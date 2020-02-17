@@ -30,8 +30,8 @@ RMDIR := rm -rf
 MKDIR := mkdir -p
 
 # extendsions and directories
-SRC_EXT 	 := c
-HEAD_EXT 	 := h
+SRC_EXT      := c
+HEAD_EXT     := h
 OBJ_EXT      := o
 
 ROOT_DIR     := .
@@ -52,6 +52,7 @@ DOXYGEN_CONFIG_FILE := $(ROOT_DIR)/cocada.doxy
 ###############################################################################
 
 SRC_PATHS      := $(shell find $(SRC_DIR) -name '*.$(SRC_EXT)')
+#SRC_PATHS      := $(wildcard find $(SRC_DIR)*.$(SRC_EXT)')
 SRCS           := $(notdir $(SRC_PATHS))
 SRC_DIRS       := $(sort $(dir $(SRC_PATHS)))
 OBJS           := $(patsubst %.$(SRC_EXT), %.$(OBJ_EXT), $(SRCS))
@@ -88,10 +89,10 @@ $(DBG_DIR):
 debugclean:
 	$(RMDIR) $(DBG_DIR)
 
-debugbuild: $(DBG_DIR) $(DBG_OBJS)
+debug: $(DBG_DIR) $(DBG_OBJS)
 	$(CC) $(DBG_cFLAGS) $(DBG_DIR)/*.$(OBJ_EXT) -lm -o $(DBG_DIR)/$(DBG_EXE) 
 
-debugrebuild: debugclean debugbuild
+debugrebuild: debugclean debug
 
 
 

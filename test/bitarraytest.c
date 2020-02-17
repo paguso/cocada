@@ -26,8 +26,9 @@
 
 #include "CuTest.h"
 
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 #include "bitarray.h"
+#include "cstringutil.h"
 #include "cocadautil.h"
 
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
@@ -35,6 +36,7 @@ static size_t ba_size;
 
 static void reset_arrays()
 {
+    //printf("reset_arrays\n");
     size_t i, j, nbytes;
     nbytes =  (size_t)ceil((double)ba_size/sizeof(byte_t));
     for (i=0; i<nbytes; i++) {
@@ -53,6 +55,7 @@ static void reset_arrays()
 
 void bitarray_test_setup(CuTest *tc) 
 {
+    //printf("bitarray_test_setup\n");
     size_t nbytes;
     ba_size = 1000;
     nbytes =  (size_t)ceil((double)ba_size/sizeof(byte_t));
@@ -71,14 +74,16 @@ void bitarray_test_setup(CuTest *tc)
 
 void bitarray_test_teardown(CuTest *tc) 
 {
+    //printf("bitarray_test_teardown\n");
     free(ba_zeros);
     free(ba_ones);
     free(ba_odd);
     free(ba_even);
 }
 
-void test_ba_new_from_str(CuTest *tc)
+void test_bitarr_new_from_str(CuTest *tc)
 {
+    //printf("test_bitarr_new_from_str\n");
     size_t max_len = 1024;
     char *str= cstr_new(max_len);
     byte_t *ba;
@@ -89,7 +94,7 @@ void test_ba_new_from_str(CuTest *tc)
         for (size_t i=0; i<len; i++) {
             dec[i] = bitarr_get_bit(ba, i)?'1':'0'; 
         }
-        //printf("str=%s\ndec=%s\n", str, dec);
+        ////printf("str=%s\ndec=%s\n", str, dec);
         CuAssertStrEquals(tc, str, dec);
         free(ba);
         free(dec);
@@ -97,37 +102,39 @@ void test_ba_new_from_str(CuTest *tc)
     free(str);
 }
 
-void test_ba_get_bit(CuTest *tc)
+void test_bitarr_get_bit(CuTest *tc)
 {
+    //printf("test_bitarr_get_bit\n");
     size_t i;
     reset_arrays();
     //byte_t bit;
     for (i=0; i<ba_size; i++) {
-        //printf("i=%zu\n",i);
-        //printf("zero\n");
+        ////printf("i=%zu\n",i);
+        ////printf("zero\n");
         CuAssertTrue(tc, !bitarr_get_bit(ba_zeros, i));
-        //printf("one\n");
+        ////printf("one\n");
         CuAssertTrue(tc, bitarr_get_bit(ba_ones, i));
         if (!(i%2)) { // i is EVEN
-            //printf("odd\n");
+            ////printf("odd\n");
             //bit = ba_get_bit(ba_odd, i);
             CuAssertTrue(tc, !bitarr_get_bit(ba_odd, i));
-            //printf("even\n");
+            ////printf("even\n");
             //bit = ba_get_bit(ba_even, i);
             CuAssertTrue(tc, bitarr_get_bit(ba_even, i));            
         } else { // i is ODD
-            //printf("odd\n");
+            ////printf("odd\n");
             //bit = ba_get_bit(ba_odd, i);
             CuAssertTrue(tc, bitarr_get_bit(ba_odd, i));
-            //printf("even\n");
+            ////printf("even\n");
             //bit = ba_get_bit(ba_even, i);
             CuAssertTrue(tc, !bitarr_get_bit(ba_even, i));            
         }
     }
 }
 
-void test_ba_set_bit(CuTest *tc)
+void test_bitarr_set_bit(CuTest *tc)
 {    
+    //printf("test_bitarr_set_bit\n");
     size_t i;
     reset_arrays();
         
@@ -160,8 +167,9 @@ void test_ba_set_bit(CuTest *tc)
 }
 
 
-void test_ba_and(CuTest *tc)
+void test_bitarr_and(CuTest *tc)
 {
+    //printf("test_bitarr_and\n");
     reset_arrays();
     size_t n = MIN(ba_size, 27);
     bitarr_and(ba_odd, ba_even, n);
@@ -175,8 +183,9 @@ void test_ba_and(CuTest *tc)
     reset_arrays();
 }
 
-void test_ba_or(CuTest *tc)
+void test_bitarr_or(CuTest *tc)
 {
+    //printf("test_bitarr_or\n");
     reset_arrays();
     size_t n = MIN(ba_size, 27);
     bitarr_or(ba_odd, ba_even, n);
@@ -190,8 +199,9 @@ void test_ba_or(CuTest *tc)
     reset_arrays();
 }
 
-void test_ba_not(CuTest *tc)
+void test_bitarr_not(CuTest *tc)
 {
+    //printf("test_bitarr_not\n");
     reset_arrays();
     size_t n = MIN(ba_size, 27);
     bitarr_not(ba_even, n);
@@ -203,6 +213,7 @@ void test_ba_not(CuTest *tc)
 
 void test_bitarr_write_char(CuTest *tc)
 {
+    //printf("test_bitarr_write_char\n");
     size_t ntests, from_bit, bitscrop, i;
     char written, read;
     ntests = 10000;
@@ -213,7 +224,7 @@ void test_bitarr_write_char(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(char)+1);
         bitarr_write_char(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_char(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(char))) {
             written &= (char)((1<<bitscrop) - 1);
             written <<= (BYTESIZE*sizeof(char)-bitscrop);
@@ -229,6 +240,7 @@ void test_bitarr_write_char(CuTest *tc)
 
 void test_bitarr_write_uchar(CuTest *tc)
 {
+    //printf("test_bitarr_write_uchar\n");
     size_t ntests, from_bit, bitscrop, i;
     unsigned char written, read;
     ntests = 10000;
@@ -242,13 +254,14 @@ void test_bitarr_write_uchar(CuTest *tc)
         if (bitscrop<(BYTESIZE*sizeof(char))) {
             written &= (char)((1<<bitscrop) - 1);
         }
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         CuAssertTrue(tc, written==read);
     }
 }
 
 void test_bitarr_write_short(CuTest *tc)
 {
+    //printf("test_bitarr_write_short\n");
     size_t ntests, from_bit, bitscrop, i;
     short written, read;
     ntests = 10000;
@@ -268,13 +281,14 @@ void test_bitarr_write_short(CuTest *tc)
                 written >>= (BYTESIZE*sizeof(short)-bitscrop);
             }
         }
-        //printf("written short = %hx cropped to %zu. read = %hx\n", written, bitscrop, read);
+        ////printf("written short = %hx cropped to %zu. read = %hx\n", written, bitscrop, read);
         CuAssertTrue(tc, written==read);
     }
 }
 
 void test_bitarr_write_ushort(CuTest *tc)
 {
+    //printf("test_bitarr_write_ushort\n");
     size_t ntests, from_bit, bitscrop, i;
     unsigned short written, read;
     ntests = 10000;
@@ -288,13 +302,14 @@ void test_bitarr_write_ushort(CuTest *tc)
         if (bitscrop<(BYTESIZE*sizeof(unsigned short))) {
             written &= (unsigned short)((1<<bitscrop) - 1);
         }
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         CuAssertTrue(tc, written==read);
     }
 }
 
 void test_bitarr_write_int(CuTest *tc)
 {
+    //printf("test_bitarr_write_int\n");
     size_t ntests, from_bit, bitscrop, i;
     int written, read;
     ntests = 10000;
@@ -320,6 +335,7 @@ void test_bitarr_write_int(CuTest *tc)
 
 void test_bitarr_write_uint(CuTest *tc)
 {
+    //printf("test_bitarr_write_uint\n");
     size_t ntests, from_bit, bitscrop, i;
     unsigned int written, read;
     ntests = 10000;
@@ -333,13 +349,14 @@ void test_bitarr_write_uint(CuTest *tc)
         if (bitscrop<(BYTESIZE*sizeof(unsigned int))) {
             written &= (unsigned int)((1<<bitscrop) - 1);
         }
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         CuAssertTrue(tc, written==read);
     }
 }
 
 void test_bitarr_write_long(CuTest *tc)
 {
+    //printf("test_bitarr_write_long\n");
     size_t ntests, from_bit, bitscrop, i;
     long written, read;
     ntests = 10000;
@@ -350,7 +367,7 @@ void test_bitarr_write_long(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(long)+1);
         bitarr_write_long(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_long(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %lx cropped to %zu. read = %lx\n", written, bitscrop, read);
+        ////printf(">>written = %lx cropped to %zu. read = %lx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(long))) {
             written &= (long)((1l<<bitscrop) - 1);
             written <<= (BYTESIZE*sizeof(long)-bitscrop);
@@ -366,6 +383,7 @@ void test_bitarr_write_long(CuTest *tc)
 
 void test_bitarr_write_ulong(CuTest *tc)
 {
+    //printf("test_bitarr_write_ulong\n");
     size_t ntests, from_bit, bitscrop, i;
     unsigned long written, read;
     ntests = 10000;
@@ -376,7 +394,7 @@ void test_bitarr_write_ulong(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(unsigned long)+1);
         bitarr_write_ulong(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_ulong(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(unsigned long))) {
             written &= (unsigned long)((1ul<<bitscrop) - 1);
         }
@@ -386,6 +404,7 @@ void test_bitarr_write_ulong(CuTest *tc)
 
 void test_bitarr_write_longlong(CuTest *tc)
 {
+    //printf("test_bitarr_write_longlong\n");
     size_t ntests, from_bit, bitscrop, i;
     long long written, read;
     ntests = 10000;
@@ -396,7 +415,7 @@ void test_bitarr_write_longlong(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(long long)+1);
         bitarr_write_longlong(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_longlong(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(long long))) {
             written &= (long long)((1ll<<bitscrop) - 1);
             written <<= (BYTESIZE*sizeof(long long)-bitscrop);
@@ -412,6 +431,7 @@ void test_bitarr_write_longlong(CuTest *tc)
 
 void test_bitarr_write_ulonglong(CuTest *tc)
 {
+    //printf("test_bitarr_write_ulonglong\n");
     size_t ntests, from_bit, bitscrop, i;
     unsigned long long written, read;
     ntests = 10000;
@@ -422,7 +442,7 @@ void test_bitarr_write_ulonglong(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(unsigned long long)+1);
         bitarr_write_ulonglong(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_ulonglong(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(unsigned long long))) {
             written &= (unsigned long long)((1ull<<bitscrop) - 1);
         }
@@ -432,6 +452,7 @@ void test_bitarr_write_ulonglong(CuTest *tc)
 
 void test_bitarr_write_size_t(CuTest *tc)
 {
+    //printf("test_bitarr_write_size_t\n");
     size_t ntests, from_bit, bitscrop, i;
     size_t written, read;
     ntests = 10000;
@@ -442,7 +463,7 @@ void test_bitarr_write_size_t(CuTest *tc)
         bitscrop = i%(BYTESIZE*sizeof(size_t)+1);
         bitarr_write_size(ba_rand, from_bit, written, bitscrop);
         read = bitarr_read_size(ba_rand, from_bit, bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         if (bitscrop<(BYTESIZE*sizeof(size_t))) {
             written &= (size_t)((1l<<bitscrop) - 1);
             written <<= (BYTESIZE*sizeof(size_t)-bitscrop);
@@ -458,6 +479,7 @@ void test_bitarr_write_size_t(CuTest *tc)
 
 void test_bitarr_write_byte_t(CuTest *tc)
 {
+    //printf("test_bitarr_write_byte_t\n");
     size_t ntests, from_bit, bitscrop, i;
     byte_t written, read;
     ntests = 10000;
@@ -470,7 +492,7 @@ void test_bitarr_write_byte_t(CuTest *tc)
         read = bitarr_read_byte(ba_rand, from_bit, bitscrop);
         written <<= (BYTESIZE*sizeof(byte_t)-bitscrop);
         written >>= (BYTESIZE*sizeof(byte_t)-bitscrop);
-        //printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
+        ////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
         CuAssertTrue(tc, written==read);
     }
 }
@@ -482,12 +504,12 @@ CuSuite *bitarray_get_test_suite()
 {
     CuSuite* suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, bitarray_test_setup);
-    SUITE_ADD_TEST(suite, test_ba_new_from_str);
-    SUITE_ADD_TEST(suite, test_ba_get_bit);
-    SUITE_ADD_TEST(suite, test_ba_set_bit);
-    SUITE_ADD_TEST(suite, test_ba_and);
-    SUITE_ADD_TEST(suite, test_ba_or);
-    SUITE_ADD_TEST(suite, test_ba_not);
+    SUITE_ADD_TEST(suite, test_bitarr_new_from_str);
+    SUITE_ADD_TEST(suite, test_bitarr_get_bit);
+    SUITE_ADD_TEST(suite, test_bitarr_set_bit);
+    SUITE_ADD_TEST(suite, test_bitarr_and);
+    SUITE_ADD_TEST(suite, test_bitarr_or);
+    SUITE_ADD_TEST(suite, test_bitarr_not);
     SUITE_ADD_TEST(suite, test_bitarr_write_char);
     SUITE_ADD_TEST(suite, test_bitarr_write_uchar);
     SUITE_ADD_TEST(suite, test_bitarr_write_short);

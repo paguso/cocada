@@ -29,8 +29,6 @@
 #include "vector.h"
 
 
-
-
 void test_vec_new(CuTest *tc)
 {
     vector *v = vec_new_with_capacity(sizeof(int), 10);
@@ -52,7 +50,7 @@ void test_vec_app(CuTest *tc)
     }
 
     for (size_t i =0; i<len; i++) {
-        short *d;
+        const short *d;
         d = vec_get(v, i);
         //printf("get da[%zu]=%d\n",i,*d);
         CuAssertIntEquals(tc, (int)i, *d);
@@ -98,12 +96,12 @@ void test_vec_set(CuTest *tc)
     }
 
     for (int i=1; i<len; i+=2) {
-        int v = -i;
-        vec_set(v, i, &v);
+        int d = -i;
+        vec_set(v, i, &d);
     }
     
     for (int i =0; i<len; i++) {
-        int *d ;
+        const int *d ;
         d = vec_get(v, i);
         //printf("get da[%zu]=%d\n",i,*d);
         CuAssertIntEquals(tc, (i%2)?-i:i, *d);
@@ -128,7 +126,7 @@ void test_vec_ins(CuTest *tc)
         vec_ins(v, i, &d);
     }
     for (size_t i =0; i<len; i++) {
-        double *d;
+        const double *d;
         d = vec_get(v, i);
         //printf("get da[%zu]=%f\n",i,*d);
         CuAssertDblEquals(tc, (double)i, *d, 0.2);
@@ -155,7 +153,7 @@ void test_vec_del(CuTest *tc)
         CuAssertDblEquals(tc, (double)2*i, d, 0.2);
     }
     for (size_t i =0; i<vec_len(v); i++) {
-        double *d;
+        const double *d;
         d = vec_get(v, i);
         //printf("get da[%zu]=%f\n",i,*d);
         CuAssertDblEquals(tc, (double)(2*i)+1.0, *d, 0.2);
@@ -178,7 +176,7 @@ void test_vec_swap(CuTest *tc)
         vec_swap(v, i, len-1-i);
     }
     for (size_t i =0; i<vec_len(v); i++) {
-        double *d;
+        const double *d;
         d = vec_get(v, i);
         //printf("get da[%zu]=%f\n",i,*d);
         CuAssertDblEquals(tc, (double)(len-1-i), *d, 0.2);

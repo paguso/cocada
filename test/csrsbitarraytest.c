@@ -27,7 +27,7 @@
 #include "CuTest.h"
 
 #include "arrayutil.h"
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 #include "bitarray.h"
 #include "cocadautil.h"
 #include "csrsbitarray.h"

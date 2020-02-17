@@ -23,7 +23,7 @@
 
 #include "bitsandbytes.h"
 //#include "cocadautil.h"
-#include "../mathutil.h"
+#include "mathutil.h"
 
 
 size_t nbytes(size_t nvalues) {

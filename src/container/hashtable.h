@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 
 /**
  * @file hashtable.h

@@ -27,6 +27,7 @@
 
 #include "arrayutil.h"
 #include "binheap.h"
+#include "randutil.h"
 
 
 
@@ -48,25 +49,16 @@ int cmp_dbl(const void *p1, const void *p2)
  */
 void test_binheap_push_pop(CuTest *tc)
 {
-    size_t j, len = 10;
+    size_t len = 10;
     binheap *minheap = binheap_new(&cmp_dbl, sizeof(double), MIN_HEAP);
     binheap *maxheap = binheap_new(&cmp_dbl, sizeof(double), MAX_HEAP);
     CuAssertSizeTEquals(tc, 0, binheap_size(minheap));
     CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
     
-    double *rv;
-    rv = NEW_ARRAY(double, len);
-    for (size_t i=0; i<len; rv[i]=(double)i++);
-    for (size_t i=len-1; i>0; i--) {
-        j = rand()%(i+1);
-        double tmp = rv[j];
-        rv[j] = rv[i];
-        rv[i] = tmp;
-    }
+    double rv[len];
+    for (size_t i=0; i<len; ++i) rv[i]=(double)i;
+    shuffle_arr(rv, len, sizeof(double));
 
-    //for (size_t i =0; i<len; i++) {
-    //    printf("rv[#%zu] = %f\n",i,rv[i]);
-    //}
     
     for (size_t i =0; i<len; i++) {
         double d = rv[i];
@@ -114,26 +106,16 @@ int cmp_int(const void *p1, const void *p2) {
 
 void test_binheap_push_pop_int(CuTest *tc)
 {
-    size_t j, len = 10;
+    size_t len = 10;
     binheap *minheap = binheap_new(&cmp_int, sizeof(int), MIN_HEAP);
     binheap *maxheap = binheap_new(&cmp_int, sizeof(int), MAX_HEAP);
     CuAssertSizeTEquals(tc, 0, binheap_size(minheap));
     CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
     
-    int *rv;
-    rv = NEW_ARRAY(int, len);
-    for (size_t i=0; i<len; rv[i]=(int)i++);
-    for (size_t i=len-1; i>0; i--) {
-        j = rand()%(i+1);
-        int tmp = rv[j];
-        rv[j] = rv[i];
-        rv[i] = tmp;
-    }
+    int rv[len];
+    for (size_t i=0; i<len; i++) rv[i]=i;
+    shuffle_arr(rv, len, sizeof(int));
 
-    //for (size_t i =0; i<len; i++) {
-    //    printf("rv[#%zu] = %d\n",i,rv[i]);
-    //}
-    
     for (size_t i =0; i<len; i++) {
         binheap_push_int(minheap, rv[i]);
         binheap_push_int(maxheap, rv[i]);

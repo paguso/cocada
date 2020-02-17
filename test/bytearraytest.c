@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 #include "bytearray.h"
 
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;

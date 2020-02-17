@@ -27,7 +27,7 @@
 #include "CuTest.h"
 
 #include "arrayutil.h"
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 #include "bitvector.h"
 #include "cocadautil.h"
 

@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "arrayutil.h"
+#include "bitsandbytes.h"
 #include "cocadautil.h"
 #include "vector.h"
 
@@ -38,6 +39,7 @@ typedef struct _vector {
     size_t len;
     size_t capacity;
     void *data;
+    void *swp;
 }
 vector;
 
@@ -56,6 +58,7 @@ vector *vec_new_with_capacity(size_t typesize, size_t init_capacity)
     ret->capacity = MAX(MIN_CAPACITY, init_capacity);
     ret->len = 0;
     ret->data = malloc(ret->capacity*ret->typesize);
+    ret->swp = malloc(typesize);
     return ret;
 }
 
@@ -82,6 +85,7 @@ void vec_free(vector *v, bool free_elements)
         }
     }
     FREE(v->data);
+    FREE(v->swp);
     FREE(v);
 }
 
@@ -141,11 +145,10 @@ void vec_set(vector *v, size_t pos, void *src)
 void vec_swap(vector *v, size_t i, size_t j)
 {
     if (i==j) return;
-    void *swp = malloc(v->typesize);
-    memcpy(swp, v->data+(i*v->typesize), v->typesize);
+    //byte_t swp[v->typesize];
+    memcpy(v->swp, v->data+(i*v->typesize), v->typesize);
     memcpy(v->data+(i*v->typesize), v->data+(j*v->typesize), v->typesize);
-    memcpy(v->data+(j*v->typesize), swp, v->typesize);
-    FREE(swp);
+    memcpy(v->data+(j*v->typesize), v->swp, v->typesize);
 }
 
 

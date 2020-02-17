@@ -5,7 +5,7 @@
 
 #include "CuTest.h"
 
-#include "core/bitsandbytes.h"
+#include "bitsandbytes.h"
 #include "mathutil.h"
 #include "xstring.h"
 
