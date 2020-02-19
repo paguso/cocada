@@ -23,10 +23,11 @@
 #include "cocadautil.h"
 #include "hashmap.h"
 #include "mathutil.h"
+#include "string.h"
 
 
-static size_t MIN_CAPACITY = 17;
-static float GROW_BY = 1.5;
+static size_t MIN_CAPACITY = 128;
+static float GROW_BY = 2;
 static float MIN_LOAD = 0.25;
 static float MAX_LOAD = 0.5;
 
@@ -40,196 +41,192 @@ hashmap_entry *hashmap_entry_new(void *key, void *val)
     return ret;
 }
 
-struct _hashmap_iterator_t {
-    hashmap *source;
+struct _hashmap_iter_t {
+    hashmap *src;
     size_t index;
 };
 
 
+typedef enum {
+    ST_EMPTY = 0x80, // 0b10000000
+    ST_DEL   = 0xFE, // 0b11111110
+    ST_SENT  = 0xFF
+} SLOT_ST;
+
+
 struct _hashmap {
-    /*
-     * The current capacity.
-     * When the number of occupied slots equals
-     * load_factor\*capacity, the table is expanded and
-     * a rehash takes place.
-     */
-    size_t capacity;
-
-    /*
-     * The (logical) size of the table, i.e. the number of
-     * stored elements.
-     */
+    size_t cap;
     size_t size;
-
-    /*
-     * The number of physically occupied slots.
-     * A slot may be logically empty but
-     * physically occupied  because of a
-     * 'soft' deletion which just marks the
-     * slot as deleted without necessarily erasing it.
-     */
-    size_t occupied;
-
-    /*
-     * The key comparator function.
-     * Any two keys which compare as equal by this function
-     * are required to have the same hash value computed
-     * by the hash function provided to this table.
-     */
-    equals_func keyequals;
-
-    /*
-     * The hash function which computes an integer 'hash value'
-     * for a given key.
-     * This function is not strictly required to be one-to-one, although
-     * this is usually a desired property.
-     * However, any two keys which compare as equal by key comparator
-     * function of this hashmap are required to give the
-     * same hash value.
-     */
-    hash_func hash;
-
-    /*
-     * The actual array of (key,val) entries.
-     */
-    hashmap_entry **entries;
+    size_t occ;
+    size_t keysize;
+    size_t valsize;
+    equals_func keyeq;
+    hash_func keyhash;
+    void   *data;
+    void   *tally;
+    void   *entries;
 };
 
 
-hashmap *hashmap_new(hash_func hfunc, equals_func eqfunc)
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
 {
-    return hashmap_new_with_capacity(hfunc, eqfunc, MIN_CAPACITY);
+   return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
 }
 
 
-hashmap *hashmap_new_with_capacity(hash_func hfunc, equals_func eqfunc,
-                                   size_t capacity)
+static void _reset_data(hashmap *hmap, size_t cap)  
+{
+    hmap->cap = cap;
+    hmap->size = 0;
+    hmap->occ = 0;
+    hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
+    hmap->tally = hmap->data;
+    memset(hmap->tally, hmap->cap,  ST_EMPTY);
+    hmap->entries = hmap->data + hmap->cap;
+}
+
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+                                   size_t min_capacity)
 {
     hashmap *ret;
     ret = NEW(hashmap);
-    ret->capacity = MAX(MIN_CAPACITY, capacity);
-    ret->occupied = 0;
-    ret->size = 0;
-    ret->hash = hfunc;
-    ret->keyequals = eqfunc;
-    ret->entries = NEW_ARRAY(hashmap_entry *, ret->capacity);
-    FILL_ARRAY(ret->entries, 0, ret->capacity, NULL);
+    ret->keysize = keysize;
+    ret->valsize = valsize;
+    ret->keyhash = keyhash;
+    ret->keyeq   = keyeq;
+    _reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
     return ret;
 }
 
-void hashmap_free(hashmap *hashmap, bool free_keys, bool free_vals)
+void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
 {
-    if (hashmap==NULL) return;
+    if (hmap==NULL) return;
     size_t i;
     if (free_keys) {
-        for (i=0; i<hashmap->capacity; i++) {
-            if (hashmap->entries[i]!=NULL) {
-                FREE(hashmap->entries[i]->key);
-            }
-        }
     }
     if (free_vals) {
-        for (i=0; i<hashmap->capacity; i++) {
-            if (hashmap->entries[i]!=NULL) {
-                FREE(hashmap->entries[i]->val);
-            }
-        }
     }
-    for (i=0; i<hashmap->capacity; i++) {
-        FREE(hashmap->entries[i]);
-    }
-    FREE(hashmap->entries);
-    FREE(hashmap);
+    FREE(hmap->data);
+    FREE(hmap);
 }
 
 
-static inline size_t _hash(hashmap *hmap, void *key)
+static inline uint64_t _hash(hashmap *hmap, void *key)
 {
+    return fib_hash(hmap->keyhash(key));
+}
+
+static inline byte_t _h2(uint64_t h) 
+{
+    return h & 0x7F;
+}
+
+static inline uint64_t _h1(uint64_t h) 
+{
+    return h >> 7;
+}
+
+static inline void * _key_at(hashmap *hmap, size_t pos) 
+{
+    return hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
+}
+
+
+static inline void * _value_at(hashmap *hmap, size_t pos) 
+{
+    return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) + hmap->keysize);
+}
+
+typedef struct {
     size_t pos;
-    pos = hmap->hash(key) % hmap->capacity;
-    while (hmap->entries[pos]!=NULL &&
-            (hmap->entries[pos]->key == NULL ||                          
-             !hmap->keyequals(key, hmap->entries[pos]->key))) { 
-        pos = ((pos + 1) % hmap->capacity);
-    }
-    return pos;
+    bool found;
+} _find_res;
+
+static _find_res _find(hashmap *hmap, void *key, uint64_t h) 
+{
+    uint64_t h1 = _h1(h);
+    uint64_t h2 = _h2(h);
+    _find_res ret = {.found=false, .pos=h1 % hmap->cap};
+    while (true) {
+        if ( ((byte_t *)hmap->tally)[ret.pos] == h2 &&
+            hmap->keyeq( key, _key_at(hmap, ret.pos) ) ) {
+            ret.found = true;
+            return ret;
+        }
+        if (((byte_t *)hmap->tally)[ret.pos] == ST_EMPTY) {
+            return ret; 
+        }
+        ret.pos = (ret.pos + 1) % hmap->cap;
+    }    
 }
 
 static void check_and_resize(hashmap *hmap)
 {
-    size_t newcapacity;
-    if ( hmap->size >= MAX_LOAD*hmap->capacity ) 
-        newcapacity = (size_t)(GROW_BY * hmap->capacity) + 1;
-    else if ( hmap->size < MIN_LOAD*hmap->capacity ) {
-        newcapacity = (size_t)(hmap->capacity / 2) ;
-        if (IS_EVEN(newcapacity)) newcapacity++;
-        newcapacity = MAX(newcapacity, MIN_CAPACITY);
-    }
-    if (newcapacity==hmap->capacity)
+    size_t new_cap;
+    if ( hmap->occ >= MAX_LOAD * hmap->cap ) 
+        new_cap = (size_t)(GROW_BY * hmap->cap);
+    //else if ( hmap->size < MIN_LOAD*hmap->cap ) {
+    //    new_cap = (size_t)(hmap->cap / GROW_BY) ;
+    //    new_cap = MAX(new_cap, MIN_CAPACITY);
+    //}
+    if (new_cap == hmap->cap)
         return; 
+    
+    size_t old_cap = hmap->cap;
+    size_t old_size = hmap->size;
+    void *old_data = hmap->data;
+    void *old_tally = old_data;
+    void *old_entries = old_data + old_cap; 
 
-    hashmap_entry **newentries = NEW_ARRAY(hashmap_entry *, newcapacity);
-    FILL_ARRAY(newentries, 0, newcapacity, NULL)
-
-    for (size_t k=0, pos; k<hmap->capacity; k++) {
-        if ( hmap->entries[k] == NULL
-             || hmap->entries[k]->key == NULL ) // null(=deleted) keys discarded
-            continue;
-        pos = hmap->hash(hmap->entries[k]->key) % newcapacity;
-        while( newentries[pos]!=NULL &&
-               !hmap->keyequals(hmap->entries[k]->key, newentries[pos]->key) ) {
-            pos = ((pos + 1) % newcapacity);
-        }
-        newentries[pos] = hmap->entries[k];
+    for (size_t i=0; i<old_cap; ++i) {
     }
 
-    FREE(hmap->entries);
-    hmap->capacity = newcapacity;
-    hmap->entries = newentries;
+    FREE(old_data);
 }
 
 
-bool hashmap_haskey(hashmap *hashmap, void *key)
+bool hashmap_haskey(hashmap *hmap, void *key)
 {
-    return (hashmap->entries[_hash(hashmap, key)] != NULL);
+    return _find(hmap, key, _hash(hmap, key)).found;
 }
 
 
-void *hashmap_get(hashmap *hashmap, void *key)
+void *hashmap_get(hashmap *hmap, void *key)
 {
-    size_t pos;
-    assert(key != NULL);
-    pos = _hash(hashmap, key);
-    return ((hashmap->entries[pos]!=NULL)?hashmap->entries[pos]->val:NULL);
-}
-
-void hashmap_set(hashmap *hashmap, void *key, void *val)
-{
-    assert(key != NULL);
-    size_t pos;
-    check_and_resize(hashmap);
-    pos = _hash(hashmap, key);
-
-    if (hashmap->entries[pos]==NULL) {
-        hashmap->entries[pos] = NEW(hashmap_entry);
-        hashmap->occupied++;
-        hashmap->size++;
+    _find_res qry = _find(hmap, key, _hash(hmap, key));
+    if (qry.found) {
+        return _value_at(hmap, qry.pos);
+    } 
+    else {
+        return NULL;
     }
-    hashmap->entries[pos]->key = key;
-    hashmap->entries[pos]->val = val;
+}
+
+void hashmap_set(hashmap *hmap, void *key, void *val)
+{
+    assert(key != NULL);
+    check_and_resize(hmap);
+    uint64_t h = _hash(hmap, key);
+    _find_res qry = _find(hmap, key, h);
+    if (!qry.found) {
+        memcpy(_key_at(hmap, qry.pos), key, hmap->keysize);
+        ((byte_t *)hmap->tally)[qry.pos] = _h2(h);
+        hmap->size++;
+        hmap->occ++;
+    } 
+    memcpy(_value_at(hmap, qry.pos), val, hmap->valsize);
 }
 
 
-void hashmap_unset(hashmap *hashmap, void *key)
+void hashmap_unset(hashmap *hmap, void *key)
 {
-    size_t pos;
     assert(key != NULL);
-    pos = _hash(hashmap, key);
-    if (hashmap->entries[pos]!=NULL) {
-        hashmap->entries[pos]->key = NULL;
-        hashmap->entries[pos]->val = NULL;
-        hashmap->size--;
-    }
+    uint64_t h = _hash(hmap, key);
+    _find_res qry = _find(hmap, key, h);
+    if (qry.found) {
+        ((byte_t *)hmap->tally)[qry.pos] = ST_DEL;
+        hmap->size--;
+    } 
 }
 
 size_t hashmap_size(hashmap *map)
@@ -238,45 +235,45 @@ size_t hashmap_size(hashmap *map)
 }
 
 
-hashmap_iterator *hashmap_iterator_new(hashmap *source)
+hashmap_iter *hashmap_iter_new(hashmap *src)
 {
-    hashmap_iterator *ret;
-    ret = NEW(hashmap_iterator);
-    ret->source = source;
+    hashmap_iter *ret;
+    ret = NEW(hashmap_iter);
+    ret->src = src;
     ret->index = 0;
-    while ((ret->index < ret->source->capacity) &&
-            (ret->source->entries[ret->index] == NULL ||
-             ret->source->entries[ret->index]->key == NULL)) {
+    while ((ret->index < ret->src->capacity) &&
+            (ret->src->entries[ret->index] == NULL ||
+             ret->src->entries[ret->index]->key == NULL)) {
         ret->index++;
     }
     return ret;
 }
 
 
-void hashmap_iterator_free(hashmap_iterator *it)
+void hashmap_iterator_free(hashmap_iter *it)
 {
     FREE(it);
 }
 
-bool hashmap_iterator_has_next(hashmap_iterator *it)
+bool hashmap_iterator_has_next(hashmap_iter *it)
 {
-    return it->index < it->source->capacity;
+    return it->index < it->src->capacity;
 }
 
-hashmap_entry *hashmap_iterator_next(hashmap_iterator *it)
+hashmap_entry *hashmap_iterator_next(hashmap_iter *it)
 {
     hashmap_entry *ret;
-    if (it->index >= it->source->capacity) {
+    if (it->index >= it->src->capacity) {
         return NULL;
     }
-    ret = hashmap_entry_new(it->source->entries[it->index]->key,
-                            it->source->entries[it->index]->val);
+    ret = hashmap_entry_new(it->src->entries[it->index]->key,
+                            it->src->entries[it->index]->val);
     do {
         it->index++;
     }
-    while ((it->index < it->source->capacity) &&
-            (it->source->entries[it->index] == NULL ||
-             it->source->entries[it->index]->key == NULL));
+    while ((it->index < it->src->capacity) &&
+            (it->src->entries[it->index] == NULL ||
+             it->src->entries[it->index]->key == NULL));
     return ret;
 }
 

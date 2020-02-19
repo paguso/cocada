@@ -37,6 +37,7 @@ CuSuite *dbgraph_get_test_suite();
 CuSuite *dynstr_get_test_suite();
 CuSuite *vec_get_test_suite();
 CuSuite *hashset_get_test_suite();
+CuSuite *hashtable_get_test_suite();
 CuSuite *huffcode_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *stack_get_test_suite();

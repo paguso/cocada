@@ -20,6 +20,8 @@
  */
 
 #include <math.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "mathutil.h"
 
@@ -79,3 +81,16 @@ double multceil(double value, double base)
         }
     }
 }
+
+
+
+#define POW2CEIL( TYPE )\
+TYPE pow2ceil_##TYPE( TYPE val ) {\
+    TYPE pow = 1;\
+    while (pow < val) pow *= 2;\
+    return pow;\
+}
+
+POW2CEIL(int)
+POW2CEIL(long)
+POW2CEIL(size_t)

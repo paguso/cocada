@@ -19,6 +19,9 @@
  *
  */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifndef MATHUTIL_H
 #define MATHUTIL_H
 
@@ -71,6 +74,14 @@ double multfloor(double value, double base);
  * multiple of "base" no smaller than "value".
  */
 double multceil(double val, double fact);
+
+
+#define POW2CEIL_DECL( TYPE )\
+TYPE pow2ceil_##TYPE( TYPE val );
+
+POW2CEIL_DECL(int)
+POW2CEIL_DECL(long)
+POW2CEIL_DECL(size_t)
 
 
 #endif

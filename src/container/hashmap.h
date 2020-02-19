@@ -24,7 +24,7 @@
 
 
 #include "cocadautil.h"
-#include "hashtable.h"
+#include "hash.h"
 
 /**
  * @file hashmap.h
@@ -51,7 +51,7 @@ typedef struct  {
 /**
  * Hashmap iterator type
  */
-typedef struct _hashmap_iterator_t hashmap_iterator;
+typedef struct _hashmap_iter_t hashmap_iter;
 
 
 /**
@@ -71,15 +71,16 @@ typedef struct _hashmap_iterator_t hashmap_iterator;
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-hashmap *hashmap_new(hash_func hfunc, equals_func keqfunc);
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func hfunc, equals_func keqfunc);
 
 
 /**
- * @brief Created a hash map with a given initial capacity.
+ * @brief Created a hash map with **at least** some initial capacity.
+ * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
-hashmap *hashmap_new_with_capacity(hash_func hfunc, equals_func eqfunc,
-                                   size_t capacity);
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+                                   size_t min_capacity);
 
 
 /**
@@ -93,7 +94,7 @@ void hashmap_free(hashmap *map, bool free_keys, bool free_vals);
 /**
  * @brief Checks whether the @p map already contains a given @p key.
  */
-bool hashmap_haskey(hashmap *map, void *key);
+bool hashmap_has_key(hashmap *map, void *key);
 
 
 /**
@@ -130,26 +131,26 @@ size_t hashmap_size(hashmap *map);
 /**
  * @brief Returns a new iterator for the given @p map.
  */
-hashmap_iterator *hashmap_iterator_new(hashmap *map);
+hashmap_iter *hashmap_iter_new(hashmap *map);
 
 
 /**
  * @brief Iterator destructor. 
  * @warning Only the iterator is disposed. The hash map is left untouched.
  */
-void hashmap_iterator_free(hashmap_iterator *it);
+void hashmap_iter_free(hashmap_iter *it);
 
 
 /**
  * @brief Indicates whether there are still entries to be iterated over.
  */
-bool hashmap_iterator_has_next(hashmap_iterator *it);
+bool hashmap_iter_has_next(hashmap_iter *it);
 
 
 /**
  * @brief Gets the next entry of the iteration.
  */
-hashmap_entry *hashmap_iterator_next(hashmap_iterator *it);
+hashmap_entry *hashmap_iter_next(hashmap_iter *it);
 
 
 #endif
