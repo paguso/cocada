@@ -20,7 +20,9 @@
 #include <stdlib.h>
 
 #include "arrayutil.h"
+#include "bitsandbytes.h"
 #include "cocadautil.h"
+#include "cstringutil.h"
 #include "hashmap.h"
 #include "mathutil.h"
 #include "string.h"
@@ -32,26 +34,8 @@ static float MIN_LOAD = 0.25;
 static float MAX_LOAD = 0.5;
 
 
-hashmap_entry *hashmap_entry_new(void *key, void *val)
-{
-    hashmap_entry *ret;
-    ret = NEW(hashmap_entry);
-    ret->key = key;
-    ret->val = val;
-    return ret;
-}
-
-struct _hashmap_iter_t {
-    hashmap *src;
-    size_t index;
-};
-
-
-typedef enum {
-    ST_EMPTY = 0x80, // 0b10000000
-    ST_DEL   = 0xFE, // 0b11111110
-    ST_SENT  = 0xFF
-} SLOT_ST;
+static byte_t  ST_EMPTY = 0x80; // 0b10000000
+static byte_t  ST_DEL   = 0xFE; // 0b11111110
 
 
 struct _hashmap {
@@ -66,50 +50,6 @@ struct _hashmap {
     void   *tally;
     void   *entries;
 };
-
-
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
-{
-   return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
-}
-
-
-static void _reset_data(hashmap *hmap, size_t cap)  
-{
-    hmap->cap = cap;
-    hmap->size = 0;
-    hmap->occ = 0;
-    hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
-    hmap->tally = hmap->data;
-    memset(hmap->tally, hmap->cap,  ST_EMPTY);
-    hmap->entries = hmap->data + hmap->cap;
-}
-
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
-                                   size_t min_capacity)
-{
-    hashmap *ret;
-    ret = NEW(hashmap);
-    ret->keysize = keysize;
-    ret->valsize = valsize;
-    ret->keyhash = keyhash;
-    ret->keyeq   = keyeq;
-    _reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
-    return ret;
-}
-
-void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
-{
-    if (hmap==NULL) return;
-    size_t i;
-    if (free_keys) {
-    }
-    if (free_vals) {
-    }
-    FREE(hmap->data);
-    FREE(hmap);
-}
-
 
 static inline uint64_t _hash(hashmap *hmap, void *key)
 {
@@ -137,55 +77,85 @@ static inline void * _value_at(hashmap *hmap, size_t pos)
     return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) + hmap->keysize);
 }
 
+
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
+{
+   return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
+}
+
+
+static void _reset_data(hashmap *hmap, size_t cap)  
+{
+    hmap->cap = cap;
+    hmap->size = 0;
+    hmap->occ = 0;
+    hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
+    hmap->tally = hmap->data;
+    memset(hmap->tally, ST_EMPTY, hmap->cap);
+    hmap->entries = hmap->data + hmap->cap;
+}
+
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+                                   size_t min_capacity)
+{
+    hashmap *ret;
+    ret = NEW(hashmap);
+    ret->keysize = keysize;
+    ret->valsize = valsize;
+    ret->keyhash = keyhash;
+    ret->keyeq   = keyeq;
+    _reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
+    return ret;
+}
+
+void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
+{
+    if (hmap==NULL) return;
+    if (free_keys || free_vals) {
+        hashmap_iter *iter = hashmap_get_iter(hmap);
+        while ( hashmap_iter_has_next(iter) ) {
+            hashmap_entry keyval = hashmap_iter_next(iter);
+            if (free_keys) FREE(((void **)keyval.key)[0]);
+            if (free_vals) FREE(((void **)keyval.val)[0]);
+        }
+        hashmap_iter_free(iter);
+    }
+    FREE(hmap->data);
+    FREE(hmap);
+}
+
+
 typedef struct {
     size_t pos;
     bool found;
 } _find_res;
 
+// Find the target position of the key in the table
+// 
 static _find_res _find(hashmap *hmap, void *key, uint64_t h) 
 {
     uint64_t h1 = _h1(h);
     uint64_t h2 = _h2(h);
     _find_res ret = {.found=false, .pos=h1 % hmap->cap};
+    //printf("starting probe at pos %zu\n", ret.pos );
     while (true) {
+        //printf("   probing pos %zu\n", ret.pos );
         if ( ((byte_t *)hmap->tally)[ret.pos] == h2 &&
             hmap->keyeq( key, _key_at(hmap, ret.pos) ) ) {
             ret.found = true;
-            return ret;
+            break;
         }
         if (((byte_t *)hmap->tally)[ret.pos] == ST_EMPTY) {
-            return ret; 
+            break;
         }
         ret.pos = (ret.pos + 1) % hmap->cap;
     }    
-}
-
-static void check_and_resize(hashmap *hmap)
-{
-    size_t new_cap;
-    if ( hmap->occ >= MAX_LOAD * hmap->cap ) 
-        new_cap = (size_t)(GROW_BY * hmap->cap);
-    //else if ( hmap->size < MIN_LOAD*hmap->cap ) {
-    //    new_cap = (size_t)(hmap->cap / GROW_BY) ;
-    //    new_cap = MAX(new_cap, MIN_CAPACITY);
-    //}
-    if (new_cap == hmap->cap)
-        return; 
-    
-    size_t old_cap = hmap->cap;
-    size_t old_size = hmap->size;
-    void *old_data = hmap->data;
-    void *old_tally = old_data;
-    void *old_entries = old_data + old_cap; 
-
-    for (size_t i=0; i<old_cap; ++i) {
-    }
-
-    FREE(old_data);
+    //printf("returning pos=%zu found=%d\n", ret.pos, (int)ret.found );
+    return ret;
 }
 
 
-bool hashmap_haskey(hashmap *hmap, void *key)
+bool hashmap_has_key(hashmap *hmap, void *key)
 {
     return _find(hmap, key, _hash(hmap, key)).found;
 }
@@ -202,10 +172,18 @@ void *hashmap_get(hashmap *hmap, void *key)
     }
 }
 
-void hashmap_set(hashmap *hmap, void *key, void *val)
+static void _print(hashmap *hmap) {
+    printf("Hashmap at %p\n", hmap);
+    char *c = cstr_new(8);
+    for (size_t i=0; i<hmap->cap; i++) {
+        byte_to_str( ((byte_t *)hmap->tally)[i], c );
+        printf("   %zu) %s\n", i, c);
+    }
+    FREE(c);
+}
+
+static inline void _set(hashmap *hmap, void *key, void *val)
 {
-    assert(key != NULL);
-    check_and_resize(hmap);
     uint64_t h = _hash(hmap, key);
     _find_res qry = _find(hmap, key, h);
     if (!qry.found) {
@@ -215,6 +193,59 @@ void hashmap_set(hashmap *hmap, void *key, void *val)
         hmap->occ++;
     } 
     memcpy(_value_at(hmap, qry.pos), val, hmap->valsize);
+    //char *c = cstr_new(8);
+    //byte_to_str(_h2(h), c);
+    //printf("adding h2 key %s to position %zu\n",c, qry.pos);
+    //FREE(c);
+    //_print(hmap);
+}
+
+
+static void check_and_resize(hashmap *hmap)
+{
+    size_t new_cap = hmap->cap;
+    if ( hmap->occ >= MAX_LOAD * hmap->cap ) 
+        new_cap = (size_t)(GROW_BY * hmap->cap);
+    //else if ( hmap->size < MIN_LOAD*hmap->cap ) {
+    //    new_cap = (size_t)(hmap->cap / GROW_BY) ;
+    //    new_cap = MAX(new_cap, MIN_CAPACITY);
+    //}
+    if (new_cap == hmap->cap)
+        return; 
+    
+    size_t old_cap = hmap->cap;
+    size_t old_size = hmap->size;
+    void *old_data = hmap->data;
+    void *old_tally = old_data;
+    void *old_entries = old_data + old_cap; 
+
+    _reset_data(hmap, new_cap);
+    //_print(hmap);
+
+    size_t rehash_attempts = 0;
+    for (size_t i=0; i<old_cap; ++i) {
+        if (! (((byte_t *)old_tally)[i] >> 7) ) { 
+            rehash_attempts += 1;
+            //printf("rehashing element at pos %zu\n",i);
+            _set( hmap, 
+                  old_entries + ( i * ( hmap->keysize + hmap->valsize ) ), 
+                  old_entries + ( i * ( hmap->keysize + hmap->valsize ) ) + hmap->keysize ); 
+            //_print(hmap);
+            if (rehash_attempts!=hmap->size) {
+                printf("failed to rehash pos %zu\n",i );
+            }
+        }
+    }
+    assert(old_size == hmap->size);
+    FREE(old_data);
+}
+
+
+void hashmap_set(hashmap *hmap, void *key, void *val)
+{
+    assert(key != NULL);
+    check_and_resize(hmap);
+    _set(hmap, key, val);
 }
 
 
@@ -235,45 +266,50 @@ size_t hashmap_size(hashmap *map)
 }
 
 
-hashmap_iter *hashmap_iter_new(hashmap *src)
+struct _hashmap_iter {
+    hashmap *src;
+    size_t index;
+};
+
+
+void _hashmap_iter_goto_next(hashmap_iter *iter) {
+    while ((iter->index < iter->src->cap) &&
+           (((byte_t *)iter->src->tally)[iter->index] >> 7))
+        iter->index++;
+}
+
+
+hashmap_iter *hashmap_get_iter(hashmap *src)
 {
     hashmap_iter *ret;
     ret = NEW(hashmap_iter);
     ret->src = src;
     ret->index = 0;
-    while ((ret->index < ret->src->capacity) &&
-            (ret->src->entries[ret->index] == NULL ||
-             ret->src->entries[ret->index]->key == NULL)) {
-        ret->index++;
-    }
+    _hashmap_iter_goto_next(ret);
     return ret;
 }
 
 
-void hashmap_iterator_free(hashmap_iter *it)
+void hashmap_iter_free(hashmap_iter *iter)
 {
-    FREE(it);
+    FREE(iter);
 }
 
-bool hashmap_iterator_has_next(hashmap_iter *it)
+bool hashmap_iter_has_next(hashmap_iter *iter)
 {
-    return it->index < it->src->capacity;
+    return (iter->index < iter->src->cap);
 }
 
-hashmap_entry *hashmap_iterator_next(hashmap_iter *it)
+hashmap_entry hashmap_iter_next(hashmap_iter *iter)
 {
-    hashmap_entry *ret;
-    if (it->index >= it->src->capacity) {
-        return NULL;
+    hashmap_entry ret = {NULL, NULL};
+    if (iter->index >= iter->src->cap ) {
+        return ret;
     }
-    ret = hashmap_entry_new(it->src->entries[it->index]->key,
-                            it->src->entries[it->index]->val);
-    do {
-        it->index++;
-    }
-    while ((it->index < it->src->capacity) &&
-            (it->src->entries[it->index] == NULL ||
-             it->src->entries[it->index]->key == NULL));
+    ret.key = _key_at(iter->src, iter->index);
+    ret.val = _value_at(iter->src, iter->index);
+    iter->index++;
+    _hashmap_iter_goto_next(iter);
     return ret;
 }
 

@@ -51,7 +51,7 @@ typedef struct  {
 /**
  * Hashmap iterator type
  */
-typedef struct _hashmap_iter_t hashmap_iter;
+typedef struct _hashmap_iter hashmap_iter;
 
 
 /**
@@ -71,7 +71,7 @@ typedef struct _hashmap_iter_t hashmap_iter;
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func hfunc, equals_func keqfunc);
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq);
 
 
 /**
@@ -88,13 +88,13 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
  * @param free_keys Indicates whether the key objects are to be freed.
  * @param free_vals Indicates whether the value objects are to be freed.
  */
-void hashmap_free(hashmap *map, bool free_keys, bool free_vals);
+void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 
 /**
  * @brief Checks whether the @p map already contains a given @p key.
  */
-bool hashmap_has_key(hashmap *map, void *key);
+bool hashmap_has_key(hashmap *hmap, void *key);
 
 
 /**
@@ -102,7 +102,7 @@ bool hashmap_has_key(hashmap *map, void *key);
  * 
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-void *hashmap_get(hashmap *map, void *key);
+void *hashmap_get(hashmap *hmap, void *key);
 
 
 /**
@@ -111,7 +111,7 @@ void *hashmap_get(hashmap *map, void *key);
  * @warning If the map already contains the provided @p key, the current value
  * gets overwitten.
  */
-void hashmap_set(hashmap *map, void *key, void *val);
+void hashmap_set(hashmap *hmap, void *key, void *val);
 
 
 /**
@@ -119,38 +119,38 @@ void hashmap_set(hashmap *map, void *key, void *val);
  * 
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-void hashmap_unset(hashmap *map, void *key);
+void hashmap_unset(hashmap *hmap, void *key);
 
 
 /**
  * @brief Returns the number of elements currently stored.
  */
-size_t hashmap_size(hashmap *map);
+size_t hashmap_size(hashmap *hmap);
 
 
 /**
  * @brief Returns a new iterator for the given @p map.
  */
-hashmap_iter *hashmap_iter_new(hashmap *map);
+hashmap_iter *hashmap_get_iter(hashmap *hmap);
 
 
 /**
  * @brief Iterator destructor. 
  * @warning Only the iterator is disposed. The hash map is left untouched.
  */
-void hashmap_iter_free(hashmap_iter *it);
+void hashmap_iter_free(hashmap_iter *iter);
 
 
 /**
  * @brief Indicates whether there are still entries to be iterated over.
  */
-bool hashmap_iter_has_next(hashmap_iter *it);
+bool hashmap_iter_has_next(hashmap_iter *iter);
 
 
 /**
  * @brief Gets the next entry of the iteration.
  */
-hashmap_entry *hashmap_iter_next(hashmap_iter *it);
+hashmap_entry hashmap_iter_next(hashmap_iter *iter);
 
 
 #endif

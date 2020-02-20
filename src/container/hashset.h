@@ -23,6 +23,7 @@
 #define HASHSET_H
 
 #include "cocadautil.h"
+#include "hash.h"
 #include "hashmap.h"
 
 
@@ -30,24 +31,22 @@
  * @file hashset.h
  * @author Paulo Fonseca
  * 
- * @brief Unordered, hashtable-based set - Hashset - ADT.
+ * @brief Unordered, hashmap-based set - Hashset - ADT.
  */
 
-/**
- * Hashset type
- */
-typedef hashtable hashset;
+typedef hashmap hashset;
+
+
+typedef struct _hashset_iter hashset_iter;
 
 
 /**
  * @brief Constructor.
  * 
- * @param hfunc Hash function pointer.
+ * @param hashfunc Hash function pointer.
  * @param eqfunc Equality comparator function pointer.
  */
-hashset *hashset_new( size_t typesize,
-                      size_t (*hash_fn)(const void *), 
-                      bool (*equals_fn)(const void *, const void *));
+hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc ); 
 
 
 /**
@@ -84,35 +83,31 @@ void hashset_remove(hashset *set, void *elt);
 
 
 
-/**
- * Hashset iterator type
- */
-typedef hashtable_iterator hashset_iterator;
-
 
 /**
  * @brief Returns a new iterator for the @p set.
  */
-hashset_iterator *hashset_get_iterator(hashset *set);
+hashset_iter *hashset_get_iter(hashset *set);
 
 
 /**
  * @brief Iterator destructor.
  * @warning Only the iterator is destroyed. The set is left unmodified.
  */
-void hashset_iterator_free(hashset_iterator *it);
+void hashset_iter_free(hashset_iter *iter);
 
 
 /**
  * @brief Indicates whether there are still entries to be iterated over.
  */
-bool hashset_iterator_has_next(hashset_iterator *it);
+bool hashset_iter_has_next(hashset_iter *iter);
 
 
 /**
  * @brief Gets the next element of the iteration.
  */
-void *hashset_iterator_next(hashset_iterator *it);
+void *hashset_iter_next(hashset_iter *iter);
+
 
 
 #endif

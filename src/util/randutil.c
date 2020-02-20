@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "bitsandbytes.h"
 #include "randutil.h"

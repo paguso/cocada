@@ -28,10 +28,6 @@
 #include "cocadautil.h"
 #include "cstringutil.h"
 
-struct _cstrfreader {
-    FILE *src;
-};
-
 
 char *cstr_new(size_t len)
 {
@@ -103,19 +99,19 @@ void uint_to_cstr(char *dest, uintmax_t val, char base)
     switch (base) {
     case 'h':
         b = 16;
-        l = (size_t)ceil(log2(val)/4.0);
+        l = (size_t)ceil(log2(val+1)/4.0);
         break;
     case 'o':
         b = 8;
-        l = (size_t)ceil(log2(val)/3.0);
+        l = (size_t)ceil(log2(val+1)/3.0);
         break;
     case 'b':
         b = 2;
-        l = (size_t)ceil(log2(val));
+        l = (size_t)ceil(log2(val+1));
         break;
     default:
         b = 10;
-        l = (size_t)ceil(log10(val));
+        l = (size_t)ceil(log10(val+1));
         break;
     }
     memset(dest, '0', l);

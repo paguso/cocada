@@ -1,7 +1,8 @@
-#ifndef HASH_H
-#define HASH_H
+#ifndef _HASH_H_
+#define _HASH_H_
 
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "bitsandbytes.h"
@@ -26,24 +27,18 @@ typedef bool (*equals_func)(const void *, const void *);
 
 
 
-uint64_t fib_hash(uint64_t key)
-{
-    return (key * 11400714819323198485llu);
-}
+#define IDENT_HASH_DECL( TYPE ) \
+uint64_t ident_hash_##TYPE(const void *key);
 
-uint64_t fnv_hash(byte_t key[], size_t keylen)
-{
-    const uint64_t p = 16777619;
-    uint64_t hash = 2166136261;
-    for (size_t i=0; i<keylen; ++i)
-        hash = (hash ^ key[i]) * p;
-    hash += hash << 13;
-    hash ^= hash >> 7;
-    hash += hash << 3;
-    hash ^= hash >> 17;
-    hash += hash << 5;
-    return hash;
-}
+IDENT_HASH_DECL(uint16_t)
+IDENT_HASH_DECL(uint32_t)
+IDENT_HASH_DECL(uint64_t)
+IDENT_HASH_DECL(size_t)
+
+
+uint64_t fib_hash(uint64_t key);
+
+uint64_t fnv_hash(byte_t key[], size_t keylen);
 
 
 

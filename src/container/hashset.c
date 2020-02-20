@@ -19,71 +19,75 @@
  *
  */
 
+
 #include "cocadautil.h"
+#include "hash.h"
+#include "hashmap.h"
 #include "hashset.h"
-#include "hashtable.h"
 
 
-
-struct _hashset_iterator {
-    hashmap_iterator *hmap_it;
+struct _hashset_iter {
+    hashmap_iter *inner;
 };
 
-hashset *hashset_new( size_t typesize, size_t (*hash_fn)(const void *), 
-                      bool (*equals_fn)(const void *, const void *))
+
+hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
 {
-    return hashtable_new(typesize, hash_fn, equals_fn);
+    hashset *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
+    return ret;
 }
 
 
 void hashset_free(hashset *set, bool free_elements)
 {
-    hashtable_free(set, free_elements);
+    hashmap_free(set, free_elements, false);
 }
 
 
 size_t hashset_size(hashset *set)
 {
-    return hashtable_size(set);
+    return hashmap_size(set);
 }
 
 
 bool hashset_contains(hashset *set, void *elt)
 {
-    return hashtable_contains(set, elt);
+    return hashmap_has_key(set, elt);
 }
 
+static int NOTHING = 0;
 
 void hashset_add(hashset *set, void *elt)
 {
-    if (hashset_contains(set, elt)) return; // no duplicates allowed
-    hashtable_add(set, elt);
+    hashmap_set(set, elt, (void *)&NOTHING);
 }
 
 
 void hashset_remove(hashset *set, void *elt)
 {
-    hashtable_del(set, elt, NULL);
+    hashmap_unset(set, elt);
 }
 
 
-hashset_iterator *hashset_get_iterator(hashset *set)
+hashset_iter *hashset_get_iter(hashset *set)
 {
-    return hashtable_get_iterator(set);
+    hashset_iter *ret = NEW(hashset_iter);
+    ret->inner = hashmap_get_iter(set);
+    return ret;
 }
 
-void hashset_iterator_free(hashset_iterator *it)
+void hashset_iter_free(hashset_iter *iter)
 {
-    hashtable_iterator_free(it);
+    hashmap_iter_free(iter->inner);
+    FREE(iter);
 }
 
-bool hashset_iterator_has_next(hashset_iterator *it)
+bool hashset_iter_has_next(hashset_iter *iter)
 {
-    return ht_iterator_has_next(it);
+    return hashmap_iter_has_next(iter->inner);
 }
 
-void *hashset_iterator_next(hashset_iterator *it)
+void *hashset_iter_next(hashset_iter *iter)
 {
-    return ht_iterator_next(it);
+    return hashmap_iter_next(iter->inner).val;
 }
-
