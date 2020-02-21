@@ -38,8 +38,11 @@ IDENT_HASH_DECL(size_t)
 
 uint64_t fib_hash(uint64_t key);
 
-uint64_t fnv_hash(byte_t key[], size_t keylen);
-
+/**
+ * Simplified 64-bit FNV hashing
+ * source: http://www.isthe.com/chongo/tech/comp/fnv
+ */
+uint64_t fnv1a_64bit_hash(void *obj, size_t objsize);
 
 
 #endif

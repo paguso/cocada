@@ -68,6 +68,32 @@ void hashset_remove(hashset *set, void *elt)
     hashmap_unset(set, elt);
 }
 
+#define HASHSET_CONTAINS_IMPL( TYPE ) \
+   bool hashset_contains_##TYPE(hashset *set, TYPE elt ) {\
+       return hashset_contains(set, &elt);\
+   }
+
+
+#define HASHSET_ADD_IMPL( TYPE ) \
+   void hashset_add_##TYPE(hashset *set, TYPE elt ) {\
+       hashset_add(set, &elt);\
+   }
+
+
+#define HASHSET_REMOVE_IMPL( TYPE ) \
+   void hashset_remove_##TYPE(hashset *set, TYPE elt ) {\
+       hashset_remove(set, &elt);\
+   }
+
+
+#define HASHSET_IMPL_ALL( TYPE )\
+HASHSET_CONTAINS_IMPL(TYPE)\
+HASHSET_ADD_IMPL(TYPE)\
+HASHSET_REMOVE_IMPL(TYPE)
+
+HASHSET_IMPL_ALL(int)
+HASHSET_IMPL_ALL(size_t)
+HASHSET_IMPL_ALL(byte_t)
 
 hashset_iter *hashset_get_iter(hashset *set)
 {
@@ -89,5 +115,5 @@ bool hashset_iter_has_next(hashset_iter *iter)
 
 void *hashset_iter_next(hashset_iter *iter)
 {
-    return hashmap_iter_next(iter->inner).val;
+    return hashmap_iter_next(iter->inner).key;
 }

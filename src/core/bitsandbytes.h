@@ -328,4 +328,10 @@ size_t byte_select1(byte_t b, size_t rank);
  */
 size_t byte_select(byte_t b, size_t rank, bool bit);
 
+
+int uint32_hibit(uint32_t v);
+
+
+int uint32_lobit(uint32_t v);
+
 #endif

@@ -21,12 +21,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "CuTest.h"
 
 #include "arrayutil.h"
 #include "hashset.h"
 
+typedef uint32_t uint;
 
 static size_t _key_fn(const void *elt) 
 {
@@ -97,8 +99,8 @@ void test_hashset_indel(CuTest *tc)
         hashset_add(set, &elt);
         CuAssertTrue(tc, hashset_contains(set, &elt));
     }
-
     CuAssertSizeTEquals(tc, n, hashset_size(set));
+    
     elts = NEW_ARRAY(uint, n);
     iterator = hashset_get_iter(set);
     for( size_t i=0; hashset_iter_has_next(iterator); i++) {
@@ -113,7 +115,7 @@ void test_hashset_indel(CuTest *tc)
     }
 
     hashset_iter_free(iterator);
-    hashset_free(set, true);
+    hashset_free(set, false);
     free(elts);
 }
 

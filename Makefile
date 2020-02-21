@@ -71,7 +71,7 @@ VPATH          =  $(SRC_DIRS) $(TEST_DIR)
 ###############################################################################
 
 DBG_EXE := cocada
-DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS))
+DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -msse2 
 
 DBG_DIR := $(BUILD_DIR)/debug
 
@@ -90,7 +90,7 @@ debugclean:
 	$(RMDIR) $(DBG_DIR)
 
 debug: $(DBG_DIR) $(DBG_OBJS)
-	$(CC) $(DBG_cFLAGS) $(DBG_DIR)/*.$(OBJ_EXT) -lm -o $(DBG_DIR)/$(DBG_EXE) 
+	$(CC) $(DBG_CFLAGS) $(DBG_DIR)/*.$(OBJ_EXT) -lm -o $(DBG_DIR)/$(DBG_EXE) 
 
 debugrebuild: debugclean debug
 
