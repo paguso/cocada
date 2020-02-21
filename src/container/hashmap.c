@@ -332,7 +332,6 @@ hashmap_iter *hashmap_get_iter(hashmap *src)
     ret->src = src;
     ret->index = 0;
     _hashmap_iter_goto_next(ret);
-    _print(src);
     return ret;
 }
 
