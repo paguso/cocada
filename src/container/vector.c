@@ -21,12 +21,14 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "arrayutil.h"
 #include "bitsandbytes.h"
 #include "cocadautil.h"
+#include "randutil.h"
 #include "vector.h"
 
 
@@ -201,6 +203,51 @@ void vec_del(vector *v, size_t pos, void *dest)
     v->len--;
     check_and_resize(v);
 }
+
+
+
+static size_t _part(vector *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+{
+    size_t p = rand_range_size_t(l, r);
+    vec_swap(v, l, p);
+    size_t i = l;
+    size_t j = r-1;
+    void *pv = v->data + (l * v->typesize);
+    void *pi = v->data + (i * v->typesize);
+    void *pj = v->data + (j * v->typesize);
+    while ( i < j ) {
+        while ( i < r && cmp_func(pi, pv) <= 0 ) {
+            i++;
+            pi += (v->typesize);
+        }
+        while ( cmp_func(pj, pv) > 0 ) {
+            j--;
+            pj -= (v->typesize);
+        }
+        if ( i < j ) {
+            vec_swap(v, i, j);
+        }
+    }
+    vec_swap(v, l, j);
+    return j;
+}
+
+
+static void _qsort(vector *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+{
+    if (l < r) {
+        size_t p = _part(v, l, r, cmp_func);
+        _qsort(v, l, p, cmp_func);
+        _qsort(v, p+1, r, cmp_func);
+    }
+}
+
+
+void vec_qsort(vector *v, int (* cmp_func)(const void *, const void *))
+{
+    _qsort(v, 0, vec_len(v), cmp_func);
+}
+
 
 
 void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),

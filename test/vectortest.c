@@ -26,6 +26,7 @@
 #include "CuTest.h"
 
 #include "arrayutil.h"
+#include "randutil.h"
 #include "vector.h"
 
 
@@ -223,14 +224,16 @@ void test_vec_radixsort(CuTest *tc)
             }
         }
     }
+    
     /*
     printf("Before sort:\n");
-    for (size_t i=0; i<vec_len(da); i++)
+    for (size_t i=0; i<vec_len(v); i++)
     {
-        triple *t = (triple *)vec_get(da, i);
-        printf("da[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
+        triple *t = (triple *)vec_get(v, i);
+        printf("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
     }
-    */ 
+    */
+
     vec_radixsort(v, &triple_key, 3, max_key);
     /*
     printf("After sort:\n");
@@ -238,6 +241,50 @@ void test_vec_radixsort(CuTest *tc)
     {
         triple *t = (triple *)vec_get(da, i);
         printf("da[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
+    }
+    */
+    for (size_t i=0; i<vec_len(v)-1; i++)
+    {
+        triple *p = (triple *)vec_get(v, i);
+        triple *q = (triple *)vec_get(v, i+1);
+        CuAssertIntEquals(tc, -1, triple_cmp(p, q));
+    }
+}
+
+
+void test_vec_qsort(CuTest *tc)
+{
+    size_t max_key = 10000;
+    triple *arr = NEW_ARRAY(triple, max_key);
+    for (size_t i=0; i<max_key; i++) {
+                triple t;
+                t.values[0] = i;
+                t.values[1] = i;
+                t.values[2] = i;
+                arr[i] = t;
+    }
+    shuffle_arr(arr, max_key, sizeof(triple));
+    vector *v = vec_new(sizeof(triple));
+    for (size_t i=0; i<max_key; i++){
+        vec_app(v, &arr[i]); 
+    }
+    FREE(arr);
+
+    /*
+    printf("Before sort:\n");
+    for (size_t i=0; i<vec_len(v); i++)
+    {
+        triple *t = (triple *)vec_get(v, i);
+        printf("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
+    }
+    */
+    vec_qsort(v, triple_cmp);
+    /*
+    printf("After sort:\n");
+    for (size_t i=0; i<vec_len(v); i++)
+    {
+        triple *t = (triple *)vec_get(v, i);
+        printf("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
     }
     */
     for (size_t i=0; i<vec_len(v)-1; i++)
@@ -260,5 +307,6 @@ CuSuite *vec_get_test_suite()
     SUITE_ADD_TEST(suite, test_vec_del);
     SUITE_ADD_TEST(suite, test_vec_swap);
     SUITE_ADD_TEST(suite, test_vec_radixsort);
+    SUITE_ADD_TEST(suite, test_vec_qsort);
     return suite;
 }

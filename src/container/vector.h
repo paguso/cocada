@@ -56,25 +56,25 @@ vector *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  *        To be used whenever the array stores pointers to dynamically allocated
  *        memory.
  */
-void vec_free(vector *da, bool free_elements);
+void vec_free(vector *v, bool free_elements);
 
 
 /**
  * @brief Returns the # of elements logically stored.
  */
-size_t vec_len(vector *da);
+size_t vec_len(vector *v);
 
 
 /**
  * @brief Returns the individual size of stored elements (in bytes). 
  */
-size_t vec_typesize(vector *da);
+size_t vec_typesize(vector *v);
 
 
 /**
  * @brief Removes all elements.
  */
-void vec_clear(vector *da);
+void vec_clear(vector *v);
 
 
 /**
@@ -83,54 +83,58 @@ void vec_clear(vector *da);
  * @see vec_trim
  * @warning After this operation, the dynamic array @p da is destroyed.
  */
-void *vec_detach(vector *da);
+void *vec_detach(vector *v);
 
 
 /**
  * @brief Returns (the internal reference to) the element at position @p pos.
  * @warn  Do not modify data ate thsi postni
  */
-const void *vec_get(vector *da, size_t pos);
+const void *vec_get(vector *v, size_t pos);
 
 
 /**
  * @brief Copies the element at position @p pos into the location 
  *        pointed to by @p dest 
  */
-void  vec_get_cpy(vector *da, size_t pos, void *dest);
+void  vec_get_cpy(vector *v, size_t pos, void *dest);
 
 
 /**
  * @brief Sets (overwrites) the element at position @p pos to a copy
  *        of the value pointed to by @p src.
  */
-void  vec_set(vector *da, size_t pos, void *src);
+void  vec_set(vector *v, size_t pos, void *src);
 
 
 /**
  * @brief Swaps elements at positions @p i and @p j
  */
-void vec_swap(vector *da, size_t i, size_t j);
+void vec_swap(vector *v, size_t i, size_t j);
 
 
 /**
  * @brief Appends a copy of the value pointed to by @p src.
  * The number of copied bytes is given by the array typesize.
  */
-void vec_app(vector *da, void *src);
+void vec_app(vector *v, void *src);
 
 
 /**
  * @brief Inserts a copy of the element pointed to by @p src 
  *        at position @p pos.
  */
-void vec_ins(vector *da, size_t pos, void *src);
+void vec_ins(vector *v, size_t pos, void *src);
 
 
 /**
  * @brief Removes and returns new the element at position @p pos.
  */
-void vec_del(vector *da, size_t pos, void *dest);
+void vec_del(vector *v, size_t pos, void *dest);
+
+
+
+void vec_qsort(vector *v, int (* cmp_func)(const void *, const void *));
 
 
 /**
@@ -145,34 +149,34 @@ void vec_del(vector *da, size_t pos, void *dest);
  * K[key_size-1] the most significant. That is the elements end up sorted by
  * K[key_size-1], then K[key_size-2], and so forth, downto K[0].
  *
- * @param da The array to sort
+ * @param v The vector to sort
  * @param key_fn A pointer to a function that computes K[j] from a given element
  * @param key_size The size of the key vector
  * @param max_key The noninclusive maximum value for each key position
  */
-void vec_radixsort(vector *da, size_t (*key_fn)(const void *, size_t),
+void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
                     size_t key_size, size_t max_key);
 
 
 
 #define VEC_GET_DECL( TYPE ) \
-   TYPE vec_get_##TYPE(vector *da, size_t pos);
+   TYPE vec_get_##TYPE(vector *v, size_t pos);
 
 
 #define VEC_SET_DECL( TYPE ) \
-   void vec_set_##TYPE(vector *da, size_t pos, TYPE val);
+   void vec_set_##TYPE(vector *v, size_t pos, TYPE val);
 
 
 #define VEC_APP_DECL( TYPE ) \
-   void vec_app_##TYPE(vector *da, TYPE val);
+   void vec_app_##TYPE(vector *v, TYPE val);
 
 
 #define VEC_INS_DECL( TYPE ) \
-   void vec_ins_##TYPE(vector *da, size_t pos, TYPE val);
+   void vec_ins_##TYPE(vector *v, size_t pos, TYPE val);
 
 
 #define VEC_DEL_DECL( TYPE ) \
-   TYPE vec_del_##TYPE(vector *da, size_t pos); 
+   TYPE vec_del_##TYPE(vector *v, size_t pos); 
 
 
 #define VEC_ALL_DECL( TYPE )\

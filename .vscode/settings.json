@@ -4,6 +4,9 @@
         "string": "c",
         "string_view": "c",
         "randutil.h": "c",
-        "arrayutil.h": "c"
+        "arrayutil.h": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "vector": "c"
     }
 }
