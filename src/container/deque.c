@@ -152,9 +152,14 @@ void deque_pop_front(deque *q, void *dest)
 }
 
 
+#define DEQUE_NEW_IMPL( TYPE )\
+    deque *deque_new_##TYPE() {\
+        return deque_new(sizeof(TYPE));\
+    }
+
 #define DEQUE_PUSH_BACK_IMPL( TYPE )\
     void deque_push_back_##TYPE(deque *q, TYPE val) {\
-        deque_push_back(q, &val);\ 
+        deque_push_back(q, &val);\
     }
 
 #define DEQUE_PUSH_FRONT_IMPL( TYPE )\
@@ -177,10 +182,11 @@ void deque_pop_front(deque *q, void *dest)
     }    
 
 #define DEQUE_ALL_IMPL( TYPE ) \
+DEQUE_NEW_IMPL(TYPE)\
 DEQUE_PUSH_BACK_IMPL(TYPE) \
-DEQUE_POP_BACK_IMPL(TYPE)\
 DEQUE_PUSH_FRONT_IMPL(TYPE)\
+DEQUE_POP_BACK_IMPL(TYPE)\
 DEQUE_POP_FRONT_IMPL(TYPE)
 
-DEQUE_ALL_DECL(int)
-DEQUE_ALL_DECL(size_t)
+DEQUE_ALL_IMPL(int)
+DEQUE_ALL_IMPL(size_t)

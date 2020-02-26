@@ -158,6 +158,8 @@ void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
                     size_t key_size, size_t max_key);
 
 
+#define VEC_NEW_DECL( TYPE ) \
+   TYPE vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
    TYPE vec_get_##TYPE(vector *v, size_t pos);
@@ -180,6 +182,7 @@ void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_ALL_DECL( TYPE )\
+VEC_NEW_DECL(TYPE)\
 VEC_GET_DECL(TYPE)\
 VEC_SET_DECL(TYPE)\
 VEC_APP_DECL(TYPE)\

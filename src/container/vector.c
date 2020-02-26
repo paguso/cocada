@@ -277,40 +277,45 @@ void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
 }
 
 
-#define VEC_GET( TYPE ) \
+#define VEC_NEW_IMPL( TYPE ) \
+   vector *vec_new_##TYPE()\
+    { return vec_new(sizeof(TYPE)); } 
+
+
+#define VEC_GET_IMPL( TYPE ) \
    TYPE vec_get_##TYPE(vector *v, size_t pos)\
     { return *((TYPE *)vec_get(v, pos)); } 
 
 
-#define VEC_SET( TYPE ) \
+#define VEC_SET_IMPL( TYPE ) \
    void vec_set_##TYPE(vector *v, size_t pos, TYPE val)\
     { vec_set(v, pos, &val); } 
 
 
-#define VEC_APP( TYPE ) \
+#define VEC_APP_IMPL( TYPE ) \
    void vec_app_##TYPE(vector *v, TYPE val)\
     { vec_app(v, &val); } 
 
 
-#define VEC_INS( TYPE ) \
+#define VEC_INS_IMPL( TYPE ) \
    void vec_ins_##TYPE(vector *v, size_t pos, TYPE val)\
     { vec_ins(v, pos, &val); } 
 
 
-#define VEC_DEL( TYPE ) \
+#define VEC_DEL_IMPL( TYPE ) \
    TYPE vec_del_##TYPE(vector *v, size_t pos)\
     {  TYPE r; vec_del(v, pos, &r); return r; } 
 
 
-#define VEC_OPS( TYPE )\
-VEC_GET(TYPE)\
-VEC_SET(TYPE)\
-VEC_APP(TYPE)\
-VEC_INS(TYPE)\
-VEC_DEL(TYPE)
+#define VEC_ALL_IMPL( TYPE )\
+VEC_GET_IMPL(TYPE)\
+VEC_SET_IMPL(TYPE)\
+VEC_APP_IMPL(TYPE)\
+VEC_INS_IMPL(TYPE)\
+VEC_DEL_IMPL(TYPE)
 
 
-VEC_OPS(int)
-VEC_OPS(size_t)
-VEC_OPS(byte_t)
+VEC_ALL_IMPL(int)
+VEC_ALL_IMPL(size_t)
+VEC_ALL_IMPL(byte_t)
 

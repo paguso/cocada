@@ -77,24 +77,27 @@ void deque_push_front(deque *q, void *elt);
  */
 void deque_pop_front(deque *q, void *dest);
 
+#define DEQUE_NEW_DECL( TYPE )\
+    deque *deque_new_##TYPE();
 
 #define DEQUE_PUSH_BACK_DECL( TYPE )\
     void deque_push_back_##TYPE(deque *q, TYPE val);
 
 
-#define DEQUE_POP_BACK_DECL( TYPE ) \
+#define DEQUE_POP_BACK_DECL( TYPE )\
     TYPE deque_pop_back_##TYPE(deque *q);    
 
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
     void deque_push_front_##TYPE(deque *q, TYPE val);
 
-#define DEQUE_POP_FRONT_DECL( TYPE ) \
+#define DEQUE_POP_FRONT_DECL( TYPE )\
     TYPE deque_pop_front_##TYPE(deque *q);    
 
 
 #define DEQUE_ALL_DECL( TYPE )\
-DEQUE_PUSH_BACK_DECL(TYPE) \
+DEQUE_NEW_DECL(TYPE)\
+DEQUE_PUSH_BACK_DECL(TYPE)\
 DEQUE_POP_BACK_DECL(TYPE)\
 DEQUE_PUSH_FRONT_DECL(TYPE)\
 DEQUE_POP_FRONT_DECL(TYPE)
