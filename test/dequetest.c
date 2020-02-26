@@ -93,6 +93,7 @@ void test_deque_push_pop_int(CuTest *tc)
     for (int i=0; i<n; i++) {
         deque_push_back_int(q, i); 
     }
+    // 0 1 2 ... n-1
     CuAssertSizeTEquals(tc, n, deque_len(q));       
 
     int o;
@@ -101,14 +102,20 @@ void test_deque_push_pop_int(CuTest *tc)
         CuAssertIntEquals(tc, i, o);
         deque_push_back_int(q, o);
     }
+    // n/2 n/2+1 ... n-1 0 1 2 ... n/2-1 
     CuAssertSizeTEquals(tc, n, deque_len(q));       
 
     for (int i=n/2-1; i>=0; i--) {
         o = deque_pop_back_int(q);
         CuAssertIntEquals(tc, i, o);
     }
+    // n/2 n/2+1 ... n-1
     CuAssertSizeTEquals(tc, n-(n/2), deque_len(q));       
-    
+
+    for (int i=0; i<n-(n/2); i++) {
+        CuAssertIntEquals(tc, deque_get_int(q, i), n/2+i);
+    }
+
     for (int i=0; i<n/4; i++) {
         if (i%2==0) { 
             o = deque_pop_back_int(q);

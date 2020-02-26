@@ -53,6 +53,27 @@ size_t deque_len(deque *q);
 
 
 /**
+ * @brief Returns an internal reference to the element at a given position
+ *        or NULL if an invalid position is given.
+ */
+void *deque_get(deque *q, size_t pos);
+
+
+/**
+ * @brief Returns an internal reference to the element at the first position
+ *        or NULL if an invalid position is given.
+ */
+void *deque_front(deque *q);
+
+
+/**
+ * @brief Returns an internal reference to the element at the last position
+ *        or NULL if an invalid position is given.
+ */
+void *deque_back(deque *q);
+
+
+/**
  * @brief Pushes an element onto the back of the deque.
  */
 void deque_push_back(deque *q, void *elt);
@@ -80,13 +101,20 @@ void deque_pop_front(deque *q, void *dest);
 #define DEQUE_NEW_DECL( TYPE )\
     deque *deque_new_##TYPE();
 
+#define DEQUE_GET_DECL( TYPE )\
+    TYPE deque_get_##TYPE(deque *q, size_t pos);
+
+#define DEQUE_FRONT_DECL( TYPE )\
+    TYPE deque_front_##TYPE(deque *q);
+
+#define DEQUE_BACK_DECL( TYPE )\
+    TYPE deque_back_##TYPE(deque *q);
+
 #define DEQUE_PUSH_BACK_DECL( TYPE )\
     void deque_push_back_##TYPE(deque *q, TYPE val);
 
-
 #define DEQUE_POP_BACK_DECL( TYPE )\
     TYPE deque_pop_back_##TYPE(deque *q);    
-
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
     void deque_push_front_##TYPE(deque *q, TYPE val);
@@ -97,6 +125,9 @@ void deque_pop_front(deque *q, void *dest);
 
 #define DEQUE_ALL_DECL( TYPE )\
 DEQUE_NEW_DECL(TYPE)\
+DEQUE_GET_DECL(TYPE)\
+DEQUE_FRONT_DECL(TYPE)\
+DEQUE_BACK_DECL(TYPE)\
 DEQUE_PUSH_BACK_DECL(TYPE)\
 DEQUE_POP_BACK_DECL(TYPE)\
 DEQUE_PUSH_FRONT_DECL(TYPE)\

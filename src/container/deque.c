@@ -84,6 +84,21 @@ size_t deque_len(deque *q)
 }
 
 
+void *deque_get(deque *q, size_t pos) 
+{
+    return q->data + ( ((q->start + pos) % q->cap) * q->typesize );
+}
+
+
+void *deque_front(deque *q) {
+    return deque_get(q, 0);
+}
+
+
+void *deque_back(deque *q) {
+    return deque_get(q, q->len-1);
+}
+
 static void check_and_resize(deque *q)
 {
     if (q->len == q->cap) { 
@@ -157,6 +172,21 @@ void deque_pop_front(deque *q, void *dest)
         return deque_new(sizeof(TYPE));\
     }
 
+#define DEQUE_GET_IMPL( TYPE )\
+    TYPE deque_get_##TYPE(deque *q, size_t pos) {\
+        return ((TYPE **)deque_get(q, pos))[0];\
+    }
+
+#define DEQUE_FRONT_IMPL( TYPE )\
+    TYPE deque_front_##TYPE(deque *q) {\
+        return deque_get_##TYPE(q, 0);\
+    }
+
+#define DEQUE_BACK_IMPL( TYPE )\
+    TYPE deque_back_##TYPE(deque *q) {\
+        return deque_get_##TYPE(q, q->len-1);\
+    }
+
 #define DEQUE_PUSH_BACK_IMPL( TYPE )\
     void deque_push_back_##TYPE(deque *q, TYPE val) {\
         deque_push_back(q, &val);\
@@ -183,6 +213,9 @@ void deque_pop_front(deque *q, void *dest)
 
 #define DEQUE_ALL_IMPL( TYPE ) \
 DEQUE_NEW_IMPL(TYPE)\
+DEQUE_GET_IMPL(TYPE)\
+DEQUE_FRONT_IMPL(TYPE)\
+DEQUE_BACK_IMPL(TYPE)\
 DEQUE_PUSH_BACK_IMPL(TYPE) \
 DEQUE_PUSH_FRONT_IMPL(TYPE)\
 DEQUE_POP_BACK_IMPL(TYPE)\
