@@ -65,4 +65,14 @@
 #define PTR_MAX SIZE_MAX
 
 
+typedef struct _free_chain free_chain;
+
+typedef void (*free_func) (void *, free_chain *);
+
+struct _free_chain {
+    free_func parfree;
+    struct _free_chain *chdfree;
+};
+
+
 #endif

@@ -141,7 +141,7 @@ static void check_and_grow_by(xstring *xs, size_t n)
 }
 
 
-void xstr_app(xstring *xs, xchar_t c) 
+void xstr_push(xstring *xs, xchar_t c) 
 {
     check_and_grow_by(xs, 1);
     xstr_set(xs, (xs->len)++, c);

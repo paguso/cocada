@@ -153,10 +153,10 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
     // build padded string with k sentinels at the beginning an one at the end
     xstring *padstr = xstring_new(sizeof_ext_char);
     for (size_t i=0; i<k; i++)
-        xstr_app(padstr, SENTINEL);
+        xstr_push(padstr, SENTINEL);
     for (xchar_t c; (c=strstream_getc(sst))!=XEOF; )
-        xstr_app(padstr, (xchar_t)(ab_rank(ab, c) + 1));
-    xstr_app(padstr, SENTINEL);
+        xstr_push(padstr, (xchar_t)(ab_rank(ab, c) + 1));
+    xstr_push(padstr, SENTINEL);
     xstr_trim(padstr);
     //xstr_print(padstr);
 
@@ -268,7 +268,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
             else 
                 bitarr_set_bit(km1mers_chars, ab_rank(ext_ab, edge_chr), 1);
             // whatever the case, set the new edge label char
-            xstr_app(edge_labels, edge_chr);
+            xstr_push(edge_labels, edge_chr);
             // and update the count of the last node label char
             char_count[ab_rank(ext_ab, xstr_get(lastkp1mers[this_line], k-1)) + 1]++;
         }

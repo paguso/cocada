@@ -296,7 +296,7 @@ xstring *huffcode_decode(huffcode *hcode, bitvector *bcode)
     for (size_t i=0, l=bitvec_len(bcode); i<l; i++) {
         cur = cur->chd[bitvec_get_bit(bcode, i)];
         if (hufftnode_is_leaf(cur)) {
-            xstr_app(dec, ab_char(hcode->ab, cur->chr_rank));
+            xstr_push(dec, ab_char(hcode->ab, cur->chr_rank));
             cur = huffcode_tree(hcode);
         }
     }

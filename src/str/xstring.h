@@ -142,7 +142,7 @@ void xstr_nset(xstring *xs, size_t n, xchar_t val);
  * @warn  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t). 
  */
-void xstr_app(xstring *xs, xchar_t c);
+void xstr_push(xstring *xs, xchar_t c);
 
 
 /**

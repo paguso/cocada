@@ -24,6 +24,7 @@
 
 #include "bitsandbytes.h"
 #include "cocadautil.h"
+#include "order.h"
 
 typedef struct _vector vector;
 
@@ -58,6 +59,8 @@ vector *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  */
 void vec_free(vector *v, bool free_elements);
 
+
+void vec_Free(vector *v, free_chain *fc );
 
 /**
  * @brief Returns the # of elements logically stored.
@@ -134,7 +137,7 @@ void vec_del(vector *v, size_t pos, void *dest);
 
 
 
-void vec_qsort(vector *v, int (* cmp_func)(const void *, const void *));
+void vec_qsort(vector *v, cmp_func cmp); 
 
 
 /**

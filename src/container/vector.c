@@ -91,6 +91,19 @@ void vec_free(vector *v, bool free_elements)
     FREE(v);
 }
 
+void vec_Free(vector *v, free_chain *fc ) 
+{
+    if (v==NULL) return;
+    if (fc[0].parfree) {
+        for (size_t i=0, l=vec_len(v); i<l; i++) {
+            fc[0].parfree(vec_get(v, i), fc[0].chdfree);
+        }
+    }
+    FREE(v->data);
+    FREE(v->swp);
+    FREE(v);
+}
+
 
 size_t vec_len(vector *v)
 {
@@ -243,9 +256,9 @@ static void _qsort(vector *v, size_t l, size_t r, int (* cmp_func)(const void *,
 }
 
 
-void vec_qsort(vector *v, int (* cmp_func)(const void *, const void *))
+void vec_qsort(vector *v, cmp_func cmp)
 {
-    _qsort(v, 0, vec_len(v), cmp_func);
+    _qsort(v, 0, vec_len(v), cmp);
 }
 
 

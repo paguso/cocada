@@ -295,6 +295,28 @@ void test_vec_qsort(CuTest *tc)
     }
 }
 
+typedef struct _vecobj {
+    int i;
+    double d;
+} vobj;
+
+void test_vec_free(CuTest *tc) 
+{
+    size_t n = 10;
+    vector *v = vec_new(sizeof(vector *));
+    for (size_t i=0; i<n; i++) {
+        vector *c = vec_new(sizeof(vobj *));
+        for (size_t j=0; j<i; j++) {
+            vobj *e = (vobj *)malloc(sizeof(vobj));
+            e->i = (int)i;
+            e->d = (double)i;
+            vec_app(c, e); 
+        }
+        CuAssertSizeTEquals(tc, i, vec_len(c));
+        vec_app(v, c);
+    }
+    CuAssertSizeTEquals(tc, n, vec_len(v));
+}
 
 CuSuite *vec_get_test_suite() 
 {
@@ -308,5 +330,6 @@ CuSuite *vec_get_test_suite()
     SUITE_ADD_TEST(suite, test_vec_swap);
     SUITE_ADD_TEST(suite, test_vec_radixsort);
     SUITE_ADD_TEST(suite, test_vec_qsort);
+    SUITE_ADD_TEST(suite, test_vec_free);
     return suite;
 }

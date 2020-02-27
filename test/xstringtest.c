@@ -43,7 +43,7 @@ void test_xstring_to_string(CuTest *tc) {
     size_t l = 1000;
     xstring *xs = xstring_new(2);
     for (xchar_t i=0; i<l; i++) {
-        xstr_app(xs, i);
+        xstr_push(xs, i);
     }
     dynstr *ds = dynstr_new();
     xstr_to_string(xs, ds);
