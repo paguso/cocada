@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "cocadautil.h"
-#include "vector.h"
+#include "vec.h"
 
 
 typedef vec stack;

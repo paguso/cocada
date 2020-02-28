@@ -27,7 +27,7 @@
 
 #include "arrayutil.h"
 #include "randutil.h"
-#include "vector.h"
+#include "vec.h"
 
 
 void test_vec_new(CuTest *tc)

@@ -33,7 +33,7 @@
 #include "csrsbitarray.h"
 #include "cstringutil.h"
 #include "debruijngraph.h"
-#include "vector.h"
+#include "vec.h"
 #include "dynstr.h"
 #include "mathutil.h"
 #include "strstream.h"

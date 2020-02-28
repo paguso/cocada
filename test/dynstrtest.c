@@ -91,4 +91,5 @@ CuSuite *dynstr_get_test_suite()
     SUITE_ADD_TEST(suite, test_dstr_get);
     SUITE_ADD_TEST(suite, test_dstr_append_char);    
     SUITE_ADD_TEST(suite, dynstr_test_teardown);
+    return suite;
 }

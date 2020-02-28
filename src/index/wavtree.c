@@ -36,7 +36,7 @@
 #include "cocadautil.h"
 #include "csrsbitarray.h"
 #include "cstringutil.h"
-#include "vector.h"
+#include "vec.h"
 #include "dynstr.h"
 #include "hashmap.h"
 #include "huffcode.h"

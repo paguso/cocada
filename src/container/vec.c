@@ -30,7 +30,7 @@
 #include "cocadautil.h"
 #include "mathutil.h"
 #include "randutil.h"
-#include "vector.h"
+#include "vec.h"
 
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1

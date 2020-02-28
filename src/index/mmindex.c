@@ -6,7 +6,7 @@
 #include "cocadautil.h"
 #include "minqueue.h"
 #include "hashmap.h"
-#include "vector.h"
+#include "vec.h"
 #include "xstring.h"
 
 #include "mmindex.h"

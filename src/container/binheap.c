@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-#include "vector.h"
+#include "vec.h"
 #include "arrayutil.h"
 #include "binheap.h"
 #include "cocadautil.h"
