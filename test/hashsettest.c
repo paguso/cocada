@@ -27,6 +27,7 @@
 
 #include "arrayutil.h"
 #include "hashset.h"
+#include "mathutil.h"
 
 typedef uint32_t uint;
 

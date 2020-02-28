@@ -29,7 +29,7 @@
 
 struct _binheap {
     heap_mode mode;
-    vector *data;
+    vec *data;
     int (*comp_fn)(const void *, const void *);
 };
 

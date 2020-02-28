@@ -32,6 +32,7 @@
 #include "cocadautil.h"
 #include "cstringutil.h"
 #include "hashmap.h"
+#include "mathutil.h"
 //#include "marshall.h"
 #include "strstream.h"
 

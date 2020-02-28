@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "cocadautil.h"
+#include "mathutil.h"
 #include "strstream.h"
 #include "xchar.h"
 #include "xstring.h"

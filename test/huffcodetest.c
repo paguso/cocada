@@ -29,6 +29,7 @@
 #include "bytearray.h"
 #include "cstringutil.h"
 #include "huffcode.h"
+#include "mathutil.h"
 #include "xstring.h" 
 
 

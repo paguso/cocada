@@ -32,7 +32,7 @@
 
 void test_vec_new(CuTest *tc)
 {
-    vector *v = vec_new_with_capacity(sizeof(int), 10);
+    vec *v = vec_new_with_capacity(sizeof(int), 10);
     CuAssertSizeTEquals(tc, 0, vec_len(v));
     vec_free(v, true);
 }
@@ -41,7 +41,7 @@ void test_vec_new(CuTest *tc)
 void test_vec_app(CuTest *tc)
 {
     size_t len = 100;
-    vector *v = vec_new(sizeof(short));
+    vec *v = vec_new(sizeof(short));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (size_t i =0; i<len; i++) {
@@ -64,7 +64,7 @@ void test_vec_app(CuTest *tc)
 void test_vec_get_cpy(CuTest *tc)
 {
     size_t len = 100;
-    vector *v = vec_new(sizeof(double));
+    vec *v = vec_new(sizeof(double));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (size_t i =0; i<len; i++) {
@@ -88,7 +88,7 @@ void test_vec_get_cpy(CuTest *tc)
 void test_vec_set(CuTest *tc)
 {
     size_t len = 100;
-    vector *v = vec_new(sizeof(int));
+    vec *v = vec_new(sizeof(int));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (int i =0; i<len; i++) {
@@ -115,7 +115,7 @@ void test_vec_set(CuTest *tc)
 void test_vec_ins(CuTest *tc)
 {
     size_t len = 110;
-    vector *v = vec_new(sizeof(double*));
+    vec *v = vec_new(sizeof(double*));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (size_t i=1; i<len; i+=2) {
@@ -140,7 +140,7 @@ void test_vec_ins(CuTest *tc)
 void test_vec_del(CuTest *tc)
 {
     size_t len = 100;
-    vector *v = vec_new(sizeof(double*));
+    vec *v = vec_new(sizeof(double*));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (size_t i=0; i<len; i++) {
@@ -166,7 +166,7 @@ void test_vec_del(CuTest *tc)
 void test_vec_swap(CuTest *tc)
 {
     size_t len = 100;
-    vector *v = vec_new(sizeof(double*));
+    vec *v = vec_new(sizeof(double*));
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (size_t i=0; i<len; i++) {
@@ -211,7 +211,7 @@ static int triple_cmp(triple *t1, triple *t2)
 void test_vec_radixsort(CuTest *tc)
 {
     size_t max_key = 3;
-    vector *v;
+    vec *v;
     v = vec_new(sizeof(triple));
     for (size_t d1=0; d1<max_key; d1++) {
         for (size_t d0=0; d0<max_key; d0++) {
@@ -264,7 +264,7 @@ void test_vec_qsort(CuTest *tc)
                 arr[i] = t;
     }
     shuffle_arr(arr, max_key, sizeof(triple));
-    vector *v = vec_new(sizeof(triple));
+    vec *v = vec_new(sizeof(triple));
     for (size_t i=0; i<max_key; i++){
         vec_app(v, &arr[i]); 
     }
@@ -303,19 +303,22 @@ typedef struct _vecobj {
 void test_vec_free(CuTest *tc) 
 {
     size_t n = 10;
-    vector *v = vec_new(sizeof(vector *));
+    vec *v = vec_new(sizeof(vec *));
     for (size_t i=0; i<n; i++) {
-        vector *c = vec_new(sizeof(vobj *));
+        vec *c = vec_new(sizeof(vobj *));
         for (size_t j=0; j<i; j++) {
-            vobj *e = (vobj *)malloc(sizeof(vobj));
+            vobj *e = NEW(vobj);
             e->i = (int)i;
             e->d = (double)i;
-            vec_app(c, e); 
+            vec_app(c, &e); 
         }
         CuAssertSizeTEquals(tc, i, vec_len(c));
-        vec_app(v, c);
+        vec_app(v, &c);
     }
     CuAssertSizeTEquals(tc, n, vec_len(v));
+
+    DESTROY_AND_CONSUME(v, dstr_cons(vec_dstr(), dstr_cons(vec_dstr(), raw_dstr())));
+
 }
 
 CuSuite *vec_get_test_suite() 

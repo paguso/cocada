@@ -29,6 +29,7 @@
 #include "cstringutil.h"
 #include "debruijngraph.h"
 #include "dynstr.h"
+#include "mathutil.h"
 #include "strstream.h"
 
 static size_t n;

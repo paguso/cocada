@@ -24,6 +24,7 @@
 #include "cocadautil.h"
 #include "cstringutil.h"
 #include "dynstr.h"
+#include "mathutil.h"
 
 
 const static size_t DEFAULT_CAPACITY = 8;

@@ -7,6 +7,7 @@
 #include "alphabet.h"
 #include "bitsandbytes.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 #include "xstring.h"
 
 static const size_t MIN_CAP = 4;

@@ -28,6 +28,7 @@
 
 #include "arrayutil.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 #include "deque.h"
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1

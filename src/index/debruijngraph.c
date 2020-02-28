@@ -161,7 +161,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
     //xstr_print(padstr);
 
     // build list of k+1mers
-    vector *kp1mers = vec_new(sizeof(kmer_t *));
+    vec *kp1mers = vec_new(sizeof(kmer_t *));
     for (size_t i=0, padslen=xstr_len(padstr), l=padslen-(k+1); i<=l; i++) {
         kmer_t *kmer = kmer_new(padstr, i, k+1);
         vec_app(kp1mers, &kmer);

@@ -30,6 +30,7 @@
 #include "bitsandbytes.h"
 #include "bitvector.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 
 static size_t ba_size = 1000;
 

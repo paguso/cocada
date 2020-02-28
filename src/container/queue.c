@@ -25,6 +25,7 @@
 
 #include "arrayutil.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 #include "queue.h"
 
 

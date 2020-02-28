@@ -28,6 +28,7 @@
 #include "arrayutil.h"
 #include "bitsandbytes.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 #include "randutil.h"
 #include "vector.h"
 
@@ -36,26 +37,24 @@ const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2 
 const static float  MIN_LOAD = 0.5;   // (!) GROW_BY*MIN_LOAD < 1
 
-typedef struct _vector {
+struct _vec {
     size_t typesize;
     size_t len;
     size_t capacity;
     void *data;
     void *swp;
-}
-vector;
+};
 
-
-vector *vec_new(size_t typesize)
+vec *vec_new(size_t typesize)
 {
     return vec_new_with_capacity(typesize, MIN_CAPACITY);
 }
 
 
-vector *vec_new_with_capacity(size_t typesize, size_t init_capacity)
+vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 {
-    vector *ret;
-    ret = NEW(vector);
+    vec *ret;
+    ret = NEW(vec);
     ret->typesize = typesize;
     ret->capacity = MAX(MIN_CAPACITY, init_capacity);
     ret->len = 0;
@@ -65,7 +64,7 @@ vector *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 }
 
 
-static void check_and_resize(vector *v)
+static void check_and_resize(vec *v)
 {
     if (v->len==v->capacity) { 
         v->capacity = MAX(GROW_BY*v->capacity, MIN_CAPACITY);
@@ -78,7 +77,7 @@ static void check_and_resize(vector *v)
 }
 
 
-void vec_free(vector *v, bool free_elements)
+void vec_free(vec *v, bool free_elements)
 {
     if (v==NULL) return;
     if (free_elements) {
@@ -91,12 +90,14 @@ void vec_free(vector *v, bool free_elements)
     FREE(v);
 }
 
-void vec_Free(vector *v, free_chain *fc ) 
+void vec_Free(void *ptr, dstr *vdst ) 
 {
-    if (v==NULL) return;
-    if (fc[0].parfree) {
+    vec *v = (vec *)ptr;
+    if (dstr_nchd(vdst)) {
+        dstr *chd_dst = dstr_chd(vdst, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
-            fc[0].parfree(vec_get(v, i), fc[0].chdfree);
+            void *chd = ((void **)(v->data + (i*sizeof(v->typesize))))[0];
+            DESTROY(chd, chd_dst);
         }
     }
     FREE(v->data);
@@ -105,31 +106,40 @@ void vec_Free(vector *v, free_chain *fc )
 }
 
 
-size_t vec_len(vector *v)
+dstr *vec_dstr() {
+    dstr *dst = NEW(dstr);
+    dst->freer = vec_Free;
+    dst->nchd = 0;
+    dst->chd_dsts = calloc(1, sizeof(dstr *));
+    return dst;
+}
+
+
+size_t vec_len(vec *v)
 {
     return v->len;
 }
 
 
-size_t vec_typesize(vector *v)
+size_t vec_typesize(vec *v)
 {
     return v->typesize;
 }
 
 
-void vec_clear(vector *v)
+void vec_clear(vec *v)
 {
     v->len = 0;
 }
 
 
-static void vec_trim(vector *v)
+static void vec_trim(vec *v)
 {
     v->data = realloc(v->data, MAX(MIN_CAPACITY, v->len)*v->typesize);
 }
 
 
-void *vec_detach(vector *v)
+void *vec_detach(vec *v)
 {
     vec_trim(v);
     void *data = v->data;
@@ -138,26 +148,26 @@ void *vec_detach(vector *v)
 }
 
 
-const void *vec_get(vector *v, size_t pos)
+const void *vec_get(vec *v, size_t pos)
 {
     return v->data + ( pos * v->typesize );
 }
 
 
-void vec_get_cpy(vector *v, size_t pos, void *dest)
+void vec_get_cpy(vec *v, size_t pos, void *dest)
 {
     memcpy(dest, v->data+(pos*v->typesize), v->typesize);
 }
 
 
-void vec_set(vector *v, size_t pos, void *src)
+void vec_set(vec *v, size_t pos, void *src)
 {
     check_and_resize(v);
     memcpy(v->data+(pos*v->typesize), src, v->typesize);
 }
 
 
-void vec_swap(vector *v, size_t i, size_t j)
+void vec_swap(vec *v, size_t i, size_t j)
 {
     if (i==j) return;
     //byte_t swp[v->typesize];
@@ -176,7 +186,7 @@ void vec_app(dynarray *v, void *val)
 */
 
 
-void vec_app(vector *v, void *src)
+void vec_app(vec *v, void *src)
 {
     check_and_resize(v);
     memcpy(v->data+(v->len*v->typesize), src, v->typesize);
@@ -197,7 +207,7 @@ void vec_ins(dynarray *v, size_t pos, void *val)
 */
 
 
-void vec_ins(vector *v, size_t pos, void *src)
+void vec_ins(vec *v, size_t pos, void *src)
 {
     check_and_resize(v);
     memmove( v->data+((pos+1)*v->typesize), v->data+(pos*v->typesize), 
@@ -207,7 +217,7 @@ void vec_ins(vector *v, size_t pos, void *src)
 }
 
 
-void vec_del(vector *v, size_t pos, void *dest)
+void vec_del(vec *v, size_t pos, void *dest)
 {
     if (dest!=NULL) 
         vec_get_cpy(v, pos, dest);
@@ -219,7 +229,7 @@ void vec_del(vector *v, size_t pos, void *dest)
 
 
 
-static size_t _part(vector *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+static size_t _part(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
 {
     size_t p = rand_range_size_t(l, r);
     vec_swap(v, l, p);
@@ -246,7 +256,7 @@ static size_t _part(vector *v, size_t l, size_t r, int (* cmp_func)(const void *
 }
 
 
-static void _qsort(vector *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+static void _qsort(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
 {
     if (l < r) {
         size_t p = _part(v, l, r, cmp_func);
@@ -256,15 +266,15 @@ static void _qsort(vector *v, size_t l, size_t r, int (* cmp_func)(const void *,
 }
 
 
-void vec_qsort(vector *v, cmp_func cmp)
+void vec_qsort(vec *v, cmp_func cmp)
 {
     _qsort(v, 0, vec_len(v), cmp);
 }
 
 
 
-void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
-                    size_t key_size, size_t max_key)
+void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
+                   size_t key_size, size_t max_key)
 {
     size_t n = vec_len(v);
     void *vcpy = malloc(n*(v->typesize));
@@ -291,32 +301,32 @@ void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_NEW_IMPL( TYPE ) \
-   vector *vec_new_##TYPE()\
-    { return vec_new(sizeof(TYPE)); } 
+   vec *vec_new_##TYPE()\
+   vecurn vec_new(sizeof(TYPE)); } 
 
 
 #define VEC_GET_IMPL( TYPE ) \
-   TYPE vec_get_##TYPE(vector *v, size_t pos)\
+   TYPE vec_get_##TYPE(vec *v, size_t pos)\
     { return *((TYPE *)vec_get(v, pos)); } 
 
 
 #define VEC_SET_IMPL( TYPE ) \
-   void vec_set_##TYPE(vector *v, size_t pos, TYPE val)\
+   void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
     { vec_set(v, pos, &val); } 
 
 
 #define VEC_APP_IMPL( TYPE ) \
-   void vec_app_##TYPE(vector *v, TYPE val)\
-    { vec_app(v, &val); } 
+   void vec_app_##TYPE(vec *v, TYPE val)\
+    { vec_app(v, &val); }
 
 
 #define VEC_INS_IMPL( TYPE ) \
-   void vec_ins_##TYPE(vector *v, size_t pos, TYPE val)\
-    { vec_ins(v, pos, &val); } 
+   void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
+    { vec_ins(v, pos, &val);} 
 
 
 #define VEC_DEL_IMPL( TYPE ) \
-   TYPE vec_del_##TYPE(vector *v, size_t pos)\
+   TYPE vec_del_##TYPE(vec *v, size_t pos)\
     {  TYPE r; vec_del(v, pos, &r); return r; } 
 
 

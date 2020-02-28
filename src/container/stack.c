@@ -26,7 +26,7 @@
 #include "vector.h"
 
 
-typedef vector stack;
+typedef vec stack;
 
 
 stack *stack_new(size_t typesize)

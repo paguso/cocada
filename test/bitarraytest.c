@@ -30,6 +30,7 @@
 #include "bitarray.h"
 #include "cstringutil.h"
 #include "cocadautil.h"
+#include "mathutil.h"
 
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
 static size_t ba_size;

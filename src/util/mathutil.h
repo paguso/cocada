@@ -32,6 +32,15 @@
  * @brief Math utility functions.
  */
 
+/**
+ * Min, max
+ */
+#define MIN( A, B )   ( (A)<(B) ? (A) : (B) )
+#define MAX( A, B )   ( (A)>(B) ? (A) : (B) )
+
+#define MIN3( A, B, C ) ((A) < (B) ? MIN(A, C) : MIN(B, C))
+#define MAX3( A, B, C ) ((A) > (B) ? MAX(A, C) : MAX(B, C))
+
 
 #define IS_EVEN( N ) (1-((N)%2))
 #define IS_ODD( N ) ((N)%2)

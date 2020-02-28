@@ -26,7 +26,6 @@
 #include "cocadautil.h"
 #include "order.h"
 
-typedef struct _vector vector;
 
 /**
  * @file vector.h
@@ -35,12 +34,16 @@ typedef struct _vector vector;
  * @brief Dynamic array ADT (a.k.a. Vector)
  */
 
+/**
+ * Vector type
+ */
+typedef struct _vec vec;
 
 /**
  * @brief Array constructor.
  * @param typesize The size of the elements to be stored (in bytes).
  */
-vector *vec_new(size_t typesize);
+vec *vec_new(size_t typesize);
 
 
 /**
@@ -48,7 +51,7 @@ vector *vec_new(size_t typesize);
  * @param typesize The size of the elements to be stored (in bytes).
  * @param init_capacity The initial capacity (in # of elements).
  */
-vector *vec_new_with_capacity(size_t typesize, size_t init_capacity);
+vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 
 /**
@@ -57,27 +60,30 @@ vector *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  *        To be used whenever the array stores pointers to dynamically allocated
  *        memory.
  */
-void vec_free(vector *v, bool free_elements);
+void vec_free(vec *v, bool free_elements);
 
 
-void vec_Free(vector *v, free_chain *fc );
+void vec_Free(void *v, dstr *fc );
+
+
+dstr *vec_dstr();
 
 /**
  * @brief Returns the # of elements logically stored.
  */
-size_t vec_len(vector *v);
+size_t vec_len(vec *v);
 
 
 /**
  * @brief Returns the individual size of stored elements (in bytes). 
  */
-size_t vec_typesize(vector *v);
+size_t vec_typesize(vec *v);
 
 
 /**
  * @brief Removes all elements.
  */
-void vec_clear(vector *v);
+void vec_clear(vec *v);
 
 
 /**
@@ -86,58 +92,60 @@ void vec_clear(vector *v);
  * @see vec_trim
  * @warning After this operation, the dynamic array @p da is destroyed.
  */
-void *vec_detach(vector *v);
+void *vec_detach(vec *v);
 
 
 /**
  * @brief Returns (the internal reference to) the element at position @p pos.
  * @warn  Do not modify data ate thsi postni
  */
-const void *vec_get(vector *v, size_t pos);
+const void *vec_get(vec *v, size_t pos);
 
 
 /**
  * @brief Copies the element at position @p pos into the location 
  *        pointed to by @p dest 
  */
-void  vec_get_cpy(vector *v, size_t pos, void *dest);
+void  vec_get_cpy(vec *v, size_t pos, void *dest);
 
 
 /**
  * @brief Sets (overwrites) the element at position @p pos to a copy
  *        of the value pointed to by @p src.
  */
-void  vec_set(vector *v, size_t pos, void *src);
+void  vec_set(vec *v, size_t pos, void *src);
 
 
 /**
  * @brief Swaps elements at positions @p i and @p j
  */
-void vec_swap(vector *v, size_t i, size_t j);
+void vec_swap(vec *v, size_t i, size_t j);
 
 
 /**
  * @brief Appends a copy of the value pointed to by @p src.
  * The number of copied bytes is given by the array typesize.
  */
-void vec_app(vector *v, void *src);
+void vec_app(vec *v, void *src);
 
 
 /**
  * @brief Inserts a copy of the element pointed to by @p src 
  *        at position @p pos.
  */
-void vec_ins(vector *v, size_t pos, void *src);
+void vec_ins(vec *v, size_t pos, void *src);
 
 
 /**
  * @brief Removes and returns new the element at position @p pos.
  */
-void vec_del(vector *v, size_t pos, void *dest);
+void vec_del(vec *v, size_t pos, void *dest);
 
 
-
-void vec_qsort(vector *v, cmp_func cmp); 
+/**
+ * @brief In-place sorting of vector elements using the Quicksort algorithm.
+ */
+void vec_qsort(vec *v, cmp_func cmp); 
 
 
 /**
@@ -157,7 +165,7 @@ void vec_qsort(vector *v, cmp_func cmp);
  * @param key_size The size of the key vector
  * @param max_key The noninclusive maximum value for each key position
  */
-void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
+void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
                     size_t key_size, size_t max_key);
 
 
@@ -165,23 +173,23 @@ void vec_radixsort(vector *v, size_t (*key_fn)(const void *, size_t),
    TYPE vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
-   TYPE vec_get_##TYPE(vector *v, size_t pos);
+   TYPE vec_get_##TYPE(vec *v, size_t pos);
 
 
 #define VEC_SET_DECL( TYPE ) \
-   void vec_set_##TYPE(vector *v, size_t pos, TYPE val);
+   void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
 
 #define VEC_APP_DECL( TYPE ) \
-   void vec_app_##TYPE(vector *v, TYPE val);
+   void vec_app_##TYPE(vec *v, TYPE val);
 
 
 #define VEC_INS_DECL( TYPE ) \
-   void vec_ins_##TYPE(vector *v, size_t pos, TYPE val);
+   void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 
 #define VEC_DEL_DECL( TYPE ) \
-   TYPE vec_del_##TYPE(vector *v, size_t pos); 
+   TYPE vec_del_##TYPE(vec *v, size_t pos); 
 
 
 #define VEC_ALL_DECL( TYPE )\

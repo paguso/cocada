@@ -13,9 +13,9 @@
 
 struct _mmindex {
     size_t nstr;
-    vector *w;
-    vector *k;
-    vector *tbls;
-    vector *offs;
+    vec *w;
+    vec *k;
+    vec *tbls;
+    vec *offs;
 };
 
