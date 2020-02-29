@@ -105,14 +105,7 @@ void vec_Free(void *ptr, dstr *vdst )
     FREE(v);
 }
 
-
-dstr *vec_dstr() {
-    dstr *dst = NEW(dstr);
-    dst->freer = vec_Free;
-    dst->nchd = 0;
-    dst->chd_dsts = calloc(1, sizeof(dstr *));
-    return dst;
-}
+DSTR_IMPL(vec)
 
 
 size_t vec_len(vec *v)

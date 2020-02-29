@@ -240,6 +240,17 @@ dstr *empty_dstr();
  */
 dstr *raw_dstr();
 
+#define DSTR_DECL( TYPE ) \
+dstr *TYPE##_dstr(); 
+
+#define DSTR_IMPL( TYPE ) \
+dstr *TYPE##_dstr() {\
+    dstr *dst = NEW(dstr);\
+    dst->freer = TYPE##_Free;\
+    dst->nchd = 0;\
+    dst->chd_dsts = calloc(1, sizeof(dstr *));\
+    return dst;\
+}
 
 #define DESTROY( OBJ, DESTRUCTOR ) {\
     void *_obj = (OBJ);\

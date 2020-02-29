@@ -40,14 +40,14 @@
 typedef struct _vec vec;
 
 /**
- * @brief Array constructor.
+ * @brief Vector constructor.
  * @param typesize The size of the elements to be stored (in bytes).
  */
 vec *vec_new(size_t typesize);
 
 
 /**
- * @brief Array constructor.
+ * @brief Vector constructor.
  * @param typesize The size of the elements to be stored (in bytes).
  * @param init_capacity The initial capacity (in # of elements).
  */
@@ -65,8 +65,7 @@ void vec_free(vec *v, bool free_elements);
 
 void vec_Free(void *v, dstr *fc );
 
-
-dstr *vec_dstr();
+DSTR_DECL(vec)
 
 /**
  * @brief Returns the # of elements logically stored.

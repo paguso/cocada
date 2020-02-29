@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "cocadautil.h"
 
@@ -30,9 +31,9 @@ dstr *dstr_cons(dstr *par, dstr *chd)
     return par;
 }
 
-static void _empty_free(void *ptr, dstr *chain ) 
-{
-}
+
+static void _empty_free(void *ptr, dstr *chain ) {}
+
 
 dstr *empty_dstr() {
     dstr *ret = NEW(dstr);
@@ -47,10 +48,10 @@ static void _raw_free(void *ptr, dstr *chain )
     FREE(ptr);
 }
 
+
 dstr *raw_dstr() {
     dstr *ret = NEW(dstr);
     ret->freer = _raw_free;
     ret->nchd = 0;
     return ret;
 }
-
