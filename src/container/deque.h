@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "cocadautil.h"
+
 /**
  * @file deque.h
  * @author Paulo Fonseca
@@ -39,6 +41,9 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity);
  */
 void deque_free(deque *q, bool free_elts);
 
+void deque_dispose(void *ptr, dstr *dst);
+
+DSTR_DECL(deque)
 
 /**
  * @brief Checks whether the deque is empty.

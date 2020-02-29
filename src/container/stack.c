@@ -34,11 +34,19 @@ stack *stack_new(size_t typesize)
     return vec_new(typesize);
 }
 
-
 void stack_free(stack *s, bool free_elements)
 {
     vec_free(s, free_elements);
 }
+
+void stack_dispose(void *ptr, dstr *dst)
+{
+    dst->freer = vec_dispose;
+    DESTROY(ptr, dst);
+}
+
+DSTR_IMPL(stack)
+
 
 bool stack_empty(stack *s)
 {

@@ -52,6 +52,24 @@ void binheap_free(binheap *heap, bool free_elements)
 }
 
 
+void binheap_dispose(void *ptr, dstr *dst) 
+{
+    binheap *heap = (binheap *)ptr;
+    if (dst!=NULL) {
+        dstr *vdst = vec_dstr();
+        for (size_t i=0, l=dstr_nchd(dst); i<l; i++) {
+            vdst = dstr_cons(vdst, dstr_chd(dst, i));
+        }
+        DESTROY(heap->data, vdst);
+        FREE(vdst);
+    }
+    FREE(heap);
+}
+
+
+DSTR_IMPL(binheap)
+
+
 size_t binheap_size(binheap *heap)
 {
     return vec_len(heap->data);

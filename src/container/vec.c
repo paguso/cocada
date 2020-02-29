@@ -75,8 +75,6 @@ static void check_and_resize(vec *v)
         v->data = realloc(v->data, v->capacity*v->typesize);
     }
 }
-
-
 void vec_free(vec *v, bool free_elements)
 {
     if (v==NULL) return;
@@ -90,13 +88,13 @@ void vec_free(vec *v, bool free_elements)
     FREE(v);
 }
 
-void vec_Free(void *ptr, dstr *vdst ) 
+void vec_dispose(void *ptr, dstr *vdst ) 
 {
     vec *v = (vec *)ptr;
     if (dstr_nchd(vdst)) {
         dstr *chd_dst = dstr_chd(vdst, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
-            void *chd = ((void **)(v->data + (i*sizeof(v->typesize))))[0];
+            void *chd = ((void **)vec_get(v, i))[0];
             DESTROY(chd, chd_dst);
         }
     }

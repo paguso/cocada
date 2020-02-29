@@ -52,10 +52,13 @@ stack *stack_new(size_t typesize);
 
 /**
  * @brief Destructor.
- * @param free_elements Indicates whether referenced elements should be freed.
  */
 void stack_free(stack *s, bool free_elements);
 
+
+void stack_dispose(void *ptr, dstr *dst);
+
+DSTR_DECL(stack)
 
 /**
  * @brief Checks whether the stack is empty. 

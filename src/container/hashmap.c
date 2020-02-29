@@ -98,6 +98,26 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
     FREE(hmap);
 }
 
+void hashmap_dispose(void *ptr, dstr *dst) {
+    hashmap *hmap = (hashmap *)ptr;
+    if (dst != NULL) {
+        bool free_keys = (dstr_nchd(dst) > 0);
+        dstr *keys_dst = (free_keys)?dstr_chd(dst, 0):NULL;
+        bool free_vals = (dstr_nchd(dst) > 1);
+        dstr *vals_dst = (free_vals)?dstr_chd(dst, 0):NULL;
+        if (free_keys || free_vals) {
+            hashmap_iter *iter = hashmap_get_iter(hmap);
+            while ( hashmap_iter_has_next(iter) ) {
+                hashmap_entry keyval = hashmap_iter_next(iter);
+                if (free_keys) DESTROY(((void **)keyval.key)[0], keys_dst);
+                if (free_vals) DESTROY(((void **)keyval.val)[0], vals_dst);
+            }
+            hashmap_iter_free(iter);
+        }
+    }
+}
+
+DSTR_IMPL(hashmap)
 
 static inline uint64_t _hash(hashmap *hmap, void *key)
 {

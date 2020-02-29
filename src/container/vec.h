@@ -62,8 +62,8 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  */
 void vec_free(vec *v, bool free_elements);
 
+void vec_dispose(void *v, dstr *dst );
 
-void vec_Free(void *v, dstr *fc );
 
 DSTR_DECL(vec)
 

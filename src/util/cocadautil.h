@@ -246,7 +246,7 @@ dstr *TYPE##_dstr();
 #define DSTR_IMPL( TYPE ) \
 dstr *TYPE##_dstr() {\
     dstr *dst = NEW(dstr);\
-    dst->freer = TYPE##_Free;\
+    dst->freer = TYPE##_dispose;\
     dst->nchd = 0;\
     dst->chd_dsts = calloc(1, sizeof(dstr *));\
     return dst;\
