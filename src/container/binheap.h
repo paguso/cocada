@@ -68,9 +68,9 @@ binheap *binheap_new(int (*cmp_fn)(const void *, const void *), size_t typesize,
  */
 void binheap_free(binheap *heap, bool free_elements);
 
-void binheap_dispose(void *ptr, dstr *dst); 
 
-DSTR_DECL(binheap)
+void binheap_dispose(void *ptr, dtor *dst); 
+
 
 /**
  * @brief Returns the number of elements stored in the heap.

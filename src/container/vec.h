@@ -62,10 +62,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  */
 void vec_free(vec *v, bool free_elements);
 
-void vec_dispose(void *v, dstr *dst );
-
-
-DSTR_DECL(vec)
+void vec_dispose(void *v, dtor *dst );
 
 /**
  * @brief Returns the # of elements logically stored.

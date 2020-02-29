@@ -91,9 +91,7 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
 void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 
-void hashmap_dispose(void *ptr, dstr *dst);
-
-DSTR_DECL(hashmap)
+void hashmap_dispose(void *ptr, dtor *dst);
 
 /**
  * @brief Checks whether the @p map already contains a given @p key.

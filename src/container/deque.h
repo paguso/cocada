@@ -41,9 +41,8 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity);
  */
 void deque_free(deque *q, bool free_elts);
 
-void deque_dispose(void *ptr, dstr *dst);
+void deque_dispose(void *ptr, dtor *dst);
 
-DSTR_DECL(deque)
 
 /**
  * @brief Checks whether the deque is empty.

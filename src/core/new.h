@@ -194,74 +194,75 @@ problems.
 /**
  * Destructor type
  */
-typedef struct _dstr dstr;
+typedef struct _dtor dtor;
+
 
 /**
  * Destructor function type
  */
-typedef void (*dstr_func) (void *, dstr *);
+typedef void (*dstr_func) (void *, dtor *);
 
-struct _dstr {
-    dstr_func freer;
+
+struct _dtor {
+    dstr_func df;
     size_t nchd;
-    struct _dstr **chd_dsts;
+    struct _dtor **chd;
 };
 
+/**
+ * @brief Creates a new destructor with destructof function.
+ */
+dtor *dtor_new_with_func(dstr_func df); 
 
-void consume_dstr(dstr *d);
 
+void dtor_free(dtor *dt);
 
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
-size_t dstr_nchd(dstr *dst); 
+size_t dtor_nchd(dtor *dt); 
 
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
-dstr *dstr_chd(dstr *par, size_t index);
+dtor *dtor_chd(dtor *par, size_t index);
 
 /**
  * @brief Composes two destructor by appending @p chd to the children list of @p par.
  * Returns a reference to the modified @p par
  */
-dstr *dstr_cons(dstr *par, dstr *chd);
+dtor *dtor_cons(dtor *par, dtor *chd);
 
 
 /**
  * @brief Returns a new empty destructor with no children.
  * @see Module documentation for details.
  */
-dstr *empty_dstr();
+dtor *empty_dtor();
 
 /**
  * @brief Returns a new raw-pointer destructor with no children.
  * @see Module documentation for details.
  */
-dstr *raw_dstr();
+dtor *ptr_dtor();
 
-#define DSTR_DECL( TYPE ) \
-dstr *TYPE##_dstr(); 
 
-#define DSTR_IMPL( TYPE ) \
-dstr *TYPE##_dstr() {\
-    dstr *dst = NEW(dstr);\
-    dst->freer = TYPE##_dispose;\
-    dst->nchd = 0;\
-    dst->chd_dsts = calloc(1, sizeof(dstr *));\
-    return dst;\
-}
 
-#define DESTROY( OBJ, DESTRUCTOR ) {\
+
+#define DTOR( TYPE ) dtor_new_with_func(TYPE##_dispose)
+
+
+
+#define DESTROY( OBJ, DTOR ) {\
     void *_obj = (OBJ);\
-    dstr *_dst = (DESTRUCTOR);\
-    _dst->freer(_obj, _dst);}
+    dtor *_dt = (DTOR);\
+    _dt->df(_obj, _dt);}
 
 
-#define DESTROY_AND_CONSUME( OBJ, DESTRUCTOR ) {\
+#define DESTROY_AND_CONSUME( OBJ, DTOR ) {\
     void *_obj = (OBJ);\
-    dstr *_dst = (DESTRUCTOR);\
-    _dst->freer(_obj, _dst);\
-    consume_dstr(_dst);}
+    dtor *_dt = (DTOR);\
+    _dt->df(_obj, _dt);\
+    dtor_free(_dt);}
 
 #endif

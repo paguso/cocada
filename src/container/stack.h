@@ -56,9 +56,7 @@ stack *stack_new(size_t typesize);
 void stack_free(stack *s, bool free_elements);
 
 
-void stack_dispose(void *ptr, dstr *dst);
-
-DSTR_DECL(stack)
+void stack_dispose(void *ptr, dtor *dst);
 
 /**
  * @brief Checks whether the stack is empty. 

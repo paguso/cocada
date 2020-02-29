@@ -27,6 +27,7 @@
 
 #include "arrayutil.h"
 #include "randutil.h"
+#include "new.h"
 #include "vec.h"
 
 
@@ -317,7 +318,7 @@ void test_vec_free(CuTest *tc)
     }
     CuAssertSizeTEquals(tc, n, vec_len(v));
 
-    DESTROY_AND_CONSUME(v, dstr_cons(vec_dstr(), dstr_cons(vec_dstr(), raw_dstr())));
+    DESTROY_AND_CONSUME(v, dtor_cons(DTOR(vec), dtor_cons(DTOR(vec), ptr_dtor())));
 
 }
 
