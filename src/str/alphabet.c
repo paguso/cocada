@@ -29,7 +29,7 @@
 #include "alphabet.h"
 #include "arrayutil.h"
 #include "arrayutil.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "cstringutil.h"
 #include "hashmap.h"
 #include "mathutil.h"

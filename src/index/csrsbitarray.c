@@ -26,7 +26,7 @@
 #include "bitarray.h"
 #include "bitsandbytes.h"
 #include "bytearray.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "csrsbitarray.h"
 #include "mathutil.h"
 

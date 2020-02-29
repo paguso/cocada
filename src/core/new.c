@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "cocadautil.h"
+#include "new.h"
 
 void consume_dstr(dstr *d) {
     if (d==NULL) return;

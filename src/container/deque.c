@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "arrayutil.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "mathutil.h"
 #include "deque.h"
 

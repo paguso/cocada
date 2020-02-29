@@ -29,7 +29,7 @@
 #include "arrayutil.h"
 #include "bitsandbytes.h"
 #include "bitvector.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "mathutil.h"
 
 static size_t ba_size = 1000;

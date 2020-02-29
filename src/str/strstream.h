@@ -24,7 +24,7 @@
 
 #include <stddef.h>
 
-#include "cocadautil.h"
+#include "new.h"
 #include "xchar.h"
 #include "xstring.h"
 

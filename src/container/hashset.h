@@ -22,7 +22,7 @@
 #ifndef HASHSET_H
 #define HASHSET_H
 
-#include "cocadautil.h"
+#include "new.h"
 #include "hash.h"
 #include "hashmap.h"
 

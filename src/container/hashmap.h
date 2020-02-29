@@ -23,7 +23,7 @@
 #define HASHMAP_H
 
 
-#include "cocadautil.h"
+#include "new.h"
 #include "hash.h"
 
 /**

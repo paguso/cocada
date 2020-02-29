@@ -20,17 +20,17 @@
  *
  */
 
-#ifndef COCADAUTIL_H
-#define COCADAUTIL_H
+#ifndef NEW_H
+#define NEW_H
 
 #include <stdbool.h>
 #include <stdlib.h>
 
 /**
-@file cocadautil.h
+@file new.h
 @author Paulo Fonseca
-@brief  Basic definitions, macros and utility functions, including facilities
-        for creating and destroying objects.
+@brief  Basic definitions, macros and utility functions for creating and 
+        destroying objects.
 
 Object destructor infrastructure.
 -------------------------------------------------------------------------------

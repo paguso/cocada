@@ -29,7 +29,7 @@
 #include "bitsandbytes.h"
 #include "bitarray.h"
 #include "cstringutil.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "mathutil.h"
 
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;

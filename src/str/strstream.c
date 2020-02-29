@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "cocadautil.h"
+#include "new.h"
 #include "mathutil.h"
 #include "strstream.h"
 #include "xchar.h"

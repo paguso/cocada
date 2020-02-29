@@ -33,7 +33,7 @@
 #include "bitarray.h"
 #include "bitvector.h"
 #include "bytearray.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "cstringutil.h"
 #include "dynstr.h"
 #include "huffcode.h"

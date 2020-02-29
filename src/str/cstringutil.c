@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cocadautil.h"
+#include "new.h"
 #include "cstringutil.h"
 
 

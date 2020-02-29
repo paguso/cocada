@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "minqueue.h"
 #include "hashmap.h"
 #include "vec.h"

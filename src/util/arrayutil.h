@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include "bitsandbytes.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "cstringutil.h"
 
 /**

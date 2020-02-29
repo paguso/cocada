@@ -8,7 +8,7 @@
 #include "bitarray.h"
 #include "bitvector.h"
 #include "bytearray.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "csarray.h"
 #include "csrsbitarray.h"
 #include "dynstr.h"

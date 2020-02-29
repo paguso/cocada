@@ -27,7 +27,7 @@
 #include "bitarray.h"
 #include "bitsandbytes.h"
 #include "bytearray.h"
-#include "cocadautil.h"
+#include "new.h"
 #include "mathutil.h"
 
 byte_t *bitarr_new(const size_t len)
