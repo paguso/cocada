@@ -53,6 +53,7 @@ vec *vec_new(size_t typesize);
  */
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
+size_t vec_sizeof();
 
 /**
  * @brief Destructor.

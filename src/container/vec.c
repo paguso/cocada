@@ -50,6 +50,9 @@ vec *vec_new(size_t typesize)
     return vec_new_with_capacity(typesize, MIN_CAPACITY);
 }
 
+size_t vec_sizeof() {
+    return sizeof(struct  _vec);
+}
 
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 {
@@ -94,13 +97,13 @@ void vec_dispose(void *ptr, dtor *vdst )
     if (dtor_nchd(vdst)) {
         dtor *chd_dst = dtor_chd(vdst, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
-            void *chd = ((void **)vec_get(v, i))[0];
-            DESTROY(chd, chd_dst);
+            void *chd = vec_get(v, i);
+            FINALISE(chd, chd_dst);
         }
     }
     FREE(v->data);
     FREE(v->swp);
-    FREE(v);
+    //FREE(v);
 }
 
 

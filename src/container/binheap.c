@@ -60,7 +60,7 @@ void binheap_dispose(void *ptr, dtor *dst)
         for (size_t i=0, l=dtor_nchd(dst); i<l; i++) {
             vdst = dtor_cons(vdst, dtor_chd(dst, i));
         }
-        DESTROY(heap->data, vdst);
+        FINALISE(heap->data, vdst);
         FREE(vdst);
     }
     FREE(heap);

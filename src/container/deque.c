@@ -79,7 +79,7 @@ void deque_dispose(void *ptr, dtor *dst)
         dtor *chd_dst = dtor_chd(dst, 0);
         for (size_t i=0, l=deque_len(dq); i<l; i++) {
             void *chd = ((void **)deque_get(dq, i))[0];
-            DESTROY(chd, chd_dst);
+            FINALISE(chd, chd_dst);
         }
     }
     FREE(dq->data);

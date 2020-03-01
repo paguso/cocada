@@ -109,8 +109,8 @@ void hashmap_dispose(void *ptr, dtor *dst) {
             hashmap_iter *iter = hashmap_get_iter(hmap);
             while ( hashmap_iter_has_next(iter) ) {
                 hashmap_entry keyval = hashmap_iter_next(iter);
-                if (free_keys) DESTROY(((void **)keyval.key)[0], keys_dst);
-                if (free_vals) DESTROY(((void **)keyval.val)[0], vals_dst);
+                if (free_keys) FINALISE(((void **)keyval.key)[0], keys_dst);
+                if (free_vals) FINALISE(((void **)keyval.val)[0], vals_dst);
             }
             hashmap_iter_free(iter);
         }

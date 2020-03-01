@@ -42,7 +42,7 @@ void stack_free(stack *s, bool free_elements)
 void stack_dispose(void *ptr, dtor *dst)
 {
     dst->df = vec_dispose;
-    DESTROY(ptr, dst);
+    FINALISE(ptr, dst);
 }
 
 bool stack_empty(stack *s)

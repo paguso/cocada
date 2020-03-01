@@ -54,15 +54,18 @@ dtor *empty_dtor() {
 } 
 
 
-static void _raw_free(void *ptr, dtor *dt ) 
+static void _ptr_free(void *ptr, dtor *dt ) 
 {
-    FREE(ptr);
+    void *pointee = *((void **)ptr); 
+    if ( dtor_nchd(dt) > 0 )
+        FINALISE( pointee, dtor_chd(dt, 0) );
+    FREE(pointee);
 }
 
 
 dtor *ptr_dtor() {
     dtor *ret = NEW(dtor);
-    ret->df = _raw_free;
+    ret->df = _ptr_free;
     ret->nchd = 0;
     return ret;
 }
