@@ -64,9 +64,9 @@
  */
 #define PRINT_ARRAY( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
     { printf(#NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
-      for (size_t _i=FROM, _el=(ELTSPERLINE); _i<TO; _i++) {\
-        if(!((_i-FROM)%_el)) printf("\n%4zu: ",_i);\
-        printf(#FORMAT" " , ARR[_i]);}\
+      for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
+        if(!((__i-FROM)%_el)) printf("\n%4zu: ",__i);\
+        printf(#FORMAT" " , ARR[__i]);}\
       printf("\n");}
 
 

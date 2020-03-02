@@ -38,8 +38,8 @@ Object lifecycle
 
 Cocada objects are typically implemented as structs with associated semantics.
 Each object has a type. In general the type is declared in the header file
-named <type>.h, and defined (implemented) in the corresponding 
-<type>.c. Most type declarations are made via anonymous structs to hide
+named `type.h`, and defined (implemented) in the corresponding 
+`type.c`. Most type declarations are made via anonymous structs to hide
 implementation details from the library user.
 
 ```
@@ -57,7 +57,7 @@ struct _type {
 
 ```
 
-The lifecycle of memory objetcs composed of five phases
+The lifecycle of memory objetcs composed of five stages
 1. Memory allocation
 2. Initialisation
 3. Normal use
@@ -66,15 +66,16 @@ The lifecycle of memory objetcs composed of five phases
 where the first two phases (1-2) comprise the object *creation*, and the two 
 last (4-5) comprise the object *destruction*.
 
-In COCADA, Step 1 usually consists in a call to `malloc`, and is supported
-via the macro ::NEW
-which allocates heap memory to an object of a given type and returns a typed
+In COCADA, Step 1 usually consists in a call to `malloc`, which is
+normally done through the macro ::NEW
+which allocates heap memory for an object of a given type and returns a typed
 pointer to this position. More commonly though, object creation (steps 1-2) 
 is done with a single call to one of the object constructors 
 `type *type_new(...)`
 
 An object can conceptually contain (or refer to) another object. We distinguish
 two kinds of object composition with regards to how it is physically realised.
+
 I. Object `A` has a physical (flat) copy of object `B` within its internal
 memory representation.
 ```
@@ -89,6 +90,7 @@ struct _A {         +-------------+
                     |             |
                     +-------------+
 ```
+
 II. Object `A` has a pointer to an object `B` that lives elsewhere in memory.
 ```
 CASE II)
@@ -103,12 +105,12 @@ struct _A {         +-------------+
                     +-------------+                          
 ```
 
-In the first case, the memory for holding the internal B instance is 
-allocated as part of the memory for holding A. In the second case, the
-memory for B must be allocated during object initialisation (Step 2).
+In the first case, the memory for holding the internal `B` instance is 
+allocated as part of the memory for holding `A`. In the second case, the
+memory for `B` must be allocated during object initialisation (Step 2).
 
-Object containers are generalised versions of those relations.
-A container is called **flat** when the contained objects are 
+Object *containers* implement generalised versions of those relations.
+A container is called *flat* when the contained objects are 
 physically stored within the container buffer (array). If the container
 has a maximum number of elements known at compile time, then it could
 be implemented as
@@ -147,7 +149,7 @@ struct _A {         +------------+
 ```
 
 In this case, the container is still considered `flat´ since the contained
-B-type objects are physically stored within the buffer, even though the
+`B`-type objects are physically stored within the buffer, even though the
 buffer itself lies somewhere outside the container, which physically contains
 only a pointer to its memory location.
 
@@ -176,36 +178,35 @@ struct _A {         +------------+               .
                                                                +---------+
 
 ```                 
-We will call containers like this *reference container*.
+
+We will call containers like this *reference containers*.
 Although a reference container conceptually stores external objects, 
 they are nothing but flat containers of pointers. So there is only one
-implementation for both cases. 
+implementation for both cases.  
 In whichever case, the buffer memory is normally allocated and initialised
 during the (container) object initialisation (Step 2).
 This is important for understanding the discussion on object destruction below.
 
 
-Object destructor infrastructure.
+Object destructor infrastructure
 -------------------------------------------------------------------------------
 
-As mentioned above, destroying an object requires `finalising´ it (Step 4), 
-or  cleaning its internal state, that is releasing the resources 
+As mentioned above, destroying an object requires, first, `finalising´ it 
+(Step 4), that is cleaning its internal state and releasing the resources 
 (in particular, memory) held by the object in reverse order of allocation, 
-and finally freeing the memory used by the `outer´ struct (Step 5).
+and then freeing the memory used by the struct (Step 5).
 In particular, finalising a flat container amounts to freeing the memory used by
-its buffer plus some constant-sized memory used for housekeeping. For example, 
+its buffer plus some constant-sized housekeeping memory. For example, 
 the buffer of a flat vector with capacity for 100 4-byte integers will occupy 
 400 bytes of heap memory. However, by deallocating the buffer of a reference
 container, we are not freeing the referenced objects, which might cause a
 to memory leak. The situation can become quite complex if we have deep
-hierarchies of nested objects.
-
-COCADA provides some infrastructure for dealing with the proper disposal of 
-complex hierarchies of objects. 
+hierarchies of nested objects. COCADA provides some infrastructure for 
+dealing with the proper disposal of  complex hierarchies of objects. 
 
 The basic concept is that of a **destructor** ::dtor which encapsulates and
 provides a way of nesting **destructor functions** ::dstr_func used for 
-finalising nested object hierarchies. A destructor is a  *closure* object 
+finalising object hierarchies. A destructor is a  *closure* object 
 composed of
 - A reference to a *destructor function* ::dstr_func; and
 - An array of child destructors.
@@ -227,9 +228,7 @@ objects of type `A`.
 |  C  |<>----|  B  |<>----|  A  |
 +-----+      +-----+      +-----+
 ```
-For now let us abstract whether these are flat or reference containers. We´ll
-come back to that later.
-
+For now let us suppose these are flat containers. We´ll come back to that later.
 
 The destruction of C would go roughly as follows.  First, the destructor function 
 
@@ -238,7 +237,7 @@ void C_dispose( void *ptr, dstr *c_dt )
 ```
 
 checks the destructor `c_dt` to see if contains a reference to a 
-destructor of its child objects, in this case of type `B`. Let us suppose 
+destructor for its child objects, in this case of type `B`. Let us suppose 
 this is the case, that is `b_dt = c_dt->chd[0]` is a destructor for 
 `B` objects.  Then a call to the corresponding destructor function 
 
@@ -250,20 +249,20 @@ will be made for each child `b` of type `B` held by the `C`-type container.
 Likewise the `B`-type destructor function, `B_dispose(void *ptr, dstr *b_dt)`, 
 will check whether `b_dt` contains references to a destructor for type 
 `A`-objects. After all `A`-objects of a type-`B` container are properly
-disposed of, then its buffer can be deallocated. 
-Similarlty, after all `B`-objects of a type-`B` container are properly
-destroyed, then its buffer can be freed.  
+disposed of, then its buffer can be deallocated.  Similarlty, after all 
+`B`-objects of a C` container are properly destroyed, then its buffer 
+can be freed.  
 
 
 ## Pointer destructors
 
-The situation we´ve been depicting is roughly precise, except for an 
-important detail. Let us suppose that the container `B` is a reference 
-container. Then each element of `C` is actually a pointer to a `B`-type
-container. After finalising one such type-`B` container, we also
-typically want to have the corresponding object memory deallocated.
-On the other hand, if `C` is a flat container, then its type-`B` container 
-elements structs are directly stored within the `C`-buffer. Thus we want
+The situation above is slightly different for reference containers. 
+Let us suppose that the container `C` is a reference  container. Then each 
+element of `C` is actually a pointer to a `B`-type container. 
+After finalising one such child containers, we also typically want to have 
+the its corresponding object memory deallocated.
+If `C` is a flat container as before, then its type-`B` container 
+elements structs are directly stored within its buffer. Thus we want
 to finalise one such type-`B` container (to delete its `A`-elements
 and release their buffers), but we cannot call a ::free on them individually.
 All the type-`B` structs memory will be released at once when the buffer
@@ -271,49 +270,50 @@ of the `C` container is released.
 
 This indirection of reference containers must be reflected in the
 destructor structure. You can think of a reference container, as mentioned
-above, as container of pointers, each pointer being a special case container
-of just one element (like in CASE II above). Hence, if `C` and `B` were
-reference containers in our running example we´d have
+above, as container of pointers, each pointer being itself a special case 
+container of just one element (like in CASE II above). 
+Hence, if `C` and `B` were reference containers in our running example 
+we´d have that
 
  <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
 
 So, the `C` destructor needs to have not a `B` destructor as child, but
-rather a *pointer destructor* which itself will have a `B` destructor
+rather a *pointer destructor*, which then will have a `B` destructor
 as child. The difference is subtle but crucial. 
 
-COCADA provide a function for obtaining a pointer destructor ::ptr_dtor. The
-corresponding destructor function will call the nested destructor in the 
-pointed object and then free the pointed memory, which is exactly what
-we want, as mentioned above. If the pointed type is a simple type with no
-further external references, then we can use a simple pointer destructor 
-whith no nested destructors.
+COCADA provides a function for obtaining a pointer destructor ::ptr_dtor. 
+The corresponding destructor function will call the nested destructor in the 
+pointed object and then free the memory pointed to. If the pointed type is 
+a simple type with no further external references, then we can simply use a  
+pointer destructor whith no nested destructors.
 
 
 ## Composing destructors
 
 In more complex cases an object may contain references to objects of 
-multiple types. A classic example is a (flat) hashmap, which directly stores 
-keys of type `K`, and values of type `V`. In such cases, a hashmap
-destructor `h_dt` should have `K` and `V` type destructors as children, 
-that is `h_dt->nchd==2`, and `h_dt->chd[0]` and `h_dt->chd_dt[1]` should
-be `K` and `V`-type destructors respectively.
+multiple types. As an example, a (flat) hashmap stores  keys of type `K`, 
+and values of type `V`. In such cases, a hashmap destructor `h_dt` 
+should have `K` and `V` type destructors as children, that is 
+`h_dt->nchd==2`, and `h_dt->chd[0]` and `h_dt->chd_dt[1]` should be `K` and 
+`V`-type destructors respectively.
 
-By extrapolating this example, we could have any tree-like destructor
-hierarchy. Although a specific destructor could be implemented by
-the library user, for example, a function 
+In general, we could have any tree-like destructor hierarchy. Although a specific 
+destructor could be implemented by the library user, for example, a function 
 
 `dstr *C_of_B_of_A_dstr()`
 
-could be implemented to return a destructor to the example above, this would 
-be unnecessarily tedious. Instead, COCADA provides an ergonomic way to 
-construct destructor hierarchies as follows.
-* The macro ::DTOR is used to return a basic destructor to a given type.
-That id `DTOR(type)` returns a destructor with destructor function
+could be implemented to return a destructor to the previous example, this would 
+be rather tedious. Instead, COCADA provides a more ergonomic way to construct 
+destructor hierarchies as follows. 
+
+- The macro ::DTOR is used to return a basic destructor to a given type.
+That is `DTOR(type)` returns a destructor with destructor function
 `type_dispose` (which must be provided for each particular type), and
 whith no nested child destructors (yet);
-* Existing destructors can be composed via the ::dtor_cons function. This 
-function takes a pointer to a parent destructor `par`, a child destructor `
-chd`, appends `chd` to the list of child destructors of `par`, and returns the 
+
+- Existing destructors can be composed via the ::dtor_cons function. This 
+function takes a pointer to a parent destructor `par`, a child destructor 
+`chd`, appends `chd` to the list of child destructors of `par`, and returns the 
 reference to the modified `par`. This can be used to create arbitrary tree-like
 hierarchies. For example, 
 
@@ -343,6 +343,19 @@ An *empty destructor* obtained via ::empty_dtor can be used in such cases to
 signal that the  corresponding child  objects should not be destroyed.
 Notice that any object down the empty destructor point will be left untouched.
 
+## Finalising and destroying objects 
+
+An object can be *finalised* (Step 4 *only*) with a destructor via the ::FINALISE macro. 
+This will not deallocate the object. This is typically what would be used from
+whithin a flat container destructor to clean memory used by its elements. 
+The destructor object is also not destroyed.
+
+An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
+In addition to finalising the object, it also deallocates its memory **and**
+also consumes the destructor.
+
+Finally, if
+
 ## Limitations: Backward/Cyclic references
 
 No check is performed for backward references, which can cause *double free*  
@@ -362,11 +375,6 @@ problems.
  * Allocate memory 
  */
 #define NEW( TYPE )   ((TYPE*)(malloc(sizeof(TYPE))))
-
-/**
- * Deallocate memory 
- */
-#define FREE( PTR )   free(PTR)
 
 
 /**
@@ -398,7 +406,9 @@ struct _dtor {
  */
 dtor *dtor_new_with_func(dstr_func df); 
 
-
+/**
+ * @brief Recursively frees a destructor.
+ */
 void dtor_free(dtor *dt);
 
 /**
@@ -430,21 +440,41 @@ dtor *empty_dtor();
  */
 dtor *ptr_dtor();
 
-
+/**
+ * Returns a default destructor for a given type with no nested destructor.
+ */
 #define DTOR( TYPE ) dtor_new_with_func(TYPE##_dispose)
 
-
+/**
+ * Finalises an object (and its referenced objects) based on a given
+ * destructor. 
+ * The object is not deallocated, and the destructor is not destroyed.
+ */
 #define FINALISE( OBJ, DTOR ) {\
-    void *_obj = (OBJ);\
-    dtor *_dt = (DTOR);\
-    _dt->df(_obj, _dt);}
+    void *__obj = (OBJ);\
+    dtor *__dt = (DTOR);\
+    __dt->df(__obj, __dt);}
+
+/**
+ * Destroys an object, that is finalises it (and its referenced objects) 
+ * based on a given destructor **and** deallocates its memory.
+ * The destructor is **also** destroyed.
+ */
+#define DESTROY( OBJ, DTOR ) \
+    void *__obj = (OBJ);\
+    dtor *__dt = (DTOR);\
+    __dt->df(__obj, __dt);\
+    free(__obj);\
+    dtor_free(__dt);
 
 
-#define DESTROY( OBJ, DTOR ) {\
-    void *_obj = (OBJ);\
-    dtor *_dt = (DTOR);\
-    _dt->df(_obj, _dt);\
-    FREE(_obj);\
-    dtor_free(_dt);}
+#define FREE1( OBJ ) free(OBJ)
+
+#define FREE2( OBJ, TYPE ) DESTROY(OBJ, DTOR(TYPE))
+
+#define _SELECT_FREE(_1, _2, NAME,...) NAME
+
+#define FREE(...) _SELECT_FREE(__VA_ARGS__, FREE2, FREE1)(__VA_ARGS__)
+
 
 #endif

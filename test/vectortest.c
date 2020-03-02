@@ -35,7 +35,7 @@ void test_vec_new(CuTest *tc)
 {
     vec *v = vec_new_with_capacity(sizeof(int), 10);
     CuAssertSizeTEquals(tc, 0, vec_len(v));
-    vec_free(v, true);
+    vec_free(v, false);
 }
 
 
@@ -58,7 +58,7 @@ void test_vec_app(CuTest *tc)
         CuAssertIntEquals(tc, (int)i, *d);
     }
 
-    vec_free(v, false);
+    FREE(v, vec);
 }
 
 
