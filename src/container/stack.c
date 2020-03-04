@@ -52,12 +52,12 @@ bool stack_empty(stack *s)
 
 void stack_push(stack *s, void *elt)
 {
-    vec_app(s, elt);
+    vec_push(s, elt);
 }
 
 void stack_pop(stack *s, void *dest)
 {
-    return vec_del(s, vec_len(s)-1, dest);
+    return vec_pop(s, vec_len(s)-1, dest);
 }
 
 #define STACK_PUSH( TYPE ) \

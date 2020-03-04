@@ -127,7 +127,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
         // if not last level
         bitvector *even_suff = bitvector_new_with_capacity(lvl_len);
         if(lvl == csa->nlevels - 1) {
-            for (size_t i = 0, last = 0; i < lvl_len; i++)
+            for (size_t i = 0 ; i < lvl_len; i++)
                     bitvec_append(even_suff, IS_EVEN(sarr[i]));
             break;
         }

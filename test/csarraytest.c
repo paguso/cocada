@@ -98,7 +98,6 @@ void xxxcsarray_test_setup(CuTest *tc)
 {
     Nab = 1;
     Narr = 1;
-    Nab*MAX_STR_SIZE;
     ab = NEW_ARRAY(alphabet*, Narr);
     strings = NEW_ARRAY(char*, Narr);
     slens = NEW_ARRAY(size_t, Narr);

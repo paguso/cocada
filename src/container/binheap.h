@@ -25,6 +25,7 @@
 #include <stdlib.h>
 
 #include "new.h"
+#include "order.h"
 
 /**
  * @file binheap.h
@@ -59,7 +60,7 @@ typedef struct _binheap binheap;
  * @param typesize The size (in bytes) of the individual elements.
  * @param mode The mode of the heap
  */
-binheap *binheap_new(int (*cmp_fn)(const void *, const void *), size_t typesize,
+binheap *binheap_new(cmp_func cmp, size_t typesize,
                      heap_mode mode);
 
 

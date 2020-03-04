@@ -34,6 +34,7 @@
  * @brief Dynamic array ADT (a.k.a. Vector)
  */
 
+
 /**
  * Vector type
  */
@@ -53,7 +54,12 @@ vec *vec_new(size_t typesize);
  */
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
+
+/**
+ * @brief returns the type size of the actual implementation in bytes.
+ */
 size_t vec_sizeof();
+
 
 /**
  * @brief Destructor.
@@ -63,18 +69,24 @@ size_t vec_sizeof();
  */
 void vec_free(vec *v, bool free_elements);
 
+
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
 void vec_dispose(void *v, dtor *dst );
+
 
 /**
  * @brief Returns the # of elements logically stored.
  */
-size_t vec_len(vec *v);
+size_t vec_len(const vec *v);
 
 
 /**
  * @brief Returns the individual size of stored elements (in bytes). 
  */
-size_t vec_typesize(vec *v);
+size_t vec_typesize(const vec *v);
 
 
 /**
@@ -87,23 +99,22 @@ void vec_clear(vec *v);
  * @brief Detaches and returns the current internal array 
  * 
  * @see vec_trim
- * @warning After this operation, the dynamic array @p da is destroyed.
+ * @warning After this operation, the vector is destroyed.
  */
 void *vec_detach(vec *v);
 
 
 /**
  * @brief Returns (the internal reference to) the element at position @p pos.
- * @warn  Do not modify data ate thsi postni
  */
-const void *vec_get(vec *v, size_t pos);
+const void *vec_get(const vec *v, size_t pos);
 
 
 /**
  * @brief Copies the element at position @p pos into the location 
  *        pointed to by @p dest 
  */
-void  vec_get_cpy(vec *v, size_t pos, void *dest);
+void  vec_get_cpy(const vec *v, size_t pos, void *dest);
 
 
 /**
@@ -123,7 +134,7 @@ void vec_swap(vec *v, size_t i, size_t j);
  * @brief Appends a copy of the value pointed to by @p src.
  * The number of copied bytes is given by the array typesize.
  */
-void vec_app(vec *v, void *src);
+void vec_push(vec *v, void *src);
 
 
 /**
@@ -134,9 +145,18 @@ void vec_ins(vec *v, size_t pos, void *src);
 
 
 /**
- * @brief Removes and returns new the element at position @p pos.
+ * @brief Removes the element at position @p pos from the vector, 
+ * copying its value to the position pointed to by @p dest.
+ * @warning Does not check if @dest is valid
  */
-void vec_del(vec *v, size_t pos, void *dest);
+void vec_pop(vec *v, size_t pos, void *dest);
+
+
+/**
+ * @brief Deletes the element at position @p pos from the vector.
+ * The value/reference is lost.
+ */
+void vec_del(vec *v, size_t pos);
 
 
 /**

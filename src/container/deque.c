@@ -189,7 +189,7 @@ void deque_pop_front(deque *q, void *dest)
 
 #define DEQUE_GET_IMPL( TYPE )\
     TYPE deque_get_##TYPE(deque *q, size_t pos) {\
-        return ((TYPE **)deque_get(q, pos))[0];\
+        return ((TYPE *)deque_get(q, pos))[0];\
     }
 
 #define DEQUE_FRONT_IMPL( TYPE )\

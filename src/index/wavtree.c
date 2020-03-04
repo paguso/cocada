@@ -73,7 +73,7 @@ static const bitvector *get_charcode(vec *code_tbl, xchar_t chr)
 static void set_charcode(vec *code_tbl, xchar_t chr, bitvector *code)
 {
     for (size_t i=vec_len(code_tbl); i<=(size_t)chr; i++)
-        vec_app(code_tbl, &NULL_CODE);
+        vec_push(code_tbl, &NULL_CODE);
     vec_set(code_tbl, chr, &code);
 }
 

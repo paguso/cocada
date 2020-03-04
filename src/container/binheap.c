@@ -25,21 +25,22 @@
 #include "arrayutil.h"
 #include "binheap.h"
 #include "new.h"
+#include "order.h"
 
 
 struct _binheap {
     heap_mode mode;
     vec *data;
-    int (*comp_fn)(const void *, const void *);
+    cmp_func cmp;
 };
 
-binheap *binheap_new( int (*comp_fn)(const void *, const void *), 
+binheap *binheap_new( cmp_func cmp, 
                       size_t typesize, heap_mode mode ) 
 {
     binheap *heap = NEW(binheap);
     heap->mode = mode;
     heap->data = vec_new(typesize);
-    heap->comp_fn = comp_fn;
+    heap->cmp = cmp;
     return heap;
 }
 
@@ -73,13 +74,13 @@ size_t binheap_size(binheap *heap)
 }
 
 
-static size_t bubble_up(binheap *heap)
+static size_t _bubble_up(binheap *heap)
 {
     size_t i=binheap_size(heap)-1;
     switch (heap->mode) {
     case MIN_HEAP:
         while ( i>0 &&
-                heap->comp_fn( vec_get(heap->data, i) ,
+                heap->cmp( vec_get(heap->data, i) ,
                                vec_get(heap->data, (i-1)/2) ) < 0 ) {
             vec_swap(heap->data, i, (i-1)/2);
             i = (i-1)/2;
@@ -87,7 +88,7 @@ static size_t bubble_up(binheap *heap)
         break;
     case MAX_HEAP:
         while ( i>0 &&
-                heap->comp_fn( vec_get(heap->data, i) ,
+                heap->cmp( vec_get(heap->data, i) ,
                                vec_get(heap->data, (i-1)/2) ) > 0 )  {
             vec_swap(heap->data, i, (i-1)/2);
             i = (i-1)/2;
@@ -98,7 +99,7 @@ static size_t bubble_up(binheap *heap)
 }
 
         
-static size_t bubble_down(binheap *heap, size_t pos)
+static size_t _bubble_down(binheap *heap, size_t pos)
 {
     size_t i, l, r, m, n;
     n = binheap_size(heap);
@@ -111,12 +112,12 @@ static size_t bubble_down(binheap *heap, size_t pos)
             l = (2*i)+1;
             r = (2*i)+2;
             if ( l < n &&
-                 heap->comp_fn( vec_get(heap->data, l),
+                 heap->cmp( vec_get(heap->data, l),
                                 vec_get(heap->data, m) ) < 0 )  {
                 m = l;
             }
             if ( r < n &&
-                 heap->comp_fn( vec_get(heap->data, r),
+                 heap->cmp( vec_get(heap->data, r),
                                 vec_get(heap->data, m) ) < 0 ) {
                 m = r;
             }
@@ -135,12 +136,12 @@ static size_t bubble_down(binheap *heap, size_t pos)
             l = (2*i)+1;
             r = (2*i)+2;
             if ( l < n &&
-                 heap->comp_fn( vec_get(heap->data, l),
+                 heap->cmp( vec_get(heap->data, l),
                                 vec_get(heap->data, m) ) > 0 ) {
                 m = l;
             }
             if ( r < n &&
-                 heap->comp_fn( vec_get(heap->data, r),
+                 heap->cmp( vec_get(heap->data, r),
                                 vec_get(heap->data, m) ) > 0 ) {
                 m = r;
             }
@@ -159,8 +160,8 @@ static size_t bubble_down(binheap *heap, size_t pos)
         
 void binheap_push(binheap *heap, void *elt)
 {
-    vec_app(heap->data, elt);
-    bubble_up(heap);
+    vec_push(heap->data, elt);
+    _bubble_up(heap);
 }
 
 
@@ -168,27 +169,25 @@ void binheap_pop(binheap *heap, void *dest)
 {
     if (vec_len(heap->data)==0) return;
     vec_swap(heap->data, 0, vec_len(heap->data)-1);
-    vec_del(heap->data, vec_len(heap->data)-1, dest);
+    vec_pop(heap->data, vec_len(heap->data)-1, dest);
     if (vec_len(heap->data) > 0) 
-        bubble_down(heap, 0);
+        _bubble_down(heap, 0);
 }
 
 
-
-
-#define BINHEAP_PUSH( TYPE )\
+#define BINHEAP_PUSH_IMPL( TYPE )\
     void binheap_push_##TYPE(binheap *heap, TYPE val)\
         {   binheap_push(heap, &val);   }
 
 
-#define BINHEAP_POP( TYPE )\
+#define BINHEAP_POP_IMPL( TYPE )\
     TYPE binheap_pop_##TYPE(binheap *heap)\
         {   TYPE s; binheap_pop(heap, &s); return s; }
 
 
-#define BINHEAP_ALL( TYPE )\
-BINHEAP_PUSH(TYPE)\
-BINHEAP_POP(TYPE)
+#define BINHEAP_ALL_IMPL( TYPE )\
+BINHEAP_PUSH_IMPL(TYPE)\
+BINHEAP_POP_IMPL(TYPE)
 
-BINHEAP_ALL(int)
-BINHEAP_ALL(size_t)
+BINHEAP_ALL_IMPL(int)
+BINHEAP_ALL_IMPL(size_t)

@@ -47,7 +47,7 @@ void test_vec_app(CuTest *tc)
 
     for (size_t i =0; i<len; i++) {
         short d = i;
-        vec_app(v, &d);
+        vec_push(v, &d);
         CuAssertSizeTEquals(tc, i+1, vec_len(v));
     }
 
@@ -70,7 +70,7 @@ void test_vec_get_cpy(CuTest *tc)
 
     for (size_t i =0; i<len; i++) {
         double d = i;
-        vec_app(v, &d);
+        vec_push(v, &d);
         CuAssertSizeTEquals(tc, i+1, vec_len(v));
     }
 
@@ -93,7 +93,7 @@ void test_vec_set(CuTest *tc)
     CuAssertSizeTEquals(tc, 0, vec_len(v));
 
     for (int i =0; i<len; i++) {
-        vec_app(v, &i);
+        vec_push(v, &i);
         CuAssertSizeTEquals(tc, i+1, vec_len(v));
     }
 
@@ -121,7 +121,7 @@ void test_vec_ins(CuTest *tc)
 
     for (size_t i=1; i<len; i+=2) {
         double d = i;
-        vec_app(v, &d);
+        vec_push(v, &d);
     }
     for (size_t i=0; i<len; i+=2) {
         double d = i;
@@ -146,11 +146,11 @@ void test_vec_del(CuTest *tc)
 
     for (size_t i=0; i<len; i++) {
         double d = i;
-        vec_app(v, &d);
+        vec_push(v, &d);
     }
     for (size_t i=0; i<len/2; i++) {
         double d; 
-        vec_del(v, i, &d);
+        vec_pop(v, i, &d);
         //printf(">deleted da[%zu]=%f\n",i,d);
         CuAssertDblEquals(tc, (double)2*i, d, 0.2);
     }
@@ -172,7 +172,7 @@ void test_vec_swap(CuTest *tc)
 
     for (size_t i=0; i<len; i++) {
         double d = i;
-        vec_app(v, &d);
+        vec_push(v, &d);
     }
     for (size_t i=0; i<len/2; i++) {
         vec_swap(v, i, len-1-i);
@@ -221,7 +221,7 @@ void test_vec_radixsort(CuTest *tc)
                 t.values[0] = d0;
                 t.values[1] = d1;
                 t.values[2] = d2;
-                vec_app(v, &t);
+                vec_push(v, &t);
             }
         }
     }
@@ -267,7 +267,7 @@ void test_vec_qsort(CuTest *tc)
     shuffle_arr(arr, max_key, sizeof(triple));
     vec *v = vec_new(sizeof(triple));
     for (size_t i=0; i<max_key; i++){
-        vec_app(v, &arr[i]); 
+        vec_push(v, &arr[i]); 
     }
     FREE(arr);
 
@@ -311,10 +311,10 @@ void test_vec_free(CuTest *tc)
             vobj *e = NEW(vobj);
             e->i = (int)i;
             e->d = (double)i;
-            vec_app(c, &e); 
+            vec_push(c, &e); 
         }
         CuAssertSizeTEquals(tc, i, vec_len(c));
-        vec_app(v, &c);
+        vec_push(v, &c);
     }
     CuAssertSizeTEquals(tc, n, vec_len(v));
 
@@ -329,10 +329,10 @@ void test_vec_flat_free(CuTest *tc)
         vec *c = vec_new(sizeof(vobj));
         for (size_t j=0; j<i; j++) {
             vobj e = {(int)i, (double)i};
-            vec_app(c, &e); 
+            vec_push(c, &e); 
         }
         CuAssertSizeTEquals(tc, i, vec_len(c));
-        vec_app(v, c);
+        vec_push(v, c);
         FREE(c);
     }
     CuAssertSizeTEquals(tc, n, vec_len(v));
@@ -340,7 +340,7 @@ void test_vec_flat_free(CuTest *tc)
         vec *c = (vec *)vec_get(v,i);
         for (size_t j=0; j<i; j++) {
             vobj e = {(int)i, (double)i};
-            vec_app(c, &e); 
+            vec_push(c, &e); 
         }
         CuAssertSizeTEquals(tc, 2*i, vec_len(c));
     }

@@ -29,6 +29,7 @@
 #include "bitsandbytes.h"
 #include "new.h"
 #include "mathutil.h"
+#include "order.h"
 #include "randutil.h"
 #include "vec.h"
 
@@ -97,7 +98,7 @@ void vec_dispose(void *ptr, dtor *vdst )
     if (dtor_nchd(vdst)) {
         dtor *chd_dst = dtor_chd(vdst, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
-            void *chd = vec_get(v, i);
+            void *chd = * (void **) vec_get(v, i);
             FINALISE(chd, chd_dst);
         }
     }
@@ -107,13 +108,13 @@ void vec_dispose(void *ptr, dtor *vdst )
 }
 
 
-size_t vec_len(vec *v)
+size_t vec_len(const vec *v)
 {
     return v->len;
 }
 
 
-size_t vec_typesize(vec *v)
+size_t vec_typesize(const vec *v)
 {
     return v->typesize;
 }
@@ -140,13 +141,13 @@ void *vec_detach(vec *v)
 }
 
 
-const void *vec_get(vec *v, size_t pos)
+const void *vec_get(const vec *v, size_t pos)
 {
     return v->data + ( pos * v->typesize );
 }
 
 
-void vec_get_cpy(vec *v, size_t pos, void *dest)
+void vec_get_cpy(const vec *v, size_t pos, void *dest)
 {
     memcpy(dest, v->data+(pos*v->typesize), v->typesize);
 }
@@ -162,41 +163,18 @@ void vec_set(vec *v, size_t pos, void *src)
 void vec_swap(vec *v, size_t i, size_t j)
 {
     if (i==j) return;
-    //byte_t swp[v->typesize];
     memcpy(v->swp, v->data+(i*v->typesize), v->typesize);
     memcpy(v->data+(i*v->typesize), v->data+(j*v->typesize), v->typesize);
     memcpy(v->data+(j*v->typesize), v->swp, v->typesize);
 }
 
 
-/*
-void vec_app(dynarray *v, void *val)
-{
-    check_and_resize(v);
-    ((void **)v->data)[v->len++] = val;
-}
-*/
-
-
-void vec_app(vec *v, void *src)
+void vec_push(vec *v, void *src)
 {
     check_and_resize(v);
     memcpy(v->data+(v->len*v->typesize), src, v->typesize);
     v->len++;
 }
-
-
-/*
-void vec_ins(dynarray *v, size_t pos, void *val)
-{
-    check_and_resize(v);
-    for (size_t i=v->len; i>pos; i--) {
-        ((void **)v->data)[i] = ((void **)v->data)[i-1];
-    }
-    ((void **)v->data)[pos] = val;
-    v->len++;
-}
-*/
 
 
 void vec_ins(vec *v, size_t pos, void *src)
@@ -209,10 +187,9 @@ void vec_ins(vec *v, size_t pos, void *src)
 }
 
 
-void vec_del(vec *v, size_t pos, void *dest)
+void vec_pop(vec *v, size_t pos, void *dest)
 {
-    if (dest!=NULL) 
-        vec_get_cpy(v, pos, dest);
+    vec_get_cpy(v, pos, dest);
     memmove( v->data+(pos*v->typesize), v->data+((pos+1)*v->typesize),
              (v->len-pos-1)*v->typesize );
     v->len--;
@@ -220,8 +197,16 @@ void vec_del(vec *v, size_t pos, void *dest)
 }
 
 
+void vec_del(vec *v, size_t pos)
+{
+    memmove( v->data+(pos*v->typesize), v->data+((pos+1)*v->typesize),
+             (v->len-pos-1)*v->typesize );
+    v->len--;
+    check_and_resize(v);
+}
 
-static size_t _part(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+
+static size_t _part(vec *v, size_t l, size_t r, cmp_func cmp)
 {
     size_t p = rand_range_size_t(l, r);
     vec_swap(v, l, p);
@@ -231,11 +216,11 @@ static size_t _part(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, c
     void *pi = v->data + (i * v->typesize);
     void *pj = v->data + (j * v->typesize);
     while ( i < j ) {
-        while ( i < r && cmp_func(pi, pv) <= 0 ) {
+        while ( i < r && cmp(pi, pv) <= 0 ) {
             i++;
             pi += (v->typesize);
         }
-        while ( cmp_func(pj, pv) > 0 ) {
+        while ( cmp(pj, pv) > 0 ) {
             j--;
             pj -= (v->typesize);
         }
@@ -248,12 +233,12 @@ static size_t _part(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, c
 }
 
 
-static void _qsort(vec *v, size_t l, size_t r, int (* cmp_func)(const void *, const void *))
+static void _qsort(vec *v, size_t l, size_t r, cmp_func cmp)
 {
     if (l < r) {
-        size_t p = _part(v, l, r, cmp_func);
-        _qsort(v, l, p, cmp_func);
-        _qsort(v, p+1, r, cmp_func);
+        size_t p = _part(v, l, r, cmp);
+        _qsort(v, l, p, cmp);
+        _qsort(v, p+1, r, cmp);
     }
 }
 
@@ -309,7 +294,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_APP_IMPL( TYPE ) \
    void vec_app_##TYPE(vec *v, TYPE val)\
-    { vec_app(v, &val); }
+    { vec_push(v, &val); }
 
 
 #define VEC_INS_IMPL( TYPE ) \
@@ -319,7 +304,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_DEL_IMPL( TYPE ) \
    TYPE vec_del_##TYPE(vec *v, size_t pos)\
-    {  TYPE r; vec_del(v, pos, &r); return r; } 
+    {  TYPE r; vec_pop(v, pos, &r); return r; } 
 
 
 #define VEC_ALL_IMPL( TYPE )\
