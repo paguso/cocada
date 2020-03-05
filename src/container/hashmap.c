@@ -98,7 +98,7 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
     FREE(hmap);
 }
 
-void hashmap_dispose(void *ptr, dtor *dst) {
+void hashmap_dispose(void *ptr, const dtor *dst) {
     hashmap *hmap = (hashmap *)ptr;
     if (dst != NULL) {
         bool free_keys = (dtor_nchd(dst) > 0);
@@ -117,7 +117,7 @@ void hashmap_dispose(void *ptr, dtor *dst) {
     }
 }
 
-static inline uint64_t _hash(hashmap *hmap, void *key)
+static inline uint64_t _hash(const hashmap *hmap, const void *key)
 {
     // combine hashing with Fibonacci hashing 
     return fib_hash(hmap->keyhash(key));
@@ -133,12 +133,12 @@ static inline uint64_t _h1(uint64_t h)
     return h >> 7;
 }
 
-static inline void * _key_at(hashmap *hmap, size_t pos) 
+static inline void * _key_at(const hashmap *hmap, size_t pos) 
 {
     return hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
 }
 
-static inline void * _value_at(hashmap *hmap, size_t pos) 
+static inline void * _value_at(const hashmap *hmap, size_t pos) 
 {
     return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) + hmap->keysize);
 }
@@ -151,7 +151,7 @@ typedef struct {
 
 
 // Find the target position of the key in the table
-static _find_res _find(hashmap *hmap, void *key, uint64_t h) 
+static _find_res _find(const hashmap *hmap, const void *key, uint64_t h) 
 {
     uint64_t h1 = _h1(h);
     uint64_t h2 = _h2(h);
@@ -217,13 +217,13 @@ static _find_res _find_sse(hashmap *hmap, void *key, uint64_t h)
 
 */
 
-bool hashmap_has_key(hashmap *hmap, void *key)
+bool hashmap_has_key(const hashmap *hmap, const void *key)
 {
     return _find(hmap, key, _hash(hmap, key)).found;
 }
 
 
-void *hashmap_get(hashmap *hmap, void *key)
+const void *hashmap_get(const hashmap *hmap, const void *key)
 {
     _find_res qry = _find(hmap, key, _hash(hmap, key));
     if (qry.found) {
@@ -234,7 +234,7 @@ void *hashmap_get(hashmap *hmap, void *key)
     }
 }
 
-static void _print(hashmap *hmap) {
+static void _print(const hashmap *hmap) {
     printf("Hashmap at %p\n", hmap);
     char *c = cstr_new(8);
     for (size_t i=0; i<hmap->cap; i++) {
@@ -245,7 +245,7 @@ static void _print(hashmap *hmap) {
 }
 
 
-static inline void _set(hashmap *hmap, void *key, void *val)
+static inline void _set(hashmap *hmap, const void *key, const void *val)
 {
     uint64_t h = _hash(hmap, key);
     _find_res qry = _find(hmap, key, h);
@@ -304,7 +304,7 @@ static void _check_resize(hashmap *hmap)
 }
 
 
-void hashmap_set(hashmap *hmap, void *key, void *val)
+void hashmap_set(hashmap *hmap, const void *key, const void *val)
 {
     assert(key != NULL);
     _check_resize(hmap);
@@ -312,7 +312,7 @@ void hashmap_set(hashmap *hmap, void *key, void *val)
 }
 
 
-void hashmap_unset(hashmap *hmap, void *key)
+void hashmap_unset(hashmap *hmap, const void *key)
 {
     assert(key != NULL);
     uint64_t h = _hash(hmap, key);
@@ -324,7 +324,7 @@ void hashmap_unset(hashmap *hmap, void *key)
     } 
 }
 
-size_t hashmap_size(hashmap *map)
+size_t hashmap_size(const hashmap *map)
 {
     return map->size;
 }
@@ -336,14 +336,14 @@ struct _hashmap_iter {
 };
 
 
-void _hashmap_iter_goto_next(hashmap_iter *iter) {
+static void _hashmap_iter_goto_next(hashmap_iter *iter) {
     while ((iter->index < iter->src->cap) &&
            (((byte_t *)iter->src->tally)[iter->index] >> 7))
         iter->index++;
 }
 
 
-hashmap_iter *hashmap_get_iter(hashmap *src)
+hashmap_iter *hashmap_get_iter(const hashmap *src)
 {
     hashmap_iter *ret;
     ret = NEW(hashmap_iter);
@@ -359,12 +359,12 @@ void hashmap_iter_free(hashmap_iter *iter)
     FREE(iter);
 }
 
-bool hashmap_iter_has_next(hashmap_iter *iter)
+bool hashmap_iter_has_next(const hashmap_iter *iter)
 {
     return (iter->index < iter->src->cap);
 }
 
-hashmap_entry hashmap_iter_next(hashmap_iter *iter)
+const hashmap_entry hashmap_iter_next(hashmap_iter *iter)
 {
     hashmap_entry ret = {NULL, NULL};
     if (iter->index >= iter->src->cap ) {

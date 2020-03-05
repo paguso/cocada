@@ -70,24 +70,24 @@ binheap *binheap_new(cmp_func cmp, size_t typesize,
 void binheap_free(binheap *heap, bool free_elements);
 
 
-void binheap_dispose(void *ptr, dtor *dst); 
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
+void binheap_dispose(void *ptr, const dtor *dst); 
 
 
 /**
  * @brief Returns the number of elements stored in the heap.
  */
-size_t binheap_size(binheap *heap);
+size_t binheap_size(const binheap *heap);
 
 
 /**
  * @brief Stores a new element in the heap.
- * @param elt A pointer to the element to be stored. Only this reference is
- * actually stored. Upon heap destruction, the pointed memory is only freed
- * if free_elements is set to 1.
- *
- * @see binheap_free
+ * @param elt 
  */
-void binheap_push(binheap *heap, void *elt);
+void binheap_push(binheap *heap, const void *elt);
 
 
 /**
@@ -106,6 +106,7 @@ void binheap_pop(binheap *heap, void *dest);
 
 #define BINHEAP_POP_DECL( TYPE )\
     TYPE binheap_pop_##TYPE(binheap *heap);
+
 
 #define BINHEAP_ALL_DECL( TYPE )\
 BINHEAP_PUSH_DECL(TYPE)\

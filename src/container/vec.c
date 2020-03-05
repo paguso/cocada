@@ -92,14 +92,14 @@ void vec_free(vec *v, bool free_elements)
     FREE(v);
 }
 
-void vec_dispose(void *ptr, dtor *vdst ) 
+void vec_dispose(void *ptr, const dtor *dt ) 
 {
     vec *v = (vec *)ptr;
-    if (dtor_nchd(vdst)) {
-        dtor *chd_dst = dtor_chd(vdst, 0);
+    if (dtor_nchd(dt)) {
+        dtor *chd_dt = dtor_chd(dt, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
             void *chd = * (void **) vec_get(v, i);
-            FINALISE(chd, chd_dst);
+            FINALISE(chd, chd_dt);
         }
     }
     FREE(v->data);

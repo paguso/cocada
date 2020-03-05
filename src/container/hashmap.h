@@ -91,12 +91,17 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
 void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 
-void hashmap_dispose(void *ptr, dtor *dst);
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
+void hashmap_dispose(void *ptr, const dtor *dst);
+
 
 /**
  * @brief Checks whether the @p map already contains a given @p key.
  */
-bool hashmap_has_key(hashmap *hmap, void *key);
+bool hashmap_has_key(const hashmap *hmap, const void *key);
 
 
 /**
@@ -104,7 +109,7 @@ bool hashmap_has_key(hashmap *hmap, void *key);
  * 
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-void *hashmap_get(hashmap *hmap, void *key);
+const void *hashmap_get(const hashmap *hmap, const void *key);
 
 
 /**
@@ -113,7 +118,7 @@ void *hashmap_get(hashmap *hmap, void *key);
  * @warning If the map already contains the provided @p key, the current value
  * gets overwitten.
  */
-void hashmap_set(hashmap *hmap, void *key, void *val);
+void hashmap_set(hashmap *hmap, const void *key, const void *val);
 
 
 /**
@@ -121,19 +126,19 @@ void hashmap_set(hashmap *hmap, void *key, void *val);
  * 
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-void hashmap_unset(hashmap *hmap, void *key);
+void hashmap_unset(hashmap *hmap, const void *key);
 
 
 /**
  * @brief Returns the number of elements currently stored.
  */
-size_t hashmap_size(hashmap *hmap);
+size_t hashmap_size(const hashmap *hmap);
 
 
 /**
  * @brief Returns a new iterator for the given @p map.
  */
-hashmap_iter *hashmap_get_iter(hashmap *hmap);
+hashmap_iter *hashmap_get_iter(const hashmap *hmap);
 
 
 /**
@@ -146,13 +151,13 @@ void hashmap_iter_free(hashmap_iter *iter);
 /**
  * @brief Indicates whether there are still entries to be iterated over.
  */
-bool hashmap_iter_has_next(hashmap_iter *iter);
+bool hashmap_iter_has_next(const hashmap_iter *iter);
 
 
 /**
  * @brief Gets the next entry of the iteration.
  */
-hashmap_entry hashmap_iter_next(hashmap_iter *iter);
+const hashmap_entry hashmap_iter_next(hashmap_iter *iter);
 
 
 #endif

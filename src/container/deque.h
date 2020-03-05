@@ -41,7 +41,12 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity);
  */
 void deque_free(deque *q, bool free_elts);
 
-void deque_dispose(void *ptr, dtor *dst);
+
+/**
+ * @brief Finaliser 
+ * @see new.h
+ */
+void deque_dispose(void *ptr, const dtor *dst);
 
 
 /**

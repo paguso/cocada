@@ -392,7 +392,7 @@ typedef struct _dtor dtor;
 /**
  * Destructor function type
  */
-typedef void (*dstr_func) (void *, dtor *);
+typedef void (*dstr_func) (void *, const dtor *);
 
 
 struct _dtor {
@@ -414,18 +414,18 @@ void dtor_free(dtor *dt);
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
-size_t dtor_nchd(dtor *dt); 
+size_t dtor_nchd(const dtor *dt); 
 
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
-dtor *dtor_chd(dtor *par, size_t index);
+const dtor *dtor_chd(const dtor *par, size_t index);
 
 /**
  * @brief Composes two destructor by appending @p chd to the children list of @p par.
  * Returns a reference to the modified @p par
  */
-dtor *dtor_cons(dtor *par, dtor *chd);
+dtor *dtor_cons(dtor *par, const dtor *chd);
 
 
 /**

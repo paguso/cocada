@@ -22,18 +22,18 @@ void dtor_free(dtor *d) {
     FREE(d);
 }
 
-size_t dtor_nchd(dtor *dst) 
+size_t dtor_nchd(const dtor *dst) 
 {
     return dst->nchd;
 }
 
-dtor *dtor_chd(dtor *par, size_t index)
+const dtor *dtor_chd(const dtor *par, size_t index)
 {
     return ((dtor **)par->chd)[index];
 }
 
 
-dtor *dtor_cons(dtor *par, dtor *chd)
+dtor *dtor_cons(dtor *par, const dtor *chd)
 {
     par->chd = (dtor **) realloc(par->chd, par->nchd+1 * sizeof(dtor *));
     par->chd[par->nchd] =  chd;

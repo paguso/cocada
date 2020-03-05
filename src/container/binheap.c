@@ -53,7 +53,7 @@ void binheap_free(binheap *heap, bool free_elements)
 }
 
 
-void binheap_dispose(void *ptr, dtor *dst) 
+void binheap_dispose(void *ptr, const dtor *dst) 
 {
     binheap *heap = (binheap *)ptr;
     if (dst!=NULL) {
@@ -68,7 +68,7 @@ void binheap_dispose(void *ptr, dtor *dst)
 }
 
 
-size_t binheap_size(binheap *heap)
+size_t binheap_size(const binheap *heap)
 {
     return vec_len(heap->data);
 }
@@ -158,7 +158,7 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 }
 
         
-void binheap_push(binheap *heap, void *elt)
+void binheap_push(binheap *heap, const void *elt)
 {
     vec_push(heap->data, elt);
     _bubble_up(heap);

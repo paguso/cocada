@@ -72,14 +72,14 @@ void deque_free(deque *q, bool free_elements)
     FREE(q);
 }
 
-void deque_dispose(void *ptr, dtor *dst)
+void deque_dispose(void *ptr, const dtor *dt)
 {
     deque *dq = (deque *)ptr;
-    if (dtor_nchd(dst)) {
-        dtor *chd_dst = dtor_chd(dst, 0);
+    if (dtor_nchd(dt)) {
+        dtor *chd_dt = dtor_chd(dt, 0);
         for (size_t i=0, l=deque_len(dq); i<l; i++) {
             void *chd = ((void **)deque_get(dq, i))[0];
-            FINALISE(chd, chd_dst);
+            FINALISE(chd, chd_dt);
         }
     }
     FREE(dq->data);
