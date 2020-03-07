@@ -93,9 +93,12 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 /**
  * @brief Finaliser
+ * If the destructor has one child, it is considered to be the destructor 
+ * for the keys.  If it has two children, the second is the destructor for
+ * the values.
  * @see new.h
  */
-void hashmap_dispose(void *ptr, const dtor *dst);
+void hashmap_dispose(void *ptr, const dtor *dt);
 
 
 /**

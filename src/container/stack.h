@@ -56,24 +56,29 @@ stack *stack_new(size_t typesize);
 void stack_free(stack *s, bool free_elements);
 
 
-void stack_dispose(void *ptr, dtor *dst);
+/**
+ * @brief Destructor.
+ */
+void stack_dispose(void *ptr, const dtor *dst);
+
 
 /**
  * @brief Checks whether the stack is empty. 
  */
-bool stack_empty(stack *s);
+bool stack_empty(const stack *s);
 
 
 /**
  * @brief Pushes an element onto the top of a stack.
  */
-void stack_push(stack *s, void *elt);
+void stack_push(stack *s, const void *elt);
 
 
 /**
  * @brief Pops an element from the top of a nonempty stack.
  */
 void stack_pop(stack *s, void *dest);
+
 
 
 #define STACK_PUSH_DECL( TYPE ) \

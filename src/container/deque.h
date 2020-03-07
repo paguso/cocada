@@ -52,40 +52,40 @@ void deque_dispose(void *ptr, const dtor *dst);
 /**
  * @brief Checks whether the deque is empty.
  */
-bool deque_empty(deque *q);
+bool deque_empty(const deque *q);
 
 
 /**
  * @brief Returns the length (logical size) of the deque.
  */
-size_t deque_len(deque *q);
+size_t deque_len(const deque *q);
 
 
 /**
  * @brief Returns an internal reference to the element at a given position
  *        or NULL if an invalid position is given.
  */
-void *deque_get(deque *q, size_t pos);
+const void *deque_get(const deque *q, size_t pos);
 
 
 /**
  * @brief Returns an internal reference to the element at the first position
  *        or NULL if an invalid position is given.
  */
-void *deque_front(deque *q);
+const void *deque_front(const deque *q);
 
 
 /**
  * @brief Returns an internal reference to the element at the last position
  *        or NULL if an invalid position is given.
  */
-void *deque_back(deque *q);
+const void *deque_back(const deque *q);
 
 
 /**
  * @brief Pushes an element onto the back of the deque.
  */
-void deque_push_back(deque *q, void *elt);
+void deque_push_back(deque *q, const void *elt);
 
 
 /**
@@ -98,7 +98,7 @@ void deque_pop_back(deque *q, void *dest);
 /**
  * @brief Pushes an element onto the back of the deque.
  */
-void deque_push_front(deque *q, void *elt);
+void deque_push_front(deque *q, const void *elt);
 
 
 /**
@@ -107,17 +107,18 @@ void deque_push_front(deque *q, void *elt);
  */
 void deque_pop_front(deque *q, void *dest);
 
+
 #define DEQUE_NEW_DECL( TYPE )\
     deque *deque_new_##TYPE();
 
 #define DEQUE_GET_DECL( TYPE )\
-    TYPE deque_get_##TYPE(deque *q, size_t pos);
+    TYPE deque_get_##TYPE(const deque *q, size_t pos);
 
 #define DEQUE_FRONT_DECL( TYPE )\
-    TYPE deque_front_##TYPE(deque *q);
+    TYPE deque_front_##TYPE(const deque *q);
 
 #define DEQUE_BACK_DECL( TYPE )\
-    TYPE deque_back_##TYPE(deque *q);
+    TYPE deque_back_##TYPE(const deque *q);
 
 #define DEQUE_PUSH_BACK_DECL( TYPE )\
     void deque_push_back_##TYPE(deque *q, TYPE val);

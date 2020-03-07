@@ -34,31 +34,36 @@ stack *stack_new(size_t typesize)
     return vec_new(typesize);
 }
 
+
 void stack_free(stack *s, bool free_elements)
 {
     vec_free(s, free_elements);
 }
 
-void stack_dispose(void *ptr, dtor *dst)
+
+void stack_dispose(void *ptr, const dtor *dt)
 {
-    dst->df = vec_dispose;
-    FINALISE(ptr, dst);
+    vec_dispose(ptr, dt);
 }
 
-bool stack_empty(stack *s)
+
+bool stack_empty(const stack *s)
 {
     return (vec_len(s)==0);
 }
 
-void stack_push(stack *s, void *elt)
+
+void stack_push(stack *s, const void *elt)
 {
     vec_push(s, elt);
 }
+
 
 void stack_pop(stack *s, void *dest)
 {
     return vec_pop(s, vec_len(s)-1, dest);
 }
+
 
 #define STACK_PUSH( TYPE ) \
     void stack_push_##TYPE(stack *s, TYPE val)\

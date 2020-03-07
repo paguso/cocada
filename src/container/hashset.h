@@ -57,29 +57,34 @@ void hashset_free(hashset *set, bool free_elements);
 
 
 /**
+ * @brief Destructor
+ */
+void hashset_dispose(void *ptr, const dtor *dt);
+
+
+/**
  * @brief Returns the number of stored elements.
  */
-size_t hashset_size();
+size_t hashset_size(const hashset *set);
 
 
 /**
  * @brief Checks whether the @p set contains a given element @p elt. 
- * @returns true iff @p set contains an element x s.t. 
- *          @p set->eqfunc(x, @p elt) == true
  */
-bool hashset_contains(hashset *set, void *elt);
+bool hashset_contains(const hashset *set, const void *elt);
 
 
 /**
  * @brief Adds a copy of the element @p elt to the @p set. 
  */
-void hashset_add(hashset *set, void *elt);
+void hashset_add(hashset *set, const void *elt);
 
 
 /**
  * @brief Removes an element @p elt from the @p set. 
  */
-void hashset_remove(hashset *set, void *elt);
+void hashset_remove(hashset *set, const void *elt);
+
 
 
 #define HASHSET_CONTAINS_DECL( TYPE ) \

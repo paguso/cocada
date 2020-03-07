@@ -104,7 +104,6 @@ void vec_dispose(void *ptr, const dtor *dt )
     }
     FREE(v->data);
     FREE(v->swp);
-    //FREE(v);
 }
 
 

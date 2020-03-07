@@ -72,6 +72,7 @@ void deque_free(deque *q, bool free_elements)
     FREE(q);
 }
 
+
 void deque_dispose(void *ptr, const dtor *dt)
 {
     deque *dq = (deque *)ptr;
@@ -83,36 +84,36 @@ void deque_dispose(void *ptr, const dtor *dt)
         }
     }
     FREE(dq->data);
-    FREE(dq);
 }
 
 
-bool deque_empty(deque *q)
+bool deque_empty(const deque *q)
 {
     return (q->len == 0);
 }
 
 
-size_t deque_len(deque *q)
+size_t deque_len(const deque *q)
 {
     return q->len;
 }
 
 
-void *deque_get(deque *q, size_t pos) 
+const void *deque_get(const deque *q, size_t pos) 
 {
     return q->data + ( ((q->start + pos) % q->cap) * q->typesize );
 }
 
 
-void *deque_front(deque *q) {
+const void *deque_front(const deque *q) {
     return deque_get(q, 0);
 }
 
 
-void *deque_back(deque *q) {
+const void *deque_back(const deque *q) {
     return deque_get(q, q->len-1);
 }
+
 
 static void check_and_resize(deque *q)
 {
@@ -144,7 +145,7 @@ static void check_and_resize(deque *q)
 }
 
 
-void deque_push_back(deque *q, void *elt)
+void deque_push_back(deque *q, const void *elt)
 {
     check_and_resize(q);
     memcpy(q->data+(((q->start+q->len)%q->cap)*q->typesize), elt, q->typesize);
@@ -152,7 +153,7 @@ void deque_push_back(deque *q, void *elt)
 }
 
 
-void deque_push_front(deque *q, void *elt)
+void deque_push_front(deque *q, const void *elt)
 {
     check_and_resize(q);
     q->start = (q->start + (q->cap-1)) % q->cap; 
@@ -188,17 +189,17 @@ void deque_pop_front(deque *q, void *dest)
     }
 
 #define DEQUE_GET_IMPL( TYPE )\
-    TYPE deque_get_##TYPE(deque *q, size_t pos) {\
+    TYPE deque_get_##TYPE(const deque *q, size_t pos) {\
         return ((TYPE *)deque_get(q, pos))[0];\
     }
 
 #define DEQUE_FRONT_IMPL( TYPE )\
-    TYPE deque_front_##TYPE(deque *q) {\
+    TYPE deque_front_##TYPE(const deque *q) {\
         return deque_get_##TYPE(q, 0);\
     }
 
 #define DEQUE_BACK_IMPL( TYPE )\
-    TYPE deque_back_##TYPE(deque *q) {\
+    TYPE deque_back_##TYPE(const deque *q) {\
         return deque_get_##TYPE(q, q->len-1);\
     }
 

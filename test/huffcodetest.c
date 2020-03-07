@@ -42,9 +42,6 @@ void test_huffcode_new(CuTest *tc)
     huffcode *hc;
     hc = huffcode_new(ab, freqs);
     //huffcode_print(hc);
-
-
-
 }
 
 static void _random_str(char *dest, alphabet *ab, size_t len)

@@ -53,18 +53,11 @@ void binheap_free(binheap *heap, bool free_elements)
 }
 
 
-void binheap_dispose(void *ptr, const dtor *dst) 
+void binheap_dispose(void *ptr, const dtor *dt) 
 {
     binheap *heap = (binheap *)ptr;
-    if (dst!=NULL) {
-        dtor *vdst = DTOR(vec);
-        for (size_t i=0, l=dtor_nchd(dst); i<l; i++) {
-            vdst = dtor_cons(vdst, dtor_chd(dst, i));
-        }
-        FINALISE(heap->data, vdst);
-        FREE(vdst);
-    }
-    FREE(heap);
+    vec_dispose(heap->data, dt);
+    FREE(heap->data);
 }
 
 

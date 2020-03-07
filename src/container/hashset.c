@@ -44,26 +44,33 @@ void hashset_free(hashset *set, bool free_elements)
 }
 
 
-size_t hashset_size(hashset *set)
+void hashset_dispose(void *ptr, const dtor *dt)
+{
+
+    hashmap_dispose(ptr, dt);
+}
+
+
+size_t hashset_size(const hashset *set)
 {
     return hashmap_size(set);
 }
 
 
-bool hashset_contains(hashset *set, void *elt)
+bool hashset_contains(const hashset *set, const void *elt)
 {
     return hashmap_has_key(set, elt);
 }
 
 static int NOTHING = 0;
 
-void hashset_add(hashset *set, void *elt)
+void hashset_add(hashset *set, const void *elt)
 {
     hashmap_set(set, elt, (void *)&NOTHING);
 }
 
 
-void hashset_remove(hashset *set, void *elt)
+void hashset_remove(hashset *set, const void *elt)
 {
     hashmap_unset(set, elt);
 }

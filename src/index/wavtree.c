@@ -41,7 +41,6 @@
 #include "hashmap.h"
 #include "huffcode.h"
 #include "mathutil.h"
-#include "queue.h"
 #include "stack.h"
 #include "wavtree.h"
 
