@@ -3,7 +3,7 @@
 
 #include "alphabet.h"
 #include "arrayutil.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "csarray.h"
 #include "strstream.h"
 
@@ -40,7 +40,7 @@ static void get_bkt_end( size_t *bkts, size_t *dest, size_t l)
 
 
 static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
-                     bitvector *lsvec, bitvector *lmsvec, size_t *bkts, 
+                     bitvec *lsvec, bitvec *lmsvec, size_t *bkts, 
                      bool add_sentinel ) 
 {
     size_t last=0;
@@ -72,7 +72,7 @@ static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
 
 
 static void induce_L( char *str, alphabet *ab, alphabet_type ab_type, 
-                      size_t *sarr, bitvector *ls,  
+                      size_t *sarr, bitvec *ls,  
                       size_t *bkts, size_t *offsets ) 
 {
     size_t l = ab_size(ab);
@@ -89,7 +89,7 @@ static void induce_L( char *str, alphabet *ab, alphabet_type ab_type,
 
 
 static void induce_S( char *str, alphabet *ab, alphabet_type ab_type, 
-                      size_t *sarr, bitvector *ls,  
+                      size_t *sarr, bitvec *ls,  
                       size_t *bkts, size_t *offsets ) 
 {
     size_t l = ab_size(ab);
@@ -106,7 +106,7 @@ static void induce_S( char *str, alphabet *ab, alphabet_type ab_type,
 
 
 static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type, 
-                      size_t *sarr, bitvector *ls, bitvector *lms,
+                      size_t *sarr, bitvec *ls, bitvec *lms,
                       size_t *bkts, size_t *offsets ) 
 {
     size_t n = bitvec_len(ls);
@@ -235,8 +235,8 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
     size_t ab_sz = ab_size(ab);
     alphabet_type ab_t = ab_type(ab);
 
-    bitvector *ls   = bitvector_new_with_capacity(len+add_sentinel);
-    bitvector *lms  = bitvector_new_with_capacity(len+add_sentinel);
+    bitvec *ls   = bitvec_new_with_capacity(len+add_sentinel);
+    bitvec *lms  = bitvec_new_with_capacity(len+add_sentinel);
     size_t    *bkts = calloc(ab_sz, sizeof(size_t)); //NEW_ARRAY(size_t, ab_sz);
   
     init_LS(str, len, ab, ab_t, ls, lms, bkts, add_sentinel);
@@ -257,8 +257,8 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
     //PRINT_ARRAY(sarr, SA, %zu, 0, len+1, 10);
     
     // clean up
-    bitvector_free(ls);
-    bitvector_free(lms);
+    bitvec_free(ls);
+    bitvec_free(lms);
     FREE(bkts);
     FREE(offsets);
 }

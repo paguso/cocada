@@ -6,7 +6,7 @@
 #include "arrayutil.h"
 #include "bitsandbytes.h"
 #include "bitarray.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "bytearray.h"
 #include "new.h"
 #include "csarray.h"
@@ -68,7 +68,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
     size_t lvl_len = len+1;  // sentinel added by sais
     csa->lvl_len[0] = lvl_len;
-    bitvector *xchar_stops = bitvector_new_with_capacity(lvl_len);
+    bitvec *xchar_stops = bitvec_new_with_capacity(lvl_len);
     bitvec_append_n(xchar_stops, lvl_len , 0);
     dynstr *supp_ab_str = dynstr_new(); // string support alphabet chars
     size_t ndiff_xchars = 1;            // has at least the SENTINEL   
@@ -125,7 +125,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
         // build even-suffix indicator bitvector
         // push even entries to first half of sarr rescaling its value
         // if not last level
-        bitvector *even_suff = bitvector_new_with_capacity(lvl_len);
+        bitvec *even_suff = bitvec_new_with_capacity(lvl_len);
         if(lvl == csa->nlevels - 1) {
             for (size_t i = 0 ; i < lvl_len; i++)
                     bitvec_append(even_suff, IS_EVEN(sarr[i]));
@@ -146,7 +146,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
         // prepare next level base string and sarr
         size_t nxt_lvl_len = (size_t) ceil(lvl_len/2.0f);
         sarr_invert(sarr, nxt_lvl_len, sarr_inv);
-        xchar_stops = bitvector_new_with_capacity(nxt_lvl_len);
+        xchar_stops = bitvec_new_with_capacity(nxt_lvl_len);
         bitvec_append_n(xchar_stops, nxt_lvl_len, 0);
         ndiff_xchars = 1;
         xchar_t ai, bi, aiminus1, biminus1;

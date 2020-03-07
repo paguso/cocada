@@ -19,14 +19,15 @@
  *
  */
 
-#ifndef BITVECTOR_H
-#define BITVECTOR_H
+#ifndef bitvec_H
+#define bitvec_H
 
 #include <stdbool.h>
 #include <stddef.h>
 
 #include "bitsandbytes.h"
 #include "dynstr.h"
+#include "new.h"
 
 /**
  * @file bitvector.h
@@ -35,100 +36,114 @@
  * @brief Dynamic bit vector.
  */
  
-typedef struct _bitvector bitvector;
+typedef struct _bitvec bitvec;
 
 
 /**
  * @brief Constructor
  */
-bitvector *bitvector_new();
+bitvec *bitvec_new();
 
 
 /**
  * @brief Constructor
  * @param capacity The initial bit capacity.
  */
-bitvector *bitvector_new_with_capacity(size_t capacity);
+bitvec *bitvec_new_with_capacity(size_t capacity);
 
 
 /**
  * @brief Constructs a new bitvector from a source bitarray.
  *        Source bits are copied internally
+ * @param src (no transfer) The source bit array
+ * @param len Number of bits to be copied
  */
-bitvector *bitvector_new_from_bitarray(byte_t *src, size_t len);
+bitvec *bitvec_new_from_bitarray(const byte_t *src, size_t len);
 
 
 /**
- * @brief Clones @p src to a new bitvector
+ * @brief Clones a bitvector
+ * @param src (no transfer) The source bitvector
  */
-bitvector *bitvector_clone(bitvector *src);
+bitvec *bitvec_clone(const bitvec *src);
 
 
 /**
  * @brief Clones the first @p nbits of @p src to a new bitvector
+ * @param src (no transfer) The source bitvector
+ * @param nbits Number of bits to be copied
  */
-bitvector *bitvector_cropped_clone(bitvector *src, size_t nbits);
+bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
 
 
 /**
  * @brief Destructor
  */
-void bitvector_free(bitvector *bv);
+void bitvec_free(bitvec *bv);
+
+
+/**
+ * @brief Destructor
+ */
+void bitvec_dispose(void *ptr, const dtor *dt);
 
 
 /**
  * @brief Returns the (bit) length of the bitvector.
  */
-size_t bitvec_len(bitvector *bv);
+size_t bitvec_len(const bitvec *bv);
 
 
 /**
  * @brief Returns the bit value stored at a given position @p pos.
  */
-bool bitvec_get_bit (bitvector *bv, size_t pos);
+bool bitvec_get_bit (const bitvec *bv, size_t pos);
 
 
 /**
  * @brief Sets the bit at a given position.
  */
-void bitvec_set_bit (bitvector *bv, size_t pos, bool bit);
+void bitvec_set_bit (bitvec *bv, size_t pos, bool bit);
 
 
 /**
  * @brief Returns the number of positions set to a given @p bit value.
  */
-size_t bitvec_count(bitvector *bv, bool bit);
+size_t bitvec_count(const bitvec *bv, bool bit);
 
 
 /**
  * @brief Appends a new @p bit.
  */
-void bitvec_append (bitvector *bv, bool bit);
+void bitvec_append (bitvec *bv, bool bit);
 
 
 /**
  * @brief Appends @p n new positions with the same @p bit value.
  */
-void bitvec_append_n (bitvector *bv, size_t n, bool bit);
+void bitvec_append_n (bitvec *bv, size_t n, bool bit);
 
 
 /**
  * @brief Concatenates the contents of @p src to @p bv.
+ * @param bv (no transfer) The target bitvector
+ * @param src (no transfer) The source bitvector
  */
-void bitvec_cat (bitvector *bv, bitvector *src);
+void bitvec_cat (bitvec *bv, const bitvec *src);
 
 
 /**
  * @brief Frees unused space 
  */
-void bitvec_trim(bitvector *bv);
+void bitvec_trim(bitvec *bv);
 
 
 /**
  * @brief Detaches and returns the internal raw byte array 
- * and destroys the bitvector object.
+ * and destroys the bitvector object
+ * @param bv (full transfer) The bitvector to be dismantled.
  */
-byte_t *bitvec_detach (bitvector *bv);
+byte_t *bitvec_detach (bitvec *bv);
 
 
 /**
@@ -136,14 +151,14 @@ byte_t *bitvec_detach (bitvector *bv);
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write 
  *        as a single line.
  */
-void bitvec_to_string ( bitvector *bv, dynstr *dest, size_t bytes_per_row);
+void bitvec_to_string ( const bitvec *bv, dynstr *dest, size_t bytes_per_row);
 
 
 /**
  * @brief Prints the bitvector do std output.
  * @param bytes_per_row Number of bytes per row
  */
-void bitvec_print(bitvector *bv, size_t bytes_per_row);
+void bitvec_print(const bitvec *bv, size_t bytes_per_row);
 
 
 #endif

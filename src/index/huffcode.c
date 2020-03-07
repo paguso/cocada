@@ -31,7 +31,7 @@
 #include "binheap.h"
 #include "bitsandbytes.h"
 #include "bitarray.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "bytearray.h"
 #include "new.h"
 #include "cstringutil.h"
@@ -56,7 +56,7 @@ struct _huffcode {
     bool       own_ab;
     size_t     size;
     hufftnode *tree;
-    bitvector **code;
+    bitvec **code;
 };
 
 
@@ -77,7 +77,7 @@ static void fill_code_table( huffcode *hcode, hufftnode *node, size_t code_len,
                              byte_t *code )
 {
     if (hufftnode_is_leaf(node)) {
-        hcode->code[node->chr_rank] = bitvector_new_from_bitarray(code, code_len);
+        hcode->code[node->chr_rank] = bitvec_new_from_bitarray(code, code_len);
         //printf("code of %c = %s\n",ab_char(hcode->ab, node->chr_rank), code);
     }
     else {
@@ -133,7 +133,7 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
     }
     //assert(next==(2*hcode->size-1));
 
-    hcode->code = NEW_ARRAY(bitvector*, hcode->size);
+    hcode->code = NEW_ARRAY(bitvec*, hcode->size);
     byte_t *chrcode = bitarr_new(hcode->size);
     if (hcode->size>0) 
         fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
@@ -219,7 +219,7 @@ void huffcode_free(huffcode *hcode)
     if (hcode->own_ab)
         alphabet_free(hcode->ab);
     for (size_t i=0; i<hcode->size; i++) {
-        bitvector_free(hcode->code[i]); // no null codes
+        bitvec_free(hcode->code[i]); // no null codes
     }
     FREE(hcode->code);
     for (size_t i=0; hcode->size>0 && i<(2*hcode->size)-1; i++) {
@@ -279,9 +279,9 @@ void huffcode_print(huffcode *hcode)
 }
 
 
-bitvector *huffcode_encode(huffcode *hcode, strstream *sst) 
+bitvec *huffcode_encode(huffcode *hcode, strstream *sst) 
 {
-    bitvector *enc = bitvector_new();
+    bitvec *enc = bitvec_new();
     for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
         bitvec_cat(enc, hcode->code[ab_rank(hcode->ab, c)]);
     }
@@ -289,7 +289,7 @@ bitvector *huffcode_encode(huffcode *hcode, strstream *sst)
 }
 
 
-xstring *huffcode_decode(huffcode *hcode, bitvector *bcode)
+xstring *huffcode_decode(huffcode *hcode, bitvec *bcode)
 {
     xstring *dec = xstring_new(nbytes(ab_size(hcode->ab)));
     hufftnode *cur = huffcode_tree(hcode);
@@ -304,7 +304,7 @@ xstring *huffcode_decode(huffcode *hcode, bitvector *bcode)
 }
 
 
-const bitvector *huffcode_charcode(huffcode *hcode, size_t char_rank)
+const bitvec *huffcode_charcode(huffcode *hcode, size_t char_rank)
 {
     return hcode->code[char_rank];
 } 

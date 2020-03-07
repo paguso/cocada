@@ -25,7 +25,7 @@
 #include "CuTest.h"
 
 #include "alphabet.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "bytearray.h"
 #include "cstringutil.h"
 #include "huffcode.h"
@@ -62,7 +62,7 @@ void test_huffcode_codec(CuTest *tc)
         huffcode *hc = huffcode_new_from_stream(ab, sst);
         strstream_reset(sst);
         //huffcode_print(hc);    
-        bitvector *code = huffcode_encode(hc, sst);
+        bitvec *code = huffcode_encode(hc, sst);
         xstring *xsdec = huffcode_decode(hc, code);
         //bytearr_print(code.rawcode, (size_t)mult_ceil(code.code_len, BYTESIZE), 4, "");
         //printf("original=%s\n",str);
@@ -97,7 +97,7 @@ void test_huffcode_xcodec(CuTest *tc)
         huffcode *hc = huffcode_new_from_stream(ab, sst);
         strstream_reset(sst);
         //huffcode_print(hc);    
-        bitvector *code = huffcode_encode(hc, sst);
+        bitvec *code = huffcode_encode(hc, sst);
         xstring *xsdec = huffcode_decode(hc, code);
         int cmp = xstr_cmp(xstr, xsdec);
         if (cmp) {

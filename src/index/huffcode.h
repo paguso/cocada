@@ -26,7 +26,7 @@
 
 #include "alphabet.h"
 #include "bitsandbytes.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "new.h"
 #include "strstream.h"
 
@@ -111,20 +111,20 @@ void huffcode_print(huffcode *hcode);
 /**
  * @brief Encodes a string into a binary code.
  */
-bitvector *huffcode_encode(huffcode *hcode, strstream *sst);
+bitvec *huffcode_encode(huffcode *hcode, strstream *sst);
 
 
 /**
  * @brief Decodes a binary code to a string.
  */
-xstring *huffcode_decode(huffcode *hcode, bitvector *code);
+xstring *huffcode_decode(huffcode *hcode, bitvec *code);
 
 /**
  * @brief Returns the code of a char
  * @param char_rank The rank of the char w.r.t. the code alphabet
  * @warn  Do NOT destroy of modify the returned bitvector.
  */
-const bitvector *huffcode_charcode(huffcode *hcode, size_t char_rank);
+const bitvec *huffcode_charcode(huffcode *hcode, size_t char_rank);
 
 /**
  * @brief Returns the (root of the) Huffman tree corresponding to a given HC. 

@@ -28,15 +28,15 @@
 
 #include "arrayutil.h"
 #include "bitsandbytes.h"
-#include "bitvector.h"
+#include "bitvec.h"
 #include "new.h"
 #include "mathutil.h"
 
 static size_t ba_size = 1000;
 
-void bitvector_test_append(CuTest *tc)
+void bitvec_test_append(CuTest *tc)
 {
-    bitvector *bv = bitvector_new_with_capacity(0);
+    bitvec *bv = bitvec_new_with_capacity(0);
     byte_t *array;
     array = NEW_ARRAY(byte_t, ba_size);
     bool bit;
@@ -53,13 +53,13 @@ void bitvector_test_append(CuTest *tc)
         CuAssertIntEquals(tc, array[i], bit);
     }
     //printf(".");
-    bitvector_free(bv);
+    bitvec_free(bv);
     FREE(array);
 }
 
-void bitvector_test_append_n(CuTest *tc)
+void bitvec_test_append_n(CuTest *tc)
 {
-    bitvector *bv = bitvector_new_with_capacity(0);
+    bitvec *bv = bitvec_new_with_capacity(0);
     byte_t *array;
     array = NEW_ARRAY(byte_t, ba_size);
     bool bit = false;
@@ -80,14 +80,14 @@ void bitvector_test_append_n(CuTest *tc)
         bit = bitvec_get_bit(bv, i);
         CuAssertIntEquals(tc, array[i], bit);
     }
-    bitvector_free(bv);
+    bitvec_free(bv);
     FREE(array);
 }
 
 
-void bitvector_test_count(CuTest *tc)
+void bitvec_test_count(CuTest *tc)
 {
-    bitvector *bv = bitvector_new_with_capacity(0);
+    bitvec *bv = bitvec_new_with_capacity(0);
     bool bit;
     size_t counts[2] = {0,0};
     for (size_t i=0; i<ba_size; i++)
@@ -103,15 +103,15 @@ void bitvector_test_count(CuTest *tc)
     size_t c1 = bitvec_count(bv, 1);
     CuAssertIntEquals(tc, counts[1], c1);
 */
-    bitvector_free(bv);
+    bitvec_free(bv);
 }
 
 
-CuSuite *bitvector_get_test_suite() 
+CuSuite *bitvec_get_test_suite() 
 {
     CuSuite* suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, bitvector_test_append);
-    SUITE_ADD_TEST(suite, bitvector_test_append_n);
-    SUITE_ADD_TEST(suite, bitvector_test_count);
+    SUITE_ADD_TEST(suite, bitvec_test_append);
+    SUITE_ADD_TEST(suite, bitvec_test_append_n);
+    SUITE_ADD_TEST(suite, bitvec_test_count);
     return suite;
 }

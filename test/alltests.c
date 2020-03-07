@@ -28,7 +28,7 @@ CuSuite *alphabet_get_test_suite();
 CuSuite *binheap_get_test_suite();
 CuSuite *bitsandbytes_get_test_suite();
 CuSuite *bitarray_get_test_suite();
-CuSuite *bitvector_get_test_suite();
+CuSuite *bitvec_get_test_suite();
 CuSuite *bytearray_get_test_suite();
 CuSuite *csrsbitarr_get_test_suite();
 CuSuite *csarray_get_test_suite();
@@ -59,7 +59,7 @@ void run_all_tests(void) {
     //CuSuiteAddSuite(suite, binheap_get_test_suite());
     //CuSuiteAddSuite(suite, bitarray_get_test_suite());
     //CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
-    //CuSuiteAddSuite(suite, bitvector_get_test_suite());
+    //CuSuiteAddSuite(suite, bitvec_get_test_suite());
     //CuSuiteAddSuite(suite, bytearray_get_test_suite());
     //CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
     //CuSuiteAddSuite(suite, cstrutil_get_test_suite());
