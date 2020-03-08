@@ -1,5 +1,4 @@
 /*
- * 
  * COCADA - COCADA Collection of Algorithms and DAta Structures
  * 
  * Copyright (C) 2016  Paulo G S Fonseca
@@ -20,21 +19,6 @@
  *
  */
 
-#ifndef DJB2_H
-#define DJB2_H
+#include <stdlib.h>
 
-/**
- * @file djb2.h
- * @author Paulo Fonseca
- * 
- * @brief djb2 string hash function 
- * @see Source: http://www.cse.yorku.ca/~oz/hash.html
- */
-
-/**
- * @brief Returns the djb2 hash of string @p str.
- */
-size_t djb2_hash(unsigned char *str);
-
-
-#endif
+#include "arrutil.h"

@@ -26,9 +26,9 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
-#include "bitarray.h"
+#include "bitarr.h"
 #include "new.h"
 #include "csrsbitarray.h"
 #include "mathutil.h"
@@ -330,7 +330,7 @@ void test_csrsbitarr_succ(CuTest *tc)
 
 
 void csrsbitarr_test_empty(CuTest *tc) {
-    byte_t *ba_empty = NEW_ARRAY(byte_t, 0);
+    byte_t *ba_empty = NEW_ARR(byte_t, 0);
     csrsbitarray *b = csrsbitarr_new(ba_empty, 0);
     for (size_t i=0; i<2; i++) {
         //csrsbitarr_get(b, i);

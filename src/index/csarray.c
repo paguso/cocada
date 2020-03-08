@@ -3,11 +3,11 @@
 
 #include "alphabet.h"
 #include "assert.h"
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
-#include "bitarray.h"
+#include "bitarr.h"
 #include "bitvec.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "new.h"
 #include "csarray.h"
 #include "csrsbitarray.h"
@@ -55,15 +55,15 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
           lvl_len = (size_t) ceil(lvl_len/2.0f) ) 
         csa->nlevels++;
         
-    csa->lvl_len = NEW_ARRAY(size_t, csa->nlevels);
-    csa->even_bv = NEW_ARRAY(csrsbitarray*, csa->nlevels);
-    csa->char_stop_bv = NEW_ARRAY(csrsbitarray*, csa->nlevels);
-    csa->phi_wt = NEW_ARRAY(wavtree*, csa->nlevels);
-    //csa->phi_str = NEW_ARRAY(xstring*, csa->nlevels);
+    csa->lvl_len = NEW_ARR(size_t, csa->nlevels);
+    csa->even_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
+    csa->char_stop_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
+    csa->phi_wt = NEW_ARR(wavtree*, csa->nlevels);
+    //csa->phi_str = NEW_ARR(xstring*, csa->nlevels);
 
     // build plain sarray and its inverse
     size_t *sarr = sais(str, len, ab);
-    size_t *sarr_inv = NEW_ARRAY(size_t, len+1);
+    size_t *sarr_inv = NEW_ARR(size_t, len+1);
     sarr_invert(sarr, len+1, sarr_inv);
 
     size_t lvl_len = len+1;  // sentinel added by sais
@@ -97,15 +97,15 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
     
     //printf("str[0]: %s\n", str);
     //xstr_print(cur_xstr);
-    //PRINT_ARRAY(sarr, sarr[0], %zu, 0, lvl_len, lvl_len);
-    //PRINT_ARRAY(sarr_inv, sarr_inv[0], %zu, 0, lvl_len, lvl_len);
+    //PRINT_ARR(sarr, sarr[0], %zu, 0, lvl_len, lvl_len);
+    //PRINT_ARR(sarr_inv, sarr_inv[0], %zu, 0, lvl_len, lvl_len);
         
     // iterate over levels
     for ( size_t lvl = 0; lvl < csa->nlevels; lvl++ ) {
         // current SA, SA^-1, char stops and normalised string ready
 
         //printf("building level %zu\n",lvl);
-        //PRINT_ARRAY(sarr, sarr, %zu, 0, lvl_len, 20);
+        //PRINT_ARR(sarr, sarr, %zu, 0, lvl_len, 20);
 
         csa->lvl_len[lvl] = lvl_len;
         
@@ -207,8 +207,8 @@ void csarray_print(csarray *csa) {
         //printf("%s\n", dstr_as_str(phi));
         //dynstr_free(phi);
     }
-    PRINT_ARRAY(csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
-    PRINT_ARRAY(csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
+    PRINT_ARR(csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
+    PRINT_ARR(csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
     printf ("} #end of csarray@%p\n", csa);
         
 }

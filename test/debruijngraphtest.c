@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "cstringutil.h"
 #include "debruijngraph.h"
 #include "dynstr.h"
@@ -54,14 +54,14 @@ static void random_seq(alphabet *ab, char *dest, size_t n)
 void dbgraph_test_setup(CuTest *tc) 
 {
     n = 20;
-    ab   = NEW_ARRAY(alphabet*, n);
-    slen = NEW_ARRAY(size_t, n);
-    str  = NEW_ARRAY(char*, n);
-    padstr  = NEW_ARRAY(char*, n);
-    padslen = NEW_ARRAY(size_t, n);
-    dbg_order    = NEW_ARRAY(size_t, n);
-    g    = NEW_ARRAY(dbgraph*, n);
-    mg   = NEW_ARRAY(dbgraph*, n);
+    ab   = NEW_ARR(alphabet*, n);
+    slen = NEW_ARR(size_t, n);
+    str  = NEW_ARR(char*, n);
+    padstr  = NEW_ARR(char*, n);
+    padslen = NEW_ARR(size_t, n);
+    dbg_order    = NEW_ARR(size_t, n);
+    g    = NEW_ARR(dbgraph*, n);
+    mg   = NEW_ARR(dbgraph*, n);
     for (size_t i=0; i<n; i++) {
         ab[i] = alphabet_new(4, "acgt");
         
@@ -153,8 +153,8 @@ size_t _outdeg_bf(size_t cs, char *node, bool multigraph)
     size_t slen = padslen[cs];
     size_t k = dbg_order[cs];
     alphabet *abt = dbg_ab(g[cs]);
-    bool *outletters = NEW_ARRAY(bool, ab_size(abt));
-    FILL_ARRAY(outletters, 0, ab_size(abt), false);
+    bool *outletters = NEW_ARR(bool, ab_size(abt));
+    FILL_ARR(outletters, 0, ab_size(abt), false);
     size_t ret = 0;
     for (size_t i=0, l=slen-k; i<l; i++) {
         size_t j = 0;

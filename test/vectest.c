@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
@@ -256,7 +256,7 @@ void test_vec_radixsort(CuTest *tc)
 void test_vec_qsort(CuTest *tc)
 {
     size_t max_key = 10000;
-    triple *arr = NEW_ARRAY(triple, max_key);
+    triple *arr = NEW_ARR(triple, max_key);
     for (size_t i=0; i<max_key; i++) {
                 triple t;
                 t.values[0] = i;

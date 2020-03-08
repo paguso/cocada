@@ -27,8 +27,8 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrayutil.h"
-#include "arrayutil.h"
+#include "arrutil.h"
+#include "arrutil.h"
 #include "new.h"
 #include "cstringutil.h"
 #include "hashmap.h"
@@ -65,8 +65,8 @@ alphabet *alphabet_new(const size_t size, const char *letters)
     ret->size = size;
     ret->letters = cstr_new(size);
     strncpy(ret->letters, letters, size);
-    ret->ranks.arr = NEW_ARRAY(size_t, UCHAR_MAX);
-    FILL_ARRAY(ret->ranks.arr, 0, UCHAR_MAX, size);
+    ret->ranks.arr = NEW_ARR(size_t, UCHAR_MAX);
+    FILL_ARR(ret->ranks.arr, 0, UCHAR_MAX, size);
     for (size_t i=0; i<size; i++)
         ret->ranks.arr[(unsigned char)letters[i]]=i;
     return ret;

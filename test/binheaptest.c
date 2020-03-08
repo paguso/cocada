@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "binheap.h"
 #include "randutil.h"
 
@@ -87,20 +87,6 @@ void test_binheap_push_pop(CuTest *tc)
 
     binheap_free(minheap, true);
     binheap_free(maxheap, true);
-}
-
-
-
-int cmp_int(const void *p1, const void *p2) {
-    int i1, i2;
-    i1 = *(int *)p1;
-    i2 = *(int *)p2;
-    if (i1<i2) 
-        return -1; 
-    else if (i1==i2) 
-        return 0; 
-    else 
-        return +1; 
 }
 
 

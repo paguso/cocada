@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "hashset.h"
 #include "mathutil.h"
 
@@ -102,7 +102,7 @@ void test_hashset_indel(CuTest *tc)
     }
     CuAssertSizeTEquals(tc, n, hashset_size(set));
     
-    elts = NEW_ARRAY(uint, n);
+    elts = NEW_ARR(uint, n);
     iterator = hashset_get_iter(set);
     for( size_t i=0; hashset_iter_has_next(iterator); i++) {
         uint *e = (uint *)hashset_iter_next(iterator);

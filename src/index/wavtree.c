@@ -29,10 +29,10 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
 #include "bitvec.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "new.h"
 #include "csrsbitarray.h"
 #include "cstringutil.h"
@@ -518,7 +518,7 @@ static wavtree *wt_build_from_tmp( tmp_wavtree *twt, wtshape shape )
     tmp_wavtree_init_veb_layout(twt);
     wavtree *wt = NEW(wavtree);
     wt->nnodes = twt->nnodes;
-    wt->nodes = NEW_ARRAY(wtnode, twt->nnodes);
+    wt->nodes = NEW_ARR(wtnode, twt->nnodes);
     _wt_build_from_tmp(wt->nodes, twt->tmp_root);
     wt->len = twt->len;
     size_t nbits = bitvec_len(twt->raw_bits);

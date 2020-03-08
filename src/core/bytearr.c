@@ -26,16 +26,16 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "cstringutil.h"
 
 
-byte_t *bytearr_new(const size_t len)
+byte_t *bytearr_new(size_t len)
 {
     byte_t *ret;
-    ret = NEW_ARRAY(byte_t, len);
+    ret = NEW_ARR(byte_t, len);
     bytearr_fill(ret, 0, len, 0);
     return ret;
 }
@@ -47,7 +47,7 @@ void bytearr_fill(byte_t *ba, size_t from, size_t to, byte_t val)
 }
 
 
-void bytearr_flip_bytes(byte_t *src, const size_t size)
+void bytearr_flip_bytes(byte_t *src, size_t size)
 {
     size_t i=0, j=size-1;
     while (i<j) {
@@ -60,8 +60,8 @@ void bytearr_flip_bytes(byte_t *src, const size_t size)
 }
 
 
-void bytearr_print (const byte_t *ba, const size_t nbytes,
-                    const size_t bytes_per_line, const char *left_margin)
+void bytearr_print (const byte_t *ba, size_t nbytes,
+                    size_t bytes_per_line, const char *left_margin)
 {
     size_t i, line_label_width;
     char *bytestr;
@@ -80,8 +80,8 @@ void bytearr_print (const byte_t *ba, const size_t nbytes,
 }
 
 
-char bytearr_read_char(const byte_t *src, const size_t from_byte,
-                       const size_t nbytes)
+char bytearr_read_char(const byte_t *src, size_t from_byte,
+                       size_t nbytes)
 {
     char ret=0;
 #if ENDIANNESS==BIG
@@ -101,8 +101,8 @@ char bytearr_read_char(const byte_t *src, const size_t from_byte,
 }
 
 
-unsigned char bytearr_read_uchar(const byte_t *src, const size_t from_byte,
-                                 const size_t nbytes)
+unsigned char bytearr_read_uchar(const byte_t *src, size_t from_byte,
+                                 size_t nbytes)
 {
     unsigned char ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -113,8 +113,8 @@ unsigned char bytearr_read_uchar(const byte_t *src, const size_t from_byte,
 }
 
 
-short bytearr_read_short(const byte_t *src, const size_t from_byte,
-                         const size_t nbytes)
+short bytearr_read_short(const byte_t *src, size_t from_byte,
+                         size_t nbytes)
 {
     short ret=0;
 #if ENDIANNESS==BIG
@@ -134,8 +134,8 @@ short bytearr_read_short(const byte_t *src, const size_t from_byte,
 }
 
 
-unsigned short bytearr_read_ushort(const byte_t *src, const size_t from_byte,
-                                   const size_t nbytes)
+unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
+                                   size_t nbytes)
 {
     unsigned short ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -146,8 +146,8 @@ unsigned short bytearr_read_ushort(const byte_t *src, const size_t from_byte,
 }
 
 
-int bytearr_read_int(const byte_t *src, const size_t from_byte,
-                     const size_t nbytes)
+int bytearr_read_int(const byte_t *src, size_t from_byte,
+                     size_t nbytes)
 {
     int ret=0;
 #if ENDIANNESS==BIG
@@ -167,8 +167,8 @@ int bytearr_read_int(const byte_t *src, const size_t from_byte,
 }
 
 
-unsigned int bytearr_read_uint(const byte_t *src, const size_t from_byte,
-                               const size_t nbytes)
+unsigned int bytearr_read_uint(const byte_t *src, size_t from_byte,
+                               size_t nbytes)
 {
     unsigned int ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -179,8 +179,8 @@ unsigned int bytearr_read_uint(const byte_t *src, const size_t from_byte,
 }
 
 
-long bytearr_read_long(const byte_t *src, const size_t from_byte,
-                       const size_t nbytes)
+long bytearr_read_long(const byte_t *src, size_t from_byte,
+                       size_t nbytes)
 {
     long ret=0;
 #if ENDIANNESS==BIG
@@ -200,8 +200,8 @@ long bytearr_read_long(const byte_t *src, const size_t from_byte,
 }
 
 
-unsigned long bytearr_read_ulong(const byte_t *src, const size_t from_byte,
-                                 const size_t nbytes)
+unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
+                                 size_t nbytes)
 {
     unsigned long ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -212,8 +212,8 @@ unsigned long bytearr_read_ulong(const byte_t *src, const size_t from_byte,
 }
 
 
-long long bytearr_read_longlong(const byte_t *src, const size_t from_byte,
-                                const size_t nbytes)
+long long bytearr_read_longlong(const byte_t *src, size_t from_byte,
+                                size_t nbytes)
 {
     long long ret=0;
 #if ENDIANNESS==BIG
@@ -234,7 +234,7 @@ long long bytearr_read_longlong(const byte_t *src, const size_t from_byte,
 
 
 unsigned long long bytearr_read_ulonglong(const byte_t *src,
-        const size_t from_byte, const size_t nbytes)
+        size_t from_byte, size_t nbytes)
 {
     unsigned long long ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -245,8 +245,8 @@ unsigned long long bytearr_read_ulonglong(const byte_t *src,
 }
 
 
-size_t bytearr_read_size(const byte_t *src, const size_t from_byte,
-                         const size_t nbytes)
+size_t bytearr_read_size(const byte_t *src, size_t from_byte,
+                         size_t nbytes)
 {
     size_t ret=0;
     bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -257,15 +257,15 @@ size_t bytearr_read_size(const byte_t *src, const size_t from_byte,
 }
 
 
-void bytearr_write(byte_t *dest, const size_t from_byte_dest, const byte_t *src,
-                   const size_t from_byte_src, const size_t nbytes)
+void bytearr_write(byte_t *dest, size_t from_byte_dest, const byte_t *src,
+                   size_t from_byte_src, size_t nbytes)
 {
     memcpy(dest+from_byte_dest, src+from_byte_src, nbytes);
 }
 
 
-void bytearr_write_char(byte_t *dest, const size_t from_byte, char val,
-                        const size_t nbytes)
+void bytearr_write_char(byte_t *dest, size_t from_byte, char val,
+                        size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(char));
@@ -274,8 +274,8 @@ void bytearr_write_char(byte_t *dest, const size_t from_byte, char val,
 }
 
 
-void bytearr_write_uchar(byte_t *dest, const size_t from_byte,
-                         unsigned char val, const size_t nbytes)
+void bytearr_write_uchar(byte_t *dest, size_t from_byte,
+                         unsigned char val, size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned char));
@@ -284,8 +284,8 @@ void bytearr_write_uchar(byte_t *dest, const size_t from_byte,
 }
 
 
-void bytearr_write_short(byte_t *dest, const size_t from_byte, short val,
-                         const size_t nbytes)
+void bytearr_write_short(byte_t *dest, size_t from_byte, short val,
+                         size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(short));
@@ -294,8 +294,8 @@ void bytearr_write_short(byte_t *dest, const size_t from_byte, short val,
 }
 
 
-void bytearr_write_ushort(byte_t *dest, const size_t from_byte,
-                          unsigned short val, const size_t nbytes)
+void bytearr_write_ushort(byte_t *dest, size_t from_byte,
+                          unsigned short val, size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned short));
@@ -304,8 +304,8 @@ void bytearr_write_ushort(byte_t *dest, const size_t from_byte,
 }
 
 
-void bytearr_write_int(byte_t *dest, const size_t from_byte, int val,
-                       const size_t nbytes)
+void bytearr_write_int(byte_t *dest, size_t from_byte, int val,
+                       size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(int));
@@ -314,8 +314,8 @@ void bytearr_write_int(byte_t *dest, const size_t from_byte, int val,
 }
 
 
-void bytearr_write_uint(byte_t *dest, const size_t from_byte, unsigned int val,
-                        const size_t nbytes)
+void bytearr_write_uint(byte_t *dest, size_t from_byte, unsigned int val,
+                        size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned int));
@@ -324,8 +324,8 @@ void bytearr_write_uint(byte_t *dest, const size_t from_byte, unsigned int val,
 }
 
 
-void bytearr_write_long(byte_t *dest, const size_t from_byte, long val,
-                        const size_t nbytes)
+void bytearr_write_long(byte_t *dest, size_t from_byte, long val,
+                        size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(long));
@@ -334,8 +334,8 @@ void bytearr_write_long(byte_t *dest, const size_t from_byte, long val,
 }
 
 
-void bytearr_write_ulong(byte_t *dest, const size_t from_byte,
-                         unsigned long val, const size_t nbytes)
+void bytearr_write_ulong(byte_t *dest, size_t from_byte,
+                         unsigned long val, size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned long));
@@ -344,8 +344,8 @@ void bytearr_write_ulong(byte_t *dest, const size_t from_byte,
 }
 
 
-void bytearr_write_longlong(byte_t *dest, const size_t from_byte, long long val,
-                            const size_t nbytes)
+void bytearr_write_longlong(byte_t *dest, size_t from_byte, long long val,
+                            size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(long long));
@@ -354,8 +354,8 @@ void bytearr_write_longlong(byte_t *dest, const size_t from_byte, long long val,
 }
 
 
-void bytearr_write_ulonglong(byte_t *dest, const size_t from_byte,
-                             unsigned long long val, const size_t nbytes)
+void bytearr_write_ulonglong(byte_t *dest, size_t from_byte,
+                             unsigned long long val, size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned long long));
@@ -364,8 +364,8 @@ void bytearr_write_ulonglong(byte_t *dest, const size_t from_byte,
 }
 
 
-void bytearr_write_size(byte_t *dest, const size_t from_byte, size_t val,
-                        const size_t nbytes)
+void bytearr_write_size(byte_t *dest, size_t from_byte, size_t val,
+                        size_t nbytes)
 {
 #if ENDIANNESS == BIG
     bytearr_flip_bytes((byte_t *)&val, sizeof(size_t));

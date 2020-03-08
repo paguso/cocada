@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "arrayutil.h"
-#include "bitarray.h"
+#include "arrutil.h"
+#include "bitarr.h"
 #include "bitsandbytes.h"
 #include "bitvec.h"
 #include "new.h"

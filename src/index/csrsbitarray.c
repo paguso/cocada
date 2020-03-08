@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bitarray.h"
+#include "bitarr.h"
 #include "bitsandbytes.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "new.h"
 #include "csrsbitarray.h"
 #include "mathutil.h"

@@ -27,12 +27,12 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "binheap.h"
 #include "bitsandbytes.h"
-#include "bitarray.h"
+#include "bitarr.h"
 #include "bitvec.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "new.h"
 #include "cstringutil.h"
 #include "dynstr.h"
@@ -99,7 +99,7 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
     hcode->size = ab_size(ab);
 
     size_t ab_bytesize = (size_t)multceil(hcode->size, BYTESIZE);
-    hcode->tree = NEW_ARRAY(hufftnode, MAX(0, 2*hcode->size-1));
+    hcode->tree = NEW_ARR(hufftnode, MAX(0, 2*hcode->size-1));
     for (size_t i = 0; i < hcode->size; i++) {
         hcode->tree[i].chr_rank = i;
         hcode->tree[i].chd[LEFT]     = &hcode->tree[i];
@@ -133,7 +133,7 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
     }
     //assert(next==(2*hcode->size-1));
 
-    hcode->code = NEW_ARRAY(bitvec*, hcode->size);
+    hcode->code = NEW_ARR(bitvec*, hcode->size);
     byte_t *chrcode = bitarr_new(hcode->size);
     if (hcode->size>0) 
         fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
@@ -174,9 +174,9 @@ huffcode *huffcode_new_online_from_stream(alphabet_type abtype, strstream *sst)
     strstream_reset(sst);
     size_t szofchar = strstream_sizeof_char(sst);
     size_t all_len = 1 << (szofchar*BYTESIZE);
-    size_t *all_freqs = NEW_ARRAY(size_t, all_len);
+    size_t *all_freqs = NEW_ARR(size_t, all_len);
     size_t ab_len = 0;
-    FILL_ARRAY(all_freqs, 0, all_len ,0);
+    FILL_ARR(all_freqs, 0, all_len ,0);
     xchar_t xcmax = 0;
     for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
         ab_len += (all_freqs[c]==0)?1:0;
@@ -189,7 +189,7 @@ huffcode *huffcode_new_online_from_stream(alphabet_type abtype, strstream *sst)
     case CHAR_TYPE:
         ;
         char *ab_str = cstr_new(ab_len);
-        ab_freqs = NEW_ARRAY(size_t, ab_len);
+        ab_freqs = NEW_ARR(size_t, ab_len);
         for (size_t i=0, k=0; i<all_len; i++) {
             if (all_freqs[i] > 0) {
                 ab_str[k]  = (char)i;

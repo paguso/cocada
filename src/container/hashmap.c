@@ -21,7 +21,7 @@
 
 #include <immintrin.h>
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
 #include "new.h"
 #include "cstringutil.h"
@@ -52,11 +52,16 @@ struct _hashmap {
 };
 
 
+
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
+{
+   hashmap_init_with_capacity(map, keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
+}
+
 hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
 {
    return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
 }
-
 
 static void _reset_data(hashmap *hmap, size_t cap)  
 {
@@ -69,16 +74,22 @@ static void _reset_data(hashmap *hmap, size_t cap)
     hmap->entries = hmap->data + hmap->cap;
 }
 
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
                                    size_t min_capacity)
 {
-    hashmap *ret;
-    ret = NEW(hashmap);
     ret->keysize = keysize;
     ret->valsize = valsize;
     ret->keyhash = keyhash;
     ret->keyeq   = keyeq;
     _reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
+    return ret;
+}
+
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+                                   size_t min_capacity)
+{
+    hashmap *ret = NEW(hashmap);
+    hashmap_init_with_capacity(ret, keysize, valsize, keyhash, keyeq, min_capacity);
     return ret;
 }
 
@@ -116,6 +127,13 @@ void hashmap_dispose(void *ptr, const dtor *dst) {
         }
     }
 }
+
+
+size_t hashmap_sizeof() {
+    return sizeof(hashmap);
+}
+
+
 
 static inline uint64_t _hash(const hashmap *hmap, const void *key)
 {

@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "new.h"
 #include "mathutil.h"
 #include "deque.h"

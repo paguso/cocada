@@ -26,7 +26,7 @@
 
 #include "alphabet.h"
 #include "bitvec.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "cstringutil.h"
 #include "huffcode.h"
 #include "mathutil.h"

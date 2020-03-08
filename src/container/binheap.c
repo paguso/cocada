@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "vec.h"
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "binheap.h"
 #include "new.h"
 #include "order.h"

@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
 #include "new.h"
 #include "mathutil.h"
@@ -146,6 +146,12 @@ const void *vec_get(const vec *v, size_t pos)
 }
 
 
+void *vec_get_mut(const vec *v, size_t pos)
+{
+    return v->data + ( pos * v->typesize );
+}
+
+
 void vec_get_cpy(const vec *v, size_t pos, void *dest)
 {
     memcpy(dest, v->data+(pos*v->typesize), v->typesize);
@@ -254,7 +260,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 {
     size_t n = vec_len(v);
     void *vcpy = malloc(n*(v->typesize));
-    size_t *count = NEW_ARRAY(size_t, max_key);
+    size_t *count = NEW_ARR(size_t, max_key);
     size_t i, k;
     for (size_t d=0; d<key_size; d++) {
         memset(count, 0, max_key*sizeof(size_t));

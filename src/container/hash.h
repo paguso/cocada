@@ -3,6 +3,7 @@
 
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "bitsandbytes.h"
@@ -40,9 +41,15 @@ uint64_t fib_hash(uint64_t key);
 
 /**
  * Simplified 64-bit FNV hashing
- * source: http://www.isthe.com/chongo/tech/comp/fnv
+ * @see source: http://www.isthe.com/chongo/tech/comp/fnv
  */
 uint64_t fnv1a_64bit_hash(void *obj, size_t objsize);
 
+
+/**
+ * @brief djb2 string hash function 
+ * @see Source: http://www.cse.yorku.ca/~oz/hash.html
+ */
+size_t djb2_hash(const unsigned char *str);
 
 #endif

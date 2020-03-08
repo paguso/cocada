@@ -25,8 +25,8 @@
 #include "CuTest.h"
 
 #include "alphabet.h"
-#include "arrayutil.h"
-#include "bytearray.h"
+#include "arrutil.h"
+#include "bytearr.h"
 #include "cstringutil.h"
 #include "csarray.h"
 #include "sais.h"
@@ -98,19 +98,19 @@ void xxxcsarray_test_setup(CuTest *tc)
 {
     Nab = 1;
     Narr = 1;
-    ab = NEW_ARRAY(alphabet*, Narr);
-    strings = NEW_ARRAY(char*, Narr);
-    slens = NEW_ARRAY(size_t, Narr);
-    csarrays = NEW_ARRAY(csarray*, Narr);    
-    sarrays = NEW_ARRAY(size_t*, Narr);    
-    sarrinvs = NEW_ARRAY(size_t*, Narr);    
+    ab = NEW_ARR(alphabet*, Narr);
+    strings = NEW_ARR(char*, Narr);
+    slens = NEW_ARR(size_t, Narr);
+    csarrays = NEW_ARR(csarray*, Narr);    
+    sarrays = NEW_ARR(size_t*, Narr);    
+    sarrinvs = NEW_ARR(size_t*, Narr);    
     ab[0] = alphabet_new(4,"elns");
     strings[0] = cstr_new(strlen("senselessness"));
     strcat(strings[0], "senselessness");
     slens[0] = strlen(strings[0]);
     csarrays[0] = csarray_new(strings[0], slens[0], ab[0]);
     sarrays[0] = sais(strings[0], slens[0], ab[0]);
-    sarrinvs[0] = NEW_ARRAY(size_t, slens[0]+1);
+    sarrinvs[0] = NEW_ARR(size_t, slens[0]+1);
     sarr_invert(sarrays[0], slens[0]+1, sarrinvs[0]);
     csarray_print(csarrays[0]);
 }
@@ -120,12 +120,12 @@ void csarray_test_setup(CuTest *tc)
 {
     Nab = 10;
     Narr = Nab*MAX_STR_SIZE;
-    ab = NEW_ARRAY(alphabet*, Narr);
-    strings = NEW_ARRAY(char*, Narr);
-    slens = NEW_ARRAY(size_t, Narr);
-    sarrays = NEW_ARRAY(size_t*, Narr);    
-    sarrinvs = NEW_ARRAY(size_t*, Narr);    
-    csarrays = NEW_ARRAY(csarray*, Narr);
+    ab = NEW_ARR(alphabet*, Narr);
+    strings = NEW_ARR(char*, Narr);
+    slens = NEW_ARR(size_t, Narr);
+    sarrays = NEW_ARR(size_t*, Narr);    
+    sarrinvs = NEW_ARR(size_t*, Narr);    
+    csarrays = NEW_ARR(csarray*, Narr);
     for (int l=0; l<Nab; l++) {
         for (int i=0, j=0; i<MAX_STR_SIZE; i++) {
             //printf("l=%d i=%d\n",l,i);
@@ -135,7 +135,7 @@ void csarray_test_setup(CuTest *tc)
             strings[j] = random_str(ab[j], slens[j]);
             csarrays[j] = csarray_new(strings[j], slens[j], ab[j]);
             sarrays[j] = sais(strings[j], slens[j], ab[j]);
-            sarrinvs[j] = NEW_ARRAY(size_t, slens[j]+1);
+            sarrinvs[j] = NEW_ARR(size_t, slens[j]+1);
             sarr_invert(sarrays[j], slens[j]+1, sarrinvs[j]);
 
             //csarray_print(csarrays[j]);
@@ -196,7 +196,7 @@ void csarray_test_get(CuTest *tc)
             //printf("csa[%zu].get(%zu) = %zu (bf = %zu)\n", i, j, s, sa[j]); 
             if (sa[j]!=s) {
                 csarray_print(csa);
-                PRINT_ARRAY(sa, sa, %zu, 0, sa_len, 10);
+                PRINT_ARR(sa, sa, %zu, 0, sa_len, 10);
             }
             CuAssertSizeTEquals(tc, sa[j], s);
         }

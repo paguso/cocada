@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef BITARRAY_H
-#define BITARRAY_H
+#ifndef BITARR_H
+#define BITARR_H
 
 #include <limits.h>
 #include <stdbool.h>

@@ -27,7 +27,7 @@
 #include "CuTest.h"
 
 #include "bitsandbytes.h"
-#include "bytearray.h"
+#include "bytearr.h"
 
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
 static size_t ba_size;

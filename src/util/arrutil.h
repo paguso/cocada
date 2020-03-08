@@ -38,13 +38,19 @@
 /**
  * @brief Allocates a new array of N elements of a given TYPE.
  */
-#define NEW_ARRAY( TYPE, N ) ((N>0)?((TYPE*)(malloc((N)*sizeof(TYPE)))):NULL)
+#define NEW_ARR( TYPE, N ) ((N>0)?((TYPE*)(malloc((N)*sizeof(TYPE)))):NULL)
+
+
+/**
+ * @brief Allocates a new array of N elements of a given TYPE.
+ */
+#define NEW_ARR_SZOF( TYPE, N , SZOF) ((N>0)?((TYPE*)(malloc((N)*(SZOF)))):NULL)
 
 
 /**
  * @brief Fills an array ARR from position =FROM to position <TO with value VAL.
  */
-#define FILL_ARRAY( ARR, FROM, TO, VAL ) \
+#define FILL_ARR( ARR, FROM, TO, VAL ) \
     for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(VAL))
 
         
@@ -52,7 +58,7 @@
  * @brief Copies N elements from an array SRC from position =FROMSRC
  *        into an array DEST from position =FROMDEST.
  */
-#define COPY_ARRAY( DEST, FROMDEST, SRC, FROMSRC, N )\
+#define COPY_ARR( DEST, FROMDEST, SRC, FROMSRC, N )\
     for(size_t _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
         (DEST)[_fd+_i]=(SRC)[_fs+_i]
         
@@ -62,7 +68,7 @@
  *        using NAME as label, displaying ELTSPERLINE elements per line, 
  *        and using the printf format string FORMAT.
  */
-#define PRINT_ARRAY( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
+#define PRINT_ARR( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
     { printf(#NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
       for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
         if(!((__i-FROM)%__el)) printf("\n%4zu: ",__i);\

@@ -111,6 +111,12 @@ const void *vec_get(const vec *v, size_t pos);
 
 
 /**
+ * @brief Returns a mutable (non-const) reference to the element at position @p pos.
+ */
+void *vec_get_mut(const vec *v, size_t pos);
+
+
+/**
  * @brief Copies the element at position @p pos into the location 
  *        pointed to by @p dest 
  */

@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "arrayutil.h"
-#include "bitarray.h"
+#include "arrutil.h"
+#include "bitarr.h"
 #include "bitsandbytes.h"
-#include "bytearray.h"
+#include "bytearr.h"
 #include "new.h"
 #include "mathutil.h"
 
@@ -39,7 +39,7 @@ byte_t *bitarr_new(size_t len)
 byte_t *bitarr_new_from_str(const char *str, size_t len)
 {
     byte_t *ret;
-    ret = NEW_ARRAY(byte_t, (size_t)multceil(len, BYTESIZE));
+    ret = NEW_ARR(byte_t, (size_t)multceil(len, BYTESIZE));
     bitarr_parse_str(ret, str, len);
     return ret;
 }

@@ -73,6 +73,7 @@ typedef struct _hashmap_iter hashmap_iter;
  */
 hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq);
 
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq);
 
 /**
  * @brief Created a hash map with **at least** some initial capacity.
@@ -82,6 +83,9 @@ hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_f
 hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
                                    size_t min_capacity);
 
+
+void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+                                   size_t min_capacity);
 
 /**
  * @brief Destructor.
@@ -100,6 +104,11 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
  */
 void hashmap_dispose(void *ptr, const dtor *dt);
 
+
+/**
+ * @brief Returns the size of the type in bytes
+ */
+size_t hashmap_sizeof();
 
 /**
  * @brief Checks whether the @p map already contains a given @p key.

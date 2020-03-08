@@ -25,13 +25,10 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
+#include "order.h"
 #include "hash.h"
 #include "hashmap.h"
-
-bool eq_uint32_t(const void *a, const void *b) {
-    return (uint32_t)(*((uint32_t *)a)) == (uint32_t)(*((uint32_t *)b));
-}
 
 
 void test_hashmap_int(CuTest *tc) 

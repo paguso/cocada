@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitsandbytes.h"
 #include "bitvec.h"
 #include "new.h"
@@ -38,7 +38,7 @@ void bitvec_test_append(CuTest *tc)
 {
     bitvec *bv = bitvec_new_with_capacity(0);
     byte_t *array;
-    array = NEW_ARRAY(byte_t, ba_size);
+    array = NEW_ARR(byte_t, ba_size);
     bool bit;
     for (int i=0; i<ba_size; i++)
     {
@@ -61,7 +61,7 @@ void bitvec_test_append_n(CuTest *tc)
 {
     bitvec *bv = bitvec_new_with_capacity(0);
     byte_t *array;
-    array = NEW_ARRAY(byte_t, ba_size);
+    array = NEW_ARR(byte_t, ba_size);
     bool bit = false;
     size_t n=0, s=0;
     while (s<ba_size)
@@ -70,7 +70,7 @@ void bitvec_test_append_n(CuTest *tc)
         bit = 1-bit;
         //printf("current size=%zu adding %zu %c-bits\n",s, n, bit?'1':'0');
         bitvec_append_n(bv, n, bit);
-        FILL_ARRAY(array, s, s+n, bit);
+        FILL_ARR(array, s, s+n, bit);
         s += n;
         //bitvec_print(bv, 8);
     }

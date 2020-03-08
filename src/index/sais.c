@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "alphabet.h"
-#include "arrayutil.h"
+#include "arrutil.h"
 #include "bitvec.h"
 #include "csarray.h"
 #include "strstream.h"
@@ -121,13 +121,13 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
         sarr[--offsets[ab_rank(ab, CHAR_AT(str, i))]] = i;
     }
     //printf("1)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     induce_L(str, ab, ab_type, sarr, ls, bkts, offsets);
     //printf("2)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     induce_S(str, ab, ab_type, sarr, ls, bkts, offsets);
     //printf("3)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
 
     // 2. Reduce the problem
     // 2.1 move sorted LMS segments to 1st half of the SA
@@ -135,9 +135,9 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
     for (size_t i=0; i<n; i++) 
         if (bitvec_get_bit(lms, sarr[i])) 
             sarr[nlms++] = sarr[i];
-    FILL_ARRAY(sarr, nlms, n, UNSET);
+    FILL_ARR(sarr, nlms, n, UNSET);
     //printf("4)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     // 2.2 compute the # of different LMS segments
     //     and rename each of them as different macro int character
     size_t ndifflms=0;
@@ -168,7 +168,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
         prev_lms = cur_lms;
     }
     //printf("5)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     // and finally push all the macro chars towards the end of the SA
     for (size_t i=n-1, j=n-1; i>=nlms; i--) 
         if (sarr[i]!=UNSET) {
@@ -177,7 +177,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
             j--;
         }
     //printf("6)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
             
     // 3. use the reduced string to sort the LMS suffixes
     size_t *red_sarr = sarr;
@@ -199,7 +199,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
     // LMS suffixes (not their original positions) in lexicographic order
     // (sarr[0] = ndifflms-1)
     //printf("7)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     
     // 4. finally put the starting positions of the sorted LMS suffixes
     //    at their correct place in the SA
@@ -208,12 +208,12 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
         if (bitvec_get_bit(lms, i))
             red_str[j++] = i;
     //printf("8)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     for (size_t i=0; i<nlms; i++)
         red_sarr[i] = red_str[red_sarr[i]];
-    FILL_ARRAY(sarr, nlms, n, UNSET);
+    FILL_ARR(sarr, nlms, n, UNSET);
     //printf("9)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
     for (size_t i=nlms-1, j; i>0; i--) {
         j = sarr[i];
         sarr[i] = UNSET;
@@ -221,7 +221,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
     }
     // Done. All LMS suffixes are sorted and correctly placed in the SA
     //printf("10)\n");
-    //PRINT_ARRAY(sarr, SA, %zu, 0, n, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, n, 10);
 }
 
 /*
@@ -237,24 +237,24 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 
     bitvec *ls   = bitvec_new_with_capacity(len+add_sentinel);
     bitvec *lms  = bitvec_new_with_capacity(len+add_sentinel);
-    size_t    *bkts = calloc(ab_sz, sizeof(size_t)); //NEW_ARRAY(size_t, ab_sz);
+    size_t    *bkts = calloc(ab_sz, sizeof(size_t)); //NEW_ARR(size_t, ab_sz);
   
     init_LS(str, len, ab, ab_t, ls, lms, bkts, add_sentinel);
     
     //printf("-------------------------------------------------------------\n");
     //bitvec_print(ls, 4);
     //bitvec_print(lms, 4);
-    //PRINT_ARRAY(bkts, bkts, %zu, 0, ab_sz, 10);
+    //PRINT_ARR(bkts, bkts, %zu, 0, ab_sz, 10);
 
-    FILL_ARRAY(sarr, 0, len+1, UNSET);
-    size_t *offsets = NEW_ARRAY(size_t, ab_sz);
+    FILL_ARR(sarr, 0, len+1, UNSET);
+    size_t *offsets = NEW_ARR(size_t, ab_sz);
     
     sort_LMS(str, ab, ab_t, sarr, ls, lms, bkts, offsets);
-    //PRINT_ARRAY(sarr, SA, %zu, 0, len+1, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, len+1, 10);
     induce_L(str, ab, ab_t, sarr, ls, bkts, offsets);
-    //PRINT_ARRAY(sarr, SA, %zu, 0, len+1, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, len+1, 10);
     induce_S(str, ab, ab_t, sarr, ls, bkts, offsets);
-    //PRINT_ARRAY(sarr, SA, %zu, 0, len+1, 10);
+    //PRINT_ARR(sarr, SA, %zu, 0, len+1, 10);
     
     // clean up
     bitvec_free(ls);
@@ -266,7 +266,7 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 
 size_t *sais(char *str, size_t len, alphabet *ab) {
     if (len<2) {
-        size_t *sarr = NEW_ARRAY(size_t, len+1);
+        size_t *sarr = NEW_ARR(size_t, len+1);
         for (size_t i=0; i<=len; i++) sarr[i]=len-i;
         return sarr;
     }
@@ -279,7 +279,7 @@ size_t *sais(char *str, size_t len, alphabet *ab) {
     alphabet *xab = alphabet_new(xl, xchars);
     
     // build the suffix array
-    size_t *sarr = NEW_ARRAY(size_t, len+1);
+    size_t *sarr = NEW_ARR(size_t, len+1);
     build_sarr(str, len, xab, sarr, 1);
     
     // clean up
