@@ -196,8 +196,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
     //xstring_free(kmstr);
     //dynstr_free(kmdstr);
     
-    xstring *edge_labels  = xstring_new_with_capacity( xstr_len(padstr), 
-                                                       sizeof_ext_char );
+    xstring *edge_labels  = xstring_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
     byte_t *last_node   = bitarr_new(vec_len(kp1mers));
     size_t *char_count = NEW_ARR(size_t, ab_size(ext_ab)+1);
     FILL_ARR(char_count, 0, ab_size(ext_ab)+1, 0);
@@ -207,11 +206,11 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
     byte_t *km1mers_chars = bitarr_new(sizeof_ext_char);
     xstring *lastkp1mers[2];
-    lastkp1mers[0] = xstring_new_with_capacity(k+1, sizeof_ext_char);
-    lastkp1mers[1] = xstring_new_with_capacity(k+1, sizeof_ext_char);
+    lastkp1mers[0] = xstring_new_with_capacity(sizeof_ext_char, k+1);
+    lastkp1mers[1] = xstring_new_with_capacity(sizeof_ext_char, k+1);
     xstring *lastkm1mers[2];
-    lastkm1mers[0] = xstring_new_with_capacity(k-1, sizeof_ext_char);
-    lastkm1mers[1] = xstring_new_with_capacity(k-1, sizeof_ext_char);
+    lastkm1mers[0] = xstring_new_with_capacity(sizeof_ext_char, k-1);
+    lastkm1mers[1] = xstring_new_with_capacity(sizeof_ext_char, k-1);
     size_t this_line, last_line;
     kmer_t *kp1mer;
     bool new_edge = false;

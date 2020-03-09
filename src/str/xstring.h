@@ -51,15 +51,15 @@ xstring *xstring_new(size_t sizeof_char);
  *        Positions 0 through @p len-1 are set to 0.
  * @param sizeof_char the size of each extended character in bytes. 
  */
-xstring *xstring_new_with_len(size_t len, size_t sizeof_char);
+xstring *xstring_new_with_len(size_t sizeof_char, size_t len);
 
 
 /**
  * @brief Creates a new empty xstring with a specified initial capacity. 
- * @param cap The initial capacity.
  * @param sizeof_char the size of each extended character in bytes. 
+ * @param cap The initial capacity.
  */
-xstring *xstring_new_with_capacity(size_t cap, size_t sizeof_char);
+xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap);
 
 
 /**

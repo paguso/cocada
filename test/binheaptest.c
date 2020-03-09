@@ -28,6 +28,7 @@
 #include "arrutil.h"
 #include "binheap.h"
 #include "randutil.h"
+#include "order.h"
 
 
 
@@ -93,8 +94,8 @@ void test_binheap_push_pop(CuTest *tc)
 void test_binheap_push_pop_int(CuTest *tc)
 {
     size_t len = 10;
-    binheap *minheap = binheap_new(&cmp_int, sizeof(int), MIN_HEAP);
-    binheap *maxheap = binheap_new(&cmp_int, sizeof(int), MAX_HEAP);
+    binheap *minheap = binheap_new(cmp_int, sizeof(int), MIN_HEAP);
+    binheap *maxheap = binheap_new(cmp_int, sizeof(int), MAX_HEAP);
     CuAssertSizeTEquals(tc, 0, binheap_size(minheap));
     CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
     

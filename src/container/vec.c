@@ -247,6 +247,25 @@ static void _qsort(vec *v, size_t l, size_t r, cmp_func cmp)
     }
 }
 
+size_t vec_min(vec *v, cmp_func cmp)
+{
+    size_t m = 0;
+    for (size_t i=1, l=vec_len(v); i<l; ++i) {
+        m = ( cmp(vec_get(v, i), vec_get(v, m)) < 0 ) ? i : m;
+    }
+    return m;
+}
+
+
+size_t vec_max(vec *v, cmp_func cmp)
+{
+    size_t m = 0;
+    for (size_t i=1, l=vec_len(v); i<l; ++i) {
+        m = ( cmp(vec_get(v, i), vec_get(v, m)) > 0 ) ? i : m;
+    } 
+    return m;
+}
+
 
 void vec_qsort(vec *v, cmp_func cmp)
 {
@@ -297,8 +316,8 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
     { vec_set(v, pos, &val); } 
 
 
-#define VEC_APP_IMPL( TYPE ) \
-   void vec_app_##TYPE(vec *v, TYPE val)\
+#define VEC_PUSH_IMPL( TYPE ) \
+   void vec_push_##TYPE(vec *v, TYPE val)\
     { vec_push(v, &val); }
 
 
@@ -307,20 +326,34 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
     { vec_ins(v, pos, &val);} 
 
 
-#define VEC_DEL_IMPL( TYPE ) \
-   TYPE vec_del_##TYPE(vec *v, size_t pos)\
+#define VEC_POP_IMPL( TYPE ) \
+   TYPE vec_pop_##TYPE(vec *v, size_t pos)\
     {  TYPE r; vec_pop(v, pos, &r); return r; } 
 
 
 #define VEC_ALL_IMPL( TYPE )\
 VEC_GET_IMPL(TYPE)\
 VEC_SET_IMPL(TYPE)\
-VEC_APP_IMPL(TYPE)\
+VEC_PUSH_IMPL(TYPE)\
 VEC_INS_IMPL(TYPE)\
-VEC_DEL_IMPL(TYPE)
+VEC_POP_IMPL(TYPE)
 
-
-VEC_ALL_IMPL(int)
-VEC_ALL_IMPL(size_t)
 VEC_ALL_IMPL(byte_t)
+VEC_ALL_IMPL(char)
+VEC_ALL_IMPL(short)
+VEC_ALL_IMPL(int)
+VEC_ALL_IMPL(long)
+VEC_ALL_IMPL(char)
+VEC_ALL_IMPL(float)
+VEC_ALL_IMPL(double)
+VEC_ALL_IMPL(size_t)
+VEC_ALL_IMPL(int8_t)
+VEC_ALL_IMPL(int16_t)
+VEC_ALL_IMPL(int32_t)
+VEC_ALL_IMPL(int64_t)
+VEC_ALL_IMPL(uint8_t)
+VEC_ALL_IMPL(uint16_t)
+VEC_ALL_IMPL(uint32_t)
+VEC_ALL_IMPL(uint64_t)
+
 

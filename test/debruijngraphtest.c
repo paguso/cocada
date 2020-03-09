@@ -180,8 +180,8 @@ void test_dbgraph_outdeg(CuTest *tc)
         dbgraph *dbg = g[i];
         //printf("T:%s\n",padstr[i]);
         //dbg_print(dbg);
-        xstring *xnode = xstring_new_with_capacity( dbg_k(dbg), 
-                                             nbytes(ab_size(dbg_ext_ab(dbg))) );
+        xstring *xnode = xstring_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))), 
+                                                    dbg_k(dbg) );
         char *node = cstr_new(dbg_k(dbg));
     
         for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
@@ -241,8 +241,8 @@ void test_dbg_lbl_outdeg(CuTest *tc)
     for (size_t i=0; i<n; i++)  {
         dbgraph *dbg = g[i];
         alphabet *abt = ab[i];
-        xstring *xnode = xstring_new_with_capacity( dbg_k(dbg), 
-                                             nbytes(ab_size(dbg_ext_ab(dbg))) );
+        xstring *xnode = xstring_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
+                                                    dbg_k(dbg) );
         char *node = cstr_new(dbg_k(dbg));
         for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
             size_t nid = dbg_node_id(dbg, nrk);
@@ -309,9 +309,9 @@ void test_dbgraph_child(CuTest *tc)
         par_lbl     = cstr_new(dbg_k(dbg));
         chd_lbl     = cstr_new(dbg_k(dbg));
         chd_lbl_bf  = cstr_new(dbg_k(dbg));
-        xpar_lbl    = xstring_new_with_capacity(dbg_k(dbg), nbytes(ab_size(dbg_ext_ab(dbg))));
-        xchd_lbl    = xstring_new_with_capacity(dbg_k(dbg), nbytes(ab_size(dbg_ext_ab(dbg))));
-        xchd_lbl_bf = xstring_new_with_capacity(dbg_k(dbg), nbytes(ab_size(dbg_ext_ab(dbg))));
+        xpar_lbl    = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+        xchd_lbl    = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+        xchd_lbl_bf = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
 
         for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
             size_t nid = dbg_node_id(dbg, nrk);

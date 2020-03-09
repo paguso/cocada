@@ -23,11 +23,11 @@ struct _xstring {
 
 xstring *xstring_new(size_t bytes_per_char)
 {
-    return xstring_new_with_capacity(MIN_CAP, bytes_per_char);
+    return xstring_new_with_capacity(bytes_per_char, MIN_CAP);
 }
 
 
-xstring *xstring_new_with_capacity(size_t cap, size_t bytes_per_char)
+xstring *xstring_new_with_capacity(size_t bytes_per_char, size_t cap)
 {
     assert(bytes_per_char<=XCHAR_BYTESIZE);
     xstring *ret = NEW(xstring);
@@ -39,9 +39,9 @@ xstring *xstring_new_with_capacity(size_t cap, size_t bytes_per_char)
 }
 
 
-xstring *xstring_new_with_len(size_t len, size_t bytes_per_char)
+xstring *xstring_new_with_len(size_t bytes_per_char, size_t len)
 {
-    xstring *ret = xstring_new_with_capacity(len, bytes_per_char);
+    xstring *ret = xstring_new_with_capacity(bytes_per_char, len);
     ret->len = len;
     return ret;
 }

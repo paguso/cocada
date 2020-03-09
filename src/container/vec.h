@@ -55,6 +55,11 @@ vec *vec_new(size_t typesize);
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 
+#define VEC_FILL( V, EXPR, N ) for (size_t __i=0, __n=(N); __i < __n; __i++) vec_push(V, (EXPR)); 
+
+#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (size_t __i=0, __n=(N), TYPE __e=(EXPR); __i < __n; __i++) vec_push(V, &__e); 
+
+
 /**
  * @brief returns the type size of the actual implementation in bytes.
  */
@@ -166,6 +171,20 @@ void vec_del(vec *v, size_t pos);
 
 
 /**
+ * @brief Returns the position of the minimum element according to 
+ *        the order @p cmp. If the vector is empty, returns 0.
+ */
+size_t vec_min(vec *v, cmp_func cmp);
+
+
+/**
+ * @brief Returns the position of the minimum element according to 
+ *        the order @p cmp. If the vector is empty, returns 0.
+ */
+size_t vec_max(vec *v, cmp_func cmp);
+
+
+/**
  * @brief In-place sorting of vector elements using the Quicksort algorithm.
  */
 void vec_qsort(vec *v, cmp_func cmp); 
@@ -203,30 +222,43 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
    void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
 
-#define VEC_APP_DECL( TYPE ) \
-   void vec_app_##TYPE(vec *v, TYPE val);
+#define VEC_PUSH_DECL( TYPE ) \
+   void vec_push_##TYPE(vec *v, TYPE val);
 
 
 #define VEC_INS_DECL( TYPE ) \
    void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 
-#define VEC_DEL_DECL( TYPE ) \
-   TYPE vec_del_##TYPE(vec *v, size_t pos); 
+#define VEC_POP_DECL( TYPE ) \
+   TYPE vec_pop_##TYPE(vec *v, size_t pos); 
 
 
 #define VEC_ALL_DECL( TYPE )\
 VEC_NEW_DECL(TYPE)\
 VEC_GET_DECL(TYPE)\
 VEC_SET_DECL(TYPE)\
-VEC_APP_DECL(TYPE)\
+VEC_PUSH_DECL(TYPE)\
 VEC_INS_DECL(TYPE)\
-VEC_DEL_DECL(TYPE)
+VEC_POP_DECL(TYPE)
 
 
-VEC_ALL_DECL(int)
-VEC_ALL_DECL(size_t)
 VEC_ALL_DECL(byte_t)
-
+VEC_ALL_DECL(char)
+VEC_ALL_DECL(short)
+VEC_ALL_DECL(int)
+VEC_ALL_DECL(long)
+VEC_ALL_DECL(char)
+VEC_ALL_DECL(float)
+VEC_ALL_DECL(double)
+VEC_ALL_DECL(size_t)
+VEC_ALL_DECL(int8_t)
+VEC_ALL_DECL(int16_t)
+VEC_ALL_DECL(int32_t)
+VEC_ALL_DECL(int64_t)
+VEC_ALL_DECL(uint8_t)
+VEC_ALL_DECL(uint16_t)
+VEC_ALL_DECL(uint32_t)
+VEC_ALL_DECL(uint64_t)
                     
 #endif
