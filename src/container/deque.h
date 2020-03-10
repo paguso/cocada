@@ -62,22 +62,29 @@ size_t deque_len(const deque *q);
 
 
 /**
- * @brief Returns an internal reference to the element at a given position
- *        or NULL if an invalid position is given.
+ * @brief Returns an internal reference to the element at a given position.
+ * @warning No check is performed on @p q bounds.
  */
 const void *deque_get(const deque *q, size_t pos);
 
 
 /**
- * @brief Returns an internal reference to the element at the first position
- *        or NULL if an invalid position is given.
+ * @brief Returns an internal reference to the element at a given position.
+ * @warning No check is performed on @p q bounds or @p dest.
+ */
+void deque_get_cpy(const deque *q, size_t pos, void *dest);
+
+
+/**
+ * @brief Returns an internal reference to the element at the first position.
+ * @warning No check is performed on @p q bounds.
  */
 const void *deque_front(const deque *q);
 
 
 /**
- * @brief Returns an internal reference to the element at the last position
- *        or NULL if an invalid position is given.
+ * @brief Returns an internal reference to the element at the last position.
+ * @warning No check is performed on @p q bounds.
  */
 const void *deque_back(const deque *q);
 
@@ -89,10 +96,17 @@ void deque_push_back(deque *q, const void *elt);
 
 
 /**
- * @brief Pops the element from the front of a nonempty deque and copies its 
- *        value into @p dest. If @p dest is NULL, the value is discarded. 
+ * @brief Pops the last element of @p q and copies its value to @p dest. 
+ * @warning No check is performed on @p q bounds or @p dest.
  */
 void deque_pop_back(deque *q, void *dest);
+
+
+/**
+ * @brief Removes the last element of @p q. 
+ * @warning No check is performed on @p q bounds.
+ */
+void deque_remv_back(deque *q);
 
 
 /**
@@ -102,10 +116,17 @@ void deque_push_front(deque *q, const void *elt);
 
 
 /**
- * @brief Pops the element from the front of a nonempty deque and copies its 
- *        value into @p dest. If @p dest is NULL, the value is discarded. 
+ * @brief Pops the first element of @p q and copies its value to @p dest. 
+ * @warning No check is performed on @p q bounds or @p dest.
  */
 void deque_pop_front(deque *q, void *dest);
+
+
+/**
+ * @brief Removes the last element of @p q. 
+ * @warning No check is performed on @p q bounds.
+ */
+void deque_remv_front(deque *q);
 
 
 #define DEQUE_NEW_DECL( TYPE )\
@@ -126,12 +147,17 @@ void deque_pop_front(deque *q, void *dest);
 #define DEQUE_POP_BACK_DECL( TYPE )\
     TYPE deque_pop_back_##TYPE(deque *q);    
 
+#define DEQUE_REMV_BACK_DECL( TYPE )\
+    TYPE deque_remv_back_##TYPE(deque *q);    
+
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
     void deque_push_front_##TYPE(deque *q, TYPE val);
 
 #define DEQUE_POP_FRONT_DECL( TYPE )\
     TYPE deque_pop_front_##TYPE(deque *q);    
 
+#define DEQUE_REMV_FRONT_DECL( TYPE )\
+    TYPE deque_remv_front_##TYPE(deque *q);    
 
 #define DEQUE_ALL_DECL( TYPE )\
 DEQUE_NEW_DECL(TYPE)\
@@ -141,7 +167,7 @@ DEQUE_BACK_DECL(TYPE)\
 DEQUE_PUSH_BACK_DECL(TYPE)\
 DEQUE_POP_BACK_DECL(TYPE)\
 DEQUE_PUSH_FRONT_DECL(TYPE)\
-DEQUE_POP_FRONT_DECL(TYPE)
+DEQUE_POP_FRONT_DECL(TYPE)\
 
 
 DEQUE_ALL_DECL(int)

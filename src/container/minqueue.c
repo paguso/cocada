@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "bitsandbytes.h"
 #include "new.h"
 #include "order.h"
 #include "minqueue.h"
@@ -14,12 +15,6 @@ struct _minqueue
     deque *mins;
     size_t dels;
     cmp_func cmp;
-};
-
-struct _minqueue_iter 
-{
-    minqueue *src;
-    size_t index;
 };
 
 
@@ -80,13 +75,22 @@ void minqueue_push(minqueue *queue, const void *elt)
 
 void minqueue_pop(minqueue *queue, void *dest) 
 {
-    if ( deque_len(queue->elts) == 0 )
-        return;
     if ( deque_front_size_t(queue->mins) == queue->dels ) {
         deque_pop_front_size_t(queue->mins);
     }
     queue->dels++;
     deque_pop_front(queue->elts, dest);
+}
+
+
+void minqueue_remv(minqueue *queue)
+{
+    if ( deque_front_size_t(queue->mins) == queue->dels ) {
+        deque_pop_front_size_t(queue->mins);
+    }
+    queue->dels++;
+    deque_remv_front(queue->elts);
+
 }
 
 
@@ -96,10 +100,70 @@ const void *minqueue_min(const minqueue *queue)
 }
 
 
+void minqueue_min_cpy(const minqueue *queue, void *dest)
+{
+    deque_get_cpy(queue->elts, deque_front_size_t(queue->mins) - queue->dels, dest );
+
+}
+
+
+#define MINQUEUE_PUSH_IMPL( TYPE )\
+void minqueue_push_##TYPE(minqueue *queue, TYPE val) {\
+    minqueue_push(queue, &val);\
+}
+
+
+#define MINQUEUE_POP_IMPL( TYPE )\
+TYPE minqueue_pop_##TYPE(minqueue *queue) {\
+    TYPE *ret;\
+    minqueue_pop(queue, &ret);\
+    return *ret;\
+}
+
+
+#define MINQUEUE_MIN_IMPL( TYPE )\
+TYPE minqueue_min_##TYPE(const minqueue *queue){\
+    return ((TYPE *)minqueue_min(queue))[0];\
+}
+
+
+#define MINQUEUE_ALL_IMPL( TYPE )\
+MINQUEUE_PUSH_IMPL(TYPE)\
+MINQUEUE_POP_IMPL(TYPE)\
+MINQUEUE_MIN_IMPL(TYPE)
+
+
+MINQUEUE_ALL_IMPL(byte_t)
+MINQUEUE_ALL_IMPL(char)
+MINQUEUE_ALL_IMPL(short)
+MINQUEUE_ALL_IMPL(int)
+MINQUEUE_ALL_IMPL(long)
+MINQUEUE_ALL_IMPL(float)
+MINQUEUE_ALL_IMPL(double)
+MINQUEUE_ALL_IMPL(size_t)
+MINQUEUE_ALL_IMPL(int8_t)
+MINQUEUE_ALL_IMPL(int16_t)
+MINQUEUE_ALL_IMPL(int32_t)
+MINQUEUE_ALL_IMPL(int64_t)
+MINQUEUE_ALL_IMPL(uint8_t)
+MINQUEUE_ALL_IMPL(uint16_t)
+MINQUEUE_ALL_IMPL(uint32_t)
+MINQUEUE_ALL_IMPL(uint64_t)
+
+
+/*
+struct _minqueue_iter 
+{
+    const minqueue *src;
+    size_t index;
+};
+*/
+
+
 static void _minqueue_iter_goto_next(minqueue_iter *iter) 
 {
     if (iter->index == 0) return;
-    minqueue *src = iter->src;
+    const minqueue *src = iter->src;
     if ( iter->index < deque_len(src->mins) &&
          src->cmp( deque_get(src->elts, deque_front_size_t(src->mins) - src->dels),
                    deque_get(src->elts, deque_get_size_t(src->mins, iter->index) - src->dels) ) < 0 ) 
@@ -110,12 +174,10 @@ static void _minqueue_iter_goto_next(minqueue_iter *iter)
 }
 
 
-minqueue_iter *minqueue_all_min(const minqueue *queue)
+minqueue_iter minqueue_all_min(const minqueue *queue)
 {
-    minqueue_iter *iter = NEW(minqueue_iter);
-    iter->src = queue;
-    iter->index = 0;
-    _minqueue_iter_goto_next(iter);
+    minqueue_iter iter = {.src=queue, .index=0};
+    _minqueue_iter_goto_next(&iter);
     return iter;
 }
 
@@ -128,7 +190,7 @@ bool minqueue_iter_has_next(const minqueue_iter *iter)
 
 const void *minqueue_iter_next(minqueue_iter *iter)
 {
-    void *ret;
+    const void *ret;
     ret = deque_get(iter->src->elts, deque_get_size_t(iter->src->mins, iter->index) - iter->src->dels );
     iter->index +=1;
     _minqueue_iter_goto_next(iter);

@@ -33,7 +33,7 @@ static void _initpow(xstrhash *self)
     }
 }
 
-static uint64_t _pow(const xstrhash *self, size_t exp) {
+static inline uint64_t _pow(const xstrhash *self, size_t exp) {
     uint64_t ret = 1;
     while (exp > self->max_exp) {
         ret *= self->pow[self->max_exp];
@@ -43,13 +43,14 @@ static uint64_t _pow(const xstrhash *self, size_t exp) {
 }
 
 
-uint64_t xstrhash_new(const alphabet *ab)
+xstrhash *xstrhash_new(alphabet *ab)
 {
     xstrhash *ret = NEW(xstrhash);
-    ret->ab = alphabet_clone(ab);
+    ret->ab = ab;
     _initpow(ret);
     return ret;
 }
+
 
 void xstrhash_dispose(void *ptr, const dtor *dt)
 {
@@ -57,19 +58,35 @@ void xstrhash_dispose(void *ptr, const dtor *dt)
     FREE(self->ab, alphabet);
 }
 
+
 uint64_t xstrhash_lex(const xstrhash *self, const xstring *s)
 {
+    return xstrhash_lex_sub(self, s, 0, xstr_len(s));
+}
+
+
+uint64_t xstrhash_lex_sub(const xstrhash *self, const xstring *s, size_t from, size_t to)
+{
     uint64_t hash = 0;
-    for (size_t i=0; i<xstr_len(s); i++) {
+    for (size_t i=from; i < to; i++) {
         hash *= ab_size(self->ab);
         hash += ab_rank(self->ab, xstr_get(s, i));
     }
     return hash;
 }
 
+
 uint64_t xstrhash_roll_lex(const xstrhash *self, const xstring *s, uint64_t hash, xchar_t c)
 {
     hash -= _pow(self, xstr_len(s)-1) * ab_rank(self->ab, xstr_get(s, 0));
+    hash += ab_rank(self->ab, c);
+    return hash;
+}
+
+
+uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstring *s, size_t from, size_t to,  uint64_t hash, xchar_t c)
+{
+    hash -= _pow(self, to - from - 1) * ab_rank(self->ab, xstr_get(s, from));
     hash += ab_rank(self->ab, c);
     return hash;
 }

@@ -105,6 +105,12 @@ const void *deque_get(const deque *q, size_t pos)
 }
 
 
+void deque_get_cpy(const deque *q, size_t pos, void *dest ) 
+{
+    memcpy(dest, q->data + ( ((q->start + pos) % q->cap) * q->typesize ), q->typesize);
+}
+
+
 const void *deque_front(const deque *q) {
     return deque_get(q, 0);
 }
@@ -164,9 +170,14 @@ void deque_push_front(deque *q, const void *elt)
 
 void deque_pop_back(deque *q, void *dest)
 {
-    if (deque_empty(q)) return;
-    if (dest!=NULL)
-        memcpy(dest, q->data+(((q->start+q->len-1)%q->cap)*q->typesize), q->typesize);
+    memcpy(dest, q->data+(((q->start+q->len-1)%q->cap)*q->typesize), q->typesize);
+    q->len--;
+    check_and_resize(q);
+}
+
+
+void deque_remv_back(deque *q)
+{
     q->len--;
     check_and_resize(q);
 }
@@ -174,14 +185,19 @@ void deque_pop_back(deque *q, void *dest)
 
 void deque_pop_front(deque *q, void *dest)
 {
-    if (deque_empty(q)) return;
-    if (dest!=NULL)
-        memcpy(dest, q->data+(q->start*q->typesize), q->typesize);
+    memcpy(dest, q->data+(q->start*q->typesize), q->typesize);
     q->len--;
     q->start = (q->start+1)%q->cap;
     check_and_resize(q);
 }
 
+
+void deque_remv_front(deque *q)
+{
+    q->len--;
+    q->start = (q->start+1)%q->cap;
+    check_and_resize(q);
+}
 
 #define DEQUE_NEW_IMPL( TYPE )\
     deque *deque_new_##TYPE() {\

@@ -252,6 +252,11 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
     }
 }
 
+void *hashmap_get_mut(const hashmap *hmap, const void *key)
+{
+    return (void *)hashmap_get(hmap, key);
+}
+
 static void _print(const hashmap *hmap) {
     printf("Hashmap at %p\n", hmap);
     char *c = cstr_new(8);

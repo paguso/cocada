@@ -118,11 +118,19 @@ bool hashmap_has_key(const hashmap *hmap, const void *key);
 
 
 /**
- * @brief Gets the value associated to a given @p key.
+ * @brief Gets an internal reference to the value associated to a given @p key.
  * 
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
 const void *hashmap_get(const hashmap *hmap, const void *key);
+
+
+/**
+ * @brief Gets a mutable internal reference to the value associated to a given @p key.
+ * 
+ * @warning If the map does not contain the provided @p key, an error may occur.
+ */
+void *hashmap_get_mut(const hashmap *hmap, const void *key);
 
 
 /**

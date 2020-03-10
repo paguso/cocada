@@ -11,11 +11,13 @@
 #include "hashmap.h"
 #include "vec.h"
 #include "xstring.h"
+#include "xstrhash.h"
 
 #include "mmindex.h"
 
 struct _mmindex {
     alphabet *ab;
+    xstrhash *hasher;
     size_t nparam;
     size_t *w;
     size_t *k;
@@ -23,6 +25,7 @@ struct _mmindex {
     hashmap **tbls;
     size_t nstr;
     vec *offs;
+    size_t nseq;
 };
 
 
@@ -30,19 +33,18 @@ mmindex *mmindex_new(alphabet *ab, size_t n, size_t *w, size_t *k)
 {
     mmindex *ret = NEW(mmindex);
     ret->ab = ab;
+    ret->hasher = xstrhash_new(alphabet_clone(ab));
     ret->nparam = n;
     ret->w = w;
     ret->k = k;
     ret->max_wlen = 0;
     for (size_t i =0; i<n; i++)
         ret->max_wlen = (w[i]+k[i] > ret->max_wlen) ? w[i]+k[i] : ret->max_wlen;
-    ret->tbls = NEW_ARR(hashmap*, ret->nparam);
-    for (size_t i=0; i<ret->nparam; i++) {
-        ret->tbls[i] = hashmap_new( sizeof(uint64_t), vec_sizeof(), 
-                                    ident_hash_uint64_t, eq_uint64_t );
-    }
+    ret->tbls = NEW_ARR(hashmap *, ret->nparam);
+    FILL_ARR(ret->tbls, 0, ret->nparam, hashmap_new(sizeof(uint64_t), sizeof(vec *), ident_hash_uint64_t, eq_uint64_t));
     ret->nstr = 0;
     ret->offs = vec_new(sizeof(size_t));
+    ret->nseq = 0;
     return ret;
 }
 
@@ -52,7 +54,7 @@ void mmindex_dispose(void *ptr, const dtor *dt)
     alphabet_free(mm->ab);
     FREE(mm->w);
     FREE(mm->k);
-    dtor *hmdt = dtor_cons( dtor_cons( DTOR(hashmap), empty_dtor() ), DTOR(vec) );
+    dtor *hmdt = dtor_cons( dtor_cons( DTOR(hashmap), empty_dtor() ), dtor_cons(ptr_dtor(), DTOR(vec)) );
     for (size_t i=0; i < mm->nparam; i++) {
         FINALISE(mm->tbls[i], hmdt);
         FREE(mm->tbls[i]);
@@ -62,13 +64,29 @@ void mmindex_dispose(void *ptr, const dtor *dt)
     FREE(mm->offs, vec);
 }
 
+
 typedef struct _rankpos {
     uint64_t rank;
     size_t pos;
 } rankpos;
 
+
 int cmp_rankpos(const void *pl, const void *pr) {
     return cmp_uint64_t(pl, pr);
+}
+
+
+static inline void _insert(hashmap *tbl, uint64_t rank, size_t pos) 
+{
+    vec *v;
+    if ( hashmap_has_key(tbl, (const void *)&rank) ) {
+        v = hashmap_get_mut(tbl, (const void *)&rank) ;
+    }
+    else {
+        v = vec_new(sizeof(size_t));
+        hashmap_set(tbl, (const void *)&rank, &v);
+    }
+    vec_push_size_t(v, pos);
 }
 
 
@@ -89,7 +107,7 @@ void mmindex_index(mmindex *self, strstream *sst)
     FILL_ARR(prev_right_rk, 0, nidx, 0);
     
     size_t pos = 0;
-    /*
+    rankpos rp = {0,0};
     for (xchar_t c; (c=strstream_getc(sst)) != EOF;) {
         // prepare window
         if (pos >= max_win_len) {
@@ -102,66 +120,76 @@ void mmindex_index(mmindex *self, strstream *sst)
         pos += 1;
         for (size_t i = 0; i < nidx; i++) {
             if (pos == self->k[i]) {
-                size_t kmer_rk = self.hasher[i].hash(&window[window.len() - self.k[i]..]);
+                uint64_t kmer_rk = xstrhash_lex_sub(self->hasher, window, 
+                                                    xstr_len(window) - self->k[i], 
+                                                    xstr_len(window));
                 prev_right_rk[i] = kmer_rk;
                 prev_mm_rk[i] = kmer_rk; 
-                minqueue_push( win_rks[i],  (kmer_rk, pos - self->k[i]) );
+                rp.rank = kmer_rk;
+                rp.pos = pos - self->k[i];
+                minqueue_push( win_rks[i],  &rp );
                 // initial end minimisers are all indexed
-                self.insert(i, kmer_rk, offset + pos - self.k[i]);
+                _insert(self->tbls[i], kmer_rk, offset + pos - self->k[i]);
             } else if (pos > self->k[i]) {
                 // get previous windows minimiser
                 // let (last_mm_rk, _last_mm_pos) = win_rks[i].xtr().unwrap().clone();
                 // compute new last kmer rank and add it to the new window
-                let kmer_rk = self.hasher[i].roll_hash(
-                    &window[window.len() - self.k[i] - 1..window.len() - 1],
-                    prev_right_rk[i],
-                    c,
-                );
-                let kmer_pos = pos - self.k[i];
+                uint64_t kmer_rk = xstrhash_roll_lex_sub( self->hasher, window, 
+                                                     xstr_len(window) - self->k[i] - 1, 
+                                                     xstr_len(window) - 1, 
+                                                     prev_right_rk[i], c );
+                size_t kmer_pos = pos - self->k[i];
                 prev_right_rk[i] = kmer_rk;
                 // dequeue the first kmer of previous window if it is full
-                if pos > self.w[i] + self.k[i] - 1 {
-                    win_rks[i].pop();
+                if ( pos > self->w[i] + self->k[i] - 1 ) {
+                    minqueue_remv( win_rks[i] );
                 }
                 // and add new kmer
-                win_rks[i].push((kmer_rk, kmer_pos));
+                rp.rank = kmer_rk;
+                rp.pos = kmer_pos;
+                minqueue_push( win_rks[i], &rp);
                 // then get current window miminiser
-                let cur_mm_rk = win_rks[i].xtr().unwrap().0;
-                if self.w[i] == 1 || prev_mm_rk[i] != cur_mm_rk {
+                uint64_t cur_mm_rk = ((rankpos *)minqueue_min(win_rks[i]))->rank;
+                if ( self->w[i] == 1 || prev_mm_rk[i] != cur_mm_rk ) {
                     // new minimiser. add all its occurrences
-                    for &(rk, p) in win_rks[i].xtr_iter() {
-                        self.insert(i, rk, offset + p);
+                    for ( minqueue_iter it = minqueue_all_min(win_rks[i]); 
+                          minqueue_iter_has_next(&it); ) 
+                    {
+                        const rankpos *mm = minqueue_iter_next(&it);
+                        _insert(self->tbls[i], mm->rank, offset + mm->pos);
                     }
                     prev_mm_rk[i] = cur_mm_rk;
-                } else if cur_mm_rk == kmer_rk {
+                } else if (cur_mm_rk == kmer_rk) {
                     // last kmer is a new occ of same old mm
-                    self.insert(i, kmer_rk, offset + kmer_pos);
+                    _insert(self->tbls[i], kmer_rk, offset + kmer_pos);
                 }
             }
         }
     }
     // index end minimisers
-    let mut still_indexing = true;
-    while still_indexing {
+    bool still_indexing = true;
+    while (still_indexing) {
         still_indexing = false;
-        for i in 0..nidx {
-            if win_rks[i].len() > 1 {
+        for (size_t i=0; i<nidx; i++) {
+            if (minqueue_len(win_rks[i]) > 1) {
                 still_indexing = true;
-                let (last_mm_rk, _last_mm_pos) = win_rks[i].xtr().unwrap().clone();
-                win_rks[i].pop();
-                let (cur_mm_rk, _cur_mm_pos) = win_rks[i].xtr().unwrap().clone();
-                if last_mm_rk != cur_mm_rk {
+                rankpos last_mm_rp;
+                minqueue_min_cpy(win_rks[i], &last_mm_rp);
+                minqueue_remv(win_rks[i]);
+                rankpos cur_mm_rp;
+                minqueue_min_cpy(win_rks[i], &cur_mm_rp);
+                if (last_mm_rp.rank != cur_mm_rp.rank) {
                     // new minimiser
-                    for &(rk, p) in win_rks[i].xtr_iter() {
-                        self.insert(i, rk, offset + p);
+                    for ( minqueue_iter it = minqueue_all_min(win_rks[i]);
+                          minqueue_iter_has_next(&it); ) 
+                    {
+                        const rankpos *mm = minqueue_iter_next(&it);
+                        _insert(self->tbls[i], mm->rank, offset + mm->pos);
                     }
                 }
             }
         }
     }
-    self.offs.push(pos);
-    self.nseq += 1;
-    //println!("nseq={0} offs={1:?}", self.nseq, self.offs);
-    Ok(())
-    */
+    vec_push_size_t(self->offs, pos);
+    self->nseq += 1;
 }

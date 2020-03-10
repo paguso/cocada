@@ -97,33 +97,33 @@ void xstr_rot_left(xstring *xs, size_t npos);
 /**
  * @brief Prints a xstring to the standard output.
  */
-void xstr_print(xstring *xs);
+void xstr_print(const xstring *xs);
 
 
 /**
  * @brief Appends a string representation of the xstring to a string buffer 
           @p dest
  */
-void xstr_to_string (xstring *xs, dynstr *dest);
+void xstr_to_string (const xstring *xs, dynstr *dest);
 
 
 /**
  * @brief Returns the lenght of the xstring.
  */
-size_t xstr_len(xstring *xs);
+size_t xstr_len(const xstring *xs);
 
 
 /**
  * @brief Returns the size of each character position in bytes.
  */
-size_t xstr_sizeof_char(xstring *xs);
+size_t xstr_sizeof_char(const xstring *xs);
 
 
 /**
  * @brief Returns the char at a specified position.
  * @warn  No out-of-bounds verification is assumed. 
  */
-xchar_t xstr_get(xstring *xs, size_t pos);
+xchar_t xstr_get(const xstring *xs, size_t pos);
 
 
 /**
@@ -156,7 +156,7 @@ void xstr_push(xstring *xs, xchar_t c);
  * @brief Concatenates (copies) the contents of @p src at the end of @p dest. 
  * @warn  Requires that both xstrings have the same character byte size.
  */
-void xstr_cat(xstring *dest, xstring *src);
+void xstr_cat(xstring *dest, const xstring *src);
 
 
 /**
@@ -164,7 +164,7 @@ void xstr_cat(xstring *dest, xstring *src);
  * @see xstr_ncpy
  * @see xstr_len
  */
-void xstr_cpy(xstring *dest, xstring *src);
+void xstr_cpy(xstring *dest, const xstring *src);
 
 
 /**
@@ -180,7 +180,7 @@ void xstr_cpy(xstring *dest, xstring *src);
  *       respect boundaries, the xstring will result inconsistent even if
  *       the operation is physically completed.
  */
-void xstr_ncpy( xstring *dest, size_t from_dest, xstring *src, size_t from_src, 
+void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src, size_t from_src, 
                 size_t nxchars );
 
 
@@ -195,14 +195,14 @@ void *xstr_detach(xstring *xs);
  * @brief Lexicographically compares the first @p n xchars  of two strings.
  * @return -1 if this < other, 0 if this==other, +1 if this > other
  */
-int xstr_ncmp(xstring *this, xstring *other, size_t n);
+int xstr_ncmp(const xstring *this, const xstring *other, size_t n);
 
 
 /**
  * @brief Lexicographically compares two strings.
  * @return -1 if this < other, 0 if this==other, +1 if this > other
  */
-int xstr_cmp(xstring *this, xstring *other);
+int xstr_cmp(const xstring *this, const xstring *other);
 
 
 

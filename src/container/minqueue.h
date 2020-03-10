@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "bitsandbytes.h"
 #include "minqueue.h"
 #include "new.h"
 #include "order.h"
@@ -58,6 +59,8 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
  */
 minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func, size_t capacity);
 
+
+
 void minqueue_free(minqueue *queue, bool free_elts);
 
 
@@ -79,10 +82,27 @@ size_t minqueue_len(const minqueue *queue);
 void minqueue_push(minqueue *queue, const void *elt);
 
 
+#define MINQUEUE_PUSH_DECL( TYPE )\
+void minqueue_push_##TYPE(minqueue *queue, TYPE val);
+
+
 /**
  * @brief Pops the element from the front of the queue and copies it into @p dest.
+ * @warning No check is performed on @p queue bounds, or @p dest.
  */
 void minqueue_pop(minqueue *queue, void *dest);
+
+
+/**
+ * @brief  Removes the element from the front of the queue.
+ * @warning No check is performed on @p queue bounds.
+ */
+void minqueue_remv(minqueue *queue);
+
+
+
+#define MINQUEUE_POP_DECL( TYPE )\
+TYPE minqueue_pop_##TYPE(minqueue *queue);
 
 
 /**
@@ -93,10 +113,51 @@ const void *minqueue_min(const minqueue *queue);
 
 
 /**
+ * @brief Copies the minimum element of the queue into @p dest. 
+ * If there are many, copies the first to have entered the queue.
+ */
+void minqueue_min_cpy(const minqueue *queue, void *dest);
+
+
+#define MINQUEUE_MIN_DECL( TYPE )\
+TYPE minqueue_min_##TYPE(const minqueue *queue);
+
+
+#define MINQUEUE_ALL_DECL( TYPE )\
+MINQUEUE_PUSH_DECL(TYPE)\
+MINQUEUE_POP_DECL(TYPE)\
+MINQUEUE_MIN_DECL(TYPE)
+
+
+MINQUEUE_ALL_DECL(byte_t)
+MINQUEUE_ALL_DECL(char)
+MINQUEUE_ALL_DECL(short)
+MINQUEUE_ALL_DECL(int)
+MINQUEUE_ALL_DECL(long)
+MINQUEUE_ALL_DECL(float)
+MINQUEUE_ALL_DECL(double)
+MINQUEUE_ALL_DECL(size_t)
+MINQUEUE_ALL_DECL(int8_t)
+MINQUEUE_ALL_DECL(int16_t)
+MINQUEUE_ALL_DECL(int32_t)
+MINQUEUE_ALL_DECL(int64_t)
+MINQUEUE_ALL_DECL(uint8_t)
+MINQUEUE_ALL_DECL(uint16_t)
+MINQUEUE_ALL_DECL(uint32_t)
+MINQUEUE_ALL_DECL(uint64_t)
+
+
+struct _minqueue_iter {
+    const minqueue *src;
+    size_t index;
+};
+
+
+/**
  * @brief Returns an iterator over all min elements of the queue
  * in FIFO order.
  */
-minqueue_iter *minqueue_all_min(const minqueue *queue);
+minqueue_iter minqueue_all_min(const minqueue *queue);
 
 
 /**
