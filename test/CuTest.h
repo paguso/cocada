@@ -17,8 +17,7 @@ char* CuStrCopy(const char* old);
 #define STRING_MAX		256
 #define STRING_INC		256
 
-typedef struct
-{
+typedef struct {
 	int length;
 	int size;
 	char* buffer;
@@ -40,8 +39,7 @@ typedef struct CuTest CuTest;
 
 typedef void (*TestFunction)(CuTest *);
 
-struct CuTest
-{
+struct CuTest {
 	char* name;
 	TestFunction function;
 	int failed;
@@ -58,24 +56,24 @@ void CuTestDelete(CuTest *t);
 /* Internal versions of assert functions -- use the public versions */
 void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message);
 void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, int condition);
-void CuAssertStrEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	const char* expected, const char* actual);
-void CuAssertCharEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	char expected, char actual);
-void CuAssertIntEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	int expected, int actual);
-void CuAssertSizeTEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	size_t expected, size_t actual);
-void CuAssertDblEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	double expected, double actual, double delta);
-void CuAssertPtrEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
-	void* expected, void* actual);
+void CuAssertStrEquals_LineMsg(CuTest* tc,
+                               const char* file, int line, const char* message,
+                               const char* expected, const char* actual);
+void CuAssertCharEquals_LineMsg(CuTest* tc,
+                                const char* file, int line, const char* message,
+                                char expected, char actual);
+void CuAssertIntEquals_LineMsg(CuTest* tc,
+                               const char* file, int line, const char* message,
+                               int expected, int actual);
+void CuAssertSizeTEquals_LineMsg(CuTest* tc,
+                                 const char* file, int line, const char* message,
+                                 size_t expected, size_t actual);
+void CuAssertDblEquals_LineMsg(CuTest* tc,
+                               const char* file, int line, const char* message,
+                               double expected, double actual, double delta);
+void CuAssertPtrEquals_LineMsg(CuTest* tc,
+                               const char* file, int line, const char* message,
+                               void* expected, void* actual);
 
 /* public assert functions */
 
@@ -105,8 +103,7 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc,
 
 #define SUITE_ADD_TEST(SUITE,TEST)	CuSuiteAdd(SUITE, CuTestNew(#TEST, TEST))
 
-typedef struct
-{
+typedef struct {
 	int count;
 	CuTest* list[MAX_TEST_CASES];
 	int failCount;

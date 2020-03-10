@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -49,14 +49,14 @@
 
 /**
  * @brief Sets the positions FROM to TO-1 of the array ARR with the expression EXPR.
- * @warning The expression EXPR is evaluated for every element to be set. 
- *          If EXPR is an object creator call `type_new()` then every position 
+ * @warning The expression EXPR is evaluated for every element to be set.
+ *          If EXPR is an object creator call `type_new()` then every position
  *          will be set to a different instance.
  */
 #define FILL_ARR( ARR, FROM, TO, EXPR ) \
     for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
 
-        
+
 /**
  * @brief Copies N elements from an array SRC from position =FROMSRC
  *        into an array DEST from position =FROMDEST.
@@ -64,11 +64,11 @@
 #define COPY_ARR( DEST, FROMDEST, SRC, FROMSRC, N )\
     for(size_t _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
         (DEST)[_fd+_i]=(SRC)[_fs+_i]
-        
-        
+
+
 /**
  * @brief Prints the array ARR from positio FROM to position TO-1
- *        using NAME as label, displaying ELTSPERLINE elements per line, 
+ *        using NAME as label, displaying ELTSPERLINE elements per line,
  *        and using the printf format string FORMAT.
  */
 #define PRINT_ARR( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\

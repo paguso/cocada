@@ -42,7 +42,7 @@
  *             to a balanced digital search tree
  * - Huffman: the tree is shaped after the Huffman code tree of the
  *            represented string.
- * 
+ *
  */
 
 
@@ -50,8 +50,8 @@
  * @brief Wavelet tree shape
  */
 typedef enum {
-    WT_BALANCED = 0, /**< Balanced, i.e. at each node the alphabet is split in halves. */
-    WT_HUFFMAN = 1   /**< Shaped after a Huffman code tree */
+	WT_BALANCED = 0, /**< Balanced, i.e. at each node the alphabet is split in halves. */
+	WT_HUFFMAN = 1   /**< Shaped after a Huffman code tree */
 }
 wtshape;
 

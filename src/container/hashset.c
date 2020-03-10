@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -27,52 +27,52 @@
 
 
 struct _hashset_iter {
-    hashmap_iter *inner;
+	hashmap_iter *inner;
 };
 
 
 hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
 {
-    hashset *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
-    return ret;
+	hashset *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
+	return ret;
 }
 
 
 void hashset_free(hashset *set, bool free_elements)
 {
-    hashmap_free(set, free_elements, false);
+	hashmap_free(set, free_elements, false);
 }
 
 
 void hashset_dispose(void *ptr, const dtor *dt)
 {
 
-    hashmap_dispose(ptr, dt);
+	hashmap_dispose(ptr, dt);
 }
 
 
 size_t hashset_size(const hashset *set)
 {
-    return hashmap_size(set);
+	return hashmap_size(set);
 }
 
 
 bool hashset_contains(const hashset *set, const void *elt)
 {
-    return hashmap_has_key(set, elt);
+	return hashmap_has_key(set, elt);
 }
 
 static int NOTHING = 0;
 
 void hashset_add(hashset *set, const void *elt)
 {
-    hashmap_set(set, elt, (void *)&NOTHING);
+	hashmap_set(set, elt, (void *)&NOTHING);
 }
 
 
 void hashset_remove(hashset *set, const void *elt)
 {
-    hashmap_unset(set, elt);
+	hashmap_unset(set, elt);
 }
 
 #define HASHSET_CONTAINS_IMPL( TYPE ) \
@@ -104,23 +104,23 @@ HASHSET_IMPL_ALL(byte_t)
 
 hashset_iter *hashset_get_iter(hashset *set)
 {
-    hashset_iter *ret = NEW(hashset_iter);
-    ret->inner = hashmap_get_iter(set);
-    return ret;
+	hashset_iter *ret = NEW(hashset_iter);
+	ret->inner = hashmap_get_iter(set);
+	return ret;
 }
 
 void hashset_iter_free(hashset_iter *iter)
 {
-    hashmap_iter_free(iter->inner);
-    FREE(iter);
+	hashmap_iter_free(iter->inner);
+	FREE(iter);
 }
 
 bool hashset_iter_has_next(hashset_iter *iter)
 {
-    return hashmap_iter_has_next(iter->inner);
+	return hashmap_iter_has_next(iter->inner);
 }
 
 void *hashset_iter_next(hashset_iter *iter)
 {
-    return hashmap_iter_next(iter->inner).key;
+	return hashmap_iter_next(iter->inner).key;
 }

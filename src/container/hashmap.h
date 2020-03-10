@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -44,8 +44,8 @@ typedef struct _hashmap hashmap;
  * Hashmap entry type
  */
 typedef struct  {
-    void *key;
-    void *val;
+	void *key;
+	void *val;
 } hashmap_entry;
 
 
@@ -86,7 +86,7 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
 
 
 void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
-                                   size_t min_capacity);
+                                size_t min_capacity);
 
 /**
  * @brief Destructor.
@@ -98,7 +98,7 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 /**
  * @brief Finaliser
- * If the destructor has one child, it is considered to be the destructor 
+ * If the destructor has one child, it is considered to be the destructor
  * for the keys.  If it has two children, the second is the destructor for
  * the values.
  * @see new.h
@@ -119,7 +119,7 @@ bool hashmap_has_key(const hashmap *hmap, const void *key);
 
 /**
  * @brief Gets an internal reference to the value associated to a given @p key.
- * 
+ *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
 const void *hashmap_get(const hashmap *hmap, const void *key);
@@ -127,7 +127,7 @@ const void *hashmap_get(const hashmap *hmap, const void *key);
 
 /**
  * @brief Gets a mutable internal reference to the value associated to a given @p key.
- * 
+ *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
 void *hashmap_get_mut(const hashmap *hmap, const void *key);
@@ -135,7 +135,7 @@ void *hashmap_get_mut(const hashmap *hmap, const void *key);
 
 /**
  * @brief Sets the value associated to a given @p key.
- * 
+ *
  * @warning If the map already contains the provided @p key, the current value
  * gets overwitten.
  */
@@ -144,7 +144,7 @@ void hashmap_set(hashmap *hmap, const void *key, const void *val);
 
 /**
  * @brief Deletes the association corresponding to a given @p key.
- * 
+ *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
 void hashmap_unset(hashmap *hmap, const void *key);
@@ -163,7 +163,7 @@ hashmap_iter *hashmap_get_iter(const hashmap *hmap);
 
 
 /**
- * @brief Iterator destructor. 
+ * @brief Iterator destructor.
  * @warning Only the iterator is disposed. The hash map is left untouched.
  */
 void hashmap_iter_free(hashmap_iter *iter);

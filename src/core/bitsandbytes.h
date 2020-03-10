@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -88,11 +88,12 @@ typedef unsigned char byte_t;
 /*
  * 8-bit Byte masks:
  */
- 
-static const byte_t _BITMASK[8] = { 0x80, 0x40, 0x20, 0x10, 
-                                    0x08, 0x04, 0x02, 0x01 };
+
+static const byte_t _BITMASK[8] = { 0x80, 0x40, 0x20, 0x10,
+                                    0x08, 0x04, 0x02, 0x01
+                                  };
 #define BITMASK(I) (_BITMASK[I])
- 
+
 /*
  * Least significant bits masks _LSBMASK[j] = 0^(8-j)1^j
  */
@@ -185,8 +186,8 @@ See release notes for porting issues."
 
 
 /**
- * @brief returns the minimal number of bytes required to represent @p nvalues  
- * distinct values. 
+ * @brief returns the minimal number of bytes required to represent @p nvalues
+ * distinct values.
  */
 size_t nbytes(size_t nvalues);
 
@@ -299,7 +300,7 @@ size_t byte_rank1(byte_t b, size_t pos);
 
 /**
  * @brief Computes rank_@p bit(@p b, @p pos) = # positions j<@p pos
- * s.t. @p b[j]==@p bit, 
+ * s.t. @p b[j]==@p bit,
  * where @p b[j] denotes the jth bit of byte @p b from the left.
  * If i>=BYTESIZE, returns the total number of positions with value == @p bit.
  */

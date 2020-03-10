@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -55,9 +55,9 @@ vec *vec_new(size_t typesize);
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 
-#define VEC_FILL( V, EXPR, N ) for (size_t __i=0, __n=(N); __i < __n; __i++) vec_push(V, (EXPR)); 
+#define VEC_FILL( V, EXPR, N ) for (size_t __i=0, __n=(N); __i < __n; __i++) vec_push(V, (EXPR));
 
-#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (struct {size_t __i; size_t __n; TYPE __e;} __s = {0,(N),(EXPR)}; __s.__i < __s.__n; __s.__i++) vec_push(V, &__s.__e); 
+#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (struct {size_t __i; size_t __n; TYPE __e;} __s = {0,(N),(EXPR)}; __s.__i < __s.__n; __s.__i++) vec_push(V, &__s.__e);
 
 
 /**
@@ -89,7 +89,7 @@ size_t vec_len(const vec *v);
 
 
 /**
- * @brief Returns the individual size of stored elements (in bytes). 
+ * @brief Returns the individual size of stored elements (in bytes).
  */
 size_t vec_typesize(const vec *v);
 
@@ -101,8 +101,8 @@ void vec_clear(vec *v);
 
 
 /**
- * @brief Detaches and returns the current internal array 
- * 
+ * @brief Detaches and returns the current internal array
+ *
  * @see vec_trim
  * @warning After this operation, the vector is destroyed.
  */
@@ -136,22 +136,22 @@ void *vec_get_mut(const vec *v, size_t pos);
 
 
 /**
- * @brief Returns a mutable (non-const) reference to the first element. 
+ * @brief Returns a mutable (non-const) reference to the first element.
  * If none exists, return NULL.
  */
 void *vec_first_mut(const vec *v);
 
 
 /**
- * @brief Returns a mutable (non-const) reference to the last element. 
+ * @brief Returns a mutable (non-const) reference to the last element.
  * If none exists, return NULL.
  */
 void *vec_last_mut(const vec *v);
 
 
 /**
- * @brief Copies the element at position @p pos into the location 
- *        pointed to by @p dest 
+ * @brief Copies the element at position @p pos into the location
+ *        pointed to by @p dest
  */
 void  vec_get_cpy(const vec *v, size_t pos, void *dest);
 
@@ -160,7 +160,7 @@ void  vec_get_cpy(const vec *v, size_t pos, void *dest);
  * @brief Sets (overwrites) the element at position @p pos to a copy
  *        of the value pointed to by @p src.
  */
-void  vec_set(vec *v, size_t pos, void *src);
+void  vec_set(vec *v, size_t pos, const void *src);
 
 
 /**
@@ -173,18 +173,18 @@ void vec_swap(vec *v, size_t i, size_t j);
  * @brief Appends a copy of the value pointed to by @p src.
  * The number of copied bytes is given by the array typesize.
  */
-void vec_push(vec *v, void *src);
+void vec_push(vec *v, const void *src);
 
 
 /**
- * @brief Inserts a copy of the element pointed to by @p src 
+ * @brief Inserts a copy of the element pointed to by @p src
  *        at position @p pos.
  */
-void vec_ins(vec *v, size_t pos, void *src);
+void vec_ins(vec *v, size_t pos, const void *src);
 
 
 /**
- * @brief Removes the element at position @p pos from the vector, 
+ * @brief Removes the element at position @p pos from the vector,
  * copying its value to the position pointed to by @p dest.
  * @warning Does not check if @dest is valid
  */
@@ -199,14 +199,14 @@ void vec_del(vec *v, size_t pos);
 
 
 /**
- * @brief Returns the position of the minimum element according to 
+ * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
 size_t vec_min(vec *v, cmp_func cmp);
 
 
 /**
- * @brief Returns the position of the minimum element according to 
+ * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
 size_t vec_max(vec *v, cmp_func cmp);
@@ -215,7 +215,7 @@ size_t vec_max(vec *v, cmp_func cmp);
 /**
  * @brief In-place sorting of vector elements using the Quicksort algorithm.
  */
-void vec_qsort(vec *v, cmp_func cmp); 
+void vec_qsort(vec *v, cmp_func cmp);
 
 
 /**
@@ -236,7 +236,7 @@ void vec_qsort(vec *v, cmp_func cmp);
  * @param max_key The noninclusive maximum value for each key position
  */
 void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
-                    size_t key_size, size_t max_key);
+                   size_t key_size, size_t max_key);
 
 
 #define VEC_NEW_DECL( TYPE ) \
@@ -261,7 +261,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
    void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define VEC_POP_DECL( TYPE ) \
-   TYPE vec_pop_##TYPE(vec *v, size_t pos); 
+   TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
 #define VEC_ALL_DECL( TYPE )\
 VEC_NEW_DECL(TYPE)\
@@ -290,5 +290,5 @@ VEC_ALL_DECL(uint8_t)
 VEC_ALL_DECL(uint16_t)
 VEC_ALL_DECL(uint32_t)
 VEC_ALL_DECL(uint64_t)
-                    
+
 #endif

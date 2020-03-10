@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -35,7 +35,7 @@
  *
  * @brief Dynamic bit vector.
  */
- 
+
 typedef struct _bitvec bitvec;
 
 
@@ -133,13 +133,13 @@ void bitvec_cat (bitvec *bv, const bitvec *src);
 
 
 /**
- * @brief Frees unused space 
+ * @brief Frees unused space
  */
 void bitvec_trim(bitvec *bv);
 
 
 /**
- * @brief Detaches and returns the internal raw byte array 
+ * @brief Detaches and returns the internal raw byte array
  * and destroys the bitvector object
  * @param bv (full transfer) The bitvector to be dismantled.
  */
@@ -148,7 +148,7 @@ byte_t *bitvec_detach (bitvec *bv);
 
 /**
  * @brief Writes a string representations of the bitvector to a string buffer
- * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write 
+ * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
  *        as a single line.
  */
 void bitvec_to_string ( const bitvec *bv, dynstr *dest, size_t bytes_per_row);

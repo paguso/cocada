@@ -43,7 +43,7 @@ void deque_free(deque *q, bool free_elts);
 
 
 /**
- * @brief Finaliser 
+ * @brief Finaliser
  * @see new.h
  */
 void deque_dispose(void *ptr, const dtor *dst);
@@ -96,14 +96,14 @@ void deque_push_back(deque *q, const void *elt);
 
 
 /**
- * @brief Pops the last element of @p q and copies its value to @p dest. 
+ * @brief Pops the last element of @p q and copies its value to @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
 void deque_pop_back(deque *q, void *dest);
 
 
 /**
- * @brief Removes the last element of @p q. 
+ * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
 void deque_remv_back(deque *q);
@@ -116,14 +116,14 @@ void deque_push_front(deque *q, const void *elt);
 
 
 /**
- * @brief Pops the first element of @p q and copies its value to @p dest. 
+ * @brief Pops the first element of @p q and copies its value to @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
 void deque_pop_front(deque *q, void *dest);
 
 
 /**
- * @brief Removes the last element of @p q. 
+ * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
 void deque_remv_front(deque *q);
@@ -145,19 +145,19 @@ void deque_remv_front(deque *q);
     void deque_push_back_##TYPE(deque *q, TYPE val);
 
 #define DEQUE_POP_BACK_DECL( TYPE )\
-    TYPE deque_pop_back_##TYPE(deque *q);    
+    TYPE deque_pop_back_##TYPE(deque *q);
 
 #define DEQUE_REMV_BACK_DECL( TYPE )\
-    TYPE deque_remv_back_##TYPE(deque *q);    
+    TYPE deque_remv_back_##TYPE(deque *q);
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
     void deque_push_front_##TYPE(deque *q, TYPE val);
 
 #define DEQUE_POP_FRONT_DECL( TYPE )\
-    TYPE deque_pop_front_##TYPE(deque *q);    
+    TYPE deque_pop_front_##TYPE(deque *q);
 
 #define DEQUE_REMV_FRONT_DECL( TYPE )\
-    TYPE deque_remv_front_##TYPE(deque *q);    
+    TYPE deque_remv_front_##TYPE(deque *q);
 
 #define DEQUE_ALL_DECL( TYPE )\
 DEQUE_NEW_DECL(TYPE)\

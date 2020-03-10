@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -36,22 +36,22 @@
  */
 
 /**
- * @brief Creates a new bytearray of given length. 
+ * @brief Creates a new bytearray of given length.
  * The array is filled with zeros by default.
  */
 byte_t *bytearr_new(size_t len);
 
 
 /**
- * @brief Sets each position  @p ba[j] to @p val, for j in the range 
+ * @brief Sets each position  @p ba[j] to @p val, for j in the range
  * @p from <= j < @p to.
  */
 void bytearr_fill(byte_t *ba, size_t from, size_t to, byte_t val);
 
 /**
- * @brief Flips the bytes of the array @p ba in place, that is, swaps the 
- * contents of positions @p ba[j] <--> @p ba[size-j], 
- * for 0 <= j < @p size. 
+ * @brief Flips the bytes of the array @p ba in place, that is, swaps the
+ * contents of positions @p ba[j] <--> @p ba[size-j],
+ * for 0 <= j < @p size.
  */
 void bytearr_flip_bytes(byte_t *ba, size_t size);
 
@@ -116,7 +116,7 @@ unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
 /**
  * @brief Reads @p src[@p from_byte:@p from_bit+@p nbytes] as a
  *        signed int.
- * 
+ *
  * This utility function is usually used in conjunction with bytetarr_write_int
  * for tightly storing ints using as few bits as necessary while respecting
  * byte boundaries for the sake of speed.
@@ -219,7 +219,7 @@ void bytearr_write(byte_t *dest, size_t from_byte_dest, const byte_t *src,
  * @brief Writes the @p nbytes least significant bytes of a
  *        char @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_char
  */
 void bytearr_write_char(byte_t *dest, size_t from_byte, char val,
@@ -230,7 +230,7 @@ void bytearr_write_char(byte_t *dest, size_t from_byte, char val,
  * @brief Writes the @p nbytes least significant bytes of an
  * unsigned char @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_uchar
  */
 void bytearr_write_uchar(byte_t *dest, size_t from_byte,
@@ -241,7 +241,7 @@ void bytearr_write_uchar(byte_t *dest, size_t from_byte,
  * @brief Writes the @p nbytes least significant bytes of a
  * short int @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_short
  */
 void bytearr_write_short(byte_t *dest, size_t from_byte, short val,
@@ -252,7 +252,7 @@ void bytearr_write_short(byte_t *dest, size_t from_byte, short val,
  * @brief Writes the @p nbytes least significant bytes of an
  * unsigned short int @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ushort
  */
 void bytearr_write_ushort(byte_t *dest, size_t from_byte,
@@ -268,17 +268,17 @@ void bytearr_write_ushort(byte_t *dest, size_t from_byte,
  *
  * @warning If not enough bytes are written, information may be lost concerning
  * the magnitude and/or signal of @p val.
- * 
+ *
  * @param dest The destination bitarray
  * @param from_bit The initial position to be (over)written in the
  *                 destination bitarray
  * @param val The source int value.
  * @param nbits The number of bits to be written.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_int
  */
- void bytearr_write_int(byte_t *dest, size_t from_byte, int val,
+void bytearr_write_int(byte_t *dest, size_t from_byte, int val,
                        size_t nbytes);
 
 
@@ -286,10 +286,10 @@ void bytearr_write_ushort(byte_t *dest, size_t from_byte,
  * @brief Writes the @p nbytes least significant bytes of an unsigned int @p val
  * to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_uint
  */
- void bytearr_write_uint(byte_t *dest, size_t from_byte, unsigned int val,
+void bytearr_write_uint(byte_t *dest, size_t from_byte, unsigned int val,
                         size_t nbytes);
 
 
@@ -297,7 +297,7 @@ void bytearr_write_ushort(byte_t *dest, size_t from_byte,
  * @brief Writes the @p nbytes least significant bytes of a long int @p val
  * to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_long
  */
 void bytearr_write_long(byte_t *dest, size_t from_byte, long val,
@@ -305,10 +305,10 @@ void bytearr_write_long(byte_t *dest, size_t from_byte, long val,
 
 
 /**
- * @brief Writes the @p nbytes least significant bytes of an unsigned 
+ * @brief Writes the @p nbytes least significant bytes of an unsigned
  * long int @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ulong
  */
 void bytearr_write_ulong(byte_t *dest, size_t from_byte,
@@ -319,7 +319,7 @@ void bytearr_write_ulong(byte_t *dest, size_t from_byte,
  * @brief Writes the @p nbytes least significant bytes of a
  * long long int @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_longlong
  */
 void bytearr_write_longlong(byte_t *dest, size_t from_byte, long long val,
@@ -330,7 +330,7 @@ void bytearr_write_longlong(byte_t *dest, size_t from_byte, long long val,
  * @brief Writes the @p nbytes least significant bytes of an
  * unsigned long long int @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ulonglong
  */
 void bytearr_write_ulonglong(byte_t *dest, size_t from_byte,
@@ -341,7 +341,7 @@ void bytearr_write_ulonglong(byte_t *dest, size_t from_byte,
  * @brief Writes the @p nbytes least significant bytes of an
  *        size_t @p val to a bytearray @p dest.
  *
- * @see bitarr_write_int for similar remarks about loss of information.  
+ * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_size
  */
 void bytearr_write_size(byte_t *dest, size_t from_byte, size_t val,

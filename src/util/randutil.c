@@ -10,27 +10,29 @@
 
 static bool _randinit = false;
 
-static inline void randinit() {    
-    if (!_randinit) {
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        int usec = tv.tv_usec;
-        srand48(usec);
-        _randinit = true;
-    }
+static inline void randinit()
+{
+	if (!_randinit) {
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		int usec = tv.tv_usec;
+		srand48(usec);
+		_randinit = true;
+	}
 }
 
-void shuffle_arr(void *arr, size_t n, size_t typesize) {
-    randinit();
-    byte_t tmp[typesize];
-    if (n > 1) {
-        for (size_t j, i = n-1; i > 0; i--) {
-            j = (size_t)(drand48() * (i+1));
-            memcpy(tmp, arr + (j * typesize), typesize);
-            memcpy(arr + (j * typesize), arr + (i * typesize), typesize);
-            memcpy(arr + (i * typesize), tmp, typesize);
-        }
-    }
+void shuffle_arr(void *arr, size_t n, size_t typesize)
+{
+	randinit();
+	byte_t tmp[typesize];
+	if (n > 1) {
+		for (size_t j, i = n-1; i > 0; i--) {
+			j = (size_t)(drand48() * (i+1));
+			memcpy(tmp, arr + (j * typesize), typesize);
+			memcpy(arr + (j * typesize), arr + (i * typesize), typesize);
+			memcpy(arr + (i * typesize), tmp, typesize);
+		}
+	}
 }
 
 

@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -31,13 +31,13 @@
  * @author Paulo Fonseca
  *
  * @brief String de Bruijn Graph (dBG) ADT.
- * 
+ *
  * A de Bruijn Graph of order k is herein defined as a digraph
  * whose nodes correspond to distinct string k-mers and such that for every
  * pair of nodes u[0]..u[k-1], v[0]...v[k-1] s.t. u[1..k-1]=v[0..k-2]
  * there is an edge labeled u[k-1].
  */
- 
+
 
 /**
  * String dBG type.
@@ -62,7 +62,7 @@ dbgraph *dbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multigraph);
  * @brief Creates a dBG from a source stream.
  * @see dbg_new_from_string
  */
-dbgraph *dbg_new_from_stream( alphabet *ab, strstream *sst, size_t k, 
+dbgraph *dbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
                               bool multigraph );
 
 
@@ -85,7 +85,7 @@ alphabet *dbg_ab(dbgraph *g);
 
 
 /**
- * @brief Returns the extended alphabet, including the sentinel 
+ * @brief Returns the extended alphabet, including the sentinel
  * character of a given de Bruijn graph.
  */
 alphabet *dbg_ext_ab(dbgraph *g);
@@ -176,7 +176,7 @@ size_t dbg_child(dbgraph *g, size_t nid, xchar_t c);
 /**
  * @brief Returns the smallest node id corresponding to a node w with
  *        an outgoing edge pointing to the node with the given id.
- * @param nid The node id of the child node. If a nonexistant id is given, 
+ * @param nid The node id of the child node. If a nonexistant id is given,
  *        the result is undefined.
  */
 size_t dbg_parent(dbgraph *g, size_t nid);

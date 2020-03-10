@@ -11,17 +11,17 @@
 
 
 /**
- * @brief The hash function is used by the hash table to obtain a numeric key 
- *        for an element. This key is then used internally to determine the 
+ * @brief The hash function is used by the hash table to obtain a numeric key
+ *        for an element. This key is then used internally to determine the
  *        location in which the element will be stored.
  */
 typedef uint64_t (*hash_func)(const void *);
 
 
 /**
- * @brief The equality function is used by the hashtable to compare elements. 
+ * @brief The equality function is used by the hashtable to compare elements.
  *        It is related to the hash function in which elements that compare as
- *        equal *must* have the same hash key and, conversely, if two elements 
+ *        equal *must* have the same hash key and, conversely, if two elements
  *        have different hash values, then they must compare as different.
  */
 typedef bool (*equals_func)(const void *, const void *);
@@ -47,7 +47,7 @@ uint64_t fnv1a_64bit_hash(void *obj, size_t objsize);
 
 
 /**
- * @brief djb2 string hash function 
+ * @brief djb2 string hash function
  * @see Source: http://www.cse.yorku.ca/~oz/hash.html
  */
 size_t djb2_hash(const unsigned char *str);

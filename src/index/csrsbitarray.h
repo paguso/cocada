@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -41,9 +41,9 @@ typedef struct _csrsbitarray csrsbitarray;
  * @param ba The raw bitarray
  * @param len The array length in bits.
  * @warn The source bitarray is attached to the internal representation
- *       of the created r&s bitarray, i.e. a pointer to @p ba is kept 
- *       within the r&s bitarray. The proper functioning of the 
- *       r&s bitarray will depend on @p ba being left untouched thereafter. 
+ *       of the created r&s bitarray, i.e. a pointer to @p ba is kept
+ *       within the r&s bitarray. The proper functioning of the
+ *       r&s bitarray will depend on @p ba being left untouched thereafter.
  *       The raw bitarray may be disposed in the r&s bitarray destructor
  *       by setting the free_data parameter to true.
  */

@@ -29,7 +29,7 @@ CC 	   := gcc
 RMDIR := rm -rf
 MKDIR := mkdir -p
 
-# extendsions and directories
+# extensions and directories
 SRC_EXT      := c
 HEAD_EXT     := h
 OBJ_EXT      := o
@@ -45,6 +45,10 @@ INCLUDE_DIR  := /usr/local/include/$(LIB_NAME)
 
 DOXYGEN_CMD := doxygen
 DOXYGEN_CONFIG_FILE := $(ROOT_DIR)/cocada.doxy
+
+
+FMT_CMD := astyle
+FMT_OPTIONS := --style=kr --indent=tab --recursive -n
 
 
 ###############################################################################
@@ -71,7 +75,7 @@ VPATH          =  $(SRC_DIRS) $(TEST_DIR)
 ###############################################################################
 
 DBG_EXE := cocada
-DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -msse2 
+DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS))
 
 DBG_DIR := $(BUILD_DIR)/debug
 
@@ -212,3 +216,11 @@ doc:
 clean:
 	$(RMDIR) $(BUILD_DIR)	
 	$(RMDIR) $(DOC_DIR)	
+
+
+###############################################################################
+# Code formatting 
+###############################################################################
+
+fmt:
+	$(FMT_CMD) $(FMT_OPTIONS) $(SRC_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT) $(TEST_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT)

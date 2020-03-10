@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -27,7 +27,7 @@ typedef struct _dynstr dynstr;
 /**
  * @file dynstr.h
  * @author Paulo Fonseca
- * 
+ *
  * @brief Dynamic string (a.k.a. String buffer) ADT.
  */
 
@@ -90,7 +90,7 @@ void dstr_set(dynstr *dtsr, size_t pos, char c);
 
 
 /**
- * @brief Appends a copy of the contents of a static string @p suff. 
+ * @brief Appends a copy of the contents of a static string @p suff.
  * @warning The source string @p suff is left untouched.
  */
 void dstr_append(dynstr *dstr, char *suff);
@@ -105,16 +105,16 @@ void dstr_append_char(dynstr *dstr, char c);
 /**
  * @brief Returns a read-only reference to the current internal static string.
  *
- * @warning The internal string can change between calls and the returned 
+ * @warning The internal string can change between calls and the returned
  *          reference can become NULL or invalid.
  */
 const char *dstr_as_str(dynstr *dstr);
 
 
 /**
- * @brief Detaches and returns the current internal static string after 
+ * @brief Detaches and returns the current internal static string after
  *        trimming (removal of trailing unused positions).
- * 
+ *
  * @see cstr_trim
  * @warning After this operation, the dynamic string @p dstr is destroyed.
  */

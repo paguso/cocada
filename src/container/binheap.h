@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -35,8 +35,8 @@
  *
  * This generic binary heap maintains a dynamic collection of items
  * over an ordered set. It supports at least insertion and min/max
- * extraction in O(log(n)) time. 
- * 
+ * extraction in O(log(n)) time.
+ *
  */
 
 /**
@@ -44,8 +44,8 @@
  * extracted in MIN-first (resp. MAX-first) order.
  */
 typedef enum {
-    MIN_HEAP = 0,
-    MAX_HEAP = 1
+	MIN_HEAP = 0,
+	MAX_HEAP = 1
 } heap_mode;
 
 
@@ -74,7 +74,7 @@ void binheap_free(binheap *heap, bool free_elements);
  * @brief Finaliser
  * @see new.h
  */
-void binheap_dispose(void *ptr, const dtor *dst); 
+void binheap_dispose(void *ptr, const dtor *dst);
 
 
 /**
@@ -85,7 +85,7 @@ size_t binheap_size(const binheap *heap);
 
 /**
  * @brief Stores a new element in the heap.
- * @param elt 
+ * @param elt
  */
 void binheap_push(binheap *heap, const void *elt);
 

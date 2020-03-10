@@ -10,7 +10,7 @@ typedef struct _mmindex mmindex;
 
 /**
  * @param ab (move)
- * @param n 
+ * @param n
  * @param w (move)
  * @param k (move)
  */

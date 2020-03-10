@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -33,21 +33,21 @@
 /**
  * @file huffcode.h
  * @author Paulo Fonseca
- * 
+ *
  * @brief Huffman coding data structures and algorithms.
- * 
- * A Huffman coding (HC) is a fixed-to-var prefix coding scheme that 
- * unambiguously associates every char c of an alphabet to a binary 
- * codeword h(c) such that if c!=c' then neither h(c) is a proper 
+ *
+ * A Huffman coding (HC) is a fixed-to-var prefix coding scheme that
+ * unambiguously associates every char c of an alphabet to a binary
+ * codeword h(c) such that if c!=c' then neither h(c) is a proper
  * prefix of h(c') nor the opposite.
- * 
+ *
  * The HC is theoretically optimal in the information theoretic sense, meaning
- * that the average number of bits needed to encode a string T of length n 
+ * that the average number of bits needed to encode a string T of length n
  * is n*H(T) where H(T) denotes the 0-order entropy of T.
- * 
- * A HC over an alphabet A of length L is associated with a strictly binary 
- * trie - The Huffman Tree (HT) - with L leaves, each corresponding to a 
- * different character of A. The codeword of a char c is given by the label 
+ *
+ * A HC over an alphabet A of length L is associated with a strictly binary
+ * trie - The Huffman Tree (HT) - with L leaves, each corresponding to a
+ * different character of A. The codeword of a char c is given by the label
  * of the path from the root of the HT to its corresponding leaf.
  */
 
@@ -90,7 +90,7 @@ huffcode *huffcode_new_from_stream(alphabet *ab, strstream *src);
 
 /**
  * @brief Creates a HC from a source stream.
- * @param src Source stream from which the support alphabet and 
+ * @param src Source stream from which the support alphabet and
  *        character frequencies are obtained.
  */
 huffcode *huffcode_new_online_from_stream(alphabet_type abtype, strstream *sst);
@@ -103,7 +103,7 @@ void huffcode_free(huffcode *hcode);
 
 
 /**
- * @brief Prints a string representation of the HC to the std output. 
+ * @brief Prints a string representation of the HC to the std output.
  */
 void huffcode_print(huffcode *hcode);
 
@@ -127,7 +127,7 @@ xstring *huffcode_decode(huffcode *hcode, bitvec *code);
 const bitvec *huffcode_charcode(huffcode *hcode, size_t char_rank);
 
 /**
- * @brief Returns the (root of the) Huffman tree corresponding to a given HC. 
+ * @brief Returns the (root of the) Huffman tree corresponding to a given HC.
  */
 hufftnode *huffcode_tree(huffcode *hcode);
 
@@ -157,9 +157,9 @@ hufftnode *hufftnode_right(hufftnode *node);
 
 
 /**
- * @brief Returns the alphabet mask of a HT @p node. The alphabet mask of a 
- *        @p node is a binary mask M[0..l-1] s.t. for each letter of the 
- *        alphabet a[j], M[j] = 1 iff the leaf corresponding to letter a[j] 
+ * @brief Returns the alphabet mask of a HT @p node. The alphabet mask of a
+ *        @p node is a binary mask M[0..l-1] s.t. for each letter of the
+ *        alphabet a[j], M[j] = 1 iff the leaf corresponding to letter a[j]
  *        is in the subtree rooted at this @p node.
  */
 byte_t *hufftnode_ab_mask(hufftnode *node);
@@ -167,7 +167,7 @@ byte_t *hufftnode_ab_mask(hufftnode *node);
 
 /**
  * @brief If the given HT @p node is a leaf, returns the lexicographic rank
- *        of the corresponding letter in the represented alphabet. 
+ *        of the corresponding letter in the represented alphabet.
  *        If the given HT @p node is not a leaf, returns the alphabet size.
  */
 size_t hufftnode_char_rank(hufftnode *node);

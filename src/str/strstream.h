@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -31,7 +31,7 @@
 /**
  * @file strstream.h
  * @author Paulo Fonseca
- * 
+ *
  * @brief String stream.
  */
 
@@ -83,10 +83,10 @@ bool strstream_end(strstream *sst);
 
 /**
  * @brief Reads the next char from a stream.
- * @returns The next character as an int, or EOF if the stream has 
+ * @returns The next character as an int, or EOF if the stream has
  *          reached its end.
- * 
- * Example of usage: 
+ *
+ * Example of usage:
  * @code
  * strstream *fsst = strstream_open_file(filename);
  * for (int c; (c=strstream_getc(fsst)) != EOF;)
@@ -98,17 +98,17 @@ xchar_t strstream_getc(strstream *sst);
 
 
 /**
- * @brief Attempts to read the next @p n chars into the string *dest. 
- *        Less than @p n characters can be read if the stream reaches its end. 
- * @returns The number of chars actually read. 
+ * @brief Attempts to read the next @p n chars into the string *dest.
+ *        Less than @p n characters can be read if the stream reaches its end.
+ * @returns The number of chars actually read.
  */
 size_t strstream_reads(strstream *sst, char *dest, size_t n);
 
 
 /**
- * @brief Attempts to read the next @p n xchars into the xstring *dest. 
- *        Less than @p n xchars can be read if the stream reaches its end. 
- * @returns The number of xchars actually read. 
+ * @brief Attempts to read the next @p n xchars into the xstring *dest.
+ *        Less than @p n xchars can be read if the stream reaches its end.
+ * @returns The number of xchars actually read.
  */
 size_t strstream_readxs(strstream *sst, xstring *xstr, size_t n);
 

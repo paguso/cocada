@@ -1,18 +1,18 @@
 /*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
- * 
+ *
  * Copyright (C) 2016  Paulo G S Fonseca
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -30,7 +30,7 @@
 /**
  * @file hashset.h
  * @author Paulo Fonseca
- * 
+ *
  * @brief Unordered, hashmap-based set - Hashset - ADT.
  */
 
@@ -42,11 +42,11 @@ typedef struct _hashset_iter hashset_iter;
 
 /**
  * @brief Constructor.
- * 
+ *
  * @param hashfunc Hash function pointer.
  * @param eqfunc Equality comparator function pointer.
  */
-hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc ); 
+hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc );
 
 
 /**
@@ -69,19 +69,19 @@ size_t hashset_size(const hashset *set);
 
 
 /**
- * @brief Checks whether the @p set contains a given element @p elt. 
+ * @brief Checks whether the @p set contains a given element @p elt.
  */
 bool hashset_contains(const hashset *set, const void *elt);
 
 
 /**
- * @brief Adds a copy of the element @p elt to the @p set. 
+ * @brief Adds a copy of the element @p elt to the @p set.
  */
 void hashset_add(hashset *set, const void *elt);
 
 
 /**
- * @brief Removes an element @p elt from the @p set. 
+ * @brief Removes an element @p elt from the @p set.
  */
 void hashset_remove(hashset *set, const void *elt);
 
