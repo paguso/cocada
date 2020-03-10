@@ -195,6 +195,15 @@ void xstr_clip(xstring *xs, size_t from, size_t to)
     xs->len = n;
 }
 
+void xstr_rot_left(xstring *xs, size_t npos) 
+{
+    npos = npos % xs->len;
+    check_and_grow_by(xs, xs->len + npos);
+    memmove(xs->str + (xs->len * xs->bytes_per_char), xs->str, npos * xs->bytes_per_char);
+    memmove(xs->str, xs->str + (npos * xs->bytes_per_char), (xs->len - npos) * xs->bytes_per_char);
+    memmove(xs->str + ((xs->len - npos) * xs->bytes_per_char), xs->str + (xs->len * xs->bytes_per_char), npos * xs->bytes_per_char);
+    memset(xs->str + (xs->len * xs->bytes_per_char), 0, npos * xs->bytes_per_char);
+}
 
 void xstr_clear(xstring *xs) 
 {

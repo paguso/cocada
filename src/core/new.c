@@ -42,7 +42,7 @@ dtor *dtor_cons(dtor *par, const dtor *chd)
 }
 
 
-static void _empty_free(void *ptr, dtor *dt ) {
+static void _empty_free(void *ptr, const dtor *dt ) {
 }
 
 

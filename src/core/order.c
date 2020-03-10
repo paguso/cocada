@@ -13,7 +13,7 @@ int cmp_##TYPE(const void *pl, const void *pr) {\
     else return +1;}
 
 #define EQ_IMPL( TYPE )\
-int eq_##TYPE(const void *pl, const void *pr)\
+bool eq_##TYPE(const void *pl, const void *pr)\
     { return   *((TYPE *)pl) == *((TYPE *)pr); }
 
 

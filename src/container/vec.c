@@ -96,7 +96,7 @@ void vec_dispose(void *ptr, const dtor *dt )
 {
     vec *v = (vec *)ptr;
     if (dtor_nchd(dt)) {
-        dtor *chd_dt = dtor_chd(dt, 0);
+        const dtor *chd_dt = dtor_chd(dt, 0);
         for (size_t i=0, l=vec_len(v); i<l; i++) {
             void *chd = * (void **) vec_get(v, i);
             FINALISE(chd, chd_dt);
@@ -146,9 +146,33 @@ const void *vec_get(const vec *v, size_t pos)
 }
 
 
+const void *vec_first(const vec *v)
+{
+    return (v->len) ? vec_get(v, 0) : NULL;
+}
+
+
+const void *vec_last(const vec *v)
+{
+    return (v->len) ? vec_get(v, v->len-1) : NULL;
+}
+
+
 void *vec_get_mut(const vec *v, size_t pos)
 {
     return v->data + ( pos * v->typesize );
+}
+
+
+void *vec_first_mut(const vec *v)
+{
+    return (v->len) ? vec_get_mut(v, 0) : NULL;
+}
+
+
+void *vec_last_mut(const vec *v)
+{
+    return (v->len) ? vec_get_mut(v, v->len-1) : NULL;
 }
 
 
@@ -311,6 +335,16 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
     { return *((TYPE *)vec_get(v, pos)); } 
 
 
+#define VEC_FIRST_IMPL( TYPE ) \
+   TYPE vec_first_##TYPE(vec *v)\
+    { return *((TYPE *)vec_first(v)); } 
+
+
+#define VEC_LAST_IMPL( TYPE ) \
+   TYPE vec_last_##TYPE(vec *v)\
+    { return *((TYPE *)vec_last(v)); } 
+
+
 #define VEC_SET_IMPL( TYPE ) \
    void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
     { vec_set(v, pos, &val); } 
@@ -333,6 +367,8 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_ALL_IMPL( TYPE )\
 VEC_GET_IMPL(TYPE)\
+VEC_FIRST_IMPL(TYPE)\
+VEC_LAST_IMPL(TYPE)\
 VEC_SET_IMPL(TYPE)\
 VEC_PUSH_IMPL(TYPE)\
 VEC_INS_IMPL(TYPE)\
@@ -343,7 +379,6 @@ VEC_ALL_IMPL(char)
 VEC_ALL_IMPL(short)
 VEC_ALL_IMPL(int)
 VEC_ALL_IMPL(long)
-VEC_ALL_IMPL(char)
 VEC_ALL_IMPL(float)
 VEC_ALL_IMPL(double)
 VEC_ALL_IMPL(size_t)

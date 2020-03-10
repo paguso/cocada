@@ -8,15 +8,15 @@
 #include "randutil.h"
 #include "string.h"
 
-static bool __randinit = false;
+static bool _randinit = false;
 
 static inline void randinit() {    
-    if (!__randinit) {
+    if (!_randinit) {
         struct timeval tv;
         gettimeofday(&tv, NULL);
         int usec = tv.tv_usec;
         srand48(usec);
-        __randinit = true;
+        _randinit = true;
     }
 }
 
@@ -42,5 +42,15 @@ TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
     return l + (rand() % (r-l));\
 }
 
-RAND_RANGE_IMPL(int)
-RAND_RANGE_IMPL(size_t)
+RAND_RANGE_IMPL(short);
+RAND_RANGE_IMPL(int);
+RAND_RANGE_IMPL(long);
+RAND_RANGE_IMPL(size_t);
+RAND_RANGE_IMPL(int8_t);
+RAND_RANGE_IMPL(int16_t);
+RAND_RANGE_IMPL(int32_t);
+RAND_RANGE_IMPL(int64_t);
+RAND_RANGE_IMPL(uint8_t);
+RAND_RANGE_IMPL(uint16_t);
+RAND_RANGE_IMPL(uint32_t);
+RAND_RANGE_IMPL(uint64_t);

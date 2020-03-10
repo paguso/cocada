@@ -88,6 +88,13 @@ void xstr_clear(xstring *xs);
 
 
 /**
+ * @brief Rotates the xstring @npos positions to the left.
+ * Example: `xstr_rotate_left(s="abcdefg",3) -> s="defgabc"`
+ */
+void xstr_rot_left(xstring *xs, size_t npos);
+
+
+/**
  * @brief Prints a xstring to the standard output.
  */
 void xstr_print(xstring *xs);

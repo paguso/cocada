@@ -72,44 +72,43 @@ int cmp_rankpos(const void *pl, const void *pr) {
 }
 
 
-void mmindex_index(mmindex *mmidx, strstream *str)
+void mmindex_index(mmindex *self, strstream *sst)
 {
-    size_t nidx = mmidx->nparam;
-    size_t offset = vec_last_size_t(mmidx->offs);
+    size_t nidx = self->nparam;
+    size_t offset = vec_last_size_t(self->offs);
 
-    size_t max_win_len = mmidx->max_wlen;
+    size_t max_win_len = self->max_wlen;
     
-    xstring *window = xstring_new_with_capacity(strstream_sizeof_char(str), max_win_len);
+    xstring *window = xstring_new_with_capacity(strstream_sizeof_char(sst), max_win_len);
 
-    vec *win_rks = vec_new_with_capacity(sizeof(minqueue *), nidx);
-    VEC_FILL( win_rks, minqueue_new(sizeof(rankpos), cmp_rankpos), nidx ); //window kmers ranks 
-    vec *prev_mm_rk = vec_new_with_capacity(sizeof(size_t), nidx); // rank of previous window minimiser
-    VEC_FILL( prev_mm_rk, 0, )
-    /* 
-    let mut win_rks: Vec<MQueue<(TMmRank, usize)>> = vec![MQueue::new_min(); nidx]; // window kmers ranks
-    let mut prev_mm_rk = vec![0 as TMmRank; nidx]; // rank of previous window minimiser
-    let mut prev_right_rk = vec![0 as TMmRank; nidx]; // rank of previous window rightmost kmer
-
-    let mut pos = 0;
-    while let Some(c) = s.get()? {
-        // perpare window
-        if pos >= max_win_len {
-            window.rotate_left(1);
-            window[max_win_len - 1] = c;
+    minqueue **win_rks = NEW_ARR(minqueue *, nidx);
+    FILL_ARR(win_rks, 0, nidx, minqueue_new(sizeof(rankpos), cmp_rankpos));
+    uint64_t *prev_mm_rk = NEW_ARR(uint64_t, nidx); // rank of previous window minimiser
+    FILL_ARR(prev_mm_rk, 0, nidx, 0);
+    uint64_t *prev_right_rk = NEW_ARR(uint64_t, nidx); // rank of previous window rightmost kmer 
+    FILL_ARR(prev_right_rk, 0, nidx, 0);
+    
+    size_t pos = 0;
+    /*
+    for (xchar_t c; (c=strstream_getc(sst)) != EOF;) {
+        // prepare window
+        if (pos >= max_win_len) {
+            xstr_rot_left(window, 1);
+            xstr_set(window, max_win_len - 1, c);
         } else {
             //read in first window
-            window.push(c);
+            xstr_push(window, c);
         }
         pos += 1;
-        for i in 0..nidx {
-            if pos == self.k[i] {
-                let kmer_rk = self.hasher[i].hash(&window[window.len() - self.k[i]..]);
+        for (size_t i = 0; i < nidx; i++) {
+            if (pos == self->k[i]) {
+                size_t kmer_rk = self.hasher[i].hash(&window[window.len() - self.k[i]..]);
                 prev_right_rk[i] = kmer_rk;
                 prev_mm_rk[i] = kmer_rk; 
-                win_rks[i].push((kmer_rk, pos - self.k[i]));
+                minqueue_push( win_rks[i],  (kmer_rk, pos - self->k[i]) );
                 // initial end minimisers are all indexed
                 self.insert(i, kmer_rk, offset + pos - self.k[i]);
-            } else if pos > self.k[i] {
+            } else if (pos > self->k[i]) {
                 // get previous windows minimiser
                 // let (last_mm_rk, _last_mm_pos) = win_rks[i].xtr().unwrap().clone();
                 // compute new last kmer rank and add it to the new window

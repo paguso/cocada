@@ -25,6 +25,7 @@
 
 #include "new.h"
 #include "hash.h"
+#include "order.h"
 
 /**
  * @file hashmap.h
@@ -71,20 +72,20 @@ typedef struct _hashmap_iter hashmap_iter;
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq);
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
 
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq);
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
 
 /**
  * @brief Created a hash map with **at least** some initial capacity.
  * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity);
 
 
-void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity);
 
 /**

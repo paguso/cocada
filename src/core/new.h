@@ -452,7 +452,7 @@ dtor *ptr_dtor();
  */
 #define FINALISE( OBJ, DTOR ) {\
     void *__obj = (OBJ);\
-    dtor *__dt = (DTOR);\
+    const dtor *__dt = (DTOR);\
     __dt->df(__obj, __dt);}
 
 /**
@@ -462,10 +462,10 @@ dtor *ptr_dtor();
  */
 #define DESTROY( OBJ, DTOR ) \
     void *__obj = (OBJ);\
-    dtor *__dt = (DTOR);\
+    const dtor *__dt = (DTOR);\
     __dt->df(__obj, __dt);\
     free(__obj);\
-    dtor_free(__dt);
+    dtor_free((void *)__dt);
 
 
 #define FREE1( OBJ ) free(OBJ)

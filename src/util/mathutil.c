@@ -84,13 +84,22 @@ double multceil(double value, double base)
 
 
 
-#define POW2CEIL( TYPE )\
+#define POW2CEIL_IMPL( TYPE )\
 TYPE pow2ceil_##TYPE( TYPE val ) {\
     TYPE pow = 1;\
     while (pow < val) pow *= 2;\
     return pow;\
 }
 
-POW2CEIL(int)
-POW2CEIL(long)
-POW2CEIL(size_t)
+POW2CEIL_IMPL(short);
+POW2CEIL_IMPL(int);
+POW2CEIL_IMPL(long);
+POW2CEIL_IMPL(size_t);
+POW2CEIL_IMPL(int8_t);
+POW2CEIL_IMPL(int16_t);
+POW2CEIL_IMPL(int32_t);
+POW2CEIL_IMPL(int64_t);
+POW2CEIL_IMPL(uint8_t);
+POW2CEIL_IMPL(uint16_t);
+POW2CEIL_IMPL(uint32_t);
+POW2CEIL_IMPL(uint64_t);

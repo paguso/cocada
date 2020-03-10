@@ -25,6 +25,7 @@
 #include <stddef.h>
 
 #include "alphabet.h"
+#include "strstream.h"
 
 /**
  * @file csarray.h

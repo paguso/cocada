@@ -57,7 +57,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 #define VEC_FILL( V, EXPR, N ) for (size_t __i=0, __n=(N); __i < __n; __i++) vec_push(V, (EXPR)); 
 
-#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (size_t __i=0, __n=(N), TYPE __e=(EXPR); __i < __n; __i++) vec_push(V, &__e); 
+#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (struct {size_t __i; size_t __n; TYPE __e;} __s = {0,(N),(EXPR)}; __s.__i < __s.__n; __s.__i++) vec_push(V, &__s.__e); 
 
 
 /**
@@ -116,9 +116,37 @@ const void *vec_get(const vec *v, size_t pos);
 
 
 /**
+ * @brief Returns (the internal reference to) the first element.
+ * If none exists, return NULL.
+ */
+const void *vec_first(const vec *v);
+
+
+/**
+ * @brief Returns (the internal reference to) the last element.
+ * If none exists, returns NULL.
+ */
+const void *vec_last(const vec *v);
+
+
+/**
  * @brief Returns a mutable (non-const) reference to the element at position @p pos.
  */
 void *vec_get_mut(const vec *v, size_t pos);
+
+
+/**
+ * @brief Returns a mutable (non-const) reference to the first element. 
+ * If none exists, return NULL.
+ */
+void *vec_first_mut(const vec *v);
+
+
+/**
+ * @brief Returns a mutable (non-const) reference to the last element. 
+ * If none exists, return NULL.
+ */
+void *vec_last_mut(const vec *v);
 
 
 /**
@@ -217,26 +245,29 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 #define VEC_GET_DECL( TYPE ) \
    TYPE vec_get_##TYPE(vec *v, size_t pos);
 
+#define VEC_FIRST_DECL( TYPE ) \
+   TYPE vec_first_##TYPE(vec *v);
+
+#define VEC_LAST_DECL( TYPE ) \
+   TYPE vec_last_##TYPE(vec *v);
 
 #define VEC_SET_DECL( TYPE ) \
    void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
-
 #define VEC_PUSH_DECL( TYPE ) \
    void vec_push_##TYPE(vec *v, TYPE val);
-
 
 #define VEC_INS_DECL( TYPE ) \
    void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
-
 #define VEC_POP_DECL( TYPE ) \
    TYPE vec_pop_##TYPE(vec *v, size_t pos); 
-
 
 #define VEC_ALL_DECL( TYPE )\
 VEC_NEW_DECL(TYPE)\
 VEC_GET_DECL(TYPE)\
+VEC_FIRST_DECL(TYPE)\
+VEC_LAST_DECL(TYPE)\
 VEC_SET_DECL(TYPE)\
 VEC_PUSH_DECL(TYPE)\
 VEC_INS_DECL(TYPE)\
@@ -248,7 +279,6 @@ VEC_ALL_DECL(char)
 VEC_ALL_DECL(short)
 VEC_ALL_DECL(int)
 VEC_ALL_DECL(long)
-VEC_ALL_DECL(char)
 VEC_ALL_DECL(float)
 VEC_ALL_DECL(double)
 VEC_ALL_DECL(size_t)

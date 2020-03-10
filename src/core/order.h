@@ -13,7 +13,7 @@ typedef bool (*eq_func)(const void *, const void *);
 int cmp_##TYPE(const void *, const void *);
 
 #define EQ_DECL( TYPE )\
-int eq_##TYPE(const void *, const void *);
+bool eq_##TYPE(const void *, const void *);
 
 
 #define CMPEQ_DECL( TYPE )\

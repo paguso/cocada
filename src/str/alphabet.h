@@ -25,7 +25,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "strstream.h"
+#include "new.h"
+//#include "strstream.h"
 #include "xchar.h"
 
 /**
@@ -97,6 +98,12 @@ alphabet *alphabet_clone(alphabet *src);
  * @brief Destructor.
  */
 void alphabet_free(alphabet *ab);
+
+
+/**
+ * @brief Destructor
+ */
+void alphabet_dispose(void *ptr, const dtor *dt);
 
 
 /**

@@ -197,8 +197,10 @@ static size_t triple_key(const void *tp, size_t d)
     return ((triple *)tp)->values[2-d%3];
 }
 
-static int triple_cmp(triple *t1, triple *t2)
+static int triple_cmp(const void *p1, const void *p2)
 {
+    triple *t1 = (triple *)p1;
+    triple *t2 = (triple *)p2;
     if (t1->values[0]<t2->values[0]) return -1;
     else if (t1->values[0]>t2->values[0]) return +1;
     else if (t1->values[1]<t2->values[1]) return -1;

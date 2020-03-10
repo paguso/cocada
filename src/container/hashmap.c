@@ -27,6 +27,7 @@
 #include "cstringutil.h"
 #include "hashmap.h"
 #include "mathutil.h"
+#include "order.h"
 #include "string.h"
 
 
@@ -44,7 +45,7 @@ struct _hashmap {
     size_t occ;
     size_t keysize;
     size_t valsize;
-    equals_func keyeq;
+    eq_func keyeq;
     hash_func keyhash;
     void   *data;
     void   *tally;
@@ -53,12 +54,12 @@ struct _hashmap {
 
 
 
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq)
 {
    hashmap_init_with_capacity(map, keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
 }
 
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq)
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq)
 {
    return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY); 
 }
@@ -74,7 +75,7 @@ static void _reset_data(hashmap *hmap, size_t cap)
     hmap->entries = hmap->data + hmap->cap;
 }
 
-void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity)
 {
     ret->keysize = keysize;
@@ -82,10 +83,9 @@ void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, ha
     ret->keyhash = keyhash;
     ret->keyeq   = keyeq;
     _reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
-    return ret;
 }
 
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, equals_func keyeq,
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity)
 {
     hashmap *ret = NEW(hashmap);
@@ -113,9 +113,9 @@ void hashmap_dispose(void *ptr, const dtor *dst) {
     hashmap *hmap = (hashmap *)ptr;
     if (dst != NULL) {
         bool free_keys = (dtor_nchd(dst) > 0);
-        dtor *keys_dst = (free_keys)?dtor_chd(dst, 0):NULL;
+        const dtor *keys_dst = (free_keys)?dtor_chd(dst, 0):NULL;
         bool free_vals = (dtor_nchd(dst) > 1);
-        dtor *vals_dst = (free_vals)?dtor_chd(dst, 0):NULL;
+        const dtor *vals_dst = (free_vals)?dtor_chd(dst, 0):NULL;
         if (free_keys || free_vals) {
             hashmap_iter *iter = hashmap_get_iter(hmap);
             while ( hashmap_iter_has_next(iter) ) {
@@ -349,7 +349,7 @@ size_t hashmap_size(const hashmap *map)
 
 
 struct _hashmap_iter {
-    hashmap *src;
+    const hashmap *src;
     size_t index;
 };
 

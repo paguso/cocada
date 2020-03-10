@@ -149,6 +149,21 @@ void alphabet_free(alphabet *ab)
 }
 
 
+void alphabet_dispose(void *ptr, const dtor *dt)
+{
+    alphabet *ab = (alphabet *)ab;
+    if (ab==NULL) return;
+    switch (ab->rank_mode) {
+    case ARRAY:
+        FREE(ab->ranks.arr);
+        break;
+    default:
+        break;
+    }
+    FREE(ab->letters);
+}
+
+
 alphabet_type ab_type(alphabet *ab) 
 {
     return ab->type;

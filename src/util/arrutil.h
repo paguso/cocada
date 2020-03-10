@@ -48,10 +48,13 @@
 
 
 /**
- * @brief Fills an array ARR from position =FROM to position <TO with value VAL.
+ * @brief Sets the positions FROM to TO-1 of the array ARR with the expression EXPR.
+ * @warning The expression EXPR is evaluated for every element to be set. 
+ *          If EXPR is an object creator call `type_new()` then every position 
+ *          will be set to a different instance.
  */
-#define FILL_ARR( ARR, FROM, TO, VAL ) \
-    for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(VAL))
+#define FILL_ARR( ARR, FROM, TO, EXPR ) \
+    for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
 
         
 /**

@@ -88,9 +88,18 @@ double multceil(double val, double fact);
 #define POW2CEIL_DECL( TYPE )\
 TYPE pow2ceil_##TYPE( TYPE val );
 
-POW2CEIL_DECL(int)
-POW2CEIL_DECL(long)
-POW2CEIL_DECL(size_t)
+POW2CEIL_DECL(short);
+POW2CEIL_DECL(int);
+POW2CEIL_DECL(long);
+POW2CEIL_DECL(size_t);
+POW2CEIL_DECL(int8_t);
+POW2CEIL_DECL(int16_t);
+POW2CEIL_DECL(int32_t);
+POW2CEIL_DECL(int64_t);
+POW2CEIL_DECL(uint8_t);
+POW2CEIL_DECL(uint16_t);
+POW2CEIL_DECL(uint32_t);
+POW2CEIL_DECL(uint64_t);
 
 
 #endif

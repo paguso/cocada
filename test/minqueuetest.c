@@ -45,7 +45,7 @@ void test_minqueue_push_pop(CuTest *tc)
     CuAssertSizeTEquals(tc, minqueue_len(q), n);
     CuAssertSizeTEquals(tc, deque_len(v), n);
 
-    minqobj *min;
+    const minqobj *min;
     for (int i=0; i<n/2; i++) {
         min = minqueue_min(q);
         for (int j=0; j<deque_len(v); j++) {
