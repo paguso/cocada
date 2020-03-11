@@ -9,66 +9,75 @@
 #include "bitsandbytes.h"
 #include "new.h"
 #include "mathutil.h"
+#include "vec.h"
 #include "xstring.h"
-
-static const size_t MIN_CAP = 4;
-static const float  GROW_BY = 1.5f;
 
 
 struct _xstring {
-	size_t  len;
-	size_t  cap;
-	size_t  bytes_per_char;
-	void   *str;
+	vec *buf;
 };
 
-xstring *xstring_new(size_t bytes_per_char)
-{
-	return xstring_new_with_capacity(bytes_per_char, MIN_CAP);
-}
 
-
-xstring *xstring_new_with_capacity(size_t bytes_per_char, size_t cap)
+xstring *xstring_new(size_t sizeof_char)
 {
-	assert(bytes_per_char<=XCHAR_BYTESIZE);
+	assert(sizeof_char<=XCHAR_BYTESIZE);
 	xstring *ret = NEW(xstring);
-	ret->bytes_per_char = MAX(1, bytes_per_char);
-	ret->len = 0;
-	ret->cap = MAX(MIN_CAP, cap) + 1;
-	ret->str = calloc(cap, bytes_per_char);
+	ret->buf = vec_new(sizeof_char);
 	return ret;
 }
 
 
-xstring *xstring_new_with_len(size_t bytes_per_char, size_t len)
+xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap)
 {
-	xstring *ret = xstring_new_with_capacity(bytes_per_char, len);
-	ret->len = len;
+	assert(sizeof_char<=XCHAR_BYTESIZE);
+	xstring *ret = NEW(xstring);
+	ret->buf = vec_new_with_capacity(sizeof_char, cap);
 	return ret;
+}
+
+
+xstring *xstring_new_with_len(size_t sizeof_char, size_t len)
+{
+	xstring *ret = xstring_new_with_capacity(sizeof_char, len);
+	
+	return ret;
+}
+
+
+xstring *xstring_from(void *src, size_t len, size_t sizeof_char) 
+{
+	return NULL;
 }
 
 
 void xstring_free(xstring *xs)
 {
 	if (xs==NULL) return;
-	FREE(xs->str);
+	FREE(xs->buf);
 	FREE(xs);
+}
+
+
+void xstring_dispose(void *ptr, const dtor *dt)
+{
+	xstring *self = (xstring *)ptr;
+	FREE(self->buf, vec);
 }
 
 
 void xstr_print(const xstring *xs)
 {
 	printf("xstring@%p {\n", xs);
-	printf("  len : %zu\n", xs->len);
-	printf("  bytes_per_char: %zu\n", xs->bytes_per_char);
+	printf("  len : %zu\n", vec_len(xs->buf));
+	printf("  sizeof_char: %zu\n", vec_typesize(xs->buf));
 	printf("  str: ");
-	for (size_t i=0; i < xs->len; i++) {
-		printf("%zu%s", (size_t)xstr_get(xs, i), (i<xs->len-1)?"-":"");
+	for (size_t i=0, l=vec_len(xs->buf); i < l; i++) {
+		printf(XCHAR_FMT"%s", xstr_get(xs, i), (i < l-1) ? "-" : "");
 	}
 	printf("} # end of xstring@%p\n", xs);
 }
 
-
+/*
 void xstr_to_string (const xstring *xs, dynstr *dest)
 {
 	for (size_t i=0; i < xs->len; i++) {
@@ -87,12 +96,12 @@ void xstr_to_string (const xstring *xs, dynstr *dest)
 		}
 	}
 }
+*/
 
-
-inline xchar_t xstr_get(const xstring *xs, size_t pos)
+xchar_t xstr_get(const xstring *xs, size_t pos)
 {
 	xchar_t ret=0x0;
-	memcpy(&ret, xs->str+(pos*xs->bytes_per_char), xs->bytes_per_char);
+	memcpy(&ret, vec_get(xs->buf, pos), xstr_sizeof_char(xs));
 #if ENDIANNESS==BIG
 	xchar_flip_bytes(&ret);
 #endif
@@ -100,124 +109,106 @@ inline xchar_t xstr_get(const xstring *xs, size_t pos)
 }
 
 
-inline void xstr_set(xstring *xs, size_t pos, xchar_t val)
+void xstr_set(xstring *xs, size_t pos, xchar_t val)
 {
 #if ENDIANNESS==BIG
 	xchar_flip_bytes(&val);
 #endif
-	memcpy(xs->str+(pos*xs->bytes_per_char), &val, xs->bytes_per_char);
+	vec_set(xs->buf, pos, &val);
 }
 
 
 void xstr_nset(xstring *xs, size_t n, xchar_t val)
 {
-	if (val==0)
-		memset( xs->str, 0, n*xs->bytes_per_char );
-	else
-		for (int i=0; i<n; i++)
-			xstr_set(xs, i, val);
-	xs->len = MAX(n, xs->len);
+	size_t l = MIN(vec_len(xs->buf), n);
+	for (size_t i=0; i<l; i++) {
+		xstr_set(xs, i, val);
+	}
+	if (n > l) {
+		xstr_push_n(xs, val, n-l);
+	}
 }
 
 
 size_t xstr_len(const xstring *xs)
 {
-	return xs->len;
+	return vec_len(xs->buf);
 }
 
 
 size_t xstr_sizeof_char(const xstring *xs)
 {
-	return xs->bytes_per_char;
-}
-
-
-static void check_and_grow_by(xstring *xs, size_t n)
-{
-	if ( (xs->cap - xs->len) >= n+1 ) return;
-	while ( (xs->cap - xs->len) < n+1)
-		xs->cap *= GROW_BY;
-	xs->str = realloc(xs->str, xs->cap*xs->bytes_per_char);
-	memset( xs->str + (xs->len * xs->bytes_per_char),  0,
-	        (xs->cap - xs->len) * xs->bytes_per_char );
+	return vec_typesize(xs->buf);
 }
 
 
 void xstr_push(xstring *xs, xchar_t c)
 {
-	check_and_grow_by(xs, 1);
-	xstr_set(xs, (xs->len)++, c);
+#if ENDIANNESS==BIG
+	xchar_flip_bytes(&c);
+#endif
+	vec_push(xs->buf, &c);
+}
+
+
+void xstr_push_n(xstring *xs, xchar_t c, size_t n)
+{
+#if ENDIANNESS==BIG
+	xchar_flip_bytes(&c);
+#endif
+	vec_push_n(xs->buf, &c, n);
 }
 
 
 void xstr_cat(xstring *dest, const xstring *src)
 {
-	assert(dest->bytes_per_char == src->bytes_per_char);
-	check_and_grow_by(dest, src->len);
-	memcpy( dest->str+(dest->len*dest->bytes_per_char),
-	        src->str, src->len*dest->bytes_per_char );
+	assert(xstr_sizeof_char(dest) == xstr_sizeof_char(src));
+	vec_cat(dest->buf, src->buf);
 }
 
 
 void xstr_cpy(xstring *dest, const xstring *src)
 {
-	xstr_ncpy(dest, 0, src, 0, src->len);
+	xstr_ncpy(dest, 0, src, 0, xstr_len(src));
 }
 
 
 void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src,
-                size_t from_src, size_t nxchars )
+                size_t from_src, size_t n )
 {
-	assert(dest->bytes_per_char == src->bytes_per_char);
-	size_t deltalen = from_dest + nxchars - dest->len;
-	check_and_grow_by(dest, deltalen);
-	memcpy( dest->str+(from_dest*dest->bytes_per_char),
-	        src->str+(from_src*src->bytes_per_char),
-	        nxchars*dest->bytes_per_char );
-	dest->len += deltalen;
+	for (size_t i=0; i < n; i++ ) {
+		xstr_set(dest, from_dest + i, xstr_get(src, from_src + i));
+	}
 }
 
 
 void xstr_trim(xstring *xs)
 {
-	xs->cap = MAX(MIN_CAP, xs->len) + 1;
-	xs->str = realloc(xs->str, xs->cap * xs->bytes_per_char);
-	memset( xs->str + (xs->len * xs->bytes_per_char), 0x0,
-	        (xs->cap - xs->len) * xs->bytes_per_char );
+	vec_trim(xs->buf);
 }
 
 
 void xstr_clip(xstring *xs, size_t from, size_t to)
 {
-	size_t n = (from < xs->len && from < to) ? MIN(to, xs->len) - from : 0;
-	if (n)
-		memmove( xs->str, xs->str + (from * xs->bytes_per_char),
-		         n * xs->bytes_per_char );
-	xs->len = n;
+	vec_clip(xs->buf, from, to);
 }
 
 
 void xstr_rot_left(xstring *xs, size_t npos)
 {
-	npos = npos % xs->len;
-	if (npos==0) return;
-	void *buf = (void *) ( NEW_ARR(byte_t, npos * xs->bytes_per_char ) );
-	memcpy(buf, xs->str, npos * xs->bytes_per_char);
-	memmove(xs->str, xs->str + (npos * xs->bytes_per_char), (xs->len - npos) * xs->bytes_per_char);
-	memcpy(xs->str + ((xs->len - npos) * xs->bytes_per_char), buf, npos * xs->bytes_per_char);
-	FREE(buf);
+	vec_rotate_left(xs->buf, npos);
 }
+
 
 void xstr_clear(xstring *xs)
 {
-	xs->len = 0;
+	vec_clear(xs->buf);
 }
 
 
 void *xstr_detach(xstring *xs)
 {
-	xstr_trim(xs);
-	void *ret = xs->str;
+	void *ret = vec_detach(xs->buf);
 	FREE(xs);
 	return ret;
 }
@@ -225,16 +216,18 @@ void *xstr_detach(xstring *xs)
 
 int xstr_ncmp(const xstring *this, const xstring *other, size_t n)
 {
-	size_t m = MIN3(n, this->len, other->len);
+	size_t lt = xstr_len(this);
+	size_t lo = xstr_len(other);
+	size_t m = MIN3(n, lt, lo);
 	intmax_t cmp;
 	for (size_t i=0; i<m;  i++) {
 		cmp = (intmax_t)xstr_get(this, i) - (intmax_t)xstr_get(other, i);
 		if (cmp) return cmp/abs(cmp);
 	}
-	if (n <= MIN(this->len, other->len)) return 0;
+	if (n <= MIN(lt, lo)) return 0;
 	else {
-		if (this->len == other->len) return 0;
-		else if (this->len < other->len) return -1;
+		if (lt == lo) return 0;
+		else if (lt < lo) return -1;
 		else return +1;
 	}
 }
@@ -242,5 +235,5 @@ int xstr_ncmp(const xstring *this, const xstring *other, size_t n)
 
 int xstr_cmp(const xstring *this, const xstring *other)
 {
-	return xstr_ncmp(this, other, MAX(this->len, other->len));
+	return xstr_ncmp(this, other, MAX(xstr_len(this), xstr_len(other)));
 }

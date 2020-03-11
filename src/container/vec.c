@@ -46,15 +46,18 @@ struct _vec {
 	void *swp;
 };
 
+
 vec *vec_new(size_t typesize)
 {
 	return vec_new_with_capacity(typesize, MIN_CAPACITY);
 }
 
+
 size_t vec_sizeof()
 {
 	return sizeof(struct  _vec);
 }
+
 
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 {
@@ -69,16 +72,23 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 }
 
 
-static void check_and_resize(vec *v)
+static void _resize_to(vec *v, size_t cap)
+{
+	v->capacity = MAX3(MIN_CAPACITY, v->len, cap);
+	v->data = realloc(v->data, v->capacity * v->typesize);	
+}
+
+
+static void _check_and_resize(vec *v)
 {
 	if (v->len==v->capacity) {
-		v->capacity = MAX(GROW_BY*v->capacity, MIN_CAPACITY);
-		v->data = realloc(v->data, v->capacity*v->typesize);
+		_resize_to(v, GROW_BY * v->capacity);
 	} else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD*v->capacity) {
-		v->capacity = MAX(v->len/MIN_LOAD, MIN_CAPACITY);
-		v->data = realloc(v->data, v->capacity*v->typesize);
+		_resize_to(v, v->len / MIN_LOAD);
 	}
 }
+
+
 void vec_free(vec *v, bool free_elements)
 {
 	if (v==NULL) return;
@@ -91,6 +101,7 @@ void vec_free(vec *v, bool free_elements)
 	FREE(v->swp);
 	FREE(v);
 }
+
 
 void vec_dispose(void *ptr, const dtor *dt )
 {
@@ -125,9 +136,10 @@ void vec_clear(vec *v)
 }
 
 
-static void vec_trim(vec *v)
+void vec_trim(vec *v)
 {
-	v->data = realloc(v->data, MAX(MIN_CAPACITY, v->len)*v->typesize);
+	v->capacity = v->len;
+	v->data = realloc(v->data, v->capacity * v->typesize);
 }
 
 
@@ -184,7 +196,7 @@ void vec_get_cpy(const vec *v, size_t pos, void *dest)
 
 void vec_set(vec *v, size_t pos, const void *src)
 {
-	check_and_resize(v);
+	_check_and_resize(v);
 	memcpy(v->data+(pos*v->typesize), src, v->typesize);
 }
 
@@ -200,19 +212,45 @@ void vec_swap(vec *v, size_t i, size_t j)
 
 void vec_push(vec *v, const void *src)
 {
-	check_and_resize(v);
+	_check_and_resize(v);
 	memcpy(v->data+(v->len*v->typesize), src, v->typesize);
 	v->len++;
 }
 
 
+void vec_push_n(vec *v, const void *src, size_t n) 
+{
+	if (n == 0) return;
+	_resize_to(v, v->len + n);
+	void *begin = v->data + (v->len * v->typesize);
+	void *end = begin;
+	memcpy(begin, src, v->typesize);
+	end += v->typesize;
+	size_t k;
+	for (k = 1; 2 * k <= n; k *= 2 ) {
+		memcpy(end, begin, k*v->typesize);
+		end += (k * v->typesize);
+	}
+	memcpy(end, begin, (n - k) * v->typesize);
+	v->len += n;
+}
+
+
 void vec_ins(vec *v, size_t pos, const void *src)
 {
-	check_and_resize(v);
+	_check_and_resize(v);
 	memmove( v->data+((pos+1)*v->typesize), v->data+(pos*v->typesize),
 	         (v->len-pos)*v->typesize );
 	memcpy( v->data+(pos*v->typesize), src, v->typesize);
 	v->len++;
+}
+
+
+void vec_cat(vec *dest, const vec *src)
+{
+	_resize_to(dest, dest->len + src->len);
+	memcpy(dest->data + (dest->len * dest->typesize), src->data, src->len * src->typesize);	
+	dest->len += src->len;
 }
 
 
@@ -222,7 +260,7 @@ void vec_pop(vec *v, size_t pos, void *dest)
 	memmove( v->data+(pos*v->typesize), v->data+((pos+1)*v->typesize),
 	         (v->len-pos-1)*v->typesize );
 	v->len--;
-	check_and_resize(v);
+	_check_and_resize(v);
 }
 
 
@@ -231,7 +269,26 @@ void vec_del(vec *v, size_t pos)
 	memmove( v->data+(pos*v->typesize), v->data+((pos+1)*v->typesize),
 	         (v->len-pos-1)*v->typesize );
 	v->len--;
-	check_and_resize(v);
+	_check_and_resize(v);
+}
+
+
+void vec_clip(vec *v, size_t from, size_t to)
+{
+	memmove( v->data, v->data + (from * v->typesize), (to - from) * v->typesize );
+	v->len = (to - from);
+}
+
+
+void vec_rotate_left(vec *v, size_t npos)
+{
+	if (v->len == 0 || npos % v->len == 0) return;
+	npos = npos % v->len;
+	void *buf = (void *) ( NEW_ARR(byte_t, npos * v->typesize ) );
+	memcpy(buf, v->data, npos * v->typesize);
+	memmove(v->data, v->data + (npos * v->typesize), (v->len - npos) * v->typesize);
+	memcpy(v->data + ((v->len - npos) * v->typesize), buf, npos * v->typesize);
+	FREE(buf);
 }
 
 
@@ -295,7 +352,6 @@ void vec_qsort(vec *v, cmp_func cmp)
 {
 	_qsort(v, 0, vec_len(v), cmp);
 }
-
 
 
 void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),

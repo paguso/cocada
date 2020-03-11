@@ -101,8 +101,16 @@ void vec_clear(vec *v);
 
 
 /**
- * @brief Detaches and returns the current internal array
- *
+ * @brief Trims the vector to its actual size, i.e. deallocates
+ *        unused internal memory.
+ */
+void vec_trim(vec *v);
+
+
+/**
+ * @brief Detaches and returns the trimmed internal byte array.
+ *        The size of the returned array in bytes will be 
+ *        vec_typesize(@p v) * vec_len(@p v);
  * @see vec_trim
  * @warning After this operation, the vector is destroyed.
  */
@@ -171,9 +179,14 @@ void vec_swap(vec *v, size_t i, size_t j);
 
 /**
  * @brief Appends a copy of the value pointed to by @p src.
- * The number of copied bytes is given by the array typesize.
  */
 void vec_push(vec *v, const void *src);
+
+
+/**
+ * @brief Appends @p n copies of the value pointed to by @p src to the vector.
+ */
+void vec_push_n(vec *v, const void *src, size_t n);
 
 
 /**
@@ -181,6 +194,13 @@ void vec_push(vec *v, const void *src);
  *        at position @p pos.
  */
 void vec_ins(vec *v, size_t pos, const void *src);
+
+
+/**
+ * @briefs Concatenates the contents of @p src to at the end of @p dest.
+ * @warn the vectors are assumed to be of the same type. No check is performed.
+ */
+void vec_cat(vec *dest, const vec *src);
 
 
 /**
@@ -196,6 +216,23 @@ void vec_pop(vec *v, size_t pos, void *dest);
  * The value/reference is lost.
  */
 void vec_del(vec *v, size_t pos);
+
+
+/**
+ * @brief Clips the vector to @p v[@p from..@p to-1].
+ * @warn Requires 0<=from<=to<=vec_len(@p v). No checks performed.
+ */
+void vec_clip(vec *v, size_t from, size_t to);
+
+
+/**
+ * @brief Rotates the vector contents npos positions to the left.
+ *        If @p v has length `n`, then @p v[@p npos + i % n] becomes @p v[i], 
+ *        for i=0..n-1. If @p npos > `n`, this is the same as rotating
+ *        @npos % `n` positions.
+ *        Example: `vec_rotate_left(v=[a,b,c,d,e,f,g], 3)` => `v[d,e,f,g,a,b,c]`.
+ */
+void vec_rotate_left(vec *v, size_t npos);
 
 
 /**

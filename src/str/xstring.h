@@ -63,6 +63,19 @@ xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap);
 
 
 /**
+ * @brief Converts a raw byte array into an xstring. The source array is
+ * moved into the xstring, meaning that, after the conversion,
+ * the @p src array should be no longer used from outside the xstring. 
+ * @param src (move) The raw source array.
+ * @param len The length of the created xstring. 
+ *            It is expected that the length of src in bytes is >= len*sizeof_char. 
+ *            Bytes after this number will be ignored.
+ * @param sizeof_char The sist of the extended char in bytes.
+ */
+xstring *xstring_from(void *src, size_t len, size_t sizeof_char);
+
+
+/**
  * @brief Destructor.
  */
 void xstring_free(xstring *xs);
@@ -153,6 +166,14 @@ void xstr_push(xstring *xs, xchar_t c);
 
 
 /**
+ * @brief Appends @p n copies of char @p to the string.
+ * @warn  May result in information loss if the internal representation uses a
+ *        smaller number of bytes for each position than sizeof(xchar_t).
+ */
+void xstr_push_n(xstring *xs, xchar_t c, size_t n);
+
+
+/**
  * @brief Concatenates (copies) the contents of @p src at the end of @p dest.
  * @warn  Requires that both xstrings have the same character byte size.
  */
@@ -168,20 +189,19 @@ void xstr_cpy(xstring *dest, const xstring *src);
 
 
 /**
- * @brief Copies @p nxchar characters from position @p from_src of the source
+ * @brief Copies @p n characters from position @p from_src of the source
  *        xstring @p src into the destination xstring @p dest, starting at
  *        position @p from_dest. That is, copies and pastes
  *        @p src[@p from_src : @p from_src + @p nxchars] over
  *        @p dest[@p from_dest : @p from_dest + @p nxchars].
+ *        Source and destination may not overlap.
  *
  * @warn Assumes without verification that both xstrings have the same internal
  *       character bytesize.
- * @warn No out-of-bounds verification is assumed. If the slices above do not
- *       respect boundaries, the xstring will result inconsistent even if
- *       the operation is physically completed.
+ * @warn The destination must be large enough, or a buffer overrun will occur. 
+ *       No out-of-bounds verification is performed.
  */
-void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src, size_t from_src,
-                size_t nxchars );
+void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src, size_t from_src, size_t n );
 
 
 /**
