@@ -30,7 +30,7 @@
 #include "bitsandbytes.h"
 
 /**
- * @file bitarray.h
+ * @file bitarr.h
  * @author Paulo Fonseca
  *
  * @brief Tight bitarray implemented as a raw byte_t array supporting

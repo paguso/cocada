@@ -10,7 +10,11 @@
  * @file deque.h
  * @author Paulo Fonseca
  *
- * Double-eneded queue (deque) ADT
+ * @brief Double-eneded queue (deque) ADT.
+ * This defines a queue with insert/remove operations at
+ * both extremities. 
+ * It is implemented as a circular buffer with static capacity 
+ * which gets reallocated on demand.
  */
 
 

@@ -38,15 +38,24 @@ xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap)
 
 xstring *xstring_new_with_len(size_t sizeof_char, size_t len)
 {
-	xstring *ret = xstring_new_with_capacity(sizeof_char, len);
-	
+	xstring *ret = xstring_new_with_capacity(sizeof_char, len);	
 	return ret;
 }
 
 
-xstring *xstring_from(void *src, size_t len, size_t sizeof_char) 
+xstring *xstring_new_from_arr(void *src, size_t len, size_t sizeof_char)
 {
-	return NULL;
+	xstring *ret = NEW(xstring);
+	ret->buf = vec_new_from_arr(src, len, sizeof_char); 
+	return ret;
+}
+
+
+xstring *xstring_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
+{
+	xstring *ret = NEW(xstring);
+	ret->buf = vec_new_from_arr_cpy(src, len, sizeof_char); 
+	return ret;
 }
 
 
@@ -77,10 +86,10 @@ void xstr_print(const xstring *xs)
 	printf("} # end of xstring@%p\n", xs);
 }
 
-/*
+
 void xstr_to_string (const xstring *xs, dynstr *dest)
 {
-	for (size_t i=0; i < xs->len; i++) {
+	for (size_t i=0, l=xstr_len(xs); i < l; i++) {
 		if (i) dstr_append(dest, "-");
 		xchar_t c = xstr_get(xs, i);
 		size_t  n = c;
@@ -96,7 +105,7 @@ void xstr_to_string (const xstring *xs, dynstr *dest)
 		}
 	}
 }
-*/
+
 
 xchar_t xstr_get(const xstring *xs, size_t pos)
 {

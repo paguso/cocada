@@ -30,7 +30,7 @@
 #include "new.h"
 
 /**
- * @file bitvector.h
+ * @file bitvec.h
  * @author Paulo Fonseca
  *
  * @brief Dynamic bit vector.

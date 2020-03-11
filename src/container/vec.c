@@ -72,6 +72,39 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 }
 
 
+
+vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
+{
+	vec *ret = NEW(vec);
+	ret->typesize = typesize;
+	ret->len = len;
+	ret->data = buf;
+	ret->capacity = ret->len;
+	ret->data = realloc(ret->data, ret->capacity * ret->typesize);
+	return ret;
+}
+
+
+vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
+{
+	vec *ret = NEW(vec);
+	ret->typesize = typesize;
+	ret->len = len;
+	ret->capacity = ret->len;
+	ret->data = malloc(ret->capacity * ret->typesize);
+	memcpy(ret->data, buf, ret->len * ret->typesize);
+	return ret;
+}
+
+
+void vec_trim(vec *v)
+{
+	v->capacity = v->len;
+	v->data = realloc(v->data, v->capacity * v->typesize);
+}
+
+
+
 static void _resize_to(vec *v, size_t cap)
 {
 	v->capacity = MAX3(MIN_CAPACITY, v->len, cap);
@@ -133,13 +166,6 @@ size_t vec_typesize(const vec *v)
 void vec_clear(vec *v)
 {
 	v->len = 0;
-}
-
-
-void vec_trim(vec *v)
-{
-	v->capacity = v->len;
-	v->data = realloc(v->data, v->capacity * v->typesize);
 }
 
 

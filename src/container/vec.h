@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
- *
  */
 
 #ifndef VECTOR_H
@@ -28,10 +27,15 @@
 
 
 /**
- * @file vector.h
+ * @file vec.h
  * @author Paulo Fonseca
- *
- * @brief Dynamic array ADT (a.k.a. Vector)
+ * @brief The vector ADT (a.k.a. dynamic array) is a linear 
+ * dynamic collection of elements of the same type and constant size.
+ * It contains the usual access/insert/deletion of individual elements
+ * at arbitrary positions, plus other convenience functions. 
+ * It is implemented as a heap allocated array with a given limited 
+ * capacity, which gets reallocated on demand depending on the actual
+ * size of the collection.
  */
 
 
@@ -55,13 +59,43 @@ vec *vec_new(size_t typesize);
 vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 
-#define VEC_FILL( V, EXPR, N ) for (size_t __i=0, __n=(N); __i < __n; __i++) vec_push(V, (EXPR));
-
-#define VEC_FILL_CPY( V, TYPE, EXPR, N ) for (struct {size_t __i; size_t __n; TYPE __e;} __s = {0,(N),(EXPR)}; __s.__i < __s.__n; __s.__i++) vec_push(V, &__s.__e);
+/**
+ * @brief Transforms raw byte array into a vector.
+ *        The buffer @p buf is **moved into** the vector and becomes 
+ *        its internal buffer.
+ *        To create an vector from a **copy** of a raw buffer, which is
+ *        not moved, see #vec_new_from_arr_cpy
+ * @param buf (**move**) The buffer containing the vector data.
+ * @param len The lenght of the vector.
+ * @param typesize The size in bytes of each vector element.
+ * @warning 
+ * - The size of @p buf must be at least (@p len * @p typesize) bytes 
+ * - The pointer @p buf **must not be used directly (read or 
+ *   modified) after this function call**.
+ * - Since it becomes the internal buffer,  @p buf  **must** be heap 
+ *   allocated. In particular, no constant arrays of string literals 
+ *   should be used.
+ * @see vec_new_from_arr_cpy
+ */
+vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
 
 
 /**
- * @brief returns the type size of the actual implementation in bytes.
+ * @brief Creates a vector from a copy of a raw buffer.
+ *        This of course implies copying the data from the buffer
+ *        to the vector. 
+ *        To turn @p buf into a dynamic array without duplicating its
+ *        values see #vec_new_from_arr.
+ * @param buf (no transfer) The buffer containing the vector data.
+ * @param len The lenght of the vector.
+ * @param typesize The  in bytes of each vector element.
+ * @see vec_new_from_arr
+ */
+vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);
+
+
+/***
+ * @brief Returns the type size of the actual implementation in bytes.
  */
 size_t vec_sizeof();
 
@@ -197,8 +231,8 @@ void vec_ins(vec *v, size_t pos, const void *src);
 
 
 /**
- * @briefs Concatenates the contents of @p src to at the end of @p dest.
- * @warn the vectors are assumed to be of the same type. No check is performed.
+ * @brief Concatenates the contents of @p src to at the end of @p dest.
+ * @warning the vectors are assumed to be of the same type. No check is performed.
  */
 void vec_cat(vec *dest, const vec *src);
 
@@ -206,7 +240,7 @@ void vec_cat(vec *dest, const vec *src);
 /**
  * @brief Removes the element at position @p pos from the vector,
  * copying its value to the position pointed to by @p dest.
- * @warning Does not check if @dest is valid
+ * @warning @p dest should be a valid address with enough space. No check is performed.
  */
 void vec_pop(vec *v, size_t pos, void *dest);
 
@@ -220,7 +254,7 @@ void vec_del(vec *v, size_t pos);
 
 /**
  * @brief Clips the vector to @p v[@p from..@p to-1].
- * @warn Requires 0<=from<=to<=vec_len(@p v). No checks performed.
+ * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed.
  */
 void vec_clip(vec *v, size_t from, size_t to);
 

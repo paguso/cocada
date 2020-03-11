@@ -29,11 +29,12 @@
 #include "bitsandbytes.h"
 
 /**
- * @file   bytearray.h
+ * @file   bytearr.h
  * @author Paulo Fonseca
  *
  * @brief Plain byte array supporting several utility read/write operations.
  */
+
 
 /**
  * @brief Creates a new bytearray of given length.

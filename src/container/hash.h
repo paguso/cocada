@@ -8,6 +8,11 @@
 
 #include "bitsandbytes.h"
 
+/**
+ * @file hash.h
+ * @author Paulo Fonseca
+ * @brief General hash function definitions
+ */
 
 
 /**

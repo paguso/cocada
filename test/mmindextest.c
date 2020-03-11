@@ -14,7 +14,7 @@
 void test_mmindex_index(CuTest *tc) 
 {
     alphabet *ab = dna_ab_new();
-    xstring *str = xstring_from("acgt", sizeof(char));
+    //xstring *str = xstring_from("acgt", sizeof(char));
 }
 
 
