@@ -51,8 +51,8 @@ void test_minqueue_push_pop(CuTest *tc)
 		for (int j=0; j<deque_len(v); j++) {
 			CuAssert(tc, "Min is not minimmal", minqobj_cmp(min, deque_get(v, j)) <= 0);
 		}
-		minqueue_pop(q, NULL);
-		deque_pop_front(v, NULL);
+		minqueue_remv(q);
+		deque_remv_front(v);
 	}
 	CuAssertSizeTEquals(tc, minqueue_len(q), n-(n/2));
 
@@ -71,8 +71,8 @@ void test_minqueue_push_pop(CuTest *tc)
 		for (int j=0; j<deque_len(v); j++) {
 			CuAssert(tc, "Min is not minimmal", minqobj_cmp(min, deque_get(v, j)) <= 0);
 		}
-		minqueue_pop(q, NULL);
-		deque_pop_front(v, NULL);
+		minqueue_remv(q);
+		deque_remv_front(v);
 	}
 	CuAssertSizeTEquals(tc, minqueue_len(q), n-(n/2));
 

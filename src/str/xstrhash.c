@@ -88,6 +88,7 @@ uint64_t xstrhash_roll_lex(const xstrhash *self, const xstring *s, uint64_t hash
 uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstring *s, size_t from, size_t to,  uint64_t hash, xchar_t c)
 {
 	hash -= _pow(self, to - from - 1) * ab_rank(self->ab, xstr_get(s, from));
+	hash *= ab_size(self->ab);
 	hash += ab_rank(self->ab, c);
 	return hash;
 }

@@ -14,7 +14,13 @@
 void test_mmindex_index(CuTest *tc) 
 {
     alphabet *ab = dna_ab_new();
-    //xstring *str = xstring_from("acgt", sizeof(char));
+    xstring *s = xstring_new_from_arr_cpy("acgtacgtacgtacgtacgtacgtacgtacgtacgtacgt", 40, sizeof(char));
+    CuAssertSizeTEquals(tc, 40, xstr_len(s));
+    size_t w[] = {4};
+    size_t k[] = {4};
+    mmindex *idx = mmindex_new(ab, 1, w, k);
+    strstream *str = strstream_open_xstr(s);
+    mmindex_index(idx, str);
 }
 
 

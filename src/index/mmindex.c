@@ -47,6 +47,7 @@ mmindex *mmindex_new(alphabet * ab, size_t n, size_t * w, size_t * k)
 	                     ident_hash_uint64_t, eq_uint64_t));
 	ret->nstr = 0;
 	ret->offs = vec_new(sizeof(size_t));
+	vec_push_size_t(ret->offs, 0);
 	ret->nseq = 0;
 	return ret;
 }

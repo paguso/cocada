@@ -99,10 +99,6 @@ xstring *xstring_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_cha
 
 
 /**
- * @brief Converts a string 
-xstring *xstring_from_str_lit(char *src, size_t len );
-
-/**
  * @brief Destructor.
  */
 void xstring_free(xstring *xs);

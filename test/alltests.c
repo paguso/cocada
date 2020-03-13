@@ -42,6 +42,7 @@ CuSuite *hashset_get_test_suite();
 CuSuite *hashtable_get_test_suite();
 CuSuite *huffcode_get_test_suite();
 CuSuite *minqueue_get_test_suite();
+CuSuite *mmindex_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *stack_get_test_suite();
 CuSuite *strstream_get_test_suite();
@@ -68,6 +69,7 @@ void run_all_tests(void)
 	CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	CuSuiteAddSuite(suite, hashset_get_test_suite());
 	CuSuiteAddSuite(suite, minqueue_get_test_suite());
+	CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	CuSuiteAddSuite(suite, vec_get_test_suite());
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, dynstr_get_test_suite());
