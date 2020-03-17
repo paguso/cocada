@@ -314,13 +314,13 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
    TYPE vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
-   TYPE vec_get_##TYPE(vec *v, size_t pos);
+   TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
 #define VEC_FIRST_DECL( TYPE ) \
-   TYPE vec_first_##TYPE(vec *v);
+   TYPE vec_first_##TYPE(const vec *v);
 
 #define VEC_LAST_DECL( TYPE ) \
-   TYPE vec_last_##TYPE(vec *v);
+   TYPE vec_last_##TYPE(const vec *v);
 
 #define VEC_SET_DECL( TYPE ) \
    void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
@@ -345,6 +345,7 @@ VEC_INS_DECL(TYPE)\
 VEC_POP_DECL(TYPE)
 
 
+VEC_ALL_DECL(rawptr)
 VEC_ALL_DECL(byte_t)
 VEC_ALL_DECL(char)
 VEC_ALL_DECL(short)

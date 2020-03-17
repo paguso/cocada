@@ -403,3 +403,36 @@ const hashmap_entry hashmap_iter_next(hashmap_iter *iter)
 	return ret;
 }
 
+
+#define HASHMAP_GET_IMPL( TYPE )\
+TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
+	const void *v = hashmap_get(hmap, key);\
+	return v ? ((TYPE *)v)[0] : (TYPE)0;\
+}
+
+#define HASHMAP_SET_IMPL( TYPE )\
+void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
+	hashmap_set(hmap, key, &val);\
+}
+
+#define HASHMAP_ALL_IMPL( TYPE )\
+HASHMAP_GET_IMPL(TYPE)\
+HASHMAP_SET_IMPL(TYPE)
+
+HASHMAP_ALL_IMPL(rawptr)
+HASHMAP_ALL_IMPL(byte_t)
+HASHMAP_ALL_IMPL(char)
+HASHMAP_ALL_IMPL(short)
+HASHMAP_ALL_IMPL(int)
+HASHMAP_ALL_IMPL(long)
+HASHMAP_ALL_IMPL(float)
+HASHMAP_ALL_IMPL(double)
+HASHMAP_ALL_IMPL(size_t)
+HASHMAP_ALL_IMPL(int8_t)
+HASHMAP_ALL_IMPL(int16_t)
+HASHMAP_ALL_IMPL(int32_t)
+HASHMAP_ALL_IMPL(int64_t)
+HASHMAP_ALL_IMPL(uint8_t)
+HASHMAP_ALL_IMPL(uint16_t)
+HASHMAP_ALL_IMPL(uint32_t)
+HASHMAP_ALL_IMPL(uint64_t)

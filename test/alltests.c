@@ -65,12 +65,12 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
-	CuSuiteAddSuite(suite, deque_get_test_suite());
-	CuSuiteAddSuite(suite, hashmap_get_test_suite());
-	CuSuiteAddSuite(suite, hashset_get_test_suite());
-	CuSuiteAddSuite(suite, minqueue_get_test_suite());
+	//CuSuiteAddSuite(suite, deque_get_test_suite());
+	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
+	//CuSuiteAddSuite(suite, hashset_get_test_suite());
+	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	CuSuiteAddSuite(suite, mmindex_get_test_suite());
-	CuSuiteAddSuite(suite, vec_get_test_suite());
+	//CuSuiteAddSuite(suite, vec_get_test_suite());
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, dynstr_get_test_suite());
 	//CuSuiteAddSuite(suite, huffcode_get_test_suite());

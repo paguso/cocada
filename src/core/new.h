@@ -363,6 +363,8 @@ problems.
 */
 
 
+typedef void* rawptr;
+
 /**
  * NULL pointer constant.
  */
@@ -468,12 +470,24 @@ dtor *ptr_dtor();
     dtor_free((void *)__dt);
 
 
+////@cond
 #define FREE1( OBJ ) free(OBJ)
 
 #define FREE2( OBJ, TYPE ) DESTROY(OBJ, DTOR(TYPE))
 
 #define _SELECT_FREE(_1, _2, NAME,...) NAME
+////@endcond
 
+/**
+ * @brief Convenience variable argument macro for destroying objects.
+ * - `FREE(p)` deallocates the memory pointed by the raw pointer `p` 
+ *    by calling `stdlib free()`.
+ * - `FREE(obj, type)` is equivalent to `DESTROY(obj, DTOR(type))` 
+ *    i.e. destroys the object `obj` of a given `type` by using its
+ *    default (flat) destructor.
+ * @see DESTROY
+ * @see DTOR
+ */
 #define FREE(...) _SELECT_FREE(__VA_ARGS__, FREE2, FREE1)(__VA_ARGS__)
 
 

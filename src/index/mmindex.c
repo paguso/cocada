@@ -7,6 +7,7 @@
 #include "new.h"
 #include "order.h"
 #include "minqueue.h"
+#include "mathutil.h"
 #include "new.h"
 #include "hashmap.h"
 #include "vec.h"
@@ -21,6 +22,7 @@ struct _mmindex {
 	size_t nidx;
 	size_t *w;
 	size_t *k;
+	size_t *k_inv;
 	size_t max_wlen;
 	hashmap **tbls;
 	size_t nstr;
@@ -38,9 +40,16 @@ mmindex *mmindex_new(alphabet * ab, size_t n, size_t * w, size_t * k)
 	ret->w = w;
 	ret->k = k;
 	ret->max_wlen = 0;
-	for (size_t i = 0; i < n; i++)
+	size_t max_k = 0;
+	for (size_t i = 0; i < n; i++) {
 		ret->max_wlen =
 		    (w[i] + k[i] > ret->max_wlen) ? w[i] + k[i] : ret->max_wlen;
+		max_k = MAX(max_k, ret->k[i]);
+	};
+	ret->k_inv = NEW_ARR(size_t, max_k + 1);
+	for (size_t i=0; i<n; i++) {
+		ret->k_inv[ret->k[i]] = i;
+	}
 	ret->tbls = NEW_ARR(hashmap *, ret->nidx);
 	FILL_ARR(ret->tbls, 0, ret->nidx,
 	         hashmap_new(sizeof(uint64_t), sizeof(vec *),
@@ -84,9 +93,9 @@ int cmp_rankpos(const void *pl, const void *pr)
 
 static inline void _insert(hashmap * tbl, uint64_t rank, size_t pos)
 {
-	vec *v;
-	if (hashmap_has_key(tbl, (const void *) &rank)) {
-		v = hashmap_get_mut(tbl, (const void *) &rank);
+	vec *v = hashmap_get_mut(tbl, (const void *) &rank);
+	if (v) {
+		v = ((vec **)v)[0];
 	} else {
 		v = vec_new(sizeof(size_t));
 		hashmap_set(tbl, (const void *) &rank, &v);
@@ -108,20 +117,20 @@ void mmindex_index(mmindex * self, strstream * sst)
 	uint64_t *prev_right_rk = NEW_ARR(uint64_t, nidx);	// rank of previous window rightmost kmer
 	FILL_ARR(prev_right_rk, 0, nidx, 0);
 
-	size_t pos = 0;
+	size_t nread = 0;
 	rankpos rp = { 0, 0 };
 	for (xchar_t c; (c = strstream_getc(sst)) != EOF;) {
 		// prepare window
-		if (pos >= self->max_wlen) {
+		if (nread >= self->max_wlen) {
 			xstr_rot_left(window, 1);
 			xstr_set(window, self->max_wlen - 1, c);
 		} else {
 			//read in first window
 			xstr_push(window, c);
 		}
-		pos += 1;
+		nread += 1;
 		for (size_t i = 0; i < nidx; i++) {
-			if (pos == self->k[i]) {
+			if (nread == self->k[i]) {
 				uint64_t kmer_rk = xstrhash_lex_sub(self->hasher, window,
 				                                    xstr_len(window) -
 				                                    self->k[i],
@@ -129,13 +138,11 @@ void mmindex_index(mmindex * self, strstream * sst)
 				prev_right_rk[i] = kmer_rk;
 				prev_mm_rk[i] = kmer_rk;
 				rp.rank = kmer_rk;
-				rp.pos = pos - self->k[i];
+				rp.pos = nread - self->k[i];
 				minqueue_push(win_rks[i], &rp);
 				// initial end minimisers are all indexed
-				_insert(self->tbls[i], kmer_rk, offset + pos - self->k[i]);
-			} else if (pos > self->k[i]) {
-				// get previous windows minimiser
-				// let (last_mm_rk, _last_mm_pos) = win_rks[i].xtr().unwrap().clone();
+				_insert(self->tbls[i], kmer_rk, offset + nread - self->k[i]);
+			} else if (nread > self->k[i]) {
 				// compute new last kmer rank and add it to the new window
 				uint64_t kmer_rk =
 				    xstrhash_roll_lex_sub(self->hasher, window,
@@ -143,10 +150,10 @@ void mmindex_index(mmindex * self, strstream * sst)
 				                          1,
 				                          xstr_len(window) - 1,
 				                          prev_right_rk[i], c);
-				size_t kmer_pos = pos - self->k[i];
+				size_t kmer_pos = nread - self->k[i];
 				prev_right_rk[i] = kmer_rk;
 				// dequeue the first kmer of previous window if it is full
-				if (pos > self->w[i] + self->k[i] - 1) {
+				if (nread > self->w[i] + self->k[i] - 1) {
 					minqueue_remv(win_rks[i]);
 				}
 				// and add new kmer
@@ -194,6 +201,26 @@ void mmindex_index(mmindex * self, strstream * sst)
 			}
 		}
 	}
-	vec_push_size_t(self->offs, pos);
+	vec_push_size_t(self->offs, nread);
 	self->nseq += 1;
+	
+	
+	FREE(window, xstring);
+	const dtor *mqdtor = DTOR(minqueue);
+	for (size_t i=0; i<nidx; i++) {
+		FINALISE(win_rks[i], mqdtor);
+		FREE(win_rks[i]);
+	}
+	FREE(win_rks);
+	FREE(prev_mm_rk);
+	FREE(prev_right_rk);
 }
+
+
+const vec *mmindex_get(mmindex *self, xstring *kmer)
+{
+	uint64_t rank = xstrhash_lex(self->hasher, kmer); 
+	return (const vec*) hashmap_get_rawptr( self->tbls[self->k_inv[xstr_len(kmer)]], &rank ); 
+}
+
+

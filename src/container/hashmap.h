@@ -181,4 +181,34 @@ bool hashmap_iter_has_next(const hashmap_iter *iter);
 const hashmap_entry hashmap_iter_next(hashmap_iter *iter);
 
 
+#define HASHMAP_GET_DECL( TYPE )\
+TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
+
+#define HASHMAP_SET_DECL( TYPE )\
+void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val);
+
+#define HASHMAP_ALL_DECL( TYPE )\
+HASHMAP_GET_DECL(TYPE)\
+HASHMAP_SET_DECL(TYPE)
+
+HASHMAP_ALL_DECL(rawptr)
+HASHMAP_ALL_DECL(byte_t)
+HASHMAP_ALL_DECL(char)
+HASHMAP_ALL_DECL(short)
+HASHMAP_ALL_DECL(int)
+HASHMAP_ALL_DECL(long)
+HASHMAP_ALL_DECL(float)
+HASHMAP_ALL_DECL(double)
+HASHMAP_ALL_DECL(size_t)
+HASHMAP_ALL_DECL(int8_t)
+HASHMAP_ALL_DECL(int16_t)
+HASHMAP_ALL_DECL(int32_t)
+HASHMAP_ALL_DECL(int64_t)
+HASHMAP_ALL_DECL(uint8_t)
+HASHMAP_ALL_DECL(uint16_t)
+HASHMAP_ALL_DECL(uint32_t)
+HASHMAP_ALL_DECL(uint64_t)
+
+
+
 #endif

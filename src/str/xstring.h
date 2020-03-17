@@ -23,6 +23,7 @@
 #define XSTRING_H
 
 #include "dynstr.h"
+#include "new.h"
 #include "xchar.h"
 
 /**
@@ -102,6 +103,12 @@ xstring *xstring_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_cha
  * @brief Destructor.
  */
 void xstring_free(xstring *xs);
+
+
+/**
+ * @brief Destructor.
+ */
+void xstring_dispose(void *ptr, const dtor *dt);
 
 
 /**
