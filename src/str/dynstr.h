@@ -22,6 +22,10 @@
 #ifndef DYNSTR_H
 #define DYNSTR_H
 
+
+#include <stddef.h>
+
+
 typedef struct _dynstr dynstr;
 
 /**

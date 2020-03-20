@@ -39,10 +39,10 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 const static float  MIN_LOAD = 0.5;   // (!) GROW_BY*MIN_LOAD < 1
 
 struct _vec {
+	void *data;
 	size_t typesize;
 	size_t len;
 	size_t capacity;
-	void *data;
 	void *swp;
 };
 

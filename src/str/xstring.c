@@ -109,10 +109,11 @@ void xstr_to_string (const xstring *xs, dynstr *dest)
 
 xchar_t xstr_get(const xstring *xs, size_t pos)
 {
-	xchar_t ret=0x0;
+	xchar_t ret = 0;
+#if ENDIANNESS==LITTLE
 	memcpy(&ret, vec_get(xs->buf, pos), xstr_sizeof_char(xs));
-#if ENDIANNESS==BIG
-	xchar_flip_bytes(&ret);
+#elif ENDIANNESS==BIG
+	memcpy((&ret + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)), vec_get(xs->buf, pos), xstr_sizeof_char(xs));
 #endif
 	return ret;
 }
@@ -120,10 +121,11 @@ xchar_t xstr_get(const xstring *xs, size_t pos)
 
 void xstr_set(xstring *xs, size_t pos, xchar_t val)
 {
-#if ENDIANNESS==BIG
-	xchar_flip_bytes(&val);
-#endif
+#if ENDIANNESS==LITTLE
 	vec_set(xs->buf, pos, &val);
+#elif ENDIANNESS==BIG
+	vec_set(xs->buf, pos, &val + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)));
+#endif
 }
 
 
@@ -153,25 +155,26 @@ size_t xstr_sizeof_char(const xstring *xs)
 
 void xstr_push(xstring *xs, xchar_t c)
 {
-#if ENDIANNESS==BIG
-	xchar_flip_bytes(&c);
-#endif
+#if ENDIANNESS==LITTLE
 	vec_push(xs->buf, &c);
+#elif ENDIANNESS==BIG
+	vec_push(xs->buf, &c + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)));
+#endif
 }
 
 
 void xstr_push_n(xstring *xs, xchar_t c, size_t n)
 {
-#if ENDIANNESS==BIG
-	xchar_flip_bytes(&c);
-#endif
+#if ENDIANNESS==LITTLE
 	vec_push_n(xs->buf, &c, n);
+#elif ENDIANNESS==BIG
+	vec_push_n(xs->buf, &c + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)), n);
+#endif
 }
 
 
 void xstr_cat(xstring *dest, const xstring *src)
 {
-	assert(xstr_sizeof_char(dest) == xstr_sizeof_char(src));
 	vec_cat(dest->buf, src->buf);
 }
 

@@ -106,11 +106,27 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n);
 
 
 /**
+ * @brief Attempts to read the next @p n chars into the string *dest.
+ *        Less than @p n characters can be read if the stream reaches its end.
+ * @returns The number of chars actually read.
+ */
+size_t strstream_reads_until(strstream *sst, char *dest, char delim);
+
+
+/**
  * @brief Attempts to read the next @p n xchars into the xstring *dest.
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
 size_t strstream_readxs(strstream *sst, xstring *xstr, size_t n);
+
+
+/**
+ * @brief Attempts to read the next @p n xchars into the xstring *dest.
+ *        Less than @p n xchars can be read if the stream reaches its end.
+ * @returns The number of xchars actually read.
+ */
+size_t strstream_readxs_until(strstream *sst, xstring *xstr, xchar_t delim);
 
 
 /**

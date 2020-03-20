@@ -39,16 +39,26 @@ typedef enum {
 
 
 struct _strstream {
-	sstream_type type;
 	union {
 		FILE    *file;
 		char    *str;
 		xstring *xstr;
 	} src;
+	sstream_type type;
 	size_t bytes_per_char;
 	size_t pos;
 	size_t slen;
 };
+
+
+static xchar_t _getchar_from_str(void *str) 
+{
+	strstream *sst = (strstream *)str;
+	if (sst->pos>=sst->slen)
+		return (xchar_t)EOF;
+	else
+		return (xchar_t)sst->src.str[sst->pos++];
+}
 
 
 strstream *strstream_open_str(char *str, size_t slen)
@@ -179,7 +189,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n)
 	size_t nread;
 	switch (sst->type) {
 	case SSTR_STR:
-		nread = MIN(n, (sst->pos<sst->slen)?(sst->slen-sst->pos):0);
+		nread = MIN(n, (sst->pos < sst->slen) ? (sst->slen - sst->pos) : 0);
 		strncpy(dest, sst->src.str+sst->pos, nread);
 		sst->pos += nread;
 		//dest[nread] = '\0';
@@ -192,6 +202,8 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n)
 		return 0;
 	}
 }
+
+
 
 size_t strstream_readxs(strstream *sst, xstring *dest, size_t n)
 {

@@ -232,7 +232,7 @@ For now let us suppose these are flat containers. We´ll come back to that later
 
 The destruction of C would go roughly as follows.  First, the destructor function
 
-```
+```C
 void C_dispose( void *ptr, dstr *c_dt )
 ```
 
@@ -241,7 +241,7 @@ destructor for its child objects, in this case of type `B`. Let us suppose
 this is the case, that is `b_dt = c_dt->chd[0]` is a destructor for
 `B` objects.  Then a call to the corresponding destructor function
 
-```
+```C
 b_dt->df(b, b_dt)
 ```
 
@@ -330,7 +330,7 @@ hierarchies. For example,
 
 could be created with
 
-```
+```C
 dtor_cons(dtor_cons(DTOR(A), DTOR(B)), dtor_cons(dtor_cons(dtor_cons(DTOR(C), DTOR(D)), DTOR(E)), DTOR(F)))
 ```
 
@@ -447,20 +447,22 @@ dtor *ptr_dtor();
  */
 #define DTOR( TYPE ) dtor_new_with_func(TYPE##_dispose)
 
+
 /**
- * Finalises an object (and its referenced objects) based on a given
- * destructor.
+ * Finalises an object @p OBJ (and its referenced objects) based on a given
+ * destructor @p DTOR.
  * The object is not deallocated, and the destructor is not destroyed.
  */
 #define FINALISE( OBJ, DTOR ) {\
     void *__obj = (OBJ);\
     const dtor *__dt = (DTOR);\
-    __dt->df(__obj, __dt);}
+    __dt->df(__obj, __dt);\
+}
 
 /**
- * Destroys an object, that is finalises it (and its referenced objects)
- * based on a given destructor **and** deallocates its memory.
- * The destructor is **also** destroyed.
+ * Destroys an object @pOBJ, that is finalises it (and its referenced objects)
+ * based on a given destructor @p DTOR **and** deallocates its memory.
+ * The destructor @p DTOR is **also** destroyed.
  */
 #define DESTROY( OBJ, DTOR ) \
     void *__obj = (OBJ);\
