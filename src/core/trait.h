@@ -3,10 +3,10 @@
 
 
 #define DECL_TRAIT(TYPE, TRAIT)\
-TRAIT * TYPE_##TRAIT( TYPE *self );
+TRAIT * TYPE##_##TRAIT( TYPE *self );
 
 #define IMPL_TRAIT(TYPE, TRAIT)\
-TRAIT * TYPE_##TRAIT( TYPE *self ) {\
+TRAIT * TYPE##_##TRAIT( TYPE *self ) {\
   return &(self->_t_##TRAIT);\
 }
 

@@ -17,7 +17,6 @@ typedef struct _strread strread;
 
 typedef struct {
     void    (*reset)(void *self);
-    bool    (*end)(void *self);
     xchar_t (*getc)(void *self);
     size_t  (*read_str)(void *self, char *dest, size_t n);
     size_t  (*read_str_until)(void *self, char *dest, char delim);
@@ -42,12 +41,6 @@ strread strread_init_trait(void *impltor);
  * @brief Resets the stream, i.e. moves cursor to initial position.
  */
 void strread_reset(strread *trait);
-
-
-/**
- * @brief Tests whether a stream has reached its end.
- */
-bool strread_end(strread *trait);
 
 
 /**

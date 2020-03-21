@@ -33,12 +33,6 @@ void strread_reset(strread *trait)
 }
 
 
-bool strread_end(strread *trait)
-{
-    return trait->vtbl.end(trait->impltor);
-}
-
-
 xchar_t strread_getc(strread *trait)
 {
     return trait->vtbl.getc(trait->impltor);

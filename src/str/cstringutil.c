@@ -72,6 +72,20 @@ char *cstr_trim_to_len(char *str, size_t len)
 }
 
 
+char *cstr_resize(char *str, size_t len)
+{
+	size_t l = strlen(str);
+	str = realloc(str, len+1);
+	if (l < len) {
+		memset(str+l, '\0', (len-l));
+	}
+	str[len] = '\0';
+	return str;
+}
+
+
+
+
 void cstr_revert(char *str, size_t len)
 {
 	size_t i=0, j=len-1;

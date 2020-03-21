@@ -473,7 +473,7 @@ dtor *ptr_dtor();
 
 
 ////@cond
-#define FREE1( OBJ ) free(OBJ)
+#define FREE1( OBJ ) if(OBJ) free(OBJ)
 
 #define FREE2( OBJ, TYPE ) DESTROY(OBJ, DTOR(TYPE))
 

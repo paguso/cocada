@@ -25,12 +25,6 @@ static void _reset(void *self)
 }
 
 
-static bool _end(void *self)
-{
-    return feof( ((strfileread *)self)->src );
-}
-
-
 static xchar_t _getc(void *self)
 {
     return fgetc( ((strfileread *)self)->src );
@@ -96,7 +90,7 @@ static void _init_strread_trait(strfileread *self)
 {
     self->_t_strread = strread_init_trait(self);
     //self->_t_strread.vtbl.close = _close;
-    self->_t_strread.vtbl.end = _end;
+    //self->_t_strread.vtbl.end = _end;
     self->_t_strread.vtbl.getc = _getc;
     self->_t_strread.vtbl.read_str = _read_str;
     self->_t_strread.vtbl.read_str_until = _read_str_until;
@@ -111,6 +105,7 @@ strfileread *strfileread_open(char *filename)
 {
    	strfileread *ret;
 	ret = NEW(strfileread);
+    _init_strread_trait(ret);
 	ret->src = fopen(filename, "r");
     ret->pos = 0;
 	ret->sizeof_char = sizeof(char);

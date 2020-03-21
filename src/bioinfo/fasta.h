@@ -1,18 +1,25 @@
 #include <stdbool.h>
 
-#include "xstring.h"
+#include "strread.h"
+
 
 typedef struct _fasta fasta;
 
 typedef struct {
     char *descr;
-    xstring *seq;    
-} fasta_xstring;
+    char *seq;    
+} fasta_record;
+
+typedef struct {
+    char *descr;
+    strread *seqread;
+} fasta_record_reader;
 
 fasta *fasta_open(char *filename);
 
 bool fasta_has_next(fasta *self);
 
-const xstring *fasta_next_xstr(fasta *self);
+fasta_record_reader *fasta_next_reader(fasta *self);
+
 
 void fasta_close(fasta *self);
