@@ -24,19 +24,20 @@
 
 #include "CuTest.h"
 
+
 CuSuite *alphabet_get_test_suite();
 CuSuite *binheap_get_test_suite();
-CuSuite *bitsandbytes_get_test_suite();
 CuSuite *bitarray_get_test_suite();
+CuSuite *bitsandbytes_get_test_suite();
 CuSuite *bitvec_get_test_suite();
 CuSuite *bytearray_get_test_suite();
-CuSuite *csrsbitarr_get_test_suite();
 CuSuite *csarray_get_test_suite();
+CuSuite *csrsbitarr_get_test_suite();
 CuSuite *cstrutil_get_test_suite();
 CuSuite *dbgraph_get_test_suite();
 CuSuite *deque_get_test_suite();
 CuSuite *dynstr_get_test_suite();
-CuSuite *vec_get_test_suite();
+CuSuite *fasta_get_test_suite();
 CuSuite *hashmap_get_test_suite();
 CuSuite *hashset_get_test_suite();
 CuSuite *hashtable_get_test_suite();
@@ -48,9 +49,9 @@ CuSuite *stack_get_test_suite();
 CuSuite *strfileread_get_test_suite();
 CuSuite *strstream_get_test_suite();
 CuSuite *vebwtree_get_test_suite();
-CuSuite *wtree_get_test_suite();
+CuSuite *vec_get_test_suite();
 CuSuite *wavtree_get_test_suite();
-
+CuSuite *wtree_get_test_suite();
 
 
 void run_all_tests(void)
@@ -67,6 +68,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
+	CuSuiteAddSuite(suite, fasta_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
