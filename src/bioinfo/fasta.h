@@ -70,6 +70,10 @@ bool fasta_has_next(fasta *self);
 fasta_record_reader *fasta_next_reader(fasta *self);
 
 
+
+const fasta_record *fasta_next(fasta *self);
+
+
 /**
  * @brief Closes the reader and releases used resources
  */

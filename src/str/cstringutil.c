@@ -58,7 +58,7 @@ char *cstr_substr(char *str, size_t from,  size_t to)
 }
 
 
-char *cstr_trim(char *str, size_t from,  size_t to)
+char *cstr_crop(char *str, size_t from,  size_t to)
 {
 	str = memmove(str, str+from, to-from);
 	str = realloc(str, to-from+1);
@@ -66,10 +66,32 @@ char *cstr_trim(char *str, size_t from,  size_t to)
 	return str;
 }
 
-char *cstr_trim_to_len(char *str, size_t len)
+char *cstr_crop_len(char *str, size_t len)
 {
-	return cstr_trim(str, 0, len);
+	return cstr_crop(str, 0, len);
 }
+
+
+void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
+{
+	size_t end = len;
+	for (size_t j=0; j<unw_len; j++) {
+		while(end && str[end-1]==unwanted[j]) end--;
+	}
+	str[end] = '\0';
+	if (end) {
+		size_t begin = 0;
+		for (size_t j=0; j<unw_len; j++) {
+			while(str[begin]==unwanted[j]) begin++;
+		}
+		if (begin) {
+			memmove(str, str + (begin*sizeof(char)), (end-begin)*sizeof(char));
+			str[end-begin] = '\0';
+		}
+	}
+}
+
+
 
 
 char *cstr_resize(char *str, size_t len)

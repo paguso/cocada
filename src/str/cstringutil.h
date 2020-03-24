@@ -65,20 +65,34 @@ char *cstr_substr(char *str, size_t from,  size_t to);
 
 
 /**
- * @brief 'Trims' the string @p str to @p str[@p from..@p to-1].
- *        The trimmed char array will end with a '\0'.
+ * @brief 'Crops' the string @p str to @p str[@p from..@p to-1].
+ *        The cropped char array will end with a '\0'.
  *        The memory used by the parts of the string out of this interval
- *        will be freed. As part of the operation, the remaining 'trimmed'
+ *        will be freed. As part of the operation, the remaining 'cropped'
  *        portion may be relocated.
  * @return The address of the trimmed string.
  */
-char *cstr_trim(char *str, size_t from,  size_t to);
+char *cstr_crop(char *str, size_t from,  size_t to);
 
 
 /**
- * @brief Same as cstr_trim(@p str, 0, @plen)
+ * @brief Same as cstr_crop(@p str, 0, @plen)
  */
-char *cstr_trim_to_len(char *str, size_t len);
+char *cstr_crop_len(char *str, size_t len);
+
+
+/**
+ * @brief Removes unwanted chars from both ends of the string
+ * 
+ * # Example
+ * 
+ * ```C
+ * char *s = "<!-- some nice comment -->";
+ * cstr_trim(s, strlen(s), " -!<>", 5);
+ * printf("%s", s); // prints "some nice comment" (w/o the quotes)
+ * ```
+ */
+void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
 
 
 /**

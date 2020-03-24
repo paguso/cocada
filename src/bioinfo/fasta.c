@@ -122,8 +122,10 @@ static void _fastaread_init(fastaread *ret, FILE *src) {
 struct _fasta {
     FILE *src;
     fasta_record cur_rec;
+    size_t cur_rec_len[2];
     fastaread rd;
     fasta_record_reader cur_rec_rd;
+    size_t cur_rec_rd_len[2];
 };
 
 
@@ -132,7 +134,11 @@ fasta *fasta_open(char *filename)
     fasta *ret = NEW(fasta);
     ret->src = fopen(filename, "r");
     _fastaread_init(&(ret->rd), ret->src);
-    ret->cur_rec_rd.descr = cstr_new(100);
+    ret->cur_rec_len[0] = ret->cur_rec_len[1] = 100;
+    ret->cur_rec_rd_len[0] = ret->cur_rec_rd_len[1] = 100;
+    ret->cur_rec.descr = cstr_new(ret->cur_rec_len[0]);
+    ret->cur_rec.seq = cstr_new(ret->cur_rec_len[1]);
+    ret->cur_rec_rd.descr = cstr_new(ret->cur_rec_rd_len[0]);
     ret->cur_rec_rd.seqread = fastaread_strread(&(ret->rd));
     return ret;
 }
@@ -160,22 +166,76 @@ bool fasta_has_next(fasta *self)
 }
 
 
+const fasta_record *fasta_next(fasta *self)
+{
+    if (!_goto_next(self)) {
+        return NULL;
+    }
+    // load description
+    assert(fgetc(self->src) == '>');
+    cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
+    size_t l = 0;
+    bool eol = false;
+    while(!eol) {
+        if (self->cur_rec_len[0] == l) {
+            self->cur_rec_len[0] *= 1.66f;
+            //(size_t)(1.66f * self->cur_rec_len[0]);
+            self->cur_rec.descr = cstr_resize(self->cur_rec.descr, self->cur_rec_len[0]);
+        }
+        fgets(self->cur_rec.descr + l, self->cur_rec_len[0] - l + 1, self->src);
+        l = strlen(self->cur_rec.descr);
+        while (self->cur_rec.descr[l-1]=='\n' || self->cur_rec.descr[l-1]=='\r') {
+            self->cur_rec.descr[--l] = '\0';
+            eol = true;
+        }
+    }
+    // load sequence
+    cstr_clear(self->cur_rec.seq, self->cur_rec_len[1]);
+    l = 0;
+    while( !feof(self->src) ) {
+        if (self->cur_rec_len[1] == l) {
+           self->cur_rec_len[1] *= 1.66f;
+           //(size_t)(1.66f * self->cur_rec_len[1]);
+            self->cur_rec.seq = cstr_resize(self->cur_rec.seq, self->cur_rec_len[1]);
+        }
+        fgets(self->cur_rec.seq + l, self->cur_rec_len[1] - l + 1, self->src);
+        if (self->cur_rec.seq[l] == '>') {
+            fseek(self->src, l - strlen(self->cur_rec.seq), SEEK_CUR);
+            self->cur_rec.seq[l] = '\0';
+            break; 
+        }
+        l = strlen(self->cur_rec.seq);
+        while (self->cur_rec.seq[l-1]=='\n' || self->cur_rec.seq[l-1]=='\r') {
+            self->cur_rec.seq[--l] = '\0';
+        }
+    } 
+    return &(self->cur_rec);
+}
+
 
 fasta_record_reader *fasta_next_reader(fasta *self)
 {
     if (!_goto_next(self)) {
         return NULL;
     }
+    // load description
     assert(fgetc(self->src) == '>');
-    cstr_clear(self->cur_rec_rd.descr, strlen(self->cur_rec_rd.descr));
-    fgets(self->cur_rec_rd.descr, 100, self->src);
-    size_t l = strlen(self->cur_rec_rd.descr);
-    while ( self->cur_rec_rd.descr[l-1] != '\n' ) {
-        self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr, l + 50);
-        fgets(self->cur_rec_rd.descr + l, 50, self->src);
+    cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
+    size_t l = 0;
+    bool eol = false;
+    while(!eol) {
+        if (self->cur_rec_rd_len[0] == l) {
+            self->cur_rec_rd_len[0] *= 1.66f;
+            //(size_t)(1.66f * self->cur_rec_rd_len[0]);
+            self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
+        }
+        fgets(self->cur_rec_rd.descr + l, self->cur_rec_rd_len[0] - l + 1, self->src);
         l = strlen(self->cur_rec_rd.descr);
+        while (self->cur_rec_rd.descr[l-1]=='\n' || self->cur_rec_rd.descr[l-1]=='\r') {
+            self->cur_rec_rd.descr[--l] = '\0';
+            eol = true;
+        }
     }
-    self->cur_rec_rd.descr[l-1] = '\0';
     self->rd.file_pos = ftell(self->src);
     return &(self->cur_rec_rd);
 }

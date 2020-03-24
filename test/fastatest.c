@@ -56,7 +56,32 @@ static void test_teardown()
 }
 
 
-void test_read_fasta(CuTest *tc)
+void test_fasta_next(CuTest *tc)
+{
+    test_setup();
+
+    fasta *f = fasta_open(filename);
+    size_t i=0;
+    for(i=0; fasta_has_next(f); i++) {
+        const fasta_record *rr = fasta_next(f);
+        CuAssertStrEquals(tc, desc[i], rr->descr);
+        size_t seq_i_len = strlen(seq[i]);
+        size_t k = 0;
+        for(size_t j=0, rl=strlen(rr->seq); j < rl; j++) {
+            while( k<seq_i_len && seq[i][k]=='\n') k++;
+            CuAssert(tc, "fasta read error: read too many chars", k<seq_i_len);
+            CuAssert(tc, "fasta read error: char mismatch", seq[i][k]==rr->seq[j]);
+            k++;
+        }
+        CuAssert(tc, "fasta read error: premature end of sequence", k==seq_i_len);
+    }
+    CuAssertSizeTEquals(tc, nseq, i);
+
+    test_teardown();
+}
+
+
+void test_fasta_next_read(CuTest *tc)
 {
     test_setup();
 
@@ -86,7 +111,8 @@ void test_read_fasta(CuTest *tc)
 CuSuite *fasta_get_test_suite() 
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_read_fasta);
+    SUITE_ADD_TEST(suite, test_fasta_next);
+    SUITE_ADD_TEST(suite, test_fasta_next_read);
     return suite;
 
 }
