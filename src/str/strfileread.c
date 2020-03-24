@@ -8,6 +8,7 @@
 #include "xchar.h"
 #include "xstring.h"
 
+
 struct _strfileread {
     strread _t_strread;
     FILE *src;
@@ -17,6 +18,7 @@ struct _strfileread {
 
 
 IMPL_TRAIT(strfileread, strread)
+
 
 
 static void _reset(void *self)
@@ -86,26 +88,21 @@ static size_t _sizeof_char(void *self)
 }
 
 
-static void _init_strread_trait(strfileread *self)
+static strread_vt _strread_vt  = 
 {
-    self->_t_strread = strread_init_trait(self);
-    //self->_t_strread.vtbl.close = _close;
-    //self->_t_strread.vtbl.end = _end;
-    self->_t_strread.vtbl.getc = _getc;
-    self->_t_strread.vtbl.read_str = _read_str;
-    self->_t_strread.vtbl.read_str_until = _read_str_until;
-    //self->_t_strread.vtbl.read_xstr = _read_xstr;
-    //self->_t_strread.vtbl.read_xstr_until = _read_xstr_until;
-    self->_t_strread.vtbl.reset = _reset;
-    self->_t_strread.vtbl.sizeof_char = _sizeof_char;
-}
+    .getc = _getc,
+    .read_str = _read_str,
+    .read_str_until = _read_str_until,
+    .reset = _reset,
+    .sizeof_char = _sizeof_char
+};
 
 
 strfileread *strfileread_open(char *filename)
 {
-   	strfileread *ret;
-	ret = NEW(strfileread);
-    _init_strread_trait(ret);
+   	strfileread *ret = NEW(strfileread);
+    ret->_t_strread.impltor = ret;
+    ret->_t_strread.vtbl = &_strread_vt;
 	ret->src = fopen(filename, "r");
     ret->pos = 0;
 	ret->sizeof_char = sizeof(char);

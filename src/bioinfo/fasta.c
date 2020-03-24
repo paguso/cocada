@@ -100,22 +100,29 @@ static size_t _sizeof_char(void *self)
 }
 
 
+
+static strread_vt _strread_vt  = 
+{
+    .getc = _getc,
+    .read_str = _read_str,
+    .read_str_until = _read_str_until,
+    .reset = _reset,
+    .sizeof_char = _sizeof_char,
+};
+
+
 static void _fastaread_init(fastaread *ret, FILE *src) {
     ret->src = src;
     ret->_t_strread.impltor = ret;
-    ret->_t_strread.vtbl.getc = _getc;
-    ret->_t_strread.vtbl.read_str = _read_str;
-    ret->_t_strread.vtbl.read_str_until = _read_str_until;
-    ret->_t_strread.vtbl.reset = _reset;
-    ret->_t_strread.vtbl.sizeof_char = _sizeof_char;
+    ret->_t_strread.vtbl = &_strread_vt;
 }
 
 
 
 struct _fasta {
     FILE *src;
-    fastaread rd;
     fasta_record cur_rec;
+    fastaread rd;
     fasta_record_reader cur_rec_rd;
 };
 

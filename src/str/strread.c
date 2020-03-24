@@ -9,39 +9,40 @@
 #include "xchar.h"
 #include "xstring.h"
 
-static strread_vt _strread_vt_init()
+
+
+strread_vt strread_vt_new()
 {
-    strread_vt _vt;// = NEW(strread_vt);
-    memset(&_vt, 0x0, sizeof(strread_vt)); // set all functions to NULL
-    return _vt;
+    strread_vt vt;
+    memset(&vt, 0x0, sizeof(strread_vt)); // set all functions to NULL
+    return vt;
 }
 
-
+/*
 strread strread_init_trait(void *impltor)
 {
     strread ret;// = NEW(strread);
     ret.impltor = impltor;
-    memset(&(ret.vtbl), 0x0, sizeof(strread_vt)); // set all vtable functions to NULL
-    //ret.vtbl = _strread_vt_init();
+    ret.vtbl = _strread_vt_init();
     return ret;
 }
-
+*/
 
 void strread_reset(strread *trait) 
 {
-    trait->vtbl.reset(trait->impltor);
+    trait->vtbl->reset(trait->impltor);
 }
 
 
 xchar_t strread_getc(strread *trait)
 {
-    return trait->vtbl.getc(trait->impltor);
+    return trait->vtbl->getc(trait->impltor);
 }
 
 
 size_t strread_read_str_until(strread *trait, char *dest, char delim)
 {
-    return trait->vtbl.read_str_until(trait->impltor, dest, delim);
+    return trait->vtbl->read_str_until(trait->impltor, dest, delim);
 }
 
 /*
@@ -63,7 +64,7 @@ void strread_close(strread *trait)
 
 size_t strread_sizeof_char(strread *trait)
 {
-    return trait->vtbl.sizeof_char(trait->impltor);
+    return trait->vtbl->sizeof_char(trait->impltor);
 }
 
 

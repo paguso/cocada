@@ -29,7 +29,6 @@ void test_getc(CuTest *tc)
 {
     test_setup();
     strfileread *sfr = strfileread_open(filename);
-    strread *sr = strfileread_strread(sfr);
     size_t n = strlen(file_content);
     char c;
     for (size_t i=0; i<n; i++) {

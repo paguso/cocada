@@ -29,12 +29,11 @@ typedef struct {
 
 struct _strread {
     void *impltor;
-    strread_vt vtbl;
+    strread_vt *vtbl;
 };
 
 
-strread strread_init_trait(void *impltor);
-
+strread_vt strread_vt_new();
 
 
 /**
