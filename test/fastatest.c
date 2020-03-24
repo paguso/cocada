@@ -49,9 +49,10 @@ static void test_setup()
     fclose(file);
 }
 
+
 static void test_teardown()
 {
-
+    remove(filename);
 }
 
 
