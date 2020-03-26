@@ -88,7 +88,7 @@ void test_fasta_next_read(CuTest *tc)
     fasta *f = fasta_open(filename);
     size_t i=0;
     for(i=0; fasta_has_next(f); i++) {
-        fasta_record_reader *rr = fasta_next_reader(f);
+        const fasta_record_reader *rr = fasta_next_reader(f);
         CuAssertStrEquals(tc, desc[i], rr->descr);
         size_t k = 0;
         xchar_t c;

@@ -67,7 +67,7 @@ bool fasta_has_next(fasta *self);
  * should *not* be destroyed directly.
  * @see strread
  */
-fasta_record_reader *fasta_next_reader(fasta *self);
+const fasta_record_reader *fasta_next_reader(fasta *self);
 
 
 

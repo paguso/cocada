@@ -213,7 +213,7 @@ const fasta_record *fasta_next(fasta *self)
 }
 
 
-fasta_record_reader *fasta_next_reader(fasta *self)
+const fasta_record_reader *fasta_next_reader(fasta *self)
 {
     if (!_goto_next(self)) {
         return NULL;
@@ -236,6 +236,7 @@ fasta_record_reader *fasta_next_reader(fasta *self)
             eol = true;
         }
     }
+    // load sequence reader
     self->rd.file_pos = ftell(self->src);
     return &(self->cur_rec_rd);
 }

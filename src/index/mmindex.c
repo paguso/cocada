@@ -2,19 +2,21 @@
 #include <stddef.h>
 #include <string.h>
 
+
 #include "alphabet.h"
 #include "arrutil.h"
+#include "fasta.h"
+#include "hashmap.h"
+#include "mathutil.h"
+#include "minqueue.h"
+#include "mmindex.h"
+#include "new.h"
 #include "new.h"
 #include "order.h"
-#include "minqueue.h"
-#include "mathutil.h"
-#include "new.h"
-#include "hashmap.h"
+#include "strread.h"
 #include "vec.h"
-#include "xstring.h"
 #include "xstrhash.h"
-
-#include "mmindex.h"
+#include "xstring.h"
 
 struct _mmindex {
 	alphabet *ab;
@@ -104,11 +106,11 @@ static inline void _insert(hashmap * tbl, uint64_t rank, size_t pos)
 }
 
 
-void mmindex_index(mmindex * self, strstream * sst)
+void mmindex_index(mmindex * self, strread * sst)
 {
 	size_t nidx = self->nidx;
 	size_t offset = vec_last_size_t(self->offs);
-	xstring *window = xstring_new_with_capacity(strstream_sizeof_char(sst),
+	xstring *window = xstring_new_with_capacity(strread_sizeof_char(sst),
 	                  self->max_wlen);
 	minqueue **win_rks = NEW_ARR(minqueue *, nidx);
 	FILL_ARR(win_rks, 0, nidx, minqueue_new(sizeof(rankpos), cmp_rankpos));
@@ -119,7 +121,7 @@ void mmindex_index(mmindex * self, strstream * sst)
 
 	size_t nread = 0;
 	rankpos rp = { 0, 0 };
-	for (xchar_t c; (c = strstream_getc(sst)) != EOF;) {
+	for (xchar_t c; (c = strread_getc(sst)) != EOF;) {
 		// prepare window
 		if (nread >= self->max_wlen) {
 			xstr_rot_left(window, 1);

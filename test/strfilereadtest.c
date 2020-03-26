@@ -8,19 +8,17 @@
 #include "strread.h"
 #include "strfileread.h"
 
-
-
 static char *filename="test_strfileread.txt";
 
 static char *file_content = "acgtacgtacgtacgtacgtacgtacgtacgtacgtacgt";
 
-void test_setup() {
+static void test_setup() {
     FILE *file = fopen(filename, "w");
     fprintf(file, "%s", file_content);
     fclose(file);
 }
 
-void test_teardown() {
+static void test_teardown() {
     remove(filename);
 }
 

@@ -9,18 +9,39 @@
 #include "alphabet.h"
 #include "dna.h"
 #include "mmindex.h"
+#include "fasta.h"
 
+
+static char *filename = "test_mmindex.fa";
+static char *file_contents = 
+"\
+>seq1\n\
+acgtacgtacgtacgtacgtacgtacgtacgtacgtacgt\n\
+";
+
+static void test_setup() {
+    FILE *f = fopen(filename, "w");
+    fputs(file_contents, f);
+    fclose(f);
+}
+
+static void test_teardown() {
+    remove(filename);
+}
 
 void test_mmindex_index(CuTest *tc) 
 {
+    test_setup();
+
     alphabet *ab = dna_ab_new();
-    xstring *s = xstring_new_from_arr_cpy("acgtacgtacgtacgtacgtacgtacgtacgtacgtacgt", 40, sizeof(char));
-    CuAssertSizeTEquals(tc, 40, xstr_len(s));
     size_t w[2] = {4, 3};
     size_t k[2] = {4, 3};
     mmindex *idx = mmindex_new(ab, 2, w, k);
-    strstream *str = strstream_open_xstr(s);
-    mmindex_index(idx, str);
+    fasta *fa = fasta_open(filename);
+    CuAssert(tc, "No FASTA sequence", fasta_has_next(fa));
+    const fasta_record_reader *fr = fasta_next_reader(fa);
+    
+    mmindex_index(idx, fr->seqread);
 
     const vec *mmpos = mmindex_get(idx, xstring_new_from_arr_cpy("acgt", 4, sizeof(char)));
     size_t exp_mmpos[10] = {0, 4, 8, 12, 16, 20, 24, 28, 32, 36}; 
@@ -40,6 +61,8 @@ void test_mmindex_index(CuTest *tc)
     for (size_t i=0; i<10; i++) 
         CuAssertSizeTEquals(tc, exp_mmpos3[i], vec_get_size_t(mmpos, i));
 
+    fasta_close(fa);
+    test_teardown();
 }
 
 
