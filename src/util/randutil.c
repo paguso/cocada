@@ -25,30 +25,53 @@
 #include <stdint.h>
 #include <sys/time.h>
 
+#include "SFMT.h"
+
 #include "bitsandbytes.h"
 #include "randutil.h"
 #include "string.h"
 
-static bool _randinit = false;
 
-static inline void randinit()
+static sfmt_t _rng;
+static bool __randinit = false;
+
+static inline void _randinit()
 {
-	if (!_randinit) {
+	if (!__randinit) {
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
-		int usec = tv.tv_usec;
-		srand48(usec);
-		_randinit = true;
+		sfmt_init_gen_rand(&_rng, tv.tv_usec);
+		__randinit = true;
 	}
 }
 
+
+static inline uint64_t _rand_next_unchecked() {
+	return sfmt_genrand_uint64(&_rng);
+}
+
+
+uint64_t rand_next ()
+{
+	_randinit();
+	return _rand_next_unchecked();
+}
+
+
+#define RAND_RANGE_IMPL( TYPE )\
+TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
+    assert(r >= l);\
+    return l + (rand_next() % (r-l));\
+}
+
+
 void shuffle_arr(void *arr, size_t n, size_t typesize)
 {
-	randinit();
+	_randinit();
 	byte_t tmp[typesize];
 	if (n > 1) {
 		for (size_t j, i = n-1; i > 0; i--) {
-			j = (size_t)(drand48() * (i+1));
+			j = (size_t)_rand_next_unchecked() % (i+1);
 			memcpy(tmp, arr + (j * typesize), typesize);
 			memcpy(arr + (j * typesize), arr + (i * typesize), typesize);
 			memcpy(arr + (i * typesize), tmp, typesize);
@@ -56,24 +79,26 @@ void shuffle_arr(void *arr, size_t n, size_t typesize)
 	}
 }
 
-
-#define RAND_RANGE_IMPL( TYPE )\
-TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
-    randinit();\
-    assert(r >= l);\
-    assert(r < RAND_MAX);\
-    return l + (rand() % (r-l));\
+#define SHUFFLE_ARR_IMPL(TYPE) \
+void shuffle_arr_##TYPE(TYPE *arr, size_t n) {\
+	shuffle_arr(arr, n, sizeof(TYPE));\
 }
 
-RAND_RANGE_IMPL(short);
-RAND_RANGE_IMPL(int);
-RAND_RANGE_IMPL(long);
-RAND_RANGE_IMPL(size_t);
-RAND_RANGE_IMPL(int8_t);
-RAND_RANGE_IMPL(int16_t);
-RAND_RANGE_IMPL(int32_t);
-RAND_RANGE_IMPL(int64_t);
-RAND_RANGE_IMPL(uint8_t);
-RAND_RANGE_IMPL(uint16_t);
-RAND_RANGE_IMPL(uint32_t);
-RAND_RANGE_IMPL(uint64_t);
+
+#define RAND_ALL_IMPL(TYPE) \
+RAND_RANGE_IMPL(TYPE) \
+SHUFFLE_ARR_IMPL(TYPE)
+
+
+RAND_ALL_IMPL(short);
+RAND_ALL_IMPL(int);
+RAND_ALL_IMPL(long);
+RAND_ALL_IMPL(size_t);
+RAND_ALL_IMPL(int8_t);
+RAND_ALL_IMPL(int16_t);
+RAND_ALL_IMPL(int32_t);
+RAND_ALL_IMPL(int64_t);
+RAND_ALL_IMPL(uint8_t);
+RAND_ALL_IMPL(uint16_t);
+RAND_ALL_IMPL(uint32_t);
+RAND_ALL_IMPL(uint64_t);

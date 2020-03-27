@@ -43,7 +43,7 @@ typedef struct {
 } fasta_rec;
 
 /**
- * @brief A FASTA record with sequence loaded as a (inner) stream
+ * @brief A FASTA record with sequence loaded as a stream
  */
 typedef struct {
 	char *descr;      /**< Sequence descriptor */
@@ -70,7 +70,7 @@ bool fasta_has_next(fasta *self);
  * The returned strread reader is a virtual stream that points to the
  * beginning of the sequence contents inside the file, and is used
  * to read these contents as if they were in a separate stream,
- * ignoring any line breaks. EOF is reached at the end of the sequence.
+ * ignoring line breaks. EOF is reached at the end of the sequence.
  *
  * Example
  * -------
