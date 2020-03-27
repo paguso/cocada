@@ -1,11 +1,11 @@
 
 /*
  * C Unit Test Framework
- * 
+ *
  * Copyright (C) 2003 Asim Jalis
- * 
+ *
  * https://github.com/ennorehling/cutest
- *   
+ *
  */
 
 #include <assert.h>

@@ -46,7 +46,8 @@ static inline void _randinit()
 }
 
 
-static inline uint64_t _rand_next_unchecked() {
+static inline uint64_t _rand_next_unchecked()
+{
 	return sfmt_genrand_uint64(&_rng);
 }
 

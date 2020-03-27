@@ -36,6 +36,7 @@ OBJ_EXT      := o
 
 ROOT_DIR     := .
 SRC_DIR      := $(ROOT_DIR)/src
+THRDPTY_DIR  := $(SRC_DIR)/thrdpty
 TEST_DIR     := $(ROOT_DIR)/test
 BUILD_DIR    := $(ROOT_DIR)/build
 DOC_DIR      := $(ROOT_DIR)/doc
@@ -57,7 +58,7 @@ FMT_OPTIONS := --style=kr --indent=tab --recursive -n
 ###############################################################################
 
 SRC_PATHS      := $(shell find $(SRC_DIR) -name '*.$(SRC_EXT)')
-#SRC_PATHS      := $(wildcard find $(SRC_DIR)*.$(SRC_EXT)')
+THRDPTY_PATHS  := $(shell find $(THRDPTY_DIR) -name '*.[$(SRC_EXT),$(HEAD_EXT)]')
 SRCS           := $(notdir $(SRC_PATHS))
 SRC_DIRS       := $(sort $(dir $(SRC_PATHS)))
 OBJS           := $(patsubst %.$(SRC_EXT), %.$(OBJ_EXT), $(SRCS))
@@ -226,5 +227,6 @@ clean:
 ###############################################################################
 
 fmt:
-	$(HEAD_LICENSE_CMD) $(SRC_PATHS) $(HEAD_PATHS) $(TEST_SRC_PATHS) $(TEST_HEAD_PATHS)
+	$(HEAD_LICENSE_CMD) $(filter-out $(THRDPTY_PATHS), $(SRC_PATHS)) $(filter-out $(THRDPTY_PATHS), $(HEAD_PATHS)) $(TEST_SRC_PATHS) $(TEST_HEAD_PATHS)
 	$(FMT_CMD) $(FMT_OPTIONS) $(SRC_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT) $(TEST_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT)
+	

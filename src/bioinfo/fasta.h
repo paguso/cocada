@@ -105,7 +105,7 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self);
  * 	printf("sequence is %s\n",rec->seq);
  * }
  * ```
- * @warning The returned record reader object should *not* be modified or 
+ * @warning The returned record reader object should *not* be modified or
  * destroyed directly.
  * @see strread
  */
