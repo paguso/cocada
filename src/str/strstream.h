@@ -33,6 +33,8 @@
  * @author Paulo Fonseca
  *
  * @brief String stream.
+ * 
+ * @deprecated Use implementations of the strread interface.
  */
 
 

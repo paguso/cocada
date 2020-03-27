@@ -36,7 +36,7 @@
 
 /**
  * @brief Total order comparison function prototype.
- * 
+ *
  * @return Returns an integer `C` such that
  * - `C == 0` iff data pointed by @p left and @p right compare as
  * **equals**
@@ -44,7 +44,7 @@
  * by **right**
  * - `C > 0` iff data pointed by @p left is **greater than** data pointed
  * by **right**
- * 
+ *
  * @see cmp_`type` for type-specific comparison
  */
 typedef int (*cmp_func)(const void *left, const void *right);
@@ -52,17 +52,17 @@ typedef int (*cmp_func)(const void *left, const void *right);
 
 /**
  * @brief Equality comparison function prototype.
- * 
- * @return Returns a boolean `E` such that  
+ *
+ * @return Returns a boolean `E` such that
  * `E == true` iff data pointed by @p left and @p right compare as
  * **equals**. Otherwise `E==false`.
- * 
+ *
  * @see eq_`type` for type-specific comparison
  */
 typedef bool (*eq_func)(const void *left, const void *right);
 
 /**
- * @brief Provides type-specific order comparison functions, 
+ * @brief Provides type-specific order comparison functions,
  * e.g. cmp_float, cmp_uin64_t, etc.
  * @p leff and @p right are assumed to point to memory locations
  * containing values of the intended type, which are compared
@@ -72,7 +72,7 @@ typedef bool (*eq_func)(const void *left, const void *right);
 int cmp_##TYPE(const void *left, const void *right);
 
 /**
- * @brief Provides type-specific equality comparison functions, 
+ * @brief Provides type-specific equality comparison functions,
  * e.g. eq_float, eq_uin64_t, etc.
  * @p leff and @p right are assumed to point to memory locations
  * containing values of the intended type, which are compared

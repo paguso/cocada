@@ -482,9 +482,9 @@ dtor *ptr_dtor();
 
 /**
  * @brief Convenience variable argument macro for destroying objects.
- * - `FREE(p)` deallocates the memory pointed by the raw pointer `p` 
+ * - `FREE(p)` deallocates the memory pointed by the raw pointer `p`
  *    by calling `stdlib free()`.
- * - `FREE(obj, type)` is equivalent to `DESTROY(obj, DTOR(type))` 
+ * - `FREE(obj, type)` is equivalent to `DESTROY(obj, DTOR(type))`
  *    i.e. destroys the object `obj` of a given `type` by using its
  *    default (flat) destructor.
  * @see DESTROY

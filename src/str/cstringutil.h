@@ -83,9 +83,9 @@ char *cstr_crop_len(char *str, size_t len);
 
 /**
  * @brief Removes unwanted chars from both ends of the string
- * 
+ *
  * # Example
- * 
+ *
  * ```C
  * char *s = "<!-- some nice comment -->";
  * cstr_trim(s, strlen(s), " -!<>", 5);
@@ -98,7 +98,7 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
 /**
  * @brief resizes the string to a given length @p len.
  * If @len is less than the current string length, this is equivalent
- * to `cstr_trim(str, 0, len)`. Else, the string is enlarged to 
+ * to `cstr_trim(str, 0, len)`. Else, the string is enlarged to
  * have physical length @p len+1, i.e. with trailing positions
  * set to '\0'.
  * @warning The string may be relocated.

@@ -1,17 +1,38 @@
+/*
+ * COCADA - COCADA Collection of Algorithms and DAta Structures
+ *
+ * Copyright (C) 2016  Paulo G S Fonseca
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ *
+ */
+
 #ifndef TRAIT_H
 #define TRAIT_H
 
 
 /**
- 
-COCADA implements a simplified Trait mechanism. A Trait (interface) 
-consists in a set of methods to be implemented by an object, called 
+
+COCADA implements a simplified Trait mechanism. A Trait (interface)
+consists in a set of methods to be implemented by an object, called
 the *implementor*. Usually a traits only declares the method, being
 the responsability of the object to provide an implementation. Thus
 trait methods are usually **virtual** methods, although the trait
 may also provide a default implementation.
 
-To illustrate, let´s suppose we what to implement a trait `shape` 
+To illustrate, let´s suppose we what to implement a trait `shape`
 with two methods
 - `dimension get_dim(shape *)`
 - `void draw(shape *, canvas *)`
@@ -32,7 +53,7 @@ draw(r);
 
 obviously, the dimensions are calculated differently depending on
 the actual shape, and similarly for the `draw` method to display
-the shapes on screen. 
+the shapes on screen.
 
 
 # Defining a Trait
@@ -59,7 +80,7 @@ dimension shape_get_dim(shape *);
 void shape_draw(shape *, canvas *);
 ```
 
-Every object implementing the 
+Every object implementing the
 
 
 */
@@ -75,7 +96,7 @@ TRAIT * TYPE##_##TRAIT( TYPE *self ) {\
 }
 
 
-#define ASTRAIT(PTR, TYPE, TRAIT) (&(((TYPE *)(PTR))->_i##TRAIT)) 
+#define ASTRAIT(PTR, TYPE, TRAIT) (&(((TYPE *)(PTR))->_i##TRAIT))
 
 
 #endif

@@ -108,7 +108,7 @@ void vec_trim(vec *v)
 static void _resize_to(vec *v, size_t cap)
 {
 	v->capacity = MAX3(MIN_CAPACITY, v->len, cap);
-	v->data = realloc(v->data, v->capacity * v->typesize);	
+	v->data = realloc(v->data, v->capacity * v->typesize);
 }
 
 
@@ -244,7 +244,7 @@ void vec_push(vec *v, const void *src)
 }
 
 
-void vec_push_n(vec *v, const void *src, size_t n) 
+void vec_push_n(vec *v, const void *src, size_t n)
 {
 	if (n == 0) return;
 	_resize_to(v, v->len + n);
@@ -275,7 +275,7 @@ void vec_ins(vec *v, size_t pos, const void *src)
 void vec_cat(vec *dest, const vec *src)
 {
 	_resize_to(dest, dest->len + src->len);
-	memcpy(dest->data + (dest->len * dest->typesize), src->data, src->len * src->typesize);	
+	memcpy(dest->data + (dest->len * dest->typesize), src->data, src->len * src->typesize);
 	dest->len += src->len;
 }
 

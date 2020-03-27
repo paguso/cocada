@@ -66,12 +66,12 @@ xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap);
 /**
  * @brief Converts a raw byte array into an xstring. The source array is
  * moved into the xstring, meaning that, after the conversion,
- * the @p src array **should be no longer used from outside the xstring**. 
+ * the @p src array **should be no longer used from outside the xstring**.
  * @param src (**move**) The raw source array.
- * @param len The length of the created xstring. 
+ * @param len The length of the created xstring.
  * @param sizeof_char The size of the extended char in bytes.
- * @warning 
- * - The size of the source buffer @p src should be at least 
+ * @warning
+ * - The size of the source buffer @p src should be at least
  *   @p len * @p sizeof_char bytes. Positions after this number will be ignored.
  * - @p src must be a heap allocated array. In particular, no constant array
  *   or string literal should be used.
@@ -81,18 +81,18 @@ xstring *xstring_new_from_arr(void *src, size_t len, size_t sizeof_char);
 
 
 /**
- * @brief Creates a new xstring from a *copy* of a raw byte array. 
- * The @p src array should be dealt with by the caller after this function call. 
+ * @brief Creates a new xstring from a *copy* of a raw byte array.
+ * The @p src array should be dealt with by the caller after this function call.
  * This should be used to create an xstring form a string literal, for example
  * ```C
  *     char *p = "Some string literal";
  *     xstring *s = xstring_new_from_arr_cpy(p, strlen(p), sizeof(char));
  * ```
  * @param src  The raw source array.
- * @param len The length of the created xstring. 
+ * @param len The length of the created xstring.
  * @param sizeof_char The size of the extended char in bytes.
- * @warning 
- * - The size of the source buffer @p src should be at least 
+ * @warning
+ * - The size of the source buffer @p src should be at least
  *   @p len * @p sizeof_char bytes. Positions after this number will be ignored.
  * @see xstring_new_from_arr
  */
@@ -228,7 +228,7 @@ void xstr_cpy(xstring *dest, const xstring *src);
  *
  * @warn Assumes without verification that both xstrings have the same internal
  *       character bytesize.
- * @warn The destination must be large enough, or a buffer overrun will occur. 
+ * @warn The destination must be large enough, or a buffer overrun will occur.
  *       No out-of-bounds verification is performed.
  */
 void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src, size_t from_src, size_t n );

@@ -29,11 +29,11 @@
 /**
  * @file vec.h
  * @author Paulo Fonseca
- * @brief The vector ADT (a.k.a. dynamic array) is a linear 
+ * @brief The vector ADT (a.k.a. dynamic array) is a linear
  * dynamic collection of elements of the same type and constant size.
  * It contains the usual access/insert/deletion of individual elements
- * at arbitrary positions, plus other convenience functions. 
- * It is implemented as a heap allocated array with a given limited 
+ * at arbitrary positions, plus other convenience functions.
+ * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand depending on the actual
  * size of the collection.
  */
@@ -61,19 +61,19 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
 
 /**
  * @brief Transforms raw byte array into a vector.
- *        The buffer @p buf is **moved into** the vector and becomes 
+ *        The buffer @p buf is **moved into** the vector and becomes
  *        its internal buffer.
  *        To create an vector from a **copy** of a raw buffer, which is
  *        not moved, see #vec_new_from_arr_cpy
  * @param buf (**move**) The buffer containing the vector data.
  * @param len The lenght of the vector.
  * @param typesize The size in bytes of each vector element.
- * @warning 
- * - The size of @p buf must be at least (@p len * @p typesize) bytes 
- * - The pointer @p buf **must not be used directly (read or 
+ * @warning
+ * - The size of @p buf must be at least (@p len * @p typesize) bytes
+ * - The pointer @p buf **must not be used directly (read or
  *   modified) after this function call**.
- * - Since it becomes the internal buffer,  @p buf  **must** be heap 
- *   allocated. In particular, no constant arrays of string literals 
+ * - Since it becomes the internal buffer,  @p buf  **must** be heap
+ *   allocated. In particular, no constant arrays of string literals
  *   should be used.
  * @see vec_new_from_arr_cpy
  */
@@ -83,7 +83,7 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
 /**
  * @brief Creates a vector from a copy of a raw buffer.
  *        This of course implies copying the data from the buffer
- *        to the vector. 
+ *        to the vector.
  *        To turn @p buf into a dynamic array without duplicating its
  *        values see #vec_new_from_arr.
  * @param buf (no transfer) The buffer containing the vector data.
@@ -143,7 +143,7 @@ void vec_trim(vec *v);
 
 /**
  * @brief Detaches and returns the trimmed internal byte array.
- *        The size of the returned array in bytes will be 
+ *        The size of the returned array in bytes will be
  *        vec_typesize(@p v) * vec_len(@p v);
  * @see vec_trim
  * @warning After this operation, the vector is destroyed.
@@ -261,7 +261,7 @@ void vec_clip(vec *v, size_t from, size_t to);
 
 /**
  * @brief Rotates the vector contents npos positions to the left.
- *        If @p v has length `n`, then @p v[@p npos + i % n] becomes @p v[i], 
+ *        If @p v has length `n`, then @p v[@p npos + i % n] becomes @p v[i],
  *        for i=0..n-1. If @p npos > `n`, this is the same as rotating
  *        @npos % `n` positions.
  *        Example: `vec_rotate_left(v=[a,b,c,d,e,f,g], 3)` => `v[d,e,f,g,a,b,c]`.

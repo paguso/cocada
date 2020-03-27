@@ -1,3 +1,24 @@
+/*
+ * COCADA - COCADA Collection of Algorithms and DAta Structures
+ *
+ * Copyright (C) 2016  Paulo G S Fonseca
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ *
+ */
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -38,7 +59,7 @@ xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap)
 
 xstring *xstring_new_with_len(size_t sizeof_char, size_t len)
 {
-	xstring *ret = xstring_new_with_capacity(sizeof_char, len);	
+	xstring *ret = xstring_new_with_capacity(sizeof_char, len);
 	return ret;
 }
 
@@ -46,7 +67,7 @@ xstring *xstring_new_with_len(size_t sizeof_char, size_t len)
 xstring *xstring_new_from_arr(void *src, size_t len, size_t sizeof_char)
 {
 	xstring *ret = NEW(xstring);
-	ret->buf = vec_new_from_arr(src, len, sizeof_char); 
+	ret->buf = vec_new_from_arr(src, len, sizeof_char);
 	return ret;
 }
 
@@ -54,7 +75,7 @@ xstring *xstring_new_from_arr(void *src, size_t len, size_t sizeof_char)
 xstring *xstring_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
 {
 	xstring *ret = NEW(xstring);
-	ret->buf = vec_new_from_arr_cpy(src, len, sizeof_char); 
+	ret->buf = vec_new_from_arr_cpy(src, len, sizeof_char);
 	return ret;
 }
 

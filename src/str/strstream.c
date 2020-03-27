@@ -51,7 +51,7 @@ struct _strstream {
 };
 
 
-static xchar_t _getchar_from_str(void *str) 
+static xchar_t _getchar_from_str(void *str)
 {
 	strstream *sst = (strstream *)str;
 	if (sst->pos>=sst->slen)

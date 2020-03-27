@@ -1,3 +1,24 @@
+/*
+ * COCADA - COCADA Collection of Algorithms and DAta Structures
+ *
+ * Copyright (C) 2016  Paulo G S Fonseca
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ *
+ */
+
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
@@ -205,8 +226,8 @@ void mmindex_index(mmindex * self, strread * sst)
 	}
 	vec_push_size_t(self->offs, nread);
 	self->nseq += 1;
-	
-	
+
+
 	FREE(window, xstring);
 	const dtor *mqdtor = DTOR(minqueue);
 	for (size_t i=0; i<nidx; i++) {
@@ -221,8 +242,8 @@ void mmindex_index(mmindex * self, strread * sst)
 
 const vec *mmindex_get(mmindex *self, xstring *kmer)
 {
-	uint64_t rank = xstrhash_lex(self->hasher, kmer); 
-	return (const vec*) hashmap_get_rawptr( self->tbls[self->k_inv[xstr_len(kmer)]], &rank ); 
+	uint64_t rank = xstrhash_lex(self->hasher, kmer);
+	return (const vec*) hashmap_get_rawptr( self->tbls[self->k_inv[xstr_len(kmer)]], &rank );
 }
 
 

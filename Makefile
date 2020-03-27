@@ -47,6 +47,7 @@ DOXYGEN_CMD := doxygen
 DOXYGEN_CONFIG_FILE := $(ROOT_DIR)/cocada.doxy
 
 
+HEAD_LICENSE_CMD := bash ./headlicense.sh
 FMT_CMD := astyle
 FMT_OPTIONS := --style=kr --indent=tab --recursive -n
 
@@ -62,7 +63,9 @@ SRC_DIRS       := $(sort $(dir $(SRC_PATHS)))
 OBJS           := $(patsubst %.$(SRC_EXT), %.$(OBJ_EXT), $(SRCS))
 HEAD_PATHS     := $(shell find $(SRC_DIR) -name '*.$(HEAD_EXT)')
 HEAD_DIRS      := $(sort $(dir $(HEAD_PATHS)))
+HEADS          := $(notdir $(HEAD_PATHS))
 TEST_SRC_PATHS := $(shell find $(TEST_DIR) -name '*.$(SRC_EXT)')
+TEST_HEAD_PATHS := $(shell find $(TEST_DIR) -name '*.$(HEAD_EXT)')
 TEST_HEAD_DIRS := $(sort $(dir $(TEST_SRC_PATHS)))
 TEST_SRCS      := $(notdir $(TEST_SRC_PATHS)) 
 
@@ -223,4 +226,5 @@ clean:
 ###############################################################################
 
 fmt:
+	$(HEAD_LICENSE_CMD) $(SRC_PATHS) $(HEAD_PATHS) $(TEST_SRC_PATHS) $(TEST_HEAD_PATHS)
 	$(FMT_CMD) $(FMT_OPTIONS) $(SRC_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT) $(TEST_DIR)/*.$(SRC_EXT),*.$(HEAD_EXT)

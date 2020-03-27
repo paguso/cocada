@@ -20,15 +20,15 @@ LIC_HEADER=$'/*
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
- 
  '
 
-for f in $@ # or whatever other pattern...
+for f in $@ 
 do
-  if ! grep -q Copyright $f
+  if ! grep -q "* Copyright (C)" $f
   then
     echo "$LIC_HEADER" > $f.bkp 
-    cat $f >> $f.bkp #&& mv $f.new $f
+    cat $f >> $f.bkp 
+    mv $f.bkp $f
   fi
 done
 
