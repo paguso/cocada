@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef BITSANDBYTES_H
-#define BITSANDBYTES_H
+#ifndef BITBYTE_H
+#define BITBYTE_H
 
 #include <endian.h>
 #include <limits.h>
@@ -30,13 +30,13 @@
 
 
 /**
- * @file bitsandbytes.h
+ * @file bitbyte.h
  * @author Paulo Fonseca
  *
  * @brief General definitions and functions necessary for low level
  *        bit/byte operatios.
  *
- * @note ATTENTION: The code herein is not portable. Check the docs for
+ * @warning The code herein is not portable. Check the docs for
  *       'porting' instructions and issues.
  */
 

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 #include "bitarr.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bytearr.h"
 #include "new.h"
 #include "csrsbitarray.h"

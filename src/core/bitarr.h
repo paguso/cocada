@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 
 /**
  * @file bitarr.h

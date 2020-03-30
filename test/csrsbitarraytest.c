@@ -27,7 +27,7 @@
 #include "CuTest.h"
 
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitarr.h"
 #include "new.h"
 #include "csrsbitarray.h"

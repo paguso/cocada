@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "new.h"
 #include "order.h"
 #include "minqueue.h"

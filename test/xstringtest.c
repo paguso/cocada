@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "mathutil.h"
 #include "xstring.h"
 

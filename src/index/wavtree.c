@@ -30,7 +30,7 @@
 
 #include "alphabet.h"
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitvec.h"
 #include "bytearr.h"
 #include "new.h"

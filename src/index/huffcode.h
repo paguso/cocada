@@ -25,7 +25,7 @@
 #include <stddef.h>
 
 #include "alphabet.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitvec.h"
 #include "new.h"
 #include "strstream.h"

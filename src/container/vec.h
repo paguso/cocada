@@ -21,7 +21,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "new.h"
 #include "order.h"
 

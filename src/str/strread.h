@@ -23,7 +23,7 @@
 #define STRREAD_H
 
 /**
- * @file strread
+ * @file strread.h
  * @author Paulo Fonseca
  * @brief String Reader Trait
  */

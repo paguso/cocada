@@ -27,7 +27,7 @@
 #include <stdint.h>
 
 /**
- * @file xchar_t
+ * @file xchar
  * @author Paulo Fonseca
  * @brief eXtended char
  * According to the C standard, the <b>char</b> type is a standard signed

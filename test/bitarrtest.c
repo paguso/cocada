@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitarr.h"
 #include "cstrutil.h"
 #include "new.h"

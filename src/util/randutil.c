@@ -27,7 +27,7 @@
 
 #include "SFMT.h"
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "randutil.h"
 #include "string.h"
 

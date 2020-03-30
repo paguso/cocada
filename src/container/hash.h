@@ -27,7 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 
 /**
  * @file hash.h

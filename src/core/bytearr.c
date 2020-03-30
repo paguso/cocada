@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bytearr.h"
 #include "cstrutil.h"
 

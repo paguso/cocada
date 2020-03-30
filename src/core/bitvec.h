@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "strbuf.h"
 #include "new.h"
 

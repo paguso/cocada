@@ -22,7 +22,7 @@
 #include <immintrin.h>
 
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "new.h"
 #include "cstrutil.h"
 #include "hashmap.h"

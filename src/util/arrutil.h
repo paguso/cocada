@@ -24,12 +24,12 @@
 
 #include <stdlib.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "new.h"
 #include "cstrutil.h"
 
 /**
- * @file arrayutil.h
+ * @file arrutil.h
  * @author Paulo Fonseca
  *
  * @brief Assorted array utility macros and functions.

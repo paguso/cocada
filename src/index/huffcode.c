@@ -29,7 +29,7 @@
 #include "alphabet.h"
 #include "arrutil.h"
 #include "binheap.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitarr.h"
 #include "bitvec.h"
 #include "bytearr.h"

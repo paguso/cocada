@@ -27,7 +27,7 @@
 
 #include "alphabet.h"
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "new.h"
 #include "mathutil.h"
 #include "vec.h"

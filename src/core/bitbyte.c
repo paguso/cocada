@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 //#include "new.h"
 #include "mathutil.h"
 

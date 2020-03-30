@@ -25,7 +25,7 @@
 #include "alphabet.h"
 #include "assert.h"
 #include "arrutil.h"
-#include "bitsandbytes.h"
+#include "bitbyte.h"
 #include "bitarr.h"
 #include "bitvec.h"
 #include "bytearr.h"
