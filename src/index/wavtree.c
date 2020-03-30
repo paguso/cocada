@@ -35,9 +35,9 @@
 #include "bytearr.h"
 #include "new.h"
 #include "csrsbitarray.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "vec.h"
-#include "dynstr.h"
+#include "strbuf.h"
 #include "hashmap.h"
 #include "huffcode.h"
 #include "mathutil.h"
@@ -94,7 +94,7 @@ void chrcode_incr(bitvec *code)
 		bitvec_set_bit(code, i, bit);
 	}
 	if (carry) {
-		bitvec_append(code, 0x1);
+		bitvec_push(code, 0x1);
 	}
 }
 
@@ -163,7 +163,7 @@ static tmp_wavtree *tmp_wavtree_new(alphabet *ab, bool own_alphabet)
 	twt->own_alphabet = own_alphabet;
 	twt->chrcodes = vec_new(sizeof(bitvec*));
 	twt->nxt_charcode = bitvec_new();
-	bitvec_append(twt->nxt_charcode, 0x0);
+	bitvec_push(twt->nxt_charcode, 0x0);
 	twt->nnodes   = 0;
 	twt->len      = 0;
 	twt->nchars   = 0;
@@ -270,7 +270,7 @@ static void tmp_wt_app_char(tmp_wtnode *root, bitvec *chcode)
 	byte_t bit;
 	while (root != NULL) {
 		bit = charcode_iter_next(&codeit);
-		bitvec_append(root->bv, bit);
+		bitvec_push(root->bv, bit);
 		root = root->chd[bit];
 	}
 }
@@ -281,7 +281,7 @@ static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, bitvec *chcode)
 	tmp_wtnode *node=root, *parent=NULL;
 	while (true) {
 		if (node!=NULL) {
-			bitvec_append(node->bv, node->nxt_chd);
+			bitvec_push(node->bv, node->nxt_chd);
 			parent = node;
 			node = node->chd[node->nxt_chd];
 			parent->nxt_chd ^= 0x1;
@@ -292,8 +292,8 @@ static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, bitvec *chcode)
 			byte_t bit = parent->nxt_chd^0x1;
 			size_t q = bitvec_count(parent->bv, bit);
 			tmp_wtnode *new_node = tmp_wtnode_new(q);
-			bitvec_append_n(new_node->bv, q-1, 0x0);
-			bitvec_append(new_node->bv, 0x1);
+			bitvec_push_n(new_node->bv, q-1, 0x0);
+			bitvec_push(new_node->bv, 0x1);
 			new_node->chr[LEFT] = parent->chr[bit];
 			new_node->chr[RIGHT] = c;
 			parent->chd[bit] = new_node;
@@ -317,7 +317,7 @@ static void tmp_wt_fill( tmp_wavtree *twt, strstream *sst )
 static void tmp_wt_fill_online( tmp_wavtree *twt, strstream *sst )
 {
 	bitvec *chcode;
-	dynstr *ab_chars = dynstr_new_with_capacity(UCHAR_MAX);
+	strbuf *ab_chars = strbuf_new_with_capacity(UCHAR_MAX);
 	strstream_reset(sst);
 	for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
 		chcode = get_charcode(twt->chrcodes, c);
@@ -327,12 +327,12 @@ static void tmp_wt_fill_online( tmp_wavtree *twt, strstream *sst )
 			chcode = bitvec_clone(twt->nxt_charcode);
 			chrcode_incr(twt->nxt_charcode);
 			set_charcode(twt->chrcodes, c, chcode);
-			dstr_append_char(ab_chars, (char)c);
+			strbuf_append_char(ab_chars, (char)c);
 			tmp_wt_app_new_char(twt->tmp_root, c, chcode);
 		}
 		(twt->len)++;
 	}
-	twt->ab = alphabet_new(dstr_len(ab_chars), dstr_detach(ab_chars));
+	twt->ab = alphabet_new(strbuf_len(ab_chars), strbuf_detach(ab_chars));
 	twt->own_alphabet = true;
 }
 
@@ -726,11 +726,11 @@ xchar_t wavtree_char(wavtree *wt, size_t pos)
 void _wt_node_print(wavtree *wt, size_t cur, size_t depth)
 {
 	size_t i;
-	dynstr *dmargin = dynstr_new_with_capacity(2*depth+2);
+	strbuf *dmargin = strbuf_new_with_capacity(2*depth+2);
 	for (i=0; i<depth; i++)
-		dstr_append(dmargin, "  ");
-	dstr_append(dmargin, "| ");
-	char *margin = dstr_detach(dmargin);
+		strbuf_append(dmargin, "  ");
+	strbuf_append(dmargin, "| ");
+	char *margin = strbuf_detach(dmargin);
 	if (cur >= wt->nnodes) {
 		printf ("%s@wtree_node NULL\n",margin);
 	} else {
@@ -765,12 +765,12 @@ void wavtree_print(wavtree *wt)
 	if (ab_type(wt->ab)==CHAR_TYPE) {
 		printf ("  char codes:\n");
 		bitvec *code;
-		dynstr *codestr = dynstr_new_with_capacity(2);
+		strbuf *codestr = strbuf_new_with_capacity(2);
 		for (xchar_t c=0; c<=UCHAR_MAX; c++) {
 			if ((code=get_charcode(wt->chrcodes, c)) != NULL_CODE) {
-				dstr_clear(codestr);
+				strbuf_clear(codestr);
 				bitvec_to_string(code, codestr, 4);
-				printf("charcode %c:\n%s\n", (char)c, dstr_as_str(codestr));
+				printf("charcode %c:\n%s\n", (char)c, strbuf_as_str(codestr));
 				//uint_to_cstr(chcodestr, code, 'b');
 				//cstr_revert(chcodestr, chcode_bits);
 				//printf ("    %c : %s\n", (char)c, chcodestr);

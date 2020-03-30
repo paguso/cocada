@@ -182,7 +182,7 @@ char bitarr_read_char(const byte_t *src, size_t from_bit,
 	bitarr_write( (byte_t *)&ret, BYTESIZE*sizeof(char)-nbits, src, from_bit,
 	              nbits );
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(char));
+		bytearr_reverse((byte_t *)&ret, sizeof(char));
 	}
 	return ret;
 }
@@ -195,7 +195,7 @@ unsigned char bitarr_read_uchar(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(unsigned char)-nbits, src,
 	             from_bit, nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(unsigned char));
+		bytearr_reverse((byte_t *)&ret, sizeof(unsigned char));
 	}
 	return ret;
 }
@@ -211,7 +211,7 @@ short bitarr_read_short(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(short)-nbits, src, from_bit,
 	             nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(short));
+		bytearr_reverse((byte_t *)&ret, sizeof(short));
 	}
 	return ret;
 }
@@ -224,7 +224,7 @@ unsigned short bitarr_read_ushort(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(unsigned short)-nbits, src,
 	             from_bit, nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(unsigned short));
+		bytearr_reverse((byte_t *)&ret, sizeof(unsigned short));
 	}
 	return ret;
 }
@@ -240,7 +240,7 @@ int bitarr_read_int(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(int)-nbits, src, from_bit,
 	             nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(int));
+		bytearr_reverse((byte_t *)&ret, sizeof(int));
 	}
 	return ret;
 }
@@ -253,7 +253,7 @@ unsigned int bitarr_read_uint(const byte_t *src, size_t from_bit,
 	bitarr_write( (byte_t *)&ret, BYTESIZE*sizeof(unsigned int)-nbits, src,
 	              from_bit, nbits );
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(unsigned int));
+		bytearr_reverse((byte_t *)&ret, sizeof(unsigned int));
 	}
 	return ret;
 }
@@ -269,7 +269,7 @@ long bitarr_read_long(const byte_t *src, size_t from_bit,
 	bitarr_write( (byte_t *)&ret, BYTESIZE*sizeof(long)-nbits, src, from_bit,
 	              nbits );
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(long));
+		bytearr_reverse((byte_t *)&ret, sizeof(long));
 	}
 	return ret;
 }
@@ -282,7 +282,7 @@ unsigned long bitarr_read_ulong(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(unsigned long)-nbits, src,
 	             from_bit, nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(unsigned long));
+		bytearr_reverse((byte_t *)&ret, sizeof(unsigned long));
 	}
 	return ret;
 }
@@ -298,7 +298,7 @@ long long bitarr_read_longlong(const byte_t *src, size_t from_bit,
 	bitarr_write( (byte_t *)&ret, BYTESIZE*sizeof(long long)-nbits, src,
 	              from_bit, nbits );
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(long long));
+		bytearr_reverse((byte_t *)&ret, sizeof(long long));
 	}
 	return ret;
 }
@@ -311,7 +311,7 @@ unsigned long long bitarr_read_ulonglong(const byte_t *src,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(unsigned long long)-nbits, src,
 	             from_bit, nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(unsigned long long));
+		bytearr_reverse((byte_t *)&ret, sizeof(unsigned long long));
 	}
 	return ret;
 }
@@ -324,7 +324,7 @@ size_t bitarr_read_size(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(size_t)-nbits, src, from_bit,
 	             nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(size_t));
+		bytearr_reverse((byte_t *)&ret, sizeof(size_t));
 	}
 	return ret;
 }
@@ -337,7 +337,7 @@ byte_t bitarr_read_byte(const byte_t *src, size_t from_bit,
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(byte_t)-nbits, src, from_bit,
 	             nbits);
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&ret, sizeof(byte_t));
+		bytearr_reverse((byte_t *)&ret, sizeof(byte_t));
 	}
 	return ret;
 }
@@ -459,7 +459,7 @@ void bitarr_write_char(byte_t *dest, size_t from_bit, char val,
                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(char));
+		bytearr_reverse((byte_t *)&val, sizeof(char));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(char)-nbits,
 	             nbits);
@@ -470,7 +470,7 @@ void bitarr_write_uchar(byte_t *dest, size_t from_bit, unsigned char val,
                         size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned char));
+		bytearr_reverse((byte_t *)&val, sizeof(unsigned char));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val,
 	             BYTESIZE*sizeof(unsigned char)-nbits, nbits);
@@ -481,7 +481,7 @@ void bitarr_write_short(byte_t *dest, size_t from_bit, short val,
                         size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(short));
+		bytearr_reverse((byte_t *)&val, sizeof(short));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(short)-nbits,
 	             nbits);
@@ -492,7 +492,7 @@ void bitarr_write_ushort(byte_t *dest, size_t from_bit,
                          unsigned short val, size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned short));
+		bytearr_reverse((byte_t *)&val, sizeof(unsigned short));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val,
 	             BYTESIZE*sizeof(unsigned short)-nbits, nbits);
@@ -503,7 +503,7 @@ void bitarr_write_int(byte_t *dest, size_t from_bit, int val,
                       size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(int));
+		bytearr_reverse((byte_t *)&val, sizeof(int));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(int)-nbits,
 	             nbits);
@@ -514,7 +514,7 @@ void bitarr_write_uint(byte_t *dest, size_t from_bit, unsigned int val,
                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned int));
+		bytearr_reverse((byte_t *)&val, sizeof(unsigned int));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val,
 	             BYTESIZE*sizeof(unsigned int)-nbits, nbits);
@@ -525,7 +525,7 @@ void bitarr_write_long(byte_t *dest, size_t from_bit, long val,
                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(long));
+		bytearr_reverse((byte_t *)&val, sizeof(long));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(long)-nbits,
 	             nbits);
@@ -536,7 +536,7 @@ void bitarr_write_ulong(byte_t *dest, size_t from_bit, unsigned long val,
                         size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned long));
+		bytearr_reverse((byte_t *)&val, sizeof(unsigned long));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val,
 	             BYTESIZE*sizeof(unsigned long)-nbits, nbits);
@@ -547,7 +547,7 @@ void bitarr_write_longlong(byte_t *dest, size_t from_bit, long long val,
                            size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(long long));
+		bytearr_reverse((byte_t *)&val, sizeof(long long));
 	}
 	bitarr_write( dest, from_bit, (byte_t *)&val,
 	              BYTESIZE*sizeof(long long)-nbits, nbits );
@@ -558,7 +558,7 @@ void bitarr_write_ulonglong(byte_t *dest, size_t from_bit,
                             unsigned long long val, size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(unsigned long long));
+		bytearr_reverse((byte_t *)&val, sizeof(unsigned long long));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val,
 	             BYTESIZE*sizeof(unsigned long long)-nbits, nbits);
@@ -569,7 +569,7 @@ void bitarr_write_byte(byte_t *dest, size_t from_bit, byte_t val,
                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(byte_t));
+		bytearr_reverse((byte_t *)&val, sizeof(byte_t));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(byte_t)-nbits,
 	             nbits);
@@ -580,7 +580,7 @@ void bitarr_write_size(byte_t *dest, size_t from_bit, size_t val,
                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
-		bytearr_flip_bytes((byte_t *)&val, sizeof(size_t));
+		bytearr_reverse((byte_t *)&val, sizeof(size_t));
 	}
 	bitarr_write(dest, from_bit, (byte_t *)&val, BYTESIZE*sizeof(size_t)-nbits,
 	             nbits);

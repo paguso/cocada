@@ -67,9 +67,9 @@ void test_xstring_to_string(CuTest *tc)
 	for (xchar_t i=0; i<l; i++) {
 		xstr_push(xs, i);
 	}
-	dynstr *ds = dynstr_new();
+	strbuf *ds = strbuf_new();
 	xstr_to_string(xs, ds);
-	printf("%s\n",dstr_as_str(ds));
+	printf("%s\n",strbuf_as_str(ds));
 }
 
 CuSuite *xstring_get_test_suite()

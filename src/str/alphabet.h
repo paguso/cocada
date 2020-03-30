@@ -75,7 +75,7 @@ typedef size_t (*char_rank_func)(xchar_t c);
  * @brief Creates a char alphabet from a string with letters in
  *        lexicographic order.
  * @param size Number of letters.
- * @param letters String with letters in lexicographic order.
+ * @param letters (no transfer) String with letters in lexicographic order.
  */
 alphabet *alphabet_new(const size_t size, const char *letters);
 

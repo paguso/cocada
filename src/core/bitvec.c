@@ -63,7 +63,7 @@ bitvec *bitvec_new_with_capacity(size_t capacity)
 }
 
 
-bitvec *bitvec_new_from_bitarray(const byte_t *src, size_t len)
+bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 {
 	bitvec *bv = bitvec_new_with_capacity(len);
 	memcpy(bv->bits, src, multceil(len, BYTESIZE));
@@ -194,7 +194,7 @@ static void _growto(bitvec *bv, size_t new_byte_cap)
 }
 
 
-void bitvec_append (bitvec *bv, bool bit)
+void bitvec_push (bitvec *bv, bool bit)
 {
 	//bv->bits[bv->len/BYTESIZE] ^= ( ((-bit)^(bv->bits[bv->len/BYTESIZE]))
 	//                                 & (BYTE_MSB>>(bv->len % BYTESIZE)) );
@@ -204,7 +204,7 @@ void bitvec_append (bitvec *bv, bool bit)
 }
 
 
-void bitvec_append_n (bitvec *bv, size_t nbits, bool bit)
+void bitvec_push_n (bitvec *bv, size_t nbits, bool bit)
 {
 	if (bv->len+nbits >= bv->cap) { // HAS to be >=, not >
 		_growto(bv, GROW_BY*(size_t)(multceil(bv->len+nbits, BYTESIZE)));
@@ -244,7 +244,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src)
 }
 
 
-void bitvec_trim(bitvec *bv)
+void bitvec_fit(bitvec *bv)
 {
 	bv->byte_cap = MAX(1, (size_t)multceil(bv->len, BYTESIZE));
 	bv->cap = bv->byte_cap*BYTESIZE;
@@ -261,25 +261,25 @@ byte_t *bitvec_detach (bitvec *bv)
 }
 
 
-void bitvec_to_string (const bitvec *bv, dynstr *dest, size_t bytes_per_line)
+void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 {
 	int line_label_width = (bv->len>1)?ceil(log10(bv->len)):1;
 	char *lbl = cstr_new(line_label_width);
 	size_t bits_per_line = bytes_per_line * BYTESIZE;
 	for (size_t i=0; i<bv->len; i++ )  {
 		if ( i % bits_per_line == 0) {
-			if (i) dstr_append(dest, "\n");
-			dstr_append(dest, "[");
+			if (i) strbuf_append(dest, "\n");
+			strbuf_append(dest, "[");
 			sprintf(lbl, "%*zu", line_label_width, i);
-			dstr_append(dest, lbl);
-			dstr_append(dest, ":");
+			strbuf_append(dest, lbl);
+			strbuf_append(dest, ":");
 			sprintf(lbl, "%*zu", line_label_width, MAX(bv->len, i+bits_per_line));
-			dstr_append(dest, lbl);
-			dstr_append(dest, "]");
+			strbuf_append(dest, lbl);
+			strbuf_append(dest, "]");
 		}
 		if ( i % BYTESIZE == 0 )
-			dstr_append(dest, " ");
-		dstr_append(dest, bitvec_get_bit(bv,i)?"1":"0" );
+			strbuf_append(dest, " ");
+		strbuf_append(dest, bitvec_get_bit(bv,i)?"1":"0" );
 	}
 }
 

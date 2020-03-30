@@ -20,6 +20,8 @@
  */
 
 #include <string.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "vec.h"
 #include "arrutil.h"
@@ -29,16 +31,14 @@
 
 
 struct _binheap {
-	heap_mode mode;
 	vec *data;
 	cmp_func cmp;
 };
 
 binheap *binheap_new( cmp_func cmp,
-                      size_t typesize, heap_mode mode )
+                      size_t typesize )
 {
 	binheap *heap = NEW(binheap);
-	heap->mode = mode;
 	heap->data = vec_new(typesize);
 	heap->cmp = cmp;
 	return heap;
@@ -70,23 +70,11 @@ size_t binheap_size(const binheap *heap)
 static size_t _bubble_up(binheap *heap)
 {
 	size_t i=binheap_size(heap)-1;
-	switch (heap->mode) {
-	case MIN_HEAP:
-		while ( i>0 &&
-		        heap->cmp( vec_get(heap->data, i),
-		                   vec_get(heap->data, (i-1)/2) ) < 0 ) {
-			vec_swap(heap->data, i, (i-1)/2);
-			i = (i-1)/2;
-		}
-		break;
-	case MAX_HEAP:
-		while ( i>0 &&
-		        heap->cmp( vec_get(heap->data, i),
-		                   vec_get(heap->data, (i-1)/2) ) > 0 )  {
-			vec_swap(heap->data, i, (i-1)/2);
-			i = (i-1)/2;
-		}
-		break;
+	while ( i>0 &&
+			heap->cmp( vec_get(heap->data, i),
+						vec_get(heap->data, (i-1)/2) ) > 0 )  {
+		vec_swap(heap->data, i, (i-1)/2);
+		i = (i-1)/2;
 	}
 	return i;
 }
@@ -97,57 +85,28 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 	size_t i, l, r, m, n;
 	n = binheap_size(heap);
 	i = pos;
-	switch (heap->mode) {
-	default:
-	case MIN_HEAP:
-		while (true) {
-			m = i;
-			l = (2*i)+1;
-			r = (2*i)+2;
-			if ( l < n &&
-			        heap->cmp( vec_get(heap->data, l),
-			                   vec_get(heap->data, m) ) < 0 )  {
-				m = l;
-			}
-			if ( r < n &&
-			        heap->cmp( vec_get(heap->data, r),
-			                   vec_get(heap->data, m) ) < 0 ) {
-				m = r;
-			}
-			if ( m != i ) {
-				vec_swap(heap->data, i, m);
-				i = m;
-			} else {
-				break;
-			}
+	while (true) {
+		m = i;
+		l = (2*i)+1;
+		r = (2*i)+2;
+		if ( l < n &&
+				heap->cmp( vec_get(heap->data, l),
+							vec_get(heap->data, m) ) > 0 ) {
+			m = l;
 		}
-		return i;
-		break;
-	case MAX_HEAP:
-		while (true) {
-			m = i;
-			l = (2*i)+1;
-			r = (2*i)+2;
-			if ( l < n &&
-			        heap->cmp( vec_get(heap->data, l),
-			                   vec_get(heap->data, m) ) > 0 ) {
-				m = l;
-			}
-			if ( r < n &&
-			        heap->cmp( vec_get(heap->data, r),
-			                   vec_get(heap->data, m) ) > 0 ) {
-				m = r;
-			}
-			if ( m != i ) {
-				vec_swap(heap->data, i, m);
-				i = m;
-			} else {
-				break;
-			}
+		if ( r < n &&
+				heap->cmp( vec_get(heap->data, r),
+							vec_get(heap->data, m) ) > 0 ) {
+			m = r;
 		}
-		return i;
-		break;
+		if ( m != i ) {
+			vec_swap(heap->data, i, m);
+			i = m;
+		} else {
+			break;
+		}
 	}
+	return i;
 }
 
 
@@ -182,5 +141,20 @@ void binheap_pop(binheap *heap, void *dest)
 BINHEAP_PUSH_IMPL(TYPE)\
 BINHEAP_POP_IMPL(TYPE)
 
+
+BINHEAP_ALL_IMPL(byte_t)
+BINHEAP_ALL_IMPL(char)
+BINHEAP_ALL_IMPL(short)
 BINHEAP_ALL_IMPL(int)
+BINHEAP_ALL_IMPL(long)
+BINHEAP_ALL_IMPL(float)
+BINHEAP_ALL_IMPL(double)
 BINHEAP_ALL_IMPL(size_t)
+BINHEAP_ALL_IMPL(int8_t)
+BINHEAP_ALL_IMPL(int16_t)
+BINHEAP_ALL_IMPL(int32_t)
+BINHEAP_ALL_IMPL(int64_t)
+BINHEAP_ALL_IMPL(uint8_t)
+BINHEAP_ALL_IMPL(uint16_t)
+BINHEAP_ALL_IMPL(uint32_t)
+BINHEAP_ALL_IMPL(uint64_t)

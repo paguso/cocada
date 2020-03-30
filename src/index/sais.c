@@ -71,23 +71,23 @@ static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
 		cmp = ab_cmp(ab, CHAR_AT(str, i-1), CHAR_AT(str,i));
 		if (cmp==0) continue;
 		ls = (cmp>0);
-		bitvec_append_n(lsvec, i-last, ls);
-		bitvec_append(lmsvec, (last>0 && ls==S && lastls==L));
-		bitvec_append_n(lmsvec, (i-last-1), false);
+		bitvec_push_n(lsvec, i-last, ls);
+		bitvec_push(lmsvec, (last>0 && ls==S && lastls==L));
+		bitvec_push_n(lmsvec, (i-last-1), false);
 		bkts[ab_rank(ab, CHAR_AT(str,i-1))] += (i-last);
 		last = i;
 		lastls = ls;
 	}
 	if (add_sentinel) {
 		// last run
-		bitvec_append_n(lsvec, len-last, L);
-		bitvec_append(lmsvec, (last>0 && ls==S && lastls==L));
-		bitvec_append_n(lmsvec, (len-last-1), false);
+		bitvec_push_n(lsvec, len-last, L);
+		bitvec_push(lmsvec, (last>0 && ls==S && lastls==L));
+		bitvec_push_n(lmsvec, (len-last-1), false);
 		bkts[ab_rank(ab, CHAR_AT(str,len-1))] += (len-last);
 	}
 	// last run must be the sentinel
-	bitvec_append(lsvec, S);
-	bitvec_append(lmsvec, true);
+	bitvec_push(lsvec, S);
+	bitvec_push(lmsvec, true);
 	bkts[0] = 1;
 }
 

@@ -31,16 +31,14 @@
  * @file deque.h
  * @author Paulo Fonseca
  *
- * @brief Double-eneded queue (deque) ADT.
- * This defines a queue with insert/remove operations at
- * both extremities.
- * It is implemented as a circular buffer with static capacity
- * which gets reallocated on demand.
+ * @brief Double-ended queue (deque).
+ * A deque is a queue with insert/remove operations at both extremities, 
+ * implemented as a circular buffer.
  */
 
 
 /**
- * Deque type
+ * Opaque deque type
  */
 typedef struct _deque deque;
 
@@ -94,7 +92,7 @@ const void *deque_get(const deque *q, size_t pos);
 
 
 /**
- * @brief Returns an internal reference to the element at a given position.
+ * @brief Copies the element at a given position into @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
 void deque_get_cpy(const deque *q, size_t pos, void *dest);

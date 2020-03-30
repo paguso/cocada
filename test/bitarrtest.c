@@ -28,7 +28,7 @@
 
 #include "bitsandbytes.h"
 #include "bitarr.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "new.h"
 #include "mathutil.h"
 

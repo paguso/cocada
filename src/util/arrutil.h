@@ -26,7 +26,7 @@
 
 #include "bitsandbytes.h"
 #include "new.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 
 /**
  * @file arrayutil.h
@@ -39,12 +39,6 @@
  * @brief Allocates a new array of N elements of a given TYPE.
  */
 #define NEW_ARR( TYPE, N ) ((N>0)?((TYPE*)(malloc((N)*sizeof(TYPE)))):NULL)
-
-
-/**
- * @brief Allocates a new array of N elements of a given TYPE.
- */
-#define NEW_ARR_SZOF( TYPE, N , SZOF) ((N>0)?((TYPE*)(malloc((N)*(SZOF)))):NULL)
 
 
 /**

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CSTRINGUTIL_H
-#define CSTRINGUTIL_H
+#ifndef CSTRUTIL_H
+#define CSTRUTIL_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #include "new.h"
 
 /**
- * @file cstringutil.h
+ * @file cstrutil.h
  * @author Paulo Fonseca
  *
  * @brief Plain C strings (char *) manipulation functions.

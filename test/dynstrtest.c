@@ -25,68 +25,68 @@
 
 #include "CuTest.h"
 
-#include "dynstr.h"
+#include "strbuf.h"
 
 
 
-void dynstr_test_setup(CuTest *tc)
+void strbuf_test_setup(CuTest *tc)
 {
 }
 
-void test_dstr_new_from_str(CuTest *tc)
+void test_strbuf_new_from_str(CuTest *tc)
 {
 	char *str = (char *)malloc(11*sizeof(char));
 	strcpy(str, "0123456789");
 	str[10]='\0';
-	dynstr *dstr;
-	dstr = dynstr_new_from_str(str);
-	CuAssertSizeTEquals(tc, 10, dstr_len(dstr));
-	CuAssertStrEquals(tc, str, dstr_as_str(dstr));
-	dynstr_free(dstr);
+	strbuf *dstr;
+	dstr = strbuf_new_from_str(str);
+	CuAssertSizeTEquals(tc, 10, strbuf_len(dstr));
+	CuAssertStrEquals(tc, str, strbuf_as_str(dstr));
+	strbuf_free(dstr);
 }
 
-void test_dstr_get(CuTest *tc)
+void test_strbuf_get(CuTest *tc)
 {
 	char *str = (char *)malloc(11*sizeof(char));
 	strcpy(str, "0123456789");
 	str[10]='\0';
-	dynstr *dstr;
-	dstr = dynstr_new_from_str(str);
-	for (size_t i=0; i<dstr_len(dstr); i++) {
-		CuAssertIntEquals(tc, dstr_get(dstr, i), '0'+(i%10));
+	strbuf *dstr;
+	dstr = strbuf_new_from_str(str);
+	for (size_t i=0; i<strbuf_len(dstr); i++) {
+		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0'+(i%10));
 	}
-	dynstr_free(dstr);
+	strbuf_free(dstr);
 }
 
-void test_dstr_append_char(CuTest *tc)
+void test_strbuf_append_char(CuTest *tc)
 {
 	char *str = (char *)malloc(11*sizeof(char));
 	strcpy(str, "0123456789");
 	str[10]='\0';
-	dynstr *dstr;
-	dstr = dynstr_new_from_str(str);
+	strbuf *dstr;
+	dstr = strbuf_new_from_str(str);
 	for (size_t i=0; i<1000; i++) {
-		dstr_append_char(dstr, '0'+(i%10));
+		strbuf_append_char(dstr, '0'+(i%10));
 	}
-	for (size_t i=0; i<dstr_len(dstr); i++) {
-		CuAssertIntEquals(tc, dstr_get(dstr, i), '0'+(i%10));
+	for (size_t i=0; i<strbuf_len(dstr); i++) {
+		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0'+(i%10));
 	}
-	//printf("final dynstr = %s\ncapacity=%zu\n", dstr_as_str(dstr), dstr_capacity(dstr));
-	dynstr_free(dstr);
+	//printf("final strbuf = %s\ncapacity=%zu\n", strbuf_as_str(dstr), strbuf_capacity(dstr));
+	strbuf_free(dstr);
 }
 
-void dynstr_test_teardown(CuTest *tc)
+void strbuf_test_teardown(CuTest *tc)
 {
 }
 
 
-CuSuite *dynstr_get_test_suite()
+CuSuite *strbuf_get_test_suite()
 {
 	CuSuite* suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, dynstr_test_setup);
-	SUITE_ADD_TEST(suite, test_dstr_new_from_str);
-	SUITE_ADD_TEST(suite, test_dstr_get);
-	SUITE_ADD_TEST(suite, test_dstr_append_char);
-	SUITE_ADD_TEST(suite, dynstr_test_teardown);
+	SUITE_ADD_TEST(suite, strbuf_test_setup);
+	SUITE_ADD_TEST(suite, test_strbuf_new_from_str);
+	SUITE_ADD_TEST(suite, test_strbuf_get);
+	SUITE_ADD_TEST(suite, test_strbuf_append_char);
+	SUITE_ADD_TEST(suite, strbuf_test_teardown);
 	return suite;
 }

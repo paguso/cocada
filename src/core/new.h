@@ -205,10 +205,10 @@ hierarchies of nested objects. COCADA provides some infrastructure for
 dealing with the proper disposal of  complex hierarchies of objects.
 
 The basic concept is that of a **destructor** ::dtor which encapsulates and
-provides a way of nesting **destructor functions** ::dstr_func used for
+provides a way of nesting **destructor functions** ::strbuf_func used for
 finalising object hierarchies. A destructor is a  *closure* object
 composed of
-- A reference to a *destructor function* ::dstr_func; and
+- A reference to a *destructor function* ::strbuf_func; and
 - An array of child destructors.
 
 A *destructor function* is a function used to dispose of the  memory used by an
@@ -394,11 +394,11 @@ typedef struct _dtor dtor;
 /**
  * Destructor function type
  */
-typedef void (*dstr_func) (void *, const dtor *);
+typedef void (*strbuf_func) (void *, const dtor *);
 
 
 struct _dtor {
-	dstr_func df;
+	strbuf_func df;
 	size_t nchd;
 	struct _dtor **chd;
 };
@@ -406,7 +406,7 @@ struct _dtor {
 /**
  * @brief Creates a new destructor with destructof function.
  */
-dtor *dtor_new_with_func(dstr_func df);
+dtor *dtor_new_with_func(strbuf_func df);
 
 /**
  * @brief Recursively frees a destructor.

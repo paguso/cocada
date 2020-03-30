@@ -113,6 +113,6 @@ const fasta_rec *fasta_next(fasta *self);
 
 
 /**
- * @brief Closes the reader and releases used resources
+ * @brief Destructor. Closes the reader and releases used resources
  */
 void fasta_close(fasta *self);

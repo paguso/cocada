@@ -25,7 +25,7 @@
 #include "new.h"
 
 
-dtor *dtor_new_with_func( dstr_func df )
+dtor *dtor_new_with_func( strbuf_func df )
 {
 	dtor *dt = NEW(dtor);
 	dt->df = df;

@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "new.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 
 
 char *cstr_new(size_t len)

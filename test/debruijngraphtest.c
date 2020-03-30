@@ -26,9 +26,9 @@
 #include "CuTest.h"
 
 #include "arrutil.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "debruijngraph.h"
-#include "dynstr.h"
+#include "strbuf.h"
 #include "mathutil.h"
 #include "strstream.h"
 

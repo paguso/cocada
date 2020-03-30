@@ -32,7 +32,7 @@
 #include "new.h"
 #include "csarray.h"
 #include "csrsbitarray.h"
-#include "dynstr.h"
+#include "strbuf.h"
 #include "math.h"
 #include "mathutil.h"
 #include "sais.h"
@@ -90,21 +90,21 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	size_t lvl_len = len+1;  // sentinel added by sais
 	csa->lvl_len[0] = lvl_len;
 	bitvec *xchar_stops = bitvec_new_with_capacity(lvl_len);
-	bitvec_append_n(xchar_stops, lvl_len, 0);
-	dynstr *supp_ab_str = dynstr_new(); // string support alphabet chars
+	bitvec_push_n(xchar_stops, lvl_len, 0);
+	strbuf *supp_ab_str = strbuf_new(); // string support alphabet chars
 	size_t ndiff_xchars = 1;            // has at least the SENTINEL
-	dstr_append_char(supp_ab_str, SENTINEL);
+	strbuf_append_char(supp_ab_str, SENTINEL);
 	bitvec_set_bit(xchar_stops, 0, 1);
 	bitvec_set_bit(xchar_stops, lvl_len-1, 1);
 	//ndiff_xchars++;
 	for (size_t i=1; i<lvl_len; i++) {
 		if (str[sarr[i]] != str[sarr[i-1]]) {
 			bitvec_set_bit(xchar_stops, i-1, 1);
-			dstr_append_char(supp_ab_str, str[sarr[i]]);
+			strbuf_append_char(supp_ab_str, str[sarr[i]]);
 			ndiff_xchars++;
 		}
 	}
-	csa->xab = alphabet_new(ndiff_xchars, dstr_detach(supp_ab_str));
+	csa->xab = alphabet_new(ndiff_xchars, strbuf_detach(supp_ab_str));
 
 	// convert source string to "normalised" xstring
 	assert(ndiff_xchars < XCHAR_MAX);
@@ -149,15 +149,15 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		bitvec *even_suff = bitvec_new_with_capacity(lvl_len);
 		if(lvl == csa->nlevels - 1) {
 			for (size_t i = 0 ; i < lvl_len; i++)
-				bitvec_append(even_suff, IS_EVEN(sarr[i]));
+				bitvec_push(even_suff, IS_EVEN(sarr[i]));
 			break;
 		} else {
 			for (size_t i = 0, last = 0; i < lvl_len; i++) {
 				if (IS_EVEN(sarr[i])) {
-					bitvec_append(even_suff, 1);
+					bitvec_push(even_suff, 1);
 					sarr[last++] = sarr[i]/2;
 				} else
-					bitvec_append(even_suff, 0);
+					bitvec_push(even_suff, 0);
 			}
 		}
 		csa->even_bv[lvl] = csrsbitarr_new(bitvec_detach(even_suff), lvl_len);
@@ -166,7 +166,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		size_t nxt_lvl_len = (size_t) ceil(lvl_len/2.0f);
 		sarr_invert(sarr, nxt_lvl_len, sarr_inv);
 		xchar_stops = bitvec_new_with_capacity(nxt_lvl_len);
-		bitvec_append_n(xchar_stops, nxt_lvl_len, 0);
+		bitvec_push_n(xchar_stops, nxt_lvl_len, 0);
 		ndiff_xchars = 1;
 		xchar_t ai, bi, aiminus1, biminus1;
 		ai = xstr_get(cur_xstr, 2*sarr[0]);
@@ -221,11 +221,11 @@ void csarray_print(csarray *csa)
 		//csrsbitarr_print(csa->char_stop_bv[lvl], 4);
 		//printf("\tphi_wt[%zu]: ", lvl);
 		//wavtree_print(csa->phi_wt[lvl]);
-		//dynstr *phi = dynstr_new();
+		//strbuf *phi = strbuf_new();
 		//xstr_to_string(csa->phi_str[lvl], phi);
 		//printf("\tphi_str[%zu]:\n\t", lvl);
-		//printf("%s\n", dstr_as_str(phi));
-		//dynstr_free(phi);
+		//printf("%s\n", strbuf_as_str(phi));
+		//strbuf_free(phi);
 	}
 	PRINT_ARR(csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
 	PRINT_ARR(csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);

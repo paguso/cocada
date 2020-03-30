@@ -40,10 +40,10 @@ const static float  MIN_LOAD = 0.5;   // (!) GROW_BY*MIN_LOAD < 1
 
 struct _vec {
 	void *data;
+	void *swp;
 	size_t typesize;
 	size_t len;
 	size_t capacity;
-	void *swp;
 };
 
 
@@ -97,7 +97,7 @@ vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
 }
 
 
-void vec_trim(vec *v)
+void vec_fit(vec *v)
 {
 	v->capacity = v->len;
 	v->data = realloc(v->data, v->capacity * v->typesize);
@@ -171,7 +171,7 @@ void vec_clear(vec *v)
 
 void *vec_detach(vec *v)
 {
-	vec_trim(v);
+	vec_fit(v);
 	void *data = v->data;
 	FREE(v);
 	return data;

@@ -34,8 +34,8 @@
 #include "bitvec.h"
 #include "bytearr.h"
 #include "new.h"
-#include "cstringutil.h"
-#include "dynstr.h"
+#include "cstrutil.h"
+#include "strbuf.h"
 #include "huffcode.h"
 #include "mathutil.h"
 #include "strstats.h"
@@ -68,7 +68,7 @@ typedef struct {
 
 static int nodefreq_cmp(const void *p1, const void *p2)
 {
-	return (*((size_t *)p1) - *((size_t *)p2));
+	return (*((size_t *)p2) - *((size_t *)p1));
 }
 
 
@@ -77,7 +77,7 @@ static void fill_code_table( huffcode *hcode, hufftnode *node, size_t code_len,
                              byte_t *code )
 {
 	if (hufftnode_is_leaf(node)) {
-		hcode->code[node->chr_rank] = bitvec_new_from_bitarray(code, code_len);
+		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
 		//printf("code of %c = %s\n",ab_char(hcode->ab, node->chr_rank), code);
 	} else {
 		bitarr_set_bit(code, code_len, 0);
@@ -107,7 +107,7 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
 		bitarr_set_bit(hcode->tree[i].ab_mask, i, 1);
 	}
 
-	binheap *nfheap = binheap_new(&nodefreq_cmp, sizeof(nodefreq), MIN_HEAP);
+	binheap *nfheap = binheap_new(&nodefreq_cmp, sizeof(nodefreq));
 	for (size_t i=0; i<hcode->size; i++) {
 		nodefreq nf = {.node =i, .freq=freqs[i]};
 		binheap_push(nfheap, &nf);

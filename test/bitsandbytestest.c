@@ -27,7 +27,7 @@
 #include "CuTest.h"
 
 #include "bitsandbytes.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 
 void test_byte_reverse(CuTest *tc)
 {

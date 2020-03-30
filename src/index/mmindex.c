@@ -155,8 +155,7 @@ void mmindex_index(mmindex * self, strread * sst)
 		for (size_t i = 0; i < nidx; i++) {
 			if (nread == self->k[i]) {
 				uint64_t kmer_rk = xstrhash_lex_sub(self->hasher, window,
-				                                    xstr_len(window) -
-				                                    self->k[i],
+				                                    xstr_len(window) - self->k[i],
 				                                    xstr_len(window));
 				prev_right_rk[i] = kmer_rk;
 				prev_mm_rk[i] = kmer_rk;
@@ -169,8 +168,7 @@ void mmindex_index(mmindex * self, strread * sst)
 				// compute new last kmer rank and add it to the new window
 				uint64_t kmer_rk =
 				    xstrhash_roll_lex_sub(self->hasher, window,
-				                          xstr_len(window) - self->k[i] -
-				                          1,
+				                          xstr_len(window) - self->k[i] - 1,
 				                          xstr_len(window) - 1,
 				                          prev_right_rk[i], c);
 				size_t kmer_pos = nread - self->k[i];
@@ -228,7 +226,7 @@ void mmindex_index(mmindex * self, strread * sst)
 	self->nseq += 1;
 
 
-	FREE(window, xstring);
+	xstring_free(window);
 	const dtor *mqdtor = DTOR(minqueue);
 	for (size_t i=0; i<nidx; i++) {
 		FINALISE(win_rks[i], mqdtor);

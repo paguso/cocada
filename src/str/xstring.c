@@ -88,13 +88,6 @@ void xstring_free(xstring *xs)
 }
 
 
-void xstring_dispose(void *ptr, const dtor *dt)
-{
-	xstring *self = (xstring *)ptr;
-	FREE(self->buf, vec);
-}
-
-
 void xstr_print(const xstring *xs)
 {
 	printf("xstring@%p {\n", xs);
@@ -108,10 +101,10 @@ void xstr_print(const xstring *xs)
 }
 
 
-void xstr_to_string (const xstring *xs, dynstr *dest)
+void xstr_to_string (const xstring *xs, strbuf *dest)
 {
 	for (size_t i=0, l=xstr_len(xs); i < l; i++) {
-		if (i) dstr_append(dest, "-");
+		if (i) strbuf_append(dest, "-");
 		xchar_t c = xstr_get(xs, i);
 		size_t  n = c;
 		size_t  ord = 1;
@@ -122,7 +115,7 @@ void xstr_to_string (const xstring *xs, dynstr *dest)
 			d[0] = '0' + (n/ord);
 			n = n % ord;
 			ord /= 10;
-			dstr_append(dest, d);
+			strbuf_append(dest, d);
 		}
 	}
 }
@@ -215,9 +208,9 @@ void xstr_ncpy( xstring *dest, size_t from_dest, const xstring *src,
 }
 
 
-void xstr_trim(xstring *xs)
+void xstr_fit(xstring *xs)
 {
-	vec_trim(xs->buf);
+	vec_fit(xs->buf);
 }
 
 

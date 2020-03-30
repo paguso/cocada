@@ -19,91 +19,91 @@
  *
  */
 
-#ifndef DYNSTR_H
-#define DYNSTR_H
+#ifndef STRBUF_H     
+#define STRBUF_H
 
 
 #include <stddef.h>
 
 
-typedef struct _dynstr dynstr;
+typedef struct _strbuf strbuf;
 
 /**
- * @file dynstr.h
+ * @file strbuf.h
  * @author Paulo Fonseca
  *
- * @brief Dynamic string (a.k.a. String buffer) ADT.
+ * @brief String buffer.
  */
 
 
 /**
- * @brief Creates an empty dynamic string with default capaciy.
+ * @brief Creates a new empty string buffer.
  */
-dynstr *dynstr_new();
+strbuf *strbuf_new();
 
 
 /**
- * @brief Creates an empty dynamic string with a given initial capacity.
+ * @brief Creates an empty string buffer with a given initial capacity.
  */
-dynstr *dynstr_new_with_capacity(size_t init_capacity);
+strbuf *strbuf_new_with_capacity(size_t init_capacity);
 
 
 /**
  * @brief Destructor.
  */
-void dynstr_free(dynstr *dstr);
+void strbuf_free(strbuf *sb);
 
 
 /**
- * @brief Creates a new dynamic string from a source static string @src.
+ * @brief Creates a new string buffer from a source static string @src.
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
  */
-dynstr *dynstr_new_from_str(char *src);
+strbuf *strbuf_new_from_str(char *src);
 
 
 /**
  * @brief Returns the "logical" length of a given dynamic string.
  */
-size_t dstr_len(dynstr *dstr);
+size_t strbuf_len(strbuf *sb);
 
 
 /**
  * @brief Returns the capacity (i.e. the "physical" length)
  *        of a given dynamic string.
  */
-size_t dstr_capacity(dynstr *dstr);
+size_t strbuf_capacity(strbuf *sb);
 
 
 /**
  * @brief Returns the character at a given position.
  */
-char dstr_get(dynstr *dstr, size_t pos);
+char strbuf_get(strbuf *sb, size_t pos);
 
 
 /**
  * @brief Sets all positions to '\0'.
  */
-void dstr_clear(dynstr *dstr);
+void strbuf_clear(strbuf *sb);
 
 
 /**
  * @brief Sets (overwrites) the character of a given position @p pos to @p c.
  */
-void dstr_set(dynstr *dtsr, size_t pos, char c);
+void strbuf_set(strbuf *sb, size_t pos, char c);
 
 
 /**
  * @brief Appends a copy of the contents of a static string @p suff.
  * @warning The source string @p suff is left untouched.
  */
-void dstr_append(dynstr *dstr, char *suff);
+void strbuf_append(strbuf *sb, char *suff);
 
 
 /**
  * @brief Appends a character @p c.
  */
-void dstr_append_char(dynstr *dstr, char c);
+void strbuf_append_char(strbuf *sb, char c);
 
 
 /**
@@ -112,7 +112,7 @@ void dstr_append_char(dynstr *dstr, char c);
  * @warning The internal string can change between calls and the returned
  *          reference can become NULL or invalid.
  */
-const char *dstr_as_str(dynstr *dstr);
+const char *strbuf_as_str(strbuf *sb);
 
 
 /**
@@ -120,8 +120,8 @@ const char *dstr_as_str(dynstr *dstr);
  *        trimming (removal of trailing unused positions).
  *
  * @see cstr_trim
- * @warning After this operation, the dynamic string @p dstr is destroyed.
+ * @warning After this operation, the dynamic string @p sb is destroyed.
  */
-char *dstr_detach(dynstr *dstr);
+char *strbuf_detach(strbuf *sb);
 
 #endif

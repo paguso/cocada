@@ -42,7 +42,7 @@ void bitvec_test_append(CuTest *tc)
 	bool bit;
 	for (int i=0; i<ba_size; i++) {
 		bit = ((byte_t)rand()%2);
-		bitvec_append(bv, bit);
+		bitvec_push(bv, bit);
 		array[i] = bit;
 	}
 	//bitvec_print(bv, 8);
@@ -66,7 +66,7 @@ void bitvec_test_append_n(CuTest *tc)
 		n = MAX(1, ((size_t)rand())%(ba_size-s));
 		bit = 1-bit;
 		//printf("current size=%zu adding %zu %c-bits\n",s, n, bit?'1':'0');
-		bitvec_append_n(bv, n, bit);
+		bitvec_push_n(bv, n, bit);
 		FILL_ARR(array, s, s+n, bit);
 		s += n;
 		//bitvec_print(bv, 8);
@@ -88,7 +88,7 @@ void bitvec_test_count(CuTest *tc)
 	size_t counts[2] = {0,0};
 	for (size_t i=0; i<ba_size; i++) {
 		bit = ((byte_t)rand()%2);
-		bitvec_append(bv, bit);
+		bitvec_push(bv, bit);
 		counts[bit]++;
 	}
 	/*

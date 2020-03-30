@@ -26,7 +26,7 @@
 #include <stddef.h>
 
 #include "bitsandbytes.h"
-#include "dynstr.h"
+#include "strbuf.h"
 #include "new.h"
 
 /**
@@ -58,7 +58,7 @@ bitvec *bitvec_new_with_capacity(size_t capacity);
  * @param src (no transfer) The source bit array
  * @param len Number of bits to be copied
  */
-bitvec *bitvec_new_from_bitarray(const byte_t *src, size_t len);
+bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len);
 
 
 /**
@@ -115,13 +115,13 @@ size_t bitvec_count(const bitvec *bv, bool bit);
 /**
  * @brief Appends a new @p bit.
  */
-void bitvec_append (bitvec *bv, bool bit);
+void bitvec_push (bitvec *bv, bool bit);
 
 
 /**
  * @brief Appends @p n new positions with the same @p bit value.
  */
-void bitvec_append_n (bitvec *bv, size_t n, bool bit);
+void bitvec_push_n (bitvec *bv, size_t n, bool bit);
 
 
 /**
@@ -133,9 +133,10 @@ void bitvec_cat (bitvec *bv, const bitvec *src);
 
 
 /**
- * @brief Frees unused space
+ * @brief Fits the bitvector internal buffer to its actual size, i.e. 
+ * deallocates unused memory.
  */
-void bitvec_trim(bitvec *bv);
+void bitvec_fit(bitvec *bv);
 
 
 /**
@@ -151,7 +152,7 @@ byte_t *bitvec_detach (bitvec *bv);
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
  *        as a single line.
  */
-void bitvec_to_string ( const bitvec *bv, dynstr *dest, size_t bytes_per_row);
+void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
 
 
 /**

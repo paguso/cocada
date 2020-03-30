@@ -36,7 +36,7 @@ CuSuite *csrsbitarr_get_test_suite();
 CuSuite *cstrutil_get_test_suite();
 CuSuite *dbgraph_get_test_suite();
 CuSuite *deque_get_test_suite();
-CuSuite *dynstr_get_test_suite();
+CuSuite *strbuf_get_test_suite();
 CuSuite *fasta_get_test_suite();
 CuSuite *hashmap_get_test_suite();
 CuSuite *hashset_get_test_suite();
@@ -76,7 +76,7 @@ void run_all_tests(void)
 	CuSuiteAddSuite(suite, strfileread_get_test_suite());
 	//CuSuiteAddSuite(suite, vec_get_test_suite());
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
-	//CuSuiteAddSuite(suite, dynstr_get_test_suite());
+	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	//CuSuiteAddSuite(suite, huffcode_get_test_suite());
 	//CuSuiteAddSuite(suite, queue_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());

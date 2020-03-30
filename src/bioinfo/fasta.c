@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "fasta.h"
 #include "new.h"
 #include "strread.h"
@@ -265,5 +265,6 @@ void fasta_close(fasta *self)
 {
 	fclose(self->src);
 	FREE(self->cur_rec.descr);
+	FREE(self->cur_rec.seq);
 	FREE(self->cur_rec_rd.descr);
 }

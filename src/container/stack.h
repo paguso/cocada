@@ -30,10 +30,7 @@
  * @file stack.h
  * @author Paulo Fonseca
  *
- * @brief Stack ADT: dynamic linear collection with LIFO access policy.
- *
- * This stack can store references to external objects as well as
- * internal primitive values via type-specific read/write operations.
+ * @brief Stack: dynamic linear collection with LIFO access policy.
  */
 
 
@@ -59,7 +56,7 @@ void stack_free(stack *s, bool free_elements);
 /**
  * @brief Destructor.
  */
-void stack_dispose(void *ptr, const dtor *dst);
+void stack_dispose(void *ptr, const dtor *dt);
 
 
 /**

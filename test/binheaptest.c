@@ -51,9 +51,7 @@ int cmp_dbl(const void *p1, const void *p2)
 void test_binheap_push_pop(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *minheap = binheap_new(&cmp_dbl, sizeof(double), MIN_HEAP);
-	binheap *maxheap = binheap_new(&cmp_dbl, sizeof(double), MAX_HEAP);
-	CuAssertSizeTEquals(tc, 0, binheap_size(minheap));
+	binheap *maxheap = binheap_new(&cmp_dbl, sizeof(double));
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
@@ -63,20 +61,10 @@ void test_binheap_push_pop(CuTest *tc)
 
 	for (size_t i =0; i<len; i++) {
 		double d = rv[i];
-		binheap_push(minheap, &d);
 		binheap_push(maxheap, &d);
-		CuAssertSizeTEquals(tc, i+1, binheap_size(minheap));
 		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
 	}
 
-
-	for (size_t i =0; i<len; i++) {
-		double d;
-		binheap_pop(minheap, &d);
-		//printf("minheap #%zu = %f\n",i, d);
-		CuAssertSizeTEquals(tc, len-i-1, binheap_size(minheap));
-		CuAssertDblEquals(tc, (double)i, d, 0.1);
-	}
 
 	for (size_t i =0; i<len; i++) {
 		double d;
@@ -86,7 +74,6 @@ void test_binheap_push_pop(CuTest *tc)
 		CuAssertDblEquals(tc, (double)(len-i-1), d, 0.1);
 	}
 
-	binheap_free(minheap, true);
 	binheap_free(maxheap, true);
 }
 
@@ -94,9 +81,7 @@ void test_binheap_push_pop(CuTest *tc)
 void test_binheap_push_pop_int(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *minheap = binheap_new(cmp_int, sizeof(int), MIN_HEAP);
-	binheap *maxheap = binheap_new(cmp_int, sizeof(int), MAX_HEAP);
-	CuAssertSizeTEquals(tc, 0, binheap_size(minheap));
+	binheap *maxheap = binheap_new(cmp_int, sizeof(int));
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	int rv[len];
@@ -104,20 +89,10 @@ void test_binheap_push_pop_int(CuTest *tc)
 	shuffle_arr(rv, len, sizeof(int));
 
 	for (size_t i =0; i<len; i++) {
-		binheap_push_int(minheap, rv[i]);
 		binheap_push_int(maxheap, rv[i]);
-		CuAssertSizeTEquals(tc, i+1, binheap_size(minheap));
 		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
 	}
 
-
-	for (size_t i =0; i<len; i++) {
-		int d;
-		d = binheap_pop_int(minheap);
-		//printf("minheap #%zu = %d\n",i,d);
-		CuAssertSizeTEquals(tc, len-i-1, binheap_size(minheap));
-		CuAssertIntEquals(tc, (int)i, d);
-	}
 
 	for (size_t i =0; i<len; i++) {
 		int d;
@@ -127,7 +102,6 @@ void test_binheap_push_pop_int(CuTest *tc)
 		CuAssertIntEquals(tc, (int)(len-i-1), d);
 	}
 
-	binheap_free(minheap, false);
 	binheap_free(maxheap, false);
 }
 

@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "cstringutil.h"
+#include "cstrutil.h"
 
 
 

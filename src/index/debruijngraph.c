@@ -31,10 +31,10 @@
 #include "bytearr.h"
 #include "new.h"
 #include "csrsbitarray.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "debruijngraph.h"
 #include "vec.h"
-#include "dynstr.h"
+#include "strbuf.h"
 #include "mathutil.h"
 #include "strstream.h"
 #include "wavtree.h"
@@ -158,7 +158,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	for (xchar_t c; (c=strstream_getc(sst))!=XEOF; )
 		xstr_push(padstr, (xchar_t)(ab_rank(ab, c) + 1));
 	xstr_push(padstr, SENTINEL);
-	xstr_trim(padstr);
+	xstr_fit(padstr);
 	//xstr_print(padstr);
 
 	// build list of k+1mers
@@ -170,32 +170,32 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
 	//printf("kmers before sort:\n");
 	//xstring *kmstr = xstring_new(sizeof_ext_char);
-	//dynstr *kmdstr = dynstr_new();
+	//strbuf *kmdstr = strbuf_new();
 	//for (size_t i=0, l=vec_len(kp1mers); i<l; i++) {
 	//    kmer_t *kp1mer = *(kmer_t **)vec_get(kp1mers, i);
 	//    xstr_ncpy(kmstr, 0, kp1mer->txt, kp1mer->pos, k+1);
 	//    xstr_to_string(kmstr, kmdstr);
-	//    printf("kmer[%*zu]=%s\n",2, i, dstr_as_str(kmdstr));
-	//    dstr_clear(kmdstr);
+	//    printf("kmer[%*zu]=%s\n",2, i, strbuf_as_str(kmdstr));
+	//    strbuf_clear(kmdstr);
 	//}
 	//xstring_free(kmstr);
-	//dynstr_free(kmdstr);
+	//strbuf_free(kmdstr);
 
 	// sort the k+1-mers
 	vec_radixsort(kp1mers, &kmer_key_fn, k+1, ab_size(ext_ab));
 
 	//printf("kmers after sort:\n");
 	//kmstr = xstring_new(sizeof_ext_char);
-	//kmdstr = dynstr_new();
+	//kmdstr = strbuf_new();
 	//for (size_t i=0, l=vec_len(kp1mers); i<l; i++) {
 	//    kmer_t *kp1mer = *(kmer_t **)vec_get(kp1mers, i);
 	//    xstr_ncpy(kmstr, 0, kp1mer->txt, kp1mer->pos, k+1);
 	//    xstr_to_string(kmstr, kmdstr);
-	//    printf("kmer[%*zu]=%s\n",2, i, dstr_as_str(kmdstr));
-	//    dstr_clear(kmdstr);
+	//    printf("kmer[%*zu]=%s\n",2, i, strbuf_as_str(kmdstr));
+	//    strbuf_clear(kmdstr);
 	//}
 	//xstring_free(kmstr);
-	//dynstr_free(kmdstr);
+	//strbuf_free(kmdstr);
 
 	xstring *edge_labels  = xstring_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
 	byte_t *last_node   = bitarr_new(vec_len(kp1mers));
@@ -272,7 +272,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 			char_count[ab_rank(ext_ab, xstr_get(lastkp1mers[this_line], k-1)) + 1]++;
 		}
 	}
-	xstr_trim(edge_labels);
+	xstr_fit(edge_labels);
 	//xstr_print(edge_labels);
 	nedges = xstr_len(edge_labels);
 	bitarr_set_bit(last_node, nedges-1, 1);

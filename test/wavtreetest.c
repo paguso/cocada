@@ -27,7 +27,7 @@
 #include "alphabet.h"
 #include "arrutil.h"
 #include "bytearr.h"
-#include "cstringutil.h"
+#include "cstrutil.h"
 #include "huffcode.h"
 #include "mathutil.h"
 #include "strstream.h"

@@ -22,7 +22,7 @@
 #ifndef XSTRING_H
 #define XSTRING_H
 
-#include "dynstr.h"
+#include "strbuf.h"
 #include "new.h"
 #include "xchar.h"
 
@@ -106,16 +106,10 @@ void xstring_free(xstring *xs);
 
 
 /**
- * @brief Destructor.
- */
-void xstring_dispose(void *ptr, const dtor *dt);
-
-
-/**
- * @brief Trims the internal representation of the xstring, i.e. deallocates
+ * @brief Fits the xstring to its actual size, i.e. deallocates 
  *        unused internal memory.
  */
-void xstr_trim(xstring *xs);
+void xstr_fit(xstring *xs);
 
 
 /**
@@ -147,7 +141,7 @@ void xstr_print(const xstring *xs);
  * @brief Appends a string representation of the xstring to a string buffer
           @p dest
  */
-void xstr_to_string (const xstring *xs, dynstr *dest);
+void xstr_to_string (const xstring *xs, strbuf *dest);
 
 
 /**

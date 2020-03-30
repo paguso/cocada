@@ -54,7 +54,7 @@ void bytearr_fill(byte_t *ba, size_t from, size_t to, byte_t val);
  * contents of positions @p ba[j] <--> @p ba[size-j],
  * for 0 <= j < @p size.
  */
-void bytearr_flip_bytes(byte_t *ba, size_t size);
+void bytearr_reverse(byte_t *ba, size_t size);
 
 
 /**

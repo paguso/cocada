@@ -23,6 +23,8 @@
 #define BINHEAP_H
 
 #include <stdlib.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "new.h"
 #include "order.h"
@@ -32,21 +34,34 @@
  * @author Paulo Fonseca
  *
  * @brief Binary heap.
- *
+ * 
  * This generic binary heap maintains a dynamic collection of items
- * over an ordered set. It supports at least insertion and min/max
- * extraction in O(log(n)) time.
+ * over an ordered set, with insertion and extraction in O(log(n)) 
+ * worst-case time.
+ * 
+ * The binary heap can be seen as a priority queue, with priority 
+ * given by a comparison function 
+ * ```
+ * int (*cmp_func) (const void *left, const void *right);
+ * ```
+ * such that
+ * - if the function returns a positive value, then `right` 
+ * has greater priority than `left` (`right` "dominates" `left`)
+ * - if the function returns a negative value, then `left` 
+ * has greater priority than `right` (`left` "dominates" `right`)
+ * - if the function returns zero, then `left` and `right` have 
+ * the same priority (neither `left` "dominates" `right` or the
+ * opposite) 
+ *
+ * A pop() operation always removes and returns an element which 
+ * is not dominated by any other element currently in the heap, 
+ * that is, no other element has greater priority (notice that 
+ * this works even with partial order relations by having 
+ * `cmp_func` returning zero when called on uncomparable elements). 
+ * If several elements respect this condition than any of them 
+ * can be returned.
  *
  */
-
-/**
- * @brief The mode of the heap: in a MIN_HEAP (MAX_HEAP) the elements are
- * extracted in MIN-first (resp. MAX-first) order.
- */
-typedef enum {
-	MIN_HEAP = 0,
-	MAX_HEAP = 1
-} heap_mode;
 
 
 /**
@@ -60,8 +75,7 @@ typedef struct _binheap binheap;
  * @param typesize The size (in bytes) of the individual elements.
  * @param mode The mode of the heap
  */
-binheap *binheap_new(cmp_func cmp, size_t typesize,
-                     heap_mode mode);
+binheap *binheap_new(cmp_func cmp, size_t typesize);
 
 
 /**
@@ -85,16 +99,14 @@ size_t binheap_size(const binheap *heap);
 
 /**
  * @brief Stores a new element in the heap.
- * @param elt
  */
 void binheap_push(binheap *heap, const void *elt);
 
 
 /**
- * @brief Removes and returns the reference MIN/MAX element stored in
- *        the heap depending on the heap mode.
- *
- * @see heap_mode
+ * @brief Removes an element with maximum priority (or 
+ *        at least one such that no other element has
+ *        greater priority) and copies it to @p dest.
  */
 void binheap_pop(binheap *heap, void *dest);
 
@@ -112,8 +124,22 @@ void binheap_pop(binheap *heap, void *dest);
 BINHEAP_PUSH_DECL(TYPE)\
 BINHEAP_POP_DECL(TYPE)
 
-BINHEAP_ALL_DECL( int )
-BINHEAP_ALL_DECL( size_t )
+BINHEAP_ALL_DECL(byte_t)
+BINHEAP_ALL_DECL(char)
+BINHEAP_ALL_DECL(short)
+BINHEAP_ALL_DECL(int)
+BINHEAP_ALL_DECL(long)
+BINHEAP_ALL_DECL(float)
+BINHEAP_ALL_DECL(double)
+BINHEAP_ALL_DECL(size_t)
+BINHEAP_ALL_DECL(int8_t)
+BINHEAP_ALL_DECL(int16_t)
+BINHEAP_ALL_DECL(int32_t)
+BINHEAP_ALL_DECL(int64_t)
+BINHEAP_ALL_DECL(uint8_t)
+BINHEAP_ALL_DECL(uint16_t)
+BINHEAP_ALL_DECL(uint32_t)
+BINHEAP_ALL_DECL(uint64_t)
 
 
 

@@ -29,13 +29,13 @@
 /**
  * @file vec.h
  * @author Paulo Fonseca
- * @brief The vector ADT (a.k.a. dynamic array) is a linear
- * dynamic collection of elements of the same type and constant size.
- * It contains the usual access/insert/deletion of individual elements
- * at arbitrary positions, plus other convenience functions.
+ * @brief A vector (a.k.a. dynamic array) is a linear dynamic 
+ * collection of elements of the same type and constant size.
+ * It contains the usual access/insert/deletion operations for
+ * individual elements at arbitrary positions, plus other 
+ * convenience functions.
  * It is implemented as a heap allocated array with a given limited
- * capacity, which gets reallocated on demand depending on the actual
- * size of the collection.
+ * capacity, which gets reallocated on demand.
  */
 
 
@@ -135,17 +135,17 @@ void vec_clear(vec *v);
 
 
 /**
- * @brief Trims the vector to its actual size, i.e. deallocates
+ * @brief Fits the vector to its actual size, i.e. deallocates
  *        unused internal memory.
  */
-void vec_trim(vec *v);
+void vec_fit(vec *v);
 
 
 /**
  * @brief Detaches and returns the trimmed internal byte array.
  *        The size of the returned array in bytes will be
  *        vec_typesize(@p v) * vec_len(@p v);
- * @see vec_trim
+ * @see vec_fit
  * @warning After this operation, the vector is destroyed.
  */
 void *vec_detach(vec *v);
