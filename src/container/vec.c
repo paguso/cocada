@@ -32,7 +32,8 @@
 #include "order.h"
 #include "randutil.h"
 #include "vec.h"
-
+#include "iter.h"
+#include "trait.h"
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
@@ -318,6 +319,14 @@ void vec_rotate_left(vec *v, size_t npos)
 }
 
 
+size_t vec_find(vec *v, void *val, eq_func eq)
+{
+	size_t i, l;
+	for (i=0, l=vec_len(v); i < l && !eq(val, vec_get(v, i)); i++);
+	return i;
+}
+
+
 static size_t _part(vec *v, size_t l, size_t r, cmp_func cmp)
 {
 	size_t p = rand_range_size_t(l, r);
@@ -475,3 +484,28 @@ VEC_ALL_IMPL(uint32_t)
 VEC_ALL_IMPL(uint64_t)
 
 
+static bool _vec_iter_has_next(void *it)
+{
+	vec_iter *vit = (vec_iter *)it;
+	return vit->index < vec_len(vit->src);
+}
+
+static const void * _vec_iter_next(void *it)
+{
+	vec_iter *vit = (vec_iter *)it;
+	return vec_get(vit->src, vit->index++);
+}
+
+static iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
+
+vec_iter *vec_get_iter(vec *v)
+{
+	vec_iter *ret = NEW(vec_iter);
+	ret->_t_iter.impltor = ret;
+	ret->_t_iter.vt = &_vec_iter_vt;
+	ret->src = v;
+	ret->index = 0;
+	return ret;
+}
+
+IMPL_TRAIT(vec_iter, iter)

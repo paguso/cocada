@@ -37,12 +37,30 @@ char *cstr_new(size_t len)
 	return ret;
 }
 
+
+char *cstr_clone(const char *src)
+{
+	char *ret = cstr_new(strlen(src));
+	strcpy(ret, src);
+	return ret;
+}
+
+
+char *cstr_clone_len(const char *src, size_t len)
+{
+	char *ret = cstr_new(len);
+	strcpy(ret, src);
+	return ret;
+}
+
+
 void cstr_fill(char *str, size_t from, size_t to, char c)
 {
 	for (size_t i=from; i<to; i++) {
 		str[i] = c;
 	}
 }
+
 
 void cstr_clear(char *str, size_t len)
 {

@@ -24,15 +24,17 @@
 #include "bitbyte.h"
 #include "new.h"
 #include "order.h"
+#include "iter.h"
+#include "trait.h"
 
 
 /**
  * @file vec.h
  * @author Paulo Fonseca
- * @brief A vector (a.k.a. dynamic array) is a linear dynamic 
+ * @brief A vector (a.k.a. dynamic array) is a linear dynamic
  * collection of elements of the same type and constant size.
  * It contains the usual access/insert/deletion operations for
- * individual elements at arbitrary positions, plus other 
+ * individual elements at arbitrary positions, plus other
  * convenience functions.
  * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand.
@@ -270,6 +272,15 @@ void vec_rotate_left(vec *v, size_t npos);
 
 
 /**
+ * @brief Returns the position of the first element that is equal to
+ *        @p val according to the equality function @p eq.
+ *        If no element satisfies the condition, returns vec_len(v)
+ * @note That is a linear search that performs O(n) comparisons
+ */
+size_t vec_find(vec *v, void *val, eq_func eq);
+
+
+/**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
@@ -362,5 +373,16 @@ VEC_ALL_DECL(uint8_t)
 VEC_ALL_DECL(uint16_t)
 VEC_ALL_DECL(uint32_t)
 VEC_ALL_DECL(uint64_t)
+
+
+typedef struct {
+	iter _t_iter;
+	vec *src;
+	size_t index;
+} vec_iter;
+
+vec_iter *vec_get_iter(vec *self);
+
+DECL_TRAIT(vec_iter, iter)
 
 #endif

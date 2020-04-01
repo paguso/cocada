@@ -71,8 +71,8 @@ static size_t _bubble_up(binheap *heap)
 {
 	size_t i=binheap_size(heap)-1;
 	while ( i>0 &&
-			heap->cmp( vec_get(heap->data, i),
-						vec_get(heap->data, (i-1)/2) ) > 0 )  {
+	        heap->cmp( vec_get(heap->data, i),
+	                   vec_get(heap->data, (i-1)/2) ) > 0 )  {
 		vec_swap(heap->data, i, (i-1)/2);
 		i = (i-1)/2;
 	}
@@ -90,13 +90,13 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 		l = (2*i)+1;
 		r = (2*i)+2;
 		if ( l < n &&
-				heap->cmp( vec_get(heap->data, l),
-							vec_get(heap->data, m) ) > 0 ) {
+		        heap->cmp( vec_get(heap->data, l),
+		                   vec_get(heap->data, m) ) > 0 ) {
 			m = l;
 		}
 		if ( r < n &&
-				heap->cmp( vec_get(heap->data, r),
-							vec_get(heap->data, m) ) > 0 ) {
+		        heap->cmp( vec_get(heap->data, r),
+		                   vec_get(heap->data, m) ) > 0 ) {
 			m = r;
 		}
 		if ( m != i ) {

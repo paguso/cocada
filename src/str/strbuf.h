@@ -19,12 +19,13 @@
  *
  */
 
-#ifndef STRBUF_H     
+#ifndef STRBUF_H
 #define STRBUF_H
 
 
 #include <stddef.h>
 
+#include <iter.h>
 
 typedef struct _strbuf strbuf;
 
@@ -59,7 +60,7 @@ void strbuf_free(strbuf *sb);
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
  */
-strbuf *strbuf_new_from_str(char *src);
+strbuf *strbuf_new_from_str(const char *src);
 
 
 /**
@@ -97,13 +98,32 @@ void strbuf_set(strbuf *sb, size_t pos, char c);
  * @brief Appends a copy of the contents of a static string @p suff.
  * @warning The source string @p suff is left untouched.
  */
-void strbuf_append(strbuf *sb, char *suff);
+void strbuf_append(strbuf *sb, const char *suff);
+
+
+/**
+ * @brief Appends copies of @p n strings in an array @p arr to @p sb,
+ *        separating each of these strings by @sep
+ * # Example
+ * ```C
+ * strbuf *sb = str_buf_new_from_str("Four seasons: ");
+ * char *seasons[4] = {"Spring", "Summer", "Autumn", "Winter"};
+ * strbuf_join(sb, 4, seasons, " and ");
+ * printf("%s", strbuf_as_str(sb)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
+ * ```
+ */
+void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep);
+
+
+
+void strbuf_join_iter(strbuf *sb, iter *it, const char *sep);
 
 
 /**
  * @brief Appends a character @p c.
  */
 void strbuf_append_char(strbuf *sb, char c);
+
 
 
 /**

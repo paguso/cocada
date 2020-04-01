@@ -106,7 +106,7 @@ void xstring_free(xstring *xs);
 
 
 /**
- * @brief Fits the xstring to its actual size, i.e. deallocates 
+ * @brief Fits the xstring to its actual size, i.e. deallocates
  *        unused internal memory.
  */
 void xstr_fit(xstring *xs);

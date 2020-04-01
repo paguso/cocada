@@ -26,6 +26,7 @@
 #include "cstrutil.h"
 #include "strbuf.h"
 #include "mathutil.h"
+#include "iter.h"
 
 
 const static size_t DEFAULT_CAPACITY = 8;
@@ -56,7 +57,7 @@ strbuf *strbuf_new_with_capacity(size_t init_capacity)
 }
 
 
-strbuf *strbuf_new_from_str(char *src)
+strbuf *strbuf_new_from_str(const char *src)
 {
 	strbuf *ret;
 	ret = NEW(strbuf);
@@ -101,6 +102,7 @@ void strbuf_set(strbuf *sb, size_t pos, char c)
 	sb->str[pos] = c;
 }
 
+
 void _double(strbuf *sb)
 {
 	sb->capacity = MAX(1, 2*sb->capacity);
@@ -108,7 +110,8 @@ void _double(strbuf *sb)
 	cstr_fill(sb->str, sb->len, sb->capacity, '\0');
 }
 
-void strbuf_append(strbuf *sb, char *suff)
+
+void strbuf_append(strbuf *sb, const char *suff)
 {
 	size_t slen = strlen(suff);
 	while (sb->len + slen >= sb->capacity) {
@@ -121,6 +124,28 @@ void strbuf_append(strbuf *sb, char *suff)
 }
 
 
+void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep)
+{
+	for (size_t i=0; i<n; i++) {
+		if (i) {
+			strbuf_append(sb, sep);
+		}
+		strbuf_append(sb, arr[i]);
+	}
+}
+
+
+void strbuf_join_iter(strbuf *sb, iter *it, const char *sep)
+{
+	for (size_t i=0; iter_has_next(it); i++) {
+		if (i) {
+			strbuf_append(sb, sep);
+		}
+		strbuf_append(sb, *((const char **)iter_next(it)));
+	}
+}
+
+
 void strbuf_append_char(strbuf *sb, char c)
 {
 	if (sb->len == sb->capacity) {
@@ -130,6 +155,7 @@ void strbuf_append_char(strbuf *sb, char c)
 	sb->len++;
 	sb->str[sb->len] = '\0';
 }
+
 
 const char *strbuf_as_str(strbuf *sb)
 {

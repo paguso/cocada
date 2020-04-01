@@ -133,7 +133,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src);
 
 
 /**
- * @brief Fits the bitvector internal buffer to its actual size, i.e. 
+ * @brief Fits the bitvector internal buffer to its actual size, i.e.
  * deallocates unused memory.
  */
 void bitvec_fit(bitvec *bv);

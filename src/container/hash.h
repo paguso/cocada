@@ -57,10 +57,21 @@ typedef bool (*equals_func)(const void *, const void *);
 #define IDENT_HASH_DECL( TYPE ) \
 uint64_t ident_hash_##TYPE(const void *key);
 
+
+IDENT_HASH_DECL(byte_t)
+IDENT_HASH_DECL(char)
+IDENT_HASH_DECL(short)
+IDENT_HASH_DECL(int)
+IDENT_HASH_DECL(long)
+IDENT_HASH_DECL(size_t)
+IDENT_HASH_DECL(int8_t)
+IDENT_HASH_DECL(int16_t)
+IDENT_HASH_DECL(int32_t)
+IDENT_HASH_DECL(int64_t)
+IDENT_HASH_DECL(uint8_t)
 IDENT_HASH_DECL(uint16_t)
 IDENT_HASH_DECL(uint32_t)
 IDENT_HASH_DECL(uint64_t)
-IDENT_HASH_DECL(size_t)
 
 
 uint64_t fib_hash(uint64_t key);
@@ -69,7 +80,7 @@ uint64_t fib_hash(uint64_t key);
  * Simplified 64-bit FNV hashing
  * @see source: http://www.isthe.com/chongo/tech/comp/fnv
  */
-uint64_t fnv1a_64bit_hash(void *obj, size_t objsize);
+uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize);
 
 
 /**

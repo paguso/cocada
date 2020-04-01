@@ -68,22 +68,18 @@ typedef unsigned char byte_t;
 
 #define BYTESIZE CHAR_BIT
 
-#define BYTE_MAX UCHAR_MAX
-
 /*
- * Although I have attempted to make this code robust to any value of
- * BYTESIZE, it has not been tested at all on any architecture with
- * a value other than 8.
- *
- * The following condition has thus been included as a safeguard.
- *
- * If this is removed to support larger bytes, the byte masks below
- * need also to be modified.
+ * Most of the code herein is not dependent on a byte being an octet.
+ * However it has only been tested on such conditions, so this is
+ * included as a safeguard.
+ * If this is removed to support larger bytes, at least the byte masks
+ * below should probably be modified.
  */
 #if BYTESIZE!=8
 #error "This code has only been tested on architectures with bytes of 8 bits"
 #endif
 
+#define BYTE_MAX UCHAR_MAX
 
 /*
  * 8-bit Byte masks:
@@ -117,7 +113,7 @@ static const byte_t _MSBMASK[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
  * constants, which correspond to the size of a machine word in bits/bytes
  * known at compile time.
  *
- * We try to determins the values of these constants based on the processor
+ * We try to determine the values of these constants based on the processor
  * type, as shown in
  * http://nadeausoftware.com/articles/2012/02/c_c_tip_how_detect_processor_type_using_compiler_predefined_macros
  *
@@ -126,7 +122,6 @@ static const byte_t _MSBMASK[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
  * to be aware of this and take the appropriate measures to make the code
  * compatible with other platforms.
  */
-
 enum _cl_processor { x86_32bits, x86_64bits };
 
 #if defined(__x86_64__) || defined(_M_X64)

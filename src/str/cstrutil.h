@@ -47,6 +47,16 @@ char *cstr_new(size_t len);
 
 
 /**
+ * @brief Creates a clone of a source string.
+ */
+char *cstr_clone(const char *src);
+
+/**
+ * @brief Creates a clone of a source string up to a given length.
+ */
+char *cstr_clone_len(const char *src, size_t len);
+
+/**
  * @brief Sets @p str[j]=@p c for @p from <= j < @p to.
  */
 void cstr_fill(char *str, size_t from, size_t to, char c);

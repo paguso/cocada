@@ -29,10 +29,20 @@ uint64_t ident_hash_##TYPE(const void *key) {\
     return (uint64_t)(*((TYPE *)key));\
 }
 
+IDENT_HASH(byte_t)
+IDENT_HASH(char)
+IDENT_HASH(short)
+IDENT_HASH(int)
+IDENT_HASH(long)
+IDENT_HASH(size_t)
+IDENT_HASH(int8_t)
+IDENT_HASH(int16_t)
+IDENT_HASH(int32_t)
+IDENT_HASH(int64_t)
+IDENT_HASH(uint8_t)
 IDENT_HASH(uint16_t)
 IDENT_HASH(uint32_t)
 IDENT_HASH(uint64_t)
-IDENT_HASH(size_t)
 
 
 uint64_t fib_hash(uint64_t key)
@@ -41,12 +51,11 @@ uint64_t fib_hash(uint64_t key)
 }
 
 
-
 /*
  * Simplified 64-bit FNV hashing
  * source: http://www.isthe.com/chongo/tech/comp/fnv
  */
-uint64_t fnv1a_64bit_hash(void *obj, size_t objsize)
+uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize)
 {
 	uint64_t hval = 0;
 
@@ -66,7 +75,6 @@ uint64_t fnv1a_64bit_hash(void *obj, size_t objsize)
 	}
 	return hval;
 }
-
 
 
 size_t djb2_hash(const unsigned char *str)

@@ -27,6 +27,8 @@
 #include "bitbyte.h"
 #include "new.h"
 #include "cstrutil.h"
+#include "iter.h"
+#include "trait.h"
 
 /**
  * @file arrutil.h
@@ -71,6 +73,21 @@
         if(!((__i-FROM)%__el)) printf("\n%4zu: ",__i);\
         printf(#FORMAT" " , ARR[__i]);}\
       printf("\n");}
+
+
+
+typedef struct {
+	iter _t_iter;
+	void *src;
+	size_t typesize;
+	size_t len;
+	size_t index;
+} arr_iter;
+
+
+arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize);
+
+DECL_TRAIT(arr_iter, iter);
 
 
 #endif

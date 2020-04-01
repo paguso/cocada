@@ -34,31 +34,31 @@
  * @author Paulo Fonseca
  *
  * @brief Binary heap.
- * 
+ *
  * This generic binary heap maintains a dynamic collection of items
- * over an ordered set, with insertion and extraction in O(log(n)) 
+ * over an ordered set, with insertion and extraction in O(log(n))
  * worst-case time.
- * 
- * The binary heap can be seen as a priority queue, with priority 
- * given by a comparison function 
+ *
+ * The binary heap can be seen as a priority queue, with priority
+ * given by a comparison function
  * ```
  * int (*cmp_func) (const void *left, const void *right);
  * ```
  * such that
- * - if the function returns a positive value, then `right` 
+ * - if the function returns a positive value, then `right`
  * has greater priority than `left` (`right` "dominates" `left`)
- * - if the function returns a negative value, then `left` 
+ * - if the function returns a negative value, then `left`
  * has greater priority than `right` (`left` "dominates" `right`)
- * - if the function returns zero, then `left` and `right` have 
+ * - if the function returns zero, then `left` and `right` have
  * the same priority (neither `left` "dominates" `right` or the
- * opposite) 
+ * opposite)
  *
- * A pop() operation always removes and returns an element which 
- * is not dominated by any other element currently in the heap, 
- * that is, no other element has greater priority (notice that 
- * this works even with partial order relations by having 
- * `cmp_func` returning zero when called on uncomparable elements). 
- * If several elements respect this condition than any of them 
+ * A pop() operation always removes and returns an element which
+ * is not dominated by any other element currently in the heap,
+ * that is, no other element has greater priority (notice that
+ * this works even with partial order relations by having
+ * `cmp_func` returning zero when called on uncomparable elements).
+ * If several elements respect this condition than any of them
  * can be returned.
  *
  */
@@ -104,7 +104,7 @@ void binheap_push(binheap *heap, const void *elt);
 
 
 /**
- * @brief Removes an element with maximum priority (or 
+ * @brief Removes an element with maximum priority (or
  *        at least one such that no other element has
  *        greater priority) and copies it to @p dest.
  */

@@ -22,3 +22,34 @@
 #include <stdlib.h>
 
 #include "arrutil.h"
+#include "iter.h"
+
+
+static bool _arr_iter_has_next(void *it)
+{
+	arr_iter *ait = (arr_iter *)it;
+	return ait->index < ait->len;
+}
+
+static const void * _arr_iter_next(void *it)
+{
+	arr_iter *ait = (arr_iter *)it;
+	return ait->src + (ait->typesize * ait->index++);
+}
+
+static iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};
+
+
+arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize)
+{
+	arr_iter *ret = NEW(arr_iter);
+	ret->_t_iter.impltor = &ret;
+	ret->_t_iter.vt = &_arr_iter_vt;
+	ret->src = arr;
+	ret->len = len;
+	ret->typesize = typesize;
+	ret->index = 0;
+	return ret;
+}
+
+IMPL_TRAIT(arr_iter, iter);

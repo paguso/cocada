@@ -96,7 +96,7 @@ TRAIT * TYPE##_##TRAIT( TYPE *self ) {\
 }
 
 
-#define ASTRAIT(PTR, TYPE, TRAIT) (&(((TYPE *)(PTR))->_i##TRAIT))
+#define ASTRAIT(PTR, TYPE, TRAIT) (&(((TYPE *)(PTR))->_t_##TRAIT))
 
 
 #endif
