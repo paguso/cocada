@@ -134,6 +134,17 @@ void cstr_revert(char *str, size_t len);
 void uint_to_cstr(char *dest, uintmax_t val, char base);
 
 
+/**
+ * @brief Compares two ASCII strings for equality
+ */
+bool cstr_equals(const char *left, const char *right);
+
+
+/**
+ * @brief Compares two ASCII strings for equality ignoring case.
+ */
+bool cstr_equals_ignore_case(const char *left, const char *right);
+
 
 #endif
 

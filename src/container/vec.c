@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "arrutil.h"
 #include "bitbyte.h"
@@ -466,6 +468,7 @@ VEC_INS_IMPL(TYPE)\
 VEC_POP_IMPL(TYPE)
 
 VEC_ALL_IMPL(rawptr)
+VEC_ALL_IMPL(bool)
 VEC_ALL_IMPL(byte_t)
 VEC_ALL_IMPL(char)
 VEC_ALL_IMPL(short)

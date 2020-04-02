@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "new.h"
 #include "cstrutil.h"
@@ -174,4 +175,20 @@ void uint_to_cstr(char *dest, uintmax_t val, char base)
 		dest[--l] = DIGITS[val%b];
 		val /= b;
 	}
+}
+
+
+bool cstr_equals(const char *left, const char *right)
+{
+	return strcmp(left, right)==0;
+}
+
+
+bool cstr_equals_ignore_case(const char *left, const char *right)
+{
+	size_t i, l = strlen(left);
+	if ( l != strlen(right) )
+		return false;
+	for (i = 0; i < l && tolower(left[i]) != tolower(right[i]); i++);
+	return i==l;
 }

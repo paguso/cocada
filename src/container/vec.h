@@ -21,6 +21,9 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "bitbyte.h"
 #include "new.h"
 #include "order.h"
@@ -233,7 +236,8 @@ void vec_ins(vec *v, size_t pos, const void *src);
 
 
 /**
- * @brief Concatenates the contents of @p src to at the end of @p dest.
+ * @brief Concatenates a copy of the contents of @p src to at the end of @p dest,
+ *        leaving @p src unchanged.
  * @warning the vectors are assumed to be of the same type. No check is performed.
  */
 void vec_cat(vec *dest, const vec *src);
@@ -357,6 +361,7 @@ VEC_POP_DECL(TYPE)
 
 
 VEC_ALL_DECL(rawptr)
+VEC_ALL_DECL(bool)
 VEC_ALL_DECL(byte_t)
 VEC_ALL_DECL(char)
 VEC_ALL_DECL(short)
