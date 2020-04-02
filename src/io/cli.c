@@ -355,7 +355,7 @@ void cliparse_print_help(cliparse *cmd)
 	}
 	for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
 		cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-		printf(" %s", arg->name);
+		printf(" %s%s", arg->name, (arg->single)?"":"...");
 	}
 	printf("\n");
 	if (has_subcmds) {
@@ -378,6 +378,14 @@ void cliparse_print_help(cliparse *cmd)
 		printf("\n  usage : ! = required, ? = optional, + = one or more,  * = zero or more\n");
 		printf("  values: <type> = one value,  <type>[N] = N values,\n");
 		printf("          <type>[M..] = at least M values, <type>[M..N] = from M to N values\n");
+	}
+	if (has_args) {
+		printf("\nArguments:\n\n");
+		for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
+			cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
+			printf("  %s%s\t%s\t(%s)", arg->name, (arg->single)?"":"...", 
+					(arg->help)?arg->help:"", val_types[arg->type]);
+		}
 	}
 	if (has_subcmds) {
 		printf("\nSubcommands:\n\n");
