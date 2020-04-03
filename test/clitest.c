@@ -21,9 +21,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "CuTest.h"
 
+#include "arrutil.h"
 #include "cli.h"
 #include "cstrutil.h"
 #include "vec.h"
@@ -32,7 +34,7 @@ static cliparse *cmd;
 
 static void test_setup()
 {
-	cmd = cliparse_new("Test", "A Test Program");
+	cmd = cliparse_new("test", "A Test Program");
 	char *choice_arr[3]  = {"choice1", "choice2", "choice3"};
 	vec *choices = vec_new_from_arr_cpy(choice_arr, 3, sizeof(char *));
 	cliparse_add_option(cmd,
@@ -149,15 +151,21 @@ static void test_setup()
 	                    )
 	                   );
 	cliparse_add_pos_arg(scmd1,
-	                     cliarg_new("arg1", "first integer argument", ARG_INT)
+	                     cliarg_new("arg1", "first char argument", ARG_CHAR)
 	                    );
 	cliparse_add_pos_arg(scmd1,
-	                     cliarg_new("arg2", "second string argument", ARG_STR)
+	                     cliarg_new("arg2", "second float argument", ARG_FLOAT)
 	                    );
 	cliparse_add_pos_arg(scmd1,
-	                     cliarg_new_multi("arg3", "third multiple file argument", ARG_FILE)
+	                     cliarg_new("arg3", "third file argument", ARG_FILE)
 	                    );
 	cliparse_add_subcommand(cmd, scmd1);
+
+}
+
+
+static void test_teardown() {
+	FREE(cmd);
 }
 
 
@@ -165,13 +173,60 @@ void test_cli_help(CuTest *tc)
 {
 	test_setup();
 	cliparse_print_help(cmd);
+	test_teardown();
+}
+
+static char **make_argv(char *call, int *argc) 
+{
+	char *str, *saveptr;
+	int i;
+	saveptr = call;
+	vec *ret = vec_new(sizeof(char *));
+	for (i=0, str=call; ; i++, str=NULL)
+	{
+		char *tok = strtok_r(str, " ", &saveptr);
+		if (!tok) break;
+		tok = cstr_clone(tok);
+		vec_push_rawptr(ret, tok );
+	}
+	*argc = i;
+	char **argv = NEW_ARR(char *, *argc);
+	for (i=0; i<*argc; i++) {
+		argv[i] = (char *)vec_get_rawptr(ret, i);
+	}
+	FREE(ret, vec);
+	return argv;
+}
+
+void freeargv(int argc, char **argv) {
+	for (int i=0; i<argc; i++)
+		FREE(argv[i]);
+	FREE(argv);
+}
+
+
+void test_cli_parse(CuTest *tc)
+{
+	test_setup();
+
+	int argc;
+	char call[] = "test subcommand1 --lll -n A 12.75 file1.c file2.c";
+	char **argv = make_argv(call, &argc);
+
+	cliparse_parse(cmd, argc, argv);
+
+	freeargv(argc, argv);
+
+
+	test_teardown();
 }
 
 
 CuSuite *cli_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_cli_help);
+	//SUITE_ADD_TEST(suite, test_cli_help);
+	SUITE_ADD_TEST(suite, test_cli_parse);
 	return suite;
 }
 

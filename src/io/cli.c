@@ -124,10 +124,10 @@ cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
 			ret->values = vec_new(sizeof(char));
 			break;
 		case ARG_INT:
-			ret->values = vec_new(sizeof(int));
+			ret->values = vec_new(sizeof(long));
 			break;
 		case ARG_FLOAT:
-			ret->values = vec_new(sizeof(float));
+			ret->values = vec_new(sizeof(double));
 			break;
 		case ARG_STR:
 			ret->values = vec_new(sizeof(char *));
@@ -212,15 +212,16 @@ cliarg *cliarg_new_choice_multi(char *name, char*help, vec *choices)
 	return ret;
 }
 
-static uint64_t _hash_str(const void *s)
+static uint64_t _hash_str(const void *ptr)
 {
+	char *s = *((char **)ptr);
 	return fnv1a_64bit_hash(s, strlen((char *)s));
 }
 
 
 static bool _str_eq(const void *s1, const void *s2)
 {
-	return strcmp((char *)s1, (char *)s2)==0;
+	return strcmp(*((char **)s1), *((char **)s2))==0;
 }
 
 
@@ -239,6 +240,7 @@ cliparse *cliparse_new(char *name, char *help)
 	ret->args = vec_new(sizeof(cliarg *));
 	cliopt *help_opt = cliopt_new_defaults('h', "help", "Prints help message");
 	hashmap_set(ret->options, &help_opt->shortname, &help_opt);
+	hashmap_set(ret->long_to_short, &help_opt->longname, &help_opt->shortname);
 	return ret;
 }
 
@@ -249,7 +251,7 @@ void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 	assert(cmd!=subcmd);
 	assert(!hashmap_has_key(cmd->subcommands, &subcmd->name));
 	subcmd->par = cmd;
-	vec_push_rawptr(cmd->subcmd_names, &subcmd->name);
+	vec_push_rawptr(cmd->subcmd_names, subcmd->name);
 	hashmap_set(cmd->subcommands, &(subcmd->name), &subcmd);
 }
 
@@ -258,11 +260,16 @@ void cliparse_add_option(cliparse *cmd, cliopt *opt)
 {
 	assert( opt->shortname!='h' && (opt->longname==NULL || strcmp(opt->longname, "help")!=0) );
 	//assert(vec_len(cmd->subcommands)==0);
-	assert( !hashmap_has_key(cmd->options, &opt->shortname) );
-	assert( !hashmap_has_key(cmd->long_to_short, &opt->longname) );
+	assert( !hashmap_has_key(cmd->options, &(opt->shortname)) );
+	if (hashmap_has_key(cmd->long_to_short, &(opt->longname)) ){
+		char sn = hashmap_get_char(cmd->long_to_short, &(opt->longname));
+		cliopt *aopt = (cliopt *)hashmap_get_rawptr(cmd->options, &sn);
+		assert(strcmp(aopt->longname,opt->longname)==0);
+	}
+	assert( !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
 	hashmap_set(cmd->options, &(opt->shortname), &opt);
 	if (opt->longname) {
-		hashmap_set(cmd->long_to_short, &opt->longname, &opt->shortname);
+		hashmap_set(cmd->long_to_short, &(opt->longname), &(opt->shortname));
 	}
 }
 
@@ -383,8 +390,8 @@ void cliparse_print_help(cliparse *cmd)
 		printf("\nArguments:\n\n");
 		for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
 			cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-			printf("  %s%s\t%s\t(%s)", arg->name, (arg->single)?"":"...", 
-					(arg->help)?arg->help:"", val_types[arg->type]);
+			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single)?"":"...", 
+					(arg->help)?arg->help:"", val_types[arg->type], (arg->single)?"":"...");
 		}
 	}
 	if (has_subcmds) {
@@ -392,9 +399,9 @@ void cliparse_print_help(cliparse *cmd)
 		for (size_t i = 0, l = vec_len(cmd->subcmd_names); i < l; i++) {
 			char *subcmd_name = (char *)vec_get_rawptr(cmd->subcmd_names, i);
 			cliparse *subcmd = (cliparse *)hashmap_get_rawptr(cmd->subcommands, &subcmd_name);
-			printf("  %s\t%s\n",subcmd->name, subcmd->help);
+			printf("  %s\t%s\n",subcmd->name, (subcmd->help)?subcmd->help:"");
 		}
-		printf("\n  Run \"%s%s%s <subcommand> --help\" for help on a specific subcommand.",
+		printf("\n  Run \"%s%s%s <subcommand> --help\" for help on a specific subcommand.\n",
 		       (cmd->par)?(cmd->par->name):"", (cmd->par)?" ":"", cmd->name);
 	}
 }
@@ -517,7 +524,8 @@ typedef enum {
 	P_CMD_OPT = 0,
 	P_CMD_ARG = 1,
 	P_SUB_OPT = 2,
-	P_SUB_ARG = 3
+	P_SUB_ARG = 3,
+	P_DONE    = 4
 } parse_state;
 
 void cliparse_parse(cliparse *clip, int argc, char **argv)
@@ -542,35 +550,38 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 			if (tlen > 1 && tok[1] == '-') {
 				// long version
 				tok = &tok[2];
-				CHECK(hashmap_has_key(clip->long_to_short, &tok), "Unknown option %s at position %d.\n", argv[t], t);
-				shortname = hashmap_get_char(clip->long_to_short, &tok);
+				CHECK( hashmap_has_key(cur_parse->long_to_short, &tok),
+				      "Unknown option %s at position %d.\n", argv[t], t );
+				shortname = hashmap_get_char(cur_parse->long_to_short, &tok);
 			} else {
 				// short version
 				CHECK(tlen==2, "Unknown option %s at position %d\n", tok, t);
 				shortname = tok[1];
 			}
-			cur_opt = (cliopt *) hashmap_get_rawptr(clip->options, &shortname);
-			CHECK(cur_opt->single && vec_len(cur_opt->values) > 0,
+			if (shortname=='h') {
+				cliparse_print_help(cur_parse);
+				exit(EXIT_SUCCESS);
+			}
+			cur_opt = (cliopt *) hashmap_get_rawptr(cur_parse->options, &shortname);
+			CHECK(!cur_opt->single || vec_len(cur_opt->values) == 0,
 			      "Invalid multiple definition of option %s at position %d.", argv[t], t);
 			if (cur_opt->max_val_no > 0) { // has values
 				// look ahead for potential values
 				int end;
-				for (end=0; end < argc && argv[end][0]!='-' 
-					 && hashmap_has_key(cur_parse->subcommands, &argv[end]); end++);
+				for (end=t+1; end < argc && end - t <= cur_opt->max_val_no && argv[end][0]!='-' 
+					 && !hashmap_has_key(cur_parse->subcommands, &argv[end]); end++);
 				// check to see if number of args is OK
 				int nargs = end - t - 1;
-				CHECK(nargs < cur_opt->min_val_no,
+				CHECK(nargs >= cur_opt->min_val_no,
 				      "Too few arguments for option %s at position %d \
-					   (found %d, but at least %zu required)\n.", argv[t], t, nargs, cur_opt->min_val_no);
-				CHECK(nargs > cur_opt->max_val_no,
-				      "Too many arguments for option %s at position %d \
-					   (found %d, but at most %zu allowed)\n.", argv[t], t, nargs, cur_opt->max_val_no);
+					   (found %d, but at least %zu required).\n", 
+					   argv[t], t, nargs, cur_opt->min_val_no);
 				// collect values
 				vec *vals;
 				int err_pos = -1;
 				CHECK( _collect_vals(vals, argv, t+1, end, cur_opt->type, cur_opt->choices, &err_pos),
 				       "Wrong value for option %s at position %d. \
-					   Found %s at position %d whereas expected type was <%s>",
+					   Found %s at position %d whereas expected type was <%s>.\n",
 				       argv[t], t, argv[err_pos], err_pos, val_types[cur_opt->type]);
 				
 				if (cur_opt->single) {
@@ -598,7 +609,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				  "Unexpected subcommand \"%s\" at position %d.\n", argv[t], t);
 			assert(cur_parse==clip);
 			assert(cur_parse->active_subcmd==NULL);
-			cur_parse->active_subcmd  = (cliparse *) hashmap_get(cur_parse->subcommands, &tok);
+			cur_parse->active_subcmd  = (cliparse *) hashmap_get_rawptr(cur_parse->subcommands, &tok);
 			cur_parse = cur_parse->active_subcmd;
 			state = P_SUB_OPT;
 		}
@@ -607,12 +618,12 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 			CHECK(state==P_CMD_OPT || state==P_SUB_OPT || state==P_CMD_ARG || state==P_SUB_ARG, 
 				  "Unexpected token \"%s\" at position %d.\n", argv[t], t);
 			cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, cur_pos_arg);
-			CHECK( t + 1 < argc, "Missing argument #%zu of type <%s> at position %d.\n", 
-				   cur_pos_arg+1, val_types[cur_arg->type], t );
 			int err_pos;
-			_collect_vals(cur_arg->values, argv, t+1, t+2, cur_arg->type, NULL, &err_pos);
+			_collect_vals(cur_arg->values, argv, t, t+1, cur_arg->type, NULL, &err_pos);
 			if (cur_arg->single) { 
 				cur_pos_arg++;
+				if (cur_pos_arg >= vec_len(cur_parse->args)) 
+					state = P_DONE;
 			}
 			if (state==P_CMD_OPT) 
 				state = P_CMD_ARG;
@@ -621,5 +632,10 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 		}
 		t++;
 	}
+	// some arguments undefined
+	cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, cur_pos_arg);
+	CHECK( cur_pos_arg == vec_len(cur_parse->args)-1 && vec_len(cur_arg->values),
+		   "Missing argument #%zu of type <%s> at position %d.\n", 
+			cur_pos_arg+1, val_types[cur_arg->type], t );
 	strbuf_free(tokbuf);
 }

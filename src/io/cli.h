@@ -116,7 +116,7 @@
  * 
  * ## Example
  * ```
- * grep -r cocada src/*.c
+ * grep -r cocada *.c
  * ```
  * The two positional arguments are the pattern string `cocada`, and
  * the second is a list of files where this pattern is to be searched
@@ -258,6 +258,9 @@ void cliparse_add_subcommand(cliparse *cmd, cliparse *subcmd);
 
 /**
  * @brief Adds an option to a (sub)program CLI parser.
+ * @warning A help option with names `-h`, `--help` is automatically added 
+ * to every cliparse. Trying to add another option with `-h` or `--help`
+ * names will cause an assertion error.
  */
 void cliparse_add_option(cliparse *cmd, cliopt *opt);
 
