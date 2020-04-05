@@ -29,6 +29,7 @@
 #include "cli.h"
 #include "cstrutil.h"
 #include "vec.h"
+#include "new.h"
 
 static cliparse *cmd;
 
@@ -48,54 +49,46 @@ static void test_setup()
 	                    cliopt_new_valued(
 	                        'b',
 	                        cstr_clone("bbb"),
-	                        cstr_clone("mandatory single option with no value"),
-	                        true, true, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("non-mandatory single option with one boolean value"),
+	                        false, true, ARG_BOOL, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'c',
 	                        cstr_clone("ccc"),
-	                        cstr_clone("mandatory multiple option with no value"),
-	                        true, false, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("non-mandatory multiple option with two int values"),
+	                        false, false, ARG_INT, 2, 2, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'd',
 	                        cstr_clone("ddd"),
-	                        cstr_clone("non-mandatory multiple option with no value"),
-	                        false, false, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("mandatory single option with one string value"),
+	                        true, true, ARG_STR, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'e',
 	                        cstr_clone("eee"),
-	                        cstr_clone("mandatory single option with one boolean value"),
-	                        true, true, ARG_BOOL, 1, 1, NULL, NULL
+	                        cstr_clone("non-mandatory multiple option with one tp three file value"),
+	                        false, false, ARG_FILE, 1, 3, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'f',
 	                        cstr_clone("fff"),
-	                        cstr_clone("mandatory single option with two integer value"),
-	                        true, true, ARG_INT, 2, 2, NULL, NULL
+	                        cstr_clone("non-mandatory single option with unlimited float values"),
+	                        false, true, ARG_FLOAT, 1, ARGNO_UNLIMITED, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'g',
 	                        cstr_clone("ggg"),
-	                        cstr_clone("mandatory single option three or more float values"),
-	                        true, true, ARG_FLOAT, 3, ARGNO_UNLIMITED, NULL, NULL
-	                    )
-	                   );
-	cliparse_add_option(cmd,
-	                    cliopt_new_valued(
-	                        'i',
-	                        cstr_clone("iii"),
 	                        cstr_clone("non-mandatory single option three or more  values"),
 	                        false, true, ARG_CHOICE, 3, ARGNO_UNLIMITED, choices, NULL
 	                    )
@@ -122,32 +115,32 @@ static void test_setup()
 	                    cliopt_new_valued(
 	                        'k',
 	                        cstr_clone("kkk"),
-	                        cstr_clone("mandatory single option with no value"),
-	                        true, true, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("mandatory single option with one boolean value"),
+	                        true, true, ARG_BOOL, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
 	                    cliopt_new_valued(
 	                        'l',
 	                        cstr_clone("lll"),
-	                        cstr_clone("mandatory multiple option with no value"),
-	                        true, false, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("non-mandatory multiple option with two values"),
+	                        false, false, ARG_BOOL, 2, 2, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
 	                    cliopt_new_valued(
 	                        'm',
 	                        cstr_clone("mmm"),
-	                        cstr_clone("non-mandatory multiple option with no value"),
-	                        false, false, ARG_BOOL, 0, 0, NULL, NULL
+	                        cstr_clone("non-mandatory single option with no value"),
+	                        false, true, ARG_NONE, 0, 0, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
 	                    cliopt_new_valued(
 	                        'n',
 	                        cstr_clone("nnn"),
-	                        cstr_clone("mandatory single option with one boolean value"),
-	                        true, true, ARG_BOOL, 1, 1, NULL, NULL
+	                        cstr_clone("non-mandatory single option with one string value"),
+	                        false, true, ARG_STR, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_pos_arg(scmd1,
@@ -157,7 +150,7 @@ static void test_setup()
 	                     cliarg_new("arg2", "second float argument", ARG_FLOAT)
 	                    );
 	cliparse_add_pos_arg(scmd1,
-	                     cliarg_new("arg3", "third file argument", ARG_FILE)
+	                     cliarg_new_multi("arg3", "third file argument", ARG_FILE)
 	                    );
 	cliparse_add_subcommand(cmd, scmd1);
 
@@ -165,7 +158,7 @@ static void test_setup()
 
 
 static void test_teardown() {
-	FREE(cmd);
+	FREE(cmd, cliparse);
 }
 
 
@@ -210,7 +203,7 @@ void test_cli_parse(CuTest *tc)
 	test_setup();
 
 	int argc;
-	char call[] = "test subcommand1 --lll -n A 12.75 file1.c file2.c";
+	char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
 	char **argv = make_argv(call, &argc);
 
 	cliparse_parse(cmd, argc, argv);

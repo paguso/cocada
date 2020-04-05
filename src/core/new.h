@@ -456,20 +456,19 @@ dtor *ptr_dtor();
 #define FINALISE( OBJ, DTOR ) {\
     void *__obj = (OBJ);\
     const dtor *__dt = (DTOR);\
-    __dt->df(__obj, __dt);\
-}
+    __dt->df(__obj, __dt);}
 
 /**
  * Destroys an object @pOBJ, that is finalises it (and its referenced objects)
  * based on a given destructor @p DTOR **and** deallocates its memory.
  * The destructor @p DTOR is **also** destroyed.
  */
-#define DESTROY( OBJ, DTOR ) \
+#define DESTROY( OBJ, DTOR ) {\
     void *__obj = (OBJ);\
     const dtor *__dt = (DTOR);\
     __dt->df(__obj, __dt);\
     free(__obj);\
-    dtor_free((void *)__dt);
+    dtor_free((void *)__dt);}
 
 
 ////@cond

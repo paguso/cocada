@@ -189,6 +189,6 @@ bool cstr_equals_ignore_case(const char *left, const char *right)
 	size_t i, l = strlen(left);
 	if ( l != strlen(right) )
 		return false;
-	for (i = 0; i < l && tolower(left[i]) != tolower(right[i]); i++);
+	for (i = 0; i < l && tolower(left[i]) == tolower(right[i]); i++);
 	return i==l;
 }

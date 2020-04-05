@@ -27,6 +27,7 @@
 
 #include "hashmap.h"
 #include "vec.h"
+#include "new.h"
 
 /**
  * @file cli.h
@@ -211,6 +212,18 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * 						Use ARGNO_UNLIMITED for an unlimited number ofvalues.
  * @param choices		(**transfer**) Possible choices if @p type = ARG_CHOICE
  * @param defaults		(**transfer**) Default values (PENDING)
+ * 
+ * # Requirements
+ * - @p shortname != `'h'` and  @p longname != `"help"`
+ * - @p min_val_no <= @p max_val_no
+ * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
+ * - If @p mandatory == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @p single == false, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @type == ARG_CHOICE then @p choices must be a non-empty vector
+ * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @single == true
+ * - If @p mandatory == true, @p defaults is discarded
+ * - If @p mandatory == false, @p defaults must have at least @p min_val_no and 
+ *   at most @p max_val_no elements
  */
 cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
                           bool mandatory, bool single, cliargtype type,
@@ -248,6 +261,13 @@ cliarg *cliarg_new_multi(char *name, char*help, cliargtype type);
  * 				used for help messages.
  */ 
 cliparse *cliparse_new(char *name, char *help);
+
+
+/**
+ * @brief Destructor. Use with default destructor DTOR(cliparse), or
+ * simply FREE(obj, cliparse)
+ */
+void cliparse_dispose(void *ptr, const dtor *dt);
 
 
 /**

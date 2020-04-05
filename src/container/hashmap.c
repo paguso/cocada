@@ -116,13 +116,13 @@ void hashmap_dispose(void *ptr, const dtor *dst)
 		bool free_keys = (dtor_nchd(dst) > 0);
 		const dtor *keys_dst = (free_keys)?dtor_chd(dst, 0):NULL;
 		bool free_vals = (dtor_nchd(dst) > 1);
-		const dtor *vals_dst = (free_vals)?dtor_chd(dst, 0):NULL;
+		const dtor *vals_dst = (free_vals)?dtor_chd(dst, 1):NULL;
 		if (free_keys || free_vals) {
 			hashmap_iter *iter = hashmap_get_iter(hmap);
 			while ( hashmap_iter_has_next(iter) ) {
 				hashmap_entry keyval = hashmap_iter_next(iter);
-				if (free_keys) FINALISE(((void **)keyval.key)[0], keys_dst);
-				if (free_vals) FINALISE(((void **)keyval.val)[0], vals_dst);
+				if (free_keys) FINALISE(keyval.key, keys_dst);
+				if (free_vals) FINALISE(keyval.val, vals_dst);
 			}
 			hashmap_iter_free(iter);
 		}

@@ -145,7 +145,7 @@ void vec_dispose(void *ptr, const dtor *dt )
 	if (dtor_nchd(dt)) {
 		const dtor *chd_dt = dtor_chd(dt, 0);
 		for (size_t i=0, l=vec_len(v); i<l; i++) {
-			void *chd = * (void **) vec_get(v, i);
+			void *chd =  vec_get_mut(v, i);
 			FINALISE(chd, chd_dt);
 		}
 	}
