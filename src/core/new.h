@@ -453,28 +453,32 @@ dtor *ptr_dtor();
  * destructor @p DTOR.
  * The object is not deallocated, and the destructor is not destroyed.
  */
-#define FINALISE( OBJ, DTOR ) {\
+#define FINALISE( OBJ, DTOR ) \
+if((OBJ)) {\
     void *__obj = (OBJ);\
     const dtor *__dt = (DTOR);\
-    __dt->df(__obj, __dt);}
+    __dt->df(__obj, __dt);\
+}
 
 /**
  * Destroys an object @pOBJ, that is finalises it (and its referenced objects)
  * based on a given destructor @p DTOR **and** deallocates its memory.
  * The destructor @p DTOR is **also** destroyed.
  */
-#define DESTROY( OBJ, DTOR ) {\
+#define DESTROY( OBJ, DTOR ) \
+if ((OBJ)) {\
     void *__obj = (OBJ);\
     const dtor *__dt = (DTOR);\
     __dt->df(__obj, __dt);\
     free(__obj);\
-    dtor_free((void *)__dt);}
+    dtor_free((void *)__dt);\
+}
 
 
 ////@cond
-#define FREE1( OBJ ) if(OBJ) free(OBJ)
+#define FREE1( OBJ ) if((OBJ)) free(OBJ)
 
-#define FREE2( OBJ, TYPE ) DESTROY(OBJ, DTOR(TYPE))
+#define FREE2( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, DTOR(TYPE))
 
 #define _SELECT_FREE(_1, _2, NAME,...) NAME
 ////@endcond

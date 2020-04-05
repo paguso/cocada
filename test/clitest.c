@@ -37,7 +37,8 @@ static void test_setup()
 {
 	cmd = cliparse_new("test", "A Test Program");
 	char *choice_arr[3]  = {"choice1", "choice2", "choice3"};
-	vec *choices = vec_new_from_arr_cpy(choice_arr, 3, sizeof(char *));
+	vec *choices = vec_new(sizeof(char *));
+	for (size_t i=0; i<3; vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
 	cliparse_add_option(cmd,
 	                    cliopt_new_defaults(
 	                        'a',
@@ -50,7 +51,7 @@ static void test_setup()
 	                        'b',
 	                        cstr_clone("bbb"),
 	                        cstr_clone("non-mandatory single option with one boolean value"),
-	                        false, true, ARG_BOOL, 1, 1, NULL, NULL
+	                        false, false, ARG_BOOL, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
@@ -58,7 +59,7 @@ static void test_setup()
 	                        'c',
 	                        cstr_clone("ccc"),
 	                        cstr_clone("non-mandatory multiple option with two int values"),
-	                        false, false, ARG_INT, 2, 2, NULL, NULL
+	                        false, true, ARG_INT, 2, 2, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
@@ -66,7 +67,7 @@ static void test_setup()
 	                        'd',
 	                        cstr_clone("ddd"),
 	                        cstr_clone("mandatory single option with one string value"),
-	                        true, true, ARG_STR, 1, 1, NULL, NULL
+	                        true, false, ARG_STR, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
@@ -74,7 +75,7 @@ static void test_setup()
 	                        'e',
 	                        cstr_clone("eee"),
 	                        cstr_clone("non-mandatory multiple option with one tp three file value"),
-	                        false, false, ARG_FILE, 1, 3, NULL, NULL
+	                        false, true, ARG_FILE, 1, 3, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
@@ -82,7 +83,7 @@ static void test_setup()
 	                        'f',
 	                        cstr_clone("fff"),
 	                        cstr_clone("non-mandatory single option with unlimited float values"),
-	                        false, true, ARG_FLOAT, 1, ARGNO_UNLIMITED, NULL, NULL
+	                        false, false, ARG_FLOAT, 1, ARGNO_UNLIMITED, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(cmd,
@@ -90,7 +91,7 @@ static void test_setup()
 	                        'g',
 	                        cstr_clone("ggg"),
 	                        cstr_clone("non-mandatory single option three or more  values"),
-	                        false, true, ARG_CHOICE, 3, ARGNO_UNLIMITED, choices, NULL
+	                        false, false, ARG_CHOICE, 3, ARGNO_UNLIMITED, choices, NULL
 	                    )
 	                   );
 	cliparse_add_pos_arg(cmd,
@@ -116,7 +117,7 @@ static void test_setup()
 	                        'k',
 	                        cstr_clone("kkk"),
 	                        cstr_clone("mandatory single option with one boolean value"),
-	                        true, true, ARG_BOOL, 1, 1, NULL, NULL
+	                        true, false, ARG_BOOL, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
@@ -124,7 +125,7 @@ static void test_setup()
 	                        'l',
 	                        cstr_clone("lll"),
 	                        cstr_clone("non-mandatory multiple option with two values"),
-	                        false, false, ARG_BOOL, 2, 2, NULL, NULL
+	                        false, true, ARG_BOOL, 2, 2, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
@@ -132,7 +133,7 @@ static void test_setup()
 	                        'm',
 	                        cstr_clone("mmm"),
 	                        cstr_clone("non-mandatory single option with no value"),
-	                        false, true, ARG_NONE, 0, 0, NULL, NULL
+	                        false, false, ARG_NONE, 0, 0, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_option(scmd1,
@@ -140,7 +141,7 @@ static void test_setup()
 	                        'n',
 	                        cstr_clone("nnn"),
 	                        cstr_clone("non-mandatory single option with one string value"),
-	                        false, true, ARG_STR, 1, 1, NULL, NULL
+	                        false, false, ARG_STR, 1, 1, NULL, NULL
 	                    )
 	                   );
 	cliparse_add_pos_arg(scmd1,

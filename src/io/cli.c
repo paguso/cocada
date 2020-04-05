@@ -44,7 +44,7 @@ struct _cliopt {
 	char *longname;		/* Long option name e.g. foo (--foo) */
 	char *help;			/* Help description */
 	bool mandatory;		/* true=mandatory argument(default); false=optional */
-	bool single;		/* true=can appear only once(default), false=can appear multiple times */
+	bool multiple;		/* true=can be declared multiple times, false=can appear only once(default) */
 	cliargtype type;	/* The type of option values */
 	size_t min_val_no;	/* Minimum number of option values (default = 0) */
 	size_t max_val_no;	/* Maximum number of option values (default = 0) */
@@ -53,14 +53,16 @@ struct _cliopt {
 	vec *values;		/* Actual parsed values */
 };
 
+
 struct _cliarg {
 	char *name;			/* argument name */
 	char *help;			/* help message */
 	cliargtype type;	/* value type */
-	bool single;		/* true=one single value; false=multiple */
+	bool single_val;	/* true=one single value; false=multiple */
 	vec *choices;		/* value choices if type=ARG_CHOICE */
 	vec *values;		/* Actual parsed value(s) */
 };
+
 
 struct _cliparse {
 	struct _cliparse *par;		/* parent command (fur subcommands) */
@@ -75,28 +77,13 @@ struct _cliparse {
 };
 
 
-cliopt *cliopt_new_defaults(char shortname, char *longname, char *help)
-{
-	cliopt *ret = NEW(cliopt);
-	ret->shortname = shortname;
-	ret->longname = (longname) ? cstr_clone(longname) : NULL;
-	ret->help = (help) ? cstr_clone(help) : NULL;
-	ret->mandatory = false;
-	ret->single = true;
-	ret->type = ARG_NONE;
-	ret->min_val_no = 0;
-	ret->max_val_no = 0;
-	ret->choices = NULL;
-	ret->defaults = NULL;
-	ret->values = vec_new(sizeof(bool));
-	return ret;
-}
 
-
-static vec *_vals_vec_new(bool single, cliargtype type)
+static vec *_vals_vec_new(bool multiple, cliargtype type)
 {
 	vec *ret;
-	if (single) {
+	if (multiple) {
+		ret	= vec_new(sizeof(vec *));
+	} else {
 		switch (type) {
 		case ARG_NONE:
 			ret = vec_new(sizeof(bool));
@@ -126,22 +113,93 @@ static vec *_vals_vec_new(bool single, cliargtype type)
 			ret = vec_new(sizeof(int));
 			break;
 		}
-	} else {
-		ret	= vec_new(sizeof(vec *));
 	}
 	return ret;
 }
 
 
+static void _vals_vec_free(vec *vals, bool multiple, cliargtype type)
+{
+	switch (type) {
+	case ARG_NONE:
+		FREE(vals, vec);
+		break;
+	case ARG_BOOL:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+		} else {
+			FREE(vals, vec);
+		}
+		break;
+	case ARG_CHAR:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+		} else {
+			FREE(vals, vec);
+		}
+		break;
+	case ARG_INT:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+		} else {
+			FREE(vals, vec);
+		}
+		break;
+	case ARG_FLOAT:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+		} else {
+			FREE(vals, vec);
+		}
+		break;
+	case ARG_STR:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+		} else {
+			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+		}
+		break;
+	case ARG_FILE:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+		} else {
+			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+		}
+		break;
+	case ARG_DIR:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+		} else {
+			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+		}
+		break;
+	case ARG_CHOICE:
+		if (multiple) {
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+		} else {
+			FREE(vals, vec);
+		}
+		break;
+	}
+}
+
+
+cliopt *cliopt_new_defaults(char shortname, char *longname, char *help)
+{
+	return cliopt_new_valued(shortname, longname, help, false, false, 
+							 ARG_NONE, 0, 0, NULL, NULL);
+}
+
+
 cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
-                          bool mandatory, bool single, cliargtype type,
+                          bool mandatory, bool multiple, cliargtype type,
                           size_t min_val_no, size_t max_val_no,
                           vec *choices, vec *defaults )
 {
 	assert( shortname!='h' );
 	assert( longname==NULL || strcmp(longname, "help")!=0 );
 	assert( !mandatory || max_val_no!=0 );
-	assert( single || max_val_no!=0 );
+	assert( !multiple || max_val_no!=0 );
 	assert( max_val_no!=0 || type==ARG_NONE);
 	assert( type!=ARG_NONE || max_val_no==0);
 	assert( type!=ARG_NONE || defaults==NULL);
@@ -155,13 +213,13 @@ cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
 	ret->longname = (longname) ? cstr_clone(longname) : NULL;
 	ret->help = (help) ? cstr_clone(help) : NULL;
 	ret->mandatory = mandatory;
-	ret->single = single;
+	ret->multiple = multiple;
 	ret->type = type;
 	ret->min_val_no = min_val_no;
 	ret->max_val_no = max_val_no;
 	ret->choices = choices;
 	ret->defaults = defaults;
-	ret->values = _vals_vec_new(single , type);
+	ret->values = _vals_vec_new(multiple , type);
 	return ret;
 }
 
@@ -173,37 +231,7 @@ void cliopt_dispose(void *ptr, const dtor *dt)
 	FREE(opt->help);
 	DESTROY(opt->choices, dtor_cons(DTOR(vec), ptr_dtor()));
 	DESTROY(opt->defaults, dtor_cons(DTOR(vec), ptr_dtor()));
-	if (opt->single) { // flat value
-		switch (opt->type) {
-		case ARG_NONE:
-			break;
-		case ARG_BOOL:
-			FREE(opt->values, vec);
-			break;
-		case ARG_CHAR:
-			FREE(opt->values, vec);
-			break;
-		case ARG_INT:
-			FREE(opt->values, vec);
-			break;
-		case ARG_FLOAT:
-			FREE(opt->values, vec);
-			break;
-		case ARG_STR:
-			DESTROY(opt->values, dtor_cons(DTOR(vec), ptr_dtor()));
-			break;
-		case ARG_FILE:
-			DESTROY(opt->values, dtor_cons(DTOR(vec), ptr_dtor()));
-			break;
-		case ARG_DIR:
-			DESTROY(opt->values, dtor_cons(DTOR(vec), ptr_dtor()));
-			break;
-		case ARG_CHOICE:
-			FREE(opt->values, vec);
-			break;
-		}
-	}
-	FREE(opt);
+	_vals_vec_free(opt->values, opt->multiple, opt->type);
 }
 
 
@@ -213,36 +241,8 @@ cliarg *cliarg_new(char *name, char*help, cliargtype type)
 	ret->name = (name) ? cstr_clone(name) : cstr_clone("Unnamed");
 	ret->help = (help) ? cstr_clone(help) : cstr_new(0);
 	ret->type = type;
-	ret->single = true;
-	switch (type) {
-	case ARG_NONE:
-		ret->values = NULL;
-		break;
-	case ARG_BOOL:
-		ret->values = vec_new(sizeof(bool));
-		break;
-	case ARG_CHAR:
-		ret->values = vec_new(sizeof(char));
-		break;
-	case ARG_INT:
-		ret->values = vec_new(sizeof(long));
-		break;
-	case ARG_FLOAT:
-		ret->values = vec_new(sizeof(double));
-		break;
-	case ARG_STR:
-		ret->values = vec_new(sizeof(char *));
-		break;
-	case ARG_FILE:
-		ret->values = vec_new(sizeof(char *));
-		break;
-	case ARG_DIR:
-		ret->values = vec_new(sizeof(char *));
-		break;
-	case ARG_CHOICE:
-		ret->values = vec_new(sizeof(int));
-		break;
-	}
+	ret->single_val = true;
+	ret->values = _vals_vec_new(false, ret->type);
 	return ret;
 }
 
@@ -250,7 +250,7 @@ cliarg *cliarg_new(char *name, char*help, cliargtype type)
 cliarg *cliarg_new_multi(char *name, char*help, cliargtype type)
 {
 	cliarg *ret = cliarg_new(name, help, type);
-	ret->single = false;
+	ret->single_val = false;
 	return ret;
 }
 
@@ -266,7 +266,7 @@ cliarg *cliarg_new_choice(char *name, char*help, vec *choices)
 cliarg *cliarg_new_choice_multi(char *name, char*help, vec *choices)
 {
 	cliarg *ret = cliarg_new_choice(name, help, choices);
-	ret->single = false;
+	ret->single_val = false;
 	return ret;
 }
 
@@ -277,35 +277,7 @@ void cliarg_dispose(void *ptr, const dtor *dt)
 	FREE(arg->name);
 	FREE(arg->help);
 	DESTROY(arg->choices, dtor_cons(DTOR(vec), ptr_dtor()));
-	switch (arg->type) {
-	case ARG_NONE:
-		break;
-	case ARG_BOOL:
-		FREE(arg->values, vec);
-		break;
-	case ARG_CHAR:
-		FREE(arg->values, vec);
-		break;
-	case ARG_INT:
-		FREE(arg->values, vec);
-		break;
-	case ARG_FLOAT:
-		FREE(arg->values, vec);
-		break;
-	case ARG_STR:
-		DESTROY(arg->values, dtor_cons(DTOR(vec), ptr_dtor()));
-		break;
-	case ARG_FILE:
-		DESTROY(arg->values, dtor_cons(DTOR(vec), ptr_dtor()));
-		break;
-	case ARG_DIR:
-		DESTROY(arg->values, dtor_cons(DTOR(vec), ptr_dtor()));
-		break;
-	case ARG_CHOICE:
-		FREE(arg->values, vec);
-		break;
-	}
-	FREE(arg);
+	_vals_vec_free(arg->values, false, arg->type);
 }
 
 
@@ -335,7 +307,9 @@ cliparse *cliparse_new(char *name, char *help)
 	ret->options = hashmap_new(sizeof(char), sizeof(cliopt *), ident_hash_char, eq_char);
 	ret->long_to_short = hashmap_new(sizeof(char *), sizeof(char), _hash_str, _str_eq);
 	ret->args = vec_new(sizeof(cliarg *));
-	cliopt *help_opt = cliopt_new_defaults('h', "help", "Prints help message");
+	// add help option directly
+	cliopt *help_opt = cliopt_new_defaults('x', "xelp", "Prints help message");
+	help_opt->shortname = help_opt->longname[0] = 'h';
 	hashmap_set(ret->options, &help_opt->shortname, &help_opt);
 	hashmap_set(ret->long_to_short, &help_opt->longname, &help_opt->shortname);
 	return ret;
@@ -344,16 +318,14 @@ cliparse *cliparse_new(char *name, char *help)
 
 void cliparse_dispose(void *ptr, const dtor *dt) 
 {
-	if (ptr == NULL) return;
 	cliparse *clip = (cliparse *)ptr;
-	FREE(clip->name);
-	FREE(clip->help);
 	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()), dtor_cons(ptr_dtor(), DTOR(cliparse))));
 	FREE(clip->subcmd_names, vec);
 	DESTROY(clip->options, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()), dtor_cons(ptr_dtor(), DTOR(cliopt))));
 	FREE(clip->long_to_short, hashmap);
 	DESTROY(clip->args, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(cliarg))));
-	FREE(clip);
+	FREE(clip->name);
+	FREE(clip->help);
 }
 
 
@@ -389,9 +361,9 @@ void cliparse_add_option(cliparse *cmd, cliopt *opt)
 void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg)
 {
 	//assert(vec_len(cmd->subcommands)==0);
-	assert( arg->single ||
+	assert( arg->single_val ||
 	        vec_len(cmd->args) == 0 ||
-	        ((cliarg*)vec_last_rawptr(cmd->args))->single );
+	        ((cliarg*)vec_last_rawptr(cmd->args))->single_val );
 	vec_push_rawptr(cmd->args, arg);
 }
 
@@ -404,11 +376,11 @@ void cliopt_print_help(cliopt *opt)
 {
 	size_t nmdel;
 	if (opt->mandatory) { // mandatory
-		if (opt->single) nmdel = 0; // exactly once
-		else nmdel = 1; // one or more
+		if (opt->multiple) nmdel = 1; // one or more 
+		else nmdel = 0; // exactly once
 	} else { // optional
-		if (opt->single) nmdel = 2; //zero or one
-		else nmdel = 3; // zero or more
+		if (opt->multiple) nmdel = 3; //zero or more
+		else nmdel = 2; // zero or one
 	}
 	//printf("%s-%c", delim_names[nmdel], opt->shortname);
 	printf("  (%s)", arity_names[nmdel]);
@@ -471,7 +443,7 @@ void cliparse_print_help(cliparse *cmd)
 	}
 	for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
 		cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-		printf(" %s%s", arg->name, (arg->single)?"":"...");
+		printf(" %s%s", arg->name, (arg->single_val)?"":"...");
 	}
 	printf("\n");
 	if (has_subcmds) {
@@ -499,8 +471,8 @@ void cliparse_print_help(cliparse *cmd)
 		printf("\nArguments:\n\n");
 		for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
 			cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single)?"":"...", 
-					(arg->help)?arg->help:"", val_types[arg->type], (arg->single)?"":"...");
+			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single_val)?"":"...", 
+					(arg->help)?arg->help:"", val_types[arg->type], (arg->single_val)?"":"...");
 		}
 	}
 	if (has_subcmds) {
@@ -538,7 +510,7 @@ static void _check_mandatory_options(cliparse *cmd)
 			(strbuf_len(ln)>4)?strbuf_as_str(ln):"");
 		if (!opt->mandatory && vec_len(opt->values)==0 && opt->defaults!=NULL) {
 			// add default values
-			vec *vals = _vals_vec_new(opt->single, opt->type);
+			vec *vals = _vals_vec_new(opt->multiple, opt->type);
 			switch (opt->type) {
 			case ARG_NONE:
 				vec_cat(vals, opt->defaults);
@@ -570,12 +542,11 @@ static void _check_mandatory_options(cliparse *cmd)
 			case ARG_CHOICE:
 				break;
 			}
-			if (opt->single) {
+			if (opt->multiple) {
+				vec_push(opt->values, &vals);
+			} else {
 				vec_cat(opt->values, vals);
 				FREE(vals, vec);
-			}
-			else {
-				vec_push(opt->values, &vals);
 			}
 		}
 	}
@@ -737,7 +708,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				exit(EXIT_SUCCESS);
 			}
 			cur_opt = (cliopt *) hashmap_get_rawptr(cur_parse->options, &shortname);
-			CHECK(!cur_opt->single || vec_len(cur_opt->values) == 0,
+			CHECK(cur_opt->multiple || vec_len(cur_opt->values) == 0,
 			      "Invalid multiple definition of option %s at position %d.", argv[t], t);
 			if (cur_opt->max_val_no > 0) { // has values
 				vec *vals = _collect_vals(NULL, argv, t+1, cur_opt->max_val_no, cur_opt->type, cur_opt->choices);
@@ -765,12 +736,11 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				       "Wrong value for option %s at position %d. Found %s at position %d whereas expected type was <%s>.\n",
 				       argv[t], t, argv[err_pos], err_pos, val_types[cur_opt->type] );		
 				*/		
-				if (cur_opt->single) {
+				if (cur_opt->multiple) {
+					vec_push(cur_opt->values, &vals);
+				} else {
 					vec_cat(cur_opt->values, vals);
 					FREE(vals, vec);
-				}
-				else {
-					vec_push(cur_opt->values, &vals);
 				}
 				t += (nargs + 1);
 				continue;
@@ -805,7 +775,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 			nvals = vec_len(cur_arg->values) - nvals;
 			CHECK(nvals==1, "Wrong value for argument #%zu (%s). Expected a <%s> value, but found %s.\n", 
 				  cur_pos_arg+1, cur_arg->name, val_types[cur_arg->type], argv[t] );
-			if (cur_arg->single) { 
+			if (cur_arg->single_val) { 
 				cur_pos_arg++;
 				if (cur_pos_arg >= vec_len(cur_parse->args)) 
 					state = P_DONE;

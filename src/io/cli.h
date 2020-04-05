@@ -204,7 +204,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * @param help			(**no transfer**) A short description of the option 
  * 						used for help messages.
  * @param mandatory  	Is the option use mandatory?
- * @param single		Can the option be used at most once?
+ * @param multiple		Can the option be declared multiple times?
  * @param type			The type of the option values (ir any)
  * @param min_val_no	The minimum number of option values
  * @param max_val_no	The maximum number of option values. 
@@ -218,7 +218,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
  * - If @p mandatory == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
- * - If @p single == false, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @p multiple == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @type == ARG_CHOICE then @p choices must be a non-empty vector
  * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @single == true
  * - If @p mandatory == true, @p defaults is discarded

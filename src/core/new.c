@@ -30,24 +30,24 @@ dtor *dtor_new_with_func( strbuf_func df )
 	dtor *dt = NEW(dtor);
 	dt->df = df;
 	dt->nchd = 0;
-	dt->chd = calloc(1, sizeof(dtor *));
+	dt->chd = NULL;//calloc(1, sizeof(dtor *));
 	return dt;
 }
 
 
-void dtor_free(dtor *d)
+void dtor_free(dtor *dt)
 {
-	if (d==NULL) return;
-	for (size_t i=0; i<d->nchd; i++) {
-		dtor_free(((dtor **)d->chd)[i]);
+	if (dt==NULL) return;
+	for (size_t i=0; i<dt->nchd; i++) {
+		dtor_free(dt->chd[i]);
 	}
-	FREE(d->chd);
-	FREE(d);
+	FREE(dt->chd);
+	FREE(dt);
 }
 
-size_t dtor_nchd(const dtor *dst)
+size_t dtor_nchd(const dtor *dt)
 {
-	return dst->nchd;
+	return dt->nchd;
 }
 
 const dtor *dtor_chd(const dtor *par, size_t index)
@@ -58,9 +58,8 @@ const dtor *dtor_chd(const dtor *par, size_t index)
 
 dtor *dtor_cons(dtor *par, const dtor *chd)
 {
-	par->chd = (dtor **) realloc(par->chd, par->nchd+1 * sizeof(dtor *));
-	par->chd[par->nchd] =  chd;
-	par->nchd++;
+	par->chd = (dtor **) realloc(par->chd, ( par->nchd + 1) * sizeof(dtor *));
+	par->chd[par->nchd++] =  (dtor *)chd;
 	return par;
 }
 
@@ -75,6 +74,7 @@ dtor *empty_dtor()
 	dtor *ret = NEW(dtor);
 	ret->df = _empty_free;
 	ret->nchd = 0;
+	ret->chd = NULL;
 	return ret;
 }
 
@@ -93,5 +93,6 @@ dtor *ptr_dtor()
 	dtor *ret = NEW(dtor);
 	ret->df = _ptr_free;
 	ret->nchd = 0;
+	ret->chd = NULL;
 	return ret;
 }

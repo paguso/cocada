@@ -84,6 +84,7 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
 	ret->data = buf;
 	ret->capacity = ret->len;
 	ret->data = realloc(ret->data, ret->capacity * ret->typesize);
+	ret->swp = malloc(typesize);
 	return ret;
 }
 
@@ -96,6 +97,7 @@ vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
 	ret->capacity = ret->len;
 	ret->data = malloc(ret->capacity * ret->typesize);
 	memcpy(ret->data, buf, ret->len * ret->typesize);
+	ret->swp = malloc(typesize);
 	return ret;
 }
 
