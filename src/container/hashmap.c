@@ -109,6 +109,7 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
 	FREE(hmap);
 }
 
+
 void hashmap_dispose(void *ptr, const dtor *dst)
 {
 	hashmap *hmap = (hashmap *)ptr;

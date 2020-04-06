@@ -85,6 +85,7 @@ static void _ptr_free(void *ptr, const dtor *dt )
 	if ( dtor_nchd(dt) > 0 )
 		FINALISE( pointee, dtor_chd(dt, 0) );
 	FREE(pointee);
+	*((void **)ptr) = NULL;
 }
 
 

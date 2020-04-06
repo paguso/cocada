@@ -180,12 +180,16 @@ void uint_to_cstr(char *dest, uintmax_t val, char base)
 
 bool cstr_equals(const char *left, const char *right)
 {
-	return strcmp(left, right)==0;
+	if ((left==NULL) ^ (right==NULL)) return false;
+	else if ((left==NULL) && (right==NULL)) return true;
+	else return strcmp(left, right)==0;
 }
 
 
 bool cstr_equals_ignore_case(const char *left, const char *right)
 {
+	if ((left==NULL) ^ (right==NULL)) return false;
+	else if ((left==NULL) && (right==NULL)) return true;
 	size_t i, l = strlen(left);
 	if ( l != strlen(right) )
 		return false;

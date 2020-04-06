@@ -85,8 +85,8 @@
  * and a maximum number of values, 0<=nmin<=nmax<=INFINITY, respectively.
  * Setting nmin=nmax enforces an exact number of values. 
  * 
- * COCADA CLI may perform some validation by setting types to option
- * values, chosen amongst the elements of the enum type cliargtype. 
+ * Some validation can be performed on option values by setting types 
+ * to these values. Option types are chosen from the enum type ::cliargtype. 
  * In particular the option ARG_STR accepts any string literal without 
  * performing any previous validation. Currently all values of an option 
  * must be of the same type.
@@ -114,7 +114,7 @@
  * values that they must be of the same type. This is useful, 
  * for example, for dealing with wildcard file name expasions made 
  * by the shell. 
- * 
+ *  
  * ## Example
  * ```
  * grep -r cocada *.c
@@ -123,6 +123,8 @@
  * the second is a list of files where this pattern is to be searched
  * for. So the last argument must admit multiple values.
  * 
+ * The values of the positional arguments are implemented with the
+ * language types defined in the table above
  *  
  * # Subcommands
  * 
@@ -140,19 +142,33 @@
 
 /**
  * @brief CLI option/argument type
+ * The alternatives, meaning and corresponding language-types are given in the 
+ * following table.
+ * 
+ *  Enum cliargtype  | Description                                     | Language type      
+ *  -----------------|-------------------------------------------------|---------------
+ *  ARG_NONE         | No type (boolean switch)                        | bool             
+ *  ARG_BOOL         | Boolean (true/false)                            | bool               
+ *  ARG_CHAR         | Single character                                | char               
+ *  ARG_INT          | Integer                                         | long               
+ *  ARG_FLOAT        | Floating point                                  | doouble             
+ *  ARG_STR          | String literal (no validation)                  | char * (heap)      
+ *  ARG_FILE         | File name (description only, no validation)     | char * (heap)
+ *  ARG_DIR          | Directory name (descrption only, no validation) | char * (heap)    
+ *  ARG_CHOICE       | Finite set of string alternatives               | int (choice #)
  */
 typedef enum {
-	ARG_NONE = 0,  /**< No type, used for valueless options */
-	ARG_BOOL = 1,  /**< Boolean type */
-	ARG_CHAR = 2,  /**< Single character */
-	ARG_INT = 3,   /**< Integer type, stored as long */
-	ARG_FLOAT = 4, /**< Floating point type, stored as double */
-	ARG_STR = 5,   /**< Free-form string literal type */
-	ARG_FILE = 6,  /**< File type (no validation, used for 
-						descriptive/documentation purposes) */
-	ARG_DIR = 7,   /**< Directory type (no validadtio, used for 
-						descriptive/documentation purposes) */
-	ARG_CHOICE = 8 /**< Finite set of string alternatives */
+	ARG_NONE = 0,  /* No type, used for valueless options */
+	ARG_BOOL = 1,  /* Boolean type */
+	ARG_CHAR = 2,  /* Single character */
+	ARG_INT = 3,   /* Integer type, stored as long */
+	ARG_FLOAT = 4, /* Floating point type, stored as double */
+	ARG_STR = 5,   /* Free-form string literal type */
+	ARG_FILE = 6,  /* File type (no validation, used for 
+						descriptive/cumentation purposes) */
+	ARG_DIR = 7,   /* Directory type (no validadtio, used for 
+						descriptive/cumentation purposes) */
+	ARG_CHOICE = 8 /* Finite set of string alternatives */
 } cliargtype;
 
 /**
@@ -213,8 +229,8 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * @param choices		(**transfer**) Possible choices if @p type = ARG_CHOICE
  * @param defaults		(**transfer**) Default values (PENDING)
  * 
- * # Requirements
- * - @p shortname != `'h'` and  @p longname != `"help"`
+ * @warning
+ * The following are required :
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
  * - If @p mandatory == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
@@ -226,7 +242,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  *   at most @p max_val_no elements
  */
 cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
-                          bool mandatory, bool single, cliargtype type,
+                          bool mandatory, bool multiple, cliargtype type,
                           size_t min_val_no, size_t max_val_no,
                           vec *choices, vec *defaults );
 
@@ -264,10 +280,27 @@ cliparse *cliparse_new(char *name, char *help);
 
 
 /**
- * @brief Destructor. Use with default destructor DTOR(cliparse), or
- * simply FREE(obj, cliparse)
+ * @brief Destructor. 
+ * Use with default destructor `DTOR(cliparse)`, or
+ * simply `FREE(obj, cliparse)`.
  */
 void cliparse_dispose(void *ptr, const dtor *dt);
+
+
+/**
+ * @brief Returns the name of a command parser
+ */
+const char *cliparse_name(const cliparse *cmd);
+
+
+/**
+ * @brief Returns the invoked subcommand of a command, if any.
+ * @return Prior to parsing a call with ::cliparse_parse (cmd), returns NULL.
+ * After parsing a call, if a subcommand was called, returns the
+ * corresponding (populated) parser, else returns NULL.
+ */
+const cliparse *cliparse_active_subcommand(const cliparse *cmd);
+
 
 
 /**
@@ -278,9 +311,11 @@ void cliparse_add_subcommand(cliparse *cmd, cliparse *subcmd);
 
 /**
  * @brief Adds an option to a (sub)program CLI parser.
- * @warning A help option with names `-h`, `--help` is automatically added 
- * to every cliparse. Trying to add another option with `-h` or `--help`
- * names will cause an assertion error.
+ * @warning Both the short (`-`) and long (`--`) names of the option must
+ * be unique for the command.
+ * Trying to add options with existing names will cause an assertion error.
+ *  In particular A help option with names 
+ * `-h`, `--help` is automatically added to every cliparse. 
  */
 void cliparse_add_option(cliparse *cmd, cliopt *opt);
 
@@ -299,8 +334,102 @@ void cliparse_print_help(cliparse *cmd);
 
 
 /**
- * @brief Parses a program call.
+ * @brief Parses a program call. 
+ * If the call is sucessfully parsed, the @p cmd is populated with the
+ * option and argument values, including default values for undeclared 
+ * non-required options, if available. If a parse error occurs, an error message
+ * id printed to stderr and the program exits.
+ * 
+ * @param argc The number of tokens (normally received by main())
+ * @param argv (*no transfer*) The program call tokens (also received by main())
+ 
+ * The parser assumes @p argv to contain the tokens of a program call in 
+ * one of the two following forms. 
+ * 1. `command [command options...] [command arguments...]`; or
+ * 2. `command [command options...] [subcommand] [subcommand options...] [subcommand arguments...]`
+ * So, in particular, currently you CANNOT:
+ * - declare command option after the subcommand name
+ * - declare an option after an argument
+ * 
+ * Notice that some calls may be ambiguous, so it is important to know how parsing
+ * works. For example, if a command has an option `-a` with 1 to 3 integer values
+ * and one argument with multiple integer values, then the call
+ * ```
+ * command -a 1 2 3 4 5
+ * ```
+ * would be ambiguous since we don`t know how many of the integer values
+ * and how many are argument values. This could be disambiguated by calling
+ * for instance
+ * ```
+ * command 4 5 -a 1 2 3
+ * ```
+ * but this form is not currently allowed (although this is expected change in
+ * the future).
+ * 
+ * This function handles option values as follows. When an option name is
+ * found at position `i`, it then tries to collect as many values as possible 
+ * from positions `i+1`, `i+2` ,... until 
+ * - The end of @p argv, OR
+ * - The maximum number of allowed values are successfully parsed, OR
+ * - A type-mismatch occurs.
+ * So, in our current example, because `-a` accepts up to 3 values, the
+ * call would be parsed as if the values of `-a` were (`1`,`2`,`3`) and 
+ * the values of the argument were (`4`,`5`).
  */
-void cliparse_parse(cliparse *cmd, int argc, char **argv);
+void cliparse_parse(cliparse *cmd, int argc, const char **argv);
+
+
+/**
+ * @brief Gets the values of an option from its short name.
+ * 
+ * @param cmd The (sub)command parser
+ * @param shortname The short (`-`) name of the option.
+ * 
+ * @return If the option is not found, returns NULL.
+ * If the option is found, returns its values.
+ * The physical type/size of the values will depend on the ::cliargtype type of
+ * the option.
+ * If the option can be declared multiple types (parameter `multiple==true` of 
+ * ::cliopt_new_valued ), then the returned vector is a two-level vector of vectors, 
+ * with child vectors containing the values of each declaration of the option. 
+ * For example if we call
+ * ```
+ * command -o 1 2 3 -o 4 5 input.txt
+ * ```
+ * for an ARG_INT option `-o` with one to three values, then
+ * calling this function with @p shortname = `'o'` would return a
+ * vector with with two child vectors, the first with three long ints
+ * and the second with two long ints.
+ */
+const vec *cliparse_opt_val_from_shortname(cliparse *cmd, char shortname);
+
+
+/**
+ * @brief Gets the values of an option from its long name.
+ * 
+ * @param cmd The (sub)command parser
+ * @param longname The long (`--`) name of the option.
+ * 
+ * @see cliparse_opt_val_from_shortname
+ * 
+ */
+const vec *cliparse_opt_val_from_longname(cliparse *cmd, char *longname);
+
+
+/**
+ * @brief Gets the values of a positional argument from its position.
+ * 
+ * @param cmd The (sub)command parser
+ * @param pos The position (0-based) of the argument.
+ * 
+ * @returns A vector with the values of argument #@p pos. 
+ * The physical type/size of  the vector elements is defined by the 
+ * ::cliargtype type of the argument.
+ * If @p pos is >= the number of arguments, returns NULL.
+ * 
+ */
+const vec *cliparse_arg_val_from_pos(cliparse *cmd, size_t pos);
+
+
 
 #endif

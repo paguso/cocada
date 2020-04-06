@@ -196,8 +196,8 @@ cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
                           size_t min_val_no, size_t max_val_no,
                           vec *choices, vec *defaults )
 {
-	assert( shortname!='h' );
-	assert( longname==NULL || strcmp(longname, "help")!=0 );
+	//assert( shortname!='h' );
+	//assert( longname==NULL || strcmp(longname, "help")!=0 );
 	assert( !mandatory || max_val_no!=0 );
 	assert( !multiple || max_val_no!=0 );
 	assert( max_val_no!=0 || type==ARG_NONE);
@@ -230,7 +230,16 @@ void cliopt_dispose(void *ptr, const dtor *dt)
 	FREE(opt->longname);
 	FREE(opt->help);
 	DESTROY(opt->choices, dtor_cons(DTOR(vec), ptr_dtor()));
-	DESTROY(opt->defaults, dtor_cons(DTOR(vec), ptr_dtor()));
+	switch (opt->type) {
+	case ARG_STR:
+	case ARG_FILE:
+	case ARG_DIR:
+		DESTROY(opt->defaults, dtor_cons(DTOR(vec), ptr_dtor()));
+		break;
+	default:
+		FREE(opt->defaults, vec);
+		break;
+	}
 	_vals_vec_free(opt->values, opt->multiple, opt->type);
 }
 
@@ -308,10 +317,8 @@ cliparse *cliparse_new(char *name, char *help)
 	ret->long_to_short = hashmap_new(sizeof(char *), sizeof(char), _hash_str, _str_eq);
 	ret->args = vec_new(sizeof(cliarg *));
 	// add help option directly
-	cliopt *help_opt = cliopt_new_defaults('x', "xelp", "Prints help message");
-	help_opt->shortname = help_opt->longname[0] = 'h';
-	hashmap_set(ret->options, &help_opt->shortname, &help_opt);
-	hashmap_set(ret->long_to_short, &help_opt->longname, &help_opt->shortname);
+	cliopt *help_opt = cliopt_new_defaults('h', "help", "Prints help message");
+	cliparse_add_option(ret, help_opt);
 	return ret;
 }
 
@@ -329,6 +336,18 @@ void cliparse_dispose(void *ptr, const dtor *dt)
 }
 
 
+const char *cliparse_name(const cliparse *cmd)
+{
+	return cmd->name;
+}
+
+
+const cliparse *cliparse_active_subcommand(const cliparse *cmd)
+{
+	return cmd->active_subcmd;
+}
+
+
 void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 {
 	assert(cmd->par==NULL);
@@ -342,9 +361,8 @@ void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 
 void cliparse_add_option(cliparse *cmd, cliopt *opt)
 {
-	assert( opt->shortname!='h' && (opt->longname==NULL || strcmp(opt->longname, "help")!=0) );
-	//assert(vec_len(cmd->subcommands)==0);
 	assert( !hashmap_has_key(cmd->options, &(opt->shortname)) );
+	assert( opt->longname==NULL || !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
 	if (hashmap_has_key(cmd->long_to_short, &(opt->longname)) ){
 		char sn = hashmap_get_char(cmd->long_to_short, &(opt->longname));
 		cliopt *aopt = (cliopt *)hashmap_get_rawptr(cmd->options, &sn);
@@ -368,11 +386,11 @@ void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg)
 }
 
 
-static char *delim_names[8] = {"","","(",")+","[","]","(",")*"};
+//static char *delim_names[8] = {"","","(",")+","[","]","(",")*"};
 static char *arity_names[4] = {"!","+","?","*"};
-static char *val_types[] = {"", "true|false", "char", "integer", "float", "literal", "file", "dir", "choice"};
+static char *val_types[] = {"", "boolean", "char", "integer", "float", "literal", "file", "dir", "choice"};
 
-void cliopt_print_help(cliopt *opt)
+static void _cliopt_print_help(cliopt *opt)
 {
 	size_t nmdel;
 	if (opt->mandatory) { // mandatory
@@ -461,7 +479,7 @@ void cliparse_print_help(cliparse *cmd)
 		vec_qsort(shortnames, cmp_char);
 		for (size_t i=0, l=vec_len(shortnames); i<l; i++) {
 			cliopt *opt = (cliopt *) hashmap_get_rawptr(cmd->options, vec_get(shortnames, i));
-			cliopt_print_help(opt);
+			_cliopt_print_help(opt);
 		}
 		printf("\n  usage : ! = required, ? = optional, + = one or more,  * = zero or more\n");
 		printf("  values: <type> = one value,  <type>[N] = N values,\n");
@@ -495,19 +513,24 @@ if (!(ASSERTION)) { \
 }
 
 
-static void _check_mandatory_options(cliparse *cmd)
+/*
+ * Checks to see if required options were not declared.
+ * AND
+ * Attribute default values for undeclared non-required options when available.
+ */
+static void _check_missing_options(cliparse *cmd)
 {
-	strbuf *ln = strbuf_new_with_capacity(16);
+	strbuf *longname = strbuf_new_with_capacity(16);
 	hashmap_iter *iter = hashmap_get_iter(cmd->options);
 	while(hashmap_iter_has_next(iter)) {
 		hashmap_entry entry = hashmap_iter_next(iter);
 		cliopt *opt = *((cliopt **)entry.val);
-		strbuf_clear(ln);
-		strbuf_append(ln, ", --");
-		if (opt->longname) strbuf_append(ln, opt->longname);
+		strbuf_clear(longname);
+		strbuf_append(longname, ", --");
+		if (opt->longname) strbuf_append(longname, opt->longname);
 		CHECK( !opt->mandatory || (opt->values != NULL && vec_len(opt->values) > 0 ),
 			"Undefined mandatory option -%c%s.\n", opt->shortname, 
-			(strbuf_len(ln)>4)?strbuf_as_str(ln):"");
+			(strbuf_len(longname)>4)?strbuf_as_str(longname):"");
 		if (!opt->mandatory && vec_len(opt->values)==0 && opt->defaults!=NULL) {
 			// add default values
 			vec *vals = _vals_vec_new(opt->multiple, opt->type);
@@ -550,7 +573,7 @@ static void _check_mandatory_options(cliparse *cmd)
 			}
 		}
 	}
-	strbuf_free(ln);
+	strbuf_free(longname);
 }
 
 
@@ -561,7 +584,7 @@ static void _check_mandatory_options(cliparse *cmd)
  * The process halts as soon as an invalid value is found or max_no values
  * are successfully collected or argv is exhausted.
  */
-vec *_collect_vals(vec *ret, char **argv, size_t from, size_t max_no, cliargtype type, vec *choices)
+vec *_collect_vals(vec *ret, const char **argv, size_t from, size_t max_no, cliargtype type, vec *choices)
 {
 	if (ret == NULL) {
 		switch (type) {
@@ -673,7 +696,7 @@ typedef enum {
 	P_DONE    = 4
 } parse_state;
 
-void cliparse_parse(cliparse *clip, int argc, char **argv)
+void cliparse_parse(cliparse *clip, int argc, const char **argv)
 {
 	int t = 1;
 	parse_state state = P_CMD_OPT;
@@ -793,7 +816,39 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 		   "Missing argument #%zu of type <%s> at position %d.\n", 
 			cur_pos_arg+1, val_types[cur_arg->type], t );
 	// check if mandatory options with no default values undefined
-	_check_mandatory_options(clip);
-	if (clip->active_subcmd) _check_mandatory_options(clip->active_subcmd);
+	_check_missing_options(clip);
+	if (clip->active_subcmd) _check_missing_options(clip->active_subcmd);
 	strbuf_free(tokbuf);
 }
+
+
+const vec *cliparse_opt_val_from_shortname(cliparse *cmd, char shortname)
+{
+	if (hashmap_has_key(cmd->options, &shortname)) {
+		return ((cliopt*)hashmap_get_rawptr(cmd->options, &shortname))->values;
+	} else {
+		return NULL;
+	}
+}
+
+
+const vec *cliparse_opt_val_from_longname(cliparse *cmd, char *longname)
+{
+	if (hashmap_has_key(cmd->long_to_short, &longname)) {
+		char shortname = hashmap_get_char(cmd->long_to_short, &longname);
+		return ((cliopt*)hashmap_get_rawptr(cmd->options, &shortname))->values;
+	} else {
+		return NULL;
+	}
+}
+
+
+const vec *cliparse_arg_val_from_pos(cliparse *cmd, size_t pos)
+{
+	if (pos < vec_len(cmd->args)) {
+		return ((cliarg *)vec_get_rawptr(cmd->args, pos))->values;
+	} else {
+		return NULL;
+	}
+}
+

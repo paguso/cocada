@@ -33,10 +33,11 @@
 
 static cliparse *cmd;
 
+
 static void test_setup()
 {
 	cmd = cliparse_new("test", "A Test Program");
-	char *choice_arr[3]  = {"choice1", "choice2", "choice3"};
+	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
 	vec *choices = vec_new(sizeof(char *));
 	for (size_t i=0; i<3; vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
 	cliparse_add_option(cmd,
@@ -54,12 +55,16 @@ static void test_setup()
 	                        false, false, ARG_BOOL, 1, 1, NULL, NULL
 	                    )
 	                   );
+	vec *def = vec_new(sizeof(long));
+	vec_push_long(def,1234);
+	vec_push_long(def,4321);
+	vec_push_long(def,2143);
 	cliparse_add_option(cmd,
 	                    cliopt_new_valued(
 	                        'c',
 	                        cstr_clone("ccc"),
 	                        cstr_clone("non-mandatory multiple option with two int values"),
-	                        false, true, ARG_INT, 2, 2, NULL, NULL
+	                        false, true, ARG_INT, 2, 5, NULL, def
 	                    )
 	                   );
 	cliparse_add_option(cmd,
