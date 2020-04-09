@@ -353,7 +353,7 @@ should have `K` and `V` type destructors as children, that is
 In general, we could have any tree-like destructor hierarchy. Although a specific
 destructor could be implemented by the library user, for example, a function
 
-`dstr *C_of_B_of_A_dstr()`
+`dtor *C_of_B_of_A_get_dtor()`
 
 could be implemented to return a destructor to the previous example, this would
 be rather tedious. Instead, COCADA provides a more ergonomic way to construct

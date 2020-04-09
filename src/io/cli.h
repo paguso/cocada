@@ -91,7 +91,7 @@
  * performing any previous validation. Currently all values of an option 
  * must be of the same type.
  *  
- * An option can either be *mandatory*, when it must be declared in the
+ * An option can either be *required*, when it must be declared in the
  * program call, or *optional*, when it may be left unspecified. Although
  * not forbidden, it is normally pointless to have a required option
  * with no associated value.
@@ -172,6 +172,24 @@ typedef enum {
 } cliargtype;
 
 /**
+ * @brief Does a CLI option need to bee used on each call?
+ */
+typedef enum {
+	OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
+	OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
+} clioptneed;
+
+
+/**
+ * @brief How many times can an option be used on a single call?
+ */
+typedef enum {
+	OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
+	OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
+} clioptmultiplicity;
+
+
+/**
  * @brief Indicates an unlimited number of option/argument values 
  */
 #define ARGNO_UNLIMITED  SIZE_MAX
@@ -219,8 +237,8 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * @param longname		(**no transfer**) The multi-character distinct name
  * @param help			(**no transfer**) A short description of the option 
  * 						used for help messages.
- * @param mandatory  	Is the option use mandatory?
- * @param multiple		Can the option be declared multiple times?
+ * @param need			Is the option use mandatory?
+ * @param multiplicity	Can the option be declared multiple times?
  * @param type			The type of the option values (ir any)
  * @param min_val_no	The minimum number of option values
  * @param max_val_no	The maximum number of option values. 
@@ -233,17 +251,17 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * The following are required :
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
- * - If @p mandatory == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
- * - If @p multiple == true, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @p need == OPT_REQUIRED, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @p multiplicity == OPT_MULTIPLE, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @type == ARG_CHOICE then @p choices must be a non-empty vector
- * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @single == true
- * - If @p mandatory == true, @p defaults is discarded
- * - If @p mandatory == false, @p defaults must have at least @p min_val_no and 
+ * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @p multiplicity == OPT_SINGLE
+ * - If @p need == OPT_REQUIRED, @p defaults is discarded
+ * - If @p need == OPT_OPTIONAL, @p defaults must have at least @p min_val_no and 
  *   at most @p max_val_no elements
  */
-cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
-                          bool mandatory, bool multiple, cliargtype type,
-                          size_t min_val_no, size_t max_val_no,
+cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
+                          clioptneed need, clioptmultiplicity multiplicity, 
+						  cliargtype type, size_t min_val_no, size_t max_val_no,
                           vec *choices, vec *defaults );
 
 
@@ -389,7 +407,7 @@ void cliparse_parse(cliparse *cmd, int argc, const char **argv);
  * If the option is found, returns its values.
  * The physical type/size of the values will depend on the ::cliargtype type of
  * the option.
- * If the option can be declared multiple types (parameter `multiple==true` of 
+ * If the option can be declared multiple types (parameter `multi==OPT_MULTIPLE` of 
  * ::cliopt_new_valued ), then the returned vector is a two-level vector of vectors, 
  * with child vectors containing the values of each declaration of the option. 
  * For example if we call
