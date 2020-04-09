@@ -88,7 +88,7 @@ void binheap_free(binheap *heap, bool free_elements);
  * @brief Finaliser
  * @see new.h
  */
-void binheap_dispose(void *ptr, const dtor *dst);
+void binheap_dtor(void *ptr, const dtor *dst);
 
 
 /**

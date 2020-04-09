@@ -103,7 +103,7 @@ void alphabet_free(alphabet *ab);
 /**
  * @brief Destructor
  */
-void alphabet_dispose(void *ptr, const dtor *dt);
+void alphabet_dtor(void *ptr, const dtor *dt);
 
 
 /**

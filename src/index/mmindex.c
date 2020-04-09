@@ -84,7 +84,7 @@ mmindex *mmindex_new(alphabet * ab, size_t n, size_t * w, size_t * k)
 	return ret;
 }
 
-void mmindex_dispose(void *ptr, const dtor * dt)
+void mmindex_dtor(void *ptr, const dtor * dt)
 {
 	mmindex *mm = (mmindex *) ptr;
 	alphabet_free(mm->ab);

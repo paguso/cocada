@@ -68,10 +68,10 @@ void minqueue_free(minqueue *queue, bool free_elts)
 }
 
 
-void minqueue_dispose(void *ptr, const dtor *dt )
+void minqueue_dtor(void *ptr, const dtor *dt )
 {
 	minqueue *mq = (minqueue *)ptr;
-	deque_dispose(mq->elts, dt);
+	deque_dtor(mq->elts, dt);
 	FREE(mq->mins, deque);
 }
 

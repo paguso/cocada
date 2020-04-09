@@ -103,7 +103,7 @@ void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
  * the values.
  * @see new.h
  */
-void hashmap_dispose(void *ptr, const dtor *dt);
+void hashmap_dtor(void *ptr, const dtor *dt);
 
 
 /**

@@ -141,7 +141,7 @@ void vec_free(vec *v, bool free_elements)
 }
 
 
-void vec_dispose(void *ptr, const dtor *dt )
+void vec_dtor(void *ptr, const dtor *dt )
 {
 	vec *v = (vec *)ptr;
 	if (dtor_nchd(dt)) {

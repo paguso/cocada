@@ -41,9 +41,9 @@ void stack_free(stack *s, bool free_elements)
 }
 
 
-void stack_dispose(void *ptr, const dtor *dt)
+void stack_dtor(void *ptr, const dtor *dt)
 {
-	vec_dispose(ptr, dt);
+	vec_dtor(ptr, dt);
 }
 
 

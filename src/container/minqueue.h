@@ -67,7 +67,7 @@ void minqueue_free(minqueue *queue, bool free_elts);
 /**
  * @brief Desctructor
  */
-void minqueue_dispose(void *ptr, const dtor *dt);
+void minqueue_dtor(void *ptr, const dtor *dt);
 
 
 /**

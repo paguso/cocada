@@ -33,13 +33,13 @@
         destroying objects.
 
 
-Object lifecycle
--------------------------------------------------------------------------------
 
-Cocada objects are typically implemented as structs with associated semantics.
+# Object lifecycle
+
+COCADA objects are typically implemented as structs with associated semantics.
 Each object has a type. In general the type is declared in the header file
 named `type.h`, and defined (implemented) in the corresponding
-`type.c`. Most type declarations are made via anonymous structs to hide
+`type.c`. Most type declarations are made via opaque structs to hide
 implementation details from the library user.
 
 ```
@@ -47,7 +47,6 @@ In type.h:
 
 typedef struct _type type;
 
------------------------------------
 
 In type.c:
 
@@ -57,24 +56,63 @@ struct _type {
 
 ```
 
-The lifecycle of memory objetcs composed of five stages
+The normal lifecycle of memory objetcs is composed of five stages
+
 1. Memory allocation
 2. Initialisation
-3. Normal use
+3. Object use
 4. Finalisation
 5. Memory deallocation
+
 where the first two phases (1-2) comprise the object *creation*, and the two
 last (4-5) comprise the object *destruction*.
 
-In COCADA, Step 1 usually consists in a call to `malloc`, which is
-normally done through the macro ::NEW
-which allocates heap memory for an object of a given type and returns a typed
-pointer to this position. More commonly though, object creation (steps 1-2)
-is done with a single call to one of the object constructors
-`type *type_new(...)`
+In COCADA, Step 1 is usually done through the macro ::NEW, which allocate heap 
+memory for an object of a given type and returns a typed pointer to this position. 
+Object creation (steps 1-2) is normally done with a single call to one of the object 
+constructors `type *type_new(...)`. Ocasionally, these two steps can be done 
+separately. The function `type_init(type *obj,...)` can be used to initialise
+a previously allocatted object `obj`. This is particularly useful for initialising
+objects living in the stack, like in
 
-An object can conceptually contain (or refer to) another object. We distinguish
-two kinds of object composition with regards to how it is physically realised.
+```
+type obj;
+type_init(&obj);
+```
+
+Object destruction can be a lot trickier though, because an object may contain or 
+refer to other objects. The crucial question is whether to destroy 
+'*child* ' objects as part of the '*parent* ' object destruction. Two
+main problems may arise.
+- If a child object is not destroyed and no furhter references to it exist after
+the parent object is destroyed, we have a *memory leak*.
+- If a child object is destroyed and another reference to it exists outside the
+parent object (shared reference), we have a *dangling reference*. In particular,
+any subsequent attempt to destroy that same object will lead to '*double free*' problems.
+
+So basically, we have to ensure that
+
+1. Every object is eventually destroyed,
+2. Every object is destroyed at most once.
+
+This is a complex problem in general. Some languages offer automatic memory
+management systems (garbage collection) whereas others, notably Rust,
+enforce strict *ownership* rules. Ownership is the principle whereby every
+object has at most one owner, and destroying the owner automatically triggers the
+destruction of its owned components. Shared references integrity is maintained
+via borrow and lifetime management mechanisms.
+
+Although we do not have native language support, in COCADA we struggle to
+maintain a simpler object dependency structure, trying to make clear 
+<b>in the documentation</b> when the ownership of an object is transferred to
+another. Likewise, the documentation of the destructors (see below) should
+indicate which child objects should be destroyed.
+
+
+# Object composition
+
+An object may *contain* or *refer* to other objects. In particular, we
+distinguish the following patterns.
 
 I. Object `A` has a physical (flat) copy of object `B` within its internal
 memory representation.
@@ -140,7 +178,7 @@ CASE IV)
 struct _A {         +------------+
     ...             |   A        |
     size_t size;    |            |
-    size_t cap;     | b +---+    |     ,...> +------+-------+-  - +----------+
+    size_t cap;     | b +----+   |     ,...> +------+-------+-   -+----------+
     B *b.           |   |    |   |    .      | b[0] | b[1]  | ... | b[cap-1] |
 }                   |   | ...........´       |      |       |     |          |
                     |   +----+   |           +------+-------+-   -+----------+
@@ -148,7 +186,7 @@ struct _A {         +------------+
                     +------------+
 ```
 
-In this case, the container is still considered `flat´ since the contained
+In this case, the container is still considered 'flat' since the contained
 `B`-type objects are physically stored within the buffer, even though the
 buffer itself lies somewhere outside the container, which physically contains
 only a pointer to its memory location.
@@ -188,12 +226,11 @@ during the (container) object initialisation (Step 2).
 This is important for understanding the discussion on object destruction below.
 
 
-Object destructor infrastructure
--------------------------------------------------------------------------------
+# Object destructor infrastructure
 
 As mentioned above, destroying an object requires, first, `finalising´ it
 (Step 4), that is cleaning its internal state and releasing the resources
-(in particular, memory) held by the object in reverse order of allocation,
+(memory) held by the object in reverse order of allocation,
 and then freeing the memory used by the struct (Step 5).
 In particular, finalising a flat container amounts to freeing the memory used by
 its buffer plus some constant-sized housekeeping memory. For example,
@@ -205,17 +242,17 @@ hierarchies of nested objects. COCADA provides some infrastructure for
 dealing with the proper disposal of  complex hierarchies of objects.
 
 The basic concept is that of a **destructor** ::dtor which encapsulates and
-provides a way of nesting **destructor functions** ::strbuf_func used for
+provides a way of nesting **destructor functions** ::dtor_func used for
 finalising object hierarchies. A destructor is a  *closure* object
 composed of
-- A reference to a *destructor function* ::strbuf_func; and
+- A reference to a *destructor function* ::dtor_func; and
 - An array of child destructors.
 
 A *destructor function* is a function used to dispose of the  memory used by an
 object, which would become otherwise unreachable after the object destruction
 (memory leak). It receives a pointer to the object to be finalised
 and a destructor object mirroring its composition.  The destructor function of
-a `type` is named `type_dispose` (example ::vec_dispose).
+a `type` is named `type_dtor` (example ::vec_dtor).
 
 The implementation of a destructor function of a parent type uses the
 provided destructor to call the destructor functions of the child (referenced)
@@ -228,12 +265,12 @@ objects of type `A`.
 |  C  |<>----|  B  |<>----|  A  |
 +-----+      +-----+      +-----+
 ```
-For now let us suppose these are flat containers. We´ll come back to that later.
+For now let us suppose these are flat containers (we´ll come back to that later).
 
 The destruction of C would go roughly as follows.  First, the destructor function
 
 ```C
-void C_dispose( void *ptr, dstr *c_dt )
+void C_dtor( void *ptr, dstr *c_dt )
 ```
 
 checks the destructor `c_dt` to see if contains a reference to a
@@ -246,19 +283,35 @@ b_dt->df(b, b_dt)
 ```
 
 will be made for each child `b` of type `B` held by the `C`-type container.
-Likewise the `B`-type destructor function, `B_dispose(void *ptr, dstr *b_dt)`,
+Likewise the `B`-type destructor function, `B_dtor(void *ptr, dstr *b_dt)`,
 will check whether `b_dt` contains references to a destructor for type
 `A`-objects. After all `A`-objects of a type-`B` container are properly
-disposed of, then its buffer can be deallocated.  Similarlty, after all
+disposed of, then its buffer can be deallocated.  Similarly, after all
 `B`-objects of a C` container are properly destroyed, then its buffer
 can be freed.
 
+### Destructor functions are finalisers: a note on the nomenclature
+
+A destructor function
+
+```
+void type_dtor (void *ptr, const dtor *dt) 
+{
+    //// DON´T DO free(ptr)
+}
+```
+
+is actually an object finaliser function. It should **NOT** attempt to deallocate
+the memory pointed by the first argument, which need not even be a 
+dynamically-allocated heap location.
+Destructor functions should be more properly called *finaliser* functions, but
+we keep the term to match the more popular C++ nomenclature.
 
 ## Pointer destructors
 
 The situation above is slightly different for reference containers.
 Let us suppose that the container `C` is a reference  container. Then each
-element of `C` is actually a pointer to a `B`-type container.
+element of `C` is actually a pointer to a type-`B` container.
 After finalising one such child containers, we also typically want to have
 the its corresponding object memory deallocated.
 If `C` is a flat container as before, then its type-`B` container
@@ -275,7 +328,7 @@ container of just one element (like in CASE II above).
 Hence, if `C` and `B` were reference containers in our running example
 we´d have that
 
- <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
+<b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
 
 So, the `C` destructor needs to have not a `B` destructor as child, but
 rather a *pointer destructor*, which then will have a `B` destructor
@@ -308,12 +361,12 @@ destructor hierarchies as follows.
 
 - The macro ::DTOR is used to return a basic destructor to a given type.
 That is `DTOR(type)` returns a destructor with destructor function
-`type_dispose` (which must be provided for each particular type), and
+`type_dtor` (which must be provided for each particular type), and
 whith no nested child destructors (yet);
 
 - Existing destructors can be composed via the ::dtor_cons function. This
-function takes a pointer to a parent destructor `par`, a child destructor
-`chd`, appends `chd` to the list of child destructors of `par`, and returns the
+function takes a pointer to a parent destructor `par` and a child destructor
+`chd`. It appends `chd` to the list of child destructors of `par`, and returns the
 reference to the modified `par`. This can be used to create arbitrary tree-like
 hierarchies. For example,
 
@@ -341,29 +394,85 @@ child objects of the root `A`-type object. For instance, they could be
 shared objects whose deletion would cause dangling pointer problems.
 An *empty destructor* obtained via ::empty_dtor can be used in such cases to
 signal that the  corresponding child  objects should not be destroyed.
-Notice that any object down the empty destructor point will be left untouched.
+Notice that any object downstream the empty destructor point will be left untouched.
+
 
 ## Finalising and destroying objects
 
 An object can be *finalised* (Step 4 *only*) with a destructor via the ::FINALISE macro.
-This will not deallocate the object. This is typically what would be used from
-whithin a flat container destructor to clean memory used by its elements.
-The destructor object is also not destroyed.
+This will not deallocate the object, and is typically what would be used from
+whithin a flat container destructor to clean memory used by its elements. It is also
+used to finalise stack objects. The destructor object is also not destroyed.
 
 An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
 In addition to finalising the object, it also deallocates its memory **and**
-also consumes the destructor.
+also consumes the destructor. If the default, childless destructor is to be used, 
+we can simply use `FREE(obj, type)` which is equivalent, but slightly more
+convenient than `DESTROY(obj, DTOR(type))`.
 
-Finally, if
+Finally, we may have simpler objects without child objects, or objects whose inner 
+references are fixed and known at compile time. The destructor functions of these
+objects  actually don't need to look at the runtime-built destructors to know which
+components to destroy. In such case, we can still define a standard destructor of
+type ::dtor_func function which ignores the `dt` argument, but this is inefficient
+and misleading. For such objects we define a simple destructor
 
-## Limitations: Backward/Cyclic references
+```
+void type_free(type *obj)
+{
+    // finalise and deallocate obj
+}
+```
+
+
+# Limitations: Backward/Cyclic references
 
 No check is performed for backward references, which can cause *double free*
 problems.
+
+
+# Summary
+
+<table>
+<tr>
+    <td>Single object operation</td>
+    <td>Code</td>
+    <td>Combined object operation</td>
+    <td>Code</td>
+</tr>
+<tr>
+    <td>1. Allocation </td>
+    <td>`type *obj = NEW(type)`</td>
+    <td rowspan=2>1+2. Construction</td>
+    <td rowspan=2>`type *obj = type_new(...)`</td>
+</tr>
+<tr>
+    <td>2. Initialisation</td>
+    <td>`type_init(type *obj, ...)`</td>
+</tr>
+<tr>
+    <td>4. Finalisation</td>
+    <td>`FINALISE(obj, dtor )`</td>
+    <td rowspan=3>4+5. Destruction</td> 
+    <td rowspan=3>`DESTROY(obj, dtor)`<br>
+    `FREE(obj, type)`<br>
+    `type_free(obj)`</td>
+</tr>
+<tr>
+    <td rowspan=2>5. Deallocation</td>
+    <td rowspan=2>`FREE(obj)`</td>
+</tr>
+<tr>
+</tr>
+</table>
+
 */
 
-
+/**
+ * @brief Raw pointer type
+ */
 typedef void* rawptr;
+
 
 /**
  * NULL pointer constant.
@@ -376,7 +485,7 @@ typedef void* rawptr;
 /**
  * Allocate memory
  */
-#define NEW( TYPE )   ((TYPE*)(malloc(sizeof(TYPE))))
+#define NEW( TYPE ) ((TYPE*)(malloc(sizeof(TYPE))))
 
 
 /**
@@ -387,6 +496,7 @@ typedef void* rawptr;
 
 /**
  * Destructor type
+ * @see _dtor
  */
 typedef struct _dtor dtor;
 
@@ -394,34 +504,42 @@ typedef struct _dtor dtor;
 /**
  * Destructor function type
  */
-typedef void (*strbuf_func) (void *, const dtor *);
+typedef void (*dtor_func) (void *, const dtor *);
 
 
+/**
+ * Destructor object
+ */ 
 struct _dtor {
-	strbuf_func df;
+	dtor_func df;
 	size_t nchd;
 	struct _dtor **chd;
 };
 
+
 /**
  * @brief Creates a new destructor with destructof function.
  */
-dtor *dtor_new_with_func(strbuf_func df);
+dtor *dtor_new_with_func(dtor_func df);
+
 
 /**
  * @brief Recursively frees a destructor.
  */
 void dtor_free(dtor *dt);
 
+
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
 size_t dtor_nchd(const dtor *dt);
 
+
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
 const dtor *dtor_chd(const dtor *par, size_t index);
+
 
 /**
  * @brief Composes two destructor by appending @p chd to the children list of @p par.
@@ -436,16 +554,18 @@ dtor *dtor_cons(dtor *par, const dtor *chd);
  */
 dtor *empty_dtor();
 
+
 /**
  * @brief Returns a new raw-pointer destructor with no children.
  * @see Module documentation for details.
  */
 dtor *ptr_dtor();
 
+
 /**
  * Returns a default destructor for a given type with no nested destructor.
  */
-#define DTOR( TYPE ) dtor_new_with_func(TYPE##_dispose)
+#define DTOR( TYPE ) dtor_new_with_func(TYPE##_dtor)
 
 
 /**
@@ -459,6 +579,7 @@ if((OBJ)) {\
     const dtor *__dt = (DTOR);\
     __dt->df(__obj, __dt);\
 }
+
 
 /**
  * Destroys an object @pOBJ, that is finalises it (and its referenced objects)

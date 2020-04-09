@@ -59,7 +59,7 @@ void hashset_free(hashset *set, bool free_elements);
 /**
  * @brief Destructor
  */
-void hashset_dispose(void *ptr, const dtor *dt);
+void hashset_dtor(void *ptr, const dtor *dt);
 
 
 /**

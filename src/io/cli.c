@@ -224,7 +224,7 @@ cliopt *cliopt_new_valued(char shortname, char *longname, char *help,
 }
 
 
-void cliopt_dispose(void *ptr, const dtor *dt)
+void cliopt_dtor(void *ptr, const dtor *dt)
 {
 	cliopt *opt = (cliopt *)ptr;
 	FREE(opt->longname);
@@ -280,7 +280,7 @@ cliarg *cliarg_new_choice_multi(char *name, char*help, vec *choices)
 }
 
 
-void cliarg_dispose(void *ptr, const dtor *dt)
+void cliarg_dtor(void *ptr, const dtor *dt)
 {
 	cliarg *arg = (cliarg *)ptr;
 	FREE(arg->name);
@@ -323,7 +323,7 @@ cliparse *cliparse_new(char *name, char *help)
 }
 
 
-void cliparse_dispose(void *ptr, const dtor *dt) 
+void cliparse_dtor(void *ptr, const dtor *dt) 
 {
 	cliparse *clip = (cliparse *)ptr;
 	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()), dtor_cons(ptr_dtor(), DTOR(cliparse))));

@@ -149,7 +149,7 @@ void alphabet_free(alphabet *ab)
 }
 
 
-void alphabet_dispose(void *ptr, const dtor *dt)
+void alphabet_dtor(void *ptr, const dtor *dt)
 {
 	alphabet *ab = (alphabet *)ab;
 	if (ab==NULL) return;

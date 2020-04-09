@@ -56,7 +56,7 @@ void stack_free(stack *s, bool free_elements);
 /**
  * @brief Destructor.
  */
-void stack_dispose(void *ptr, const dtor *dt);
+void stack_dtor(void *ptr, const dtor *dt);
 
 
 /**

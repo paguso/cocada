@@ -85,7 +85,7 @@ void bitvec_free(bitvec *bv);
 /**
  * @brief Destructor
  */
-void bitvec_dispose(void *ptr, const dtor *dt);
+void bitvec_dtor(void *ptr, const dtor *dt);
 
 
 /**

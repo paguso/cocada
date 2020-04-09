@@ -44,10 +44,10 @@ void hashset_free(hashset *set, bool free_elements)
 }
 
 
-void hashset_dispose(void *ptr, const dtor *dt)
+void hashset_dtor(void *ptr, const dtor *dt)
 {
 
-	hashmap_dispose(ptr, dt);
+	hashmap_dtor(ptr, dt);
 }
 
 

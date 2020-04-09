@@ -118,7 +118,7 @@ void vec_free(vec *v, bool free_elements);
  * @brief Finaliser
  * @see new.h
  */
-void vec_dispose(void *v, const dtor *dt );
+void vec_dtor(void *v, const dtor *dt);
 
 
 /**
