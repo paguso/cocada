@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
+#ifndef FASTA_H
+#define FASTA_H
 
 #include <stdbool.h>
 
@@ -116,3 +118,5 @@ const fasta_rec *fasta_next(fasta *self);
  * @brief Destructor. Closes the reader and releases used resources
  */
 void fasta_close(fasta *self);
+
+#endif

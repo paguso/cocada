@@ -37,7 +37,6 @@
  *
  * @brief A queue with FIFO push/pop and *minimum* query.
  */
-
 typedef struct _minqueue minqueue;
 
 typedef struct _minqueue_iter minqueue_iter;
@@ -58,10 +57,6 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
  * @see order.h
  */
 minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func, size_t capacity);
-
-
-
-void minqueue_free(minqueue *queue, bool free_elts);
 
 
 /**

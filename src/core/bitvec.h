@@ -83,12 +83,6 @@ void bitvec_free(bitvec *bv);
 
 
 /**
- * @brief Destructor
- */
-void bitvec_dtor(void *ptr, const dtor *dt);
-
-
-/**
  * @brief Returns the (bit) length of the bitvector.
  */
 size_t bitvec_len(const bitvec *bv);

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef __DNA_H__
-#define __DNA_H__
+#ifndef DNA_H
+#define DNA_H
 
 #include "alphabet.h"
 

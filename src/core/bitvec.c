@@ -80,12 +80,6 @@ void bitvec_free(bitvec *bv)
 }
 
 
-void bitvec_dtor(void *ptr, const dtor *dt)
-{
-	FREE( ((bitvec *)ptr)->bits );
-}
-
-
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits)
 {
 	bitvec *bv = bitvec_new_with_capacity(nbits);

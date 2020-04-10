@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef _HASH_H_
-#define _HASH_H_
+#ifndef HASH_H
+#define HASH_H
 
 
 #include <stddef.h>
