@@ -25,6 +25,7 @@
 #include <stddef.h>
 
 #include "new.h"
+#include "vec.h"
 
 /**
  * @file stack.h
@@ -37,7 +38,7 @@
 /**
  * Stack type
  */
-typedef stack;
+typedef vec stack;
 
 
 /**
@@ -45,12 +46,6 @@ typedef stack;
  * @param typesize The individual size of stored elements in bytes.
  */
 stack *stack_new(size_t typesize);
-
-
-/**
- * @brief Destructor.
- */
-void stack_free(stack *s, bool free_elements);
 
 
 /**

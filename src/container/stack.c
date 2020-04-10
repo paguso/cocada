@@ -23,21 +23,14 @@
 #include <stdlib.h>
 
 #include "new.h"
+#include "stack.h"
 #include "vec.h"
 
-
-typedef vec stack;
 
 
 stack *stack_new(size_t typesize)
 {
 	return vec_new(typesize);
-}
-
-
-void stack_free(stack *s, bool free_elements)
-{
-	vec_free(s, free_elements);
 }
 
 

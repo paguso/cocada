@@ -69,7 +69,7 @@ void deque_free(deque *q, bool free_elts);
  * @brief Finaliser
  * @see new.h
  */
-void deque_dispose(void *ptr, const dtor *dst);
+void deque_dtor(void *ptr, const dtor *dt);
 
 
 /**

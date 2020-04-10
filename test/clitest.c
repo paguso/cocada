@@ -212,7 +212,7 @@ void test_cli_parse(CuTest *tc)
 	char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
 	char **argv = make_argv(call, &argc);
 
-	cliparse_parse(cmd, argc, argv);
+	cliparse_parse(cmd, argc, (const char **)argv);
 
 	freeargv(argc, argv);
 

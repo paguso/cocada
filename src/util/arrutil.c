@@ -25,15 +25,15 @@
 #include "iter.h"
 
 
-static bool _arr_iter_has_next(void *it)
+static bool _arr_iter_has_next(iter *it)
 {
-	arr_iter *ait = (arr_iter *)it;
+	arr_iter *ait = (arr_iter *)it->impltor;
 	return ait->index < ait->len;
 }
 
-static const void * _arr_iter_next(void *it)
+static const void * _arr_iter_next(iter *it)
 {
-	arr_iter *ait = (arr_iter *)it;
+	arr_iter *ait = (arr_iter *)it->impltor;
 	return ait->src + (ait->typesize * ait->index++);
 }
 

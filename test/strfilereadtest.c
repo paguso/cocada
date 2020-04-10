@@ -53,10 +53,10 @@ void test_getc(CuTest *tc)
 	size_t n = strlen(file_content);
 	char c;
 	for (size_t i=0; i<n; i++) {
-		c = strread_getc(strfileread_strread(sfr));
+		c = strread_getc(strfileread_as_strread(sfr));
 		CuAssertCharEquals(tc, file_content[i], c);
 	}
-	c = strread_getc(strfileread_strread(sfr));
+	c = strread_getc(strfileread_as_strread(sfr));
 	CuAssertIntEquals(tc, EOF, c);
 	test_teardown();
 }

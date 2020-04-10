@@ -397,9 +397,9 @@ static void _tmp_wavtree_init_veb_layout( tmp_wtnode *node, size_t heig,
 				stack_push_size_t(stknxtchd, 0);
 			}
 		}
-		stack_free(stknode, false);
-		stack_free(stkdepth, false);
-		stack_free(stknxtchd, false);
+		FREE(stknode, stack);
+		FREE(stkdepth, stack);
+		FREE(stknxtchd, stack);
 	}
 }
 

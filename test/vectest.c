@@ -26,6 +26,7 @@
 #include "CuTest.h"
 
 #include "arrutil.h"
+#include "cstrutil.h"
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
@@ -186,6 +187,47 @@ void test_vec_swap(CuTest *tc)
 	vec_free(v, false);
 }
 
+
+void test_vec_iter(CuTest *tc) 
+{
+	vec *v = vec_new(sizeof(int));
+	
+	vec_iter *it = vec_get_iter(v);
+	FOREACH_IN_ITER(j, int, vec_iter_as_iter(it)) {
+		CuFail(tc, "Vector has no element to iterate.");
+	}
+	FREE(it);
+	
+	int n = 10;
+	for (int i=0; i<n; i++) {
+		vec_push_int(v, i);
+	}
+	int i = 0;
+	it = vec_get_iter(v);
+	FOREACH_IN_ITER(j, int, vec_iter_as_iter(it)) {
+		//printf("Iterator[%d]==%d\n", i, *j);
+		CuAssertIntEquals(tc, i, *j);
+		i++;
+	}
+	FREE(it);
+	FREE(v, vec);
+	
+	char *strings[8] = {"The", "quick", "fox", "jumps", "over", "the", "lazy", "dog"};
+	v = vec_new(sizeof(char *));
+	n = 8;
+	for (int i=0; i<n; i++) {
+		vec_push_rawptr(v, cstr_clone(strings[i]));
+	}
+	i = 0;
+	it = vec_get_iter(v);
+	FOREACH_IN_ITER(j, char *, vec_iter_as_iter(it)) {
+		//printf("Iterator[%d]==%s\n", i, *j);
+		CuAssertStrEquals(tc, strings[i], *j);
+		i++;
+	}
+	FREE(it);
+	DESTROY(v, dtor_cons(DTOR(vec), ptr_dtor()));
+}
 
 
 typedef struct _triple {
@@ -360,6 +402,7 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_ins);
 	SUITE_ADD_TEST(suite, test_vec_del);
 	SUITE_ADD_TEST(suite, test_vec_swap);
+	SUITE_ADD_TEST(suite, test_vec_iter);
 	SUITE_ADD_TEST(suite, test_vec_radixsort);
 	SUITE_ADD_TEST(suite, test_vec_qsort);
 	SUITE_ADD_TEST(suite, test_vec_free);

@@ -24,22 +24,99 @@
 
 #include <stdbool.h>
 
+#include "trait.h"
+
+/**
+ * @file iter.h
+ * @author Paulo Fonseca
+ * @brief Iterator trait
+ * 
+ * To implement this iterator trait, follow the indications in trait.h
+ * 
+ * If concrete type implements this trait, say `concreteiter` ,then it
+ * is used as follows.
+ * 
+ * ```C
+ * concreteiter *cit = // get a concreteiter reference
+ * iter *it = ASTRAIT(cit, concreteiter, iter);
+ * while (iter_has_next(it)) {
+ * 		void *elt = iter_next(it);
+ * }
+ * FREE(cit);
+ * ```
+ * 
+ * or, alternatively, with the FOREACH_IN_ITER macro.
+ * 
+ */
+
+
 typedef struct _iter iter;
 
+/**
+ * @brief Iterator virtual table
+ */
 typedef struct {
-	bool (*has_next) (void *it);
-	const void* (*next) (void *it);
+	bool (*has_next) (iter *it);
+	const void* (*next) (iter *it);
 } iter_vt;
 
 
+/**
+ * @brief Iterator type
+ */
 struct _iter {
 	iter_vt *vt;
 	void *impltor;
 };
 
+
+/**
+ * @brief Does the iterator have any remaining element?
+ */
 bool iter_has_next(iter *it);
 
+
+/**
+ * @brief Gets the next iterator element.
+ * @return If  iter_has_next(it) == true returns a pointer to the next
+ * element. Otherwise, the behaviour is undefined and may result in a 
+ * fatal error.
+ */
 const void *iter_next(iter *it);
+
+
+/**
+ * @brief Meaning:
+ * `for each element ELT_NAME of type ELT_TYPE of the iterator ITER do...`
+ * that is, scans an iterator pointed by @p ITER naming each element 
+ * @p ELT_NAME (local iteration variable), which are of type pointer to 
+ * @p ELT_TYPE.
+ *
+ * For example, to iterate over a vector `v` of int 
+ * 
+ * ```C
+ * vec *v = vec_new(sizeof(int));
+ * vec_push_int(v, 10);
+ * vec_push_int(v, 20);
+ * vec_push_int(v, 30);
+ * vec_iter *it = vec_get_iter(v);
+ * FOREACH_IN_ITER(val, int, ASTRAIT(it, vec_iter, iter)) {
+ * 		printf ("Element is %d\n", *val); // notice that val is a pointer
+ * }
+ * FREE(it); // iterator must be manually disposed of after use
+ * ```
+ *
+ * @param ELT_NAME The variable identifier for the elements returned in the iteration (local)
+ * @param ELT_TYPE The base type of the elements. The iteration returns pointers to ELT_TYPE
+ * @param ITER 		An initialised pointer to an ::iter
+ */ 
+#define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
+for (iter *__it = (iter *) (ITER); __it ; __it = NULL) \
+for (bool __has = iter_has_next(__it); __has; __has = false ) \
+for ( ELT_TYPE *ELT_NAME = (ELT_TYPE *) iter_next(__it) \
+		; __has && ( (__has = iter_has_next(__it)) || !__has ) \
+		; ELT_NAME = (__has) ? (ELT_TYPE *) iter_next(__it) : ELT_NAME )
+
 
 
 #endif

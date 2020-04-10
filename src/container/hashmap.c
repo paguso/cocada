@@ -32,8 +32,8 @@
 
 
 static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
-static float GROW_BY = 2; // DON´T TOUCH
-static float MIN_LOAD = 0.25;
+static float GROW_BY = 2.0F; // DON´T TOUCH
+//static float MIN_LOAD = 0.25;
 static float MAX_LOAD = 0.5;
 
 static byte_t  ST_EMPTY = 0x80; // empty slot ctrlcode 0b10000000

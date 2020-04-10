@@ -27,11 +27,11 @@
 
 bool iter_has_next(iter *it)
 {
-	return it->vt->has_next(it->impltor);
+	return it->vt->has_next(it);
 }
 
 
 const void *iter_next(iter *it)
 {
-	return it->vt->next(it->impltor);
+	return it->vt->next(it);
 }

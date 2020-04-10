@@ -489,15 +489,15 @@ VEC_ALL_IMPL(uint32_t)
 VEC_ALL_IMPL(uint64_t)
 
 
-static bool _vec_iter_has_next(void *it)
+static bool _vec_iter_has_next(iter *it)
 {
-	vec_iter *vit = (vec_iter *)it;
+	vec_iter *vit = (vec_iter *)it->impltor;
 	return vit->index < vec_len(vit->src);
 }
 
-static const void * _vec_iter_next(void *it)
+static const void * _vec_iter_next(iter *it)
 {
-	vec_iter *vit = (vec_iter *)it;
+	vec_iter *vit = (vec_iter *)it->impltor;
 	return vec_get(vit->src, vit->index++);
 }
 

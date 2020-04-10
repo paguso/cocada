@@ -157,7 +157,7 @@ fasta *fasta_open(char *filename)
 	ret->cur_rec.descr = cstr_new(ret->cur_rec_len[0]);
 	ret->cur_rec.seq = cstr_new(ret->cur_rec_len[1]);
 	ret->cur_rec_rd.descr = cstr_new(ret->cur_rec_rd_len[0]);
-	ret->cur_rec_rd.seqrdr = fastaread_strread(&(ret->rd));
+	ret->cur_rec_rd.seqrdr = fastaread_as_strread(&(ret->rd));
 	return ret;
 }
 

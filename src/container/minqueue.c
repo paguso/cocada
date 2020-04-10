@@ -60,14 +60,6 @@ minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp, size_t capa
 }
 
 
-void minqueue_free(minqueue *queue, bool free_elts)
-{
-	deque_free(queue->elts, free_elts);
-	deque_free(queue->mins, false);
-	FREE(queue);
-}
-
-
 void minqueue_dtor(void *ptr, const dtor *dt )
 {
 	minqueue *mq = (minqueue *)ptr;

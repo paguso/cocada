@@ -103,7 +103,7 @@ void strbuf_append(strbuf *sb, const char *suff);
 
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p sb,
- *        separating each of these strings by @sep
+ *        separating each of these strings by @p sep
  * # Example
  * ```C
  * strbuf *sb = str_buf_new_from_str("Four seasons: ");
@@ -116,6 +116,22 @@ void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep);
 
 
 
+/**
+ * @brief Appends copies of strings in an iterator to @p sb,
+ *        separating each of these strings by @p sep
+ * # Example
+ * ```C
+ * vec *v = new vec(sizeof(char *));
+ * vec_push_rawptr(cstr_clone("Spring"));
+ * vec_push_rawptr(cstr_clone("Summer"));
+ * vec_push_rawptr(cstr_clone("Autumn"));
+ * vec_push_rawptr(cstr_clone("Winter"));
+ * vec_iter *it = vec_get_iter(v);
+ * strbuf *sb = str_buf_new_from_str("Four seasons: ");
+ * strbuf_join(sb, it, " and ");
+ * printf("%s", strbuf_as_str(sb)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
+ * ```
+ */
 void strbuf_join_iter(strbuf *sb, iter *it, const char *sep);
 
 
