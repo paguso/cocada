@@ -127,20 +127,6 @@ static void _check_and_resize(vec *v)
 }
 
 
-void vec_free(vec *v, bool free_elements)
-{
-	if (v==NULL) return;
-	if (free_elements) {
-		for (size_t i=0; i<v->len; i++) {
-			FREE(((void **)v->data)[i]);
-		}
-	}
-	FREE(v->data);
-	FREE(v->swp);
-	FREE(v);
-}
-
-
 void vec_dtor(void *ptr, const dtor *dt )
 {
 	vec *v = (vec *)ptr;

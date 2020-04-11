@@ -151,7 +151,7 @@ static void tmp_wtnode_free(tmp_wtnode *node)
 	if (node == NULL) return;
 	tmp_wtnode_free(node->chd[LEFT]);
 	tmp_wtnode_free(node->chd[RIGHT]);
-	bitvec_free(node->bv);
+	FREE(node->bv, bitvec);
 	FREE(node);
 }
 
@@ -258,7 +258,7 @@ static void tmp_wt_free(tmp_wavtree *twt)
 {
 	alphabet_free(twt->ab);
 	huffcode_free(twt->hcode);
-	vec_free(twt->chrcodes, false);
+	FREE(twt->chrcodes, vec);
 	tmp_wtnode_free(twt->tmp_root);
 	FREE(twt);
 }
@@ -598,7 +598,7 @@ void wavtree_free(wavtree *wt)
 {
 	if (wt==NULL) return;
 	if (wt->own_ab) alphabet_free(wt->ab);
-	vec_free(wt->chrcodes, false);
+	FREE(wt->chrcodes, vec);
 	csrsbitarr_free(wt->bitarr, true);
 	FREE(wt->nodes);
 	FREE(wt);

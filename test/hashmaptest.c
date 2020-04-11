@@ -55,7 +55,7 @@ void test_hashmap_int(CuTest *tc)
 		n--;
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
-	hashmap_free(hmap, false, false);
+	FREE(hmap, hashmap);
 }
 
 
@@ -126,7 +126,7 @@ void test_hashmap_obj(CuTest *tc)
 		FREE(k);
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
-	hashmap_free(hmap, true, false);
+	DESTROY(hmap, dtor_cons(dtor_cons(DTOR(hashmap), ptr_dtor()), empty_dtor()));
 }
 
 

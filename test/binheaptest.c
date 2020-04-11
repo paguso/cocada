@@ -32,10 +32,10 @@
 
 
 
-int cmp_dbl(const void *p1, const void *p2)
+int cmp_ptr_dbl(const void *p1, const void *p2)
 {
-	double d1 = *((double *)p1);
-	double d2 = *((double *)p2);
+	double d1 = (*((double **)p1))[0];
+	double d2 = (*((double **)p2))[0];
 	if ( d1 < d2 )
 		return -1;
 	else if ( d1 == d2 )
@@ -51,7 +51,7 @@ int cmp_dbl(const void *p1, const void *p2)
 void test_binheap_push_pop(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *maxheap = binheap_new(&cmp_dbl, sizeof(double));
+	binheap *maxheap = binheap_new(&cmp_ptr_dbl, sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
@@ -60,21 +60,21 @@ void test_binheap_push_pop(CuTest *tc)
 
 
 	for (size_t i =0; i<len; i++) {
-		double d = rv[i];
+		double *d = &rv[i];
 		binheap_push(maxheap, &d);
 		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
 	}
 
 
 	for (size_t i =0; i<len; i++) {
-		double d;
+		double *d;
 		binheap_pop(maxheap, &d);
 		//printf("maxheap #%zu = %f\n",i,d);
 		CuAssertSizeTEquals(tc, len-i-1, binheap_size(maxheap));
-		CuAssertDblEquals(tc, (double)(len-i-1), d, 0.1);
+		CuAssertDblEquals(tc, (double)(len-i-1), *d, 0.1);
 	}
 
-	binheap_free(maxheap, true);
+	DESTROY(maxheap, DTOR(binheap));
 }
 
 
@@ -102,7 +102,7 @@ void test_binheap_push_pop_int(CuTest *tc)
 		CuAssertIntEquals(tc, (int)(len-i-1), d);
 	}
 
-	binheap_free(maxheap, false);
+	DESTROY(maxheap, DTOR(binheap));
 }
 
 

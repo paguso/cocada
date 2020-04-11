@@ -79,12 +79,6 @@ binheap *binheap_new(cmp_func cmp, size_t typesize);
 
 
 /**
- * @brief Destructor.
- */
-void binheap_free(binheap *heap, bool free_elements);
-
-
-/**
  * @brief Finaliser
  * @see new.h
  */

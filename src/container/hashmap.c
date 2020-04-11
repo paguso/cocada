@@ -29,6 +29,7 @@
 #include "mathutil.h"
 #include "order.h"
 #include "string.h"
+#include "iter.h"
 
 
 static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
@@ -93,22 +94,6 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
 	return ret;
 }
 
-void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals)
-{
-	if (hmap==NULL) return;
-	if (free_keys || free_vals) {
-		hashmap_iter *iter = hashmap_get_iter(hmap);
-		while ( hashmap_iter_has_next(iter) ) {
-			hashmap_entry keyval = hashmap_iter_next(iter);
-			if (free_keys) FREE(((void **)keyval.key)[0]);
-			if (free_vals) FREE(((void **)keyval.val)[0]);
-		}
-		hashmap_iter_free(iter);
-	}
-	FREE(hmap->data);
-	FREE(hmap);
-}
-
 
 void hashmap_dtor(void *ptr, const dtor *dst)
 {
@@ -119,13 +104,12 @@ void hashmap_dtor(void *ptr, const dtor *dst)
 		bool free_vals = (dtor_nchd(dst) > 1);
 		const dtor *vals_dst = (free_vals)?dtor_chd(dst, 1):NULL;
 		if (free_keys || free_vals) {
-			hashmap_iter *iter = hashmap_get_iter(hmap);
-			while ( hashmap_iter_has_next(iter) ) {
-				hashmap_entry keyval = hashmap_iter_next(iter);
-				if (free_keys) FINALISE(keyval.key, keys_dst);
-				if (free_vals) FINALISE(keyval.val, vals_dst);
+			hashmap_iter *it = hashmap_get_iter(hmap);
+			FOREACH_IN_ITER(keyval, hashmap_entry, hashmap_iter_as_iter(it)) {
+				if (free_keys) FINALISE(keyval->key, keys_dst);
+				if (free_vals) FINALISE(keyval->val, vals_dst);
 			}
-			hashmap_iter_free(iter);
+			FREE(it);
 		}
 	}
 }
@@ -357,53 +341,59 @@ size_t hashmap_size(const hashmap *map)
 
 
 struct _hashmap_iter {
+	iter _t_iter;
 	const hashmap *src;
 	size_t index;
+	hashmap_entry entry;
 };
 
 
-static void _hashmap_iter_goto_next(hashmap_iter *iter)
+
+static bool _hashmap_iter_has_next(iter *it)
 {
-	while ((iter->index < iter->src->cap) &&
-	        (((byte_t *)iter->src->tally)[iter->index] >> 7))
-		iter->index++;
+	hashmap_iter *hmit = (hashmap_iter *)it->impltor;
+	return (hmit->index < hmit->src->cap);
 }
+
+
+static void _hashmap_iter_goto_next(hashmap_iter *hmit)
+{
+	while ((hmit->index < hmit->src->cap) &&
+	        (((byte_t *)hmit->src->tally)[hmit->index] >> 7))
+		hmit->index++;
+}
+
+
+static const void *_hashmap_iter_next(iter *it)
+{
+	hashmap_iter *hmit = (hashmap_iter *)it->impltor;
+	if (hmit->index >= hmit->src->cap ) {
+		return NULL;
+	}
+	hmit->entry.key = _key_at(hmit->src, hmit->index);
+	hmit->entry.val = _value_at(hmit->src, hmit->index);
+	hmit->index++;
+	_hashmap_iter_goto_next(hmit);
+	return &hmit->entry;
+}
+
+
+static iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next, 
+									.next = _hashmap_iter_next };
 
 
 hashmap_iter *hashmap_get_iter(const hashmap *src)
 {
-	hashmap_iter *ret;
-	ret = NEW(hashmap_iter);
+	hashmap_iter *ret = NEW(hashmap_iter);
+	ret->_t_iter.vt = &_hashmap_iter_vt;
+	ret->_t_iter.impltor = ret;
 	ret->src = src;
 	ret->index = 0;
 	_hashmap_iter_goto_next(ret);
 	return ret;
 }
 
-
-void hashmap_iter_free(hashmap_iter *iter)
-{
-	FREE(iter);
-}
-
-bool hashmap_iter_has_next(const hashmap_iter *iter)
-{
-	return (iter->index < iter->src->cap);
-}
-
-const hashmap_entry hashmap_iter_next(hashmap_iter *iter)
-{
-	hashmap_entry ret = {NULL, NULL};
-	if (iter->index >= iter->src->cap ) {
-		return ret;
-	}
-	ret.key = _key_at(iter->src, iter->index);
-	ret.val = _value_at(iter->src, iter->index);
-	iter->index++;
-	_hashmap_iter_goto_next(iter);
-	return ret;
-}
-
+IMPL_TRAIT(hashmap_iter, iter);
 
 #define HASHMAP_GET_IMPL( TYPE )\
 TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\

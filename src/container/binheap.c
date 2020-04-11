@@ -45,14 +45,6 @@ binheap *binheap_new( cmp_func cmp,
 }
 
 
-void binheap_free(binheap *heap, bool free_elements)
-{
-	if (heap == NULL) return;
-	vec_free(heap->data, free_elements);
-	FREE(heap);
-}
-
-
 void binheap_dtor(void *ptr, const dtor *dt)
 {
 	binheap *heap = (binheap *)ptr;

@@ -105,14 +105,6 @@ vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);
 size_t vec_sizeof();
 
 
-/**
- * @brief Destructor.
- * @param free_elements Indicates whether referenced objects should be freed.
- *        To be used whenever the array stores pointers to dynamically allocated
- *        memory.
- */
-void vec_free(vec *v, bool free_elements);
-
 
 /**
  * @brief Finaliser

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef bitvec_H
-#define bitvec_H
+#ifndef BITVEC_H
+#define BITVEC_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -77,9 +77,10 @@ bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
 
 
 /**
- * @brief Destructor
+ * @brief Finaliser
+ * @see new.h
  */
-void bitvec_free(bitvec *bv);
+void bitvec_dtor(void *bv, const dtor *dt);
 
 
 /**

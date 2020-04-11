@@ -26,6 +26,7 @@
 #include "new.h"
 #include "hash.h"
 #include "order.h"
+#include "iter.h"
 
 /**
  * @file hashmap.h
@@ -39,14 +40,6 @@
  */
 typedef struct _hashmap hashmap;
 
-
-/**
- * Hashmap entry type
- */
-typedef struct  {
-	void *key;
-	void *val;
-} hashmap_entry;
 
 
 /**
@@ -87,13 +80,6 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
 
 void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                 size_t min_capacity);
-
-/**
- * @brief Destructor.
- * @param free_keys Indicates whether the key objects are to be freed.
- * @param free_vals Indicates whether the value objects are to be freed.
- */
-void hashmap_free(hashmap *hmap, bool free_keys, bool free_vals);
 
 
 /**
@@ -157,28 +143,25 @@ size_t hashmap_size(const hashmap *hmap);
 
 
 /**
+ * Hashmap entry type
+ */
+typedef struct  {
+	void *key;
+	void *val;
+} hashmap_entry;
+
+
+/**
  * @brief Returns a new iterator for the given @p map.
+ * Implements iter trait.
+ * The ::iter_next method returns a pointer to a ::hashmap_entry.
+ * @see iter
  */
 hashmap_iter *hashmap_get_iter(const hashmap *hmap);
 
 
-/**
- * @brief Iterator destructor.
- * @warning Only the iterator is disposed. The hash map is left untouched.
- */
-void hashmap_iter_free(hashmap_iter *iter);
+DECL_TRAIT(hashmap_iter, iter);
 
-
-/**
- * @brief Indicates whether there are still entries to be iterated over.
- */
-bool hashmap_iter_has_next(const hashmap_iter *iter);
-
-
-/**
- * @brief Gets the next entry of the iteration.
- */
-const hashmap_entry hashmap_iter_next(hashmap_iter *iter);
 
 
 #define HASHMAP_GET_DECL( TYPE )\

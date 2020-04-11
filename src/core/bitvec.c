@@ -72,10 +72,10 @@ bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 }
 
 
-void bitvec_free(bitvec *bv)
+void bitvec_dtor(void *bv, const dtor *dt)
 {
 	if (bv == NULL) return;
-	FREE(bv->bits);
+	FREE(((bitvec *)bv)->bits);
 	FREE(bv);
 }
 

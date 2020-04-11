@@ -218,7 +218,7 @@ void huffcode_free(huffcode *hcode)
 	if (hcode->own_ab)
 		alphabet_free(hcode->ab);
 	for (size_t i=0; i<hcode->size; i++) {
-		bitvec_free(hcode->code[i]); // no null codes
+		FREE(hcode->code[i], bitvec); // no null codes
 	}
 	FREE(hcode->code);
 	for (size_t i=0; hcode->size>0 && i<(2*hcode->size)-1; i++) {

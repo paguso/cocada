@@ -72,11 +72,11 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, fasta_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
-	//CuSuiteAddSuite(suite, hashset_get_test_suite());
+	CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());
-	CuSuiteAddSuite(suite, vec_get_test_suite());
+	//CuSuiteAddSuite(suite, vec_get_test_suite());
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	//CuSuiteAddSuite(suite, huffcode_get_test_suite());

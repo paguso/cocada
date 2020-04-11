@@ -29,15 +29,16 @@
 #include <limits.h>
 #include <math.h>
 
-#include "hashmap.h"
-#include "cli.h"
-#include "new.h"
-#include "cstrutil.h"
-#include "strbuf.h"
 #include "arrutil.h"
+#include "cli.h"
+#include "cstrutil.h"
 #include "hash.h"
-#include "vec.h"
+#include "hashmap.h"
+#include "iter.h"
 #include "new.h"
+#include "new.h"
+#include "strbuf.h"
+#include "vec.h"
 
 struct _cliopt {
 	char shortname;		/* Short option name e.g. f (-f) */
@@ -512,12 +513,12 @@ void cliparse_print_help(cliparse *cmd)
 	}
 	if (has_options) {
 		printf("\nOptions:\n\n");
-		hashmap_iter *iter = hashmap_get_iter(cmd->options);
 		vec *shortnames = vec_new(sizeof(char));
-		while(hashmap_iter_has_next(iter)) {
-			hashmap_entry entry = hashmap_iter_next(iter);
-			vec_push_char(shortnames, *((char *)entry.key));
+		hashmap_iter *it = hashmap_get_iter(cmd->options);
+		FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_iter(it)) {
+			vec_push_char(shortnames, *((char *)(entry->key)));
 		}
+		FREE(it);
 		vec_qsort(shortnames, cmp_char);
 		for (size_t i=0, l=vec_len(shortnames); i<l; i++) {
 			cliopt *opt = (cliopt *) hashmap_get_rawptr(cmd->options, vec_get(shortnames, i));
@@ -563,10 +564,9 @@ if (!(ASSERTION)) { \
 static void _check_missing_options(cliparse *cmd)
 {
 	strbuf *longname = strbuf_new_with_capacity(16);
-	hashmap_iter *iter = hashmap_get_iter(cmd->options);
-	while(hashmap_iter_has_next(iter)) {
-		hashmap_entry entry = hashmap_iter_next(iter);
-		cliopt *opt = *((cliopt **)entry.val);
+	hashmap_iter *opt_it = hashmap_get_iter(cmd->options);
+	FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_iter(opt_it)) {
+		cliopt *opt = *((cliopt **)(entry->val));
 		strbuf_clear(longname);
 		strbuf_append(longname, ", --");
 		if (opt->longname) strbuf_append(longname, opt->longname);
@@ -618,6 +618,7 @@ static void _check_missing_options(cliparse *cmd)
 			}
 		}
 	}
+	FREE(opt_it);
 	strbuf_free(longname);
 }
 

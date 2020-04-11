@@ -24,23 +24,14 @@
 #include "hash.h"
 #include "hashmap.h"
 #include "hashset.h"
+#include "iter.h"
 
-
-struct _hashset_iter {
-	hashmap_iter *inner;
-};
 
 
 hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
 {
 	hashset *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
 	return ret;
-}
-
-
-void hashset_free(hashset *set, bool free_elements)
-{
-	hashmap_free(set, free_elements, false);
 }
 
 
@@ -102,25 +93,44 @@ HASHSET_IMPL_ALL(int)
 HASHSET_IMPL_ALL(size_t)
 HASHSET_IMPL_ALL(byte_t)
 
+
+struct _hashset_iter {
+	iter _t_iter;
+	hashmap_iter *inner;
+};
+
+
+bool _hashset_iter_has_next(iter *it)
+{
+	return iter_has_next(hashmap_iter_as_iter(((hashset_iter *)(it->impltor))->inner));
+}
+
+
+const void *_hashset_iter_next(iter *it)
+{
+	return ((hashmap_entry *)iter_next(hashmap_iter_as_iter(((hashset_iter *)(it->impltor))->inner)))->key;
+}
+
+
+static iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
+									.next = _hashset_iter_next };
+
+
+
 hashset_iter *hashset_get_iter(hashset *set)
 {
 	hashset_iter *ret = NEW(hashset_iter);
+	ret->_t_iter.impltor = ret;
+	ret->_t_iter.vt = &_hashset_iter_vt;
 	ret->inner = hashmap_get_iter(set);
 	return ret;
 }
 
-void hashset_iter_free(hashset_iter *iter)
+
+void hashset_iter_dtor(void *ptr, const dtor *dt)
 {
-	hashmap_iter_free(iter->inner);
-	FREE(iter);
+	FREE(((hashset_iter *)ptr)->inner);
 }
 
-bool hashset_iter_has_next(hashset_iter *iter)
-{
-	return hashmap_iter_has_next(iter->inner);
-}
 
-void *hashset_iter_next(hashset_iter *iter)
-{
-	return hashmap_iter_next(iter->inner).key;
-}
+IMPL_TRAIT(hashset_iter, iter)

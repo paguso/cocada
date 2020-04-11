@@ -112,12 +112,6 @@ kmer_t *kmer_new(xstring *txt, size_t pos, size_t k)
 }
 
 
-void kmer_free(kmer_t *kmer)
-{
-	FREE(kmer);
-}
-
-
 static size_t kmer_key_fn(const void *kp, size_t d)
 {
 	kmer_t *km = *(kmer_t **)kp;
@@ -299,7 +293,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	// clean up temporary stuff
 	xstring_free(padstr);
 	xstring_free(edge_labels);
-	vec_free(kp1mers, true);
+	DESTROY(kp1mers, dtor_cons(DTOR(vec), ptr_dtor()));
 	FREE(lastkm1mers[0]);
 	FREE(lastkm1mers[1]);
 	FREE(lastkp1mers[0]);

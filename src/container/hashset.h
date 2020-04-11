@@ -25,6 +25,7 @@
 #include "new.h"
 #include "hash.h"
 #include "hashmap.h"
+#include "iter.h"
 
 
 /**
@@ -37,9 +38,6 @@
 typedef hashmap hashset;
 
 
-typedef struct _hashset_iter hashset_iter;
-
-
 /**
  * @brief Constructor.
  *
@@ -47,13 +45,6 @@ typedef struct _hashset_iter hashset_iter;
  * @param eqfunc Equality comparator function pointer.
  */
 hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc );
-
-
-/**
- * @brief Destructor.
- * @param free_elements Indicates whether stored elements should be disposed.
- */
-void hashset_free(hashset *set, bool free_elements);
 
 
 /**
@@ -109,30 +100,26 @@ HASHSET_DECL_ALL(size_t)
 HASHSET_DECL_ALL(byte_t)
 
 
+
+typedef struct _hashset_iter hashset_iter;
+
+
 /**
  * @brief Returns a new iterator for the @p set.
+ * Implements the iter trait.
+ * The ::iter_next method returns an internal pointer to an element.
  */
 hashset_iter *hashset_get_iter(hashset *set);
 
 
 /**
- * @brief Iterator destructor.
- * @warning Only the iterator is destroyed. The set is left unmodified.
+ * @brief Finaliser.
+ * Takes NO destructor
  */
-void hashset_iter_free(hashset_iter *iter);
+void hashset_iter_dtor(void *ptr, const dtor *dt);
 
 
-/**
- * @brief Indicates whether there are still entries to be iterated over.
- */
-bool hashset_iter_has_next(hashset_iter *iter);
-
-
-/**
- * @brief Gets the next element of the iteration.
- */
-void *hashset_iter_next(hashset_iter *iter);
-
+DECL_TRAIT(hashset_iter, iter);
 
 
 #endif

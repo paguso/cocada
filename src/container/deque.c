@@ -62,17 +62,6 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity)
 }
 
 
-void deque_free(deque *q, bool free_elements)
-{
-	if (q==NULL) return;
-	if (free_elements)
-		for (size_t i=0; i<q->len; i++)
-			FREE(((void **)q->data)[(q->start+i)%q->cap]);
-	FREE(q->data);
-	FREE(q);
-}
-
-
 void deque_dtor(void *ptr, const dtor *dt)
 {
 	deque *dq = (deque *)ptr;

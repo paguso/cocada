@@ -51,7 +51,6 @@ void test_hashset_indel(CuTest *tc)
 	size_t n=105;
 	hashset *set;
 	uint elt, *elts;
-	hashset_iter *iterator;
 	set = hashset_new(sizeof(uint), &_key_fn, &_equals_fn);
 
 	CuAssertSizeTEquals(tc, 0, hashset_size(set));
@@ -103,10 +102,10 @@ void test_hashset_indel(CuTest *tc)
 	CuAssertSizeTEquals(tc, n, hashset_size(set));
 
 	elts = NEW_ARR(uint, n);
-	iterator = hashset_get_iter(set);
-	for( size_t i=0; hashset_iter_has_next(iterator); i++) {
-		uint *e = (uint *)hashset_iter_next(iterator);
-		elts[i] = *e;
+	hashset_iter *it = hashset_get_iter(set);
+	size_t i = 0;
+	FOREACH_IN_ITER(e, uint, hashset_iter_as_iter(it)) {
+		elts[i++] = *e;
 		//printf("element[%zu] = %u\n",i,*e);
 	}
 	qsort(elts, n, sizeof(uint), &_uint_cmp_fn);
@@ -115,9 +114,9 @@ void test_hashset_indel(CuTest *tc)
 		//printf("element[%zu] = %u\n",i, elts[i]);
 	}
 
-	hashset_iter_free(iterator);
-	hashset_free(set, false);
-	free(elts);
+	FREE(it, hashset_iter);
+	FREE(set, hashset);
+	FREE(elts);
 }
 
 

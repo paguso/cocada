@@ -36,7 +36,7 @@ void test_vec_new(CuTest *tc)
 {
 	vec *v = vec_new_with_capacity(sizeof(int), 10);
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 
@@ -82,7 +82,7 @@ void test_vec_get_cpy(CuTest *tc)
 		CuAssertDblEquals(tc, (double)i, d, 0.2);
 	}
 
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 
@@ -110,7 +110,7 @@ void test_vec_set(CuTest *tc)
 		CuAssertIntEquals(tc, (i%2)?-i:i, *d);
 	}
 
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 
@@ -134,7 +134,7 @@ void test_vec_ins(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)i, *d, 0.2);
 	}
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 
@@ -161,7 +161,7 @@ void test_vec_del(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)(2*i)+1.0, *d, 0.2);
 	}
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 
@@ -184,7 +184,7 @@ void test_vec_swap(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)(len-1-i), *d, 0.2);
 	}
-	vec_free(v, false);
+	FREE(v, vec);
 }
 
 

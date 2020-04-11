@@ -59,13 +59,6 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity);
 
 
 /**
- * @brief Destructor.
- * @param free_elts Indicates whether referenced elements should be freed.
- */
-void deque_free(deque *q, bool free_elts);
-
-
-/**
  * @brief Finaliser
  * @see new.h
  */

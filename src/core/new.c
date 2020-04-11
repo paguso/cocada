@@ -64,7 +64,7 @@ dtor *dtor_cons(dtor *par, const dtor *chd)
 }
 
 
-static void _empty_free(void *ptr, const dtor *dt )
+static void _empty_dtor(void *ptr, const dtor *dt )
 {
 }
 
@@ -72,14 +72,14 @@ static void _empty_free(void *ptr, const dtor *dt )
 dtor *empty_dtor()
 {
 	dtor *ret = NEW(dtor);
-	ret->df = _empty_free;
+	ret->df = _empty_dtor;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;
 }
 
 
-static void _ptr_free(void *ptr, const dtor *dt )
+static void _ptr_dtor(void *ptr, const dtor *dt )
 {
 	void *pointee = *((void **)ptr);
 	if ( dtor_nchd(dt) > 0 )
@@ -92,7 +92,7 @@ static void _ptr_free(void *ptr, const dtor *dt )
 dtor *ptr_dtor()
 {
 	dtor *ret = NEW(dtor);
-	ret->df = _ptr_free;
+	ret->df = _ptr_dtor;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;
