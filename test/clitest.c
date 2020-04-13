@@ -36,6 +36,7 @@ static cliparse *cmd;
 
 static void test_setup()
 {
+	/*
 	cmd = cliparse_new("test", "A Test Program");
 	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
 	vec *choices = vec_new(sizeof(char *));
@@ -159,6 +160,12 @@ static void test_setup()
 	                     cliarg_new_multi("arg3", "third file argument", ARG_FILE)
 	                    );
 	cliparse_add_subcommand(cmd, scmd1);
+	*/
+    cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
+    cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
+    cliparse_add_option(index, cliopt_new_valued('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 10, NULL, NULL));
+    cliparse_add_option(index, cliopt_new_valued('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 10, NULL, NULL));
+    cliparse_add_subcommand(cmd, index);
 
 }
 
@@ -209,10 +216,11 @@ void test_cli_parse(CuTest *tc)
 	test_setup();
 
 	int argc;
-	char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
+	//char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
+	char call[] = "vmat index -k 10";
 	char **argv = make_argv(call, &argc);
 
-	cliparse_parse(cmd, argc, (const char **)argv);
+	cliparse_parse(cmd, argc, argv);
 
 	freeargv(argc, argv);
 

@@ -67,10 +67,17 @@ typedef struct _hashmap_iter hashmap_iter;
  */
 hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
 
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
 
 /**
- * @brief Created a hash map with **at least** some initial capacity.
+ * @Initialiser
+ * Analogous to ::hashmap_new
+ * @see hashmap_new
+ */
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
+
+
+/**
+ * @brief Creates a hash map with **at least** some initial capacity.
  * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
@@ -78,6 +85,11 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
                                    size_t min_capacity);
 
 
+/**
+ * @Initialiser
+ * Analogous to ::hashmap_new_with_capacit
+ * @see hashmap_new_with_capacity
+ */
 void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
                                 size_t min_capacity);
 

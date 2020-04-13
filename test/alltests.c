@@ -68,11 +68,11 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
-	//CuSuiteAddSuite(suite, cli_get_test_suite());
+	CuSuiteAddSuite(suite, cli_get_test_suite());
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, fasta_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
-	CuSuiteAddSuite(suite, hashset_get_test_suite());
+	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());

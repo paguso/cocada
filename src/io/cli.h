@@ -394,7 +394,7 @@ void cliparse_print_help(cliparse *cmd);
  * call would be parsed as if the values of `-a` were (`1`,`2`,`3`) and 
  * the values of the argument were (`4`,`5`).
  */
-void cliparse_parse(cliparse *cmd, int argc, const char **argv);
+void cliparse_parse(cliparse *cmd, int argc, char **argv);
 
 
 /**

@@ -238,10 +238,12 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
 	}
 }
 
+
 void *hashmap_get_mut(const hashmap *hmap, const void *key)
 {
 	return (void *)hashmap_get(hmap, key);
 }
+
 
 static void _print(const hashmap *hmap)
 {
@@ -348,7 +350,6 @@ struct _hashmap_iter {
 };
 
 
-
 static bool _hashmap_iter_has_next(iter *it)
 {
 	hashmap_iter *hmit = (hashmap_iter *)it->impltor;
@@ -393,7 +394,9 @@ hashmap_iter *hashmap_get_iter(const hashmap *src)
 	return ret;
 }
 
+
 IMPL_TRAIT(hashmap_iter, iter);
+
 
 #define HASHMAP_GET_IMPL( TYPE )\
 TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
@@ -401,10 +404,12 @@ TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
 	return v ? ((TYPE *)v)[0] : (TYPE)0;\
 }
 
+
 #define HASHMAP_SET_IMPL( TYPE )\
 void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
 	hashmap_set(hmap, key, &val);\
 }
+
 
 #define HASHMAP_ALL_IMPL( TYPE )\
 HASHMAP_GET_IMPL(TYPE)\

@@ -115,7 +115,6 @@ void strbuf_append(strbuf *sb, const char *suff);
 void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep);
 
 
-
 /**
  * @brief Appends copies of strings in an iterator to @p sb,
  *        separating each of these strings by @p sep

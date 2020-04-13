@@ -35,7 +35,7 @@
 #include "hash.h"
 #include "hashmap.h"
 #include "iter.h"
-#include "new.h"
+#include "mathutil.h"
 #include "new.h"
 #include "strbuf.h"
 #include "vec.h"
@@ -81,7 +81,7 @@ struct _cliparse {
 
 static vec *_vals_vec_new(clioptmultiplicity multi, cliargtype type)
 {
-	vec *ret;
+	vec *ret = NULL;
 	switch (multi) {
 	case OPT_SINGLE:
 		switch (type) {
@@ -414,37 +414,36 @@ void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg)
 }
 
 
-//static char *delim_names[8] = {"","","(",")+","[","]","(",")*"};
-static char *arity_names[4] = {"!","+","?","*"};
-static char *val_types[] = {"", "boolean", "char", "integer", "float", "literal", "file", "dir", "choice"};
+static char *mult_lbl[4] = {"!","+","?","*"};
+static char *type_lbl[9] = {"", "boolean", "char", "integer", "float", "literal", "file", "dir", "choice (see help)"};
 
 static void _cliopt_print_help(cliopt *opt)
 {
-	size_t nmdel;
+	size_t mult_idx = 0;
 	switch (opt->need) {
 	case OPT_REQUIRED:
 		switch (opt->multi) {
 			case OPT_MULTIPLE:
-				nmdel = 1;
+				mult_idx = 1;
 				break;
 			case OPT_SINGLE:
-				nmdel = 0;
+				mult_idx = 0;
 				break;
 		} 
 		break;
 	case OPT_OPTIONAL:
 		switch (opt->multi) {
 			case OPT_MULTIPLE:
-				nmdel = 3; //zero or more
+				mult_idx = 3; //zero or more
 				break;
 			case OPT_SINGLE:
-				nmdel = 2; // zero or one
+				mult_idx = 2; // zero or one
 				break;
 		} 
 		break;
 	}
 	//printf("%s-%c", delim_names[nmdel], opt->shortname);
-	printf("  (%s)", arity_names[nmdel]);
+	printf("  (%s)", mult_lbl[mult_idx]);
 	printf(" -%c", opt->shortname);
 	if (opt->longname!=NULL) {
 		printf(" --%s", opt->longname);
@@ -459,7 +458,7 @@ static void _cliopt_print_help(cliopt *opt)
 			strbuf_join_iter(typedescr, ASTRAIT(it, vec_iter, iter), "|");
 			FREE(it);
 		} else {
-			strbuf_append(typedescr, val_types[opt->type]);
+			strbuf_append(typedescr, type_lbl[opt->type]);
 		}
 		strbuf_append(typedescr, ">");
 		if (opt->min_val_no==1 && opt->max_val_no==1) {
@@ -533,7 +532,7 @@ void cliparse_print_help(cliparse *cmd)
 		for (size_t i=0, l=vec_len(cmd->args); i < l; i++) {
 			cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
 			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single_val)?"":"...", 
-					(arg->help)?arg->help:"", val_types[arg->type], (arg->single_val)?"":"...");
+					(arg->help)?arg->help:"", type_lbl[arg->type], (arg->single_val)?"":"...");
 		}
 	}
 	if (has_subcmds) {
@@ -630,7 +629,7 @@ static void _check_missing_options(cliparse *cmd)
  * The process halts as soon as an invalid value is found or max_no values
  * are successfully collected or argv is exhausted.
  */
-vec *_collect_vals(vec *ret, const char **argv, size_t from, size_t max_no, cliargtype type, vec *choices)
+vec *_collect_vals(vec *ret, int argc, char **argv, size_t from, size_t max_no, cliargtype type, vec *choices)
 {
 	if (ret == NULL) {
 		switch (type) {
@@ -664,7 +663,7 @@ vec *_collect_vals(vec *ret, const char **argv, size_t from, size_t max_no, clia
 		}
 	}
 	strbuf *tokbuf = strbuf_new();
-	for (int i=from; i < from + max_no; i++) {
+	for (int i=from, l = MIN(argc, from+max_no); i < l; i++) {
 		strbuf_clear(tokbuf);
 		strbuf_append(tokbuf, argv[i]);
 		const char *tok = strbuf_as_str(tokbuf);
@@ -742,7 +741,7 @@ typedef enum {
 	P_DONE    = 4
 } parse_state;
 
-void cliparse_parse(cliparse *clip, int argc, const char **argv)
+void cliparse_parse(cliparse *clip, int argc, char **argv)
 {
 	int t = 1;
 	parse_state state = P_CMD_OPT;
@@ -780,11 +779,11 @@ void cliparse_parse(cliparse *clip, int argc, const char **argv)
 			CHECK(cur_opt->multi == OPT_MULTIPLE || vec_len(cur_opt->values) == 0,
 			      "Invalid multiple definition of option %s at position %d.", argv[t], t);
 			if (cur_opt->max_val_no > 0) { // has values
-				vec *vals = _collect_vals(NULL, argv, t+1, cur_opt->max_val_no, cur_opt->type, cur_opt->choices);
+				vec *vals = _collect_vals(NULL, argc, argv, t+1, cur_opt->max_val_no, cur_opt->type, cur_opt->choices);
 				size_t nargs = vec_len(vals);					
 				CHECK( nargs >= cur_opt->min_val_no,
 				      "Too few values for option %s at position %d. Found %zu values of type %s, but at least %zu are required.\n", 
-					   argv[t], t, nargs, val_types[cur_opt->type], cur_opt->min_val_no);
+					   argv[t], t, nargs, type_lbl[cur_opt->type], cur_opt->min_val_no);
 				switch(cur_opt->multi) {
 				case OPT_MULTIPLE:
 					vec_push(cur_opt->values, &vals);
@@ -823,10 +822,10 @@ void cliparse_parse(cliparse *clip, int argc, const char **argv)
 			cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, cur_pos_arg);
 			//int err_pos;
 			size_t nvals = vec_len(cur_arg->values);
-			_collect_vals(cur_arg->values, argv, t, 1, cur_arg->type, NULL);// &err_pos);
+			_collect_vals(cur_arg->values, argc, argv, t, 1, cur_arg->type, NULL);// &err_pos);
 			nvals = vec_len(cur_arg->values) - nvals;
 			CHECK(nvals==1, "Wrong value for argument #%zu (%s). Expected a <%s> value, but found %s.\n", 
-				  cur_pos_arg+1, cur_arg->name, val_types[cur_arg->type], argv[t] );
+				  cur_pos_arg+1, cur_arg->name, type_lbl[cur_arg->type], argv[t] );
 			if (cur_arg->single_val) { 
 				cur_pos_arg++;
 				if (cur_pos_arg >= vec_len(cur_parse->args)) 
@@ -841,9 +840,11 @@ void cliparse_parse(cliparse *clip, int argc, const char **argv)
 	}
 	// check if some arguments undefined
 	cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, cur_pos_arg);
-	CHECK( cur_pos_arg == vec_len(cur_parse->args)-1 && vec_len(cur_arg->values),
+	CHECK( (vec_len(cur_parse->args)==0 && cur_pos_arg==0) ||
+	       (vec_len(cur_parse->args)>0 && cur_pos_arg == vec_len(cur_parse->args)-1 
+		   	&& vec_len(cur_arg->values) > 0),
 		   "Missing argument #%zu of type <%s> at position %d.\n", 
-			cur_pos_arg+1, val_types[cur_arg->type], t );
+			cur_pos_arg+1, type_lbl[cur_arg->type], t );
 	// check if mandatory options with no default values undefined
 	_check_missing_options(clip);
 	if (clip->active_subcmd) _check_missing_options(clip->active_subcmd);

@@ -80,7 +80,7 @@ bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
  * @brief Finaliser
  * @see new.h
  */
-void bitvec_dtor(void *bv, const dtor *dt);
+void bitvec_dtor(void *bv, const dtor *unused);
 
 
 /**

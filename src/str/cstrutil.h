@@ -51,10 +51,12 @@ char *cstr_new(size_t len);
  */
 char *cstr_clone(const char *src);
 
+
 /**
  * @brief Creates a clone of a source string up to a given length.
  */
 char *cstr_clone_len(const char *src, size_t len);
+
 
 /**
  * @brief Sets @p str[j]=@p c for @p from <= j < @p to.
