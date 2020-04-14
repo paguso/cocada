@@ -261,7 +261,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  */
 cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
                           clioptneed need, clioptmultiplicity multiplicity, 
-						  cliargtype type, size_t min_val_no, size_t max_val_no,
+						  cliargtype type, int min_val_no, int max_val_no,
                           vec *choices, vec *defaults );
 
 

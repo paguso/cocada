@@ -163,8 +163,9 @@ static void test_setup()
 	*/
     cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
     cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
-    cliparse_add_option(index, cliopt_new_valued('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 10, NULL, NULL));
-    cliparse_add_option(index, cliopt_new_valued('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 10, NULL, NULL));
+    cliparse_add_option(index, cliopt_new_valued('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+    cliparse_add_option(index, cliopt_new_valued('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+	cliparse_add_pos_arg(index, cliarg_new("sequence file", "input sequence file in fasta format", ARG_FILE));
     cliparse_add_subcommand(cmd, index);
 
 }
@@ -217,7 +218,7 @@ void test_cli_parse(CuTest *tc)
 
 	int argc;
 	//char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
-	char call[] = "vmat index -k 10";
+	char call[] = "vmat index -k 5 10 input.fasta -w 20 30 40";
 	char **argv = make_argv(call, &argc);
 
 	cliparse_parse(cmd, argc, argv);
