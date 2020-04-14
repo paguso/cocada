@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -39,6 +40,14 @@
 #include "new.h"
 #include "strbuf.h"
 #include "vec.h"
+
+
+#define CHECK(ASSERTION, FORMAT, ...) \
+if (!(ASSERTION)) { \
+	fprintf(stderr,  "Error: "FORMAT, ##__VA_ARGS__ ); \
+	exit(EXIT_FAILURE); \
+}
+
 
 struct _cliopt {
 	char shortname;		/* Short option name e.g. f (-f) */
@@ -110,7 +119,7 @@ static vec *_vals_vec_new(clioptmultiplicity multi, cliargtype type)
 			ret = vec_new(sizeof(char *));
 			break;
 		case ARG_CHOICE:
-			ret = vec_new(sizeof(int));
+			ret = vec_new(sizeof(char *));
 			break;
 		}
 		break;
@@ -201,10 +210,10 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_CHOICE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
 			break;
 		case OPT_SINGLE:
-			FREE(vals, vec);
+			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
 			break;
 		}
 		break;
@@ -248,6 +257,70 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help)
 }
 
 
+static bool _str_eq(const void *s1, const void *s2)
+{
+	return strcmp(*((char **)s1), *((char **)s2))==0;
+}
+
+
+/*
+ * Validates NON-NULL default values. If type==ARG_CHOICE, choices contains
+ * the valid alternatives
+ */
+static bool _validate_defaults(vec *defaults, cliargtype type, vec *choices) {
+	switch (type) {
+	case ARG_NONE:
+		break;
+	case ARG_CHAR:
+		assert(vec_typesize(defaults)==sizeof(char));
+		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
+			char c = vec_get_char(defaults, i);
+			assert(isprint(c));
+		}
+		break;
+	case ARG_BOOL:
+		assert(vec_typesize(defaults)==sizeof(bool));
+		break;
+	case ARG_INT:
+		assert(vec_typesize(defaults)==sizeof(long));
+		break;
+	case ARG_FLOAT:
+		assert(vec_typesize(defaults)==sizeof(double));
+		break;
+	case ARG_STR:
+		assert(vec_typesize(defaults)==sizeof(char *));
+		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
+			char *c = (char *)vec_get_rawptr(defaults, i);
+			assert(strlen(c)==0 || c[0]!='-');
+		}
+		break;
+	case ARG_FILE:
+		assert(vec_typesize(defaults)==sizeof(char *));
+		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
+			char *c = (char *)vec_get_rawptr(defaults, i);
+			assert(strlen(c)==0 || c[0]!='-');
+		}
+		break;
+	case ARG_DIR:
+		assert(vec_typesize(defaults)==sizeof(char *));
+		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
+			char *c = (char *)vec_get_rawptr(defaults, i);
+			assert(strlen(c)==0 || c[0]!='-');
+		}
+		break;
+	case ARG_CHOICE:
+		assert(vec_typesize(defaults)==sizeof(char *));
+		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
+			char *c = (char *)vec_get_rawptr(defaults, i);
+			assert(strlen(c)==0 || c[0]!='-');
+			assert(vec_find(choices, &c, _str_eq) < vec_len(choices));
+		}
+		break;
+	}
+	return true;
+}
+
+
 cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
                           clioptneed need, clioptmultiplicity multiplicity, 
 						  cliargtype type, int min_val_no, int max_val_no,
@@ -263,8 +336,9 @@ cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
 	assert( 0<=min_val_no && min_val_no <= max_val_no );
 	assert( type!=ARG_CHOICE ||_arechoices(choices) );
 	assert( defaults==NULL || 
-	        ( min_val_no <= vec_len(defaults) 
-			  && vec_len(defaults) <= max_val_no ) );
+	        (  min_val_no <= vec_len(defaults) 
+			   && vec_len(defaults) <= max_val_no 
+			   && _validate_defaults(defaults, type, choices) ) );
 	cliopt *ret = NEW(cliopt);
 	ret->shortname = shortname;
 	ret->longname = (longname) ? cstr_clone(longname) : NULL;
@@ -355,12 +429,6 @@ static uint64_t _hash_str(const void *ptr)
 }
 
 
-static bool _str_eq(const void *s1, const void *s2)
-{
-	return strcmp(*((char **)s1), *((char **)s2))==0;
-}
-
-
 cliparse *cliparse_new(char *name, char *help)
 {
 	assert(_isid(name));
@@ -406,11 +474,40 @@ const cliparse *cliparse_active_subcommand(const cliparse *cmd)
 }
 
 
+static bool _not_a_subcmd_name(char *id, cliparse *cmd) {
+	for (cliparse *cur_cmd = cmd; cur_cmd != NULL; cur_cmd = cmd->par) {
+		CHECK(strcmp(id, cmd->name) && !hashmap_has_key(cur_cmd->subcommands, &id),
+			  "Value '%s' is not allowed because it is a (sub)command name.\n", id);
+	}	
+	return true;
+}
+
+
 void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 {
-	assert(cmd->par==NULL);
-	assert(cmd!=subcmd);
-	assert(!hashmap_has_key(cmd->subcommands, &subcmd->name));
+	assert(cmd->par==NULL); // subcommand cannot have subcommands
+	assert(cmd!=subcmd);	// avoid cycles
+	assert(subcmd->par==NULL); // a subcommand gets added at most once
+	assert(!hashmap_has_key(cmd->subcommands, &subcmd->name)); // all subcommand names are unique
+	// assert that no subcmd option choice is equal to a subcommand name in cmd
+	hashmap_iter *it = hashmap_get_iter(subcmd->options);
+	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_iter(it)) {
+		cliopt *opt = *((cliopt **)(optentry->val));
+		if (opt->type == ARG_CHOICE) {
+			for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
+				char *ch = (char *)vec_get_rawptr(opt->choices, i);
+				assert(_not_a_subcmd_name(ch, cmd));
+			}
+		}
+		if (opt->defaults!=NULL && ( opt->type==ARG_STR || opt->type==ARG_FILE 
+									|| opt->type==ARG_DIR || opt->type==ARG_CHOICE ) ) {
+			for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+				char *val = (char *)vec_get_rawptr(opt->defaults, i);
+				assert(_not_a_subcmd_name(val, cmd)); 
+			}
+		}
+	}
+	FREE(it);
 	subcmd->par = cmd;
 	vec_push_rawptr(cmd->subcmd_names, subcmd->name);
 	hashmap_set(cmd->subcommands, &(subcmd->name), &subcmd);
@@ -421,12 +518,19 @@ void cliparse_add_option(cliparse *cmd, cliopt *opt)
 {
 	assert( !hashmap_has_key(cmd->options, &(opt->shortname)) );
 	assert( opt->longname==NULL || !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
-	if (hashmap_has_key(cmd->long_to_short, &(opt->longname)) ){
-		char sn = hashmap_get_char(cmd->long_to_short, &(opt->longname));
-		cliopt *aopt = (cliopt *)hashmap_get_rawptr(cmd->options, &sn);
-		assert(strcmp(aopt->longname,opt->longname)==0);
+	if (opt->type == ARG_CHOICE) {
+		for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
+			char *ch = (char *)vec_get_rawptr(opt->choices, i);
+			assert(_not_a_subcmd_name(ch, cmd)); 
+		}
 	}
-	assert( !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
+	if (opt->defaults!=NULL && ( opt->type==ARG_STR || opt->type==ARG_FILE 
+	                             || opt->type==ARG_DIR || opt->type==ARG_CHOICE ) ) {
+		for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+			char *val = (char *)vec_get_rawptr(opt->defaults, i);
+			assert(_not_a_subcmd_name(val, cmd)); 
+		}
+	}
 	hashmap_set(cmd->options, &(opt->shortname), &opt);
 	if (opt->longname) {
 		hashmap_set(cmd->long_to_short, &(opt->longname), &(opt->shortname));
@@ -578,13 +682,6 @@ void cliparse_print_help(cliparse *cmd)
 }
 
 
-#define CHECK(ASSERTION, FORMAT, ...) \
-if (!(ASSERTION)) { \
-	fprintf(stderr,  "Error: "FORMAT, ##__VA_ARGS__ ); \
-	exit(EXIT_FAILURE); \
-}
-
-
 /*
  * Checks to see if required options were not declared.
  * AND
@@ -623,18 +720,28 @@ static void _check_missing_options(cliparse *cmd)
 				vec_cat(vals, opt->defaults);
 				break;
 			case ARG_STR:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++)
-					vec_push_rawptr(vals, cstr_clone(vec_get(opt->defaults, i)));
+				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+					char *val = (char *)vec_get_rawptr(opt->defaults, i);
+					vec_push_rawptr(vals, cstr_clone(val));
+				}
 				break;
 			case ARG_FILE:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++)
-					vec_push_rawptr(vals, cstr_clone(vec_get(opt->defaults, i)));
+				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+					char *val = (char *)vec_get_rawptr(opt->defaults, i);
+					vec_push_rawptr(vals, cstr_clone(val));
+				}
 				break;
 			case ARG_DIR:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++)
-					vec_push_rawptr(vals, cstr_clone(vec_get(opt->defaults, i)));
+				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+					char *val = (char *)vec_get_rawptr(opt->defaults, i);
+					vec_push_rawptr(vals, cstr_clone(val));
+				}
 				break;
 			case ARG_CHOICE:
+				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+					char *val = (char *)vec_get_rawptr(opt->defaults, i);
+					vec_push_rawptr(vals, cstr_clone(val));
+				}
 				break;
 			}
 			switch(opt->multi) {
@@ -658,7 +765,7 @@ static void _check_missing_options(cliparse *cmd)
  * If type=ARGV_CHOICE, a non-null choices vector must be informed.
  * Returns whether parsing went OK.
  */
-static bool _collect_val(vec *vals, char *tok, cliargtype type, vec *choices, vec *subcmds)
+static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices, cliparse *cmd)
 {
 	switch (type) {
 	case ARG_NONE:
@@ -700,22 +807,28 @@ static bool _collect_val(vec *vals, char *tok, cliargtype type, vec *choices, ve
 		vec_push_double(vals, dval);
 		break;
 	case ARG_STR:
-		if (tok[0]=='-' || vec_find(subcmds, &tok, _str_eq)<vec_len(subcmds) ) {
-			return false;
+		for (cliparse *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
+			if (tok[0]=='-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+				return false;
+			}
 		}
 		char *sval = cstr_clone(tok);
 		vec_push(vals, &sval);
 		break;
 	case ARG_FILE:
-		if (tok[0]=='-' || vec_find(subcmds, &tok, _str_eq)<vec_len(subcmds) ) {
-			return false;
+		for (cliparse *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
+			if (tok[0]=='-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+				return false;
+			}
 		}
 		char *fval = cstr_clone(tok);
 		vec_push(vals, &fval);
 		break;
 	case ARG_DIR:
-		if (tok[0]=='-' || vec_find(subcmds, &tok, _str_eq)<vec_len(subcmds) ) {
-			return false;
+		for (cliparse *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
+			if (tok[0]=='-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+				return false;
+			}
 		}
 		char *pval = cstr_clone(tok);
 		vec_push(vals, &pval);
@@ -803,7 +916,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				CHECK( cur_arg_no < vec_len(cur_parse->args) ,
 					   "Unexpected token %s at position %d.\n", tok, t);
 				cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, 0);
-				bool is_arg = _collect_val(cur_arg->values, tok, cur_arg->type, cur_arg->choices, cur_parse->subcmd_names);
+				bool is_arg = _parse_value(cur_arg->values, tok, cur_arg->type, cur_arg->choices, cur_parse);
 				CHECK( is_arg, "Wrong value %s for argument #%d of type <%s> at position %d.\n",
 					   tok, cur_arg_no, type_lbl[cur_arg->type], t );
 				// positional argument value ok
@@ -811,7 +924,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				t++;
 			}
 		} else if (state == PS_VAL) { // can only be here if expecting values for a valued option
-			bool val_ok = _collect_val(cur_vals, tok, cur_opt->type, cur_opt->choices, cur_parse->subcmd_names);
+			bool val_ok = _parse_value(cur_vals, tok, cur_opt->type, cur_opt->choices, cur_parse);
 			bool max_val_no_reached =  val_ok && ( vec_len(cur_vals) == cur_opt->max_val_no );
 			bool eof_argv = val_ok && ((t+1)==argc);
 			if (!val_ok || max_val_no_reached || eof_argv) {
@@ -844,7 +957,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				t++;
 			}
 		} else {
-			CHECK(false, "Error parsing command arguments at position %d (WRONG STATE).\n", t);
+			CHECK(false, "Uh-oh: undefined error parsing command arguments at position %d (WRONG STATE).\n", t);
 		}
 	}
 	// check if some arguments undefined

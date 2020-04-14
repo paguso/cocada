@@ -161,11 +161,18 @@ static void test_setup()
 	                    );
 	cliparse_add_subcommand(cmd, scmd1);
 	*/
+	vec *choices = vec_new(sizeof(char *));
+	vec_push_rawptr(choices, cstr_clone("plain"));
+	vec_push_rawptr(choices, cstr_clone("fasta"));
+	//vec_push_rawptr(choices, cstr_clone("index"));
+	vec *deftype = vec_new(sizeof(char*));
+	vec_push_rawptr(deftype, cstr_clone("fasta"));
     cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
     cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
     cliparse_add_option(index, cliopt_new_valued('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
     cliparse_add_option(index, cliopt_new_valued('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparse_add_pos_arg(index, cliarg_new("sequence file", "input sequence file in fasta format", ARG_FILE));
+	cliparse_add_option(index, cliopt_new_valued('t',"input-type", "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices, deftype));
+	cliparse_add_pos_arg(index, cliarg_new("sequence file", "Input sequence file", ARG_FILE));
     cliparse_add_subcommand(cmd, index);
 
 }
@@ -222,6 +229,11 @@ void test_cli_parse(CuTest *tc)
 	char **argv = make_argv(call, &argc);
 
 	cliparse_parse(cmd, argc, argv);
+
+	cliparse *subcmd = cliparse_active_subcommand(cmd);
+	const vec *tvals = cliparse_opt_val_from_shortname(subcmd, 't');
+	CuAssertSizeTEquals(tc, 1, vec_len(tvals));
+	CuAssertStrEquals(tc, "fasta", (char*)vec_first_rawptr(tvals));
 
 	freeargv(argc, argv);
 

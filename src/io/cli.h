@@ -136,7 +136,57 @@
  * *subcommands* or *subprograms*, each of which can have its own
  * set of options. The program may still have a set of global
  * options that affect all or at least a significant set of subcommands.
+ * 
+ * 
+ * 
+ * <command> ::= <command name> <options or args> |
+ *          	 <command name> <options> <subcommand>
+ * 
+ * <command name> ::= <id>
+ * 
+ * <id> ::= <letter>(<letter>|<digit>|<dash>)*
+ * 
+ * <letter> ::= [A-Z] | [a-z]
+ * 
+ * <digit> ::= [0-9]
+ * 
+ * <dash> ::= _ | -
+ * 
+ * <options or args> ::= <option> <options or args> |
+ * 						 <arg> <options or args>
  *  
+ * <option> ::= <option name> <option values> 
+ * 
+ * <option name> ::= -<letter> | --<id>
+ * 
+ * <option values> ::= <empty> | <value> <option values>
+ * 
+ * <arg> := <value>
+ * 
+ * <subcommand> ::= <subcommand name> <options or args>
+ *
+ * <subcommand name> ::= <id>
+ *  
+ * <value> ::= <boolean> | <char> | <int> | <float> | <string>
+ *             <file> | <dir> | <choice> 
+ * 
+ * <boolean> ::= 0 | 1 | false | true
+ * 
+ * <char> ::= printable ascii character
+ * 
+ * <integer> ::= long recognised by stlib atof function
+ *
+ * <float> ::= double recognised by stlib atof function
+ * 
+ * <string> ::= printable ascii string not starting with '-'
+ * 				and which is not a subcommand name
+ * 
+ * <file> ::= currently a <string> with no further validation
+ * 
+ * <dir> ::= currently a <string> with no further validation
+ * 
+ * <choice> ::= <id>
+ * 
  */
 
 
