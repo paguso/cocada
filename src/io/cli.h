@@ -449,7 +449,8 @@ void cliparse_print_help(cliparse *cmd);
  * @param argv (*no transfer*) The program call tokens (also received by main())
  * 
  * The parser assumes @p argv to contain the tokens of a program call to be
- * parsed according to the CLI grammar shown in the module documentation.
+ * parsed according to the CLI grammar shown in the module 
+ * documentation. **All tokens** must be separated by spaces.
  * 
  * Notice that some calls may be ambiguous, so it is important to know how parsing
  * works. For example, if a command has an option `-a` with 1 to 3 integer values
