@@ -87,14 +87,10 @@
  * 
  * Some validation can be performed on option values by setting types 
  * to these values. Option types are chosen from the enum type ::cliargtype. 
- * In particular the option ARG_STR accepts any string literal without 
- * performing any previous validation. Currently all values of an option 
- * must be of the same type.
  *  
  * An option can either be *required*, when it must be declared in the
- * program call, or *optional*, when it may be left unspecified. Although
- * not forbidden, it is normally pointless to have a required option
- * with no associated value.
+ * program call, or *optional*, when it may be left unspecified. 
+ * A required option must have an associated value.
  * 
  * An option can also be allowed to be declared one *single* time,
  * or either *multiple* times. For example, the `gcc -I <include dir>`
@@ -104,10 +100,9 @@
  * # Positional arguments
  * 
  * The required inputs to a program are given as a list of positional
- * arguments at the end of the program call. Arguments are typed
- * with the same types as option values. Argument values are validated
- * during the parsing of the program call. Use ARG_STRING for 
- * a string literal type with no validation. In general, evey argument
+ * arguments, usually at the end of the program call. Arguments are typed
+ * with the same ::cliargtype types as option values. Argument are validated
+ * during the parsing of the program call.  In general, every argument 
  * has a single value, however some programs may accept an unbounded
  * list of inputs. So we allow the last positional argument to 
  * have multiple values, with the same restriction as the option
@@ -132,13 +127,17 @@
  * many different options, which could make the use of the program
  * confusing. Moreover, many of these options would not make sense for
  * the program as a whole, but rather for a specific operation. 
- * In order to address this issue, a program can be divided in 
- * *subcommands* or *subprograms*, each of which can have its own
- * set of options. The program may still have a set of global
+ * In order to address this issue, a program can be organised
+ * in *subcommands* or *subprograms*, each of which with its own
+ * set of options and arguments. The program may still have a set of global
  * options that affect all or at least a significant set of subcommands.
  * 
+ * # CLI grammar
  * 
+ * A command line call accepted by this module will be parsed according 
+ * to the following grammar.
  * 
+ * ```
  * <command> ::= <command name> <options or args> |
  *          	 <command name> <options> <subcommand>
  * 
@@ -153,7 +152,10 @@
  * <dash> ::= _ | -
  * 
  * <options or args> ::= <option> <options or args> |
- * 						 <arg> <options or args>
+ *                       <arg> <options or args> | 
+ *                       <empty>
+ * 
+ * <options> ::= <empty> | <option> <options>
  *  
  * <option> ::= <option name> <option values> 
  * 
@@ -167,16 +169,16 @@
  *
  * <subcommand name> ::= <id>
  *  
- * <value> ::= <boolean> | <char> | <int> | <float> | <string>
+ * <value> ::= <boolean> | <char> | <int> | <float> | <string> |
  *             <file> | <dir> | <choice> 
  * 
  * <boolean> ::= 0 | 1 | false | true
  * 
  * <char> ::= printable ascii character
  * 
- * <integer> ::= long recognised by stlib atof function
+ * <integer> ::= long recognised by stlib.h atol 
  *
- * <float> ::= double recognised by stlib atof function
+ * <float> ::= double recognised by stlib.h atof 
  * 
  * <string> ::= printable ascii string not starting with '-'
  * 				and which is not a subcommand name
@@ -186,7 +188,7 @@
  * <dir> ::= currently a <string> with no further validation
  * 
  * <choice> ::= <id>
- * 
+ * ``` 
  */
 
 
@@ -205,7 +207,7 @@
  *  ARG_STR          | String literal (no validation)                  | char * (heap)      
  *  ARG_FILE         | File name (description only, no validation)     | char * (heap)
  *  ARG_DIR          | Directory name (descrption only, no validation) | char * (heap)    
- *  ARG_CHOICE       | Finite set of string alternatives               | int (choice #)
+ *  ARG_CHOICE       | Finite set of string alternatives               | char * (heap)
  */
 typedef enum {
 	ARG_NONE = 0,  /* No type, used for valueless options */
@@ -220,6 +222,7 @@ typedef enum {
 						descriptive/cumentation purposes) */
 	ARG_CHOICE = 8 /* Finite set of string alternatives */
 } cliargtype;
+
 
 /**
  * @brief Does a CLI option need to bee used on each call?
@@ -244,15 +247,18 @@ typedef enum {
  */
 #define ARGNO_UNLIMITED  SIZE_MAX
 
+
 /**
  * @brief CLI Option type (opaque)
  */
 typedef struct _cliopt cliopt;
 
+
 /**
  * @brief CLI Positional argument type (opaque)
  */
 typedef struct _cliarg cliarg;
+
 
 /**
  * @brief CLI parser type (opaque). 
@@ -277,12 +283,18 @@ typedef struct _cliparse cliparse;
  * @param longname  (**no transfer**) The multi-character distinct name
  * @param help      (**no transfer**) A short description of the option 
  *                  used for help messages.
+ * 
+ * This is equivalent to
+ * ```C
+ * clopt_new_valued(shortname, longname, help, OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL )
+ * ```
  */
 cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
 
 
 /**
  * @brief Creates a new option. 
+ * 
  * @param shortname		(**no transfer**) The one-character distinct name
  * @param longname		(**no transfer**) The multi-character distinct name
  * @param help			(**no transfer**) A short description of the option 
@@ -295,19 +307,36 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * 						Required: @p min_val_no <= @p max_val_no.
  * 						Use ARGNO_UNLIMITED for an unlimited number ofvalues.
  * @param choices		(**transfer**) Possible choices if @p type = ARG_CHOICE
- * @param defaults		(**transfer**) Default values (PENDING)
+ * @param defaults		(**transfer**) Default values
  * 
- * @warning
- * The following are required :
+ * The following validations will be performed:
+ * 
+ * - @p shortname is an alphabetical character (<letter> in the CLI grammar)
+ * - @p longname ia a valid <id> according to the CLI grammar (a letter followed by
+ *   a string of alphanumeric chars, dash '-' or underscores '_')
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
  * - If @p need == OPT_REQUIRED, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @p multiplicity == OPT_MULTIPLE, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
- * - If @type == ARG_CHOICE then @p choices must be a non-empty vector
+ * - If @type == ARG_CHOICE then @p choices must be a non-empty vector of strings with
+ *   every member being a valid <id> according to the CLI grammar 
  * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @p multiplicity == OPT_SINGLE
  * - If @p need == OPT_REQUIRED, @p defaults is discarded
- * - If @p need == OPT_OPTIONAL, @p defaults must have at least @p min_val_no and 
- *   at most @p max_val_no elements
+ * - If @p need == OPT_OPTIONAL, and @p defaults is given, it must have at least 
+ *   @p min_val_no and at most @p max_val_no elements. In such case, the type of @p defaults
+ *   and the constraints that each of its elements must observe is given in the following table.
+ * 
+ * option type  | defaults type                 | element constraints
+ * -------------|-------------------------------|---------------------------------------------  
+ * ARG_BOOL     | vec of bool                   | valid boolean constant
+ * ARG_CHAR     | vec of char                   | isprint(elt) == true
+ * ARG_INT      | vec of long                   | valid long constant
+ * ARG_FLOAT    | vec of double                 | valid double constant
+ * ARG_STRING   | vec of heap-allocated char *  | elt[0] != '-'
+ * ARG_FILE     | vec of heap-allocated char *  | elt[0] != '-'
+ * ARG_DIR      | vec of heap-allocated char *  | elt[0] != '-'
+ * ARG_CHOICE   | vec of heap-allocated char *  | elt must be equal to some member of choices
+ * 
  */
 cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
                           clioptneed need, clioptmultiplicity multiplicity, 
@@ -318,7 +347,7 @@ cliopt *cliopt_new_valued(char shortname,  char *longname, char *help,
 /**
  * @brief Creates a new single-valued positional argument.
  * @param name	(**no transfer**) The name of the argument used for 
- * 				descritptive/documentation purposes only.
+ * 				descritptive/documentation purposes only (<id> according).
  * @param help	(**no transfer**) A short description of the argument 
  * 				used for help messages.
  * @param type	The type of the argument.
@@ -362,34 +391,42 @@ const char *cliparse_name(const cliparse *cmd);
 
 
 /**
- * @brief Returns the invoked subcommand of a command, if any.
- * @return Prior to parsing a call with ::cliparse_parse (cmd), returns NULL.
- * After parsing a call, if a subcommand was called, returns the
- * corresponding (populated) parser, else returns NULL.
- */
-const cliparse *cliparse_active_subcommand(const cliparse *cmd);
-
-
-
-/**
- * @brief Adds a subprogram (subcommand parser) to a program (command parser).
+ * @brief Adds a subprogram (subcommand parser) to a 
+ * program (command parser).
+ * 
+ * The following validations are performed:
+ * 
+ * - Neither can @p cmd be a subcommand, or and @p subcmd
+ *   have subcommands, so that we have at most one level
+ * 	 of subcommands nesting
+ * - Moreover every @p subcmd must be added as a subcommand
+ *   at most once
+ * - If @p subcmd has an option of type @p ARG_CHOICE, then
+ *   none of its choice values can be equal to a command
+ *   or subcommand name of the @p cmd parser.
  */
 void cliparse_add_subcommand(cliparse *cmd, cliparse *subcmd);
 
 
 /**
  * @brief Adds an option to a (sub)program CLI parser.
- * @warning Both the short (`-`) and long (`--`) names of the option must
- * be unique for the command.
- * Trying to add options with existing names will cause an assertion error.
- *  In particular A help option with names 
- * `-h`, `--help` is automatically added to every cliparse. 
+ * 
+ * The following validations are performed:
+ * 
+ * - Both the short (`-`) and long (`--`) names of the option must
+ *   be unique for the command. In particular, a help option with names 
+ *  `-h`, `--help` is automatically added to every cliparse.
+ * - if @p opt is of type ARG_CHOICE, then none of its choice values
+ *   can be equal to any command or subcommand name of the parser @p cmd
  */
 void cliparse_add_option(cliparse *cmd, cliopt *opt);
 
 
 /**
  * @brief Adds a positional argument to a (sub)program CLI parser.
+ * 
+ * Ir 
+ * 
  */
 void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg);
 
@@ -410,14 +447,9 @@ void cliparse_print_help(cliparse *cmd);
  * 
  * @param argc The number of tokens (normally received by main())
  * @param argv (*no transfer*) The program call tokens (also received by main())
- 
- * The parser assumes @p argv to contain the tokens of a program call in 
- * one of the two following forms. 
- * 1. `command [command options...] [command arguments...]`; or
- * 2. `command [command options...] [subcommand] [subcommand options...] [subcommand arguments...]`
- * So, in particular, currently you CANNOT:
- * - declare command option after the subcommand name
- * - declare an option after an argument
+ * 
+ * The parser assumes @p argv to contain the tokens of a program call to be
+ * parsed according to the CLI grammar shown in the module documentation.
  * 
  * Notice that some calls may be ambiguous, so it is important to know how parsing
  * works. For example, if a command has an option `-a` with 1 to 3 integer values
@@ -431,20 +463,36 @@ void cliparse_print_help(cliparse *cmd);
  * ```
  * command 4 5 -a 1 2 3
  * ```
- * but this form is not currently allowed (although this is expected change in
- * the future).
+ * but let us suppose the the first form has been entered.
  * 
  * This function handles option values as follows. When an option name is
- * found at position `i`, it then tries to collect as many values as possible 
- * from positions `i+1`, `i+2` ,... until 
+ * found at position `i`, it then tries to greedily collect as many values as 
+ * possible from positions `i+1`, `i+2` ,... until 
  * - The end of @p argv, OR
  * - The maximum number of allowed values are successfully parsed, OR
  * - A type-mismatch occurs.
+ * 
  * So, in our current example, because `-a` accepts up to 3 values, the
  * call would be parsed as if the values of `-a` were (`1`,`2`,`3`) and 
  * the values of the argument were (`4`,`5`).
+ * 
+ * Now, if instead of having one argument with multiple int values, the
+ * command had three single int arguments, the parse would result
+ * in an error (missing argument), althought it could have been interpreted 
+ * as if option `-a` had values (`1`, `2`) and the arguments values were
+ * `3`, `4`, and `5`. 
+ * 
  */
 void cliparse_parse(cliparse *cmd, int argc, char **argv);
+
+
+/**
+ * @brief Returns the invoked subcommand of a command, if any.
+ * @return Prior to parsing a call with ::cliparse_parse (cmd), returns NULL.
+ * After parsing a call, if a subcommand was called, returns the
+ * corresponding (populated) parser, else returns NULL.
+ */
+const cliparse *cliparse_active_subcommand(const cliparse *cmd);
 
 
 /**
