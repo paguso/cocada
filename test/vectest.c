@@ -188,16 +188,16 @@ void test_vec_swap(CuTest *tc)
 }
 
 
-void test_vec_iter(CuTest *tc) 
+void test_vec_iter(CuTest *tc)
 {
 	vec *v = vec_new(sizeof(int));
-	
+
 	vec_iter *it = vec_get_iter(v);
 	FOREACH_IN_ITER(j, int, vec_iter_as_iter(it)) {
 		CuFail(tc, "Vector has no element to iterate.");
 	}
 	FREE(it);
-	
+
 	int n = 10;
 	for (int i=0; i<n; i++) {
 		vec_push_int(v, i);
@@ -211,7 +211,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	FREE(it);
 	FREE(v, vec);
-	
+
 	char *strings[8] = {"The", "quick", "fox", "jumps", "over", "the", "lazy", "dog"};
 	v = vec_new(sizeof(char *));
 	n = 8;

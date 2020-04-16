@@ -25,11 +25,11 @@
 #include <stdint.h>
 
 #include "bitbyte.h"
+#include "coretype.h"
+#include "iter.h"
 #include "new.h"
 #include "order.h"
-#include "iter.h"
 #include "trait.h"
-
 
 /**
  * @file vec.h
@@ -143,7 +143,7 @@ void vec_fit(vec *v);
  *        The size of the returned array in bytes will be
  *        vec_typesize(@p v) * vec_len(@p v);
  * @see vec_fit
- * @warning After this operation, the vector is destroyed.
+ * @warning After this operation, the vector object is destroyed.
  */
 void *vec_detach(vec *v);
 
@@ -351,25 +351,32 @@ VEC_PUSH_DECL(TYPE)\
 VEC_INS_DECL(TYPE)\
 VEC_POP_DECL(TYPE)
 
-
-VEC_ALL_DECL(rawptr)
-VEC_ALL_DECL(bool)
-VEC_ALL_DECL(byte_t)
 VEC_ALL_DECL(char)
+VEC_ALL_DECL(uchar)
 VEC_ALL_DECL(short)
+VEC_ALL_DECL(ushort)
 VEC_ALL_DECL(int)
+VEC_ALL_DECL(uint)
 VEC_ALL_DECL(long)
+VEC_ALL_DECL(ulong)
+VEC_ALL_DECL(llong)
+VEC_ALL_DECL(ullong)
 VEC_ALL_DECL(float)
 VEC_ALL_DECL(double)
+VEC_ALL_DECL(ldouble)
+VEC_ALL_DECL(bool)
 VEC_ALL_DECL(size_t)
 VEC_ALL_DECL(int8_t)
-VEC_ALL_DECL(int16_t)
-VEC_ALL_DECL(int32_t)
-VEC_ALL_DECL(int64_t)
 VEC_ALL_DECL(uint8_t)
+VEC_ALL_DECL(int16_t)
 VEC_ALL_DECL(uint16_t)
+VEC_ALL_DECL(int32_t)
 VEC_ALL_DECL(uint32_t)
+VEC_ALL_DECL(int64_t)
 VEC_ALL_DECL(uint64_t)
+VEC_ALL_DECL(byte_t)
+VEC_ALL_DECL(rawptr)
+VEC_ALL_DECL(cstr)
 
 
 typedef struct {

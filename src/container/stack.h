@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 
+#include "coretype.h"
 #include "new.h"
 #include "vec.h"
 
@@ -83,7 +84,32 @@ void stack_pop(stack *s, void *dest);
 STACK_PUSH_DECL(TYPE) \
 STACK_POP_DECL(TYPE)
 
+STACK_ALL_DECL(char)
+STACK_ALL_DECL(uchar)
+STACK_ALL_DECL(short)
+STACK_ALL_DECL(ushort)
 STACK_ALL_DECL(int)
+STACK_ALL_DECL(uint)
+STACK_ALL_DECL(long)
+STACK_ALL_DECL(ulong)
+STACK_ALL_DECL(llong)
+STACK_ALL_DECL(ullong)
+STACK_ALL_DECL(float)
+STACK_ALL_DECL(double)
+STACK_ALL_DECL(ldouble)
+STACK_ALL_DECL(bool)
 STACK_ALL_DECL(size_t)
+STACK_ALL_DECL(int8_t)
+STACK_ALL_DECL(uint8_t)
+STACK_ALL_DECL(int16_t)
+STACK_ALL_DECL(uint16_t)
+STACK_ALL_DECL(int32_t)
+STACK_ALL_DECL(uint32_t)
+STACK_ALL_DECL(int64_t)
+STACK_ALL_DECL(uint64_t)
+STACK_ALL_DECL(byte_t)
+STACK_ALL_DECL(rawptr)
+STACK_ALL_DECL(cstr)
+
 
 #endif

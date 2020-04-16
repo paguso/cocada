@@ -28,7 +28,7 @@
 
 size_t nbytes(size_t nvalues)
 {
-	return (nvalues==0)?0:(size_t)(multceil(log2((double)nvalues), BYTESIZE));
+	return (nvalues==0)?0:(size_t)(DIVCEIL(log2((double)nvalues), BYTESIZE));
 }
 
 

@@ -45,7 +45,7 @@ static size_t ba_size=7000;
 static void reset_arrays()
 {
 	size_t i, j, ba_byte_size;
-	ba_byte_size =  (size_t)multceil(ba_size, BYTESIZE);
+	ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
 	for (i=0; i<ba_byte_size; i++) {
 		ba_zeros[i] = 0x0;
 		ba_ones[i] = ~(0x0);
@@ -64,7 +64,7 @@ static void reset_arrays()
 void csrsbitarr_test_setup(CuTest *tc)
 {
 	size_t ba_byte_size;
-	ba_byte_size =  (size_t)multceil(ba_size, BYTESIZE);
+	ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
 	nof_arrays = 6;
 	ba_zeros = malloc(ba_byte_size);
 	ba_ones = malloc(ba_byte_size);

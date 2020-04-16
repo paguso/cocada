@@ -26,6 +26,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "coretype.h"
+
 /**
 @file new.h
 @author Paulo Fonseca
@@ -67,10 +69,10 @@ The normal lifecycle of memory objetcs is composed of five stages
 where the first two phases (1-2) comprise the object *creation*, and the two
 last (4-5) comprise the object *destruction*.
 
-In COCADA, Step 1 is usually done through the macro ::NEW, which allocate heap 
-memory for an object of a given type and returns a typed pointer to this position. 
-Object creation (steps 1-2) is normally done with a single call to one of the object 
-constructors `type *type_new(...)`. Ocasionally, these two steps can be done 
+In COCADA, Step 1 is usually done through the macro ::NEW, which allocate heap
+memory for an object of a given type and returns a typed pointer to this position.
+Object creation (steps 1-2) is normally done with a single call to one of the object
+constructors `type *type_new(...)`. Ocasionally, these two steps can be done
 separately. The function `type_init(type *obj,...)` can be used to initialise
 a previously allocatted object `obj`. This is particularly useful for initialising
 objects living in the stack, like in
@@ -80,8 +82,8 @@ type obj;
 type_init(&obj);
 ```
 
-Object destruction can be a lot trickier though, because an object may contain or 
-refer to other objects. The crucial question is whether to destroy 
+Object destruction can be a lot trickier though, because an object may contain or
+refer to other objects. The crucial question is whether to destroy
 '*child* ' objects as part of the '*parent* ' object destruction. Two
 main problems may arise.
 - If a child object is not destroyed and no furhter references to it exist after
@@ -103,7 +105,7 @@ destruction of its owned components. Shared references integrity is maintained
 via borrow and lifetime management mechanisms.
 
 Although we do not have native language support, in COCADA we struggle to
-maintain a simpler object dependency structure, trying to make clear 
+maintain a simpler object dependency structure, trying to make clear
 <b>in the documentation</b> when the ownership of an object is transferred to
 another. Likewise, the documentation of the destructors (see below) should
 indicate which child objects should be destroyed.
@@ -295,14 +297,14 @@ can be freed.
 A destructor function
 
 ```
-void type_dtor (void *ptr, const dtor *dt) 
+void type_dtor (void *ptr, const dtor *dt)
 {
     //// DON´T DO free(ptr)
 }
 ```
 
 is actually an object finaliser function. It should **NOT** attempt to deallocate
-the memory pointed by the first argument, which need not even be a 
+the memory pointed by the first argument, which need not even be a
 dynamically-allocated heap location.
 Destructor functions should be more properly called *finaliser* functions, but
 we keep the term to match the more popular C++ nomenclature.
@@ -406,11 +408,11 @@ used to finalise stack objects. The destructor object is also not destroyed.
 
 An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
 In addition to finalising the object, it also deallocates its memory **and**
-also consumes the destructor. If the default, childless destructor is to be used, 
+also consumes the destructor. If the default, childless destructor is to be used,
 we can simply use `FREE(obj, type)` which is equivalent, but slightly more
 convenient than `DESTROY(obj, DTOR(type))`.
 
-Finally, we may have simpler objects without child objects, or objects whose inner 
+Finally, we may have simpler objects without child objects, or objects whose inner
 references are fixed and known at compile time. The destructor functions of these
 objects  actually don't need to look at the runtime-built destructors to know which
 components to destroy. In such case, we can still define a standard destructor of
@@ -453,7 +455,7 @@ problems.
 <tr>
     <td>4. Finalisation</td>
     <td>`FINALISE(obj, dtor )`</td>
-    <td rowspan=3>4+5. Destruction</td> 
+    <td rowspan=3>4+5. Destruction</td>
     <td rowspan=3>`DESTROY(obj, dtor)`<br>
     `FREE(obj, type)`<br>
     `type_free(obj)`</td>
@@ -467,19 +469,6 @@ problems.
 </table>
 
 */
-
-/**
- * @brief Raw pointer type
- */
-typedef void* rawptr;
-
-
-/**
- * NULL pointer constant.
- */
-#if !defined(NULL)
-#define NULL ((void *)0)
-#endif
 
 
 /**
@@ -509,7 +498,7 @@ typedef void (*dtor_func) (void *, const dtor *);
 
 /**
  * Destructor object
- */ 
+ */
 struct _dtor {
 	dtor_func df;
 	size_t nchd;

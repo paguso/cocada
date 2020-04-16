@@ -23,6 +23,7 @@
 
 #include "arrutil.h"
 #include "iter.h"
+#include "trait.h"
 
 
 static bool _arr_iter_has_next(iter *it)

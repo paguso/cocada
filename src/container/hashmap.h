@@ -22,11 +22,12 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
-
-#include "new.h"
+#include "coretype.h"
 #include "hash.h"
-#include "order.h"
 #include "iter.h"
+#include "new.h"
+#include "order.h"
+#include "trait.h"
 
 /**
  * @file hashmap.h
@@ -186,24 +187,32 @@ void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val);
 HASHMAP_GET_DECL(TYPE)\
 HASHMAP_SET_DECL(TYPE)
 
-HASHMAP_ALL_DECL(rawptr)
-HASHMAP_ALL_DECL(byte_t)
 HASHMAP_ALL_DECL(char)
+HASHMAP_ALL_DECL(uchar)
 HASHMAP_ALL_DECL(short)
+HASHMAP_ALL_DECL(ushort)
 HASHMAP_ALL_DECL(int)
+HASHMAP_ALL_DECL(uint)
 HASHMAP_ALL_DECL(long)
+HASHMAP_ALL_DECL(ulong)
+HASHMAP_ALL_DECL(llong)
+HASHMAP_ALL_DECL(ullong)
 HASHMAP_ALL_DECL(float)
 HASHMAP_ALL_DECL(double)
+HASHMAP_ALL_DECL(ldouble)
+HASHMAP_ALL_DECL(bool)
 HASHMAP_ALL_DECL(size_t)
 HASHMAP_ALL_DECL(int8_t)
-HASHMAP_ALL_DECL(int16_t)
-HASHMAP_ALL_DECL(int32_t)
-HASHMAP_ALL_DECL(int64_t)
 HASHMAP_ALL_DECL(uint8_t)
+HASHMAP_ALL_DECL(int16_t)
 HASHMAP_ALL_DECL(uint16_t)
+HASHMAP_ALL_DECL(int32_t)
 HASHMAP_ALL_DECL(uint32_t)
+HASHMAP_ALL_DECL(int64_t)
 HASHMAP_ALL_DECL(uint64_t)
-
+HASHMAP_ALL_DECL(byte_t)
+HASHMAP_ALL_DECL(rawptr)
+HASHMAP_ALL_DECL(cstr)
 
 
 #endif

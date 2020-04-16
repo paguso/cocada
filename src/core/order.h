@@ -61,6 +61,7 @@ typedef int (*cmp_func)(const void *left, const void *right);
  */
 typedef bool (*eq_func)(const void *left, const void *right);
 
+
 /**
  * @brief Provides type-specific order comparison functions,
  * e.g. cmp_float, cmp_uin64_t, etc.
@@ -70,6 +71,7 @@ typedef bool (*eq_func)(const void *left, const void *right);
  */
 #define CMP_DECL( TYPE )\
 int cmp_##TYPE(const void *left, const void *right);
+
 
 /**
  * @brief Provides type-specific equality comparison functions,
@@ -81,10 +83,12 @@ int cmp_##TYPE(const void *left, const void *right);
 #define EQ_DECL( TYPE )\
 bool eq_##TYPE(const void *left, const void *right);
 
+
 ///@cond
 #define CMPEQ_DECL( TYPE )\
 CMP_DECL( TYPE )\
 EQ_DECL( TYPE )
+
 
 CMPEQ_DECL(int)
 CMPEQ_DECL(long)

@@ -39,7 +39,7 @@ void test_mult_floor(CuTest *tc)
 		base = rand();
 		if (((unsigned int)rand())%2) value = -value;
 		if (((unsigned int)rand())%2) base = -base;
-		actual = multfloor(value, base);
+		actual = DIVFLOOR(value, base);
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
@@ -86,7 +86,7 @@ void test_mult_ceil(CuTest *tc)
 		base = rand();
 		if (((unsigned int)rand())%2) value = -value;
 		if (((unsigned int)rand())%2) base = -base;
-		actual = multceil(value, base);
+		actual = DIVCEIL(value, base);
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;

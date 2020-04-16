@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <immintrin.h>
+//#include <immintrin.h>
 
 #include "arrutil.h"
 #include "bitbyte.h"
@@ -379,8 +379,9 @@ static const void *_hashmap_iter_next(iter *it)
 }
 
 
-static iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next, 
-									.next = _hashmap_iter_next };
+static iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next,
+                                    .next = _hashmap_iter_next
+                                  };
 
 
 hashmap_iter *hashmap_get_iter(const hashmap *src)
@@ -415,20 +416,30 @@ void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
 HASHMAP_GET_IMPL(TYPE)\
 HASHMAP_SET_IMPL(TYPE)
 
-HASHMAP_ALL_IMPL(rawptr)
-HASHMAP_ALL_IMPL(byte_t)
+
 HASHMAP_ALL_IMPL(char)
+HASHMAP_ALL_IMPL(uchar)
 HASHMAP_ALL_IMPL(short)
+HASHMAP_ALL_IMPL(ushort)
 HASHMAP_ALL_IMPL(int)
+HASHMAP_ALL_IMPL(uint)
 HASHMAP_ALL_IMPL(long)
+HASHMAP_ALL_IMPL(ulong)
+HASHMAP_ALL_IMPL(llong)
+HASHMAP_ALL_IMPL(ullong)
 HASHMAP_ALL_IMPL(float)
 HASHMAP_ALL_IMPL(double)
+HASHMAP_ALL_IMPL(ldouble)
+HASHMAP_ALL_IMPL(bool)
 HASHMAP_ALL_IMPL(size_t)
 HASHMAP_ALL_IMPL(int8_t)
-HASHMAP_ALL_IMPL(int16_t)
-HASHMAP_ALL_IMPL(int32_t)
-HASHMAP_ALL_IMPL(int64_t)
 HASHMAP_ALL_IMPL(uint8_t)
+HASHMAP_ALL_IMPL(int16_t)
 HASHMAP_ALL_IMPL(uint16_t)
+HASHMAP_ALL_IMPL(int32_t)
 HASHMAP_ALL_IMPL(uint32_t)
+HASHMAP_ALL_IMPL(int64_t)
 HASHMAP_ALL_IMPL(uint64_t)
+HASHMAP_ALL_IMPL(byte_t)
+HASHMAP_ALL_IMPL(rawptr)
+HASHMAP_ALL_IMPL(cstr)

@@ -26,9 +26,9 @@
 #include "bitarr.h"
 #include "bitbyte.h"
 #include "bytearr.h"
-#include "new.h"
 #include "csrsbitarray.h"
 #include "mathutil.h"
+#include "new.h"
 
 
 static size_t MIN_RANK_SAMPLE_INTERVAL =
@@ -52,14 +52,14 @@ struct _csrsbitarray {
 };
 
 
-void init_rank_tables(csrsbitarray *ba)
+static void init_rank_tables(csrsbitarray *ba)
 {
 	size_t byte_pos, group, cumul_rank, next_group_byte_pos;
 	ba->rank_samples_bit_interval = MAX( MIN_RANK_SAMPLE_INTERVAL,
 	                                     ( ((size_t)(pow(log2(ba->len),2)
 	                                             / BYTESIZE)) * BYTESIZE ) );
 	ba->rank_samples_byte_interval = ba->rank_samples_bit_interval / BYTESIZE;
-	ba->rank_samples_count = MAX( (size_t) multceil(ba->len,
+	ba->rank_samples_count = MAX( (size_t) DIVCEIL(ba->len,
 	                              ba->rank_samples_bit_interval), 1 );
 	ba->rank_samples = bytearr_new(ba->rank_samples_count*ba->bytes_per_pos);
 
@@ -140,7 +140,7 @@ void init_rank_tables(csrsbitarray *ba)
 }
 
 
-void init_select_tables(csrsbitarray *ba)
+static void init_select_tables(csrsbitarray *ba)
 {
 	size_t byte_pos, group, chunk_rank, cumul_rank, target_rank;
 
@@ -152,10 +152,10 @@ void init_select_tables(csrsbitarray *ba)
 	    MAX( MIN_RANK_SAMPLE_INTERVAL,
 	         (((size_t)(pow(log2(ba->total_bit_count[1]),2)/BYTESIZE))
 	          * BYTESIZE) );
-	ba->sel_samples_count[0] = MAX( multceil(ba->total_bit_count[0],
-	                                ba->sel_samples_bit_interval[0]),
+	ba->sel_samples_count[0] = MAX( DIVCEIL(ba->total_bit_count[0],
+	                                        ba->sel_samples_bit_interval[0]),
 	                                1 );
-	ba->sel_samples_count[1] = MAX( multceil( ba->total_bit_count[1],
+	ba->sel_samples_count[1] = MAX( DIVCEIL( ba->total_bit_count[1],
 	                                ba->sel_samples_bit_interval[1]),
 	                                1 );
 	ba->byte_sel_samples[0] = bytearr_new( ba->sel_samples_count[0]
@@ -252,11 +252,11 @@ csrsbitarray *csrsbitarr_new(byte_t *ba, size_t len)
 	ret = NEW(csrsbitarray);
 	ret->data = ba;
 	ret->len = len;
-	ret->byte_size = multceil(ret->len, BYTESIZE);
+	ret->byte_size = DIVCEIL(ret->len, BYTESIZE);
 	// use the minimum number of "bytes" per bit and byte position
-	ret->bytes_per_pos = (size_t) multceil((size_t) ceil(log2(ret->len + 1)),
-	                                       BYTESIZE);
-	ret->bytes_per_byte_pos = (size_t) multceil((size_t) ceil(log2(
+	ret->bytes_per_pos = (size_t) DIVCEIL((size_t) ceil(log2(ret->len + 1)),
+	                                      BYTESIZE);
+	ret->bytes_per_byte_pos = (size_t) DIVCEIL((size_t) ceil(log2(
 	                              ret->byte_size + 1)), BYTESIZE);
 
 	init_rank_tables(ret);
@@ -415,12 +415,11 @@ size_t csrsbitarr_rank1(csrsbitarray *ba, size_t pos)
 	return rank;
 }
 
+
 size_t csrsbitarr_rank(csrsbitarray *ba, size_t pos, bool bit)
 {
 	return bit ? csrsbitarr_rank1(ba, pos) : csrsbitarr_rank0(ba, pos);
 }
-
-
 
 
 size_t csrsbitarr_select0(csrsbitarray *ba, size_t rank)

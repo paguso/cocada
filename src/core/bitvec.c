@@ -55,7 +55,7 @@ bitvec *bitvec_new_with_capacity(size_t capacity)
 {
 	bitvec *bv = NEW(bitvec);
 	bv->len = 0;
-	bv->byte_cap = MAX(MIN_BYTE_SIZE, (size_t)multceil(capacity, BYTESIZE));
+	bv->byte_cap = MAX(MIN_BYTE_SIZE, (size_t)DIVCEIL(capacity, BYTESIZE));
 	bv->cap = bv->byte_cap*BYTESIZE;
 	bv->bits = malloc(bv->byte_cap);
 	memset(bv->bits, 0x00, bv->byte_cap); //(!) unused positions must be 0
@@ -66,7 +66,7 @@ bitvec *bitvec_new_with_capacity(size_t capacity)
 bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 {
 	bitvec *bv = bitvec_new_with_capacity(len);
-	memcpy(bv->bits, src, multceil(len, BYTESIZE));
+	memcpy(bv->bits, src, DIVCEIL(len, BYTESIZE));
 	bv->len = len;
 	return bv;
 }
@@ -83,7 +83,7 @@ void bitvec_dtor(void *bv, const dtor *unused)
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits)
 {
 	bitvec *bv = bitvec_new_with_capacity(nbits);
-	size_t nbytes = (size_t) multceil(nbits, BYTESIZE);
+	size_t nbytes = (size_t) DIVCEIL(nbits, BYTESIZE);
 	memcpy(bv->bits, src->bits, nbytes);
 	bv->len = nbits;
 	for (size_t i=bv->len; i<nbytes*BYTESIZE; i++)
@@ -119,7 +119,7 @@ inline void bitvec_set_bit (bitvec *bv, size_t pos, bool bit)
 static inline size_t _bitvec_count1(const bitvec *bv)
 {
 	size_t byte_pos = 0;
-	size_t used_bytes = (size_t)multceil(bv->len, BYTESIZE);
+	size_t used_bytes = (size_t)DIVCEIL(bv->len, BYTESIZE);
 	size_t cnt = 0;
 #if BYTEWORDSIZE==8
 	while (byte_pos+8 < used_bytes) {
@@ -201,7 +201,7 @@ void bitvec_push (bitvec *bv, bool bit)
 void bitvec_push_n (bitvec *bv, size_t nbits, bool bit)
 {
 	if (bv->len+nbits >= bv->cap) { // HAS to be >=, not >
-		_growto(bv, GROW_BY*(size_t)(multceil(bv->len+nbits, BYTESIZE)));
+		_growto(bv, GROW_BY*(size_t)(DIVCEIL(bv->len+nbits, BYTESIZE)));
 	}
 	if (bit) {
 		size_t nleft=nbits;
@@ -231,7 +231,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src)
 {
 	size_t nbits = bitvec_len(src);
 	if (bv->len+nbits >= bv->cap) { // HAS to be >=, not >
-		_growto(bv, GROW_BY*(size_t)(multceil(bv->len+nbits, BYTESIZE)));
+		_growto(bv, GROW_BY*(size_t)(DIVCEIL(bv->len+nbits, BYTESIZE)));
 	}
 	bitarr_write(bv->bits, bv->len, src->bits, 0, nbits);
 	bv->len += nbits;
@@ -240,7 +240,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src)
 
 void bitvec_fit(bitvec *bv)
 {
-	bv->byte_cap = MAX(1, (size_t)multceil(bv->len, BYTESIZE));
+	bv->byte_cap = MAX(1, (size_t)DIVCEIL(bv->len, BYTESIZE));
 	bv->cap = bv->byte_cap*BYTESIZE;
 	bv->bits = realloc(bv->bits, bv->byte_cap);
 }
@@ -249,7 +249,7 @@ void bitvec_fit(bitvec *bv)
 byte_t *bitvec_detach (bitvec *bv)
 {
 	byte_t *ret = (byte_t *)bv->bits;
-	ret = realloc(ret, (size_t)multceil(bv->len, BYTESIZE));
+	ret = realloc(ret, (size_t)DIVCEIL(bv->len, BYTESIZE));
 	FREE(bv);
 	return ret;
 }

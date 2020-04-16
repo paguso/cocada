@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
 /**
  * @file bitbyte.h
  * @author Paulo Fonseca
@@ -40,6 +39,9 @@
  *       'porting' instructions and issues.
  */
 
+
+#ifndef BYTE_T
+#define BYTE_T
 
 /**
  * @brief A required unsigned byte type.
@@ -76,10 +78,12 @@ typedef unsigned char byte_t;
  * below should probably be modified.
  */
 #if BYTESIZE!=8
-#error "This code has only been tested on architectures with bytes of 8 bits"
+#error Error: this code requires an 8-bit byte_t type
 #endif
 
 #define BYTE_MAX UCHAR_MAX
+
+#endif // BYTE_T
 
 /*
  * 8-bit Byte masks:

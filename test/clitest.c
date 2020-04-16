@@ -167,18 +167,19 @@ static void test_setup()
 	//vec_push_rawptr(choices, cstr_clone("index"));
 	vec *deftype = vec_new(sizeof(char*));
 	vec_push_rawptr(deftype, cstr_clone("fasta"));
-    cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
-    cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
-    cliparse_add_option(index, cliopt_new_valued('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-    cliparse_add_option(index, cliopt_new_valued('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparse_add_option(index, cliopt_new_valued('t',"input-type", "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices, deftype));
+	cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
+	cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
+	cliparse_add_option(index, cliopt_new('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+	cliparse_add_option(index, cliopt_new('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+	cliparse_add_option(index, cliopt_new('t',"input-type", "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices, deftype));
 	cliparse_add_pos_arg(index, cliarg_new("sequence file", "Input sequence file", ARG_FILE));
-    cliparse_add_subcommand(cmd, index);
+	cliparse_add_subcommand(cmd, index);
 
 }
 
 
-static void test_teardown() {
+static void test_teardown()
+{
 	FREE(cmd, cliparse);
 }
 
@@ -190,14 +191,13 @@ void test_cli_help(CuTest *tc)
 	test_teardown();
 }
 
-static char **make_argv(char *call, int *argc) 
+static char **make_argv(char *call, int *argc)
 {
 	char *str, *saveptr;
 	int i;
 	saveptr = call;
 	vec *ret = vec_new(sizeof(char *));
-	for (i=0, str=call; ; i++, str=NULL)
-	{
+	for (i=0, str=call; ; i++, str=NULL) {
 		char *tok = strtok_r(str, " ", &saveptr);
 		if (!tok) break;
 		tok = cstr_clone(tok);
@@ -212,7 +212,8 @@ static char **make_argv(char *call, int *argc)
 	return argv;
 }
 
-void freeargv(int argc, char **argv) {
+void freeargv(int argc, char **argv)
+{
 	for (int i=0; i<argc; i++)
 		FREE(argv[i]);
 	FREE(argv);

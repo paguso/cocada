@@ -84,14 +84,37 @@ void hashset_remove(hashset *set, const void *elt)
    }
 
 
-#define HASHSET_IMPL_ALL( TYPE )\
+#define HASHSET_ALL_IMPL( TYPE )\
 HASHSET_CONTAINS_IMPL(TYPE)\
 HASHSET_ADD_IMPL(TYPE)\
 HASHSET_REMOVE_IMPL(TYPE)
 
-HASHSET_IMPL_ALL(int)
-HASHSET_IMPL_ALL(size_t)
-HASHSET_IMPL_ALL(byte_t)
+HASHSET_ALL_IMPL(char)
+HASHSET_ALL_IMPL(uchar)
+HASHSET_ALL_IMPL(short)
+HASHSET_ALL_IMPL(ushort)
+HASHSET_ALL_IMPL(int)
+HASHSET_ALL_IMPL(uint)
+HASHSET_ALL_IMPL(long)
+HASHSET_ALL_IMPL(ulong)
+HASHSET_ALL_IMPL(llong)
+HASHSET_ALL_IMPL(ullong)
+HASHSET_ALL_IMPL(float)
+HASHSET_ALL_IMPL(double)
+HASHSET_ALL_IMPL(ldouble)
+HASHSET_ALL_IMPL(bool)
+HASHSET_ALL_IMPL(size_t)
+HASHSET_ALL_IMPL(int8_t)
+HASHSET_ALL_IMPL(uint8_t)
+HASHSET_ALL_IMPL(int16_t)
+HASHSET_ALL_IMPL(uint16_t)
+HASHSET_ALL_IMPL(int32_t)
+HASHSET_ALL_IMPL(uint32_t)
+HASHSET_ALL_IMPL(int64_t)
+HASHSET_ALL_IMPL(uint64_t)
+HASHSET_ALL_IMPL(byte_t)
+HASHSET_ALL_IMPL(rawptr)
+HASHSET_ALL_IMPL(cstr)
 
 
 struct _hashset_iter {
@@ -113,7 +136,8 @@ const void *_hashset_iter_next(iter *it)
 
 
 static iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
-									.next = _hashset_iter_next };
+                                    .next = _hashset_iter_next
+                                  };
 
 
 

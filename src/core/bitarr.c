@@ -32,14 +32,14 @@
 
 byte_t *bitarr_new(size_t len)
 {
-	return bytearr_new((size_t)multceil(len, BYTESIZE));
+	return bytearr_new((size_t)DIVCEIL(len, BYTESIZE));
 }
 
 
 byte_t *bitarr_new_from_str(const char *str, size_t len)
 {
 	byte_t *ret;
-	ret = NEW_ARR(byte_t, (size_t)multceil(len, BYTESIZE));
+	ret = NEW_ARR(byte_t, (size_t)DIVCEIL(len, BYTESIZE));
 	bitarr_parse_str(ret, str, len);
 	return ret;
 }
@@ -48,7 +48,7 @@ byte_t *bitarr_new_from_str(const char *str, size_t len)
 void bitarr_parse_str(byte_t *dest, const char *src, size_t len)
 {
 	byte_t bt;
-	size_t i = (size_t)multceil(len, BYTESIZE);
+	size_t i = (size_t)DIVCEIL(len, BYTESIZE);
 	i = 0;
 	while (i+BYTESIZE <= len) {
 		bt = 0x0;

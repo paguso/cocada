@@ -97,7 +97,7 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
 	hcode->own_ab = false;
 	hcode->size = ab_size(ab);
 
-	size_t ab_bytesize = (size_t)multceil(hcode->size, BYTESIZE);
+	size_t ab_bytesize = (size_t)DIVCEIL(hcode->size, BYTESIZE);
 	hcode->tree = NEW_ARR(hufftnode, MAX(0, 2*hcode->size-1));
 	for (size_t i = 0; i < hcode->size; i++) {
 		hcode->tree[i].chr_rank = i;

@@ -30,12 +30,12 @@
  * @file iter.h
  * @author Paulo Fonseca
  * @brief Iterator trait
- * 
+ *
  * To implement this iterator trait, follow the indications in trait.h
- * 
+ *
  * If concrete type implements this trait, say `concreteiter` ,then it
  * is used as follows.
- * 
+ *
  * ```C
  * concreteiter *cit = // get a concreteiter reference
  * iter *it = ASTRAIT(cit, concreteiter, iter);
@@ -44,9 +44,9 @@
  * }
  * FREE(cit);
  * ```
- * 
+ *
  * or, alternatively, with the FOREACH_IN_ITER macro.
- * 
+ *
  */
 
 
@@ -79,7 +79,7 @@ bool iter_has_next(iter *it);
 /**
  * @brief Gets the next iterator element.
  * @return If  iter_has_next(it) == true returns a pointer to the next
- * element. Otherwise, the behaviour is undefined and may result in a 
+ * element. Otherwise, the behaviour is undefined and may result in a
  * fatal error.
  */
 const void *iter_next(iter *it);
@@ -88,12 +88,12 @@ const void *iter_next(iter *it);
 /**
  * @brief Meaning:
  * `for each element ELT_NAME of type ELT_TYPE of the iterator ITER do...`
- * that is, scans an iterator pointed by @p ITER naming each element 
- * @p ELT_NAME (local iteration variable), which are of type pointer to 
+ * that is, scans an iterator pointed by @p ITER naming each element
+ * @p ELT_NAME (local iteration variable), which are of type pointer to
  * @p ELT_TYPE.
  *
- * For example, to iterate over a vector `v` of int 
- * 
+ * For example, to iterate over a vector `v` of int
+ *
  * ```C
  * vec *v = vec_new(sizeof(int));
  * vec_push_int(v, 10);
@@ -109,7 +109,7 @@ const void *iter_next(iter *it);
  * @param ELT_NAME The variable identifier for the elements returned in the iteration (local)
  * @param ELT_TYPE The base type of the elements. The iteration returns pointers to ELT_TYPE
  * @param ITER 		An initialised pointer to an ::iter
- */ 
+ */
 #define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
 for (iter *__it = (iter *) (ITER); __it ; __it = NULL) \
 for (bool __has = iter_has_next(__it); __has; __has = false ) \

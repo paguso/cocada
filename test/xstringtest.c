@@ -34,7 +34,7 @@
 void test_xstring_new(CuTest *tc)
 {
 	for (size_t len=0; len<1000; len++) {
-		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)multceil(log2(len), BYTESIZE):0);
+		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)DIVCEIL(log2(len), BYTESIZE):0);
 		xstring_free(xs);
 	}
 }
@@ -43,7 +43,7 @@ void test_xstring_new(CuTest *tc)
 void test_xstring_get_set(CuTest *tc)
 {
 	for (size_t len=0; len<1000; len++) {
-		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)multceil(log2(len), BYTESIZE):0);
+		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)DIVCEIL(log2(len), BYTESIZE):0);
 
 		for (size_t i=0; i<len; i++) {
 			xstr_set(xs, i, i);

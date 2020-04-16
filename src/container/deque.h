@@ -25,7 +25,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "coretype.h"
 #include "new.h"
+
 
 /**
  * @file deque.h
@@ -186,9 +188,32 @@ DEQUE_PUSH_FRONT_DECL(TYPE)\
 DEQUE_POP_FRONT_DECL(TYPE)\
 
 
+DEQUE_ALL_DECL(char)
+DEQUE_ALL_DECL(uchar)
+DEQUE_ALL_DECL(short)
+DEQUE_ALL_DECL(ushort)
 DEQUE_ALL_DECL(int)
+DEQUE_ALL_DECL(uint)
+DEQUE_ALL_DECL(long)
+DEQUE_ALL_DECL(ulong)
+DEQUE_ALL_DECL(llong)
+DEQUE_ALL_DECL(ullong)
+DEQUE_ALL_DECL(float)
+DEQUE_ALL_DECL(double)
+DEQUE_ALL_DECL(ldouble)
+DEQUE_ALL_DECL(bool)
 DEQUE_ALL_DECL(size_t)
-
+DEQUE_ALL_DECL(int8_t)
+DEQUE_ALL_DECL(uint8_t)
+DEQUE_ALL_DECL(int16_t)
+DEQUE_ALL_DECL(uint16_t)
+DEQUE_ALL_DECL(int32_t)
+DEQUE_ALL_DECL(uint32_t)
+DEQUE_ALL_DECL(int64_t)
+DEQUE_ALL_DECL(uint64_t)
+DEQUE_ALL_DECL(byte_t)
+DEQUE_ALL_DECL(rawptr)
+DEQUE_ALL_DECL(cstr)
 
 
 #endif
