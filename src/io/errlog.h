@@ -1,3 +1,24 @@
+/*
+ * COCADA - COCADA Collection of Algorithms and DAta Structures
+ *
+ * Copyright (C) 2016  Paulo G S Fonseca
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ *
+ */
+
 #ifndef ERRLOG_H
 #define ERRLOG_H
 
@@ -6,36 +27,36 @@
  * @file errlog.h
  * @brief Error logging
  * @author Paulo Fonseca
- * 
+ *
  * COCADA defines three debug levels, as defined by the DEBUG_LVL macro,
- * which is often declared at compile time with the appropriate compiler 
+ * which is often declared at compile time with the appropriate compiler
  * option (`-DDEBUG_LVL=L` in `gcc`).
- * 
+ *
  * The three debug levels are
- * 
+ *
  * - Error  (DEBUG_LVL=0)
  * - Warning  (DEBUG_LVL=1)
  * - Debug info  (DEBUG_LVL=2 Default)
- * 
- * The error level is used for unrecoverable error events that cause the 
+ *
+ * The error level is used for unrecoverable error events that cause the
  * program to exit with a EXIT_FAILURE status.
- * 
+ *
  * The warning level is used for recoverable errors or extreme events
  * which do not abort the program to halt but may result in suboptimal
  * behaviour.
- * 
- * The debug level is used for specific information about the program 
+ *
+ * The debug level is used for specific information about the program
  * state during execution.
- * 
- * These levels are strictly hierarchical. Any event of a level `L` is 
+ *
+ * These levels are strictly hierarchical. Any event of a level `L` is
  * also pertinent to levels greater than `L`. That is, an Error event
  * is also a Warning and a Debug event. A Warning is also a Debug info
  * but not an Error. A Debug event is just a Debug info event and nothing
- * else. Conversely, an event is only considered if its level is 
- * >= DEBUG_LVL. For example, all Warning events are disregarded if 
- * DEBUG_LVL=0 (Error level). This module provides macros for triggering 
+ * else. Conversely, an event is only considered if its level is
+ * >= DEBUG_LVL. For example, all Warning events are disregarded if
+ * DEBUG_LVL=0 (Error level). This module provides macros for triggering
  * and reporting  such events.
- * 
+ *
  */
 
 
@@ -44,7 +65,7 @@
 /**
  * @brief The debug level described in the module documentation
  */
-#define DEBUG_LVL 2 
+#define DEBUG_LVL 2
 #elif DEBUG_LVL<0 || DEBUG_LVL>2
 #warning Invalid debug level (DEBUG_LVL). Setting to default DEBUG(2) level.
 #undef DEBUG_LVL
@@ -62,7 +83,7 @@ void print_trace(FILE *);
 /**
  * @brief Triggers an ERROR and prints an error message to `stderr`,
  * after which the program exits with `EXIT_FAILURE` status.
- * 
+ *
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
@@ -73,10 +94,10 @@ void print_trace(FILE *);
 
 
 /**
- * @brief Conditionally triggers an ERROR and prints an error 
- * message to `stderr`, after which the program exits with 
+ * @brief Conditionally triggers an ERROR and prints an error
+ * message to `stderr`, after which the program exits with
  * `EXIT_FAILURE` status.
- * 
+ *
  * @param CONDITION The condition that has to be satisfied for
  * the Error to occur.
  * @param FORMAT Is the format string of the message, followed
@@ -89,11 +110,11 @@ if ( CONDITION ) { \
 
 
 /**
- * @brief Triggers an ERROR if an assertion is false and prints 
- * an error message to `stderr`, after which the program exits with 
+ * @brief Triggers an ERROR if an assertion is false and prints
+ * an error message to `stderr`, after which the program exits with
  * `EXIT_FAILURE` status.
- * 
- * @param ASSERTION The condition which, if not satisfied, triggers 
+ *
+ * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
@@ -109,7 +130,7 @@ if ( CONDITION ) { \
 /**
  * @brief Issues a WARNING and prints an error message to `stderr`
  * if DEBUG_LVL>=1. Otherwise nothing takes place.
- * 
+ *
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
@@ -118,10 +139,10 @@ if ( CONDITION ) { \
 
 
 /**
- * @brief Conditionally issues a WARNING and prints a message to 
- * `stderr`. If DEBUG_LVL<1 nothing takes place regardless of 
+ * @brief Conditionally issues a WARNING and prints a message to
+ * `stderr`. If DEBUG_LVL<1 nothing takes place regardless of
  * the condition.
- * 
+ *
  * @param CONDITION The condition that has to be satisfied for
  * the warning.
  * @param FORMAT Is the format string of the message, followed
@@ -134,11 +155,11 @@ if ( CONDITION ) { \
 
 
 /**
- * @brief Issues a WARNING if an assertion is false and prints 
- * an error message to `stderr`. 
+ * @brief Issues a WARNING if an assertion is false and prints
+ * an error message to `stderr`.
  * If DEBUG_LVL<1 nothing takes place regardless of  the assertion.
- * 
- * @param ASSERTION The condition which, if not satisfied, triggers 
+ *
+ * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
@@ -148,7 +169,7 @@ if ( CONDITION ) { \
 		fprintf(stderr,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
 	}
 
-#else 
+#else
 
 #define WARN(IGNORE, ...) ((void)0)
 #define WARN_IF(IGN, ORE, ...) ((void)0)
@@ -163,7 +184,7 @@ if ( CONDITION ) { \
 /**
  * @brief Prints a DEBUG info message to `stderr`
  * if DEBUG_LVL==2. Otherwise nothing takes place.
- * 
+ *
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
@@ -171,10 +192,10 @@ if ( CONDITION ) { \
 	fprintf(stderr,  "Debug info: "FORMAT, ##__VA_ARGS__ );
 
 /**
- * @brief Conditionally prints a DEBUG info message to 
- * `stderr`. If DEBUG_LVL<2 nothing takes place regardless of 
+ * @brief Conditionally prints a DEBUG info message to
+ * `stderr`. If DEBUG_LVL<2 nothing takes place regardless of
  * the condition.
- * 
+ *
  * @param CONDITION The condition that has to be satisfied for
  * the warning.
  * @param FORMAT Is the format string of the message, followed
@@ -186,11 +207,11 @@ if ( CONDITION ) { \
 }
 
 /**
- * @brief Prints a DEBUG info message to `stderr`if an assertion is 
- * false. 
+ * @brief Prints a DEBUG info message to `stderr`if an assertion is
+ * false.
  * If DEBUG_LVL<2 nothing takes place regardless of the assertion.
- * 
- * @param ASSERTION The condition which, if not satisfied, triggers 
+ *
+ * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
@@ -202,17 +223,10 @@ if ( !(ASSERTION) ) { \
 
 #else
 
-#define DEBUG(IGNORE , ...) ((void)0) 
-#define DEBUG_IF(IGN, ORE , ...) ((void)0) 
-#define DEBUG_ASSERT(IGN, ORE , ...) ((void)0) 
-
-
-#endif
-
-
-
-
-
-
+#define DEBUG(IGNORE , ...) ((void)0)
+#define DEBUG_IF(IGN, ORE , ...) ((void)0)
+#define DEBUG_ASSERT(IGN, ORE , ...) ((void)0)
 
 #endif
+
+#endif // ERRLOG_H

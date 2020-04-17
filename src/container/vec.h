@@ -41,6 +41,9 @@
  * convenience functions.
  * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand.
+ * This is a **flat** vector (see ::new.h module documentation),
+ * meaning the values are directly copied into the buffer, as 
+ * opposed to storing only references to elements located elsewhere.
  */
 
 
@@ -105,7 +108,6 @@ vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);
 size_t vec_sizeof();
 
 
-
 /**
  * @brief Finaliser
  * @see new.h
@@ -129,6 +131,14 @@ size_t vec_typesize(const vec *v);
  * @brief Removes all elements.
  */
 void vec_clear(vec *v);
+
+
+/**
+ * @brief Returns a reference to the internal buffer array.
+ * @warning Directly modifying the returned array may result
+ * in undefined behaviour. Use for read-only access.
+ */
+const void *vec_as_array(vec *v);
 
 
 /**

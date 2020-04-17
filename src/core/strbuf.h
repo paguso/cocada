@@ -25,7 +25,6 @@
 
 #include <stddef.h>
 
-#include <iter.h>
 
 typedef struct _strbuf strbuf;
 
@@ -112,33 +111,13 @@ void strbuf_append(strbuf *sb, const char *suff);
  * printf("%s", strbuf_as_str(sb)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
  * ```
  */
-void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep);
-
-
-/**
- * @brief Appends copies of strings in an iterator to @p sb,
- *        separating each of these strings by @p sep
- * # Example
- * ```C
- * vec *v = new vec(sizeof(char *));
- * vec_push_rawptr(cstr_clone("Spring"));
- * vec_push_rawptr(cstr_clone("Summer"));
- * vec_push_rawptr(cstr_clone("Autumn"));
- * vec_push_rawptr(cstr_clone("Winter"));
- * vec_iter *it = vec_get_iter(v);
- * strbuf *sb = str_buf_new_from_str("Four seasons: ");
- * strbuf_join(sb, it, " and ");
- * printf("%s", strbuf_as_str(sb)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
- * ```
- */
-void strbuf_join_iter(strbuf *sb, iter *it, const char *sep);
+void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep);
 
 
 /**
  * @brief Appends a character @p c.
  */
 void strbuf_append_char(strbuf *sb, char c);
-
 
 
 /**

@@ -30,6 +30,7 @@
 #include "new.h"
 #include "strread.h"
 #include "trait.h"
+#include "errlog.h"
 
 typedef struct _fastaread {
 	strread _t_strread;
@@ -139,6 +140,7 @@ static void _fastaread_init(fastaread *ret, FILE *src)
 
 struct _fasta {
 	FILE *src;
+	char *src_path;
 	fasta_rec cur_rec;
 	size_t cur_rec_len[2];
 	fastaread rd;
@@ -151,6 +153,7 @@ fasta *fasta_open(char *filename)
 {
 	fasta *ret = NEW(fasta);
 	ret->src = fopen(filename, "r");
+	ret->src_path = cstr_clone(filename);
 	_fastaread_init(&(ret->rd), ret->src);
 	ret->cur_rec_len[0] = ret->cur_rec_len[1] = 100;
 	ret->cur_rec_rd_len[0] = ret->cur_rec_rd_len[1] = 100;
@@ -191,7 +194,8 @@ const fasta_rec *fasta_next(fasta *self)
 		return NULL;
 	}
 	// load description
-	assert(fgetc(self->src) == '>');
+	ERROR_ASSERT(fgetc(self->src) == '>', 
+		"Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
 	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
 	size_t l = 0;
 	bool eol = false;
@@ -238,7 +242,8 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 		return NULL;
 	}
 	// load description
-	assert(fgetc(self->src) == '>');
+	ERROR_ASSERT(fgetc(self->src) == '>', 
+		"Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
 	size_t l = 0;
 	bool eol = false;
@@ -264,6 +269,7 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 void fasta_close(fasta *self)
 {
 	fclose(self->src);
+	FREE(self->src_path);
 	FREE(self->cur_rec.descr);
 	FREE(self->cur_rec.seq);
 	FREE(self->cur_rec_rd.descr);

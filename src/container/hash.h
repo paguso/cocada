@@ -61,7 +61,7 @@ typedef bool (*equals_func)(const void *, const void *);
  * ```
  * uint64_t ident_hash_short(const void *key)
  * ```
- * Takes a raw pointer to a short (key) and returns its value as a uint64_t  
+ * Takes a raw pointer to a short (key) and returns its value as a uint64_t
  */
 #define IDENT_HASH_DECL( TYPE ) \
 uint64_t ident_hash_##TYPE(const void *key);

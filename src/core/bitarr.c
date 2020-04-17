@@ -289,7 +289,7 @@ unsigned long bitarr_read_ulong(const byte_t *src, size_t from_bit,
 
 
 long long bitarr_read_llong(const byte_t *src, size_t from_bit,
-                               size_t nbits)
+                            size_t nbits)
 {
 	long long ret=0;
 	if (nbits>0 && bitarr_get_bit(src, from_bit)) {
@@ -305,7 +305,7 @@ long long bitarr_read_llong(const byte_t *src, size_t from_bit,
 
 
 unsigned long long bitarr_read_ullong(const byte_t *src,
-        size_t from_bit, size_t nbits)
+                                      size_t from_bit, size_t nbits)
 {
 	unsigned long long ret=0;
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(unsigned long long)-nbits, src,
@@ -318,7 +318,7 @@ unsigned long long bitarr_read_ullong(const byte_t *src,
 
 
 size_t bitarr_read_size_t(const byte_t *src, size_t from_bit,
-                        size_t nbits)
+                          size_t nbits)
 {
 	size_t ret=0;
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(size_t)-nbits, src, from_bit,
@@ -331,7 +331,7 @@ size_t bitarr_read_size_t(const byte_t *src, size_t from_bit,
 
 
 byte_t bitarr_read_byte_t(const byte_t *src, size_t from_bit,
-                        size_t nbits)
+                          size_t nbits)
 {
 	byte_t ret=0;
 	bitarr_write((byte_t *)&ret, BYTESIZE*sizeof(byte_t)-nbits, src, from_bit,
@@ -544,7 +544,7 @@ void bitarr_write_ulong(byte_t *dest, size_t from_bit, unsigned long val,
 
 
 void bitarr_write_llong(byte_t *dest, size_t from_bit, long long val,
-                           size_t nbits)
+                        size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
 		bytearr_reverse((byte_t *)&val, sizeof(long long));
@@ -555,7 +555,7 @@ void bitarr_write_llong(byte_t *dest, size_t from_bit, long long val,
 
 
 void bitarr_write_ullong(byte_t *dest, size_t from_bit,
-                            unsigned long long val, size_t nbits)
+                         unsigned long long val, size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
 		bytearr_reverse((byte_t *)&val, sizeof(unsigned long long));
@@ -566,7 +566,7 @@ void bitarr_write_ullong(byte_t *dest, size_t from_bit,
 
 
 void bitarr_write_byte_t(byte_t *dest, size_t from_bit, byte_t val,
-                       size_t nbits)
+                         size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
 		bytearr_reverse((byte_t *)&val, sizeof(byte_t));
@@ -577,7 +577,7 @@ void bitarr_write_byte_t(byte_t *dest, size_t from_bit, byte_t val,
 
 
 void bitarr_write_size_t(byte_t *dest, size_t from_bit, size_t val,
-                       size_t nbits)
+                         size_t nbits)
 {
 	if (ENDIANNESS==LITTLE) {
 		bytearr_reverse((byte_t *)&val, sizeof(size_t));

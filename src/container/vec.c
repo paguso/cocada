@@ -160,6 +160,12 @@ void vec_clear(vec *v)
 }
 
 
+const void *vec_as_array(vec *v)
+{
+	return v->data;
+}
+
+
 void *vec_detach(vec *v)
 {
 	vec_fit(v);

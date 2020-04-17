@@ -81,7 +81,7 @@ bool fasta_has_next(fasta *self);
  * fasta *fr = fasta_open("teste.fa");
  * while(fasta_has_next(fr)) {
  *  fasta_rec_rdr rec = fasta_next_reader(fr);
- *  for (xchar c; (c=strread_getc(rec->seqread)) != EOF;) {
+ *  for (xchar c; (c=strread_getc(rec->seqrdr)) != EOF;) {
  *      //do something with c
  *  }
  * }

@@ -97,7 +97,7 @@ static void init_rank_tables(csrsbitarray *ba)
 			byte_pos++;
 		}
 		bytearr_write_size_t( ba->rank_samples, group*ba->bytes_per_pos,
-		                    cumul_rank, ba->bytes_per_pos );
+		                      cumul_rank, ba->bytes_per_pos );
 		next_group_byte_pos += ba->rank_samples_byte_interval;
 		group++;
 	}
@@ -176,7 +176,7 @@ static void init_select_tables(csrsbitarray *ba)
 		// position to N (byte) by default if it doesnt exist.
 		// if it does, the correct value will be found below
 		bytearr_write_size_t(ba->byte_sel_samples[bit], 0, ba->byte_size,
-		                   ba->bytes_per_byte_pos);
+		                     ba->bytes_per_byte_pos);
 		bytearr_write_size_t(ba->byte_sel_samples_corr[bit], 0, ba->len, 0);
 
 		while (target_rank < ba->total_bit_count[bit]) {
@@ -233,8 +233,8 @@ static void init_select_tables(csrsbitarray *ba)
 			}
 
 			bytearr_write_size_t( ba->byte_sel_samples[bit],
-			                    group*ba->bytes_per_byte_pos,
-			                    byte_pos, ba->bytes_per_byte_pos );
+			                      group*ba->bytes_per_byte_pos,
+			                      byte_pos, ba->bytes_per_byte_pos );
 
 			// add select samples corrections
 			ba->byte_sel_samples_corr[bit][group] = (byte_t)(target_rank-cumul_rank);
@@ -309,7 +309,7 @@ void csrsbitarr_print(csrsbitarray *ba, size_t bytes_per_row)
 	for (size_t i = 0; i  < ba->rank_samples_count; i++ ) {
 		printf( "    rank_sample[%zu] = %zu\n", i,
 		        bytearr_read_size_t( ba->rank_samples,i*ba->bytes_per_pos,
-		                           ba->bytes_per_pos ) );
+		                             ba->bytes_per_pos ) );
 	}
 	for (unsigned int b=0; b<=1; b++) {
 		printf( "->select_samples_bit_interval[%u] = %zu\n", b,
@@ -320,8 +320,8 @@ void csrsbitarr_print(csrsbitarray *ba, size_t bytes_per_row)
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
 			printf("    byte_select_sample[%u][%zu] = %zu\n", b, i,
 			       bytearr_read_size_t( ba->byte_sel_samples[b],
-			                          i*ba->bytes_per_byte_pos,
-			                          ba->bytes_per_byte_pos));
+			                            i*ba->bytes_per_byte_pos,
+			                            ba->bytes_per_byte_pos));
 		}
 		printf("->select_samples_corrections[%u]:\n",b);
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
@@ -358,7 +358,7 @@ size_t csrsbitarr_rank1(csrsbitarray *ba, size_t pos)
 	// go directly to the rank sample group
 	group = pos / ba->rank_samples_bit_interval;
 	rank = bytearr_read_size_t(ba->rank_samples, group*ba->bytes_per_pos,
-	                         ba->bytes_per_pos);
+	                           ba->bytes_per_pos);
 	byte_pos = (group*ba->rank_samples_bit_interval) / BYTESIZE;
 	last_byte = pos / BYTESIZE;
 
@@ -366,13 +366,13 @@ size_t csrsbitarr_rank1(csrsbitarray *ba, size_t pos)
 	sel_grp = rank/ba->sel_samples_bit_interval[1];
 	while ( sel_grp < ba->sel_samples_count[1]-1 &&
 	        bytearr_read_size_t( ba->byte_sel_samples[1],
-	                           (sel_grp+1)*ba->bytes_per_byte_pos,
-	                           ba->bytes_per_byte_pos ) * BYTESIZE < pos )
+	                             (sel_grp+1)*ba->bytes_per_byte_pos,
+	                             ba->bytes_per_byte_pos ) * BYTESIZE < pos )
 		sel_grp++;
 
 	byte_sel_smpl = bytearr_read_size_t( ba->byte_sel_samples[1],
-	                                   sel_grp*ba->bytes_per_byte_pos,
-	                                   ba->bytes_per_byte_pos );
+	                                     sel_grp*ba->bytes_per_byte_pos,
+	                                     ba->bytes_per_byte_pos );
 	if ( byte_pos < byte_sel_smpl
 	        && byte_sel_smpl <= last_byte
 	        && byte_sel_smpl < ba->byte_size ) {
@@ -433,8 +433,8 @@ size_t csrsbitarr_select0(csrsbitarray *ba, size_t rank)
 
 	group = rank / ba->sel_samples_bit_interval[0];
 	byte_pos = bytearr_read_size_t( ba->byte_sel_samples[0],
-	                              group*ba->bytes_per_byte_pos,
-	                              ba->bytes_per_byte_pos );
+	                                group*ba->bytes_per_byte_pos,
+	                                ba->bytes_per_byte_pos );
 
 	if (byte_pos>last_byte) return ba->len;
 
@@ -521,8 +521,8 @@ size_t csrsbitarr_select1(csrsbitarray *ba, size_t rank)
 
 	group = rank / ba->sel_samples_bit_interval[1];
 	byte_pos = bytearr_read_size_t( ba->byte_sel_samples[1],
-	                              group*ba->bytes_per_byte_pos,
-	                              ba->bytes_per_byte_pos );
+	                                group*ba->bytes_per_byte_pos,
+	                                ba->bytes_per_byte_pos );
 
 	if (byte_pos>last_byte) return ba->len;
 
@@ -533,15 +533,15 @@ size_t csrsbitarr_select1(csrsbitarray *ba, size_t rank)
 	rank_group = cumul_rank / ba->rank_samples_bit_interval;
 	while ( rank_group < ba->rank_samples_count - 1  &&
 	        bytearr_read_size_t( ba->rank_samples,
-	                           (rank_group+1)*ba->bytes_per_pos,
-	                           ba->bytes_per_pos ) <= rank )
+	                             (rank_group+1)*ba->bytes_per_pos,
+	                             ba->bytes_per_pos ) <= rank )
 		rank_group ++;
 
 	if (byte_pos < rank_group*ba->rank_samples_byte_interval) {
 		byte_pos = rank_group * ba->rank_samples_byte_interval;
 		cumul_rank = bytearr_read_size_t( ba->rank_samples,
-		                                rank_group*ba->bytes_per_pos,
-		                                ba->bytes_per_pos );
+		                                  rank_group*ba->bytes_per_pos,
+		                                  ba->bytes_per_pos );
 	}
 
 #if BYTEWORDSIZE==8

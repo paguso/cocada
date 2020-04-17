@@ -235,7 +235,7 @@ void bitarr_write_ulong( byte_t *dest, size_t from_bit, unsigned long val,
  * @see bitarr_write_int for similar details.
  */
 void bitarr_write_llong( byte_t *dest, size_t from_bit, long long val,
-                            size_t nbits );
+                         size_t nbits );
 
 
 /**
@@ -245,7 +245,7 @@ void bitarr_write_llong( byte_t *dest, size_t from_bit, long long val,
  * @see bitarr_write_int for similar details.
  */
 void bitarr_write_ullong( byte_t *dest, size_t from_bit,
-                             unsigned long long val, size_t nbits );
+                          unsigned long long val, size_t nbits );
 
 
 /**
@@ -255,7 +255,7 @@ void bitarr_write_ullong( byte_t *dest, size_t from_bit,
  * @see bitarr_write_int for similar details.
  */
 void bitarr_write_byte_t( byte_t *dest, size_t from_bit, byte_t val,
-                        size_t nbits );
+                          size_t nbits );
 
 
 /**
@@ -265,7 +265,7 @@ void bitarr_write_byte_t( byte_t *dest, size_t from_bit, byte_t val,
  * @see bitarr_write_int for similar details.
  */
 void bitarr_write_size_t( byte_t *dest, size_t from_bit, size_t val,
-                        size_t nbits );
+                          size_t nbits );
 
 
 /**
@@ -369,7 +369,7 @@ unsigned long bitarr_read_ulong(const byte_t *src, size_t from_bit,
  * @see bitarr_read_int for similar details
  */
 long long bitarr_read_llong(const byte_t *src, size_t from_bit,
-                               size_t nbits);
+                            size_t nbits);
 
 
 /**
@@ -378,7 +378,7 @@ long long bitarr_read_llong(const byte_t *src, size_t from_bit,
  * @see bitarr_read_int for similar details
  */
 unsigned long long bitarr_read_ullong(const byte_t *src,
-        size_t from_bit, size_t nbits);
+                                      size_t from_bit, size_t nbits);
 
 
 /**
@@ -387,7 +387,7 @@ unsigned long long bitarr_read_ullong(const byte_t *src,
  * @see bitarr_read_int for similar details
  */
 size_t bitarr_read_size_t(const byte_t *src, size_t from_bit,
-                        size_t nbits);
+                          size_t nbits);
 
 
 /**
@@ -396,7 +396,7 @@ size_t bitarr_read_size_t(const byte_t *src, size_t from_bit,
  * @see bitarr_read_int for similar details
  */
 byte_t bitarr_read_byte_t(const byte_t *src, size_t from_bit,
-                        size_t nbits);
+                          size_t nbits);
 
 
 #endif

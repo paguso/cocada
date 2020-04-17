@@ -213,7 +213,7 @@ unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
 
 
 long long bytearr_read_llong(const byte_t *src, size_t from_byte,
-                                size_t nbytes)
+                             size_t nbytes)
 {
 	long long ret=0;
 #if ENDIANNESS==BIG
@@ -234,7 +234,7 @@ long long bytearr_read_llong(const byte_t *src, size_t from_byte,
 
 
 unsigned long long bytearr_read_ullong(const byte_t *src,
-        size_t from_byte, size_t nbytes)
+                                       size_t from_byte, size_t nbytes)
 {
 	unsigned long long ret=0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -246,7 +246,7 @@ unsigned long long bytearr_read_ullong(const byte_t *src,
 
 
 size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
-                         size_t nbytes)
+                           size_t nbytes)
 {
 	size_t ret=0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
@@ -345,7 +345,7 @@ void bytearr_write_ulong(byte_t *dest, size_t from_byte,
 
 
 void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
-                            size_t nbytes)
+                         size_t nbytes)
 {
 #if ENDIANNESS == BIG
 	bytearr_reverse((byte_t *)&val, sizeof(long long));
@@ -355,7 +355,7 @@ void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
 
 
 void bytearr_write_ullong(byte_t *dest, size_t from_byte,
-                             unsigned long long val, size_t nbytes)
+                          unsigned long long val, size_t nbytes)
 {
 #if ENDIANNESS == BIG
 	bytearr_reverse((byte_t *)&val, sizeof(unsigned long long));
@@ -365,7 +365,7 @@ void bytearr_write_ullong(byte_t *dest, size_t from_byte,
 
 
 void bytearr_write_size_t(byte_t *dest, size_t from_byte, size_t val,
-                        size_t nbytes)
+                          size_t nbytes)
 {
 #if ENDIANNESS == BIG
 	bytearr_reverse((byte_t *)&val, sizeof(size_t));

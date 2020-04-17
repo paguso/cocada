@@ -26,7 +26,6 @@
 #include "cstrutil.h"
 #include "strbuf.h"
 #include "mathutil.h"
-#include "iter.h"
 
 
 const static size_t DEFAULT_CAPACITY = 8;
@@ -131,17 +130,6 @@ void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep)
 			strbuf_append(sb, sep);
 		}
 		strbuf_append(sb, arr[i]);
-	}
-}
-
-
-void strbuf_join_iter(strbuf *sb, iter *it, const char *sep)
-{
-	for (size_t i=0; iter_has_next(it); i++) {
-		if (i) {
-			strbuf_append(sb, sep);
-		}
-		strbuf_append(sb, *((const char **)iter_next(it)));
 	}
 }
 

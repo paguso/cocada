@@ -227,7 +227,8 @@ void test_cli_parse(CuTest *tc)
 
 	int argc;
 	//char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
-	char call[] = "vmat index -k 5 10 -w 20 30 input.fasta";
+	//char call[] = "vmat index -k 5 10 -w 20 30 input.fasta";
+	char call[] = "vmat index --help";
 	char **argv = make_argv(call, &argc);
 
 	cliparse_parse(cmd, argc, argv);
