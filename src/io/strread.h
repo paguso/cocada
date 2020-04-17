@@ -31,14 +31,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "xchar.h"
-#include "xstring.h"
 
 typedef struct _strread strread;
 
 typedef struct {
 	void    (*reset)(void *self);
-	xchar_t (*getc)(void *self);
+	char	(*getc)(void *self);
 	size_t  (*read_str)(void *self, char *dest, size_t n);
 	size_t  (*read_str_until)(void *self, char *dest, char delim);
 	//size_t  (*read_xstr)(void *self, xstring *xstr, size_t n);
@@ -76,7 +74,7 @@ void strread_reset(strread *trait);
  * strread_close(ftrait);
  * @endcode
  */
-xchar_t strread_getc(strread *trait);
+char strread_getc(strread *trait);
 
 
 /**

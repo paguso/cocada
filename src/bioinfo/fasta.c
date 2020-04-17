@@ -48,7 +48,7 @@ static void _reset(void *self)
 }
 
 
-static xchar_t _getc(void *self)
+static char _getc(void *self)
 {
 	fastaread *fr = (fastaread *)self;
 	int c;

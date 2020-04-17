@@ -176,7 +176,7 @@ unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_longlong.
  */
-long long bytearr_read_longlong(const byte_t *src, size_t from_byte,
+long long bytearr_read_llong(const byte_t *src, size_t from_byte,
                                 size_t nbytes);
 
 
@@ -187,7 +187,7 @@ long long bytearr_read_longlong(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_ulonglong.
  */
-unsigned long long bytearr_read_ulonglong(const byte_t *src,
+unsigned long long bytearr_read_ullong(const byte_t *src,
         size_t from_byte, size_t nbytes);
 
 
@@ -197,7 +197,7 @@ unsigned long long bytearr_read_ulonglong(const byte_t *src,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_size.
  */
-size_t bytearr_read_size(const byte_t *src, size_t from_byte,
+size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
                          size_t nbytes);
 
 
@@ -323,7 +323,7 @@ void bytearr_write_ulong(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_longlong
  */
-void bytearr_write_longlong(byte_t *dest, size_t from_byte, long long val,
+void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
                             size_t nbytes);
 
 
@@ -334,7 +334,7 @@ void bytearr_write_longlong(byte_t *dest, size_t from_byte, long long val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ulonglong
  */
-void bytearr_write_ulonglong(byte_t *dest, size_t from_byte,
+void bytearr_write_ullong(byte_t *dest, size_t from_byte,
                              unsigned long long val, size_t nbytes);
 
 
@@ -345,7 +345,7 @@ void bytearr_write_ulonglong(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_size
  */
-void bytearr_write_size(byte_t *dest, size_t from_byte, size_t val,
+void bytearr_write_size_t(byte_t *dest, size_t from_byte, size_t val,
                         size_t nbytes);
 
 #endif

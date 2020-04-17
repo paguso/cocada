@@ -435,7 +435,7 @@ void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg);
  * @brief Prints the automatically-generated help message of a program
  * 			to the standard output.
  */
-void cliparse_print_help(cliparse *cmd);
+void cliparse_print_help(const cliparse *cmd);
 
 
 /**
@@ -518,7 +518,7 @@ const cliparse *cliparse_active_subcommand(const cliparse *cmd);
  * vector with with two child vectors, the first with three long ints
  * and the second with two long ints.
  */
-const vec *cliparse_opt_val_from_shortname(cliparse *cmd, char shortname);
+const vec *cliparse_opt_val_from_shortname(const cliparse *cmd, char shortname);
 
 
 /**
@@ -530,7 +530,7 @@ const vec *cliparse_opt_val_from_shortname(cliparse *cmd, char shortname);
  * @see cliparse_opt_val_from_shortname
  *
  */
-const vec *cliparse_opt_val_from_longname(cliparse *cmd, char *longname);
+const vec *cliparse_opt_val_from_longname(const cliparse *cmd, char *longname);
 
 
 /**
@@ -545,7 +545,7 @@ const vec *cliparse_opt_val_from_longname(cliparse *cmd, char *longname);
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */
-const vec *cliparse_arg_val_from_pos(cliparse *cmd, size_t pos);
+const vec *cliparse_arg_val_from_pos(const cliparse *cmd, size_t pos);
 
 
 

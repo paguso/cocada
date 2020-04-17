@@ -159,8 +159,8 @@ void test_bytearr_write_size_t(CuTest *tc)
 		from_byte = rand()%(ba_size-sizeof(size_t));
 		written = (size_t)(rand());
 		bytecrop = i%(sizeof(size_t)+1);
-		bytearr_write_size(ba_zeros, from_byte, written, bytecrop);
-		read = bytearr_read_size(ba_zeros, from_byte, bytecrop);
+		bytearr_write_size_t(ba_zeros, from_byte, written, bytecrop);
+		read = bytearr_read_size_t(ba_zeros, from_byte, bytecrop);
 		if (bytecrop < sizeof(size_t)) {
 			written &= (size_t)((((size_t)0x1)<<(bytecrop*BYTESIZE)) - 1);
 			written <<= (BYTESIZE*sizeof(size_t)-(bytecrop*BYTESIZE));

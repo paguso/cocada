@@ -26,10 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "new.h"
-#include "xchar.h"
-#include "xstring.h"
-
 
 
 strread_vt strread_vt_new()
@@ -55,7 +51,7 @@ void strread_reset(strread *trait)
 }
 
 
-xchar_t strread_getc(strread *trait)
+char strread_getc(strread *trait)
 {
 	return trait->vtbl->getc(trait->impltor);
 }

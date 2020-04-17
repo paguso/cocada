@@ -112,7 +112,7 @@ void test_fasta_next_read(CuTest *tc)
 		const fasta_rec_rdr *rr = fasta_next_reader(f);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t k = 0;
-		xchar_t c;
+		char c;
 		size_t l = strlen(seq[i]);
 		while((c=strread_getc(rr->seqrdr)) != EOF) {
 			while( k<l && seq[i][k]=='\n') k++;

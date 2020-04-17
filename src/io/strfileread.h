@@ -27,6 +27,7 @@
 
 typedef struct _strfileread strfileread;
 
+
 strfileread *strfileread_open(char *filename);
 
 

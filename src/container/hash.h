@@ -28,6 +28,7 @@
 #include <stdint.h>
 
 #include "bitbyte.h"
+#include "coretype.h"
 
 /**
  * @file hash.h
@@ -53,16 +54,28 @@ typedef uint64_t (*hash_func)(const void *);
 typedef bool (*equals_func)(const void *, const void *);
 
 
-
+/**
+ * @brief Identity hash for integer types that simply returns the value
+ * converted to uint64_t
+ * Example
+ * ```
+ * uint64_t ident_hash_short(const void *key)
+ * ```
+ * Takes a raw pointer to a short (key) and returns its value as a uint64_t  
+ */
 #define IDENT_HASH_DECL( TYPE ) \
 uint64_t ident_hash_##TYPE(const void *key);
 
 
 IDENT_HASH_DECL(byte_t)
 IDENT_HASH_DECL(char)
+IDENT_HASH_DECL(uchar)
 IDENT_HASH_DECL(short)
+IDENT_HASH_DECL(ushort)
 IDENT_HASH_DECL(int)
+IDENT_HASH_DECL(uint)
 IDENT_HASH_DECL(long)
+IDENT_HASH_DECL(llong)
 IDENT_HASH_DECL(size_t)
 IDENT_HASH_DECL(int8_t)
 IDENT_HASH_DECL(int16_t)

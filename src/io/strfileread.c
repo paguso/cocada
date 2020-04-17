@@ -26,15 +26,12 @@
 
 #include "strread.h"
 #include "strfileread.h"
-#include "xchar.h"
-#include "xstring.h"
-
+#include "new.h"
 
 struct _strfileread {
 	strread _t_strread;
 	FILE *src;
 	size_t pos;
-	size_t sizeof_char;
 };
 
 
@@ -48,7 +45,7 @@ static void _reset(void *self)
 }
 
 
-static xchar_t _getc(void *self)
+static char _getc(void *self)
 {
 	return fgetc( ((strfileread *)self)->src );
 }
@@ -56,7 +53,7 @@ static xchar_t _getc(void *self)
 
 static size_t _read_str(void *self, char *dest, size_t n)
 {
-	return fread(dest, ((strfileread *)self)->sizeof_char, n, ((strfileread *)self)->src);
+	return fread(dest, sizeof(char), n, ((strfileread *)self)->src);
 }
 
 
@@ -75,46 +72,12 @@ static size_t _read_str_until(void *self, char *dest, char delim)
 	return nread;
 }
 
-/*
-static size_t _read_xstr(void *self, xstring *xstr, size_t n)
-{
-    xchar_t c;
-	size_t bpc = xstr_sizeof_char(dest);
-	size_t nread=0;
-	while (nread < n) {
-		if (fread(&c, bpc, 1, sst->src.file) == bpc)
-			xstr_set(dest, nread++, c);
-        else
-			break;
-	}
-	return nread;
-}
-
-
-static size_t _read_xstr_until(void *self, xstring *xstr, xchar_t delim)
-{
-    return 0;
-}
-
-
-static void  _close(void *self)
-{
-
-}
-*/
-
-static size_t _sizeof_char(void *self)
-{
-	return ((strfileread*)self)->sizeof_char;
-}
-
 
 static strread_vt _strread_vt  = {
 	.getc = _getc,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
-	.reset = _reset,
-	.sizeof_char = _sizeof_char
+	.reset = _reset
 };
 
 
@@ -125,6 +88,12 @@ strfileread *strfileread_open(char *filename)
 	ret->_t_strread.vtbl = &_strread_vt;
 	ret->src = fopen(filename, "r");
 	ret->pos = 0;
-	ret->sizeof_char = sizeof(char);
 	return ret;
+}
+
+
+void strfileread_close(strfileread *self)
+{
+	fclose(self->src);
+	FREE(self);
 }

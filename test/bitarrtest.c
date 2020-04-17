@@ -414,8 +414,8 @@ void test_bitarr_write_longlong(CuTest *tc)
 		from_bit = rand()%(ba_size-BYTESIZE*sizeof(long long));
 		written = (long long)(rand());
 		bitscrop = i%(BYTESIZE*sizeof(long long)+1);
-		bitarr_write_longlong(ba_rand, from_bit, written, bitscrop);
-		read = bitarr_read_longlong(ba_rand, from_bit, bitscrop);
+		bitarr_write_llong(ba_rand, from_bit, written, bitscrop);
+		read = bitarr_read_llong(ba_rand, from_bit, bitscrop);
 		////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
 		if (bitscrop<(BYTESIZE*sizeof(long long))) {
 			written &= (long long)((1ll<<bitscrop) - 1);
@@ -441,8 +441,8 @@ void test_bitarr_write_ulonglong(CuTest *tc)
 		from_bit = rand()%(ba_size-BYTESIZE*sizeof(unsigned long long));
 		written = (unsigned long long)(rand());
 		bitscrop = i%(BYTESIZE*sizeof(unsigned long long)+1);
-		bitarr_write_ulonglong(ba_rand, from_bit, written, bitscrop);
-		read = bitarr_read_ulonglong(ba_rand, from_bit, bitscrop);
+		bitarr_write_ullong(ba_rand, from_bit, written, bitscrop);
+		read = bitarr_read_ullong(ba_rand, from_bit, bitscrop);
 		////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
 		if (bitscrop<(BYTESIZE*sizeof(unsigned long long))) {
 			written &= (unsigned long long)((1ull<<bitscrop) - 1);
@@ -462,8 +462,8 @@ void test_bitarr_write_size_t(CuTest *tc)
 		from_bit = rand()%(ba_size-BYTESIZE*sizeof(size_t));
 		written = (size_t)(rand());
 		bitscrop = i%(BYTESIZE*sizeof(size_t)+1);
-		bitarr_write_size(ba_rand, from_bit, written, bitscrop);
-		read = bitarr_read_size(ba_rand, from_bit, bitscrop);
+		bitarr_write_size_t(ba_rand, from_bit, written, bitscrop);
+		read = bitarr_read_size_t(ba_rand, from_bit, bitscrop);
 		////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
 		if (bitscrop<(BYTESIZE*sizeof(size_t))) {
 			written &= (size_t)((1l<<bitscrop) - 1);
@@ -489,8 +489,8 @@ void test_bitarr_write_byte_t(CuTest *tc)
 		from_bit = rand()%(ba_size-BYTESIZE*sizeof(byte_t));
 		written = (byte_t)(rand());
 		bitscrop = i%(BYTESIZE*sizeof(byte_t)+1);
-		bitarr_write_byte(ba_rand, from_bit, written, bitscrop);
-		read = bitarr_read_byte(ba_rand, from_bit, bitscrop);
+		bitarr_write_byte_t(ba_rand, from_bit, written, bitscrop);
+		read = bitarr_read_byte_t(ba_rand, from_bit, bitscrop);
 		written <<= (BYTESIZE*sizeof(byte_t)-bitscrop);
 		written >>= (BYTESIZE*sizeof(byte_t)-bitscrop);
 		////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);

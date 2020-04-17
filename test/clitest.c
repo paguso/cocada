@@ -30,6 +30,7 @@
 #include "cstrutil.h"
 #include "vec.h"
 #include "new.h"
+#include "errlog.h"
 
 static cliparse *cmd;
 
@@ -226,12 +227,12 @@ void test_cli_parse(CuTest *tc)
 
 	int argc;
 	//char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
-	char call[] = "vmat index -k 5 10 input.fasta -w 20 30 40";
+	char call[] = "vmat index -k 5 10 -w 20 30 input.fasta";
 	char **argv = make_argv(call, &argc);
 
 	cliparse_parse(cmd, argc, argv);
 
-	cliparse *subcmd = cliparse_active_subcommand(cmd);
+	const cliparse *subcmd = cliparse_active_subcommand(cmd);
 	const vec *tvals = cliparse_opt_val_from_shortname(subcmd, 't');
 	CuAssertSizeTEquals(tc, 1, vec_len(tvals));
 	CuAssertStrEquals(tc, "fasta", (char*)vec_first_rawptr(tvals));
