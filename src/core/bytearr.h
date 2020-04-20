@@ -32,7 +32,7 @@
  * @file   bytearr.h
  * @author Paulo Fonseca
  *
- * @brief Plain byte array supporting several utility read/write operations.
+ * @brief Byte array with read/write operations
  */
 
 

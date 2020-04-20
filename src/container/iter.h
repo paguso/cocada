@@ -28,17 +28,19 @@
 
 /**
  * @file iter.h
- * @author Paulo Fonseca
+ *
  * @brief Iterator trait
+ *
+ * @author Paulo Fonseca
  *
  * To implement this iterator trait, follow the indications in trait.h
  *
- * If concrete type implements this trait, say `concreteiter` ,then it
+ * If a concrete type implements this trait, say `citer` ,then it
  * is used as follows.
  *
  * ```C
- * concreteiter *cit = // get a concreteiter reference
- * iter *it = ASTRAIT(cit, concreteiter, iter);
+ * citer *cit = // get a concreteiter reference
+ * iter *it = citer_as_iter(cit); // ASTRAIT(cit, citer, iter)
  * while (iter_has_next(it)) {
  * 		void *elt = iter_next(it);
  * }
@@ -47,6 +49,7 @@
  *
  * or, alternatively, with the FOREACH_IN_ITER macro.
  *
+ * @see trait.h
  */
 
 
@@ -100,7 +103,7 @@ const void *iter_next(iter *it);
  * vec_push_int(v, 20);
  * vec_push_int(v, 30);
  * vec_iter *it = vec_get_iter(v);
- * FOREACH_IN_ITER(val, int, ASTRAIT(it, vec_iter, iter)) {
+ * FOREACH_IN_ITER(val, int, vec_iter_as_iter(it)) {
  * 		printf ("Element is %d\n", *val); // notice that val is a pointer
  * }
  * FREE(it); // iterator must be manually disposed of after use

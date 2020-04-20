@@ -32,7 +32,7 @@
  * @file cstrutil.h
  * @author Paulo Fonseca
  *
- * @brief Plain C strings (char *) manipulation functions.
+ * @brief Plain C strings (char *) manipulation functions
  */
 
 

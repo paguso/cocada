@@ -27,6 +27,7 @@
 
 #include "arrutil.h"
 #include "cstrutil.h"
+#include "errlog.h"
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
@@ -302,9 +303,9 @@ void test_vec_qsort(CuTest *tc)
 	triple *arr = NEW_ARR(triple, max_key);
 	for (size_t i=0; i<max_key; i++) {
 		triple t;
-		t.values[0] = i;
-		t.values[1] = i;
-		t.values[2] = i;
+		t.values[0] = rand_range_int(0, max_key);
+		t.values[1] = rand_range_int(0, max_key);
+		t.values[2] = rand_range_int(0, max_key);
 		arr[i] = t;
 	}
 	shuffle_arr(arr, max_key, sizeof(triple));
@@ -315,27 +316,32 @@ void test_vec_qsort(CuTest *tc)
 	FREE(arr);
 
 	/*
-	printf("Before sort:\n");
+	DEBUG("Before sort:\n");
 	for (size_t i=0; i<vec_len(v); i++)
 	{
 	    triple *t = (triple *)vec_get(v, i);
-	    printf("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
+	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
 	}
 	*/
+	
 	vec_qsort(v, triple_cmp);
-	/*
-	printf("After sort:\n");
+
+	/*	
+	DEBUG("After sort:\n");
 	for (size_t i=0; i<vec_len(v); i++)
 	{
 	    triple *t = (triple *)vec_get(v, i);
-	    printf("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
+	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
 	}
 	*/
+	
 	for (size_t i=0; i<vec_len(v)-1; i++) {
 		triple *p = (triple *)vec_get(v, i);
 		triple *q = (triple *)vec_get(v, i+1);
 		CuAssertIntEquals(tc, -1, triple_cmp(p, q));
 	}
+
+	FREE(v, vec);
 }
 
 typedef struct _vecobj {

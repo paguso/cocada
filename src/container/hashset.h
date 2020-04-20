@@ -33,7 +33,7 @@
  * @file hashset.h
  * @author Paulo Fonseca
  *
- * @brief Unordered, hashmap-based set - Hashset - ADT.
+ * @brief Unordered, hashmap-based set
  */
 
 typedef hashmap hashset;

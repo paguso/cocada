@@ -35,54 +35,25 @@ strread_vt strread_vt_new()
 	return vt;
 }
 
-/*
-strread strread_init_trait(void *impltor)
-{
-    strread ret;// = NEW(strread);
-    ret.impltor = impltor;
-    ret.vtbl = _strread_vt_init();
-    return ret;
-}
-*/
 
 void strread_reset(strread *trait)
 {
-	trait->vtbl->reset(trait->impltor);
+	trait->vt->reset(trait);
 }
 
 
 char strread_getc(strread *trait)
 {
-	return trait->vtbl->getc(trait->impltor);
+	return trait->vt->getc(trait);
 }
 
 
 size_t strread_read_str_until(strread *trait, char *dest, char delim)
 {
-	return trait->vtbl->read_str_until(trait->impltor, dest, delim);
+	return trait->vt->read_str_until(trait, dest, delim);
 }
 
-/*
-size_t strread_read_xstr(strread *trait, xstring *dest, size_t n)
-{
-    return trait->vtbl->read_xstr(trait->impltor, dest, n);
-}
 
-size_t strread_read_xstr_until(strread *trait, xstring *dest, xchar_t delim)
-{
-    return trait->vtbl->read_xstr_until(trait->impltor, dest, delim);
-}
-
-void strread_close(strread *trait)
-{
-    trait->vtbl->close(trait->impltor);
-}
-*/
-
-size_t strread_sizeof_char(strread *trait)
-{
-	return trait->vtbl->sizeof_char(trait->impltor);
-}
 
 
 

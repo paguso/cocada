@@ -42,13 +42,6 @@
 typedef struct _hashmap hashmap;
 
 
-
-/**
- * Hashmap iterator type
- */
-typedef struct _hashmap_iter hashmap_iter;
-
-
 /**
  * @brief Constructor.
  * In order to define a hash map, one has to provide:
@@ -156,12 +149,23 @@ size_t hashmap_size(const hashmap *hmap);
 
 
 /**
- * Hashmap entry type
+ * @brief Hashmap entry type.
+ *
+ * This is a simple wrapper containing two pointers for the internal
+ * address of a key and its associated value.
+ *
+ * @warning Do not alter the key or value directly.
  */
 typedef struct  {
 	void *key;
 	void *val;
 } hashmap_entry;
+
+
+/**
+ * Hashmap iterator type
+ */
+typedef struct _hashmap_iter hashmap_iter;
 
 
 /**

@@ -32,7 +32,7 @@
  * @file stack.h
  * @author Paulo Fonseca
  *
- * @brief Stack: dynamic linear collection with LIFO access policy.
+ * @brief Stack with LIFO push/pop.
  */
 
 

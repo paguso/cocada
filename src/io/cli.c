@@ -585,8 +585,8 @@ static void _cliopt_print_help(cliopt *opt)
 		strbuf *typedescr = strbuf_new();
 		strbuf_append(typedescr, " <");
 		if (opt->type==ARG_CHOICE) {
-			strbuf_join(typedescr, vec_len(opt->choices), 
-				(const char**)vec_as_array(opt->choices), "|");
+			strbuf_join(typedescr, vec_len(opt->choices),
+			            (const char**)vec_as_array(opt->choices), "|");
 		} else {
 			strbuf_append(typedescr, type_lbl[opt->type]);
 		}

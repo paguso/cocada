@@ -32,7 +32,7 @@
  * @file bitbyte.h
  * @author Paulo Fonseca
  *
- * @brief General definitions and functions necessary for low level
+ * @brief General definitions and functions for low level
  *        bit/byte operatios.
  *
  * @warning The code herein is not portable. Check the docs for

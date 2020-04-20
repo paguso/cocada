@@ -21,10 +21,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "bitbyte.h"
 #include "coretype.h"
 #include "iter.h"
 #include "new.h"
@@ -33,22 +29,26 @@
 
 /**
  * @file vec.h
+ * @brief Vector, a.k.a dynamic array.
  * @author Paulo Fonseca
- * @brief A vector (a.k.a. dynamic array) is a linear dynamic
- * collection of elements of the same type and constant size.
+ *
+ * A vector (a.k.a. dynamic array) is a linear dynamic
+ * collection of elements of the same type and fixed size.
  * It contains the usual access/insert/deletion operations for
  * individual elements at arbitrary positions, plus other
  * convenience functions.
+ *
  * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand.
+ *
  * This is a **flat** vector (see ::new.h module documentation),
- * meaning the values are directly copied into the buffer, as 
+ * meaning the values are directly copied into the buffer, as
  * opposed to storing only references to elements located elsewhere.
  */
 
 
 /**
- * Vector type
+ * @brief Vector type (opaque).
  */
 typedef struct _vec vec;
 
@@ -102,7 +102,7 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
 vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);
 
 
-/***
+/**
  * @brief Returns the type size of the actual implementation in bytes.
  */
 size_t vec_sizeof();
@@ -302,6 +302,42 @@ size_t vec_max(vec *v, cmp_func cmp);
 
 /**
  * @brief In-place sorting of vector elements using the Quicksort algorithm.
+ * 
+ * The @p cmp function should compare elements of the type stored in the vector,
+ * so it receives pointers to locations containing such values.
+ * 
+ * ## Example
+ * 
+ * ```C
+ * typedef struct {
+ *    int first;
+ *    int second;
+ * } pair;
+ * 
+ * int pair_cmp(const void *lp, const void *rp) {
+ *    pair *left = (pair *)lp;
+ *    pair *right = (pair *)lp;
+ *    if (left.first < right.first) return -1;
+ *    else if (left.first > right.first) return +1;
+ *    else if (left.second < right.second) return -1;
+ *    else if (left.second > right.second) return +1;
+ *    else return 0;
+ * }
+ * 
+ * // ...
+ * 
+ * vec *pairs = vec_new(sizeof(pair));
+ * 
+ * pair p = {.first=1, .second=2};
+ * vec_push(pairs, &p);
+ * 
+ * // other insertions ...
+ * 
+ * vec_qsort(pairs, pair_cmp);
+ * ```
+ * 
+ * 
+ * @see order.h
  */
 void vec_qsort(vec *v, cmp_func cmp);
 
@@ -327,28 +363,37 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
                    size_t key_size, size_t max_key);
 
 
+
 #define VEC_NEW_DECL( TYPE ) \
+   /** @brief Creates a new TYPE vector @see coretype.h */ \
    TYPE vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
+   /** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
    TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
 #define VEC_FIRST_DECL( TYPE ) \
+   /** @brief Returns TYPE copy of the first element @see coretype.h */ \
    TYPE vec_first_##TYPE(const vec *v);
 
 #define VEC_LAST_DECL( TYPE ) \
+   /** @brief Returns TYPE copy of the last element @see coretype.h */ \
    TYPE vec_last_##TYPE(const vec *v);
 
 #define VEC_SET_DECL( TYPE ) \
+   /** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
    void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define VEC_PUSH_DECL( TYPE ) \
+   /** @brief Appends a TYPE copy of @p val @see coretype.h */ \
    void vec_push_##TYPE(vec *v, TYPE val);
 
 #define VEC_INS_DECL( TYPE ) \
+   /** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
    void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define VEC_POP_DECL( TYPE ) \
+   /** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
    TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
 #define VEC_ALL_DECL( TYPE )\
@@ -388,12 +433,11 @@ VEC_ALL_DECL(byte_t)
 VEC_ALL_DECL(rawptr)
 VEC_ALL_DECL(cstr)
 
-
-typedef struct {
-	iter _t_iter;
-	vec *src;
-	size_t index;
-} vec_iter;
+/**
+ * @brief Vector iterator type (opaque). Implements the ::iter trait.
+ * @see iter.h
+ */
+typedef struct _vec_iter vec_iter;
 
 vec_iter *vec_get_iter(vec *self);
 

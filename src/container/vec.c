@@ -359,6 +359,14 @@ static void _qsort(vec *v, size_t l, size_t r, cmp_func cmp)
 	}
 }
 
+
+void vec_qsort(vec *v, cmp_func cmp)
+{
+	qsort(v->data, v->len, v->typesize, cmp);
+	//_qsort(v, 0, vec_len(v), cmp);
+}
+
+
 size_t vec_min(vec *v, cmp_func cmp)
 {
 	size_t m = 0;
@@ -376,12 +384,6 @@ size_t vec_max(vec *v, cmp_func cmp)
 		m = ( cmp(vec_get(v, i), vec_get(v, m)) > 0 ) ? i : m;
 	}
 	return m;
-}
-
-
-void vec_qsort(vec *v, cmp_func cmp)
-{
-	_qsort(v, 0, vec_len(v), cmp);
 }
 
 
@@ -489,11 +491,19 @@ VEC_ALL_IMPL(rawptr)
 VEC_ALL_IMPL(cstr)
 
 
+struct _vec_iter {
+	iter _t_iter;
+	vec *src;
+	size_t index;
+};
+
+
 static bool _vec_iter_has_next(iter *it)
 {
 	vec_iter *vit = (vec_iter *)it->impltor;
 	return vit->index < vec_len(vit->src);
 }
+
 
 static const void * _vec_iter_next(iter *it)
 {
@@ -501,7 +511,9 @@ static const void * _vec_iter_next(iter *it)
 	return vec_get(vit->src, vit->index++);
 }
 
+
 static iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
+
 
 vec_iter *vec_get_iter(vec *v)
 {

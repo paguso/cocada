@@ -19,19 +19,41 @@
  *
  */
 
-#ifndef STRFILEREAD_H
-#define STRFILEREAD_H
+#ifndef STRFILEREADER_H
+#define STRFILEREADER_H
 
+/**
+ * @file strfilereader.h
+ * @brief String file reader. Implements the strread trait.
+ * @author Paulo Fonseca
+ * @see strread.h
+ *
+ * This string reader is backed by a text FILE, and therefore is
+ * likely to be a *buffered* reader.
+ */
 
 #include "trait.h"
 
-typedef struct _strfileread strfileread;
+
+/**
+ * @brief String file reader
+ */
+typedef struct _strfilereader strfilereader;
 
 
-strfileread *strfileread_open(char *filename);
+DECL_TRAIT(strfilereader, strread)
 
 
-DECL_TRAIT(strfileread, strread)
+/**
+ * @brief Opens a character file for reading.
+ */
+strfilereader *strfilereader_open(char *filename);
+
+
+/**
+ * @brief Closes the source file and destroys the reader.
+ */
+void strfilereader_close(strfilereader *self);
 
 
 

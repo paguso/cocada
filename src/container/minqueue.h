@@ -36,7 +36,7 @@
  * @file minqueue.h
  * @author Paulo Fonseca
  *
- * @brief A queue with FIFO push/pop and *minimum* query.
+ * @brief Queue with FIFO push/pop and constant-time *minimum* query.
  */
 typedef struct _minqueue minqueue;
 

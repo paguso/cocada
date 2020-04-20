@@ -30,8 +30,14 @@
  * @author Paulo Fonseca
  * @brief FASTA file sequence reader
  *
- * The `fasta` reader provides a way to iterate through the sequences
+ * A FASTA file is a plain text sequence of *records*, each consisting
+ * of *description* and the *sequence itself*.
+ * The `fasta` reader provides a way to iterate through the records
  * defined in a FASTA-format file.
+ * During the iteration, each sequence can *either* be entirely loaded to
+ * memory as a string, or be treated as a char input stream with a
+ * buffered string reader (::strread), which avoids having to load
+ * potentially large sequences to memory.
  */
 
 typedef struct _fasta fasta;

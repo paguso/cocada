@@ -131,8 +131,7 @@ void mmindex_index(mmindex * self, strread * sst)
 {
 	size_t nidx = self->nidx;
 	size_t offset = vec_last_size_t(self->offs);
-	xstring *window = xstring_new_with_capacity(strread_sizeof_char(sst),
-	                  self->max_wlen);
+	xstring *window = xstring_new_with_capacity(sizeof(char), self->max_wlen);
 	minqueue **win_rks = NEW_ARR(minqueue *, nidx);
 	FILL_ARR(win_rks, 0, nidx, minqueue_new(sizeof(rankpos), cmp_rankpos));
 	uint64_t *prev_mm_rk = NEW_ARR(uint64_t, nidx);	// rank of previous window minimiser

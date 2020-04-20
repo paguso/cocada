@@ -31,9 +31,9 @@
 
 /**
  * @file deque.h
+ * @brief Double-ended queue (deque)
  * @author Paulo Fonseca
  *
- * @brief Double-ended queue (deque).
  * A deque is a queue with insert/remove operations at both ends,
  * implemented as a circular buffer.
  */

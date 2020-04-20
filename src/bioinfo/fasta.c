@@ -42,16 +42,16 @@ typedef struct _fastaread {
 IMPL_TRAIT(fastaread, strread)
 
 
-static void _reset(void *self)
+static void _reset(strread *self)
 {
-	fastaread *fr = (fastaread *)self;
+	fastaread *fr = (fastaread *)self->impltor;
 	fseek(fr->src, fr->file_pos, SEEK_SET);
 }
 
 
-static char _getc(void *self)
+static char _getc(strread *self)
 {
-	fastaread *fr = (fastaread *)self;
+	fastaread *fr = (fastaread *)self->impltor;
 	int c;
 	while(true) {
 		c = fgetc(fr->src);
@@ -69,9 +69,9 @@ static char _getc(void *self)
 }
 
 
-static size_t _read_str(void *self, char *dest, size_t n)
+static size_t _read_str(strread *self, char *dest, size_t n)
 {
-	FILE *src = ((fastaread *)self)->src;
+	FILE *src = ((fastaread *)self->impltor)->src;
 	char *origdest = dest;
 	memset(dest, '\0', n+1);
 	while( !feof(src) && n > 0 ) {
@@ -92,9 +92,9 @@ static size_t _read_str(void *self, char *dest, size_t n)
 }
 
 
-static size_t _read_str_until(void *self, char *dest, char delim)
+static size_t _read_str_until(strread *self, char *dest, char delim)
 {
-	FILE *src = ((fastaread *)self)->src;
+	FILE *src = ((fastaread *)self->impltor)->src;
 	size_t nread = 0;
 	char c;
 	while( !feof(src) ) {
@@ -112,28 +112,20 @@ static size_t _read_str_until(void *self, char *dest, char delim)
 }
 
 
-
-static size_t _sizeof_char(void *self)
-{
-	return sizeof(char);
-}
-
-
-
 static strread_vt _strread_vt  = {
 	.getc = _getc,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
 	.reset = _reset,
-	.sizeof_char = _sizeof_char,
 };
 
 
 static void _fastaread_init(fastaread *ret, FILE *src)
 {
+
 	ret->src = src;
 	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vtbl = &_strread_vt;
+	ret->_t_strread.vt = &_strread_vt;
 }
 
 
@@ -178,7 +170,6 @@ static bool _goto_next(fasta *self)
 }
 
 
-
 bool fasta_has_next(fasta *self)
 {
 	long cur = ftell(self->src);
@@ -194,8 +185,8 @@ const fasta_rec *fasta_next(fasta *self)
 		return NULL;
 	}
 	// load description
-	ERROR_ASSERT(fgetc(self->src) == '>', 
-		"Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
+	ERROR_ASSERT(fgetc(self->src) == '>',
+	             "Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
 	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
 	size_t l = 0;
 	bool eol = false;
@@ -242,8 +233,8 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 		return NULL;
 	}
 	// load description
-	ERROR_ASSERT(fgetc(self->src) == '>', 
-		"Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
+	ERROR_ASSERT(fgetc(self->src) == '>',
+	             "Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
 	size_t l = 0;
 	bool eol = false;

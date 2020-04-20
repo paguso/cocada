@@ -25,41 +25,40 @@
 #include <stdio.h>
 
 #include "strread.h"
-#include "strfileread.h"
+#include "strfilereader.h"
 #include "new.h"
 
-struct _strfileread {
+struct _strfilereader {
 	strread _t_strread;
 	FILE *src;
 	size_t pos;
 };
 
 
-IMPL_TRAIT(strfileread, strread)
+IMPL_TRAIT(strfilereader, strread)
 
 
-
-static void _reset(void *self)
+static void _reset(strread *self)
 {
-	rewind( ((strfileread *)self)->src );
+	rewind( ((strfilereader *)self->impltor)->src );
 }
 
 
-static char _getc(void *self)
+static char _getc(strread *self)
 {
-	return fgetc( ((strfileread *)self)->src );
+	return fgetc( ((strfilereader *)self->impltor)->src );
 }
 
 
-static size_t _read_str(void *self, char *dest, size_t n)
+static size_t _read_str(strread *self, char *dest, size_t n)
 {
-	return fread(dest, sizeof(char), n, ((strfileread *)self)->src);
+	return fread(dest, sizeof(char), n, ((strfilereader *)self->impltor)->src);
 }
 
 
-static size_t _read_str_until(void *self, char *dest, char delim)
+static size_t _read_str_until(strread *self, char *dest, char delim)
 {
-	FILE *src = ((strfileread *)self)->src;
+	FILE *src = ((strfilereader *)self->impltor)->src;
 	size_t nread;
 	char c;
 	for (nread=0; !feof(src); nread++) {
@@ -81,18 +80,18 @@ static strread_vt _strread_vt  = {
 };
 
 
-strfileread *strfileread_open(char *filename)
+strfilereader *strfilereader_open(char *filename)
 {
-	strfileread *ret = NEW(strfileread);
+	strfilereader *ret = NEW(strfilereader);
 	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vtbl = &_strread_vt;
+	ret->_t_strread.vt = &_strread_vt;
 	ret->src = fopen(filename, "r");
 	ret->pos = 0;
 	return ret;
 }
 
 
-void strfileread_close(strfileread *self)
+void strfilereader_close(strfilereader *self)
 {
 	fclose(self->src);
 	FREE(self);

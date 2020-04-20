@@ -30,9 +30,8 @@ typedef struct _strbuf strbuf;
 
 /**
  * @file strbuf.h
+ * @brief String buffer (dynamic char string)
  * @author Paulo Fonseca
- *
- * @brief String buffer.
  */
 
 

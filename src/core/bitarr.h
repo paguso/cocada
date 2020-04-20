@@ -33,9 +33,10 @@
  * @file bitarr.h
  * @author Paulo Fonseca
  *
- * @brief Tight bitarray implemented as a raw byte_t array supporting
- * utility read/write operations.
+ * @brief Tight bitarray implemented as a raw byte_t array
+ * with read/write operations
  */
+
 
 /**
  * @brief Creates a new raw bitarray with all bits set to zero

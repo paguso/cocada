@@ -33,7 +33,7 @@
  * @file bitvec.h
  * @author Paulo Fonseca
  *
- * @brief Dynamic bit vector.
+ * @brief Dynamic bit vector
  */
 
 typedef struct _bitvec bitvec;

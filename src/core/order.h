@@ -26,8 +26,8 @@
 
 /**
  * @file order.h
- * @author Paulo Fonseca
  * @brief Comparison functions (order, equality)
+ * @author Paulo Fonseca
  */
 
 #include <stdbool.h>
