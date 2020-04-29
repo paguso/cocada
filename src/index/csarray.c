@@ -108,7 +108,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 	// convert source string to "normalised" xstring
 	assert(ndiff_xchars < XCHAR_MAX);
-	xstring *cur_xstr = xstring_new_with_len(lvl_len, nbytes(ndiff_xchars));
+	xstring *cur_xstr = xstring_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
+	xstr_push_n(cur_xstr, 0, lvl_len);
 	xchar_t cur_xchar = 0;
 	for (size_t i=0; i<lvl_len; i++) {
 		xstr_set(cur_xstr, sarr[i], cur_xchar);
@@ -134,7 +135,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		csa->char_stop_bv[lvl] = csrsbitarr_new( bitvec_detach(xchar_stops),
 		                         lvl_len );
 
-		xstring *phi_xstr = xstring_new_with_len(lvl_len, nbytes(ndiff_xchars));
+		xstring *phi_xstr = xstring_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
+		xstr_push_n(phi_xstr, 0, lvl_len);
 		for (size_t i=0; i<lvl_len; i++)
 			xstr_set( phi_xstr, sarr_inv[(sarr[i]+1)%lvl_len],
 			          xstr_get(cur_xstr, sarr[i]) );
@@ -184,7 +186,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		assert(ndiff_xchars < XCHAR_MAX);
 		bitvec_set_bit(xchar_stops, nxt_lvl_len-1, 1);
 		xstring_free(cur_xstr);
-		cur_xstr = xstring_new_with_len( nxt_lvl_len, nbytes(ndiff_xchars) );
+		cur_xstr = xstring_new_with_capacity( nbytes(ndiff_xchars), nxt_lvl_len );
+		xstr_push_n(cur_xstr, 0, nxt_lvl_len);
 		cur_xchar = 0;
 		for (size_t i = 0; i < nxt_lvl_len; i++) {
 			xstr_set(cur_xstr, sarr[i], cur_xchar);

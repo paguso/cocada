@@ -31,22 +31,14 @@
 #include "xstring.h"
 
 
-void test_xstring_new(CuTest *tc)
-{
-	for (size_t len=0; len<1000; len++) {
-		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)DIVCEIL(log2(len), BYTESIZE):0);
-		xstring_free(xs);
-	}
-}
-
 
 void test_xstring_get_set(CuTest *tc)
 {
 	for (size_t len=0; len<1000; len++) {
-		xstring *xs = xstring_new_with_len(len, (len>0)?(size_t)DIVCEIL(log2(len), BYTESIZE):0);
+		xstring *xs = xstring_new_with_capacity(nbytes(len), len);
 
 		for (size_t i=0; i<len; i++) {
-			xstr_set(xs, i, i);
+			xstr_push(xs, i);
 		}
 
 		//xstr_print(xs);
@@ -75,7 +67,6 @@ void test_xstring_to_string(CuTest *tc)
 CuSuite *xstring_get_test_suite()
 {
 	CuSuite* suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_xstring_new);
 	SUITE_ADD_TEST(suite, test_xstring_get_set);
 	//SUITE_ADD_TEST(suite, test_xstring_to_string);
 	return suite;

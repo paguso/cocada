@@ -54,7 +54,6 @@ static const byte_t RIGHT = 0x1;
 
 static const bitvec *NULL_CODE = NULL;
 
-
 typedef struct {
 	bitvec *code;
 	size_t pos;

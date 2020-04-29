@@ -302,18 +302,18 @@ size_t vec_max(vec *v, cmp_func cmp);
 
 /**
  * @brief In-place sorting of vector elements using the Quicksort algorithm.
- * 
+ *
  * The @p cmp function should compare elements of the type stored in the vector,
  * so it receives pointers to locations containing such values.
- * 
+ *
  * ## Example
- * 
+ *
  * ```C
  * typedef struct {
  *    int first;
  *    int second;
  * } pair;
- * 
+ *
  * int pair_cmp(const void *lp, const void *rp) {
  *    pair *left = (pair *)lp;
  *    pair *right = (pair *)lp;
@@ -323,20 +323,20 @@ size_t vec_max(vec *v, cmp_func cmp);
  *    else if (left.second > right.second) return +1;
  *    else return 0;
  * }
- * 
+ *
  * // ...
- * 
+ *
  * vec *pairs = vec_new(sizeof(pair));
- * 
+ *
  * pair p = {.first=1, .second=2};
  * vec_push(pairs, &p);
- * 
+ *
  * // other insertions ...
- * 
+ *
  * vec_qsort(pairs, pair_cmp);
  * ```
- * 
- * 
+ *
+ *
  * @see order.h
  */
 void vec_qsort(vec *v, cmp_func cmp);
@@ -396,7 +396,8 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
    /** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
    TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
-#define VEC_ALL_DECL( TYPE )\
+
+#define TYPED_VEC_DECL( TYPE , ...)\
 VEC_NEW_DECL(TYPE)\
 VEC_GET_DECL(TYPE)\
 VEC_FIRST_DECL(TYPE)\
@@ -406,32 +407,8 @@ VEC_PUSH_DECL(TYPE)\
 VEC_INS_DECL(TYPE)\
 VEC_POP_DECL(TYPE)
 
-VEC_ALL_DECL(char)
-VEC_ALL_DECL(uchar)
-VEC_ALL_DECL(short)
-VEC_ALL_DECL(ushort)
-VEC_ALL_DECL(int)
-VEC_ALL_DECL(uint)
-VEC_ALL_DECL(long)
-VEC_ALL_DECL(ulong)
-VEC_ALL_DECL(llong)
-VEC_ALL_DECL(ullong)
-VEC_ALL_DECL(float)
-VEC_ALL_DECL(double)
-VEC_ALL_DECL(ldouble)
-VEC_ALL_DECL(bool)
-VEC_ALL_DECL(size_t)
-VEC_ALL_DECL(int8_t)
-VEC_ALL_DECL(uint8_t)
-VEC_ALL_DECL(int16_t)
-VEC_ALL_DECL(uint16_t)
-VEC_ALL_DECL(int32_t)
-VEC_ALL_DECL(uint32_t)
-VEC_ALL_DECL(int64_t)
-VEC_ALL_DECL(uint64_t)
-VEC_ALL_DECL(byte_t)
-VEC_ALL_DECL(rawptr)
-VEC_ALL_DECL(cstr)
+XX_CORETYPES(TYPED_VEC_DECL)
+
 
 /**
  * @brief Vector iterator type (opaque). Implements the ::iter trait.

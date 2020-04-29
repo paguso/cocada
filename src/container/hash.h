@@ -63,29 +63,10 @@ typedef bool (*equals_func)(const void *, const void *);
  * ```
  * Takes a raw pointer to a short (key) and returns its value as a uint64_t
  */
-#define IDENT_HASH_DECL( TYPE ) \
+#define IDENT_HASH_DECL( TYPE, ... ) \
 uint64_t ident_hash_##TYPE(const void *key);
 
-
-IDENT_HASH_DECL(byte_t)
-IDENT_HASH_DECL(char)
-IDENT_HASH_DECL(uchar)
-IDENT_HASH_DECL(short)
-IDENT_HASH_DECL(ushort)
-IDENT_HASH_DECL(int)
-IDENT_HASH_DECL(uint)
-IDENT_HASH_DECL(long)
-IDENT_HASH_DECL(llong)
-IDENT_HASH_DECL(size_t)
-IDENT_HASH_DECL(int8_t)
-IDENT_HASH_DECL(int16_t)
-IDENT_HASH_DECL(int32_t)
-IDENT_HASH_DECL(int64_t)
-IDENT_HASH_DECL(uint8_t)
-IDENT_HASH_DECL(uint16_t)
-IDENT_HASH_DECL(uint32_t)
-IDENT_HASH_DECL(uint64_t)
-
+XX_PRIM_CORETYPES(IDENT_HASH_DECL)
 
 uint64_t fib_hash(uint64_t key);
 

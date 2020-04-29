@@ -78,4 +78,4 @@ size_t *char_count_stream(strstream *sst, alphabet *ab);
 size_t  *char_cumul_count_stream(strstream *sst, alphabet *ab);
 
 
-#endif // !STRSTATS_H
+#endif // STRSTATS_H

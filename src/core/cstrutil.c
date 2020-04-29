@@ -144,11 +144,11 @@ void cstr_revert(char *str, size_t len)
 static const char *DIGITS = "0123456789abcdef";
 
 
-void uint_to_cstr(char *dest, uintmax_t val, char base)
+char *uint_to_cstr(char *dest, uintmax_t val, char base)
 {
 	if (val==0) {
 		strcpy(dest, "0");
-		return;
+		return dest;
 	}
 	size_t b, l;
 	switch (base) {
@@ -175,6 +175,7 @@ void uint_to_cstr(char *dest, uintmax_t val, char base)
 		dest[--l] = DIGITS[val%b];
 		val /= b;
 	}
+	return dest;
 }
 
 

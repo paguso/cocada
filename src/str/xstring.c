@@ -56,13 +56,13 @@ xstring *xstring_new_with_capacity(size_t sizeof_char, size_t cap)
 	return ret;
 }
 
-
+/*
 xstring *xstring_new_with_len(size_t sizeof_char, size_t len)
 {
 	xstring *ret = xstring_new_with_capacity(sizeof_char, len);
 	return ret;
 }
-
+*/
 
 xstring *xstring_new_from_arr(void *src, size_t len, size_t sizeof_char)
 {

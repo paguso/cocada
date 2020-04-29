@@ -129,24 +129,8 @@ void binheap_pop(binheap *heap, void *dest)
         {   TYPE s; binheap_pop(heap, &s); return s; }
 
 
-#define BINHEAP_ALL_IMPL( TYPE )\
+#define BINHEAP_ALL_IMPL( TYPE , ...)\
 BINHEAP_PUSH_IMPL(TYPE)\
 BINHEAP_POP_IMPL(TYPE)
 
-
-BINHEAP_ALL_IMPL(byte_t)
-BINHEAP_ALL_IMPL(char)
-BINHEAP_ALL_IMPL(short)
-BINHEAP_ALL_IMPL(int)
-BINHEAP_ALL_IMPL(long)
-BINHEAP_ALL_IMPL(float)
-BINHEAP_ALL_IMPL(double)
-BINHEAP_ALL_IMPL(size_t)
-BINHEAP_ALL_IMPL(int8_t)
-BINHEAP_ALL_IMPL(int16_t)
-BINHEAP_ALL_IMPL(int32_t)
-BINHEAP_ALL_IMPL(int64_t)
-BINHEAP_ALL_IMPL(uint8_t)
-BINHEAP_ALL_IMPL(uint16_t)
-BINHEAP_ALL_IMPL(uint32_t)
-BINHEAP_ALL_IMPL(uint64_t)
+XX_CORETYPES(BINHEAP_ALL_IMPL)

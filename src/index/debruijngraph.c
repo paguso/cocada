@@ -57,7 +57,6 @@ struct _dbgraph {
 
 static const xchar_t SENTINEL = 0;
 
-
 // input to extended char conversion
 static inline xchar_t inp2ext (alphabet *input_ab, xchar_t c)
 {
@@ -406,7 +405,9 @@ void dbg_node_lbl(dbgraph *g, size_t nid, xstring *dest)
 {
 	if (nid >= g->nedges) return;
 	size_t l=0;
-	xstr_nset(dest, g->k, SENTINEL);
+	for (size_t i=0; i<g->k; i++) {
+		xstr_set(dest, i, SENTINEL);
+	}
 	for (size_t cur=nid; l<g->k && 0<cur && cur<g->nedges; l++) {
 		size_t crk = _last_node_char_rank(g, cur);
 		xchar_t c = ab_char(g->ext_ab, crk);
@@ -511,7 +512,8 @@ void dbg_print(dbgraph *g)
 	cols[2] = MAX(cols[2], g->k);
 
 	char *edge, *node;
-	xstring *xnode = xstring_new_with_len(g->k, nbytes(ab_size(g->ext_ab)));
+	xstring *xnode = xstring_new_with_capacity(nbytes(ab_size(g->ext_ab)), g->k);
+	xstr_push_n(xnode, 0, g->k);
 	node = cstr_new(g->k);
 	cstr_fill(node, 0, g->k, '?');
 	edge = cstr_new(2);

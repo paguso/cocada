@@ -132,8 +132,9 @@ void cstr_revert(char *str, size_t len);
  * @param val the value to be converted
  * @param base 'b' (binary), 'o' (octal), 'd' (decimal=default),
  *        'h' (hexadecimal)
+ * @return Upon success, returns a @p dest
  */
-void uint_to_cstr(char *dest, uintmax_t val, char base);
+char *uint_to_cstr(char *dest, uintmax_t val, char base);
 
 
 /**

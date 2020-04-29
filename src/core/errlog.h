@@ -28,25 +28,27 @@
  * @brief Error logging
  * @author Paulo Fonseca
  *
- * COCADA defines three debug levels, as defined by the DEBUG_LVL macro,
+ * COCADA defines four debug levels, as defined by the DEBUG_LVL macro,
  * which is often declared at compile time with the appropriate compiler
  * option (`-DDEBUG_LVL=L` in `gcc`).
  *
- * The three debug levels are
+ * The four levels in increasing sensitivity are
+ * 
+ * - Off      (DEBUG_LVL=0)  
+ * - Error    (DEBUG_LVL=1)
+ * - Warning  (DEBUG_LVL=2)
+ * - Debug    (DEBUG_LVL=3 Default)
+ * 
+ * The Off level is used to turn off all verifications in the code.
  *
- * - Error  (DEBUG_LVL=0)
- * - Warning  (DEBUG_LVL=1)
- * - Debug info  (DEBUG_LVL=2 Default)
+ * The error level is used for checking critical, unrecoverable error 
+ * conditions that cause the program to exit with a EXIT_FAILURE status.
  *
- * The error level is used for unrecoverable error events that cause the
- * program to exit with a EXIT_FAILURE status.
+ * The warning level is used for recoverable errors or extreme conditions
+ * which do not abort the program but may result in suboptimal behaviour.
  *
- * The warning level is used for recoverable errors or extreme events
- * which do not abort the program to halt but may result in suboptimal
- * behaviour.
- *
- * The debug level is used for specific information about the program
- * state during execution.
+ * The debug level is used for conditionally reporting specific 
+ * information about the program state during execution.
  *
  * These levels are strictly hierarchical. Any event of a level `L` is
  * also pertinent to levels greater than `L`. That is, an Error event
@@ -56,20 +58,19 @@
  * >= DEBUG_LVL. For example, all Warning events are disregarded if
  * DEBUG_LVL=0 (Error level). This module provides macros for triggering
  * and reporting  such events.
- *
  */
 
 
 #ifndef DEBUG_LVL
-#warning Unset debug level (DEBUG_LVL). Setting to default DEBUG(2) level.
+#warning Unset debug level (DEBUG_LVL). Setting to default DEBUG(3) level.
 /**
  * @brief The debug level described in the module documentation
  */
-#define DEBUG_LVL 2
-#elif DEBUG_LVL<0 || DEBUG_LVL>2
-#warning Invalid debug level (DEBUG_LVL). Setting to default DEBUG(2) level.
+#define DEBUG_LVL 3
+#elif DEBUG_LVL<0 || DEBUG_LVL>3
+#warning Invalid debug level (DEBUG_LVL). Setting to default DEBUG(3) level.
 #undef DEBUG_LVL
-#define DEBUG_LVL 2
+#define DEBUG_LVL 3
 #endif
 
 /**
@@ -79,6 +80,8 @@ void print_trace(FILE *);
 
 
 // ------------------------ ERROR ---------------------------
+
+#if DEBUG_LVL>=1
 
 /**
  * @brief Triggers an ERROR and prints an error message to `stderr`,
@@ -123,9 +126,18 @@ if ( CONDITION ) { \
 	ERROR_IF(!(ASSERTION), FORMAT, ##__VA_ARGS__)
 
 
+#else 
+
+#define ERROR(IGNORE, ...) ((void)0)
+#define ERROR_IF(IGN, ORE, ...) ((void)0)
+#define ERROR_ASSERT(IGN, ORE, ...) ((void)0)
+
+#endif
+
+
 // ------------------------ WARNING ---------------------------
 
-#if DEBUG_LVL>=1
+#if DEBUG_LVL>=2
 
 /**
  * @brief Issues a WARNING and prints an error message to `stderr`
@@ -179,7 +191,7 @@ if ( CONDITION ) { \
 
 // ------------------------ DEBUG ---------------------------
 
-#if DEBUG_LVL>=2
+#if DEBUG_LVL>=3
 
 /**
  * @brief Prints a DEBUG info message to `stderr`
@@ -189,7 +201,7 @@ if ( CONDITION ) { \
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define DEBUG(FORMAT, ...) \
-	fprintf(stderr,  "Debug info: "FORMAT, ##__VA_ARGS__ );
+	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );
 
 /**
  * @brief Conditionally prints a DEBUG info message to
@@ -203,7 +215,7 @@ if ( CONDITION ) { \
  */
 #define DEBUG_IF(CONDITION, FORMAT, ...) \
 if ( CONDITION ) { \
-	fprintf(stderr,  "Debug info: "FORMAT, ##__VA_ARGS__ );\
+	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 }
 
 /**
@@ -218,7 +230,7 @@ if ( CONDITION ) { \
  */
 #define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
 if ( !(ASSERTION) ) { \
-	fprintf(stderr,  "Debug info: "FORMAT, ##__VA_ARGS__ );\
+	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 }
 
 #else

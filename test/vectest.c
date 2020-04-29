@@ -323,10 +323,10 @@ void test_vec_qsort(CuTest *tc)
 	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
 	}
 	*/
-	
+
 	vec_qsort(v, triple_cmp);
 
-	/*	
+	/*
 	DEBUG("After sort:\n");
 	for (size_t i=0; i<vec_len(v); i++)
 	{
@@ -334,7 +334,7 @@ void test_vec_qsort(CuTest *tc)
 	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
 	}
 	*/
-	
+
 	for (size_t i=0; i<vec_len(v)-1; i++) {
 		triple *p = (triple *)vec_get(v, i);
 		triple *q = (triple *)vec_get(v, i+1);

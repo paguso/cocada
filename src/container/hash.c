@@ -24,30 +24,12 @@
 
 #include "hash.h"
 
-#define IDENT_HASH_IMPL( TYPE ) \
+#define IDENT_HASH_IMPL( TYPE, ... ) \
 uint64_t ident_hash_##TYPE(const void *key) {\
     return (uint64_t)(*((TYPE *)key));\
 }
 
-IDENT_HASH_IMPL(byte_t)
-IDENT_HASH_IMPL(char)
-IDENT_HASH_IMPL(uchar)
-IDENT_HASH_IMPL(short)
-IDENT_HASH_IMPL(ushort)
-IDENT_HASH_IMPL(int)
-IDENT_HASH_IMPL(uint)
-IDENT_HASH_IMPL(long)
-IDENT_HASH_IMPL(llong)
-IDENT_HASH_IMPL(size_t)
-IDENT_HASH_IMPL(int8_t)
-IDENT_HASH_IMPL(int16_t)
-IDENT_HASH_IMPL(int32_t)
-IDENT_HASH_IMPL(int64_t)
-IDENT_HASH_IMPL(uint8_t)
-IDENT_HASH_IMPL(uint16_t)
-IDENT_HASH_IMPL(uint32_t)
-IDENT_HASH_IMPL(uint64_t)
-
+XX_PRIM_CORETYPES(IDENT_HASH_IMPL)
 
 uint64_t fib_hash(uint64_t key)
 {

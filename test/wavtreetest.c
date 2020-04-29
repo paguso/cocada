@@ -294,9 +294,9 @@ static alphabet *xseq_ab(size_t len)
 
 static xstring *random_xstr(alphabet *ab, size_t len)
 {
-	xstring *ret = xstring_new_with_len(len, nbytes(ab_size(ab)));
+	xstring *ret = xstring_new_with_capacity(nbytes(ab_size(ab)), len);
 	for (size_t i = 0; i < len; i++)
-		xstr_set(ret, i, ab_char(ab, rand() % ab_size(ab)));
+		xstr_push(ret, ab_char(ab, rand() % ab_size(ab)));
 	return ret;
 }
 

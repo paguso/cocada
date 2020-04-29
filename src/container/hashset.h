@@ -91,38 +91,12 @@ void hashset_remove(hashset *set, const void *elt);
    void hashset_remove_##TYPE(hashset *set, TYPE elt );
 
 
-#define HASHSET_ALL_DECL( TYPE )\
+#define HASHSET_ALL_DECL( TYPE, ... )\
 HASHSET_CONTAINS_DECL(TYPE)\
 HASHSET_ADD_DECL(TYPE)\
 HASHSET_REMOVE_DECL(TYPE)
 
-HASHSET_ALL_DECL(char)
-HASHSET_ALL_DECL(uchar)
-HASHSET_ALL_DECL(short)
-HASHSET_ALL_DECL(ushort)
-HASHSET_ALL_DECL(int)
-HASHSET_ALL_DECL(uint)
-HASHSET_ALL_DECL(long)
-HASHSET_ALL_DECL(ulong)
-HASHSET_ALL_DECL(llong)
-HASHSET_ALL_DECL(ullong)
-HASHSET_ALL_DECL(float)
-HASHSET_ALL_DECL(double)
-HASHSET_ALL_DECL(ldouble)
-HASHSET_ALL_DECL(bool)
-HASHSET_ALL_DECL(size_t)
-HASHSET_ALL_DECL(int8_t)
-HASHSET_ALL_DECL(uint8_t)
-HASHSET_ALL_DECL(int16_t)
-HASHSET_ALL_DECL(uint16_t)
-HASHSET_ALL_DECL(int32_t)
-HASHSET_ALL_DECL(uint32_t)
-HASHSET_ALL_DECL(int64_t)
-HASHSET_ALL_DECL(uint64_t)
-HASHSET_ALL_DECL(byte_t)
-HASHSET_ALL_DECL(rawptr)
-HASHSET_ALL_DECL(cstr)
-
+XX_CORETYPES(HASHSET_ALL_DECL)
 
 typedef struct _hashset_iter hashset_iter;
 

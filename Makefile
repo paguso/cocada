@@ -80,10 +80,11 @@ VPATH          =  $(SRC_DIRS) $(TEST_DIR)
 
 DBG_EXE := cocada
 
-# -DDEBUG_LVL=0  Only errors are captured (default)
-# -DDEBUG_LVL=1  Only errors and warnings are captured
-# -DDEBUG_LVL=2  Errors, warnings, and debug messages are captured
-DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -DDEBUG_LVL=2
+# -DDEBUG_LVL=0  No checks performed
+# -DDEBUG_LVL=1  Only errors are captured 
+# -DDEBUG_LVL=2  Only errors and warnings are captured
+# -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
+DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -DDEBUG_LVL=3
 
 DBG_DIR := $(BUILD_DIR)/debug
 
@@ -112,10 +113,11 @@ debugrebuild: debugclean debug
 # Library build and installation
 ###############################################################################
 
-# -DDEBUG_LVL=0  Only errors are captured (default)
-# -DDEBUG_LVL=1  Only errors and warnings are captured
-# -DDEBUG_LVL=2  Errors, warnings, and debug messages are captured
-CFLAGS  := -Wall -g -O3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -DDEBUG_LVL=0
+# -DDEBUG_LVL=0  No checks performed
+# -DDEBUG_LVL=1  Only errors are captured 
+# -DDEBUG_LVL=2  Only errors and warnings are captured
+# -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
+CFLAGS  := -Wall -g -O3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -DDEBUG_LVL=1
 
 OBJ_DIR := $(BUILD_DIR)/release
 

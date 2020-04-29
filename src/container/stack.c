@@ -68,34 +68,8 @@ void stack_pop(stack *s, void *dest)
     { TYPE val; stack_pop(q, &val); return val;}
 
 
-#define STACK_ALL_IMPL( TYPE ) \
+#define STACK_ALL_IMPL( TYPE , ...) \
 STACK_PUSH_IMPL(TYPE) \
 STACK_POP_IMPL(TYPE)
 
-
-STACK_ALL_IMPL(char)
-STACK_ALL_IMPL(uchar)
-STACK_ALL_IMPL(short)
-STACK_ALL_IMPL(ushort)
-STACK_ALL_IMPL(int)
-STACK_ALL_IMPL(uint)
-STACK_ALL_IMPL(long)
-STACK_ALL_IMPL(ulong)
-STACK_ALL_IMPL(llong)
-STACK_ALL_IMPL(ullong)
-STACK_ALL_IMPL(float)
-STACK_ALL_IMPL(double)
-STACK_ALL_IMPL(ldouble)
-STACK_ALL_IMPL(bool)
-STACK_ALL_IMPL(size_t)
-STACK_ALL_IMPL(int8_t)
-STACK_ALL_IMPL(uint8_t)
-STACK_ALL_IMPL(int16_t)
-STACK_ALL_IMPL(uint16_t)
-STACK_ALL_IMPL(int32_t)
-STACK_ALL_IMPL(uint32_t)
-STACK_ALL_IMPL(int64_t)
-STACK_ALL_IMPL(uint64_t)
-STACK_ALL_IMPL(byte_t)
-STACK_ALL_IMPL(rawptr)
-STACK_ALL_IMPL(cstr)
+XX_CORETYPES(STACK_ALL_IMPL)

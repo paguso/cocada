@@ -135,4 +135,44 @@ typedef char *              cstr;
 #endif
 
 
+#define XX_INT_PRIM_CORETYPES(XX, ...) \
+XX(char, __VA_ARGS__) \
+XX(uchar, __VA_ARGS__) \
+XX(short, __VA_ARGS__) \
+XX(ushort, __VA_ARGS__) \
+XX(int, __VA_ARGS__) \
+XX(uint, __VA_ARGS__) \
+XX(long, __VA_ARGS__) \
+XX(ulong, __VA_ARGS__) \
+XX(llong, __VA_ARGS__) \
+XX(ullong, __VA_ARGS__) \
+XX(bool, __VA_ARGS__) \
+XX(size_t, __VA_ARGS__) \
+XX(int8_t, __VA_ARGS__) \
+XX(uint8_t, __VA_ARGS__) \
+XX(int16_t, __VA_ARGS__) \
+XX(uint16_t, __VA_ARGS__) \
+XX(int32_t, __VA_ARGS__) \
+XX(uint32_t, __VA_ARGS__) \
+XX(int64_t, __VA_ARGS__) \
+XX(uint64_t, __VA_ARGS__) \
+XX(byte_t, __VA_ARGS__) 
+
+#define XX_FLOAT_PRIM_CORETYPES( XX, ...) \
+XX(float, __VA_ARGS__) \
+XX(double, __VA_ARGS__) \
+XX(ldouble, __VA_ARGS__) 
+
+#define XX_PRIM_CORETYPES( XX, ...) \
+XX_INT_PRIM_CORETYPES(XX, __VA_ARGS__) \
+XX_FLOAT_PRIM_CORETYPES(XX, __VA_ARGS__) 
+
+#define XX_PTR_CORETYPES( XX, ...) \
+XX(rawptr, __VA_ARGS__) \
+XX(cstr , __VA_ARGS__) 
+
+#define XX_CORETYPES(XX,...) \
+XX_PRIM_CORETYPES(XX, __VA_ARGS__) \
+XX_PTR_CORETYPES(XX, __VA_ARGS__) 
+
 #endif //CORETYPE_H

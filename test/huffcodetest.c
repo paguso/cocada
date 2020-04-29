@@ -79,9 +79,9 @@ void test_huffcode_codec(CuTest *tc)
 
 static xstring  *_random_xstr(alphabet *ab, size_t len)
 {
-	xstring *xs = xstring_new_with_len(len, nbytes(ab_size(ab)));
+	xstring *xs = xstring_new_with_capacity(nbytes(ab_size(ab)), len);
 	for (size_t i=0; i<len; i++)
-		xstr_set(xs, i, ab_char(ab, rand()%ab_size(ab)));
+		xstr_push(xs, ab_char(ab, rand()%ab_size(ab)));
 	return xs;
 }
 

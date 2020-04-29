@@ -51,8 +51,9 @@ xstring *xstring_new(size_t sizeof_char);
  * @brief Creates a new xstring with a specified length.
  *        Positions 0 through @p len-1 are set to 0.
  * @param sizeof_char the size of each extended character in bytes.
+ * @deprecated Do not assume a default xchar_t value.
  */
-xstring *xstring_new_with_len(size_t sizeof_char, size_t len);
+//xstring *xstring_new_with_len(size_t sizeof_char, size_t len);
 
 
 /**

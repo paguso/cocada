@@ -29,13 +29,13 @@
 
 #include "arrutil.h"
 #include "bitbyte.h"
-#include "new.h"
+#include "iter.h"
 #include "mathutil.h"
+#include "new.h"
 #include "order.h"
 #include "randutil.h"
-#include "vec.h"
-#include "iter.h"
 #include "trait.h"
+#include "vec.h"
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
@@ -323,43 +323,6 @@ size_t vec_find(vec *v, void *val, eq_func eq)
 }
 
 
-static size_t _part(vec *v, size_t l, size_t r, cmp_func cmp)
-{
-	size_t p = rand_range_size_t(l, r);
-	vec_swap(v, l, p);
-	size_t i = l;
-	size_t j = r-1;
-	void *pv = v->data + (l * v->typesize);
-	void *pi = v->data + (i * v->typesize);
-	void *pj = v->data + (j * v->typesize);
-	while ( i < j ) {
-		while ( i < r && cmp(pi, pv) <= 0 ) {
-			i++;
-			pi += (v->typesize);
-		}
-		while ( cmp(pj, pv) > 0 ) {
-			j--;
-			pj -= (v->typesize);
-		}
-		if ( i < j ) {
-			vec_swap(v, i, j);
-		}
-	}
-	vec_swap(v, l, j);
-	return j;
-}
-
-
-static void _qsort(vec *v, size_t l, size_t r, cmp_func cmp)
-{
-	if (l < r) {
-		size_t p = _part(v, l, r, cmp);
-		_qsort(v, l, p, cmp);
-		_qsort(v, p+1, r, cmp);
-	}
-}
-
-
 void vec_qsort(vec *v, cmp_func cmp)
 {
 	qsort(v->data, v->len, v->typesize, cmp);
@@ -421,40 +384,52 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_GET_IMPL( TYPE ) \
    TYPE vec_get_##TYPE(const vec *v, size_t pos)\
-    { return *((TYPE *)vec_get(v, pos)); }
+    { return ((TYPE *)v->data)[pos]; }
 
 
 #define VEC_FIRST_IMPL( TYPE ) \
    TYPE vec_first_##TYPE(const vec *v)\
-    { return *((TYPE *)vec_first(v)); }
+    { return ((TYPE *)v->data)[0]; }
 
 
 #define VEC_LAST_IMPL( TYPE ) \
    TYPE vec_last_##TYPE(const vec *v)\
-    { return *((TYPE *)vec_last(v)); }
+    { return ((TYPE *)v->data)[v->len - 1]; }
+
 
 
 #define VEC_SET_IMPL( TYPE ) \
-   void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
-    { vec_set(v, pos, &val); }
+void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
+{\
+	((TYPE *)v->data)[pos] = val;\
+}
 
 
 #define VEC_PUSH_IMPL( TYPE ) \
-   void vec_push_##TYPE(vec *v, TYPE val)\
-    { vec_push(v, &val); }
+void vec_push_##TYPE(vec *v, TYPE val)\
+{\
+	_check_and_resize(v);\
+	((TYPE *)v->data)[v->len++] = val;\
+}
 
 
 #define VEC_INS_IMPL( TYPE ) \
-   void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
-    { vec_ins(v, pos, &val);}
+void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
+{\
+	vec_ins(v, pos, &val);\
+}
 
 
 #define VEC_POP_IMPL( TYPE ) \
-   TYPE vec_pop_##TYPE(vec *v, size_t pos)\
-    {  TYPE r; vec_pop(v, pos, &r); return r; }
+TYPE vec_pop_##TYPE(vec *v, size_t pos)\
+{\
+	TYPE r;\
+	vec_pop(v, pos, &r);\
+	return r;\
+}
 
 
-#define VEC_ALL_IMPL( TYPE )\
+#define TYPED_VEC_IMPL( TYPE , ...)\
 VEC_GET_IMPL(TYPE)\
 VEC_FIRST_IMPL(TYPE)\
 VEC_LAST_IMPL(TYPE)\
@@ -463,32 +438,9 @@ VEC_PUSH_IMPL(TYPE)\
 VEC_INS_IMPL(TYPE)\
 VEC_POP_IMPL(TYPE)
 
-VEC_ALL_IMPL(char)
-VEC_ALL_IMPL(uchar)
-VEC_ALL_IMPL(short)
-VEC_ALL_IMPL(ushort)
-VEC_ALL_IMPL(int)
-VEC_ALL_IMPL(uint)
-VEC_ALL_IMPL(long)
-VEC_ALL_IMPL(ulong)
-VEC_ALL_IMPL(llong)
-VEC_ALL_IMPL(ullong)
-VEC_ALL_IMPL(float)
-VEC_ALL_IMPL(double)
-VEC_ALL_IMPL(ldouble)
-VEC_ALL_IMPL(bool)
-VEC_ALL_IMPL(size_t)
-VEC_ALL_IMPL(int8_t)
-VEC_ALL_IMPL(uint8_t)
-VEC_ALL_IMPL(int16_t)
-VEC_ALL_IMPL(uint16_t)
-VEC_ALL_IMPL(int32_t)
-VEC_ALL_IMPL(uint32_t)
-VEC_ALL_IMPL(int64_t)
-VEC_ALL_IMPL(uint64_t)
-VEC_ALL_IMPL(byte_t)
-VEC_ALL_IMPL(rawptr)
-VEC_ALL_IMPL(cstr)
+
+XX_CORETYPES(TYPED_VEC_IMPL)
+
 
 
 struct _vec_iter {
