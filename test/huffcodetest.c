@@ -30,7 +30,7 @@
 #include "cstrutil.h"
 #include "huffcode.h"
 #include "mathutil.h"
-#include "xstring.h"
+#include "xstr.h"
 
 
 void test_huffcode_new(CuTest *tc)
@@ -63,7 +63,7 @@ void test_huffcode_codec(CuTest *tc)
 		strstream_reset(sst);
 		//huffcode_print(hc);
 		bitvec *code = huffcode_encode(hc, sst);
-		xstring *xsdec = huffcode_decode(hc, code);
+		xstr *xsdec = huffcode_decode(hc, code);
 		//bytearr_print(code.rawcode, (size_t)mult_ceil(code.code_len, BYTESIZE), 4, "");
 		//printf("original=%s\n",str);
 		//printf("decoded =%s\n",dec);
@@ -77,9 +77,9 @@ void test_huffcode_codec(CuTest *tc)
 
 
 
-static xstring  *_random_xstr(alphabet *ab, size_t len)
+static xstr  *_random_xstr(alphabet *ab, size_t len)
 {
-	xstring *xs = xstring_new_with_capacity(nbytes(ab_size(ab)), len);
+	xstr *xs = xstr_new_with_capacity(nbytes(ab_size(ab)), len);
 	for (size_t i=0; i<len; i++)
 		xstr_push(xs, ab_char(ab, rand()%ab_size(ab)));
 	return xs;
@@ -92,19 +92,19 @@ void test_huffcode_xcodec(CuTest *tc)
 	size_t max_len = 4096;
 	for (size_t len=2; len<max_len; len++) {
 		alphabet *ab = int_alphabet_new(MAX(2, len/4));
-		xstring *xstr = _random_xstr(ab, len);
-		strstream *sst = strstream_open_xstr(xstr);
+		xstr *xs = _random_xstr(ab, len);
+		strstream *sst = strstream_open_xstr(xs);
 		huffcode *hc = huffcode_new_from_stream(ab, sst);
 		strstream_reset(sst);
 		//huffcode_print(hc);
 		bitvec *code = huffcode_encode(hc, sst);
-		xstring *xsdec = huffcode_decode(hc, code);
-		int cmp = xstr_cmp(xstr, xsdec);
+		xstr *xsdec = huffcode_decode(hc, code);
+		int cmp = xstr_cmp(xs, xsdec);
 		if (cmp) {
-			xstr_print(xstr);
+			xstr_print(xs);
 			xstr_print(xsdec);
 		}
-		CuAssert(tc, "decoded xstring does not match the encoded one",
+		CuAssert(tc, "decoded xstr does not match the encoded one",
 		         cmp==0 );
 		strstream_close(sst);
 		//FREE(str);

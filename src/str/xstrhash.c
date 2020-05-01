@@ -26,7 +26,7 @@
 #include "arrutil.h"
 #include "math.h"
 #include "new.h"
-#include "xstring.h"
+#include "xstr.h"
 #include "xstrhash.h"
 
 struct _xstrhash {
@@ -81,13 +81,13 @@ void xstrhash_dtor(void *ptr, const dtor *dt)
 }
 
 
-uint64_t xstrhash_lex(const xstrhash *self, const xstring *s)
+uint64_t xstrhash_lex(const xstrhash *self, const xstr *s)
 {
 	return xstrhash_lex_sub(self, s, 0, xstr_len(s));
 }
 
 
-uint64_t xstrhash_lex_sub(const xstrhash *self, const xstring *s, size_t from, size_t to)
+uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to)
 {
 	uint64_t hash = 0;
 	for (size_t i=from; i < to; i++) {
@@ -98,7 +98,7 @@ uint64_t xstrhash_lex_sub(const xstrhash *self, const xstring *s, size_t from, s
 }
 
 
-uint64_t xstrhash_roll_lex(const xstrhash *self, const xstring *s, uint64_t hash, xchar_t c)
+uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash, xchar_t c)
 {
 	hash -= _pow(self, xstr_len(s)-1) * ab_rank(self->ab, xstr_get(s, 0));
 	hash += ab_rank(self->ab, c);
@@ -106,7 +106,7 @@ uint64_t xstrhash_roll_lex(const xstrhash *self, const xstring *s, uint64_t hash
 }
 
 
-uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstring *s, size_t from, size_t to,  uint64_t hash, xchar_t c)
+uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to,  uint64_t hash, xchar_t c)
 {
 	hash -= _pow(self, to - from - 1) * ab_rank(self->ab, xstr_get(s, from));
 	hash *= ab_size(self->ab);

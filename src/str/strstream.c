@@ -27,7 +27,7 @@
 #include "mathutil.h"
 #include "strstream.h"
 #include "xchar.h"
-#include "xstring.h"
+#include "xstr.h"
 
 
 typedef enum {
@@ -42,7 +42,7 @@ struct _strstream {
 	union {
 		FILE    *file;
 		char    *str;
-		xstring *xstr;
+		xstr *xstr;
 	} src;
 	sstream_type type;
 	size_t bytes_per_char;
@@ -74,7 +74,7 @@ strstream *strstream_open_str(char *str, size_t slen)
 }
 
 
-strstream *strstream_open_xstr(xstring *xstr)
+strstream *strstream_open_xstr(xstr *xstr)
 {
 	strstream *sst;
 	sst = NEW(strstream);
@@ -205,7 +205,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n)
 
 
 
-size_t strstream_readxs(strstream *sst, xstring *dest, size_t n)
+size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 {
 	size_t nread;
 	switch (sst->type) {

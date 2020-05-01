@@ -95,13 +95,13 @@ static alphabet *get_ext_ab(alphabet *input_ab)
 
 
 typedef struct {
-	xstring  *txt;
+	xstr  *txt;
 	size_t    pos;
 	size_t    k;
 } kmer_t;
 
 
-kmer_t *kmer_new(xstring *txt, size_t pos, size_t k)
+kmer_t *kmer_new(xstr *txt, size_t pos, size_t k)
 {
 	kmer_t *ret = NEW(kmer_t);
 	ret->txt = txt;
@@ -145,7 +145,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	size_t sizeof_ext_char = nbytes(ab_size(ext_ab));
 
 	// build padded string with k sentinels at the beginning an one at the end
-	xstring *padstr = xstring_new(sizeof_ext_char);
+	xstr *padstr = xstr_new(sizeof_ext_char);
 	for (size_t i=0; i<k; i++)
 		xstr_push(padstr, SENTINEL);
 	for (xchar_t c; (c=strstream_getc(sst))!=XEOF; )
@@ -162,7 +162,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	}
 
 	//printf("kmers before sort:\n");
-	//xstring *kmstr = xstring_new(sizeof_ext_char);
+	//xstr *kmstr = xstr_new(sizeof_ext_char);
 	//strbuf *kmdstr = strbuf_new();
 	//for (size_t i=0, l=vec_len(kp1mers); i<l; i++) {
 	//    kmer_t *kp1mer = *(kmer_t **)vec_get(kp1mers, i);
@@ -171,14 +171,14 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	//    printf("kmer[%*zu]=%s\n",2, i, strbuf_as_str(kmdstr));
 	//    strbuf_clear(kmdstr);
 	//}
-	//xstring_free(kmstr);
+	//xstr_free(kmstr);
 	//strbuf_free(kmdstr);
 
 	// sort the k+1-mers
 	vec_radixsort(kp1mers, &kmer_key_fn, k+1, ab_size(ext_ab));
 
 	//printf("kmers after sort:\n");
-	//kmstr = xstring_new(sizeof_ext_char);
+	//kmstr = xstr_new(sizeof_ext_char);
 	//kmdstr = strbuf_new();
 	//for (size_t i=0, l=vec_len(kp1mers); i<l; i++) {
 	//    kmer_t *kp1mer = *(kmer_t **)vec_get(kp1mers, i);
@@ -187,10 +187,10 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	//    printf("kmer[%*zu]=%s\n",2, i, strbuf_as_str(kmdstr));
 	//    strbuf_clear(kmdstr);
 	//}
-	//xstring_free(kmstr);
+	//xstr_free(kmstr);
 	//strbuf_free(kmdstr);
 
-	xstring *edge_labels  = xstring_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
+	xstr *edge_labels  = xstr_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
 	byte_t *last_node   = bitarr_new(vec_len(kp1mers));
 	size_t *char_count = NEW_ARR(size_t, ab_size(ext_ab)+1);
 	FILL_ARR(char_count, 0, ab_size(ext_ab)+1, 0);
@@ -199,12 +199,12 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	size_t nedges = 0; // # of *distinct* edges (k+1-mers)
 
 	byte_t *km1mers_chars = bitarr_new(sizeof_ext_char);
-	xstring *lastkp1mers[2];
-	lastkp1mers[0] = xstring_new_with_capacity(sizeof_ext_char, k+1);
-	lastkp1mers[1] = xstring_new_with_capacity(sizeof_ext_char, k+1);
-	xstring *lastkm1mers[2];
-	lastkm1mers[0] = xstring_new_with_capacity(sizeof_ext_char, k-1);
-	lastkm1mers[1] = xstring_new_with_capacity(sizeof_ext_char, k-1);
+	xstr *lastkp1mers[2];
+	lastkp1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k+1);
+	lastkp1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k+1);
+	xstr *lastkm1mers[2];
+	lastkm1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k-1);
+	lastkm1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k-1);
 	size_t this_line, last_line;
 	kmer_t *kp1mer;
 	bool new_edge = false;
@@ -278,7 +278,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	graph->multi = multigraph;
 	graph->nnodes = nnodes;
 	graph->nedges = nedges;
-	graph->edge_lbl_wt = wavtree_new_from_xstring( ext_ab, edge_labels,
+	graph->edge_lbl_wt = wavtree_new_from_xstr( ext_ab, edge_labels,
 	                     WT_HUFFMAN );
 	graph->true_node = csrsbitarr_new(last_node, nedges);
 	for (size_t i=1, l=ab_size(ext_ab)+1; i<l; i++) {
@@ -290,8 +290,8 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	//wavtree_print(graph->edge_lbl_wt);
 
 	// clean up temporary stuff
-	xstring_free(padstr);
-	xstring_free(edge_labels);
+	xstr_free(padstr);
+	xstr_free(edge_labels);
 	DESTROY(kp1mers, dtor_cons(DTOR(vec), ptr_dtor()));
 	FREE(lastkm1mers[0]);
 	FREE(lastkm1mers[1]);
@@ -401,7 +401,7 @@ static size_t _last_node_char_rank(dbgraph *g, size_t nid)
 }
 
 
-void dbg_node_lbl(dbgraph *g, size_t nid, xstring *dest)
+void dbg_node_lbl(dbgraph *g, size_t nid, xstr *dest)
 {
 	if (nid >= g->nedges) return;
 	size_t l=0;
@@ -490,7 +490,7 @@ size_t dbg_parent(dbgraph *g, size_t nid)
 
 
 
-static void node_cstr(xstring *node, alphabet *ab, char *dest)
+static void node_cstr(xstr *node, alphabet *ab, char *dest)
 {
 	for (size_t i=0, l=xstr_len(node); i<l; i++ ) {
 		xchar_t c = xstr_get(node, i);
@@ -512,7 +512,7 @@ void dbg_print(dbgraph *g)
 	cols[2] = MAX(cols[2], g->k);
 
 	char *edge, *node;
-	xstring *xnode = xstring_new_with_capacity(nbytes(ab_size(g->ext_ab)), g->k);
+	xstr *xnode = xstr_new_with_capacity(nbytes(ab_size(g->ext_ab)), g->k);
 	xstr_push_n(xnode, 0, g->k);
 	node = cstr_new(g->k);
 	cstr_fill(node, 0, g->k, '?');

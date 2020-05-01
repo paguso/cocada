@@ -37,7 +37,7 @@
 #include "strread.h"
 #include "vec.h"
 #include "xstrhash.h"
-#include "xstring.h"
+#include "xstr.h"
 
 struct _mmindex {
 	alphabet *ab;
@@ -131,7 +131,7 @@ void mmindex_index(mmindex * self, strread * sst)
 {
 	size_t nidx = self->nidx;
 	size_t offset = vec_last_size_t(self->offs);
-	xstring *window = xstring_new_with_capacity(sizeof(char), self->max_wlen);
+	xstr *window = xstr_new_with_capacity(sizeof(char), self->max_wlen);
 	minqueue **win_rks = NEW_ARR(minqueue *, nidx);
 	FILL_ARR(win_rks, 0, nidx, minqueue_new(sizeof(rankpos), cmp_rankpos));
 	uint64_t *prev_mm_rk = NEW_ARR(uint64_t, nidx);	// rank of previous window minimiser
@@ -225,7 +225,7 @@ void mmindex_index(mmindex * self, strread * sst)
 	self->nseq += 1;
 
 
-	xstring_free(window);
+	xstr_free(window);
 	const dtor *mqdtor = DTOR(minqueue);
 	for (size_t i=0; i<nidx; i++) {
 		FINALISE(win_rks[i], mqdtor);
@@ -237,7 +237,7 @@ void mmindex_index(mmindex * self, strread * sst)
 }
 
 
-const vec *mmindex_get(mmindex *self, xstring *kmer)
+const vec *mmindex_get(mmindex *self, xstr *kmer)
 {
 	uint64_t rank = xstrhash_lex(self->hasher, kmer);
 	return (const vec*) hashmap_get_rawptr( self->tbls[self->k_inv[xstr_len(kmer)]], &rank );

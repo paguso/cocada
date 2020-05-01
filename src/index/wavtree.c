@@ -567,7 +567,7 @@ wavtree *wavtree_new ( alphabet *ab, char *str, size_t len, wtshape shape )
 }
 
 
-wavtree *wavtree_new_from_xstring( alphabet *ab, xstring *str, wtshape shape )
+wavtree *wavtree_new_from_xstr( alphabet *ab, xstr *str, wtshape shape )
 {
 	strstream *sst = strstream_open_xstr(str);
 	wavtree *wt = wt_build(ab, sst, shape);

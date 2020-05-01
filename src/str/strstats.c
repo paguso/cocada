@@ -26,7 +26,7 @@
 #include "strstats.h"
 #include "strstream.h"
 #include "xchar.h"
-#include "xstring.h"
+#include "xstr.h"
 
 
 size_t *char_count(char *str, size_t slen, alphabet *ab)
@@ -39,7 +39,7 @@ size_t *char_count(char *str, size_t slen, alphabet *ab)
 }
 
 
-size_t *xchar_count(xstring *xstr, alphabet *ab)
+size_t *xchar_count(xstr *xstr, alphabet *ab)
 {
 	size_t absz = ab_size(ab);
 	size_t *counts = NEW_ARR(size_t, absz);
@@ -64,7 +64,7 @@ size_t  *char_cumul_count(char *str, size_t slen, alphabet *ab)
 }
 
 
-size_t  *xchar_cumul_count(xstring *xstr, alphabet *ab)
+size_t  *xchar_cumul_count(xstr *xstr, alphabet *ab)
 {
 	size_t absz = ab_size(ab);
 	size_t *counts = NEW_ARR(size_t, absz+1);

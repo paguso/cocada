@@ -27,7 +27,7 @@
 #include "alphabet.h"
 #include "strstream.h"
 #include "xchar.h"
-#include "xstring.h"
+#include "xstr.h"
 
 /**
  * @brief Returns individual letter counts of a given string.
@@ -37,7 +37,7 @@
 size_t *char_count(char *str, size_t slen, alphabet *ab);
 
 
-size_t *xchar_count(xstring *xstr, alphabet *ab);
+size_t *xchar_count(xstr *xstr, alphabet *ab);
 
 
 /**

@@ -138,7 +138,7 @@ static inline xchar_t plain_chr(alphabet *base_ab,  xchar_t c)
 	       ab_char(base_ab, c - 1);
 }
 
-static void node_cstr(xstring *node, alphabet *ab, char *dest)
+static void node_cstr(xstr *node, alphabet *ab, char *dest)
 {
 	for (size_t i=0, l=xstr_len(node); i<l; i++ ) {
 		xchar_t c = xstr_get(node, i);
@@ -180,7 +180,7 @@ void test_dbgraph_outdeg(CuTest *tc)
 		dbgraph *dbg = g[i];
 		//printf("T:%s\n",padstr[i]);
 		//dbg_print(dbg);
-		xstring *xnode = xstring_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
+		xstr *xnode = xstr_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
 		                 dbg_k(dbg) );
 		char *node = cstr_new(dbg_k(dbg));
 
@@ -241,7 +241,7 @@ void test_dbg_lbl_outdeg(CuTest *tc)
 	for (size_t i=0; i<n; i++)  {
 		dbgraph *dbg = g[i];
 		alphabet *abt = ab[i];
-		xstring *xnode = xstring_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
+		xstr *xnode = xstr_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
 		                 dbg_k(dbg) );
 		char *node = cstr_new(dbg_k(dbg));
 		for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
@@ -305,13 +305,13 @@ void test_dbgraph_child(CuTest *tc)
 		dbgraph *dbg = g[i];
 		alphabet *abt = ab[i];
 		char *par_lbl, *chd_lbl, *chd_lbl_bf;
-		xstring *xpar_lbl, *xchd_lbl, *xchd_lbl_bf;
+		xstr *xpar_lbl, *xchd_lbl, *xchd_lbl_bf;
 		par_lbl     = cstr_new(dbg_k(dbg));
 		chd_lbl     = cstr_new(dbg_k(dbg));
 		chd_lbl_bf  = cstr_new(dbg_k(dbg));
-		xpar_lbl    = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
-		xchd_lbl    = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
-		xchd_lbl_bf = xstring_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+		xpar_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+		xchd_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+		xchd_lbl_bf = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
 
 		for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
 			size_t nid = dbg_node_id(dbg, nrk);

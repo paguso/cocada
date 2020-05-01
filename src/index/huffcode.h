@@ -117,7 +117,7 @@ bitvec *huffcode_encode(huffcode *hcode, strstream *sst);
 /**
  * @brief Decodes a binary code to a string.
  */
-xstring *huffcode_decode(huffcode *hcode, bitvec *code);
+xstr *huffcode_decode(huffcode *hcode, bitvec *code);
 
 /**
  * @brief Returns the code of a char

@@ -26,7 +26,7 @@
 
 #include "new.h"
 #include "xchar.h"
-#include "xstring.h"
+#include "xstr.h"
 
 /**
  * @file strstream.h
@@ -53,10 +53,10 @@ strstream *strstream_open_str(char *str, size_t slen);
 
 
 /**
- * @brief Opens a stream for a in-memory source xstring.
- * @param str The source xstring.
+ * @brief Opens a stream for a in-memory source xstr.
+ * @param str The source xstr.
  */
-strstream *strstream_open_xstr(xstring *xstr);
+strstream *strstream_open_xstr(xstr *xstr);
 
 
 /**
@@ -66,7 +66,7 @@ strstream *strstream_open_file(char *filename);
 
 
 /**
- * @brief Opens a stream for a source xstring text file.
+ * @brief Opens a stream for a source xstr text file.
  */
 strstream *strstream_open_xfile(char *filename, size_t bytes_per_char);
 
@@ -116,19 +116,19 @@ size_t strstream_reads_until(strstream *sst, char *dest, char delim);
 
 
 /**
- * @brief Attempts to read the next @p n xchars into the xstring *dest.
+ * @brief Attempts to read the next @p n xchars into the xstr *dest.
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs(strstream *sst, xstring *xstr, size_t n);
+size_t strstream_readxs(strstream *sst, xstr *xstr, size_t n);
 
 
 /**
- * @brief Attempts to read the next @p n xchars into the xstring *dest.
+ * @brief Attempts to read the next @p n xchars into the xstr *dest.
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs_until(strstream *sst, xstring *xstr, xchar_t delim);
+size_t strstream_readxs_until(strstream *sst, xstr *xstr, xchar_t delim);
 
 
 /**

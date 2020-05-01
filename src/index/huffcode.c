@@ -150,7 +150,7 @@ huffcode *huffcode_new_from_str(alphabet *ab, char *src)
 }
 
 
-huffcode *huffcode_new_from_xstr(alphabet *ab, xstring *src)
+huffcode *huffcode_new_from_xstr(alphabet *ab, xstr *src)
 {
 	strstream *sst = strstream_open_xstr(src);
 	huffcode *hcode = huffcode_new_from_stream(ab, sst);
@@ -287,9 +287,9 @@ bitvec *huffcode_encode(huffcode *hcode, strstream *sst)
 }
 
 
-xstring *huffcode_decode(huffcode *hcode, bitvec *bcode)
+xstr *huffcode_decode(huffcode *hcode, bitvec *bcode)
 {
-	xstring *dec = xstring_new(nbytes(ab_size(hcode->ab)));
+	xstr *dec = xstr_new(nbytes(ab_size(hcode->ab)));
 	hufftnode *cur = huffcode_tree(hcode);
 	for (size_t i=0, l=bitvec_len(bcode); i<l; i++) {
 		cur = cur->chd[bitvec_get_bit(bcode, i)];

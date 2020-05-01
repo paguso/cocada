@@ -143,7 +143,7 @@ size_t dbg_node_rank(dbgraph *g, size_t nid);
  * @param nid The node id. If a nonexistant id is given, the result is
  *            the empty string.
  */
-void dbg_node_lbl(dbgraph *g, size_t nid, xstring *dest);
+void dbg_node_lbl(dbgraph *g, size_t nid, xstr *dest);
 
 
 /**

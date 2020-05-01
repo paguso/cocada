@@ -39,7 +39,7 @@
 #include "strstream.h"
 #include "wavtree.h"
 #include "xchar.h"
-#include "xstring.h"
+#include "xstr.h"
 
 #define MIN_NLEVELS 1
 #define MAX_PLAIN_SA_LEN 3
@@ -56,7 +56,7 @@ struct _csarray {
 	wavtree **phi_wt;
 	size_t *root_sa;
 	size_t *root_sa_inv;
-	//xstring **phi_str;
+	//xstr **phi_str;
 };
 
 
@@ -80,7 +80,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	csa->even_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
 	csa->char_stop_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
 	csa->phi_wt = NEW_ARR(wavtree*, csa->nlevels);
-	//csa->phi_str = NEW_ARR(xstring*, csa->nlevels);
+	//csa->phi_str = NEW_ARR(xstr*, csa->nlevels);
 
 	// build plain sarray and its inverse
 	size_t *sarr = sais(str, len, ab);
@@ -106,9 +106,9 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	}
 	csa->xab = alphabet_new(ndiff_xchars, strbuf_detach(supp_ab_str));
 
-	// convert source string to "normalised" xstring
+	// convert source string to "normalised" xstr
 	assert(ndiff_xchars < XCHAR_MAX);
-	xstring *cur_xstr = xstring_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
+	xstr *cur_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 	xstr_push_n(cur_xstr, 0, lvl_len);
 	xchar_t cur_xchar = 0;
 	for (size_t i=0; i<lvl_len; i++) {
@@ -135,15 +135,15 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		csa->char_stop_bv[lvl] = csrsbitarr_new( bitvec_detach(xchar_stops),
 		                         lvl_len );
 
-		xstring *phi_xstr = xstring_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
+		xstr *phi_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 		xstr_push_n(phi_xstr, 0, lvl_len);
 		for (size_t i=0; i<lvl_len; i++)
 			xstr_set( phi_xstr, sarr_inv[(sarr[i]+1)%lvl_len],
 			          xstr_get(cur_xstr, sarr[i]) );
-		csa->phi_wt[lvl] = wavtree_new_from_xstring( int_alphabet_new(ndiff_xchars),
+		csa->phi_wt[lvl] = wavtree_new_from_xstr( int_alphabet_new(ndiff_xchars),
 		                   phi_xstr,  WT_BALANCED );
 		//csa->phi_str[lvl] = phi_xstr;
-		xstring_free(phi_xstr);
+		xstr_free(phi_xstr);
 
 		// build even-suffix indicator bitvector
 		// push even entries to first half of sarr rescaling its value
@@ -185,8 +185,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		}
 		assert(ndiff_xchars < XCHAR_MAX);
 		bitvec_set_bit(xchar_stops, nxt_lvl_len-1, 1);
-		xstring_free(cur_xstr);
-		cur_xstr = xstring_new_with_capacity( nbytes(ndiff_xchars), nxt_lvl_len );
+		xstr_free(cur_xstr);
+		cur_xstr = xstr_new_with_capacity( nbytes(ndiff_xchars), nxt_lvl_len );
 		xstr_push_n(cur_xstr, 0, nxt_lvl_len);
 		cur_xchar = 0;
 		for (size_t i = 0; i < nxt_lvl_len; i++) {
@@ -197,7 +197,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 		lvl_len = nxt_lvl_len;
 	}
-	xstring_free(cur_xstr);
+	xstr_free(cur_xstr);
 
 	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
 	csa->root_sa_inv = realloc(sarr_inv, csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
