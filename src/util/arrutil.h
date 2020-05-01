@@ -44,6 +44,12 @@
 
 
 /**
+ * @brief Allocates a new array of N elements of a given TYPE all set to 0.
+ */
+#define NEW_ARR_0( TYPE, N ) ((N>0)?((TYPE*)(calloc((N),sizeof(TYPE)))):NULL)
+
+
+/**
  * @brief Sets the positions FROM to TO-1 of the array ARR with the expression EXPR.
  * @warning The expression EXPR is evaluated for every element to be set.
  *          If EXPR is an object creator call `type_new()` then every position

@@ -26,7 +26,6 @@
 #include <stdlib.h>
 
 #include "new.h"
-//#include "strstream.h"
 #include "xchar.h"
 
 /**
@@ -83,7 +82,7 @@ alphabet *alphabet_new(const size_t size, const char *letters);
 /**
  * @brief Creates an integer alphabet with characters ranging from
  *        0 to @p size-1
- * @param The alphabet size.
+ * @param size The alphabet size.
  */
 alphabet *int_alphabet_new(const size_t size);
 
@@ -91,7 +90,7 @@ alphabet *int_alphabet_new(const size_t size);
 /**
  * @brief Clones an alphabet
  */
-alphabet *alphabet_clone(alphabet *src);
+alphabet *alphabet_clone(const alphabet *src);
 
 
 /**
@@ -109,32 +108,32 @@ void alphabet_dtor(void *ptr, const dtor *dt);
 /**
  * @brief Prints an alphabet representation to the standard output.
  */
-void ab_print(alphabet *ab);
+void ab_print(const alphabet *ab);
 
 
 /**
  * @brief Return the base char type of the alphabet
  */
-alphabet_type ab_type(alphabet *ab);
+alphabet_type ab_type(const alphabet *ab);
 
 
 /**
  * @brief Returns the number of letters.
  */
-size_t ab_size(alphabet *ab);
+size_t ab_size(const alphabet *ab);
 
 
 /**
  * @brief Indicates whether alphabet @p ab contains the character @c.
  */
-bool ab_contains(alphabet *ab, xchar_t c);
+bool ab_contains(const alphabet *ab, xchar_t c);
 
 
 /**
  * @brief Returns the letter of given rank. If rank >= alphabet size, the
  * behaviour is undefined.
  */
-xchar_t ab_char(alphabet *ab, size_t rank);
+xchar_t ab_char(const alphabet *ab, size_t rank);
 
 
 /**
@@ -144,7 +143,7 @@ xchar_t ab_char(alphabet *ab, size_t rank);
  * This means that all chars not in the alphabet are lexicographically
  * identical and strictly greater than any char in the alphabet.
  */
-size_t ab_rank(alphabet *ab, xchar_t c);
+size_t ab_rank(const alphabet *ab, xchar_t c);
 
 
 /**
@@ -153,7 +152,7 @@ size_t ab_rank(alphabet *ab, xchar_t c);
  *         or +1 if rank(@p a)==rank(@p b);
  * @see ab_rank
  */
-int ab_cmp(alphabet *ab, xchar_t a, xchar_t b);
+int ab_cmp(const alphabet *ab, xchar_t a, xchar_t b);
 
 
 #endif

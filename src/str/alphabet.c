@@ -108,7 +108,7 @@ alphabet *int_alphabet_new(size_t size)
 }
 
 
-alphabet *alphabet_clone(alphabet *src)
+alphabet *alphabet_clone(const alphabet *src)
 {
 	switch(src->type) {
 	case CHAR_TYPE:
@@ -122,7 +122,7 @@ alphabet *alphabet_clone(alphabet *src)
 }
 
 
-void ab_print(alphabet *ab)
+void ab_print(const alphabet *ab)
 {
 	printf("alphabet@%p\n",(void *)ab);
 	printf("  size = %zu\n", ab->size);
@@ -164,26 +164,26 @@ void alphabet_dtor(void *ptr, const dtor *dt)
 }
 
 
-alphabet_type ab_type(alphabet *ab)
+alphabet_type ab_type(const alphabet *ab)
 {
 	return ab->type;
 }
 
 
-size_t ab_size(alphabet *ab)
+size_t ab_size(const alphabet *ab)
 {
 	return ab->size;
 }
 
 
-bool ab_contains(alphabet *ab, xchar_t c)
+bool ab_contains(const alphabet *ab, xchar_t c)
 {
 	return (bool)(ab_rank(ab, c) < ab->size);
 }
 
 
 
-xchar_t ab_char(alphabet *ab, size_t index)
+xchar_t ab_char(const alphabet *ab, size_t index)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
@@ -197,7 +197,7 @@ xchar_t ab_char(alphabet *ab, size_t index)
 }
 
 
-size_t ab_rank(alphabet *ab, xchar_t c)
+size_t ab_rank(const alphabet *ab, xchar_t c)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
@@ -211,7 +211,7 @@ size_t ab_rank(alphabet *ab, xchar_t c)
 }
 
 
-int ab_cmp(alphabet *ab, xchar_t a, xchar_t b)
+int ab_cmp(const alphabet *ab, xchar_t a, xchar_t b)
 {
 	size_t ra = ab_rank(ab, a);
 	size_t rb = ab_rank(ab, b);

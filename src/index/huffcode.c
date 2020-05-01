@@ -38,8 +38,8 @@
 #include "strbuf.h"
 #include "huffcode.h"
 #include "mathutil.h"
-#include "strstats.h"
-#include "strstream.h"
+#include "strread.h"
+#include "xstr.h"
 
 static const byte_t LEFT  = 0;
 static const byte_t RIGHT = 1;
@@ -53,7 +53,6 @@ struct _hufftnode {
 
 struct _huffcode {
 	alphabet  *ab;
-	bool       own_ab;
 	size_t     size;
 	hufftnode *tree;
 	bitvec **code;
@@ -88,13 +87,12 @@ static void fill_code_table( huffcode *hcode, hufftnode *node, size_t code_len,
 }
 
 
-huffcode *huffcode_new(alphabet *ab, size_t freqs[])
+huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 {
 	huffcode *hcode;
 
 	hcode = NEW(huffcode);
-	hcode->ab = ab;
-	hcode->own_ab = false;
+	hcode->ab = alphabet_clone(ab);
 	hcode->size = ab_size(ab);
 
 	size_t ab_bytesize = (size_t)DIVCEIL(hcode->size, BYTESIZE);
@@ -141,82 +139,34 @@ huffcode *huffcode_new(alphabet *ab, size_t freqs[])
 }
 
 
-huffcode *huffcode_new_from_str(alphabet *ab, char *src)
+huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 {
-	strstream *sst = strstream_open_str(src, strlen(src));
-	huffcode *hcode = huffcode_new_from_stream(ab, sst);
-	strstream_close(sst);
-	return hcode;
-}
-
-
-huffcode *huffcode_new_from_xstr(alphabet *ab, xstr *src)
-{
-	strstream *sst = strstream_open_xstr(src);
-	huffcode *hcode = huffcode_new_from_stream(ab, sst);
-	strstream_close(sst);
-	return hcode;
-}
-
-
-huffcode *huffcode_new_from_stream(alphabet *ab, strstream *sst)
-{
-	size_t *freqs = char_count_stream(sst, ab);
-	huffcode *hcode = huffcode_new(ab, freqs);
-	FREE(freqs);
-	return hcode;
-}
-
-
-huffcode *huffcode_new_online_from_stream(alphabet_type abtype, strstream *sst)
-{
-	strstream_reset(sst);
-	size_t szofchar = strstream_sizeof_char(sst);
-	size_t all_len = 1 << (szofchar*BYTESIZE);
-	size_t *all_freqs = NEW_ARR(size_t, all_len);
-	size_t ab_len = 0;
-	FILL_ARR(all_freqs, 0, all_len,0);
-	xchar_t xcmax = 0;
-	for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
-		ab_len += (all_freqs[c]==0)?1:0;
-		all_freqs[c] += 1;
-		xcmax = MAX(xcmax, c);
+	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	for (;*src!='\0'; src++) {
+		counts[ab_rank(ab, *src)]++;
 	}
-	alphabet *ab = NULL;
-	size_t   *ab_freqs;
-	switch(abtype) {
-	case CHAR_TYPE:
-		;
-		char *ab_str = cstr_new(ab_len);
-		ab_freqs = NEW_ARR(size_t, ab_len);
-		for (size_t i=0, k=0; i<all_len; i++) {
-			if (all_freqs[i] > 0) {
-				ab_str[k]  = (char)i;
-				ab_freqs[k] = all_freqs[i];
-				k++;
-			}
-		}
-		ab = alphabet_new(ab_len, ab_str);
-		FREE(all_freqs);
-		break;
-	case INT_TYPE:
-		ab_freqs = realloc(all_freqs, (xcmax+1)*sizeof(size_t));
-		ab = int_alphabet_new(xcmax+1);
-		break;
-	}
-	huffcode *hcode = huffcode_new(ab, ab_freqs);
-	hcode->own_ab = true;
-	FREE(ab_freqs);
-	return hcode;
+	huffcode *hc = huffcode_new(ab, counts);
+	FREE(counts);
+	return hc;
 }
 
+
+huffcode *huffcode_new_from_strread(const alphabet *ab, const strread *reader) 
+{
+	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	for (int c; (c=strread_getc(reader)) != EOF;) {
+		counts[ab_rank(ab, c)]++;
+	}
+	huffcode *hc = huffcode_new(ab, counts);
+	FREE(counts);
+	return hc;
+}
 
 
 void huffcode_free(huffcode *hcode)
 {
 	if (hcode==NULL) return;
-	if (hcode->own_ab)
-		alphabet_free(hcode->ab);
+	alphabet_free(hcode->ab);
 	for (size_t i=0; i<hcode->size; i++) {
 		FREE(hcode->code[i], bitvec); // no null codes
 	}
@@ -253,7 +203,7 @@ void _print_htree(huffcode *hc, hufftnode *node, size_t level, char *code)
 }
 
 
-void huffcode_print(huffcode *hcode)
+void huffcode_print(const huffcode *hcode)
 {
 	printf("huffcode@%p {\n",(void *)hcode);
 	printf("    size: %zu\n",hcode->size);
@@ -277,17 +227,17 @@ void huffcode_print(huffcode *hcode)
 }
 
 
-bitvec *huffcode_encode(huffcode *hcode, strstream *sst)
+bitvec *huffcode_encode(const huffcode *hcode, const char *src, size_t len)
 {
 	bitvec *enc = bitvec_new();
-	for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
-		bitvec_cat(enc, hcode->code[ab_rank(hcode->ab, c)]);
+	for (int i=0; i<len; i++) {
+		bitvec_cat(enc, hcode->code[ab_rank(hcode->ab, src[i])]);
 	}
 	return enc;
 }
 
 
-xstr *huffcode_decode(huffcode *hcode, bitvec *bcode)
+xstr *huffcode_decode(const huffcode *hcode, const bitvec *bcode)
 {
 	xstr *dec = xstr_new(nbytes(ab_size(hcode->ab)));
 	hufftnode *cur = huffcode_tree(hcode);
@@ -302,47 +252,49 @@ xstr *huffcode_decode(huffcode *hcode, bitvec *bcode)
 }
 
 
-const bitvec *huffcode_charcode(huffcode *hcode, size_t char_rank)
+const bitvec *huffcode_charcode(const huffcode *hcode, size_t char_rank)
 {
 	return hcode->code[char_rank];
 }
 
 
-hufftnode *huffcode_tree(huffcode *code)
+const hufftnode *huffcode_tree(const huffcode *code)
 {
 	return (code->size>0)?code->tree+(2*code->size)-2:NULL;
 }
 
-alphabet *huffcode_ab(huffcode *code)
+
+const alphabet *huffcode_ab(const huffcode *code)
 {
 	return code->ab;
 }
 
 
-bool hufftnode_is_leaf(hufftnode *node)
+bool hufftnode_is_leaf(const hufftnode *node)
 {
 	return node->chd[LEFT]==node->chd[RIGHT];
 }
 
 
-hufftnode *hufftnode_left(hufftnode *node)
+const hufftnode *hufftnode_left(const hufftnode *node)
 {
 	return node->chd[LEFT];
 }
 
 
-hufftnode *hufftnode_right(hufftnode *node)
+const hufftnode *hufftnode_right(const hufftnode *node)
 {
 	return node->chd[RIGHT];
 }
 
 
-byte_t *hufftnode_ab_mask(hufftnode *node)
+const byte_t *hufftnode_ab_mask(const hufftnode *node)
 {
 	return node->ab_mask;
 }
 
-size_t hufftnode_char_rank(hufftnode *node)
+
+size_t hufftnode_char_rank(const hufftnode *node)
 {
 	return node->chr_rank;
 }

@@ -39,9 +39,9 @@ void test_huffcode_new(CuTest *tc)
 	size_t freqs[5] = {15, 7, 6, 6, 5};
 	alphabet *ab;
 	ab = alphabet_new(5, letters);
-	huffcode *hc;
-	hc = huffcode_new(ab, freqs);
+	huffcode *hc = huffcode_new(ab, freqs);
 	//huffcode_print(hc);
+	huffcode_free(hc);
 }
 
 static void _random_str(char *dest, alphabet *ab, size_t len)
@@ -58,56 +58,16 @@ void test_huffcode_codec(CuTest *tc)
 		alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
 		char *str = cstr_new(len);
 		_random_str(str, ab, len);
-		strstream *sst = strstream_open_str(str, len);
-		huffcode *hc = huffcode_new_from_stream(ab, sst);
-		strstream_reset(sst);
+		huffcode *hc = huffcode_new_from_str(ab, str);
 		//huffcode_print(hc);
-		bitvec *code = huffcode_encode(hc, sst);
+		bitvec *code = huffcode_encode(hc, str, len);
 		xstr *xsdec = huffcode_decode(hc, code);
 		//bytearr_print(code.rawcode, (size_t)mult_ceil(code.code_len, BYTESIZE), 4, "");
 		//printf("original=%s\n",str);
 		//printf("decoded =%s\n",dec);
 		char *dec = xstr_detach(xsdec);
 		CuAssertStrEquals(tc, str, dec);
-		strstream_close(sst);
 		FREE(str);
-		huffcode_free(hc);
-	}
-}
-
-
-
-static xstr  *_random_xstr(alphabet *ab, size_t len)
-{
-	xstr *xs = xstr_new_with_capacity(nbytes(ab_size(ab)), len);
-	for (size_t i=0; i<len; i++)
-		xstr_push(xs, ab_char(ab, rand()%ab_size(ab)));
-	return xs;
-}
-
-
-
-void test_huffcode_xcodec(CuTest *tc)
-{
-	size_t max_len = 4096;
-	for (size_t len=2; len<max_len; len++) {
-		alphabet *ab = int_alphabet_new(MAX(2, len/4));
-		xstr *xs = _random_xstr(ab, len);
-		strstream *sst = strstream_open_xstr(xs);
-		huffcode *hc = huffcode_new_from_stream(ab, sst);
-		strstream_reset(sst);
-		//huffcode_print(hc);
-		bitvec *code = huffcode_encode(hc, sst);
-		xstr *xsdec = huffcode_decode(hc, code);
-		int cmp = xstr_cmp(xs, xsdec);
-		if (cmp) {
-			xstr_print(xs);
-			xstr_print(xsdec);
-		}
-		CuAssert(tc, "decoded xstr does not match the encoded one",
-		         cmp==0 );
-		strstream_close(sst);
-		//FREE(str);
 		huffcode_free(hc);
 	}
 }
@@ -118,7 +78,6 @@ CuSuite *huffcode_get_test_suite()
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_huffcode_new);
 	SUITE_ADD_TEST(suite, test_huffcode_codec);
-	SUITE_ADD_TEST(suite, test_huffcode_xcodec);
 	return suite;
 }
 
