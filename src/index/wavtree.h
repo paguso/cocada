@@ -25,6 +25,9 @@
 #include <stddef.h>
 
 #include "alphabet.h"
+#include "strread.h"
+#include "xstr.h"
+#include "xstrread.h"
 
 /**
  * @file wavtree.h
@@ -58,42 +61,42 @@ wtshape;
 typedef struct _wavtree wavtree;
 
 /**
- * @brief Creates a wavelet tree representing a string @p str over an alphabet
+ * @brief Creates a wavelet tree representing a string @p src over an alphabet
  *        @p ab.
  * @param ab The base alphabet.
- * @param str The source string.
- * @param len The length of the indexed string.
+ * @param src The source string.
+ * @param len The length of the source string.
  * @param shape The WT shape.
  */
-wavtree *wavtree_new(alphabet *ab, char *str, size_t len, wtshape shape);
-
-
-/**
- * @brief Creates a wavelet tree representing a string @p str over an alphabet
- *        @p ab.
- * @param ab The base alphabet.
- * @param str The source string.
- * @param len The length of the indexed string.
- * @param shape The WT shape.
- */
-wavtree *wavtree_new_from_xstr(alphabet *ab, xstr *xstr, wtshape shape);
+wavtree *wavtree_new(alphabet *ab, char *src, size_t len, wtshape shape);
 
 
 /**
  * @brief Creates a wavelet tree from a stream with known alphabet @p ab.
  * @param ab The base alphabet.
- * @param sst The source stream.
+ * @param src The source string reader.
  * @param shape The WT shape.
  * @param layout The WT memory layout.
  */
-wavtree *wavtree_new_from_stream(alphabet *ab, strstream *sst, wtshape shape);
+wavtree *wavtree_new_from_reader(alphabet *ab, xstrread *src, wtshape shape);
 
 
 /**
- * @brief Create a balanced wavelet tree from a stream with unknown alphabet.
- * @warn  Only CHAR_TYPE streams currently supported
+ * @brief Creates a wavelet tree from an xstring with known alphabet @p ab.
+ * @param ab The base alphabet.
+ * @param src The source string reader.
+ * @param shape The WT shape.
+ * @param layout The WT memory layout.
  */
-wavtree *wavtree_new_online( strstream *sst );
+wavtree *wavtree_new_from_xstr( alphabet *ab, xstr *src, wtshape shape );
+
+/**
+ * @brief Create a balanced wavelet tree from a stream with unknown alphabet
+ * as described in 
+ * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*, 
+ * 16th Int´l Symposium on Experimental Algorithms (SEA 2017), London, UK.
+ */
+wavtree *wavtree_new_online( strread *src );
 
 
 /**

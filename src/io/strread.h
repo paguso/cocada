@@ -44,10 +44,10 @@ typedef struct _strread strread;
  * @brief String reader virtual table
  */
 typedef struct {
-	void    (*reset)(strread *self);
-	char	(*getc)(strread *self);
-	size_t  (*read_str)(strread *self, char *dest, size_t n);
-	size_t  (*read_str_until)(strread *self, char *dest, char delim);
+	void    (*reset) (strread *self);
+	int		(*getc) (strread *self);
+	size_t  (*read_str) (strread *self, char *dest, size_t n);
+	size_t  (*read_str_until) (strread *self, char *dest, char delim);
 }  strread_vt;
 
 
@@ -79,7 +79,7 @@ void strread_reset(strread *trait);
  * strread_close(ftrait);
  * @endcode
  */
-char strread_getc(strread *trait);
+int strread_getc(strread *trait);
 
 
 /**

@@ -149,5 +149,15 @@ bool cstr_equals(const char *left, const char *right);
 bool cstr_equals_ignore_case(const char *left, const char *right);
 
 
+#define FOREACH_IN_SUBSTR(CHR, STR, FROM, TO) \
+for (char *__s = (char *)(STR), CHR; __s; __s = NULL) \
+for (size_t __i = FROM, __l = TO; __i < __l; __i = __l) \
+for (CHR = __s[__i]; __i < __l; CHR = ((++__i) < __l) ? __s[__i] : CHR ) 
+
+
+#define FOREACH_IN_CSTR(CHR, STR) \
+for (char *__s = (char *)(STR), CHR; (CHR = (*__s)) != '\0'; __s += 1) \
+
+
 #endif
 

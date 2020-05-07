@@ -84,9 +84,9 @@ void test_revert_bytes(CuTest *tc)
 	uint32_t a, ainv;
 	byte_t *ap, *ainvp;
 	a = 0xccddeeff;
-	ap = &a;
+	ap = (byte_t *) &a;
 	ainv = a;
-	ainvp = &ainv;
+	ainvp = (byte_t *) &ainv;
 	bytearr_reverse((byte_t *)&ainv, sizeof(uint32_t));
 	for (i=0; i<sizeof(uint32_t); i++) {
 		//printf("a[%zu]=%x ainv[%zu]=%x\n", i, ap[i], sizeof(uint32_t)-i-1, ainvp[sizeof(uint32_t)-i-1]);

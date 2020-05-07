@@ -50,6 +50,7 @@ static void _random_str(char *dest, alphabet *ab, size_t len)
 
 }
 
+
 void test_huffcode_codec(CuTest *tc)
 {
 	size_t max_len = 1024;
@@ -60,8 +61,8 @@ void test_huffcode_codec(CuTest *tc)
 		_random_str(str, ab, len);
 		huffcode *hc = huffcode_new_from_str(ab, str);
 		//huffcode_print(hc);
-		bitvec *code = huffcode_encode(hc, str, len);
-		xstr *xsdec = huffcode_decode(hc, code);
+		bitvec *code = huffcode_encode(str, len, hc);
+		xstr *xsdec = huffcode_decode(code, hc);
 		//bytearr_print(code.rawcode, (size_t)mult_ceil(code.code_len, BYTESIZE), 4, "");
 		//printf("original=%s\n",str);
 		//printf("decoded =%s\n",dec);

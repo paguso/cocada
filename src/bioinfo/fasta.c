@@ -49,7 +49,7 @@ static void _reset(strread *self)
 }
 
 
-static char _getc(strread *self)
+static int _getc(strread *self)
 {
 	fastaread *fr = (fastaread *)self->impltor;
 	int c;

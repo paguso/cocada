@@ -40,6 +40,7 @@
 #include "mathutil.h"
 #include "strread.h"
 #include "xstr.h"
+#include "xstrread.h"
 
 static const byte_t LEFT  = 0;
 static const byte_t RIGHT = 1;
@@ -55,7 +56,7 @@ struct _huffcode {
 	alphabet  *ab;
 	size_t     size;
 	hufftnode *tree;
-	bitvec **code;
+	bitvec   **code;
 };
 
 
@@ -72,8 +73,8 @@ static int nodefreq_cmp(const void *p1, const void *p2)
 
 
 
-static void fill_code_table( huffcode *hcode, hufftnode *node, size_t code_len,
-                             byte_t *code )
+static void fill_code_table( huffcode *hcode, const hufftnode *node, 
+							 size_t code_len, byte_t *code )
 {
 	if (hufftnode_is_leaf(node)) {
 		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
@@ -96,7 +97,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	hcode->size = ab_size(ab);
 
 	size_t ab_bytesize = (size_t)DIVCEIL(hcode->size, BYTESIZE);
-	hcode->tree = NEW_ARR(hufftnode, MAX(0, 2*hcode->size-1));
+	hcode->tree = NEW_ARR(hufftnode, MAX(0, 2 * hcode->size - 1));
 	for (size_t i = 0; i < hcode->size; i++) {
 		hcode->tree[i].chr_rank = i;
 		hcode->tree[i].chd[LEFT]     = &hcode->tree[i];
@@ -105,7 +106,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 		bitarr_set_bit(hcode->tree[i].ab_mask, i, 1);
 	}
 
-	binheap *nfheap = binheap_new(&nodefreq_cmp, sizeof(nodefreq));
+	binheap *nfheap = binheap_new(nodefreq_cmp, sizeof(nodefreq));
 	for (size_t i=0; i<hcode->size; i++) {
 		nodefreq nf = {.node =i, .freq=freqs[i]};
 		binheap_push(nfheap, &nf);
@@ -142,8 +143,8 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 {
 	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
-	for (;*src!='\0'; src++) {
-		counts[ab_rank(ab, *src)]++;
+	FOREACH_IN_CSTR(c, src) {
+		counts[ab_rank(ab, c)]++;
 	}
 	huffcode *hc = huffcode_new(ab, counts);
 	FREE(counts);
@@ -151,10 +152,34 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 }
 
 
-huffcode *huffcode_new_from_strread(const alphabet *ab, const strread *reader) 
+huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader) 
 {
 	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
 	for (int c; (c=strread_getc(reader)) != EOF;) {
+		counts[ab_rank(ab, c)]++;
+	}
+	huffcode *hc = huffcode_new(ab, counts);
+	FREE(counts);
+	return hc;
+}
+
+
+huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src)
+{
+	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	FOREACH_IN_XSTR(c, src) {
+		counts[ab_rank(ab, c)]++ ;
+	}
+	huffcode *hc = huffcode_new(ab, counts);
+	FREE(counts);
+	return hc;
+}
+
+
+huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *reader) 
+{
+	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	for (xchar_wt c; (c=xstrread_getc(reader)) != XEOF;) {
 		counts[ab_rank(ab, c)]++;
 	}
 	huffcode *hc = huffcode_new(ab, counts);
@@ -180,7 +205,7 @@ void huffcode_free(huffcode *hcode)
 }
 
 
-void _print_htree(huffcode *hc, hufftnode *node, size_t level, char *code)
+static void _print_htree(const huffcode *hc, const hufftnode *node, size_t level, const char *code)
 {
 	if (node==NULL) return;
 	char *space = cstr_new(4*level);
@@ -218,7 +243,7 @@ void huffcode_print(const huffcode *hcode)
 		break;
 	case INT_TYPE:
 		for (size_t i=0; i<hcode->size; i++) {
-			printf(XCHAR_FMT": ", ab_char(hcode->ab, i) );
+			printf("%"XCHAR_FMT": ", ab_char(hcode->ab, i) );
 			bitvec_print(hcode->code[i], 8);
 		}
 		break;
@@ -227,25 +252,79 @@ void huffcode_print(const huffcode *hcode)
 }
 
 
-bitvec *huffcode_encode(const huffcode *hcode, const char *src, size_t len)
+bitvec *huffcode_encode(const char *src, size_t len, const huffcode *hcode)
 {
 	bitvec *enc = bitvec_new();
-	for (int i=0; i<len; i++) {
-		bitvec_cat(enc, hcode->code[ab_rank(hcode->ab, src[i])]);
-	}
+	huffcode_encode_to(enc, src, len, hcode);
 	return enc;
 }
 
 
-xstr *huffcode_decode(const huffcode *hcode, const bitvec *bcode)
+void huffcode_encode_to(bitvec *dest, const char *src, size_t len, const huffcode *hcode)
+{
+	for (int i=0; i<len; i++) {
+		bitvec_cat(dest, hcode->code[ab_rank(hcode->ab, src[i])]);
+	}
+}
+
+
+bitvec *huffcode_encode_xstr(const xstr *src, const huffcode *hcode)
+{
+	bitvec *enc = bitvec_new();
+	huffcode_encode_xstr_to(enc, src, hcode);
+	return enc;
+}
+
+
+void huffcode_encode_xstr_to(bitvec *dest, const xstr *src, const huffcode *hcode)
+{
+	FOREACH_IN_XSTR(c, src) {
+		bitvec_cat(dest, hcode->code[ab_rank(hcode->ab, c)]);
+	}
+}
+
+
+bitvec *huffcode_encode_strread(strread *src, const huffcode *hcode)
+{
+	bitvec *enc = bitvec_new();
+	huffcode_encode_strread_to(enc, src, hcode);
+	return enc;
+}
+
+
+void huffcode_encode_strread_to(bitvec *dest, strread *src, const huffcode *hcode)
+{
+	for (int c; (c = strread_getc(src)) != EOF;) {
+		bitvec_cat(dest, hcode->code[ab_rank(hcode->ab, c)]);
+	}
+}
+
+
+bitvec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode)
+{
+	bitvec *enc = bitvec_new();
+	huffcode_encode_xstrread_to(enc, src, hcode);
+	return enc;
+}
+
+
+void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src, const huffcode *hcode)
+{
+	for (xchar_wt c; (c = xstrread_getc(src)) != XEOF;) {
+		bitvec_cat(dest, hcode->code[ab_rank(hcode->ab, c)]);
+	}
+}
+
+
+xstr *huffcode_decode(const bitvec *bcode, const huffcode *hcode)
 {
 	xstr *dec = xstr_new(nbytes(ab_size(hcode->ab)));
-	hufftnode *cur = huffcode_tree(hcode);
+	hufftnode *cur = (hufftnode *) huffcode_tree(hcode);
 	for (size_t i=0, l=bitvec_len(bcode); i<l; i++) {
 		cur = cur->chd[bitvec_get_bit(bcode, i)];
 		if (hufftnode_is_leaf(cur)) {
 			xstr_push(dec, ab_char(hcode->ab, cur->chr_rank));
-			cur = huffcode_tree(hcode);
+			cur = (hufftnode *) huffcode_tree(hcode);
 		}
 	}
 	return dec;

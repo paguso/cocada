@@ -42,9 +42,15 @@ void strread_reset(strread *trait)
 }
 
 
-char strread_getc(strread *trait)
+int strread_getc(strread *trait)
 {
 	return trait->vt->getc(trait);
+}
+
+
+size_t strread_read_str(strread *trait, char *dest, size_t n) 
+{
+	return trait->vt->read_str(trait, dest, n);
 }
 
 

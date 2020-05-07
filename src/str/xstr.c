@@ -195,8 +195,12 @@ void xstr_cpy(xstr *dest, const xstr *src)
 void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src,
                 size_t from_src, size_t n )
 {
-	for (size_t i=0; i < n; i++ ) {
+	size_t l = MIN(n, xstr_len(dest)-from_dest);
+	for (size_t i=0; i < l; i++ ) {
 		xstr_set(dest, from_dest + i, xstr_get(src, from_src + i));
+	}
+	for (size_t i=l; i<n; i++) {
+		xstr_push(dest, xstr_get(src, from_src + i));
 	}
 }
 

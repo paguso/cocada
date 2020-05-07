@@ -30,6 +30,7 @@
 #include "new.h"
 #include "strread.h"
 #include "xstr.h"
+#include "xstrread.h"
 
 /**
  * @file huffcode.h
@@ -86,7 +87,24 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_strread(const alphabet *ab, const strread *src);
+huffcode *huffcode_new_from_strread(const alphabet *ab, strread *src);
+
+
+/**
+ * @brief Creates a HC for an alphabet from a source string.
+ * @param ab (no transfer) The base alphabet.
+ * @param src (no transfer( Source string from which letter frequencies are to be estimated.
+ */
+huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src);
+
+
+/**
+ * @brief Creates a HC for an alphabet from a source stream.
+ * @param (no transfer) ab The base alphabet.
+ * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
+ */
+huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *src);
+
 
 
 /**
@@ -104,19 +122,55 @@ void huffcode_print(const huffcode *hcode);
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-bitvec *huffcode_encode(const huffcode *hcode, const char *src, size_t len);
+bitvec *huffcode_encode(const char *src, size_t len, const huffcode *code);
 
 
 /**
- * @brief Encodes a soruce stream into a binary code.
+ * @brief Encodes a string @p src of length @p len to a given destination.
  */
-bitvec *huffcode_encode_strread(const huffcode *hcode, const strread *src);
+void huffcode_encode_to(bitvec *dest, const char *src, size_t len, const huffcode *hcode);
+
+
+/**
+ * @brief Encodes a string @p src of length @p len.
+ */
+bitvec *huffcode_encode_xstr(const xstr *src, const huffcode *code);
+
+
+/**
+ * @brief Encodes a string @p src of length @p len to a given destination.
+ */
+void huffcode_encode_xstr_to(bitvec *dest, const xstr *src, const huffcode *hcode);
+
+
+/**
+ * @brief Encodes a source stream into a binary code.
+ */
+bitvec *huffcode_encode_strread(strread *src, const huffcode *hcode);
+
+
+/**
+ * @brief Encodes a source stream to a given destination.
+ */
+void huffcode_encode_strread_to(bitvec *dest, strread *src, const huffcode *hcode);
+
+
+/**
+ * @brief Encodes a source stream into a binary code.
+ */
+bitvec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode);
+
+
+/**
+ * @brief Encodes a source stream to a given destination.
+ */
+void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src, const huffcode *hcode);
 
 
 /**
  * @brief Decodes a binary code to a string.
  */
-xstr *huffcode_decode(const huffcode *hcode, const bitvec *code);
+xstr *huffcode_decode(const bitvec *code, const huffcode *hcode);
 
 
 /**

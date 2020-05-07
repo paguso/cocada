@@ -33,16 +33,20 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "bytearr.h"
-#include "new.h"
 #include "csrsbitarray.h"
 #include "cstrutil.h"
-#include "vec.h"
-#include "strbuf.h"
 #include "hashmap.h"
 #include "huffcode.h"
 #include "mathutil.h"
+#include "new.h"
 #include "stack.h"
+#include "strbuf.h"
+#include "strread.h"
+#include "strreader.h"
+#include "vec.h"
 #include "wavtree.h"
+#include "xstrread.h"
+#include "xstrreader.h"
 
 
 /****************************************************************************
@@ -55,7 +59,7 @@ static const byte_t RIGHT = 0x1;
 static const bitvec *NULL_CODE = NULL;
 
 typedef struct {
-	bitvec *code;
+	const bitvec *code;
 	size_t pos;
 } charcode_iter;
 
@@ -155,7 +159,7 @@ static void tmp_wtnode_free(tmp_wtnode *node)
 }
 
 
-static tmp_wavtree *tmp_wavtree_new(alphabet *ab, bool own_alphabet)
+static tmp_wavtree *tmp_wavtree_new(const alphabet *ab, bool own_alphabet)
 {
 	tmp_wavtree *twt = NEW(tmp_wavtree);
 	twt->ab       = ab;
@@ -212,10 +216,10 @@ static tmp_wavtree *tmp_wt_init_bal(alphabet *ab, bool own_ab)
 // Requires: node!=NULL
 //           htnode not a leaf
 static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
-                               hufftnode *htnode, huffcode *hcode )
+                               const hufftnode *htnode, const huffcode *hcode )
 {
 	for (byte_t dir=LEFT; dir<=RIGHT; dir++) {
-		hufftnode *chd = ( (dir==LEFT) ? hufftnode_left(htnode) :
+		const hufftnode *chd = ( (dir==LEFT) ? hufftnode_left(htnode) :
 		                   hufftnode_right(htnode) );
 		if (hufftnode_is_leaf(chd)) {
 			size_t crk = hufftnode_char_rank(chd);
@@ -232,9 +236,9 @@ static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
 
 
 // requires hcode != NULL
-static tmp_wavtree *tmp_wt_init_huff(huffcode *hcode, bool own_ab)
+static tmp_wavtree *tmp_wt_init_huff(const huffcode *hcode, bool own_ab)
 {
-	alphabet *hc_ab = huffcode_ab(hcode);
+	const alphabet *hc_ab = huffcode_ab(hcode);
 	tmp_wavtree *twt = tmp_wavtree_new(hc_ab, own_ab);
 	twt->nchars = ab_size(hc_ab);
 	// tmp_wt has at least one empty root node
@@ -263,7 +267,7 @@ static void tmp_wt_free(tmp_wavtree *twt)
 }
 
 
-static void tmp_wt_app_char(tmp_wtnode *root, bitvec *chcode)
+static void tmp_wt_app_char(tmp_wtnode *root, const bitvec *chcode)
 {
 	charcode_iter codeit = {.code=chcode, .pos=0 };
 	byte_t bit;
@@ -302,10 +306,10 @@ static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, bitvec *chcode)
 }
 
 
-static void tmp_wt_fill( tmp_wavtree *twt, strstream *sst )
+static void tmp_wt_fill( tmp_wavtree *twt, xstrread *rdr )
 {
-	strstream_reset(sst);
-	for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
+	xstrread_reset(rdr);
+	for (xchar_wt c; (c=xstrread_getc(rdr)) != XEOF;) {
 		tmp_wt_app_char( twt->tmp_root, get_charcode(twt->chrcodes, c) );
 		(twt->len)++;
 	}
@@ -313,13 +317,12 @@ static void tmp_wt_fill( tmp_wavtree *twt, strstream *sst )
 
 
 // online construction only available for CHAR_TYPE alphabets
-static void tmp_wt_fill_online( tmp_wavtree *twt, strstream *sst )
+static void tmp_wt_fill_online( tmp_wavtree *twt, strread *src )
 {
-	bitvec *chcode;
-	strbuf *ab_chars = strbuf_new_with_capacity(UCHAR_MAX);
-	strstream_reset(sst);
-	for (xchar_t c; (c=strstream_getc(sst))!=XEOF;) {
-		chcode = get_charcode(twt->chrcodes, c);
+	strbuf *ab_chars = strbuf_new();
+	strread_reset(src);
+	for (int c; (c=strread_getc(src))!=EOF;) {
+		bitvec *chcode = (bitvec *) get_charcode(twt->chrcodes, c);
 		if (chcode != NULL_CODE) {
 			tmp_wt_app_char(twt->tmp_root, chcode);
 		} else {
@@ -533,24 +536,23 @@ static wavtree *wt_build_from_tmp( tmp_wavtree *twt, wtshape shape )
 }
 
 
-static wavtree *wt_build( alphabet *ab, strstream *sst,
+static wavtree *wt_build( alphabet *ab, xstrread *rdr,
                           wtshape shape )
 {
 	tmp_wavtree *twt;
 	switch (shape) {
 	case WT_BALANCED:
 		twt =  tmp_wt_init_bal(ab, ab==NULL);
-		tmp_wt_fill(twt, sst);
 		break;
 	case WT_HUFFMAN:
 		;
 		huffcode *hcode;
-		hcode = huffcode_new_from_stream(ab, sst);
+		hcode = huffcode_new_from_xstrread(ab, rdr);
 		//huffcode_print(hcode);
 		twt = tmp_wt_init_huff(hcode, ab==NULL);
-		tmp_wt_fill(twt, sst);
 		break;
 	}
+	tmp_wt_fill(twt, rdr);
 	wavtree *wt = wt_build_from_tmp(twt, shape);
 	wt->shape = shape;
 	tmp_wt_free(twt);
@@ -558,34 +560,34 @@ static wavtree *wt_build( alphabet *ab, strstream *sst,
 }
 
 
-wavtree *wavtree_new ( alphabet *ab, char *str, size_t len, wtshape shape )
+wavtree *wavtree_new( alphabet *ab, char *str, size_t len, wtshape shape )
 {
-	strstream *sst = strstream_open_str(str, len);
-	wavtree *wt = wt_build(ab, sst, shape);
-	strstream_close(sst);
+	xstrreader *rdr = xstrreader_open_str(str, len);
+	wavtree *wt = wt_build(ab, xstrreader_as_xstrread(rdr), shape);
+	xstrreader_close(rdr);
 	return wt;
 }
 
 
 wavtree *wavtree_new_from_xstr( alphabet *ab, xstr *str, wtshape shape )
 {
-	strstream *sst = strstream_open_xstr(str);
-	wavtree *wt = wt_build(ab, sst, shape);
-	strstream_close(sst);
+	xstrreader *rdr = xstrreader_open(str);
+	wavtree *wt = wt_build(ab, xstrreader_as_xstrread(rdr), shape);
+	xstrreader_close(rdr);
 	return wt;
 }
 
-wavtree *wavtree_new_from_stream( alphabet *ab, strstream *sst, wtshape shape )
+
+wavtree *wavtree_new_from_reader( alphabet *ab, xstrread *src, wtshape shape )
 {
-	return wt_build( ab, sst, shape);
+	return wt_build( ab, src, shape);
 }
 
 
-wavtree *wavtree_new_online( strstream *sst )
+wavtree *wavtree_new_online( strread *src )
 {
-	assert (strstream_sizeof_char(sst) == sizeof(char));
 	tmp_wavtree *twt =  tmp_wt_init_bal(NULL, true);
-	tmp_wt_fill_online(twt, sst);
+	tmp_wt_fill_online(twt, src);
 	wavtree *wt = wt_build_from_tmp(twt, WT_BALANCED);
 	wt->shape = WT_BALANCED;
 	tmp_wt_free(twt);
@@ -737,11 +739,11 @@ void _wt_node_print(wavtree *wt, size_t cur, size_t depth)
 		printf ("%slen: %zu\n", margin, wt->nodes[cur].len);
 		printf ("%soffset: %zu\n", margin, wt->nodes[cur].offset);
 		if (!(wt->nodes[cur].has_chd & (0x1) )) // no left chd
-			printf ( "%schar[0]: "XCHAR_FMT" (%c)\n", margin,
+			printf ( "%schar[0]: %"XCHAR_FMT" (%c)\n", margin,
 			         wt->nodes[cur].cc[LEFT].chr,
 			         (char)wt->nodes[cur].cc[LEFT].chr );
 		if (!(wt->nodes[cur].has_chd & (0x2) )) // no right chd
-			printf ( "%schar[1]: "XCHAR_FMT" (%c)\n", margin,
+			printf ( "%schar[1]: %"XCHAR_FMT" (%c)\n", margin,
 			         wt->nodes[cur].cc[RIGHT].chr,
 			         (char)wt->nodes[cur].cc[RIGHT].chr  );
 		if (wt->nodes[cur].has_chd & (0x1) ) // has left chd
@@ -763,10 +765,10 @@ void wavtree_print(wavtree *wt)
 	//csrsbitarr_print(wt->bitarr, 4);
 	if (ab_type(wt->ab)==CHAR_TYPE) {
 		printf ("  char codes:\n");
-		bitvec *code;
 		strbuf *codestr = strbuf_new_with_capacity(2);
 		for (xchar_t c=0; c<=UCHAR_MAX; c++) {
-			if ((code=get_charcode(wt->chrcodes, c)) != NULL_CODE) {
+			const bitvec *code = get_charcode(wt->chrcodes, c);
+			if (code != NULL_CODE) {
 				strbuf_clear(codestr);
 				bitvec_to_string(code, codestr, 4);
 				printf("charcode %c:\n%s\n", (char)c, strbuf_as_str(codestr));

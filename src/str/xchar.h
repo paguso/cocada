@@ -25,6 +25,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 /**
  * @file xchar.h
@@ -60,33 +61,38 @@
 
 #warning "Undefined XCHAR_BYTESIZE. Setting to default = 4 (32 bits)"
 #define XCHAR_BYTESIZE 4
-typedef int32_t  xchar_t;
+typedef int32_t   xchar_t;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
+typedef int32_t   xchar_wt; // xchar wrapper type
 
 #elif XCHAR_BYTESIZE == 1
 
 typedef int8_t   xchar_t;
 #define XCHAR_MAX INT8_MAX
 #define XCHAR_FMT PRId8
+typedef int32_t   xchar_wt; // xchar wrapper type
 
 #elif XCHAR_BYTESIZE == 2
 
 typedef int16_t  xchar_t;
 #define XCHAR_MAX INT16_MAX
 #define XCHAR_FMT PRId16
+typedef int32_t   xchar_wt; // xchar wrapper type
 
 #elif XCHAR_BYTESIZE == 4
 
 typedef int32_t  xchar_t;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
+typedef int32_t   xchar_wt; // xchar wrapper type
 
 #elif XCHAR_BYTESIZE == 8
 
 typedef int64_t  xchar_t;
 #define XCHAR_MAX INT64_MAX
 #define XCHAR_FMT PRId64
+typedef int64_t   xchar_wt; // xchar wrapper type
 
 #else 
 
@@ -104,7 +110,7 @@ typedef int32_t  xchar_t;
 /**
  * @deprecated Should be removed. No direct connexion with I/O assumed.
  */
-#define XEOF (-1)
+#define XEOF ((xchar_wt)EOF)
 
 
 #endif // XCHAR_BYTESIZE

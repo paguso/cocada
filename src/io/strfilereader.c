@@ -44,7 +44,7 @@ static void _reset(strread *self)
 }
 
 
-static char _getc(strread *self)
+static int _getc(strread *self)
 {
 	return fgetc( ((strfilereader *)self->impltor)->src );
 }
