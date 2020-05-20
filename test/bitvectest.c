@@ -51,7 +51,7 @@ void bitvec_test_append(CuTest *tc)
 		CuAssertIntEquals(tc, array[i], bit);
 	}
 	//printf(".");
-	FREE(bv, bitvec);
+	bitvec_free(bv);
 	FREE(array);
 }
 
@@ -76,7 +76,7 @@ void bitvec_test_append_n(CuTest *tc)
 		bit = bitvec_get_bit(bv, i);
 		CuAssertIntEquals(tc, array[i], bit);
 	}
-	FREE(bv, bitvec);
+	bitvec_free(bv);
 	FREE(array);
 }
 
@@ -98,7 +98,7 @@ void bitvec_test_count(CuTest *tc)
 	    size_t c1 = bitvec_count(bv, 1);
 	    CuAssertIntEquals(tc, counts[1], c1);
 	*/
-	FREE(bv, bitvec);
+	bitvec_free(bv);
 }
 
 

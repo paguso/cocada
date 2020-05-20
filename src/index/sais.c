@@ -278,8 +278,8 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 	//PRINT_ARR(sarr, SA, %zu, 0, len+1, 10);
 
 	// clean up
-	FREE(ls, bitvec);
-	FREE(lms, bitvec);
+	bitvec_free(ls);
+	bitvec_free(lms);
 	FREE(bkts);
 	FREE(offsets);
 }

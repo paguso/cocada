@@ -154,7 +154,7 @@ static void tmp_wtnode_free(tmp_wtnode *node)
 	if (node == NULL) return;
 	tmp_wtnode_free(node->chd[LEFT]);
 	tmp_wtnode_free(node->chd[RIGHT]);
-	FREE(node->bv, bitvec);
+	bitvec_free(node->bv);
 	FREE(node);
 }
 

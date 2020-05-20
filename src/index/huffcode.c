@@ -132,10 +132,11 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	//assert(next==(2*hcode->size-1));
 
 	hcode->code = NEW_ARR(bitvec*, hcode->size);
-	byte_t *chrcode = bitarr_new(hcode->size);
-	if (hcode->size>0)
+	if (hcode->size) {
+		byte_t *chrcode = bitarr_new(hcode->size);
 		fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
-	FREE(chrcode);
+		FREE(chrcode);
+	}
 	return hcode;
 }
 
@@ -193,7 +194,8 @@ void huffcode_free(huffcode *hcode)
 	if (hcode==NULL) return;
 	alphabet_free(hcode->ab);
 	for (size_t i=0; i<hcode->size; i++) {
-		FREE(hcode->code[i], bitvec); // no null codes
+		//FREE(hcode->code[i], bitvec); // no null codes
+		bitvec_free(hcode->code[i]);
 	}
 	FREE(hcode->code);
 	for (size_t i=0; hcode->size>0 && i<(2*hcode->size)-1; i++) {

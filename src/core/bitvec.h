@@ -77,10 +77,9 @@ bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
 
 
 /**
- * @brief Finaliser
- * @see new.h
+ * @brief Destructor
  */
-void bitvec_dtor(void *bv, const dtor *unused);
+void bitvec_free(bitvec *bv);
 
 
 /**
