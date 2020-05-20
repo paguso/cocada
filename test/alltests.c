@@ -82,11 +82,11 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, tvec_get_test_suite());
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
-	//CuSuiteAddSuite(suite, huffcode_get_test_suite());
+	CuSuiteAddSuite(suite, huffcode_get_test_suite());
 	//CuSuiteAddSuite(suite, queue_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strstream_get_test_suite());
-	CuSuiteAddSuite(suite, xstr_get_test_suite());
+	//CuSuiteAddSuite(suite, xstr_get_test_suite());
 
 
 	//CuSuiteAddSuite(suite, dbgraph_get_test_suite());

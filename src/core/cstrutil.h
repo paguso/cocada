@@ -88,7 +88,7 @@ char *cstr_crop(char *str, size_t from,  size_t to);
 
 
 /**
- * @brief Same as cstr_crop(@p str, 0, @plen)
+ * @brief Same as cstr_crop(@p str, 0, @p len)
  */
 char *cstr_crop_len(char *str, size_t len);
 
@@ -109,7 +109,7 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
 
 /**
  * @brief resizes the string to a given length @p len.
- * If @len is less than the current string length, this is equivalent
+ * If @p len is less than the current string length, this is equivalent
  * to `cstr_trim(str, 0, len)`. Else, the string is enlarged to
  * have physical length @p len+1, i.e. with trailing positions
  * set to '\0'.

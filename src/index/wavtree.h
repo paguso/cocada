@@ -88,7 +88,7 @@ wavtree *wavtree_new_from_reader(alphabet *ab, xstrread *src, wtshape shape);
  * @param shape The WT shape.
  * @param layout The WT memory layout.
  */
-wavtree *wavtree_new_from_xstr( alphabet *ab, xstr *src, wtshape shape );
+wavtree *wavtree_new_from_xstr(alphabet *ab, xstr *src, wtshape shape);
 
 /**
  * @brief Create a balanced wavelet tree from a stream with unknown alphabet
@@ -96,7 +96,7 @@ wavtree *wavtree_new_from_xstr( alphabet *ab, xstr *src, wtshape shape );
  * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*, 
  * 16th Int´l Symposium on Experimental Algorithms (SEA 2017), London, UK.
  */
-wavtree *wavtree_new_online( strread *src );
+wavtree *wavtree_new_online(strread *src);
 
 
 /**

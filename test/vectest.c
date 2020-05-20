@@ -365,8 +365,7 @@ void test_vec_free(CuTest *tc)
 		vec_push(v, &c);
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
-
-	DESTROY(v,  dtor_cons  ( DTOR(vec),  dtor_cons ( ptr_dtor(),  dtor_cons ( DTOR(vec), ptr_dtor() ) ) )   ) ;
+	DESTROY(v,  dtor_cons(DTOR(vec), dtor_cons (ptr_dtor(),dtor_cons (DTOR(vec), ptr_dtor())))) ;
 }
 
 void test_vec_flat_free(CuTest *tc)

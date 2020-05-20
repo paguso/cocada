@@ -127,7 +127,7 @@ void xstr_clear(xstr *xs);
 
 
 /**
- * @brief Rotates the xstr @npos positions to the left.
+ * @brief Rotates the xstr @p npos positions to the left.
  * Example: `xstr_rotate_left(s="abcdefg",3) -> s="defgabc"`
  */
 void xstr_rot_left(xstr *xs, size_t npos);
@@ -161,7 +161,7 @@ size_t xstr_sizeof_char(const xstr *xs);
 
 /**
  * @brief Returns the char at a specified position.
- * @warn  No out-of-bounds verification is assumed.
+ * @warning  No out-of-bounds verification is assumed.
  */
 xchar_t xstr_get(const xstr *xs, size_t pos);
 
@@ -177,8 +177,8 @@ void xstr_set(xstr *xs, size_t pos, xchar_t val);
 
 /**
  * @brief Sets the first n chars to a specified value
- * @warn  No out-of-bounds verification is assumed.
- * @warn  May result in information loss if the internal representation uses a
+ * @warning  No out-of-bounds verification is assumed.
+ * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
 void xstr_nset(xstr *xs, size_t n, xchar_t val);
@@ -186,7 +186,7 @@ void xstr_nset(xstr *xs, size_t n, xchar_t val);
 
 /**
  * @brief Appends a new char to a xstr.
- * @warn  May result in information loss if the internal representation uses a
+ * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
 void xstr_push(xstr *xs, xchar_t c);
@@ -194,7 +194,7 @@ void xstr_push(xstr *xs, xchar_t c);
 
 /**
  * @brief Appends @p n copies of char @p to the string.
- * @warn  May result in information loss if the internal representation uses a
+ * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
 void xstr_push_n(xstr *xs, xchar_t c, size_t n);
@@ -202,7 +202,7 @@ void xstr_push_n(xstr *xs, xchar_t c, size_t n);
 
 /**
  * @brief Concatenates (copies) the contents of @p src at the end of @p dest.
- * @warn  Requires that both xstrs have the same character byte size.
+ * @warning  Requires that both xstrs have the same character byte size.
  */
 void xstr_cat(xstr *dest, const xstr *src);
 
@@ -223,9 +223,9 @@ void xstr_cpy(xstr *dest, const xstr *src);
  *        @p dest[@p from_dest : @p from_dest + @p nxchars].
  *        Source and destination may not overlap.
  *
- * @warn Assumes without verification that both xstrs have the same internal
+ * @warning Assumes without verification that both xstrs have the same internal
  *       character bytesize.
- * @warn The destination must be large enough, or a buffer overrun will occur.
+ * @warning The destination must be large enough, or a buffer overrun will occur.
  *       No out-of-bounds verification is performed.
  */
 void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src, size_t from_src, size_t n );

@@ -23,13 +23,13 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/time.h>
 
 #include "SFMT.h"
-
+#include "coretype.h"
 #include "bitbyte.h"
 #include "randutil.h"
-#include "string.h"
 
 
 static sfmt_t _rng;
@@ -59,6 +59,7 @@ uint64_t rand_next ()
 }
 
 
+
 #define RAND_RANGE_IMPL( TYPE )\
 TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
     assert(r >= l);\
@@ -86,20 +87,8 @@ void shuffle_arr_##TYPE(TYPE *arr, size_t n) {\
 }
 
 
-#define RAND_ALL_IMPL(TYPE) \
+#define RAND_ALL_IMPL(TYPE, ...) \
 RAND_RANGE_IMPL(TYPE) \
 SHUFFLE_ARR_IMPL(TYPE)
 
-
-RAND_ALL_IMPL(short);
-RAND_ALL_IMPL(int);
-RAND_ALL_IMPL(long);
-RAND_ALL_IMPL(size_t);
-RAND_ALL_IMPL(int8_t);
-RAND_ALL_IMPL(int16_t);
-RAND_ALL_IMPL(int32_t);
-RAND_ALL_IMPL(int64_t);
-RAND_ALL_IMPL(uint8_t);
-RAND_ALL_IMPL(uint16_t);
-RAND_ALL_IMPL(uint32_t);
-RAND_ALL_IMPL(uint64_t);
+XX_INT_PRIM_CORETYPES(RAND_ALL_IMPL)

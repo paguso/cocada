@@ -31,6 +31,7 @@
 #include "huffcode.h"
 #include "mathutil.h"
 #include "xstr.h"
+#include "randutil.h"
 
 
 void test_huffcode_new(CuTest *tc)
@@ -46,8 +47,7 @@ void test_huffcode_new(CuTest *tc)
 
 static void _random_str(char *dest, alphabet *ab, size_t len)
 {
-	for (size_t i=0; i<len; dest[i++] = ab_char(ab, rand()%ab_size(ab)));
-
+	for (size_t i=0; i<len; dest[i++] = ab_char(ab, rand_range_size_t(0, ab_size(ab))));
 }
 
 

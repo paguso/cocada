@@ -25,6 +25,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * @file randutil.h
+ * @author Paulo Fonseca
+ * @brief Random number generation utility functions
+ */
+
 
 /**
  * Returns a randomly generated 64-bit unsigned integer
@@ -32,10 +38,14 @@
 uint64_t rand_next ();
 
 
-/**
- * Equiprobably picks a random element in the range \@p min..\@p max-1.
+/*
+ * Generic rand_range declaration
  */
+
+
+
 #define RAND_RANGE_DECL(TYPE)\
+/** Returns a uniformly picked TYPE random number in the range @p min to @p max-1*/\
 TYPE rand_range_##TYPE(TYPE min, TYPE max);
 
 
@@ -46,26 +56,22 @@ TYPE rand_range_##TYPE(TYPE min, TYPE max);
 void shuffle_arr(void *arr, size_t n, size_t typesize);
 
 
+/*
+ * Generic shuffle_arr declaration
+ */
+
+
+
 #define SHUFFLE_ARR_DECL(TYPE)\
+/** Suffles an array of @p n TYPE elements in place */\
 void shuffle_arr_##TYPE(TYPE *arr, size_t n);
 
 
-#define RAND_ALL_DECL(TYPE)\
+#define RAND_ALL_DECL(TYPE, ...)\
 SHUFFLE_ARR_DECL(TYPE)\
 RAND_RANGE_DECL(TYPE)
 
+XX_INT_PRIM_CORETYPES(RAND_ALL_DECL)
 
-RAND_ALL_DECL(short)
-RAND_ALL_DECL(int)
-RAND_ALL_DECL(long)
-RAND_ALL_DECL(size_t)
-RAND_ALL_DECL(int8_t)
-RAND_ALL_DECL(int16_t)
-RAND_ALL_DECL(int32_t)
-RAND_ALL_DECL(int64_t)
-RAND_ALL_DECL(uint8_t)
-RAND_ALL_DECL(uint16_t)
-RAND_ALL_DECL(uint32_t)
-RAND_ALL_DECL(uint64_t)
 
 #endif
