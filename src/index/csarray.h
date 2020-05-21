@@ -60,7 +60,7 @@ void csarray_free(csarray *csa);
 /**
  * @brief Print the CSA to the standard output.
  */
-void csarray_print(csarray *csa);
+void csarray_print(FILE *stream, csarray *csa);
 
 
 /**

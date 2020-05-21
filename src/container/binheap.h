@@ -82,7 +82,7 @@ binheap *binheap_new(cmp_func cmp, size_t typesize);
  * @brief Finaliser
  * @see new.h
  */
-void binheap_dtor(void *ptr, const dtor *dst);
+void binheap_dtor(void *ptr, const dtor *dt);
 
 
 /**

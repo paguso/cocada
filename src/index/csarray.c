@@ -206,20 +206,20 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 
 
-void csarray_print(csarray *csa)
+void csarray_print(FILE *stream, csarray *csa)
 {
 	if (csa==NULL) return;
-	printf ("csarray@%p {\n", csa);
-	printf ("\tlen:%zu\n", csa->lvl_len[0]);
-	printf ("\tlevels:%zu\n", csa->nlevels);
+	fprintf (stream, "csarray@%p {\n", csa);
+	fprintf (stream, "\tlen:%zu\n", csa->lvl_len[0]);
+	fprintf (stream, "\tlevels:%zu\n", csa->nlevels);
 	for (size_t lvl=0; lvl<csa->nlevels-1; lvl++) {
-		printf("\t--- LEVEL %zu ---\n", lvl);
-		printf("\teven_bv[%zu]:\n\t", lvl);
-		bitarr_print( csrsbitarr_data(csa->even_bv[lvl]),
+		fprintf(stream, "\t--- LEVEL %zu ---\n", lvl);
+		fprintf(stream, "\teven_bv[%zu]:\n\t", lvl);
+		bitarr_print( stream,  csrsbitarr_data(csa->even_bv[lvl]),
 		              csrsbitarr_len(csa->even_bv[lvl]), 10 );
 		//csrsbitarr_print(csa->even_bv[lvl], 4);
-		printf("\tchar_stop_bv[%zu]:\n\t", lvl);
-		bitarr_print( csrsbitarr_data(csa->char_stop_bv[lvl]),
+		fprintf(stream, "\tchar_stop_bv[%zu]:\n\t", lvl);
+		bitarr_print( stream,  csrsbitarr_data(csa->char_stop_bv[lvl]),
 		              csrsbitarr_len(csa->char_stop_bv[lvl]), 10 );
 		//csrsbitarr_print(csa->char_stop_bv[lvl], 4);
 		//printf("\tphi_wt[%zu]: ", lvl);
@@ -230,9 +230,9 @@ void csarray_print(csarray *csa)
 		//printf("%s\n", strbuf_as_str(phi));
 		//strbuf_free(phi);
 	}
-	PRINT_ARR(csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
-	PRINT_ARR(csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
-	printf ("} #end of csarray@%p\n", csa);
+	FPRINT_ARR(stream, csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
+	FPRINT_ARR(stream, csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
+	fprintf (stream, "} #end of csarray@%p\n", csa);
 
 }
 

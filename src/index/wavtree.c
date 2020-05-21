@@ -422,7 +422,7 @@ static void tmp_wavtree_init_veb_layout( tmp_wavtree *twt )
 }
 
 
-static void tmp_wtnode_print(tmp_wtnode *node, size_t depth)
+static void tmp_wtnode_print(FILE *stream, tmp_wtnode *node, size_t depth)
 {
 	size_t i;
 	char *margin = cstr_new(2*depth+2);
@@ -435,21 +435,21 @@ static void tmp_wtnode_print(tmp_wtnode *node, size_t depth)
 	if (node==NULL) {
 		printf ("%s@tmp_wtree_node NULL\n",margin);
 	} else {
-		printf ("%s@tmp_wtree_node %p\n",margin, node);
-		printf ("%ssize: %zu\n", margin, bitvec_len(node->bv));
-		printf ("%snxt_chd: %c\n",margin, node->nxt_chd?'1':'0');
-		printf ("%sbits: \n", margin);
-		bitvec_print(node->bv, 8);
-		tmp_wtnode_print(node->chd[LEFT], depth+1);
-		tmp_wtnode_print(node->chd[RIGHT], depth+1);
+		printf (stream, "%s@tmp_wtree_node %p\n",margin, node);
+		printf (stream, "%ssize: %zu\n", margin, bitvec_len(node->bv));
+		printf (stream, "%snxt_chd: %c\n",margin, node->nxt_chd?'1':'0');
+		printf (stream, "%sbits: \n", margin);
+		bitvec_print(stream, node->bv, 8);
+		tmp_wtnode_print(stream, node->chd[LEFT], depth+1);
+		tmp_wtnode_print(stream, node->chd[RIGHT], depth+1);
 	}
 }
 
 
-static void tmp_wt_print(tmp_wavtree *twt)
+static void tmp_wt_print(FILE *stream, tmp_wavtree *twt)
 {
-	printf ("tmp_wavtree@%p\n",twt);
-	tmp_wtnode_print(twt->tmp_root, 0);
+	fprintf (stream, "tmp_wavtree@%p\n",twt);
+	tmp_wtnode_print(stream, twt->tmp_root, 0);
 }
 
 

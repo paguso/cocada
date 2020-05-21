@@ -24,6 +24,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -81,7 +82,7 @@ void bitarr_set_bit(byte_t *ba, size_t pos, bool bit_val);
  * @param nbits The total number of bits.
  * @param bytes_per_line The number of bytes per line.
  */
-void bitarr_print( const byte_t *ba, size_t nbits,
+void bitarr_print( FILE *stream, const byte_t *ba, size_t nbits,
                    size_t bytes_per_line );
 
 

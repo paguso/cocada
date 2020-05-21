@@ -28,23 +28,42 @@
 #include "alphabet.h"
 #include "arrutil.h"
 #include "bitbyte.h"
+#include "errlog.h"
 #include "new.h"
 #include "mathutil.h"
-#include "vec.h"
 #include "xstr.h"
 
 
+
 struct _xstr {
-	vec *buf;
+	void *buf;
+	size_t len;
+	size_t cap;
+	size_t sizeof_char;
 };
+
+
+#define MIN_CAP 4
+#define GROWBY 1.66f
+
+
+static void check_and_resize_by(xstr *xs, size_t n) {
+	size_t new_cap = MAX(MIN_CAP, xs->cap);
+	while (new_cap - xs->len < n + 1) {
+		new_cap *= GROWBY;
+	}
+	if (new_cap != xs->cap) {
+		xs->buf = realloc(xs->buf, new_cap * xs->sizeof_char);
+		memset( xs->buf + (xs->cap * xs->sizeof_char), '\0', 
+				(new_cap - xs->cap) * xs->sizeof_char );
+		xs->cap = new_cap;
+	}
+}
 
 
 xstr *xstr_new(size_t sizeof_char)
 {
-	assert(sizeof_char<=XCHAR_BYTESIZE);
-	xstr *ret = NEW(xstr);
-	ret->buf = vec_new(sizeof_char);
-	return ret;
+	return xstr_new_with_capacity(sizeof_char, MIN_CAP);
 }
 
 
@@ -52,7 +71,10 @@ xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
 {
 	assert(sizeof_char<=XCHAR_BYTESIZE);
 	xstr *ret = NEW(xstr);
-	ret->buf = vec_new_with_capacity(sizeof_char, cap);
+	ret->sizeof_char = sizeof_char;
+	ret->len = 0;
+	ret->cap = MAX(MIN_CAP, cap);
+	ret->buf = calloc(ret->cap, sizeof_char);
 	return ret;
 }
 
@@ -60,7 +82,11 @@ xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
 xstr *xstr_new_from_arr(void *src, size_t len, size_t sizeof_char)
 {
 	xstr *ret = NEW(xstr);
-	ret->buf = vec_new_from_arr(src, len, sizeof_char);
+	ret->sizeof_char = sizeof_char;
+	ret->len = len;
+	ret->cap = len;
+	ret->buf = realloc(src, len * sizeof_char);
+	check_and_resize_by(ret, 0); // add at least one trailing \0
 	return ret;
 }
 
@@ -68,9 +94,15 @@ xstr *xstr_new_from_arr(void *src, size_t len, size_t sizeof_char)
 xstr *xstr_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
 {
 	xstr *ret = NEW(xstr);
-	ret->buf = vec_new_from_arr_cpy(src, len, sizeof_char);
+	ret->sizeof_char = sizeof_char;
+	ret->len = len;
+	ret->cap = len;
+	ret->buf = malloc(len * sizeof_char);
+	memcpy(ret->buf, src, len * sizeof_char);
+	check_and_resize_by(ret, 0); 
 	return ret;
 }
+
 
 
 void xstr_free(xstr *xs)
@@ -81,16 +113,16 @@ void xstr_free(xstr *xs)
 }
 
 
-void xstr_print(const xstr *xs)
+void xstr_print(FILE *stream, const xstr *xs)
 {
-	printf("xstr@%p {\n", xs);
-	printf("  len : %zu\n", vec_len(xs->buf));
-	printf("  sizeof_char: %zu\n", vec_typesize(xs->buf));
-	printf("  str: ");
-	for (size_t i=0, l=vec_len(xs->buf); i < l; i++) {
-		printf(XCHAR_FMT"%s", xstr_get(xs, i), (i < l-1) ? "-" : "");
+	fprintf(stream, "xstr@%p {\n", xs);
+	fprintf(stream, "  len : %zu\n", xstr_len(xs));
+	fprintf(stream, "  sizeof_char: %zu\n", xstr_sizeof_char(xs) );
+	fprintf(stream, "  str: ");
+	for (size_t i=0, l=xs->len; i < l; i++) {
+		fprintf(stream, XCHAR_FMT"%s", xstr_get(xs, i), (i < l-1) ? "-" : "");
 	}
-	printf("} # end of xstr@%p\n", xs);
+	fprintf(stream, "} # end of xstr@%p\n", xs);
 }
 
 
@@ -118,9 +150,9 @@ xchar_t xstr_get(const xstr *xs, size_t pos)
 {
 	xchar_t ret = 0;
 #if ENDIANNESS==LITTLE
-	memcpy(&ret, vec_get(xs->buf, pos), xstr_sizeof_char(xs));
+	memcpy(&ret, xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	memcpy((&ret + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)), vec_get(xs->buf, pos), xstr_sizeof_char(xs));
+	memcpy(&ret + (XCHAR_BYTESIZE - xs->sizeof_char), xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #endif
 	return ret;
 }
@@ -129,16 +161,16 @@ xchar_t xstr_get(const xstr *xs, size_t pos)
 void xstr_set(xstr *xs, size_t pos, xchar_t val)
 {
 #if ENDIANNESS==LITTLE
-	vec_set(xs->buf, pos, &val);
+	memcpy(xs->buf + (pos * xs->sizeof_char), &val, xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	vec_set(xs->buf, pos, &val + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)));
+	memcpy(xs->buf + (pos * xs->sizeof_char), &val + (XCHAR_BYTESIZE - xs->sizeof_char));
 #endif
 }
 
 
 void xstr_nset(xstr *xs, size_t n, xchar_t val)
 {
-	size_t l = MIN(vec_len(xs->buf), n);
+	size_t l = MIN(xstr_len(xs), n);
 	for (size_t i=0; i<l; i++) {
 		xstr_set(xs, i, val);
 	}
@@ -148,41 +180,45 @@ void xstr_nset(xstr *xs, size_t n, xchar_t val)
 }
 
 
-size_t xstr_len(const xstr *xs)
+inline size_t xstr_len(const xstr *xs)
 {
-	return vec_len(xs->buf);
+	return xs->len;
 }
 
 
-size_t xstr_sizeof_char(const xstr *xs)
+inline size_t xstr_sizeof_char(const xstr *xs)
 {
-	return vec_typesize(xs->buf);
+	return xs->sizeof_char;
 }
 
 
 void xstr_push(xstr *xs, xchar_t c)
 {
-#if ENDIANNESS==LITTLE
-	vec_push(xs->buf, &c);
-#elif ENDIANNESS==BIG
-	vec_push(xs->buf, &c + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)));
-#endif
+	xstr_push_n(xs, c, 1);
 }
 
 
 void xstr_push_n(xstr *xs, xchar_t c, size_t n)
 {
+	check_and_resize_by(xs, n);
+	void *last = xs->buf + (xs->len * xs->sizeof_char);
+	for (size_t i=0; i<n; i++, last += xs->sizeof_char) {
 #if ENDIANNESS==LITTLE
-	vec_push_n(xs->buf, &c, n);
+		memcpy(last, &c, xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	vec_push_n(xs->buf, &c + (XCHAR_BYTESIZE - xstr_sizeof_char(xs)), n);
+		memcpy(last, &c + (XCHAR_BYTESIZE - xs->sizeof_char), xs->sizeof_char);
 #endif
+	}
+	xs->len += n;
 }
 
 
 void xstr_cat(xstr *dest, const xstr *src)
 {
-	vec_cat(dest->buf, src->buf);
+	check_and_resize_by(dest, src->len);
+	memcpy(	dest->buf + (dest->len * dest->sizeof_char), src->buf,
+			src->len * src->sizeof_char );
+	dest->len += src->len;
 }
 
 
@@ -207,31 +243,46 @@ void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src,
 
 void xstr_fit(xstr *xs)
 {
-	vec_fit(xs->buf);
+	xs->cap = MAX(xs->len + 1, MIN_CAP);
+	xs->buf = realloc(xs->buf, xs->cap * xs->sizeof_char);
 }
 
 
 void xstr_clip(xstr *xs, size_t from, size_t to)
 {
-	vec_clip(xs->buf, from, to);
+	memmove( xs->buf, xs->buf + (from * xs->sizeof_char), 
+			 (to - from) * xs->sizeof_char );
+	memset( xs->buf + ((to - from) * xs->sizeof_char), '\0', 
+	        (xs->len - (to - from)) * xs->sizeof_char );
+	xs->len = to - from;
 }
 
 
 void xstr_rot_left(xstr *xs, size_t npos)
 {
-	vec_rotate_left(xs->buf, npos);
+	size_t h = npos % xs->len;
+	size_t t = xs->len - h;
+	if (h) {
+		void *tmp = malloc(h * xs->sizeof_char);
+		memcpy(tmp, xs->buf, h * xs->sizeof_char);
+		memcpy(xs->buf, xs->buf + (h * xs->sizeof_char), t * xs->sizeof_char);
+		memcpy(xs->buf + (t * xs->sizeof_char), tmp, h * xs->sizeof_char);
+		FREE(tmp);
+	}
 }
 
 
 void xstr_clear(xstr *xs)
 {
-	vec_clear(xs->buf);
+	memset(xs->buf, '\0', xs->len * xs->sizeof_char);
+	xs->len = 0;
 }
 
 
 void *xstr_detach(xstr *xs)
 {
-	void *ret = vec_detach(xs->buf);
+	xstr_fit(xs);
+	void *ret = xs->buf;
 	FREE(xs);
 	return ret;
 }

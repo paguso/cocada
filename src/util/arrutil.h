@@ -81,6 +81,19 @@
       printf("\n");}
 
 
+/**
+ * @brief Prints the array ARR from positio FROM to position TO-1
+ *        using NAME as label, displaying ELTSPERLINE elements per line,
+ *        and using the printf format string FORMAT.
+ */
+#define FPRINT_ARR(STREAM, ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
+    { fprintf(STREAM, #NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
+      for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
+        if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%4zu: ",__i);\
+        fprintf(STREAM, #FORMAT" " , ARR[__i]);}\
+      fprintf(STREAM, "\n");}
+
+
 #define FOREACH_IN_ARR( ELT, ELT_TYPE, ARR, ARR_LEN ) \
 for (ELT_TYPE *__arr = (ELT_TYPE *)(ARR), ELT; __arr; __arr = NULL) \
 for (size_t __i = 0, __l = (ARR_LEN); __i < __l; __i = __l) \

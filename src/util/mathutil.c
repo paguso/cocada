@@ -23,26 +23,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "coretype.h"
 #include "mathutil.h"
 
 
 
-#define POW2CEIL_IMPL( TYPE )\
+#define POW2CEIL_IMPL( TYPE, ... )\
 TYPE pow2ceil_##TYPE( TYPE val ) {\
     TYPE pow = 1;\
     while (pow < val) pow *= 2;\
     return pow;\
 }
 
-POW2CEIL_IMPL(short);
-POW2CEIL_IMPL(int);
-POW2CEIL_IMPL(long);
-POW2CEIL_IMPL(size_t);
-POW2CEIL_IMPL(int8_t);
-POW2CEIL_IMPL(int16_t);
-POW2CEIL_IMPL(int32_t);
-POW2CEIL_IMPL(int64_t);
-POW2CEIL_IMPL(uint8_t);
-POW2CEIL_IMPL(uint16_t);
-POW2CEIL_IMPL(uint32_t);
-POW2CEIL_IMPL(uint64_t);
+
+XX_UNSIGNED_INT(POW2CEIL_IMPL)

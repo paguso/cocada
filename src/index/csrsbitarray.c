@@ -291,50 +291,50 @@ size_t csrsbitarr_len(csrsbitarray *ba)
 }
 
 
-void csrsbitarr_print(csrsbitarray *ba, size_t bytes_per_row)
+void csrsbitarr_print(FILE *stream, csrsbitarray *ba, size_t bytes_per_row)
 {
-	printf("csrsbitarray@%p {\n",(void *)ba);
-	printf("->size = %zu\n",ba->len);
-	printf("->data:\n");
-	bitarr_print(ba->data, ba->len, 4);
+	fprintf(stream, "csrsbitarray@%p {\n",(void *)ba);
+	fprintf(stream, "->size = %zu\n",ba->len);
+	fprintf(stream, "->data:\n");
+	bitarr_print(stream, ba->data, ba->len, 4);
 	for (unsigned int b=0; b<=1; b++) {
-		printf("->total_bits_count[%u] = %zu\n",b,  ba->total_bit_count[b]);
+		fprintf(stream, "->total_bits_count[%u] = %zu\n",b,  ba->total_bit_count[b]);
 	}
-	printf("->rank_bit_sample_interval = %zu\n", ba->rank_samples_bit_interval);
-	//printf("->rank_byte_sample_interval = %zu\n", ba->rank_samples_byte_interval);
-	printf("->rank_samples_count = %zu\n", ba->rank_samples_count);
-	//printf("->bits_per_rank = %zu\n", ba->bits_per_pos);
-	printf("->bytes_per_rank = %zu\n", ba->bytes_per_pos);
-	printf("->rank_samples:\n");
+	fprintf(stream, "->rank_bit_sample_interval = %zu\n", ba->rank_samples_bit_interval);
+	//fprintf(stream, "->rank_byte_sample_interval = %zu\n", ba->rank_samples_byte_interval);
+	fprintf(stream, "->rank_samples_count = %zu\n", ba->rank_samples_count);
+	//fprintf(stream, "->bits_per_rank = %zu\n", ba->bits_per_pos);
+	fprintf(stream, "->bytes_per_rank = %zu\n", ba->bytes_per_pos);
+	fprintf(stream, "->rank_samples:\n");
 	for (size_t i = 0; i  < ba->rank_samples_count; i++ ) {
-		printf( "    rank_sample[%zu] = %zu\n", i,
+		fprintf(stream,  "    rank_sample[%zu] = %zu\n", i,
 		        bytearr_read_size_t( ba->rank_samples,i*ba->bytes_per_pos,
 		                             ba->bytes_per_pos ) );
 	}
 	for (unsigned int b=0; b<=1; b++) {
-		printf( "->select_samples_bit_interval[%u] = %zu\n", b,
+		fprintf(stream,  "->select_samples_bit_interval[%u] = %zu\n", b,
 		        ba->sel_samples_bit_interval[b] );
-		printf( "->select_samples_count[%u] = %zu\n", b,
+		fprintf(stream,  "->select_samples_count[%u] = %zu\n", b,
 		        ba->sel_samples_count[b] );
-		printf("->byte_select_samples[%u]:\n",b);
+		fprintf(stream, "->byte_select_samples[%u]:\n",b);
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
-			printf("    byte_select_sample[%u][%zu] = %zu\n", b, i,
+			fprintf(stream, "    byte_select_sample[%u][%zu] = %zu\n", b, i,
 			       bytearr_read_size_t( ba->byte_sel_samples[b],
 			                            i*ba->bytes_per_byte_pos,
 			                            ba->bytes_per_byte_pos));
 		}
-		printf("->select_samples_corrections[%u]:\n",b);
+		fprintf(stream, "->select_samples_corrections[%u]:\n",b);
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
-			printf("    byte_select_sample_corr[%u][%zu] = %zu\n", b, i,
+			fprintf(stream, "    byte_select_sample_corr[%u][%zu] = %zu\n", b, i,
 			       bytearr_read_size_t(ba->byte_sel_samples_corr[b], i, 1));
 		}
 	}
 	//bytearr_print(ba->rank_samples, ba->rank_samples_count*ba->bytes_per_pos, 4);
-	//printf("->select_samples[1]:\n");
+	//fprintf(stream, "->select_samples[1]:\n");
 	//bytearr_print(ba->select_samples[1], ba->select_samples_count[1]*ba->bytes_per_pos, 4);
-	//printf("->byte_select_samples[1]:\n");
+	//fprintf(stream, "->byte_select_samples[1]:\n");
 	//bytearr_print(ba->byte_select_samples[1], ba->select_samples_count[1]*ba->bytes_per_pos, 4);
-	printf("}//end of csrsbitarray@%p\n",(void *)ba);
+	fprintf(stream, "}//end of csrsbitarray@%p\n",(void *)ba);
 }
 
 bool csrsbitarr_get(csrsbitarray *ba, size_t pos)

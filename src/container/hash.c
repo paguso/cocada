@@ -29,7 +29,7 @@ uint64_t ident_hash_##TYPE(const void *key) {\
     return (uint64_t)(*((TYPE *)key));\
 }
 
-XX_PRIM_CORETYPES(IDENT_HASH_IMPL)
+XX_PRIMITIVES(IDENT_HASH_IMPL)
 
 uint64_t fib_hash(uint64_t key)
 {

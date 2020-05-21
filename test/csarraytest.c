@@ -114,7 +114,7 @@ void xxxcsarray_test_setup(CuTest *tc)
 	sarrays[0] = sais(strings[0], slens[0], ab[0]);
 	sarrinvs[0] = NEW_ARR(size_t, slens[0]+1);
 	sarr_invert(sarrays[0], slens[0]+1, sarrinvs[0]);
-	csarray_print(csarrays[0]);
+	csarray_print(stdout, csarrays[0]);
 }
 
 
@@ -197,7 +197,7 @@ void csarray_test_get(CuTest *tc)
 			size_t s = csarray_get(csa, j);
 			//printf("csa[%zu].get(%zu) = %zu (bf = %zu)\n", i, j, s, sa[j]);
 			if (sa[j]!=s) {
-				csarray_print(csa);
+				csarray_print(stdout, csa);
 				PRINT_ARR(sa, sa, %zu, 0, sa_len, 10);
 			}
 			CuAssertSizeTEquals(tc, sa[j], s);

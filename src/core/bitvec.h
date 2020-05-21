@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "bitbyte.h"
 #include "strbuf.h"
@@ -74,6 +75,13 @@ bitvec *bitvec_clone(const bitvec *src);
  * @param nbits Number of bits to be copied
  */
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
+
+
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
+void bitvec_dtor(void *ptr, const dtor *dt);
 
 
 /**
@@ -153,7 +161,7 @@ void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
  * @brief Prints the bitvector do std output.
  * @param bytes_per_row Number of bytes per row
  */
-void bitvec_print(const bitvec *bv, size_t bytes_per_row);
+void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row);
 
 
 #endif

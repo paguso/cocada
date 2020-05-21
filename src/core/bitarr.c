@@ -88,7 +88,7 @@ inline void bitarr_set_bit (byte_t *ba, size_t pos, const bool bit)
 }
 
 
-void bitarr_print(const byte_t *ba, size_t nbits,
+void bitarr_print(FILE *stream, const byte_t *ba, size_t nbits,
                   size_t bytes_per_line)
 {
 	size_t i, c, line_label_width, bits_per_line;
@@ -99,27 +99,27 @@ void bitarr_print(const byte_t *ba, size_t nbits,
 	i = 0;
 	while (i < nbits) {
 		if (i%bits_per_line == 0) {
-			if (i) printf("\n");
-			printf("%*zu:", (int)line_label_width, i);
+			if (i) fprintf(stream, "\n");
+			fprintf(stream, "%*zu:", (int)line_label_width, i);
 		}
-		printf(" ");
+		fprintf(stream, " ");
 		b = ba[i/BYTESIZE];
 		//printf ("%x ",b);
 		for (c=0; c<BYTESIZE; c++) {
 			if (i+c < nbits) {
 				if (b & onemask) {
-					printf("1");
+					fprintf(stream, "1");
 				} else {
-					printf("0");
+					fprintf(stream, "0");
 				}
 			} else {
-				printf("*");
+				fprintf(stream, "*");
 			}
 			b <<= 1;
 		}
 		i += BYTESIZE;
 	}
-	printf("\n");
+	fprintf(stream, "\n");
 }
 
 

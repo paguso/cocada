@@ -66,7 +66,7 @@ typedef bool (*equals_func)(const void *, const void *);
 #define IDENT_HASH_DECL( TYPE, ... ) \
 uint64_t ident_hash_##TYPE(const void *key);
 
-XX_PRIM_CORETYPES(IDENT_HASH_DECL)
+XX_PRIMITIVES(IDENT_HASH_DECL)
 
 uint64_t fib_hash(uint64_t key);
 

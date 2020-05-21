@@ -66,22 +66,31 @@ strbuf *strbuf_new_from_str(const char *src)
 	return ret;
 }
 
+
+void strbuf_dtor(void *ptr, const dtor *dt)
+{
+	FREE(((strbuf*)ptr)->str);
+}
+
+
 void strbuf_free(strbuf *sb)
 {
-	if (sb==NULL) return;
 	FREE(sb->str);
 	FREE(sb);
 }
+
 
 size_t strbuf_len(strbuf *sb)
 {
 	return sb->len;
 }
 
+
 size_t strbuf_capacity(strbuf *sb)
 {
 	return sb->capacity;
 }
+
 
 char strbuf_get(strbuf *sb, size_t pos)
 {

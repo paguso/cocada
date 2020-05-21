@@ -134,9 +134,9 @@ void xstr_rot_left(xstr *xs, size_t npos);
 
 
 /**
- * @brief Prints a xstr to the standard output.
+ * @brief Prints a xstr to the given stream.
  */
-void xstr_print(const xstr *xs);
+void xstr_print(FILE *stream, const xstr *xs);
 
 
 /**

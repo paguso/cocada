@@ -25,6 +25,8 @@
 
 #include <stddef.h>
 
+#include "new.h"
+
 
 typedef struct _strbuf strbuf;
 
@@ -45,6 +47,13 @@ strbuf *strbuf_new();
  * @brief Creates an empty string buffer with a given initial capacity.
  */
 strbuf *strbuf_new_with_capacity(size_t init_capacity);
+
+
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
+void strbuf_dtor(void *ptr, const dtor *dt);
 
 
 /**

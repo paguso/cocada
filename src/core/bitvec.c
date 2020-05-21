@@ -72,7 +72,14 @@ bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 }
 
 
-void bitvec_free(bitvec *bv) {
+void bitvec_dtor(void *ptr, const dtor *dt)
+{
+	FREE(((bitvec*)ptr)->bits);
+}
+
+
+void bitvec_free(bitvec *bv) 
+{
 	FREE(bv->bits);
 	FREE(bv);
 }
@@ -276,14 +283,13 @@ void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 }
 
 
-void bitvec_print(const bitvec *bv, size_t bytes_per_row)
+void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row)
 {
-	printf("bitvector@%p\n", bv);
-	printf("  len     : %zu\n", bv->len);
-	printf("  capacity: %zu\n", bv->cap);
-	//printf("  count1: %zu\n", bv->count1);
-	printf("  data:\n");
-	bitarr_print(bv->bits, bv->cap, bytes_per_row);
-	printf("end of bitvector@%p\n", bv);
+	fprintf(stream, "bitvector@%p {\n", bv);
+	fprintf(stream, "  len     : %zu\n", bv->len);
+	fprintf(stream, "  capacity: %zu\n", bv->cap);
+	fprintf(stream, "  data:\n");
+	bitarr_print(stream, bv->bits, bv->cap, bytes_per_row);
+	fprintf(stream, "}\n");
 
 }

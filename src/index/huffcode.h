@@ -23,6 +23,7 @@
 #define HUFFCODE_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 #include "alphabet.h"
 #include "bitbyte.h"
@@ -116,7 +117,7 @@ void huffcode_free(huffcode *hcode);
 /**
  * @brief Prints a string representation of the HC to the std output.
  */
-void huffcode_print(const huffcode *hcode);
+void huffcode_print(FILE *stream, const huffcode *hcode);
 
 
 /**

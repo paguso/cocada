@@ -207,50 +207,51 @@ void huffcode_free(huffcode *hcode)
 }
 
 
-static void _print_htree(const huffcode *hc, const hufftnode *node, size_t level, const char *code)
+static void _print_htree( FILE *stream, const huffcode *hc, 
+	const hufftnode *node, size_t level, const char *code )
 {
 	if (node==NULL) return;
 	char *space = cstr_new(4*level);
 	cstr_fill(space, 0, 4*level, ' ');
 	if (hufftnode_is_leaf(node)) {
-		printf("%s[%p code=%s chr=%c(%d)]\n", space, node, code,
+		fprintf(stream ,"%s[%p code=%s chr=%c(%d)]\n", space, node, code,
 		       ab_char(hc->ab, node->chr_rank), (int)(ab_char(hc->ab, node->chr_rank)));
 		//bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 	} else {
-		printf("%s[%p code=%s]\n", space, node, code);
+		fprintf(stream, "%s[%p code=%s]\n", space, node, code);
 		//bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 		char *ccode = cstr_new(level+1);
 		strcpy(ccode, code);
 		ccode[level] = '0';
-		_print_htree(hc, hufftnode_left(node), level+1, ccode);
+		_print_htree(stream, hc, hufftnode_left(node), level+1, ccode);
 		ccode[level] = '1';
-		_print_htree(hc, hufftnode_right(node), level+1, ccode);
+		_print_htree(stream, hc, hufftnode_right(node), level+1, ccode);
 	}
 	FREE(space);
 }
 
 
-void huffcode_print(const huffcode *hcode)
+void huffcode_print(FILE *stream, const huffcode *hcode)
 {
-	printf("huffcode@%p {\n",(void *)hcode);
-	printf("    size: %zu\n",hcode->size);
-	_print_htree(hcode, huffcode_tree(hcode), 0, "");
-	printf("    codes:\n");
+	fprintf(stream, "huffcode@%p {\n",(void *)hcode);
+	fprintf(stream, "    size: %zu\n",hcode->size);
+	_print_htree(stream, hcode, huffcode_tree(hcode), 0, "");
+	fprintf(stream, "    codes:\n");
 	switch ( ab_type(hcode->ab) ) {
 	case CHAR_TYPE:
 		for (size_t i=0; i<hcode->size; i++) {
-			printf("%c: ", ab_char(hcode->ab, i) );
-			bitvec_print(hcode->code[i], 8);
+			fprintf(stream, "%c: ", ab_char(hcode->ab, i) );
+			bitvec_print(stream , hcode->code[i], 8);
 		}
 		break;
 	case INT_TYPE:
 		for (size_t i=0; i<hcode->size; i++) {
-			printf("%"XCHAR_FMT": ", ab_char(hcode->ab, i) );
-			bitvec_print(hcode->code[i], 8);
+			fprintf(stream ,"%"XCHAR_FMT": ", ab_char(hcode->ab, i) );
+			bitvec_print(stream, hcode->code[i], 8);
 		}
 		break;
 	}
-	printf("} // end of huffcode@%p\n",(void *)hcode);
+	fprintf(stream, "} // end of huffcode@%p\n", (void *)hcode);
 }
 
 

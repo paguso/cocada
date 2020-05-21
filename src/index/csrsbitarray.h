@@ -66,7 +66,7 @@ const byte_t *csrsbitarr_data(csrsbitarray *ba);
 /**
  * @brief Prints a representations of the bitarray to standard output.
  */
-void csrsbitarr_print(csrsbitarray *ba, size_t bytes_per_row);
+void csrsbitarr_print(FILE *stream, csrsbitarray *ba, size_t bytes_per_row);
 
 
 /**

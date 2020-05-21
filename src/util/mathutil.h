@@ -22,6 +22,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "coretype.h"
+
 #ifndef MATHUTIL_H
 #define MATHUTIL_H
 
@@ -35,37 +37,37 @@
 /**
  * @brief Minimum of two values
  */
-#define MIN( A, B )   ( (A)<(B) ? (A) : (B) )
+#define MIN( A, B )   ( ( (A) < (B) ) ? (A) : (B) )
 
 
 /**
  * @brief Maximum of two values
  */
-#define MAX( A, B )   ( (A)>(B) ? (A) : (B) )
+#define MAX( A, B )   ( ( (A) > (B) ) ? (A) : (B) )
 
 
 /**
  * @brief Minimum of three values
  */
-#define MIN3( A, B, C ) ((A) < (B) ? MIN(A, C) : MIN(B, C))
+#define MIN3( A, B, C ) ( ( (A) < (B) ) ? MIN(A, C) : MIN(B, C) )
 
 
 /**
  * @brief Maximum of three values
  */
-#define MAX3( A, B, C ) ((A) > (B) ? MAX(A, C) : MAX(B, C))
+#define MAX3( A, B, C ) ( ( (A) > (B) ) ? MAX(A, C) : MAX(B, C) )
 
 
 /**
  * @brief Is N even?
  */
-#define IS_EVEN( N ) (1-((N)%2))
+#define IS_EVEN( N ) ( 1 - ( (N) % 2) )
 
 
 /**
  * @brief Is N odd?
  */
-#define IS_ODD( N ) ((N)%2)
+#define IS_ODD( N ) ( (N) % 2 )
 
 
 /**
@@ -79,24 +81,15 @@
  */
 #define DIVCEIL(NUM, DEN) (ceil(((double)(NUM))/((double)(DEN))))
 
+
 /**
  * @brief Computes the smallest power of 2 greater or equal to @p val
  */
-#define POW2CEIL_DECL( TYPE )\
+#define POW2CEIL_DECL( TYPE , ...)\
 TYPE pow2ceil_##TYPE( TYPE val );
 
-POW2CEIL_DECL(short);
-POW2CEIL_DECL(int);
-POW2CEIL_DECL(long);
-POW2CEIL_DECL(size_t);
-POW2CEIL_DECL(int8_t);
-POW2CEIL_DECL(int16_t);
-POW2CEIL_DECL(int32_t);
-POW2CEIL_DECL(int64_t);
-POW2CEIL_DECL(uint8_t);
-POW2CEIL_DECL(uint16_t);
-POW2CEIL_DECL(uint32_t);
-POW2CEIL_DECL(uint64_t);
+
+XX_UNSIGNED_INT(POW2CEIL_DECL)
 
 
 #endif
