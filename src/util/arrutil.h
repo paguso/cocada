@@ -97,7 +97,7 @@
 #define FOREACH_IN_ARR( ELT, ELT_TYPE, ARR, ARR_LEN ) \
 for (ELT_TYPE *__arr = (ELT_TYPE *)(ARR), ELT; __arr; __arr = NULL) \
 for (size_t __i = 0, __l = (ARR_LEN); __i < __l; __i = __l) \
-for (ELT = __arr[__i]; __i < __l; ELT = ((++__i) < __l) ? __arr[__i] : ELT ) 
+for (ELT = __arr[__i]; __i < __l; ELT = ((++__i) < __l) ? __arr[__i] : ELT )
 
 
 typedef struct {

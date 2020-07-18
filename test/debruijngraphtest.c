@@ -181,7 +181,7 @@ void test_dbgraph_outdeg(CuTest *tc)
 		//printf("T:%s\n",padstr[i]);
 		//dbg_print(dbg);
 		xstr *xnode = xstr_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
-		                 dbg_k(dbg) );
+		                                      dbg_k(dbg) );
 		char *node = cstr_new(dbg_k(dbg));
 
 		for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
@@ -242,7 +242,7 @@ void test_dbg_lbl_outdeg(CuTest *tc)
 		dbgraph *dbg = g[i];
 		alphabet *abt = ab[i];
 		xstr *xnode = xstr_new_with_capacity( nbytes(ab_size(dbg_ext_ab(dbg))),
-		                 dbg_k(dbg) );
+		                                      dbg_k(dbg) );
 		char *node = cstr_new(dbg_k(dbg));
 		for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
 			size_t nid = dbg_node_id(dbg, nrk);

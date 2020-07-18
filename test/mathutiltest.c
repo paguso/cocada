@@ -123,10 +123,44 @@ void test_mult_ceil(CuTest *tc)
 	}
 }
 
+
+void test_naive_is_prime(CuTest *tc) 
+{
+	uint64_t max_val = 0x1 << 16;
+	for (uint64_t val=2; val<max_val; val++) {
+		bool is_prime = naive_is_prime(val);
+	}
+}
+
+
+void test_is_prime(CuTest *tc)
+{
+	//bool a = is_prime(18023405708736723011);
+	//bool b = naive_is_prime(18023405708736723011);
+
+	uint64_t val = 1;
+	for (size_t p=0; p<63; p++) {
+		for (size_t n=0; n<1000; n++) {
+			bool ispr = is_prime(val);
+			printf("%zu is %s prime\n", val, ispr?"":"NOT");
+			if (ispr!=naive_is_prime(val)) {
+				ispr = is_prime(val);
+				CuAssert(tc, "primality test failed", ispr==naive_is_prime(val));
+			}
+			val++;
+		}
+		val <<= 1;
+	}
+}
+
+
+
 CuSuite* mathutil_get_test_suite()
 {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_mult_floor);
 	SUITE_ADD_TEST(suite, test_mult_ceil);
+	SUITE_ADD_TEST(suite, test_naive_is_prime);
+	SUITE_ADD_TEST(suite, test_is_prime);
 	return suite;
 }

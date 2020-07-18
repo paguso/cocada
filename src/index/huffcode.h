@@ -221,7 +221,7 @@ const hufftnode *hufftnode_right(const hufftnode *node);
  *        @p node is a binary mask M[0..l-1] s.t. for each letter of the
  *        alphabet a[j], M[j] = 1 iff the leaf corresponding to letter a[j]
  *        is in the subtree rooted at this @p node.
- * 
+ *
  * @warning Do NOT modify or destroy the returned value
  */
 const byte_t *hufftnode_ab_mask(const hufftnode *node);

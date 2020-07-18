@@ -73,8 +73,8 @@ static int nodefreq_cmp(const void *p1, const void *p2)
 
 
 
-static void fill_code_table( huffcode *hcode, const hufftnode *node, 
-							 size_t code_len, byte_t *code )
+static void fill_code_table( huffcode *hcode, const hufftnode *node,
+                             size_t code_len, byte_t *code )
 {
 	if (hufftnode_is_leaf(node)) {
 		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
@@ -153,7 +153,7 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 }
 
 
-huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader) 
+huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader)
 {
 	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
 	for (int c; (c=strread_getc(reader)) != EOF;) {
@@ -177,7 +177,7 @@ huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src)
 }
 
 
-huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *reader) 
+huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *reader)
 {
 	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
 	for (xchar_wt c; (c=xstrread_getc(reader)) != XEOF;) {
@@ -207,15 +207,15 @@ void huffcode_free(huffcode *hcode)
 }
 
 
-static void _print_htree( FILE *stream, const huffcode *hc, 
-	const hufftnode *node, size_t level, const char *code )
+static void _print_htree( FILE *stream, const huffcode *hc,
+                          const hufftnode *node, size_t level, const char *code )
 {
 	if (node==NULL) return;
 	char *space = cstr_new(4*level);
 	cstr_fill(space, 0, 4*level, ' ');
 	if (hufftnode_is_leaf(node)) {
-		fprintf(stream ,"%s[%p code=%s chr=%c(%d)]\n", space, node, code,
-		       ab_char(hc->ab, node->chr_rank), (int)(ab_char(hc->ab, node->chr_rank)));
+		fprintf(stream,"%s[%p code=%s chr=%c(%d)]\n", space, node, code,
+		        ab_char(hc->ab, node->chr_rank), (int)(ab_char(hc->ab, node->chr_rank)));
 		//bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 	} else {
 		fprintf(stream, "%s[%p code=%s]\n", space, node, code);
@@ -241,12 +241,12 @@ void huffcode_print(FILE *stream, const huffcode *hcode)
 	case CHAR_TYPE:
 		for (size_t i=0; i<hcode->size; i++) {
 			fprintf(stream, "%c: ", ab_char(hcode->ab, i) );
-			bitvec_print(stream , hcode->code[i], 8);
+			bitvec_print(stream, hcode->code[i], 8);
 		}
 		break;
 	case INT_TYPE:
 		for (size_t i=0; i<hcode->size; i++) {
-			fprintf(stream ,"%"XCHAR_FMT": ", ab_char(hcode->ab, i) );
+			fprintf(stream,"%"XCHAR_FMT": ", ab_char(hcode->ab, i) );
 			bitvec_print(stream, hcode->code[i], 8);
 		}
 		break;

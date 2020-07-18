@@ -47,15 +47,16 @@ struct _xstr {
 #define GROWBY 1.66f
 
 
-static void check_and_resize_by(xstr *xs, size_t n) {
+static void check_and_resize_by(xstr *xs, size_t n)
+{
 	size_t new_cap = MAX(MIN_CAP, xs->cap);
 	while (new_cap - xs->len < n + 1) {
 		new_cap *= GROWBY;
 	}
 	if (new_cap != xs->cap) {
 		xs->buf = realloc(xs->buf, new_cap * xs->sizeof_char);
-		memset( xs->buf + (xs->cap * xs->sizeof_char), '\0', 
-				(new_cap - xs->cap) * xs->sizeof_char );
+		memset( xs->buf + (xs->cap * xs->sizeof_char), '\0',
+		        (new_cap - xs->cap) * xs->sizeof_char );
 		xs->cap = new_cap;
 	}
 }
@@ -99,7 +100,7 @@ xstr *xstr_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
 	ret->cap = len;
 	ret->buf = malloc(len * sizeof_char);
 	memcpy(ret->buf, src, len * sizeof_char);
-	check_and_resize_by(ret, 0); 
+	check_and_resize_by(ret, 0);
 	return ret;
 }
 
@@ -116,13 +117,14 @@ void xstr_free(xstr *xs)
 void xstr_print(FILE *stream, const xstr *xs)
 {
 	fprintf(stream, "xstr@%p {\n", xs);
-	fprintf(stream, "  len : %zu\n", xstr_len(xs));
-	fprintf(stream, "  sizeof_char: %zu\n", xstr_sizeof_char(xs) );
+	fprintf(stream, "  len : %zu\n", xs->len );
+	fprintf(stream, "  cap : %zu\n", xs->cap );
+	fprintf(stream, "  sizeof_char: %zu\n", xs->sizeof_char );
 	fprintf(stream, "  str: ");
 	for (size_t i=0, l=xs->len; i < l; i++) {
 		fprintf(stream, XCHAR_FMT"%s", xstr_get(xs, i), (i < l-1) ? "-" : "");
 	}
-	fprintf(stream, "} # end of xstr@%p\n", xs);
+	fprintf(stream, "}\n");
 }
 
 
@@ -217,7 +219,7 @@ void xstr_cat(xstr *dest, const xstr *src)
 {
 	check_and_resize_by(dest, src->len);
 	memcpy(	dest->buf + (dest->len * dest->sizeof_char), src->buf,
-			src->len * src->sizeof_char );
+	        src->len * src->sizeof_char );
 	dest->len += src->len;
 }
 
@@ -250,9 +252,9 @@ void xstr_fit(xstr *xs)
 
 void xstr_clip(xstr *xs, size_t from, size_t to)
 {
-	memmove( xs->buf, xs->buf + (from * xs->sizeof_char), 
-			 (to - from) * xs->sizeof_char );
-	memset( xs->buf + ((to - from) * xs->sizeof_char), '\0', 
+	memmove( xs->buf, xs->buf + (from * xs->sizeof_char),
+	         (to - from) * xs->sizeof_char );
+	memset( xs->buf + ((to - from) * xs->sizeof_char), '\0',
 	        (xs->len - (to - from)) * xs->sizeof_char );
 	xs->len = to - from;
 }

@@ -32,15 +32,15 @@
  * @author Paulo Fonseca
  *
  * @brief Dynamic string over an eXtended character set.
- * 
- * An xstr is an indexable dynamic sequence of 'characters' of 
- * fixed length. The exact number of bytes needed to represent 
- * individual characters is provided by the user to optmise space. 
+ *
+ * An xstr is an indexable dynamic sequence of 'characters' of
+ * fixed length. The exact number of bytes needed to represent
+ * individual characters is provided by the user to optmise space.
  * Characters are read from/written to the string via methods that
- * return/receive xchar_t values. Thus xstr characters must fit 
+ * return/receive xchar_t values. Thus xstr characters must fit
  * into the xchar_t value, that is, they must require at most
  * XCHAR_BYTESIZE bytes.
- * 
+ *
  * @see xchar.h
  */
 
@@ -140,7 +140,7 @@ void xstr_print(FILE *stream, const xstr *xs);
 
 
 /**
- * @brief Appends a string representation of the xstr to a 
+ * @brief Appends a string representation of the xstr to a
  * string buffer @p dest
  * @warning This is not a conversion to @p xs to string.
  */
@@ -256,6 +256,6 @@ int xstr_cmp(const xstr *this, const xstr *other);
 for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
 for (xchar_t CHR = 1; CHR ; CHR = 0) \
 for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
-for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR ) 
+for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
 
 #endif // !XSTRING_H

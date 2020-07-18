@@ -145,7 +145,7 @@ XX(uint8_t, __VA_ARGS__) \
 XX(uint16_t, __VA_ARGS__) \
 XX(uint32_t, __VA_ARGS__) \
 XX(uint64_t, __VA_ARGS__) \
-XX(byte_t, __VA_ARGS__) 
+XX(byte_t, __VA_ARGS__)
 
 #define XX_SIGNED_INT(XX, ...) \
 XX(char, __VA_ARGS__) \
@@ -157,27 +157,27 @@ XX(bool, __VA_ARGS__) \
 XX(int8_t, __VA_ARGS__) \
 XX(int16_t, __VA_ARGS__) \
 XX(int32_t, __VA_ARGS__) \
-XX(int64_t, __VA_ARGS__) 
+XX(int64_t, __VA_ARGS__)
 
 #define XX_INTS( XX, ...) \
 XX_UNSIGNED_INT(XX, __VA_ARGS__) \
-XX_SIGNED_INT(XX, __VA_ARGS__) 
+XX_SIGNED_INT(XX, __VA_ARGS__)
 
 #define XX_FLOATS( XX, ...) \
 XX(float, __VA_ARGS__) \
 XX(double, __VA_ARGS__) \
-XX(ldouble, __VA_ARGS__) 
+XX(ldouble, __VA_ARGS__)
 
 #define XX_PRIMITIVES( XX, ...) \
 XX_INTS(XX, __VA_ARGS__) \
-XX_FLOATS(XX, __VA_ARGS__) 
+XX_FLOATS(XX, __VA_ARGS__)
 
 #define XX_PTRS( XX, ...) \
 XX(rawptr, __VA_ARGS__) \
-XX(cstr , __VA_ARGS__) 
+XX(cstr , __VA_ARGS__)
 
 #define XX_CORETYPES(XX,...) \
 XX_PRIMITIVES(XX, __VA_ARGS__) \
-XX_PTRS(XX, __VA_ARGS__) 
+XX_PTRS(XX, __VA_ARGS__)
 
 #endif //CORETYPE_H

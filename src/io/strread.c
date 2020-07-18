@@ -48,7 +48,7 @@ int strread_getc(strread *trait)
 }
 
 
-size_t strread_read_str(strread *trait, char *dest, size_t n) 
+size_t strread_read_str(strread *trait, char *dest, size_t n)
 {
 	return trait->vt->read_str(trait, dest, n);
 }

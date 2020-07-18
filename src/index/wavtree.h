@@ -92,8 +92,8 @@ wavtree *wavtree_new_from_xstr(alphabet *ab, xstr *src, wtshape shape);
 
 /**
  * @brief Create a balanced wavelet tree from a stream with unknown alphabet
- * as described in 
- * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*, 
+ * as described in
+ * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*,
  * 16th Int´l Symposium on Experimental Algorithms (SEA 2017), London, UK.
  */
 wavtree *wavtree_new_online(strread *src);

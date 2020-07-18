@@ -87,34 +87,11 @@ bool eq_##TYPE(const void *left, const void *right);
 
 
 ///@cond
-#define CMPEQ_DECL( TYPE )\
+#define CMPEQ_DECL( TYPE , ...)\
 CMP_DECL( TYPE )\
 EQ_DECL( TYPE )
 
-CMPEQ_DECL(char)
-CMPEQ_DECL(uchar)
-CMPEQ_DECL(short)
-CMPEQ_DECL(ushort)
-CMPEQ_DECL(int)
-CMPEQ_DECL(uint)
-CMPEQ_DECL(long)
-CMPEQ_DECL(ulong)
-CMPEQ_DECL(llong)
-CMPEQ_DECL(ullong)
-CMPEQ_DECL(float)
-CMPEQ_DECL(double)
-CMPEQ_DECL(ldouble)
-CMPEQ_DECL(bool)
-CMPEQ_DECL(size_t)
-CMPEQ_DECL(int8_t)
-CMPEQ_DECL(uint8_t)
-CMPEQ_DECL(int16_t)
-CMPEQ_DECL(uint16_t)
-CMPEQ_DECL(int32_t)
-CMPEQ_DECL(uint32_t)
-CMPEQ_DECL(int64_t)
-CMPEQ_DECL(uint64_t)
-CMPEQ_DECL(byte_t)
+XX_PRIMITIVES(CMPEQ_DECL)
 
 ////@endcond
 

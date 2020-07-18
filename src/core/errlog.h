@@ -33,21 +33,21 @@
  * option (`-DDEBUG_LVL=L` in `gcc`).
  *
  * The four levels in increasing sensitivity are
- * 
- * - Off      (DEBUG_LVL=0)  
+ *
+ * - Off      (DEBUG_LVL=0)
  * - Error    (DEBUG_LVL=1)
  * - Warning  (DEBUG_LVL=2)
  * - Debug    (DEBUG_LVL=3 Default)
- * 
+ *
  * The Off level is used to turn off all verifications in the code.
  *
- * The error level is used for checking critical, unrecoverable error 
+ * The error level is used for checking critical, unrecoverable error
  * conditions that cause the program to exit with a EXIT_FAILURE status.
  *
  * The warning level is used for recoverable errors or extreme conditions
  * which do not abort the program but may result in suboptimal behaviour.
  *
- * The debug level is used for conditionally reporting specific 
+ * The debug level is used for conditionally reporting specific
  * information about the program state during execution.
  *
  * These levels are strictly hierarchical. Any event of a level `L` is
@@ -126,7 +126,7 @@ if ( CONDITION ) { \
 	ERROR_IF(!(ASSERTION), FORMAT, ##__VA_ARGS__)
 
 
-#else 
+#else
 
 #define ERROR(IGNORE, ...) ((void)0)
 #define ERROR_IF(IGN, ORE, ...) ((void)0)

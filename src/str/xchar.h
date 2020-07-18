@@ -31,24 +31,24 @@
  * @file xchar.h
  * @author Paulo Fonseca
  * @brief eXtended char
- * 
+ *
  * According to the C standard, the <b>char</b> type is a standard signed
  * integer type, "large enough to store any member of the basic execution
  * character set". Its is often implemented as a single byte (octet) and
  * thus capable of representing 255 distinct symbols, frequently associated
  * with the ASCII encoding, although no such connexion is implied by the
  * standard.
- * 
+ *
  * The eXtended char type (xchar_t) defined herein is simply a renaming
- * of a larger standard integer type, to be used whenever larger alphabets 
- * are required. **This type is not intended for I/O. No connexion with a 
- * particular character set or encoding is required or implied, neither 
+ * of a larger standard integer type, to be used whenever larger alphabets
+ * are required. **This type is not intended for I/O. No connexion with a
+ * particular character set or encoding is required or implied, neither
  * the size is related to the current locale.**
- * 
- * The XCHAR_BYTESIZE constant macro defines the size of the xchar_t type 
- * in bytes. Allowed values are 1, 2, 4, and 8. When not defined, the 
- * default value of 4 (32 bits) is assumed. When XCHAR_BYTESIZE is set 
- * to $N$, the  xchar_t is a typedef renaming of the standard int`N`_t 
+ *
+ * The XCHAR_BYTESIZE constant macro defines the size of the xchar_t type
+ * in bytes. Allowed values are 1, 2, 4, and 8. When not defined, the
+ * default value of 4 (32 bits) is assumed. When XCHAR_BYTESIZE is set
+ * to $N$, the  xchar_t is a typedef renaming of the standard int`N`_t
  * type. In addition to that, two more constants are defined. XCHAR_MAX
  * defines the maximum numerical value of xchar_t, and XCHAR_FMT is a
  * format string used for printing the *numerical value* of a xchar_t
@@ -56,7 +56,7 @@
  */
 
 
-#ifndef XCHAR_BYTESIZE 
+#ifndef XCHAR_BYTESIZE
 
 
 #warning "Undefined XCHAR_BYTESIZE. Setting to default = 4 (32 bits)"
@@ -94,7 +94,7 @@ typedef int64_t  xchar_t;
 #define XCHAR_FMT PRId64
 typedef int64_t   xchar_wt; // xchar wrapper type
 
-#else 
+#else
 
 #warning "Invalid XCHAR_BYTESIZE. Allowed values are 1,2,4, and 8. Setting to default = 4 (32 bits)"
 #undef XCHAR_BYTESIZE

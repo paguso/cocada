@@ -78,7 +78,7 @@ void bitvec_dtor(void *ptr, const dtor *dt)
 }
 
 
-void bitvec_free(bitvec *bv) 
+void bitvec_free(bitvec *bv)
 {
 	FREE(bv->bits);
 	FREE(bv);

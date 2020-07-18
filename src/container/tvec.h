@@ -41,7 +41,7 @@
 
 
 /*----------------------------------------------------------------------------*
- *                         GENERIC TYPE DECLARATION                           *     
+ *                         GENERIC TYPE DECLARATION                           *
  *----------------------------------------------------------------------------*/
 
 #define TVEC_DECL(TYPE, ...)                                                   \
@@ -114,10 +114,10 @@ typedef struct _tvec_##TYPE##_iter tvec_##TYPE##_iter;                         \
                                                                                \
 tvec_##TYPE##_iter *tvec_##TYPE##_get_iter(tvec_##TYPE *v);                    \
                                                                                \
-DECL_TRAIT(tvec_##TYPE##_iter, iter)                                           
+DECL_TRAIT(tvec_##TYPE##_iter, iter)
 
 
-XX_CORETYPES(TVEC_DECL)                                                        
+XX_CORETYPES(TVEC_DECL)
 
 
 #define TYPEMAP(T, F) tvec_##T *: tvec_##T##_##F,
@@ -143,15 +143,15 @@ XX_CORETYPES(TVEC_DECL)
 #define tvec_get_iter(self)  GENFNAME(self, tvec, get_iter) (self)
 
 
-                                                                               
-                                                                               
-// IMPLEMENTATION                                                              
-                                                                               
-                                                                               
-#define TVEC_DEFAULT_CAP  16                                                   
-#define TVEC_GROW_BY      1.6F                                                 
+
+
+// IMPLEMENTATION
+
+
+#define TVEC_DEFAULT_CAP  16
+#define TVEC_GROW_BY      1.6F
 #define TVEC_MIN_LOAD     0.5F   // (!) GROW_BY*MIN_LOAD < 1                   
-                                                                               
+
 #define TVEC_IMPL(TYPE, ...)                                                   \
                                                                                \
 struct _tvec_##TYPE {                                                          \

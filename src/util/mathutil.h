@@ -92,4 +92,37 @@ TYPE pow2ceil_##TYPE( TYPE val );
 XX_UNSIGNED_INT(POW2CEIL_DECL)
 
 
+/**
+ * @brief Computes (a + b) mod m for 64bit unsigned values.
+ * Takes proper care of overflow if a + b > UINT64_MAX.
+ */
+uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m);
+
+
+/**
+ * @brief Computes (a * b) mod m for 64bit unsigned values.
+ * Takes proper care of overflow if a * b > UINT64_MAX.
+ */
+uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m);
+
+
+/**
+ * @brief Computes (a^b) mod m for 64bit unsigned values.
+ * Takes proper care of overflow if a^b > UINT64_MAX.
+ */
+uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m); 
+
+/**
+ * @brief Naive O(sqrt(n))-time primality testing.
+ */
+bool naive_is_prime(uint64_t n);
+
+
+/**
+ * @brief Deterministic Miller-Rabin primality testing.
+ */
+bool is_prime(uint64_t n);
+
+
+
 #endif

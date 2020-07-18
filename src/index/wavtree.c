@@ -220,7 +220,7 @@ static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
 {
 	for (byte_t dir=LEFT; dir<=RIGHT; dir++) {
 		const hufftnode *chd = ( (dir==LEFT) ? hufftnode_left(htnode) :
-		                   hufftnode_right(htnode) );
+		                         hufftnode_right(htnode) );
 		if (hufftnode_is_leaf(chd)) {
 			size_t crk = hufftnode_char_rank(chd);
 			xchar_t c = ab_char(huffcode_ab(hcode), crk);
@@ -433,12 +433,12 @@ static void tmp_wtnode_print(FILE *stream, tmp_wtnode *node, size_t depth)
 	margin[i++] = ' ';
 	margin[i++] = '\0';
 	if (node==NULL) {
-		printf ("%s@tmp_wtree_node NULL\n",margin);
+		fprintf (stream, "%s@tmp_wtree_node NULL\n",margin);
 	} else {
-		printf (stream, "%s@tmp_wtree_node %p\n",margin, node);
-		printf (stream, "%ssize: %zu\n", margin, bitvec_len(node->bv));
-		printf (stream, "%snxt_chd: %c\n",margin, node->nxt_chd?'1':'0');
-		printf (stream, "%sbits: \n", margin);
+		fprintf(stream, "%s@tmp_wtree_node %p\n",margin, node);
+		fprintf(stream, "%ssize: %zu\n", margin, bitvec_len(node->bv));
+		fprintf(stream, "%snxt_chd: %c\n",margin, node->nxt_chd?'1':'0');
+		fprintf(stream, "%sbits: \n", margin);
 		bitvec_print(stream, node->bv, 8);
 		tmp_wtnode_print(stream, node->chd[LEFT], depth+1);
 		tmp_wtnode_print(stream, node->chd[RIGHT], depth+1);

@@ -33,7 +33,8 @@ typedef struct {
 } MyType;
 
 
-static int MyType_cmp(const void *pl, const void *pr) {
+static int MyType_cmp(const void *pl, const void *pr)
+{
 	MyType l = *((MyType *)pl);
 	MyType r = *((MyType *)pr);
 	if (l.a < r.a) return -1;
@@ -92,7 +93,7 @@ void tvec_test_push(CuTest *tc)
 }
 
 
-void tvec_test_qsort(CuTest *tc) 
+void tvec_test_qsort(CuTest *tc)
 {
 	tvec_MyType *v = tvec_MyType_new();
 	size_t n = 100;

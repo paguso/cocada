@@ -319,14 +319,14 @@ void csrsbitarr_print(FILE *stream, csrsbitarray *ba, size_t bytes_per_row)
 		fprintf(stream, "->byte_select_samples[%u]:\n",b);
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
 			fprintf(stream, "    byte_select_sample[%u][%zu] = %zu\n", b, i,
-			       bytearr_read_size_t( ba->byte_sel_samples[b],
-			                            i*ba->bytes_per_byte_pos,
-			                            ba->bytes_per_byte_pos));
+			        bytearr_read_size_t( ba->byte_sel_samples[b],
+			                             i*ba->bytes_per_byte_pos,
+			                             ba->bytes_per_byte_pos));
 		}
 		fprintf(stream, "->select_samples_corrections[%u]:\n",b);
 		for (size_t i = 0; i  < ba->sel_samples_count[b]; i++ ) {
 			fprintf(stream, "    byte_select_sample_corr[%u][%zu] = %zu\n", b, i,
-			       bytearr_read_size_t(ba->byte_sel_samples_corr[b], i, 1));
+			        bytearr_read_size_t(ba->byte_sel_samples_corr[b], i, 1));
 		}
 	}
 	//bytearr_print(ba->rank_samples, ba->rank_samples_count*ba->bytes_per_pos, 4);
