@@ -43,6 +43,7 @@ CuSuite *hashmap_get_test_suite();
 CuSuite *hashset_get_test_suite();
 CuSuite *hashtable_get_test_suite();
 CuSuite *huffcode_get_test_suite();
+CuSuite *kwayrng_get_test_suite();
 CuSuite *mathutil_get_test_suite();
 CuSuite *minqueue_get_test_suite();
 CuSuite *mmindex_get_test_suite();
@@ -76,7 +77,8 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, fasta_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
-	CuSuiteAddSuite(suite, mathutil_get_test_suite());
+	CuSuiteAddSuite(suite, kwayrng_get_test_suite());
+	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());

@@ -19,13 +19,14 @@
  *
  */
 
+#include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <stdio.h>
 
 #include "CuTest.h"
 
+#include "errlog.h"
 #include "mathutil.h"
 
 
@@ -124,14 +125,6 @@ void test_mult_ceil(CuTest *tc)
 }
 
 
-void test_naive_is_prime(CuTest *tc) 
-{
-	uint64_t max_val = 0x1 << 16;
-	for (uint64_t val=2; val<max_val; val++) {
-		bool is_prime = naive_is_prime(val);
-	}
-}
-
 
 void test_is_prime(CuTest *tc)
 {
@@ -142,7 +135,7 @@ void test_is_prime(CuTest *tc)
 	for (size_t p=0; p<63; p++) {
 		for (size_t n=0; n<1000; n++) {
 			bool ispr = is_prime(val);
-			printf("%zu is %s prime\n", val, ispr?"":"NOT");
+			DEBUG("%zu is %s prime\n", val, ispr?"":"NOT");
 			if (ispr!=naive_is_prime(val)) {
 				ispr = is_prime(val);
 				CuAssert(tc, "primality test failed", ispr==naive_is_prime(val));
@@ -154,13 +147,25 @@ void test_is_prime(CuTest *tc)
 }
 
 
+void test_prime_succ(CuTest *tc) 
+{
+	for (uint64_t n=0; n<100000; n++) {
+		uint64_t psucc = prime_succ(n);
+		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n , psucc);
+		for (uint64_t s=n+1; s<psucc; s++) {
+			CuAssert(tc, "Prime successor not minimal", !is_prime(s));
+		}
+		CuAssert(tc, "Prime successor is NOT a prime", is_prime(psucc));
+	}
+}
+
 
 CuSuite* mathutil_get_test_suite()
 {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_mult_floor);
 	SUITE_ADD_TEST(suite, test_mult_ceil);
-	SUITE_ADD_TEST(suite, test_naive_is_prime);
-	SUITE_ADD_TEST(suite, test_is_prime);
+	//SUITE_ADD_TEST(suite, test_is_prime);
+	SUITE_ADD_TEST(suite, test_prime_succ);
 	return suite;
 }

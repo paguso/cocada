@@ -27,6 +27,9 @@
 #ifndef MATHUTIL_H
 #define MATHUTIL_H
 
+
+#define UINT64_MAX_PRIME ((uint64_t)18446744073709551557)
+
 /**
  * @file mathutil.h
  * @author Paulo Fonseca
@@ -61,13 +64,13 @@
 /**
  * @brief Is N even?
  */
-#define IS_EVEN( N ) ( 1 - ( (N) % 2) )
+#define IS_EVEN( N ) ( ((N) % 2) == 0 )
 
 
 /**
  * @brief Is N odd?
  */
-#define IS_ODD( N ) ( (N) % 2 )
+#define IS_ODD( N ) ( ((N) % 2) == 1 )
 
 
 /**
@@ -124,5 +127,9 @@ bool naive_is_prime(uint64_t n);
 bool is_prime(uint64_t n);
 
 
+/**
+ * @brief Returns the prime sucessor of @p n, i.e. the smallest prime >= @p n.
+ */
+uint64_t prime_succ(uint64_t n);
 
 #endif

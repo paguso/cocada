@@ -44,7 +44,7 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 {
     a %= m;
     b %= m;
-    if ( a < UINT64_MAX - b) {
+    if ( a <= UINT64_MAX - b) {
         return (a + b) % m;
     }  
     else {
@@ -58,34 +58,10 @@ uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m)
     uint64_t res = 0;
     a = a % m; 
     while (b > 0) {
-        // If b is odd, add 'a' to result 
-        if ( b & 1 ) {
-            res = mod_sum(res, a, m);
-            /*
-            if (res < UINT64_MAX - a ) {
-                res = (res + a) % m; 
-            } 
-            else { // res + a overflows
-                //assert (m-res <= a);
-                res = a - (m - res);
-                //assert (res <= m);
-            }
-            */
+        if ( b & 1 ) { // b is odd
+            res = mod_sum(res, a, m); // res = res + a mod m
         }
-        // Multiply 'a' with 2 
-        a = mod_sum(a, a, m);
-        /*
-        if (a <= 0x7FFFFFFFFFFFFFFF) {
-            a = (a * 2) % m; 
-        }
-        else { // 2*a overflows
-            //assert(a<=m);
-            //assert(m-a <= a);
-            a = a - (m - a);
-            //assert(a<=m);
-        }
-        */
-        // Divide b by 2 
+        a = mod_sum(a, a, m); // a = 2*a mod m
         b /= 2; 
     } 
     return res % m; 
@@ -96,22 +72,22 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m)
 {
     b = b % m;
     if (b == 0) return 0;
-    uint64_t r = 1;
+    uint64_t res = 1;
     while (e) {
         if (e & 1)
-            r = mod_mult(r, b, m);//(r*b) % m;
+            res = mod_mult(res, b, m); // res = (res*b) % m;
         e >>= 1;
-        b = mod_mult(b, b, m);//(b*b) % m;
+        b = mod_mult(b, b, m); // b = b^2 % m;
     }
-    return r;
+    return res;
 }
 
 
 bool naive_is_prime(uint64_t val) 
 {
-    if (val<2) return false;
+    if (val < 2) return false;
     for (uint64_t q=2; q*q <=val; q++) {
-        if (val%q == 0) {
+        if (val % q == 0) {
             return false;
         }
     }
@@ -125,7 +101,7 @@ bool is_prime(uint64_t n)
     uint64_t limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615};
     size_t nwitness[] = {1, 2, 3, 4, 5, 6, 7, 9, 12};
     if (n < 2) return false;
-    if (n==2) return true;
+    if (n == 2) return true;
     if (IS_EVEN(n)) return false;
 
     size_t nwit = 1;
@@ -155,4 +131,23 @@ bool is_prime(uint64_t n)
         }
     }
     return prime;
+}
+
+
+uint64_t prime_succ(uint64_t n) {
+    uint64_t firstfew[] = {2,2,2,3,5,5,7};
+    if (n<=6) return firstfew[n];
+    uint64_t k = (uint64_t) DIVCEIL(n, 6);
+    assert (n <= k*6);
+    uint64_t ret = 6 * k - 1;
+    bool pm = true;    
+    if (ret < n) {
+        ret += 2;
+        pm = false;
+    }
+    while ( !is_prime(ret) ) {
+        ret += (pm)?2:4;
+        pm = !pm;        
+    }
+    return ret;
 }

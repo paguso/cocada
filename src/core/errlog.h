@@ -23,6 +23,8 @@
 #define ERRLOG_H
 
 
+#include <stdio.h>
+
 /**
  * @file errlog.h
  * @brief Error logging
