@@ -113,7 +113,7 @@ uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m);
  * @brief Computes (a^b) mod m for 64bit unsigned values.
  * Takes proper care of overflow if a^b > UINT64_MAX.
  */
-uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m); 
+uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m);
 
 /**
  * @brief Naive O(sqrt(n))-time primality testing.

@@ -147,11 +147,11 @@ void test_is_prime(CuTest *tc)
 }
 
 
-void test_prime_succ(CuTest *tc) 
+void test_prime_succ(CuTest *tc)
 {
 	for (uint64_t n=0; n<100000; n++) {
 		uint64_t psucc = prime_succ(n);
-		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n , psucc);
+		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n, psucc);
 		for (uint64_t s=n+1; s<psucc; s++) {
 			CuAssert(tc, "Prime successor not minimal", !is_prime(s));
 		}
