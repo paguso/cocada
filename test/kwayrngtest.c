@@ -45,23 +45,26 @@ void test_kwayrng(CuTest *tc)
 
 void test_uniform(CuTest *tc)
 {
-	size_t *counts = NEW_ARR_0(size_t, 17);
-	uint64_t *coefs = NEW_ARR(uint64_t, 3);
-	for (size_t k0=0; k0<17; k0++) {
+	size_t *counts = NEW_ARR_0(size_t, 32);
+	uint64_t *coefs = NEW_ARR(uint64_t, 4);
+	for (size_t k0=0; k0<32; k0++) {
 		coefs[0] = k0;
-		for (size_t k1=0; k1<17; k1++) {
+		for (size_t k1=0; k1<32; k1++) {
 			coefs[1] = k1;
-			for (size_t k2=0; k2<17; k2++) {
-				coefs[2] = k2;
-				kwayrng *rng = kwayrng_new_with_coefs(3, coefs,  4);
-				for (size_t x=0; x<17; x++) {
+			for (size_t k2=0; k2<32; k2++) {
+			coefs[2] = k2;
+			for (size_t k3=0; k3<32; k3++) {
+				coefs[3] = k3;
+				kwayrng *rng = kwayrng_new_with_coefs(4, coefs,  4);
+				for (size_t x=0; x<32; x++) {
 					uint64_t val = kwayrng_next(rng);
 					counts[(size_t)val]++;
 				}
 			}
+			}
 		}
 	}
-	PRINT_ARR(counts, counts, %zu, 0, 17, 17);
+	PRINT_ARR(counts, counts, %zu, 0, 32, 32);
 }
 
 

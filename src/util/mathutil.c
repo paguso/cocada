@@ -36,7 +36,6 @@ TYPE pow2ceil_##TYPE( TYPE val ) {\
     return pow;\
 }
 
-
 XX_UNSIGNED_INT(POW2CEIL_IMPL)
 
 

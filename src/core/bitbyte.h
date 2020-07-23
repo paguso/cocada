@@ -334,4 +334,7 @@ int uint32_hibit(uint32_t v);
 
 int uint32_lobit(uint32_t v);
 
+
+byte_t uint64_lobit(uint64_t v);
+
 #endif

@@ -41,9 +41,10 @@ struct  _kwayrng {
 
 kwayrng *kwayrng_new(size_t k, size_t nbits)
 {
-	ERROR_ASSERT(nbits<64, "Maximum number of random bits is 63");
+	ERROR_ASSERT(nbits<=64, "Maximum number of random bits is 64");
 	kwayrng *ret = NEW(kwayrng);
-	ret->k = k;
+	ret->k = k; 
+	ret->maxval = (uint64_t)1 << nbits;
 	ret->maxval = prime_succ((1 << nbits) - 1 );
 	ret->coefs = NEW_ARR(uint64_t, k);
 	for (size_t i=0; i<k; i++) {
@@ -59,7 +60,8 @@ kwayrng *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
 	ERROR_ASSERT(nbits<64, "Maximum number of random bits is 63");
 	kwayrng *ret = NEW(kwayrng);
 	ret->k = k;
-	ret->maxval = prime_succ((1 << nbits) - 1 );
+	//ret->maxval = prime_succ((1 << nbits) - 1 );
+	ret->maxval = (uint64_t)1 << nbits;
 	ret->coefs = NEW_ARR(uint64_t, k);
 	for (size_t i=0; i<k; i++) {
 		ret->coefs[i] = coefs[i] % ret->maxval;
@@ -69,6 +71,11 @@ kwayrng *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
 }
 
 
+void kwayrng_free(kwayrng *rng)
+{
+	FREE(rng->coefs);
+	FREE(rng);
+}
 
 
 size_t kwayrng_k(kwayrng *rng)
@@ -106,3 +113,14 @@ uint64_t kwayrng_next(kwayrng *rng)
 	return ret;
 }
 
+
+uint64_t kwayrng_val(kwayrng *rng, uint64_t ith)
+{
+	uint64_t ret = 0;
+    ith =  ith % rng->maxval;
+	for (uint64_t i=0, pow=1; i < rng->k; i++) {
+		ret = mod_sum(ret, mod_mult(rng->coefs[i], pow, rng->maxval), rng->maxval);
+		pow = mod_mult(pow, ith, rng->maxval);
+	}
+	return ret;
+}
