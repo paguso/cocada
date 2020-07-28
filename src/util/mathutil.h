@@ -132,4 +132,21 @@ bool is_prime(uint64_t n);
  */
 uint64_t prime_succ(uint64_t n);
 
+
+long double average_uint64_t(uint64_t *vals, size_t n);
+
+
+#define KTH_SMALLEST_DECL(TYPE, ...)\
+TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty);
+
+XX_PRIMITIVES(KTH_SMALLEST_DECL)
+
+#define MEDIAN_DECL(TYPE, ...)\
+TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);
+
+XX_PRIMITIVES(MEDIAN_DECL)
+
+
+
+
 #endif

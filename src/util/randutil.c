@@ -62,7 +62,7 @@ uint64_t rand_next ()
 
 #define RAND_RANGE_IMPL( TYPE )\
 TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
-    assert(r >= l);\
+    assert(r > l);\
     return l + (rand_next() % (r-l));\
 }
 

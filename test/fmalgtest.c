@@ -10,9 +10,9 @@
 
 void test_fmalg(CuTest *tc) 
 {
-    uint64_t maxval = (uint64_t)1<<16;
+    uint64_t maxval = (uint64_t)1<<32;
     bitvec *ticks = bitvec_new_with_capacity(maxval);
-    fmalg *fm  = fmalg_init(maxval);
+    fmalg *fm  = fmalg_init(maxval, 5, 9);
     uint64_t val=0, true_count=0;
     for (size_t i=0; i<100000; i++) {
         val = rand_range_uint64_t(0, maxval);
@@ -23,10 +23,10 @@ void test_fmalg(CuTest *tc)
         fmalg_process(fm, val);
         if (i%10 == 0) {
             uint64_t f0 = fmalg_query(fm);
-            DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0, true_count, (double)(f0-true_count)/true_count);
+            DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0, true_count, abs((double)f0-(double)true_count)/(double)true_count);
         }
-
     }
+    fmalg_free(fm);
 }
 
 

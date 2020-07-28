@@ -23,6 +23,7 @@
 #define ARRAYUTIL_H
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "bitbyte.h"
 #include "new.h"
@@ -98,6 +99,29 @@
 for (ELT_TYPE *__arr = (ELT_TYPE *)(ARR), ELT; __arr; __arr = NULL) \
 for (size_t __i = 0, __l = (ARR_LEN); __i < __l; __i = __l) \
 for (ELT = __arr[__i]; __i < __l; ELT = ((++__i) < __l) ? __arr[__i] : ELT )
+
+
+#define NEW_MATRIX(ID, TYPE, ROWS, COLS)\
+TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
+TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
+for (size_t __i=0; __i < (ROWS); __i++)\
+  ID[__i] = __ptr##ID + (__i * COLS);
+
+
+#define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
+size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
+TYPE** ID = (TYPE**) malloc(__len##ID);\
+memset(ID, 0x0, __len##ID);\
+TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
+for (size_t __i=0; __i < (ROWS); __i++)\
+  ID[__i] = __ptr##ID + (__i * COLS);
+
+
+#define FILL_MATRIX(ID, ROWS, COLS, EXPR)\
+for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
+for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
+ID[__i][__j] = (EXPR);\
+
 
 
 typedef struct {
