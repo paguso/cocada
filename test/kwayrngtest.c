@@ -52,15 +52,15 @@ void test_uniform(CuTest *tc)
 		for (size_t k1=0; k1<32; k1++) {
 			coefs[1] = k1;
 			for (size_t k2=0; k2<32; k2++) {
-			coefs[2] = k2;
-			for (size_t k3=0; k3<32; k3++) {
-				coefs[3] = k3;
-				kwayrng *rng = kwayrng_new_with_coefs(4, coefs,  4);
-				for (size_t x=0; x<32; x++) {
-					uint64_t val = kwayrng_next(rng);
-					counts[(size_t)val]++;
+				coefs[2] = k2;
+				for (size_t k3=0; k3<32; k3++) {
+					coefs[3] = k3;
+					kwayrng *rng = kwayrng_new_with_coefs(4, coefs,  4);
+					for (size_t x=0; x<32; x++) {
+						uint64_t val = kwayrng_next(rng);
+						counts[(size_t)val]++;
+					}
 				}
-			}
 			}
 		}
 	}

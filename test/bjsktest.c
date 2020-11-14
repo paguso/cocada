@@ -19,31 +19,40 @@
  *
  */
 
-#ifndef FMALG_H
-#define FMALG_H
-
 #include <inttypes.h>
+#include <stdio.h>
+
+#include "CuTest.h"
+
+#include "bjkst.h"
+#include "randutil.h"
 
 
-typedef struct _fmalg fmalg;
+void bjkst_test(CuTest *tc)
+{
+	size_t nbits = 16;
+	uint64_t maxval = 1 << nbits;
+	size_t ndistinct = maxval >> 3;
+	uint64_t step = maxval / ndistinct;
+	size_t n = 1 << 20;
+	
+	double eps = 0.1;
+	double delta = 0.1;
+	bjkst *counter = bjkst_init(nbits, eps, delta);
+
+	for (int i=0; i<n; i++) {
+		uint64_t val = rand_range_uint64_t(0, ndistinct) * step;
+		bjkst_process(counter, val);
+	}
+
+	uint64_t count = bjkst_qry(counter);
+	printf("Counter after %zu values = %"PRIu64"\n", n, count);
+}
 
 
-fmalg *fmalg_init_single(uint64_t maxval);
-
-
-fmalg *fmalg_init(uint64_t maxval, size_t navg, size_t mmedian);
-
-
-void fmalg_free(fmalg *fm);
-
-
-void fmalg_reset(fmalg *fm);
-
-
-void fmalg_process(fmalg *fm, uint64_t val);
-
-
-uint64_t fmalg_query(fmalg *fm);
-
-
-#endif
+CuSuite *bjkst_get_test_suite()
+{
+	CuSuite *suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, bjkst_test);
+	return suite;
+}

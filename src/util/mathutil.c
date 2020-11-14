@@ -54,6 +54,7 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 
 }
 
+
 uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m)
 {
 	uint64_t res = 0;
@@ -123,7 +124,7 @@ bool is_prime(uint64_t n)
 			prime = true;
 			continue;
 		}
-		for (size_t _j=0; _j<r-1; _j++) {
+		for (size_t _j=0; _j < r-1; _j++) {
 			x = mod_mult(x, x, n); // (x*x) % n;
 			if ( x == n-1 ) {
 				prime = true;
@@ -177,7 +178,7 @@ long double average_uint64_t(uint64_t *vals, size_t n)
 
 #define _PARTITION(TYPE, ...)\
 static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\
-	if (l==r) return l;\
+	assert(l < r);\
 	TYPE tmp;\
 	size_t p = rand_range_size_t(l, r);\
 	SWAP(v[l], v[p], tmp);\
@@ -209,15 +210,15 @@ TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty)\
 	}\
 	size_t p = len;\
 	size_t l = 0, r = len;\
-	while (p != k) {\
+	do {\
 		p = _partition_##TYPE(w, l, r);\
 		if ( p < k ) {\
 			l = p + 1;\
 		}\
 		else if ( p > k ) {\
-			r = p - 1;\
+			r = p;\
 		}\
-	}\
+	} while (p!=k);\
 	if (dirty) \
 		return w[p];\
 	TYPE ret = w[p];\

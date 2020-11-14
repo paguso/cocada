@@ -19,44 +19,46 @@
  *
  */
 
-#include <stddef.h>
-
-#include "CuTest.h"
-
-#include "bitvec.h"
+#include "arrutil.h"
 #include "errlog.h"
-#include "fmalg.h"
-#include "float.h"
+#include "new.h"
 #include "randutil.h"
+#include "twuhash.h"
 
 
-void test_fmalg(CuTest *tc)
+struct _twuhash {
+	byte_t in_bits, out_bits;
+	uint64_t *A;
+	uint64_t B;
+};
+
+
+twuhash *twuhash_new(byte_t in_bits, byte_t out_bits)
 {
-	uint64_t maxval = (uint64_t)1<<32;
-	bitvec *ticks = bitvec_new_with_capacity(maxval);
-	fmalg *fm  = fmalg_init(maxval, 5, 7);
-	uint64_t val=0, true_count=0;
-	double error;
-	for (size_t i=0; i<100000; i++) {
-		val = rand_range_uint64_t(0, maxval);
-		if ( bitvec_get_bit(ticks, val) == 0 ) {
-			true_count++;
-			bitvec_set_bit(ticks, val, 1);
-		}
-		fmalg_process(fm, val);
-		if (i%10 == 0) {
-			uint64_t f0 = fmalg_query(fm);
-			error = abs((double)f0-(double)true_count)/(double)true_count;
-			DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0, true_count, error);
-		}
+	ERROR_ASSERT( 0 < in_bits && in_bits <= 64 && 0 < out_bits && out_bits <= 64,
+	              "twuhash must hash m to n bits where 0 < m,n <= 64");
+	twuhash *ret = NEW(twuhash);
+	ret->in_bits = in_bits;
+	ret->out_bits = out_bits;
+	ret->A = NEW_ARR_0(uint64_t, out_bits);
+	for (size_t i = 0; i < out_bits; i++) {
+		ret->A[i] = rand_next();
+		ret->A[i] >>= (64 - out_bits);
 	}
-	fmalg_free(fm);
+	ret->B = rand_next();
+	ret->B >>= (64 - in_bits);
+	return ret;
 }
 
 
-CuSuite *fmalg_get_test_suite()
+
+uint64_t twuhash_hash(twuhash *h, uint64_t x)
 {
-	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_fmalg);
-	return suite;
+	uint64_t ret = 0;
+	for (size_t k = 0; k < h->out_bits; k++) {
+		ret <<= 1;
+		ret |= (uint64_bitcount1(h->A[k] & x) & 1);
+	}
+	ret ^= (h->B);
+	return ret;
 }

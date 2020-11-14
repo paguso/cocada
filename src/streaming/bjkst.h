@@ -19,31 +19,23 @@
  *
  */
 
-#ifndef FMALG_H
-#define FMALG_H
+#ifndef __BJKST__
+#define __BJKST__
 
-#include <inttypes.h>
+#include <stdint.h>
 
-
-typedef struct _fmalg fmalg;
-
-
-fmalg *fmalg_init_single(uint64_t maxval);
+typedef struct _bjkst bjkst;
 
 
-fmalg *fmalg_init(uint64_t maxval, size_t navg, size_t mmedian);
+/**
+ * @param nbits Number of bits of elements in the stream
+ * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
+ */
+bjkst *bjkst_init(size_t nbits, double eps, double delta);
 
+void bjkst_process(bjkst *counter, uint64_t val);
 
-void fmalg_free(fmalg *fm);
-
-
-void fmalg_reset(fmalg *fm);
-
-
-void fmalg_process(fmalg *fm, uint64_t val);
-
-
-uint64_t fmalg_query(fmalg *fm);
+uint64_t bjkst_qry(bjkst *counter);
 
 
 #endif

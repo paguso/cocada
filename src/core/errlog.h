@@ -24,6 +24,7 @@
 
 
 #include <stdio.h>
+#include <inttypes.h>
 
 /**
  * @file errlog.h

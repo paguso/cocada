@@ -25,6 +25,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "coretype.h"
+
 /**
  * @file randutil.h
  * @author Paulo Fonseca
@@ -41,9 +43,6 @@ uint64_t rand_next ();
 /*
  * Generic rand_range declaration
  */
-
-
-
 #define RAND_RANGE_DECL(TYPE)\
 /** Returns a uniformly picked TYPE random number in the range @p min to @p max-1*/\
 TYPE rand_range_##TYPE(TYPE min, TYPE max);
@@ -59,9 +58,6 @@ void shuffle_arr(void *arr, size_t n, size_t typesize);
 /*
  * Generic shuffle_arr declaration
  */
-
-
-
 #define SHUFFLE_ARR_DECL(TYPE)\
 /** Suffles an array of @p n TYPE elements in place */\
 void shuffle_arr_##TYPE(TYPE *arr, size_t n);

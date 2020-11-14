@@ -329,12 +329,17 @@ size_t byte_select1(byte_t b, size_t rank);
 size_t byte_select(byte_t b, size_t rank, bool bit);
 
 
+/**
+ * @brief Returns the position of the highest order 1 bit of @p v.
+ */
 int uint32_hibit(uint32_t v);
 
 
 int uint32_lobit(uint32_t v);
 
-
+/**
+ * @brief Returns the position of the lowest order 1 bit of @p v.
+ */
 byte_t uint64_lobit(uint64_t v);
 
 #endif

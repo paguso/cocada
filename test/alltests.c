@@ -30,6 +30,7 @@ CuSuite *binheap_get_test_suite();
 CuSuite *bitarray_get_test_suite();
 CuSuite *bitsandbytes_get_test_suite();
 CuSuite *bitvec_get_test_suite();
+CuSuite *bjkst_get_test_suite();
 CuSuite *bytearray_get_test_suite();
 CuSuite *cli_get_test_suite();
 CuSuite *csarray_get_test_suite();
@@ -54,6 +55,7 @@ CuSuite *strfileread_get_test_suite();
 CuSuite *strstream_get_test_suite();
 CuSuite *vebwtree_get_test_suite();
 CuSuite *tvec_get_test_suite();
+CuSuite *twuhash_get_test_suite();
 CuSuite *vec_get_test_suite();
 CuSuite *wavtree_get_test_suite();
 CuSuite *wtree_get_test_suite();
@@ -70,13 +72,14 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	//CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
 	//CuSuiteAddSuite(suite, bitvec_get_test_suite());
+	CuSuiteAddSuite(suite, bjkst_get_test_suite());
 	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
 	//CuSuiteAddSuite(suite, cli_get_test_suite());
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, fasta_get_test_suite());
-	CuSuiteAddSuite(suite, fmalg_get_test_suite());
+	//CuSuiteAddSuite(suite, fmalg_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, kwayrng_get_test_suite());
@@ -92,6 +95,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, queue_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strstream_get_test_suite());
+	//CuSuiteAddSuite(suite, twuhash_get_test_suite());
 	//CuSuiteAddSuite(suite, xstr_get_test_suite());
 
 

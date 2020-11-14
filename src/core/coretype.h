@@ -22,9 +22,9 @@
 #ifndef CORETYPE_H
 #define CORETYPE_H
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <limits.h>
 
 

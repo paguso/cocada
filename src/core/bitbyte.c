@@ -228,25 +228,36 @@ int uint32_hibit(uint32_t v)
 }
 
 
-static const int table_lo[32] = {
+static const int _uint32_lobit_tbl[32] = {
 	0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
 	31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
 };
 
 int uint32_lobit(uint32_t v)
 {
-	return table_lo[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
+	return _uint32_lobit_tbl[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
 }
 
 
-static const byte_t table64_lo[67] = 
-{ 64, 0, 1, 39, 2, 15, 40, 23, 3, 12, 16, 59, 41, 19, 24, 54, 4, 
-  128, 13, 10, 17, 62, 60, 28, 42, 30, 20, 51, 25, 44, 55, 47, 5, 32, 
-  128, 38, 14, 22, 11, 58, 18, 53, 63, 9, 61, 27, 29, 50, 43, 46, 31, 
-  37, 21, 57, 52, 8, 26, 49, 45, 36, 56, 7, 48, 35, 6, 34, 33 };
+static const byte_t _uint64_lobit_tbl[67] = {
+	64, 0, 1, 39, 2, 15, 40, 23, 3, 12, 16, 59, 41, 19, 24, 54, 4,
+	128, 13, 10, 17, 62, 60, 28, 42, 30, 20, 51, 25, 44, 55, 47, 5, 32,
+	128, 38, 14, 22, 11, 58, 18, 53, 63, 9, 61, 27, 29, 50, 43, 46, 31,
+	37, 21, 57, 52, 8, 26, 49, 45, 36, 56, 7, 48, 35, 6, 34, 33
+};
 
-
-byte_t uint64_lobit(uint64_t v) {
-	return table64_lo[(uint64_t)(v & -v) % 67];
+/*
+ * w := (v & -v) has all but the lobit to 0
+ * e.g. v = 01010110000
+ *     -v = 10101010000
+ *      w = 00000010000
+ * so, there are 64 distinct results of the form w=2^q.
+ * because 67 is a prime greater than 64, the values
+ * of w % 67 are all distinct. hence we can determine w,
+ * and hence q, from w % 67.
+ */
+byte_t uint64_lobit(uint64_t v)
+{
+	return _uint64_lobit_tbl[(uint64_t)(v & -v) % 67];
 }
 
