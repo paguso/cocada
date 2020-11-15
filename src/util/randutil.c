@@ -31,6 +31,8 @@
 #include "bitbyte.h"
 #include "randutil.h"
 
+#include "ltqnorn.h"
+
 
 static sfmt_t _rng;
 static bool __randinit = false;
@@ -92,3 +94,15 @@ RAND_RANGE_IMPL(TYPE) \
 SHUFFLE_ARR_IMPL(TYPE)
 
 XX_INTS(RAND_ALL_IMPL)
+
+
+double rand_unif() { 
+	double ret = (double) rand_next() / (double) 0xFFFFFFFFFFFFFFFF;
+	assert( 0 <= ret && ret <= 1.0 );
+	return ret;
+}
+
+
+double rand_norm() {
+	return	ltqnorm(rand_unif());
+}

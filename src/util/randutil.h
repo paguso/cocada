@@ -70,4 +70,8 @@ RAND_RANGE_DECL(TYPE)
 XX_INTS(RAND_ALL_DECL)
 
 
+double rand_norm();
+double rand_unif();
+
+
 #endif
