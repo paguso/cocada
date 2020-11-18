@@ -236,11 +236,15 @@ if ( !(ASSERTION) ) { \
 	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 }
 
+#define DEBUG_ACTION(STATEMENT)\
+	{STATEMENT;}\
+
 #else
 
 #define DEBUG(IGNORE , ...) ((void)0)
 #define DEBUG_IF(IGN, ORE , ...) ((void)0)
 #define DEBUG_ASSERT(IGN, ORE , ...) ((void)0)
+#define DEBUG_ACTION(IGNORE) ((void)0)
 
 #endif
 
