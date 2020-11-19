@@ -64,28 +64,28 @@ static size_t succ(vec *data, cmp_func cmp, const void *val)
 }
 
 
-void gk_upd(gksketch *sk, const void *val)
+void gk_upd(gksketch *self, const void *val)
 {
-    sk->total_qty++;
-    size_t succ_pos = succ(sk->vals, sk->cmp, val);
-    gk_qty *succ_qty = (gk_qty *) vec_get(sk->qtys, succ_pos);
-    const size_t qty_thres = ceil(2.0 * sk->err * sk->total_qty);
+    self->total_qty++;
+    size_t succ_pos = succ(self->vals, self->cmp, val);
+    gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
+    const size_t qty_thres = ceil(2.0 * self->err * self->total_qty);
     if ( succ_qty->qty + succ_qty->delta + 1 < qty_thres ) {
         succ_qty->qty++;
     }
     else {
-        vec_ins(sk->vals, succ_pos, val);
+        vec_ins(self->vals, succ_pos, val);
         gk_qty new_qty = {.qty = 1, .delta = succ_qty->qty + succ_qty->delta - 1};
-        vec_ins(sk->qtys, succ_pos, &new_qty);
+        vec_ins(self->qtys, succ_pos, &new_qty);
 
-        gk_qty *ith_qty = (gk_qty *) vec_get(sk->qtys, 0);
+        gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, 0);
         gk_qty *iplus1th_qty;
-        for (size_t i=0, l=vec_len(sk->vals); i < l - 1; i++ ) {
-            iplus1th_qty = (gk_qty *) vec_get(sk->qtys, i + 1);
+        for (size_t i=0, l=vec_len(self->vals); i < l - 1; i++ ) {
+            iplus1th_qty = (gk_qty *) vec_get(self->qtys, i + 1);
             if (ith_qty->qty + iplus1th_qty->qty + iplus1th_qty->delta < qty_thres) {
                 iplus1th_qty->qty += ith_qty->qty;
-                vec_del(sk->vals, i);
-                vec_del(sk->qtys, i);
+                vec_del(self->vals, i);
+                vec_del(self->qtys, i);
                 break;
             }
             ith_qty = iplus1th_qty;
@@ -143,32 +143,32 @@ void gk_merge(gksketch *self, const gksketch *other)
 }
 
 
-size_t gk_qry(gksketch *sk, const void *val)
+size_t gk_qry(gksketch *self, const void *val)
 {
-    if (vec_len(sk->vals) == 1) {
+    if (vec_len(self->vals) == 1) {
         return 0;
     }
-    size_t succ_pos = succ(sk->vals, sk->cmp, val);
-    gk_qty *succ_qty = (gk_qty *) vec_get(sk->qtys, succ_pos);   
+    size_t succ_pos = succ(self->vals, self->cmp, val);
+    gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);   
     size_t ret = 0;
     for(size_t i=0; i<succ_pos; i++) {
-        ret += ((gk_qty *)vec_get(sk->qtys, i))->qty;
+        ret += ((gk_qty *)vec_get(self->qtys, i))->qty;
     }       
     return ret - 1 + (succ_qty->qty + succ_qty->delta) / 2;
 }
 
 
-void gk_print(gksketch *sk, FILE *stream, void (*print_val)(FILE *, const void *))
+void gk_print(gksketch *self, FILE *stream, void (*print_val)(FILE *, const void *))
 {
-    size_t l = vec_len(sk->vals);
+    size_t l = vec_len(self->vals);
     for (size_t i=0; i < l-1; i++) 
     {
         fprintf(stream, "(");
-        print_val(stream, vec_get(sk->vals, i));
+        print_val(stream, vec_get(self->vals, i));
         fprintf(stream, ", ");
-        gk_qty *q = (gk_qty *) vec_get(sk->qtys, i);
+        gk_qty *q = (gk_qty *) vec_get(self->qtys, i);
         fprintf(stream, "%zu, %zu) ", q->qty, q->delta);
     }    
-    gk_qty *q = (gk_qty *) vec_get(sk->qtys, l-1);
+    gk_qty *q = (gk_qty *) vec_get(self->qtys, l-1);
     fprintf(stream, "(INF, %zu, %zu)", q->qty, q->delta);
 }
