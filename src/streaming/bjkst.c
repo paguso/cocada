@@ -66,7 +66,7 @@ bjkst* bjkst_init(size_t nbits, double eps, double delta)
 	ret->buf_size = 0;
 	ret->min_zeros = 0;
 	FILL_ARR(ret->buf, 0, nbits + 1, \
-             hashset_new(64, ident_hash_uint64_t, eq_uint64_t));
+	         hashset_new(64, ident_hash_uint64_t, eq_uint64_t));
 	return ret;
 }
 
