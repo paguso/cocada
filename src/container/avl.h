@@ -178,6 +178,10 @@ const void *avl_get(avl *self, void *key);
 bool avl_push(avl *self, void *val);
 
 
+void *avl_del(avl *self, void *val);
+
+
+
 /** 
  * @brief Prints the AVL tree in the given output @p stream.
  * @par prt_val is the function used to print the stored values.
@@ -187,7 +191,8 @@ void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *, const void
 
 #define AVL_DECLARE_ALL(TYPE, ...)\
 const void *avl_get_##TYPE(avl *self, TYPE val);\
-bool avl_push_##TYPE(avl *self, TYPE val);
+bool avl_push_##TYPE(avl *self, TYPE val);\
+TYPE avl_del_##TYPE(avl *self, TYPE val);
 
 
 XX_CORETYPES(AVL_DECLARE_ALL)

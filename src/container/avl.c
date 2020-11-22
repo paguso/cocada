@@ -36,58 +36,34 @@
 
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
+typedef union {
+    XX_CORETYPES(AVL_FIELD_DECL);
+} val_t;
 
 typedef struct _avlnode {
+	val_t val;
     union {
         XX_CORETYPES(AVL_FIELD_DECL);
-    } val;
+    } old_val;
 	char bf;
 	struct _avlnode *chd[2];
 } avlnode;
 
-/*
-avlnode *avlnode_new(void *val, size_t typesize)
-{
-	avlnode *ret = NEW(avlnode);
-	ret->val.rawptr_val = malloc(typesize);
-	memcpy(ret->val.rawptr_val, val, typesize);
-	ret->bf = 0;
-	ret->chd[LEFT] = ret->chd[RIGHT] = NULL;
-	return ret;
-}
-
-#define AVL_NODE_NEW_IMPL( TYPE , ...)\
-avlnode *avlnode_new_##TYPE(TYPE val)\
-{\
-	avlnode *ret = NEW(avlnode);\
-	ret->val.TYPE##_val = val;\
-	ret->bf = 0;\
-	ret->chd[LEFT] = ret->chd[RIGHT] = NULL;\
-	return ret;\
-}
-
-XX_CORETYPES(AVL_NODE_NEW_IMPL)
-*/
 
 struct _avl {
 	avlnode *root;
 	cmp_func cmp;
 	size_t typesize;
-	//size_t owned;
 };
 
 
 avl *avl_new(cmp_func cmp)
 {
 	avl *ret = NEW(avl);
-	//ret->owned = true;
-	//ret->typesize = typesize;
 	ret->cmp = cmp;
 	ret->root = NULL;
 	return ret;
 }
-
-
 
 
 
@@ -137,22 +113,7 @@ const void *avl_get_##TYPE (avl *self, TYPE key)\
 {\
 	return avl_get(self, &key);\
 }
-/*
-{\
-	avlnode *cur = self->root;\
-	while (cur != NULL) {\
-		int where = self->cmp(&key, &(cur->val.TYPE##_val));\
-		if (where == 0) {\
-			break;\
-		} else if (where < 0) {\
-			cur = cur->chd[0];\
-		} else if (where > 0) {\
-			cur = cur->chd[1];\
-		}\
-	}\
-	return cur ? cur->val.rawptr_val : NULL;\
-}
-*/
+
 XX_CORETYPES(AVL_GET_IMPL)
 
 
@@ -193,6 +154,7 @@ static push_t __avl_push(avl *self, avlnode *root, void *val, size_t val_size, b
 		ret.node = NEW(avlnode);
 		ret.node->bf = 0;
 		ret.node->chd[LEFT] = ret.node->chd[RIGHT] = NULL;
+		memcpy(&(ret.node->val), val, sizeof(val_t));
 		memcpy(&(ret.node->val), val, val_size);
 		ret.height_chgd = 1;
 		*insert = true;
@@ -266,6 +228,144 @@ bool avl_push_##TYPE(avl *self, TYPE val)\
 
 
 XX_CORETYPES(AVL_PUSH_IMPL)
+
+
+push_t __avl_del_min(avlnode *root, val_t *deleted_val) 
+{
+	assert(root != NULL);
+	if (root->chd[LEFT] == NULL) { //root is the min node
+		push_t ret = {.height_chgd = true, .node = root->chd[RIGHT]};
+		*deleted_val = root->val;
+		//memcpy(deleted_val, &(root->val), sizeof(val_t));
+		return ret;
+	} else {
+		push_t ret = __avl_del_min(root->chd[LEFT], deleted_val);
+		root->bf += ret.height_chgd;
+		assert(!ret.height_chgd || (0 <= root->bf && root->bf <= 2));
+		if (!ret.height_chgd) {
+			ret.node = root;
+			ret.height_chgd = false;
+			return ret;
+		} else if (root->bf == 0) { // was -1 now 0
+			ret.node = root;
+			ret.height_chgd = true;
+			return ret;
+		} else if (root->bf == +1) { // was 0 now +1
+			ret.node = root;
+			ret.height_chgd = false;
+			return ret;
+		} else { // was +1 now +2
+			if (root->chd[RIGHT]->bf < 0) {
+				root->chd[RIGHT] = __rotate_right(root->chd[RIGHT]);
+			}
+			ret.node = __rotate_left(root);
+			ret.height_chgd = true;
+			return ret;
+		}
+	}
+}
+
+
+push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, val_t *deleted_val) 
+{
+	if (root==NULL) {
+		push_t ret = {.height_chgd=0, .node=NULL};
+		return ret;
+	}
+	int where = self->cmp(val, &(root->val));
+	push_t ret;
+	if (where < 0) {
+		ret = __avl_del(self, root->chd[LEFT], val, deleted, deleted_val);
+		root->chd[LEFT] = ret.node;
+		root->bf += ret.height_chgd;
+	} else if (where > 0) {
+		ret = __avl_del(self, root->chd[RIGHT], val, deleted, deleted_val);
+		root->chd[RIGHT] = ret.node;
+		root->bf -= ret.height_chgd;
+	} else { //delete this root node
+		*deleted = true;
+		//memcpy(deleted_val, &(root->val), sizeof(val_t));
+		root->val = *deleted_val;
+		if (root->chd[LEFT] == NULL) { // leaf or has only right chd
+			ret.height_chgd = true;
+			ret.node = root->chd[RIGHT];
+			free(root);
+			return ret;
+		} else if (root->chd[RIGHT] == NULL) { // has only left chd 
+			ret.height_chgd = true; 
+			ret.node = root->chd[LEFT];
+			free(root);
+			return ret;			
+		} else { // has two children
+			val_t min_val;
+			ret = __avl_del_min(root->chd[RIGHT], &min_val);
+			root->chd[RIGHT] = ret.node;
+			memcpy(&(root->val), &min_val, sizeof(val_t));
+			root->bf -= ret.height_chgd;
+		}
+	} 
+	// here ret has recursive call result (maybe to del min)
+	// root->bf is up-to-date
+	assert(-2 <= root->bf && root->bf <= 2);
+	if (!ret.height_chgd) {
+		ret.node = root;
+		ret.height_chgd = false;
+		return ret;
+	} else if (root->bf == 0) { // was +-1 now 0
+		ret.node = root;
+		ret.height_chgd = true;
+		return ret;
+	} else if (root->bf == -1 || root->bf == +1) { // was 0 now +-1
+		ret.node = root;
+		ret.height_chgd = false;
+		return ret;
+	} else if (root->bf == -2 ) { // was -1 now -2
+		if (root->chd[LEFT]->bf > 0) {
+			root->chd[LEFT] = __rotate_left(root->chd[LEFT]);
+		}
+		ret.node = __rotate_right(root);
+		ret.height_chgd = true;
+		return ret;
+	} else { // was +1 now +2
+		if (root->chd[RIGHT]->bf < 0) {
+			root->chd[RIGHT] = __rotate_right(root->chd[RIGHT]);
+		}
+		ret.node = __rotate_left(root);
+		ret.height_chgd = true;
+		return ret;
+	}
+}
+
+
+void *avl_del(avl *self, void *val) 
+{
+	bool deleted;
+	val_t deleted_val;
+	push_t del_res = __avl_del(self, self->root, &val, &deleted, &deleted_val);
+	self->root = del_res.node;
+	return (deleted) ? deleted_val.rawptr_val : NULL;
+}
+
+
+#define AVL_DEL_IMPL(TYPE, ...) \
+TYPE avl_del_##TYPE(avl *self, TYPE val) \
+{\
+	bool deleted;\
+	val_t deleted_val;\
+	push_t del_res = __avl_del(self, self->root, &val, &deleted, &deleted_val);\
+	self->root = del_res.node;\
+	return (deleted) ? deleted_val.TYPE##_val : 0;\
+}
+
+XX_CORETYPES(AVL_DEL_IMPL)
+
+
+
+
+
+
+
+
 
 
 static void __avl_print(avlnode *root, size_t level, FILE *stream, void (*prt_val)(FILE *, const void *))
