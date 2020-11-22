@@ -102,10 +102,62 @@ void test_avl_push(CuTest *tc)
 }
 
 
+void test_avl_del(CuTest *tc)
+{
+	int half_univ = 10;
+	// typed primitive values
+	avl *tree = avl_new(cmp_int);
+	for (int i = 0; i < half_univ; i++) {
+		int val = half_univ + ((i % 2) ? i : -i);
+		//DEBUG("Insert %d\n", val);
+		avl_push_int(tree, val);
+		//DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	}
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+	// remove non-existent value
+	avl_del_int(tree, 2*half_univ);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+	// remove leaf node
+	avl_del_int(tree, 2);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+	avl_del_int(tree, 4);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+	avl_del_int(tree, 6);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+	
+	avl_del_int(tree, 13);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+	
+	avl_del_int(tree, 17);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+	
+	avl_del_int(tree, 19);
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+
+	FREE(tree, avl);
+}
+
+
+
+
 
 CuSuite *avl_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_avl_push);
+	SUITE_ADD_TEST(suite, test_avl_del);
 	return suite;
 }

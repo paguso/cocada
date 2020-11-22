@@ -237,9 +237,11 @@ push_t __avl_del_min(avlnode *root, val_t *deleted_val)
 		push_t ret = {.height_chgd = true, .node = root->chd[RIGHT]};
 		*deleted_val = root->val;
 		//memcpy(deleted_val, &(root->val), sizeof(val_t));
+		free(root);
 		return ret;
 	} else {
 		push_t ret = __avl_del_min(root->chd[LEFT], deleted_val);
+		root->chd[LEFT] = ret.node;
 		root->bf += ret.height_chgd;
 		assert(!ret.height_chgd || (0 <= root->bf && root->bf <= 2));
 		if (!ret.height_chgd) {
@@ -358,11 +360,6 @@ TYPE avl_del_##TYPE(avl *self, TYPE val) \
 }
 
 XX_CORETYPES(AVL_DEL_IMPL)
-
-
-
-
-
 
 
 
