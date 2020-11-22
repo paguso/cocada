@@ -25,6 +25,7 @@
 
 #include "avl.h"
 #include "coretype.h"
+#include "errlog.h"
 #include "new.h"
 #include "order.h"
 
@@ -33,39 +34,61 @@
 #define RIGHT 1
 
 
+#define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
+
+
 typedef struct _avlnode {
-	void *val;
+    union {
+        XX_CORETYPES(AVL_FIELD_DECL);
+    } val;
 	char bf;
 	struct _avlnode *chd[2];
 } avlnode;
 
-
+/*
 avlnode *avlnode_new(void *val, size_t typesize)
 {
 	avlnode *ret = NEW(avlnode);
-	ret->val = malloc(typesize);
-	memcpy(ret->val, val, typesize);
+	ret->val.rawptr_val = malloc(typesize);
+	memcpy(ret->val.rawptr_val, val, typesize);
 	ret->bf = 0;
 	ret->chd[LEFT] = ret->chd[RIGHT] = NULL;
 	return ret;
 }
 
+#define AVL_NODE_NEW_IMPL( TYPE , ...)\
+avlnode *avlnode_new_##TYPE(TYPE val)\
+{\
+	avlnode *ret = NEW(avlnode);\
+	ret->val.TYPE##_val = val;\
+	ret->bf = 0;\
+	ret->chd[LEFT] = ret->chd[RIGHT] = NULL;\
+	return ret;\
+}
+
+XX_CORETYPES(AVL_NODE_NEW_IMPL)
+*/
 
 struct _avl {
-	size_t typesize;
-	cmp_func cmp;
 	avlnode *root;
+	cmp_func cmp;
+	size_t typesize;
+	//size_t owned;
 };
 
 
-avl *avl_new(size_t typesize, cmp_func cmp)
+avl *avl_new(cmp_func cmp)
 {
 	avl *ret = NEW(avl);
-	ret->typesize = typesize;
+	//ret->owned = true;
+	//ret->typesize = typesize;
 	ret->cmp = cmp;
 	ret->root = NULL;
 	return ret;
 }
+
+
+
 
 
 static void __avl_dtor(avlnode *root, const dtor *dt)
@@ -96,7 +119,7 @@ const void *avl_get(avl *self, void *key)
 {
 	avlnode *cur = self->root;
 	while (cur != NULL) {
-		int where = self->cmp(key, cur->val);
+		int where = self->cmp(key, &(cur->val));
 		if (where == 0) {
 			break;
 		} else if (where < 0) {
@@ -105,12 +128,35 @@ const void *avl_get(avl *self, void *key)
 			cur = cur->chd[1];
 		}
 	}
-	return cur ? cur->val : NULL;
+	return cur ? cur->val.rawptr_val : NULL;
 }
 
 
+#define AVL_GET_IMPL(TYPE,...)\
+const void *avl_get_##TYPE (avl *self, TYPE key)\
+{\
+	return avl_get(self, &key);\
+}
+/*
+{\
+	avlnode *cur = self->root;\
+	while (cur != NULL) {\
+		int where = self->cmp(&key, &(cur->val.TYPE##_val));\
+		if (where == 0) {\
+			break;\
+		} else if (where < 0) {\
+			cur = cur->chd[0];\
+		} else if (where > 0) {\
+			cur = cur->chd[1];\
+		}\
+	}\
+	return cur ? cur->val.rawptr_val : NULL;\
+}
+*/
+XX_CORETYPES(AVL_GET_IMPL)
 
-avlnode *_rotate_left(avlnode *root)
+
+static avlnode *__rotate_left(avlnode *root)
 {
 	avlnode *r = root->chd[RIGHT];
 	avlnode *rl = r->chd[LEFT];
@@ -122,7 +168,7 @@ avlnode *_rotate_left(avlnode *root)
 }
 
 
-avlnode *_rotate_right(avlnode *root)
+static avlnode *__rotate_right(avlnode *root)
 {
 	avlnode *l = root->chd[LEFT];
 	avlnode *lr = l->chd[RIGHT];
@@ -137,33 +183,37 @@ avlnode *_rotate_right(avlnode *root)
 typedef struct {
 	avlnode *node;
 	bool height_chgd;
-} _push_ret;
+} push_t;
 
 
-_push_ret _push(avl *self, avlnode *root, void *val)
+static push_t __avl_push(avl *self, avlnode *root, void *val, size_t val_size, bool *insert)
 {
 	if (root == NULL) {
-		_push_ret ret;
-		ret.node = avlnode_new(val, self->typesize);
+		push_t ret;
+		ret.node = NEW(avlnode);
+		ret.node->bf = 0;
+		ret.node->chd[LEFT] = ret.node->chd[RIGHT] = NULL;
+		memcpy(&(ret.node->val), val, val_size);
 		ret.height_chgd = 1;
+		*insert = true;
 		return ret;
 	}
-	int where = self->cmp(val, root->val);
-	_push_ret ret;
+	int where = self->cmp(val, &(root->val));
+	push_t ret;
 	if (where == 0) { // duplicate value
 		ret.node = root;
 		ret.height_chgd = 0;
 		return ret;
 	} else if (where < 0) {
-		ret = _push(self, root->chd[0], val);
+		ret = __avl_push(self, root->chd[0], val, val_size, insert);
 		root->chd[LEFT] = ret.node;
 		root->bf -= ret.height_chgd;
 	} else if (where > 0) {
-		ret = _push(self, root->chd[1], val);
+		ret = __avl_push(self, root->chd[1], val, val_size, insert);
 		root->chd[RIGHT] = ret.node;
 		root->bf += ret.height_chgd;
 	}
-	// check for unbalance
+	// check for unbalanced
 	assert (-2 <= root->bf && root->bf <= 2);
 	if (!ret.height_chgd) {
 		ret.node = root;
@@ -179,47 +229,62 @@ _push_ret _push(avl *self, avlnode *root, void *val)
 	} else if (root->bf == -2) {
 		assert (root->chd[LEFT] != NULL);
 		if (root->chd[LEFT]->bf > 0) {
-			root->chd[LEFT] = _rotate_left(root->chd[LEFT]);
+			root->chd[LEFT] = __rotate_left(root->chd[LEFT]);
 		}
-		ret.node = _rotate_right(root);
+		ret.node = __rotate_right(root);
 		ret.height_chgd = 0;
 		return ret;
 	} else {//  (root->bf == +2)
 		assert (root->chd[RIGHT] != NULL);
 		if (root->chd[RIGHT]->bf < 0) {
-			root->chd[RIGHT] = _rotate_right(root->chd[RIGHT]);
+			root->chd[RIGHT] = __rotate_right(root->chd[RIGHT]);
 		}
-		ret.node = _rotate_left(root);
+		ret.node = __rotate_left(root);
 		ret.height_chgd = 0;
 		return ret;
 	}
 }
 
 
-void avl_push(avl *self, void *val)
+bool avl_push(avl *self, void *val)
 {
-	_push_ret ret = _push(self, self->root, val);
+	bool insert = false;
+	push_t ret = __avl_push(self, self->root, &val, sizeof(rawptr), &insert);
 	self->root = ret.node;
+	return insert;
 }
 
 
-static void __print(avlnode *root, size_t level, FILE *stream, void (*prt_val)(FILE *, const void *))
+#define AVL_PUSH_IMPL(TYPE, ...)\
+bool avl_push_##TYPE(avl *self, TYPE val)\
+{\
+	bool insert = false;\
+	push_t ret = __avl_push(self, self->root, &val, sizeof(TYPE), &insert);\
+	self->root = ret.node;\
+	return insert;\
+}\
+
+
+XX_CORETYPES(AVL_PUSH_IMPL)
+
+
+static void __avl_print(avlnode *root, size_t level, FILE *stream, void (*prt_val)(FILE *, const void *))
 {
 	if (root == NULL) {
 		return;
 	}
-	__print(root->chd[LEFT], level+1, stream, prt_val);
+	__avl_print(root->chd[LEFT], level+1, stream, prt_val);
 	for (size_t i=0; i<level; i++) {
 		fprintf(stream, "    ");
 	}
 	fprintf(stream, "[val=");
-	prt_val(stream, root->val);
+	prt_val(stream, &(root->val));
 	fprintf(stream, "  bf=%d]\n", (int)(root->bf));
-	__print(root->chd[RIGHT], level+1, stream, prt_val);
+	__avl_print(root->chd[RIGHT], level+1, stream, prt_val);
 }
 
 
 void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *, const void *))
 {
-	__print(self->root, 0, stream, prt_val);
+	__avl_print(self->root, 0, stream, prt_val);
 }
