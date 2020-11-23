@@ -44,7 +44,7 @@
  * given size 
  * 2. avl_dtor() object destructor (see new.h)
  * 2. avl_get() searches for a node matching a given key
- * 3. avl_push() inserts an **owned copy** of a given object 
+ * 3. avl_ins() inserts an **owned copy** of a given object 
  * 4. avl_del() removes the **owned copy** of an object
  * 
  * Thus, the plain version of this AVL tree stores pointers to external 
@@ -59,9 +59,9 @@
  * |              \                             |         type obj_t               
  * |               \  AVL node                  |       +-----------------+       
  * |          +--------------+                  |       |   int key       |        
- * |          | balance = 0  |          +-------------> |   ...           |        
+ * |          | balance = 0  |          .-------------> |   ...           |        
  * |          |              |          |       |       |                 |        
- * |          | val -------------------+        |       +-----------------+        
+ * |          | val --------------------'       |       +-----------------+        
  * |          |              |                  |               
  * |          | left  right  |                  |                          
  * |          +--/-------\---+                  |
@@ -94,7 +94,7 @@
  * of the primitive (and pointer) types defined in the coretype.h header. 
  * The corresponding access/insertion/deletion methods have the one-word type 
  * names as suffixes, e.g. `avl_get_int(avl *self, int val)`, or
- * `avl_push_ullong(avl *self, ullong val)`. 
+ * `avl_ins_ullong(avl *self, ullong val)`. 
  * 
  * Any value inserted via the corresponding typed  method
  * is directly stored in the node. The same applies for
@@ -151,48 +151,83 @@ typedef struct _avl avl;
 
 /**
  * @brief Constructor.
- * @param typesize The individual size of stored elements (in bytes).
  * @param cmp Key comparison function 
  * @see order.h
+ * @warning The comparison function receives pointers to whatever
+ * is stored in the tree nodes. If the nodes store pointers to
+ * external objects, which is the case for all but the primitive 
+ * types, then @p cmp receives pointers to pointers as arguments.
+ * See the header file documentation for an example.
  */
 avl *avl_new(cmp_func cmp);
 
 
 /**
  * @brief Destructor
+ * @see new.h
  */
 void avl_dtor(void *ptr, const dtor *dt);
 
 
 /**
- * @brief Return a pointer to the internal data matching the given *key
- * if it exists. Else returns NULL
+ * @brief Searches for an object matching a given @p key.
+ * @returns A copy of the reference stored in the tree node 
+ * which matches the given @p key (according to the AVL comparison
+ * function), if it exists. Otherwise returns NULL.
  */
-const void *avl_get(avl *self, void *key);
+bool avl_get(avl *self, void *key, void **dest);
 
 
 /**
- * @brief Inserts a copy of the value pointed at by @p val in the tree.
- * @warning If the tree already has a node matching @p val, nothing is inserted.
+ * @brief Inserts the reference @p val in the tree, if it doesn't
+ * already contain a reference to an object that compares as equal 
+ * to @p val. Otherwise this operation has no effect.
+ * @returns A boolean indicating if the insertion was successful.
  */
-bool avl_push(avl *self, void *val);
+bool avl_ins(avl *self, void *val);
 
 
-void *avl_del(avl *self, void *val);
-
+/**
+ * @brief Deletes the node matching a given @p key, if any.
+ * @returns A copy of the deleted reference stored in the tree node 
+ * which matched the given @p key (according to the AVL comparison
+ * function), if any. Otherwise returns NULL.
+ */
+bool avl_del(avl *self, void *key, void **dest);
 
 
 /** 
  * @brief Prints the AVL tree in the given output @p stream.
+ * 
  * @par prt_val is the function used to print the stored values.
+ * Similarly to the comparator function, the @p prt_val 
+ * function receives a pointer to whatever is stored in the
+ * tree nodes. 
+ * ## Example
+ * If the node stores references to objects of type `obj_t`
+ * ```C
+ * typedef struct {
+ *      int key;
+ *      double value;
+ * } obj_t;
+ * ```
+ * 
+ * Then the print function could be something like
+ * ```C
+ * void print_obj_t(FILE *stream, const void *ptr) {
+ *      fprintf(stream, "(key=%d value=%f)", (*((obj_t **)ptr))->key, (*((obj_t **)ptr))->value);
+ * }
+ * ```
  */
-void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *, const void *));
+void avl_print( const avl *self, FILE *stream, 
+                void (*prt_val)(FILE *, const void *));
+
 
 
 #define AVL_DECLARE_ALL(TYPE, ...)\
-const void *avl_get_##TYPE(avl *self, TYPE val);\
-bool avl_push_##TYPE(avl *self, TYPE val);\
-TYPE avl_del_##TYPE(avl *self, TYPE val);
+bool avl_get_##TYPE(avl *self, TYPE val, TYPE *dest);\
+bool avl_ins_##TYPE(avl *self, TYPE val);\
+bool avl_del_##TYPE(avl *self, TYPE val, TYPE *dest);
 
 
 XX_CORETYPES(AVL_DECLARE_ALL)

@@ -54,7 +54,7 @@ void print_obj_t(FILE *stream, const void *ptr)
 }
 
 
-void test_avl_push(CuTest *tc)
+void test_avl_ins(CuTest *tc)
 {
 	int half_univ = 100;
 	// typed primitive values
@@ -62,7 +62,8 @@ void test_avl_push(CuTest *tc)
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		DEBUG("Insert %d\n", val);
-		avl_push_int(tree, val);
+		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
+		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_int(tree, val));
 		DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
@@ -77,7 +78,8 @@ void test_avl_push(CuTest *tc)
 		obj->key = key;
 		obj->value = (double)key;
 		DEBUG("\n\nInsert owned obj %d\n", key);
-		avl_push(tree, obj);
+		CuAssert(tc, "Failed AVL push", avl_ins(tree, obj));
+		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins(tree, obj));
 		DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
@@ -92,11 +94,60 @@ void test_avl_push(CuTest *tc)
 		obj_t obj = {.key = key, .value = (double)key};
 		vec_push(buf, &obj);
 		DEBUG("\n\nInsert non-owned obj %d\n", key);
-		avl_push_rawptr(tree, (void *)vec_get(buf, i));
+		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
+		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
 		DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
+	FREE(tree, avl);
+	FREE(buf, vec);
+}
+
+
+void test_avl_get(CuTest *tc)
+{
+	int half_univ = 100;
+	// typed primitive values
+	avl *tree = avl_new(cmp_int);
+	for (int i = 0; i < half_univ; i++) {
+		int val = half_univ + ((i % 2) ? i : -i);
+		int getval;
+		CuAssert(tc, "Wrongly successful AVL search", !avl_get_int(tree, val, &getval));
+		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
+		CuAssert(tc, "Failed AVL search", avl_get_int(tree, val, &getval));
+		CuAssertIntEquals(tc, val, getval);
+	}
+	FREE(tree, avl);
+
+	// owned references with plain methods	
+	tree = avl_new(cmp_obj_t);
+	for (int i = 0; i < half_univ; i++) {
+		int key = half_univ + ((i % 2) ? i : -i);
+		obj_t *obj = NEW(obj_t);
+		obj_t *get_obj;
+		obj->key = key;
+		obj->value = (double)key;
+		CuAssert(tc, "Wrongly successful AVL search", !avl_get(tree, obj, (void **)&get_obj));
+		CuAssert(tc, "Failed AVL push", avl_ins(tree, obj));
+		CuAssert(tc, "Failed AVL search", avl_get(tree, obj, (void **)&get_obj));
+		CuAssertPtrEquals(tc, obj, get_obj);
+	}
+	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));	
+
+	// non-owned references with rawptr method
+	vec *buf = vec_new(sizeof(obj_t));
+	tree = avl_new(cmp_obj_t);
+	for (int i = 0; i < half_univ; i++) {
+		int key = half_univ + ((i % 2) ? i : -i);
+		obj_t obj = {.key = key, .value = (double)key};
+		obj_t *get_obj;
+		vec_push(buf, &obj);
+		CuAssert(tc, "Wrongly successful AVL search", !avl_get_rawptr(tree, (void *)vec_get(buf, i), (rawptr *)&get_obj));
+		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
+		CuAssert(tc, "Failed AVL search", avl_get_rawptr(tree, (void *)vec_get(buf, i), (rawptr *)&get_obj));
+		CuAssertPtrEquals(tc, (void *)vec_get(buf,i), get_obj);
+	}
 	FREE(tree, avl);
 	FREE(buf, vec);
 }
@@ -110,42 +161,43 @@ void test_avl_del(CuTest *tc)
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		//DEBUG("Insert %d\n", val);
-		avl_push_int(tree, val);
+		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
 		//DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
+	int res;
 	// remove non-existent value
-	avl_del_int(tree, 2*half_univ);
+	CuAssert(tc, "Attempt to delete non-existent element should return false", 
+			! avl_del_int(tree, 2*half_univ, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	// remove leaf node
-	avl_del_int(tree, 2);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 2, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
-	avl_del_int(tree, 4);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 4, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
-	avl_del_int(tree, 6);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 6, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 	
-	avl_del_int(tree, 13);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 13, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 	
-	avl_del_int(tree, 17);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 17, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 	
-	avl_del_int(tree, 19);
+	CuAssert(tc, "Failed deletion", avl_del_int(tree, 19, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-
 
 	FREE(tree, avl);
 }
@@ -157,7 +209,8 @@ void test_avl_del(CuTest *tc)
 CuSuite *avl_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_avl_push);
+	SUITE_ADD_TEST(suite, test_avl_ins);
+	SUITE_ADD_TEST(suite, test_avl_get);
 	SUITE_ADD_TEST(suite, test_avl_del);
 	return suite;
 }
