@@ -114,7 +114,7 @@ const void *iter_next(iter *it);
  * @param ITER 		An initialised pointer to an ::iter
  */
 #define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
-for (iter *__it = (iter *) (ITER); __it ; __it = NULL) \
+for (iter* __it = (iter *) (ITER); __it ; __it = NULL) \
 for (bool __has = iter_has_next(__it); __has; __has = false ) \
 for ( ELT_TYPE *ELT_NAME = (ELT_TYPE *) iter_next(__it) \
 		; __has && ( (__has = iter_has_next(__it)) || !__has ) \

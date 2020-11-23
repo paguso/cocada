@@ -58,6 +58,12 @@ void stack_pop(stack *s, void *dest)
 }
 
 
+void stack_peek(stack *s, void *dest)
+{
+	return vec_get_cpy(s, vec_len(s)-1, dest);
+}
+
+
 #define STACK_PUSH_IMPL( TYPE ) \
     void stack_push_##TYPE(stack *s, TYPE val)\
     { stack_push(s, &val); }
@@ -68,8 +74,14 @@ void stack_pop(stack *s, void *dest)
     { TYPE val; stack_pop(q, &val); return val;}
 
 
+#define STACK_PEEK_IMPL( TYPE ) \
+    TYPE stack_peek_##TYPE(stack *q)\
+    { TYPE val; stack_peek(q, &val); return val;}
+
+
 #define STACK_ALL_IMPL( TYPE , ...) \
 STACK_PUSH_IMPL(TYPE) \
-STACK_POP_IMPL(TYPE)
+STACK_POP_IMPL(TYPE) \
+STACK_PEEK_IMPL(TYPE)
 
 XX_CORETYPES(STACK_ALL_IMPL)

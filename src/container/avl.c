@@ -27,6 +27,7 @@
 #include "coretype.h"
 #include "errlog.h"
 #include "new.h"
+#include "stack.h"
 #include "order.h"
 
 
@@ -38,7 +39,7 @@
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
 typedef union {
-    XX_CORETYPES(AVL_FIELD_DECL);
+	XX_CORETYPES(AVL_FIELD_DECL);
 } core_t;
 
 typedef struct _avlnode {
@@ -241,7 +242,7 @@ bool avl_ins_##TYPE(avl *self, TYPE val)\
 XX_CORETYPES(AVL_PUSH_IMPL)
 
 
-push_t __avl_del_min(avlnode *root, core_t *deleted_val) 
+push_t __avl_del_min(avlnode *root, core_t *deleted_val)
 {
 	assert(root != NULL);
 	if (root->left == NULL) { //root is the min node
@@ -279,7 +280,7 @@ push_t __avl_del_min(avlnode *root, core_t *deleted_val)
 }
 
 
-push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, core_t *deleted_val) 
+push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, core_t *deleted_val)
 {
 	if (root==NULL) {
 		push_t ret = {.height_chgd=0, .node=NULL};
@@ -303,11 +304,11 @@ push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, core_t *del
 			ret.node = root->right;
 			free(root);
 			return ret;
-		} else if (root->right == NULL) { // has only left chd 
-			ret.height_chgd = true; 
+		} else if (root->right == NULL) { // has only left chd
+			ret.height_chgd = true;
 			ret.node = root->left;
 			free(root);
-			return ret;			
+			return ret;
 		} else { // has two children
 			core_t min_val;
 			ret = __avl_del_min(root->right, &min_val);
@@ -315,7 +316,7 @@ push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, core_t *del
 			memcpy(&(root->val), &min_val, sizeof(core_t));
 			root->bf -= ret.height_chgd;
 		}
-	} 
+	}
 	// here ret has recursive call result (maybe to del min)
 	// root->bf is up-to-date
 	assert(-2 <= root->bf && root->bf <= 2);
@@ -349,7 +350,7 @@ push_t __avl_del(avl *self, avlnode *root, void *val, bool *deleted, core_t *del
 }
 
 
-bool avl_del(avl *self, void *val, void **dest) 
+bool avl_del(avl *self, void *val, void **dest)
 {
 	bool deleted;
 	core_t deleted_val;
@@ -398,3 +399,200 @@ void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *, const void
 {
 	__avl_print(self->root, 0, stream, prt_val);
 }
+
+
+
+
+struct _avl_iter {
+	iter _t_iter;
+	avl *src;
+	stack *node_stack;
+	stack *next_chd_stack;
+	avl_traversal_order order;
+};
+
+
+bool avl_iter_has_next (iter *it)
+{
+	return !stack_empty(((avl_iter *)it->impltor)->node_stack);
+}
+
+
+static void _next_pre_order(avl *tree, stack *node_stack, stack *next_chd_stack) 
+{
+	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
+	assert(nxtchd == 0);
+	while (!stack_empty(node_stack)) {
+		avlnode *cur = stack_peek_rawptr(node_stack);
+		nxtchd = stack_pop_byte_t(next_chd_stack);
+		stack_push_byte_t(next_chd_stack, nxtchd + 1);
+		if (nxtchd == 0 && cur->left != NULL) {
+			stack_push_rawptr(node_stack, cur->left);
+			stack_push_byte_t(next_chd_stack, 0);
+			break;
+		} else if (nxtchd == 1 && cur->right != NULL) {
+			stack_push_rawptr(node_stack, cur->right);
+			stack_push_byte_t(next_chd_stack, 0);
+			break;
+		} else { // both chd visited
+			stack_pop_rawptr(node_stack);
+			stack_pop_byte_t(next_chd_stack);
+		}
+	}
+}
+
+
+static void _next_in_order(avl *tree, stack *node_stack, stack *next_chd_stack) 
+{
+	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
+	assert(nxtchd == 1);
+	while (!stack_empty(node_stack)) {
+		avlnode *cur = stack_peek_rawptr(node_stack);
+		nxtchd = stack_pop_byte_t(next_chd_stack);
+		stack_push_byte_t(next_chd_stack, nxtchd + 1);
+		if (nxtchd == 0) {
+			if (cur->left != NULL) {
+				stack_push_rawptr(node_stack, cur->left);
+				stack_push_byte_t(next_chd_stack, 0);
+			} else {
+				break;
+			}
+		} else if (nxtchd == 1 && cur->right != NULL) {
+			stack_push_rawptr(node_stack, cur->right);
+			stack_push_byte_t(next_chd_stack, 0);
+		} else { // both chd visited
+			stack_pop_rawptr(node_stack);
+			stack_pop_byte_t(next_chd_stack);
+		}
+	}
+}
+
+
+static void _next_post_order(avl *tree, stack *node_stack, stack *next_chd_stack) 
+{
+	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
+	assert(nxtchd == 2);
+	stack_pop_rawptr(node_stack);
+	stack_pop_byte_t(next_chd_stack);
+	while (!stack_empty(node_stack)) {
+		avlnode *cur = stack_peek_rawptr(node_stack);
+		nxtchd = stack_pop_byte_t(next_chd_stack);
+		stack_push_byte_t(next_chd_stack, nxtchd + 1);
+		if (nxtchd == 0) {
+			if (cur->left != NULL) {
+				stack_push_rawptr(node_stack, cur->left);
+				stack_push_byte_t(next_chd_stack, 0);
+			}
+		} else if (nxtchd == 1) { 
+			if (cur->right != NULL) {
+				stack_push_rawptr(node_stack, cur->right);
+				stack_push_byte_t(next_chd_stack, 0);
+			}
+		} else { // both chd visited
+			//stack_pop_rawptr(node_stack);
+			//stack_pop_byte_t(next_chd_stack);
+			break;
+		}
+	}
+}
+
+
+
+const void *avl_iter_next (iter *it)
+{
+	assert(avl_iter_has_next(it));
+	avl_iter *avlit = (avl_iter *) it->impltor;
+	const void *ret = &(((avlnode *) stack_peek_rawptr(avlit->node_stack))->val);
+	switch (avlit->order) {
+	case PRE_ORDER:
+		_next_pre_order(avlit->src, avlit->node_stack, avlit->next_chd_stack);
+		break;
+	case IN_ORDER:
+		_next_in_order(avlit->src, avlit->node_stack, avlit->next_chd_stack);
+		break;
+	case POST_ORDER:
+		_next_post_order(avlit->src, avlit->node_stack, avlit->next_chd_stack);
+		break;
+	default:
+		ERROR("Invalid AVL traversal order");
+		break;
+	}
+	return ret;
+}
+
+static iter_vt avl_iter_vt = {.has_next = avl_iter_has_next, .next = avl_iter_next };
+
+
+avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
+{
+	avl_iter *ret = NEW(avl_iter);
+	ret->_t_iter.impltor = ret;
+	ret->_t_iter.vt = &avl_iter_vt;
+	ret->src = self;
+	ret->order = order;
+	ret->node_stack = stack_new(sizeof(rawptr));
+	ret->next_chd_stack = stack_new(sizeof(byte_t));
+	avlnode *cur;
+	switch (order) {
+	case PRE_ORDER:
+		if (self->root) {
+			stack_push_rawptr(ret->node_stack, self->root);
+			stack_push_byte_t(ret->next_chd_stack, 0);
+		}
+		break;
+	case IN_ORDER:
+		if (self->root) {
+			stack_push_rawptr(ret->node_stack, self->root);
+			stack_push_byte_t(ret->next_chd_stack, 0);
+		}
+		cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+		while(cur->left != NULL) {
+			stack_pop_byte_t(ret->next_chd_stack);
+			stack_push_byte_t(ret->next_chd_stack, 1);
+			stack_push_rawptr(ret->node_stack, cur->left);
+			stack_push_byte_t(ret->next_chd_stack, 0);
+			cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+		}
+		stack_pop_byte_t(ret->next_chd_stack);
+		stack_push_byte_t(ret->next_chd_stack, 1);
+		break;
+	case POST_ORDER:
+		if (self->root) {
+			stack_push_rawptr(ret->node_stack, self->root);
+			stack_push_byte_t(ret->next_chd_stack, 0);
+		}
+		cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+		while ( cur->left != NULL || cur->right != NULL) {
+			if (cur->left != NULL) {
+				stack_pop_byte_t(ret->next_chd_stack);
+				stack_push_byte_t(ret->next_chd_stack, 1);
+				stack_push_rawptr(ret->node_stack, cur->left);
+				stack_push_byte_t(ret->next_chd_stack, 0);
+			} else { // has cur->right
+				stack_pop_byte_t(ret->next_chd_stack);
+				stack_push_byte_t(ret->next_chd_stack, 2);
+				stack_push_rawptr(ret->node_stack, cur->right);
+				stack_push_byte_t(ret->next_chd_stack, 0);
+			}
+			cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+		}
+		stack_pop_byte_t(ret->next_chd_stack);
+		stack_push_byte_t(ret->next_chd_stack, 2);
+		break;
+	default:
+		ERROR("Invalid AVL traversal order");
+		break;
+	}
+	return ret;
+}
+
+
+void avl_iter_free(avl_iter *self) {
+	if (!self) return;
+	FREE(self->node_stack);
+	FREE(self->next_chd_stack);
+	FREE(self);
+}
+
+
+IMPL_TRAIT(avl_iter, iter)

@@ -22,6 +22,7 @@
 #include "CuTest.h"
 #include "avl.h"
 #include "errlog.h"
+#include "iter.h"
 #include "order.h"
 #include "randutil.h"
 #include "vec.h"
@@ -38,7 +39,7 @@ typedef struct {
 } obj_t;
 
 
-int cmp_obj_t (const void *l, const void *r) 
+int cmp_obj_t (const void *l, const void *r)
 {
 	obj_t *lo = *((obj_t **)l);
 	obj_t *ro = *((obj_t **)r);
@@ -70,7 +71,7 @@ void test_avl_ins(CuTest *tc)
 	DEBUG("\n\n\n");
 	FREE(tree, avl);
 
-	// owned references with plain methods	
+	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);
@@ -84,7 +85,7 @@ void test_avl_ins(CuTest *tc)
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
-	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));	
+	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -120,7 +121,7 @@ void test_avl_get(CuTest *tc)
 	}
 	FREE(tree, avl);
 
-	// owned references with plain methods	
+	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);
@@ -133,7 +134,7 @@ void test_avl_get(CuTest *tc)
 		CuAssert(tc, "Failed AVL search", avl_get(tree, obj, (void **)&get_obj));
 		CuAssertPtrEquals(tc, obj, get_obj);
 	}
-	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));	
+	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -169,8 +170,8 @@ void test_avl_del(CuTest *tc)
 
 	int res;
 	// remove non-existent value
-	CuAssert(tc, "Attempt to delete non-existent element should return false", 
-			! avl_del_int(tree, 2*half_univ, &res));
+	CuAssert(tc, "Attempt to delete non-existent element should return false",
+	         ! avl_del_int(tree, 2*half_univ, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
@@ -186,15 +187,15 @@ void test_avl_del(CuTest *tc)
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 6, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-	
+
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 13, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-	
+
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 17, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-	
+
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 19, &res));
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
@@ -204,6 +205,49 @@ void test_avl_del(CuTest *tc)
 
 
 
+void test_avl_get_iter(CuTest *tc)
+{
+	int half_univ = 10;
+	// typed primitive values
+	avl *tree = avl_new(cmp_int);
+	for (int i = 0; i < half_univ; i++) {
+		int val = half_univ + ((i % 2) ? i : -i);
+		//DEBUG("Insert %d\n", val);
+		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
+		//DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	}
+	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG("\n\n\n");
+
+	avl_iter *iter = avl_get_iter(tree, PRE_ORDER);
+	for (int k=0; iter_has_next(avl_iter_as_iter(iter)); k++) {
+		int val = *((int *)iter_next(avl_iter_as_iter(iter)));
+		DEBUG("Preorder[%d] = %d\n",k, val);		
+	}
+	avl_iter_free(iter);
+/*
+	DEBUG("\n\n");
+	iter = avl_get_iter(tree, IN_ORDER);
+	for (int k=0; iter_has_next(avl_iter_as_iter(iter)); k++) {
+		int val = *((int *)iter_next(avl_iter_as_iter(iter)));
+		DEBUG("Inorder[%d] = %d\n",k, val);		
+		k++;
+	}
+	avl_iter_free(iter);
+*/
+	DEBUG("\n\n");
+	iter = avl_get_iter(tree, POST_ORDER);
+	for (int k=0; iter_has_next(avl_iter_as_iter(iter)); k++) {
+		int val = *((int *)iter_next(avl_iter_as_iter(iter)));
+		DEBUG("Post-order[%d] = %d\n",k, val);		
+		k++;
+	}
+	avl_iter_free(iter);
+
+
+
+}
+
 
 
 CuSuite *avl_get_test_suite()
@@ -212,5 +256,6 @@ CuSuite *avl_get_test_suite()
 	SUITE_ADD_TEST(suite, test_avl_ins);
 	SUITE_ADD_TEST(suite, test_avl_get);
 	SUITE_ADD_TEST(suite, test_avl_del);
+	SUITE_ADD_TEST(suite, test_avl_get_iter);
 	return suite;
 }

@@ -73,6 +73,11 @@ void stack_push(stack *s, const void *elt);
 void stack_pop(stack *s, void *dest);
 
 
+/**
+ * @brief Peeks the element from the top of a nonempty stack, if any;
+ */
+void stack_peek(stack *s, void *dest);
+
 
 #define STACK_PUSH_DECL( TYPE ) \
     void stack_push_##TYPE(stack *s, TYPE val);
@@ -80,9 +85,13 @@ void stack_pop(stack *s, void *dest);
 #define STACK_POP_DECL( TYPE ) \
     TYPE stack_pop_##TYPE(stack *q);
 
+#define STACK_PEEK_DECL( TYPE ) \
+    TYPE stack_peek_##TYPE(stack *q);
+
 #define STACK_ALL_DECL( TYPE , ...) \
 STACK_PUSH_DECL(TYPE) \
-STACK_POP_DECL(TYPE)
+STACK_POP_DECL(TYPE)\
+STACK_PEEK_DECL(TYPE)
 
 XX_CORETYPES(STACK_ALL_DECL)
 
