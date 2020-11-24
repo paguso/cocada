@@ -235,8 +235,8 @@ XX_CORETYPES(AVL_DECLARE_ALL)
 
 
 typedef enum {
-	PRE_ORDER = 0,
-	IN_ORDER = 1,
+	PRE_ORDER  = 0,
+	IN_ORDER   = 1,
 	POST_ORDER = 2,
 } avl_traversal_order;
 

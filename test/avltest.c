@@ -225,7 +225,7 @@ void test_avl_get_iter(CuTest *tc)
 		DEBUG("Preorder[%d] = %d\n",k, val);		
 	}
 	avl_iter_free(iter);
-/*
+
 	DEBUG("\n\n");
 	iter = avl_get_iter(tree, IN_ORDER);
 	for (int k=0; iter_has_next(avl_iter_as_iter(iter)); k++) {
@@ -234,7 +234,7 @@ void test_avl_get_iter(CuTest *tc)
 		k++;
 	}
 	avl_iter_free(iter);
-*/
+
 	DEBUG("\n\n");
 	iter = avl_get_iter(tree, POST_ORDER);
 	for (int k=0; iter_has_next(avl_iter_as_iter(iter)); k++) {
@@ -243,8 +243,6 @@ void test_avl_get_iter(CuTest *tc)
 		k++;
 	}
 	avl_iter_free(iter);
-
-
 
 }
 
