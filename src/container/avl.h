@@ -171,28 +171,34 @@ void avl_dtor(void *ptr, const dtor *dt);
 
 
 /**
- * @brief Searches for an object matching a given @p key.
- * @returns A copy of the reference stored in the tree node
- * which matches the given @p key (according to the AVL comparison
- * function), if it exists. Otherwise returns NULL.
+ * @brief Searches for a node matching a given @p key 
+ * (according to the AVL comparison function) , if any, and  
+ * copies of the reference stored therein into @p dest. 
+ * @returns A boolean indicating whether the search was
+ * successful.
  */
 bool avl_get(avl *self, void *key, void **dest);
 
 
 /**
- * @brief Inserts the reference @p val in the tree, if it doesn't
- * already contain a reference to an object that compares as equal
- * to @p val. Otherwise this operation has no effect.
- * @returns A boolean indicating if the insertion was successful.
+ * @brief Inserts a node containing the reference @p val, 
+ * if it doesn't already contain a node matching this
+ * value (according to thw comparison function). Otherwise 
+ * this operation has no effect.
+ * @returns A boolean indicating whether the insertion was 
+ * successful.
  */
 bool avl_ins(avl *self, void *val);
 
 
 /**
- * @brief Deletes the node matching a given @p key, if any.
- * @returns A copy of the deleted reference stored in the tree node
- * which matched the given @p key (according to the AVL comparison
- * function), if any. Otherwise returns NULL.
+ * @brief Deletes the node matching a given @p key 
+ * (according to the AVL comparison function) , if any, and  
+ * copies of the reference stored therein prior to removal 
+ * into @p dest. If no such node is found, the operation 
+ * has no effect. 
+ * @returns A boolean indicating whether the deletion was
+ * successful.
  */
 bool avl_del(avl *self, void *key, void **dest);
 
@@ -233,7 +239,9 @@ bool avl_del_##TYPE(avl *self, TYPE val, TYPE *dest);
 
 XX_CORETYPES(AVL_DECLARE_ALL)
 
-
+/**
+ * @brief AVL traversal order
+ */
 typedef enum {
 	PRE_ORDER  = 0,
 	IN_ORDER   = 1,
