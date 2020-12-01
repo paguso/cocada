@@ -54,6 +54,7 @@ CuSuite *mmindex_get_test_suite();
 CuSuite *qdigest_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *randutil_get_test_suite();
+CuSuite *segtree_get_test_suite();
 CuSuite *stack_get_test_suite();
 CuSuite *strfileread_get_test_suite();
 CuSuite *strstream_get_test_suite();
@@ -72,7 +73,7 @@ void run_all_tests(void)
 	CuSuite* suite = CuSuiteNew();
 
 	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	CuSuiteAddSuite(suite, avl_get_test_suite());
+	//CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	//CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
@@ -94,6 +95,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
+	CuSuiteAddSuite(suite, segtree_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());
 	//CuSuiteAddSuite(suite, vec_get_test_suite());
 	//CuSuiteAddSuite(suite, tvec_get_test_suite());

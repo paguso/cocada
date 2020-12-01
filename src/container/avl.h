@@ -171,9 +171,9 @@ void avl_dtor(void *ptr, const dtor *dt);
 
 
 /**
- * @brief Searches for a node matching a given @p key 
- * (according to the AVL comparison function) , if any, and  
- * copies of the reference stored therein into @p dest. 
+ * @brief Searches for a node matching a given @p key
+ * (according to the AVL comparison function) , if any, and
+ * copies of the reference stored therein into @p dest.
  * @returns A boolean indicating whether the search was
  * successful.
  */
@@ -181,22 +181,22 @@ bool avl_get(avl *self, void *key, void **dest);
 
 
 /**
- * @brief Inserts a node containing the reference @p val, 
+ * @brief Inserts a node containing the reference @p val,
  * if it doesn't already contain a node matching this
- * value (according to thw comparison function). Otherwise 
+ * value (according to thw comparison function). Otherwise
  * this operation has no effect.
- * @returns A boolean indicating whether the insertion was 
+ * @returns A boolean indicating whether the insertion was
  * successful.
  */
 bool avl_ins(avl *self, void *val);
 
 
 /**
- * @brief Deletes the node matching a given @p key 
- * (according to the AVL comparison function) , if any, and  
- * copies of the reference stored therein prior to removal 
- * into @p dest. If no such node is found, the operation 
- * has no effect. 
+ * @brief Deletes the node matching a given @p key
+ * (according to the AVL comparison function) , if any, and
+ * copies of the reference stored therein prior to removal
+ * into @p dest. If no such node is found, the operation
+ * has no effect.
  * @returns A boolean indicating whether the deletion was
  * successful.
  */

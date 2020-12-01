@@ -418,7 +418,7 @@ bool avl_iter_has_next (iter *it)
 }
 
 
-static void __next(avl *tree, avl_traversal_order order, stack *node_stack, stack *next_chd_stack) 
+static void __next(avl *tree, avl_traversal_order order, stack *node_stack, stack *next_chd_stack)
 {
 	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
 	assert(nxtchd == order);
@@ -541,7 +541,8 @@ avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
 }
 
 
-void avl_iter_free(avl_iter *self) {
+void avl_iter_free(avl_iter *self)
+{
 	if (!self) return;
 	FREE(self->node_stack);
 	FREE(self->next_chd_stack);
