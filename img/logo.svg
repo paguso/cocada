@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 210 297"
+   height="297mm"
+   width="210mm">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="1672"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
+     inkscape:guide-bbox="true"
+     showguides="false"
+     showgrid="true"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="318.51028"
+     inkscape:cx="299.20597"
+     inkscape:zoom="2.5384767"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base">
+    <inkscape:grid
+       id="grid833"
+       type="xygrid" />
+    <sodipodi:guide
+       id="guide837"
+       orientation="0,-1"
+       position="10.583333,286.41667" />
+    <sodipodi:guide
+       id="guide839"
+       orientation="0,-1"
+       position="52.916665,267.89584" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <rect
+       inkscape:export-ydpi="109.71429"
+       inkscape:export-xdpi="109.71429"
+       inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada-large.png"
+       y="63.500008"
+       x="19.84376"
+       height="27.781248"
+       width="117.73957"
+       id="rect1238"
+       style="opacity:1;fill:#ffffff;stroke:none;stroke-width:0.280174" />
+    <g
+       inkscape:export-ydpi="109.71429"
+       inkscape:export-xdpi="109.71429"
+       inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada-large.png"
+       transform="translate(0.09163646,0.20412532)"
+       id="g1236">
+      <path
+         id="path1003-4"
+         style="opacity:0.96;fill:#000000;stroke:#000000;stroke-width:0.189284"
+         d="m 87.467793,68.398159 c -3.844833,-1.2215 -8.038043,0.186617 -10.366364,3.481115 -2.328321,3.294499 -2.255948,7.717231 0.17892,10.933785 2.434868,3.216553 6.671905,4.486718 10.474713,3.140073 l -0.883176,-2.494114 c -2.716276,0.961884 -5.742716,0.05463 -7.481899,-2.242898 -1.739182,-2.297526 -1.790877,-5.456605 -0.127799,-7.809806 1.663078,-2.353201 4.658212,-3.358993 7.404507,-2.486498 2.746295,0.872495 4.611757,3.422494 4.611757,6.304053 v 9.260427 h 2.645833 l 3e-6,-9.260417 c 0,-4.034204 -2.611662,-7.604221 -6.456495,-8.82572 z"
+         sodipodi:nodetypes="sssccsssscccs"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077" />
+      <path
+         sodipodi:nodetypes="sssccsssscccs"
+         d="m 106.87039,86.049537 c -3.84484,1.2215 -8.038049,-0.186617 -10.366355,-3.481115 -2.32832,-3.294499 -2.25595,-7.717231 0.17892,-10.933785 2.434856,-3.216553 6.671895,-4.486718 10.474705,-3.140073 l -0.88318,2.494114 c -2.71628,-0.961884 -5.74272,-0.05463 -7.481899,2.242898 -1.739176,2.297526 -1.790866,5.456605 -0.1278,7.809806 1.663079,2.353201 4.658209,3.358993 7.404509,2.486498 2.74629,-0.872495 4.61177,-3.422495 4.61177,-6.304054 V 67.9634 h 2.64583 v 9.260417 c 0,4.034204 -2.61166,7.604221 -6.4565,8.82572 z"
+         style="opacity:0.96;fill:#000000;stroke:#000000;stroke-width:0.189284"
+         id="path1003-4-9"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077" />
+      <path
+         sodipodi:nodetypes="sssccsssscccs"
+         d="m 126.27299,68.398159 c -3.84483,-1.2215 -8.03805,0.186617 -10.36637,3.481115 -2.32832,3.294499 -2.25594,7.717231 0.17892,10.933785 2.43487,3.216553 6.67191,4.486718 10.47472,3.140073 l -0.88318,-2.494114 c -2.71627,0.961884 -5.74271,0.05463 -7.4819,-2.242898 -1.73918,-2.297526 -1.79088,-5.456605 -0.1278,-7.809806 1.66308,-2.353201 4.65822,-3.358993 7.40451,-2.486498 2.7463,0.872495 4.61176,3.422494 4.61176,6.304053 v 9.260427 h 2.64583 l 1e-5,-9.260417 c 0,-4.034204 -2.61167,-7.604221 -6.4565,-8.82572 z"
+         style="opacity:0.96;fill:#000000;stroke:#000000;stroke-width:0.189284"
+         id="path1003-4-5"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077" />
+      <path
+         sodipodi:nodetypes="sssccsssscccs"
+         d="m 56.435038,80.028316 c -1.2215,-3.844833 0.186617,-8.038043 3.481115,-10.366364 3.294499,-2.328321 7.71723,-2.255948 10.933784,0.17892 3.216553,2.434868 4.486718,6.671905 3.140073,10.474714 l -2.494114,-0.883177 c 0.961884,-2.716276 0.05463,-5.742716 -2.242898,-7.481899 -2.297526,-1.739182 -5.456604,-1.790877 -7.809805,-0.127799 -2.353201,1.663078 -3.358993,4.658212 -2.486498,7.404507 0.872495,2.746295 3.422494,4.611757 6.304053,4.611757 h 9.260426 v 2.645833 l -9.260416,3e-6 c -4.034204,0 -7.604221,-2.611661 -8.82572,-6.456495 z"
+         style="opacity:0.96;fill:#000000;stroke:#000000;stroke-width:0.189284"
+         id="path1003-4-0"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077" />
+      <path
+         id="path1003-4-0-7"
+         style="opacity:0.96;fill:#000000;stroke:#000000;stroke-width:0.189284"
+         d="m 24.949601,80.028316 c -1.2215,-3.844832 0.186617,-8.038042 3.481115,-10.366363 3.294499,-2.328321 7.71723,-2.255948 10.933784,0.17892 3.216553,2.434867 4.486718,6.671905 3.140073,10.474713 L 40.01046,79.432409 c 0.961884,-2.716275 0.05463,-5.742715 -2.242899,-7.481898 -2.297526,-1.739182 -5.456604,-1.790877 -7.809805,-0.127799 -2.353201,1.663078 -3.358993,4.658212 -2.486498,7.404506 0.872495,2.746295 3.422494,4.611757 6.304053,4.611757 h 9.260426 v 2.645833 l -9.260416,3e-6 c -4.034204,0 -7.604221,-2.61166 -8.82572,-6.456495 z"
+         sodipodi:nodetypes="sssccsssscccs"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077" />
+      <g
+         id="g1153"
+         transform="translate(-44.858656,-21.690917)"
+         inkscape:export-filename="C:\Users\PauloFonseca\Documents\work\github\cocada\cocada.png"
+         inkscape:export-xdpi="117.63077"
+         inkscape:export-ydpi="117.63077">
+        <path
+           style="opacity:1;fill:#ffffff;stroke:#ffffff;stroke-width:0.264999"
+           d="m 95.588964,90.290369 a 8.5873138,8.5873138 0 0 1 0.05323,0 8.5873138,8.5873138 0 0 1 8.587096,8.587073 8.5873138,8.5873138 0 0 1 -8.587098,8.587068 8.5873138,8.5873138 0 0 1 -8.587074,-8.587068 8.5873138,8.5873138 0 0 1 8.533846,-8.587073 z"
+           id="path1222" />
+        <path
+           d="m 95.582563,89.617034 a 9.2604168,9.2604168 0 0 0 -9.19272,9.260416 9.2604168,9.2604168 0 0 0 9.260417,9.26042 9.2604168,9.2604168 0 0 0 9.26042,-9.26042 9.2604168,9.2604168 0 0 0 -9.26042,-9.260416 9.2604168,9.2604168 0 0 0 -0.0677,0 z m 0.01447,0.673343 a 8.5873136,8.5873136 0 0 1 0.05323,0 8.5873136,8.5873136 0 0 1 8.587067,8.587073 8.5873136,8.5873136 0 0 1 -8.587069,8.58708 8.5873136,8.5873136 0 0 1 -8.587074,-8.58708 8.5873136,8.5873136 0 0 1 8.533846,-8.587073 z"
+           style="opacity:1;fill:#784421;stroke:#552200;stroke-width:0.264999"
+           id="path1082" />
+        <g
+           id="g1173"
+           transform="translate(21.166667,1.3229166)">
+          <circle
+             r="6.4666314"
+             cy="97.554504"
+             cx="74.483589"
+             id="path1082-4"
+             style="opacity:1;fill:#ffffff;stroke:#b3b3b3;stroke-width:0.185051" />
+          <path
+             id="path1082-4-4"
+             style="opacity:1;fill:#e6e6e6;stroke:#e6e6e6;stroke-width:0.185051"
+             d="m 74.454266,91.049549 c -3.556399,0.02123 -6.42818,2.910326 -6.42803,6.466789 7e-6,2.857682 1.875777,5.376552 4.61367,6.195412 -1.2717,-1.0345 -2.00986,-2.58673 -2.0097,-4.226018 3.2e-5,-0.458526 0.05672,-0.903816 0.16344,-1.329252 0.593447,-2.365716 2.73406,-4.117516 5.28378,-4.117449 2.056702,9.5e-5 3.937991,1.158612 4.86378,2.995168 -0.252242,-3.374853 -3.063914,-5.984407 -6.44818,-5.98465 -0.01293,-3.9e-5 -0.02587,-3.9e-5 -0.0388,0 z"
+             sodipodi:nodetypes="ccccsccccc" />
+          <circle
+             style="opacity:1;fill:none;stroke:#b3b3b3;stroke-width:0.185051"
+             id="path1082-4-0"
+             cx="74.483589"
+             cy="97.554504"
+             r="6.4666314" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

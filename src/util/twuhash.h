@@ -26,9 +26,11 @@
 
 /**
  * @file twuhash.h
+ * @brief Two-way universal hash family
  * @author Paulo Fonseca
- * @brief Defines a two-way universal hash family which maps an n-bit
- * unsigned int value to an m-bit unsigned int value.
+ *
+ * Defines a family of two-way universal hash functions mapping 
+ * n-bit to m-bit unsigned int values.
  * The hash is computed as
  * ```
  * h(x) = Ax + B
