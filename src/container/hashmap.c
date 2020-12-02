@@ -22,7 +22,7 @@
 //#include <immintrin.h>
 
 #include "coretype.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "new.h"
 #include "cstrutil.h"

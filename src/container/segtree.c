@@ -19,7 +19,7 @@
  *
  */
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "coretype.h"
 #include "mathutil.h"
 #include "new.h"

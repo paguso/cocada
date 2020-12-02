@@ -30,7 +30,7 @@
 #include <limits.h>
 #include <math.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "cli.h"
 #include "cstrutil.h"
 #include "hash.h"

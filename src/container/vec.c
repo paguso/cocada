@@ -27,7 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "iter.h"
 #include "mathutil.h"

@@ -25,7 +25,7 @@
 #include "CuTest.h"
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "bytearr.h"
 #include "cstrutil.h"
 #include "huffcode.h"

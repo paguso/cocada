@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "math.h"
 #include "new.h"
 #include "xstr.h"

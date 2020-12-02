@@ -21,7 +21,7 @@
 
 #include <assert.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "bjkst.h"
 #include "coretype.h"
 #include "errlog.h"

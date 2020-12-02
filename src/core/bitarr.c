@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitarr.h"
 #include "bitbyte.h"
 #include "bytearr.h"

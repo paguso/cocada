@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitvec.h"
 #include "csarray.h"
 #include "strstream.h"

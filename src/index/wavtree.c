@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "bytearr.h"

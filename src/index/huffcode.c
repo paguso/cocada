@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "binheap.h"
 #include "bitbyte.h"
 #include "bitarr.h"

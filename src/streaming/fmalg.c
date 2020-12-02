@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <inttypes.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "errlog.h"
 #include "fmalg.h"

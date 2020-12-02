@@ -26,7 +26,7 @@
 
 #include "CuTest.h"
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "new.h"

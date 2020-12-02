@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "vec.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "binheap.h"
 #include "new.h"
 #include "order.h"

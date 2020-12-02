@@ -31,7 +31,7 @@
 #include "errlog.h"
 #include "order.h"
 #include "mathutil.h"
-#include "arrutil.h"
+#include "arrays.h"
 
 /**
  * @file tvec.h

@@ -21,7 +21,7 @@
 
 #include "CuTest.h"
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "errlog.h"
 #include "randutil.h"
 #include "twuhash.h"

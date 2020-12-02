@@ -27,12 +27,9 @@
 
 #include "bitbyte.h"
 #include "new.h"
-#include "cstrutil.h"
-#include "iter.h"
-#include "trait.h"
 
 /**
- * @file arrutil.h
+ * @file arrays.h
  * @author Paulo Fonseca
  *
  * @brief Assorted array utility macros and functions.
@@ -122,20 +119,6 @@ for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
 for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
 ID[__i][__j] = (EXPR);\
 
-
-
-typedef struct {
-	iter _t_iter;
-	void *src;
-	size_t typesize;
-	size_t len;
-	size_t index;
-} arr_iter;
-
-
-arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize);
-
-DECL_TRAIT(arr_iter, iter);
 
 
 #endif

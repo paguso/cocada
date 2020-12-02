@@ -27,8 +27,8 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
-#include "arrutil.h"
+#include "arrays.h"
+#include "arrays.h"
 #include "new.h"
 #include "cstrutil.h"
 #include "hashmap.h"

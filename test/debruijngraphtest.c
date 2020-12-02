@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "cstrutil.h"
 #include "debruijngraph.h"
 #include "strbuf.h"

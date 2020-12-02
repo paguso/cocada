@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "bitbyte.h"
 #include "errlog.h"
 #include "new.h"

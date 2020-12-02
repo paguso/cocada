@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "binheap.h"
 #include "randutil.h"
 #include "order.h"

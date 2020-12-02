@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include "arrutil.h"
+#include "arriter.h"
 #include "iter.h"
 #include "trait.h"
 

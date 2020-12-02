@@ -25,7 +25,7 @@
 
 
 #include "alphabet.h"
-#include "arrutil.h"
+#include "arrays.h"
 #include "fasta.h"
 #include "hashmap.h"
 #include "mathutil.h"

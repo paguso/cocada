@@ -19,7 +19,7 @@
  *
  */
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "errlog.h"
 #include "new.h"
 #include "randutil.h"

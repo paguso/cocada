@@ -25,7 +25,7 @@
 
 #include "CuTest.h"
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "cli.h"
 #include "cstrutil.h"
 #include "vec.h"

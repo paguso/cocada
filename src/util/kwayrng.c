@@ -22,7 +22,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "arrutil.h"
+#include "arrays.h"
 #include "coretype.h"
 #include "errlog.h"
 #include "kwayrng.h"
