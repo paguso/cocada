@@ -236,6 +236,9 @@ if ( !(ASSERTION) ) { \
 	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 }
 
+/**
+ * @brief Executes a statement if in DEBUG mode, i.e. if  DEBUG_LVL >= 3
+ */
 #define DEBUG_ACTION(STATEMENT)\
 	{STATEMENT;}\
 

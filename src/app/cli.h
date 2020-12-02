@@ -315,10 +315,10 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * - @p longname ia a valid <id> according to the CLI grammar (a letter followed by
  *   a string of alphanumeric chars, dash '-' or underscores '_')
  * - @p min_val_no <= @p max_val_no
- * - If @p max_val_no == 0 then @type == ARG_NONE and vice versa (iff)
+ * - If @p max_val_no == 0 then @p type == ARG_NONE and vice versa (iff)
  * - If @p need == OPT_REQUIRED, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @p multiplicity == OPT_MULTIPLE, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
- * - If @type == ARG_CHOICE then @p choices must be a non-empty vector of strings with
+ * - If @p type == ARG_CHOICE then @p choices must be a non-empty vector of strings with
  *   every member being a valid <id> according to the CLI grammar
  * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @p multiplicity == OPT_SINGLE
  * - If @p need == OPT_REQUIRED, @p defaults is discarded

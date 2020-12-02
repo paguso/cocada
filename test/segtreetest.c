@@ -77,7 +77,7 @@ void test_segtree_upd(CuTest *tc)
 			CuAssertIntEquals(tc, ex, v);
 		}
 	}
-    segtree_free(tree);
+	segtree_free(tree);
 }
 
 

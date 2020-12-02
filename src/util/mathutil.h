@@ -115,6 +115,7 @@ uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m);
  */
 uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m);
 
+
 /**
  * @brief Naive O(sqrt(n))-time primality testing.
  */
@@ -140,6 +141,7 @@ long double average_uint64_t(uint64_t *vals, size_t n);
 TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty);
 
 XX_PRIMITIVES(KTH_SMALLEST_DECL)
+
 
 #define MEDIAN_DECL(TYPE, ...)\
 TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);

@@ -29,7 +29,7 @@
  * @brief Two-way universal hash family
  * @author Paulo Fonseca
  *
- * Defines a family of two-way universal hash functions mapping 
+ * Defines a family of two-way universal hash functions mapping
  * n-bit to m-bit unsigned int values.
  * The hash is computed as
  * ```
