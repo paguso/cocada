@@ -26,6 +26,7 @@
 #include "CuTest.h"
 
 #include "arrays.h"
+#include "cstrutil.h"
 #include "order.h"
 #include "hash.h"
 #include "hashmap.h"
@@ -116,7 +117,7 @@ void test_hashmap_obj(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (uint64_t i=mink; i<maxk; i++) {
+	for (uint64_t i=mink; i<maxk; i+=2) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		CuAssert(tc, "map should contain key", hashmap_has_key(hmap, &k));
@@ -125,6 +126,27 @@ void test_hashmap_obj(CuTest *tc)
 		n--;
 		FREE(k);
 	}
+
+	hashmap_fit(hmap);
+
+	for (uint64_t i=mink; i<maxk; i++) {
+		char *k = cstr_new(64);
+		uint_to_cstr(k, i, 'b');
+		if (i%2) {
+			object *v = (object *)hashmap_get(hmap, &k);
+			CuAssert(tc, "map should contain key", hashmap_has_key(hmap, &k));
+			CuAssert(tc, "wrong k1 value", i == v->k1);
+			CuAssert(tc, "wrong k2 value", i+1 == v->k2);
+			CuAssert(tc, "wrong k3 value", strcmp(k, v->k3)==0);
+		} else {
+			object *v = (object *)hashmap_get(hmap, &k);
+			CuAssert(tc, "should be null", v==NULL);
+		}
+		FREE(k);
+	}
+	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
+
+
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 	DESTROY(hmap, dtor_cons(dtor_cons(DTOR(hashmap), ptr_dtor()), empty_dtor()));
 }

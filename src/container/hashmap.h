@@ -103,6 +103,13 @@ void hashmap_dtor(void *ptr, const dtor *dt);
  */
 size_t hashmap_sizeof();
 
+
+/**
+ * @brief Adjusts the size of the table to the number of stored elements.
+ */
+void hashmap_fit(hashmap *hmap);
+
+
 /**
  * @brief Checks whether the @p map already contains a given @p key.
  */
