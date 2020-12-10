@@ -35,7 +35,7 @@
 
 static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
 static float GROW_BY = 2.0F; // DON´T TOUCH
-static float MAX_LOAD = 0.75; 
+static float MAX_LOAD = 0.75;
 
 static byte_t  ST_EMPTY = 0x80; // empty slot ctrl code   0b10000000
 static byte_t  ST_DEL   = 0xFE; // deleted slot ctrl code 0b11111110
@@ -174,7 +174,7 @@ static _find_res _find(const hashmap *hmap, const void *key, uint64_t h)
 	while (true) {
 		//printf("   probing pos %zu\n", ret.pos );
 		if ( hmap->tally[ret.pos] == h2 &&
-		     hmap->keyeq( key, _key_at(hmap, ret.pos) ) ) {
+		        hmap->keyeq( key, _key_at(hmap, ret.pos) ) ) {
 			ret.found = true;
 			break;
 		}
@@ -317,14 +317,14 @@ static void _resize(hashmap *hmap, size_t new_cap)
 
 
 static void _check_resize(hashmap *hmap)
-{	
+{
 	if (hmap->occ < hmap->max_occ) {
 		return;
 	}
 	_resize( hmap, (size_t)(GROW_BY * hmap->cap) );
 }
 
-	
+
 
 void hashmap_set(hashmap *hmap, const void *key, const void *val)
 {
@@ -353,12 +353,12 @@ size_t hashmap_size(const hashmap *map)
 }
 
 
-void hashmap_fit(hashmap *hmap) 
+void hashmap_fit(hashmap *hmap)
 {
 	size_t new_cap;
-	for ( new_cap = MIN_CAPACITY; 
-		  hmap->size >= MAX_LOAD * new_cap; 
-		  new_cap = (size_t)(new_cap * GROW_BY) );
+	for ( new_cap = MIN_CAPACITY;
+	        hmap->size >= MAX_LOAD * new_cap;
+	        new_cap = (size_t)(new_cap * GROW_BY) );
 	_resize(hmap, new_cap);
 }
 
@@ -381,7 +381,7 @@ static bool _hashmap_iter_has_next(iter *it)
 static void _hashmap_iter_goto_next(hashmap_iter *hmit)
 {
 	while ((hmit->index < hmit->src->cap) &&
-	       (hmit->src->tally[hmit->index] >> 7))
+	        (hmit->src->tally[hmit->index] >> 7))
 		hmit->index++;
 }
 

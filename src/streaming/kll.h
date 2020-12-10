@@ -19,23 +19,24 @@
  *
  */
 
-#ifndef BJKST_H
-#define BJKST_H
+#ifndef KLL_H
+#define KLL_H
 
-#include <stdint.h>
+#include <stdio.h>
 
-typedef struct _bjkst bjkst;
+#include "coretype.h"
+#include "order.h"
+
+typedef struct __kllsumm kllsumm;
 
 
-/**
- * @param nbits Number of bits of elements in the stream
- * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
- */
-bjkst *bjkst_init(size_t nbits, double eps, double delta);
+kllsumm *kll_new(size_t typesize, cmp_func cmp, double eps, double c);
 
-void bjkst_process(bjkst *counter, uint64_t val);
+void kll_upd(kllsumm *self, void *val);
 
-uint64_t bjkst_qry(bjkst *counter);
+size_t kll_rank(kllsumm *self, void *val);
+
+void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *, const void *));
 
 
 #endif

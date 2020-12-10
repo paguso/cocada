@@ -210,7 +210,7 @@ size_t _sum_tree(qdnode *root)
 }
 
 
-size_t qdigest_qry(qdigest *self, size_t val)
+size_t qdigest_rank(qdigest *self, size_t val)
 {
 	qdnode *cur = self->root;
 	size_t l = 0, r = self->range, m;

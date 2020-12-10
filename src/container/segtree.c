@@ -86,8 +86,8 @@ void segtree_upd(segtree *self, size_t pos, const void *val)
 	pos += self->range;
 	vec_set(self->tree, pos, val);
 	for (pos /= 2 ; pos > 1; pos /= 2) {
-		self->merge( vec_get(self->tree, 2 * pos), 
-                     vec_get(self->tree, 2 * pos + 1),
+		self->merge( vec_get(self->tree, 2 * pos),
+		             vec_get(self->tree, 2 * pos + 1),
 		             vec_get_mut(self->tree, pos) );
 	}
 }

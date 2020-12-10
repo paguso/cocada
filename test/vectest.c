@@ -28,6 +28,7 @@
 #include "arrays.h"
 #include "cstrutil.h"
 #include "errlog.h"
+#include "mathutil.h"
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
@@ -344,6 +345,28 @@ void test_vec_qsort(CuTest *tc)
 	FREE(v, vec);
 }
 
+
+
+void test_vec_bsearch(CuTest *tc)
+{
+	vec *v = vec_new(sizeof(int));
+	int maxval = 100;
+	CuAssertIntEquals(tc, 0, (int)vec_bsearch(v, &maxval, cmp_int));
+	for (int i=0; i<maxval; i+=2) {
+		for (int j=0; j<i; j++) {
+			vec_push_int(v, i);
+		}
+	}
+	for (int i=0; i<maxval; i++) {
+		size_t pos = vec_bsearch(v, &i, cmp_int);
+		size_t exp_pos = (i>0 && IS_EVEN(i)) ? ((i/2) * ((i/2)-1)) : vec_len(v);
+		CuAssertIntEquals(tc, exp_pos, pos);
+	}
+	FREE(v);
+}
+
+
+
 typedef struct _vecobj {
 	int i;
 	double d;
@@ -402,6 +425,7 @@ CuSuite *vec_get_test_suite()
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_vec_new);
 	SUITE_ADD_TEST(suite, test_vec_app);
+	SUITE_ADD_TEST(suite, test_vec_bsearch);
 	SUITE_ADD_TEST(suite, test_vec_get_cpy);
 	SUITE_ADD_TEST(suite, test_vec_set);
 	SUITE_ADD_TEST(suite, test_vec_ins);

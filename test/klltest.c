@@ -19,23 +19,41 @@
  *
  */
 
-#ifndef BJKST_H
-#define BJKST_H
+#include "CuTest.h"
 
-#include <stdint.h>
-
-typedef struct _bjkst bjkst;
-
-
-/**
- * @param nbits Number of bits of elements in the stream
- * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
- */
-bjkst *bjkst_init(size_t nbits, double eps, double delta);
-
-void bjkst_process(bjkst *counter, uint64_t val);
-
-uint64_t bjkst_qry(bjkst *counter);
+#include "errlog.h"
+#include "kll.h"
+#include "mathutil.h"
+#include "randutil.h"
 
 
-#endif
+static void print_int(FILE *stream, const void *val)
+{
+	fprintf(stream, "%d", *((int*)val));
+}
+
+
+void test_kll_upd(CuTest *tc)
+{
+	kllsumm *summ = kll_new(sizeof(int), cmp_int, 0.2, 0.6);
+	kll_print(summ, stderr, print_int);
+	size_t n = 100;
+	int max_val = 30;
+	for (size_t i = 0; i < n; i++) {
+		int val =  rand_next() % max_val;
+        DEBUG("KLL insert %d\n", val);        
+		kll_upd(summ, &val);
+		DEBUG_ACTION(kll_print(summ, stderr, print_int));
+	}
+
+}
+
+
+
+
+CuSuite *kll_get_test_suite()
+{
+	CuSuite *suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, test_kll_upd);
+	return suite;
+}

@@ -323,6 +323,42 @@ size_t vec_find(vec *v, void *val, eq_func eq)
 }
 
 
+// returns the first position i s.t. v[i]>=val if any; else vec_len(v)
+static size_t _first_geq_bsearch(vec *v, void *val, cmp_func cmp)
+{
+	if (vec_len(v) == 0 ) {
+		return 0;
+	} else if (cmp(val, vec_first(v)) <= 0) {
+		return 0;
+	} else if (cmp(vec_last(v), val) < 0) {
+		return vec_len(v);
+	} else {
+		size_t l = 0, r = vec_len(v) - 1;
+		while (r - l > 1) { // l < ans <= r
+			size_t m = (l + r) / 2;
+			if (cmp(vec_get(v, m), val) < 0) {
+				l = m;
+			} else {
+				r = m;
+			}
+		}
+		return r;
+	}
+}
+
+
+size_t vec_bsearch(vec *v, void *val, cmp_func cmp)
+{
+	size_t fgeq = _first_geq_bsearch(v, val, cmp);
+	if ( ( fgeq < vec_len(v) ) && (cmp(vec_get(v, fgeq), val) == 0) ) {
+		return fgeq;
+	} else {
+		return vec_len(v);
+	}
+}
+
+
+
 void vec_qsort(vec *v, cmp_func cmp)
 {
 	qsort(v->data, v->len, v->typesize, cmp);

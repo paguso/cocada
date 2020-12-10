@@ -287,6 +287,15 @@ size_t vec_find(vec *v, void *val, eq_func eq);
 
 
 /**
+ * @brief Performs a binary search for @p val in @p v
+ * @returns The first position of @p val in @p v if it exists, else
+ * returns the length of @p v.
+ * @param cmp Comparison function
+ * @see order.h
+ */
+size_t vec_bsearch(vec *v, void *val, cmp_func cmp);
+
+/**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */

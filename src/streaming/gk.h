@@ -28,16 +28,16 @@
 #include "order.h"
 
 
-typedef struct __gksketch gksketch;
+typedef struct __gksumm gksumm;
 
-gksketch *gk_new(size_t typesize, cmp_func cmp, double err);
+gksumm *gk_new(size_t typesize, cmp_func cmp, double err);
 
-void gk_upd(gksketch *self, const void *val);
+void gk_upd(gksumm *self, const void *val);
 
-void gk_merge(gksketch *self, const gksketch *other);
+void gk_merge(gksumm *self, const gksumm *other);
 
-size_t gk_qry(gksketch *self, const void *val);
+size_t gk_rank(gksumm *self, const void *val);
 
-void gk_print(gksketch *self, FILE *stream, void (*print_val)(FILE *, const void *));
+void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *, const void *));
 
 #endif

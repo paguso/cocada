@@ -36,7 +36,7 @@ typedef struct {
 } gk_qty ;
 
 
-struct __gksketch {
+struct __gksumm {
 	vec *vals;
 	vec *qtys;
 	cmp_func cmp;
@@ -45,9 +45,9 @@ struct __gksketch {
 };
 
 
-gksketch *gk_new(size_t typesize, cmp_func cmp, double err)
+gksumm *gk_new(size_t typesize, cmp_func cmp, double err)
 {
-	gksketch *ret = NEW(gksketch);
+	gksumm *ret = NEW(gksumm);
 	ret->vals = vec_new(typesize);
 	ret->qtys = vec_new(sizeof(gk_qty));
 	void *inf = malloc(typesize);
@@ -83,7 +83,7 @@ static size_t succ(vec *data, cmp_func cmp, const void *val)
 }
 
 
-void gk_upd(gksketch *self, const void *val)
+void gk_upd(gksumm *self, const void *val)
 {
 	self->total_qty++;
 	size_t succ_pos = succ(self->vals, self->cmp, val);
@@ -112,7 +112,7 @@ void gk_upd(gksketch *self, const void *val)
 }
 
 
-void gk_merge(gksketch *self, const gksketch *other)
+void gk_merge(gksumm *self, const gksumm *other)
 {
 	ERROR_ASSERT( self->cmp == other->cmp
 	              && self->err == other->err
@@ -160,7 +160,7 @@ void gk_merge(gksketch *self, const gksketch *other)
 }
 
 
-size_t gk_qry(gksketch *self, const void *val)
+size_t gk_rank(gksumm *self, const void *val)
 {
 	if (vec_len(self->vals) == 1) {
 		return 0;
@@ -175,7 +175,7 @@ size_t gk_qry(gksketch *self, const void *val)
 }
 
 
-void gk_print(gksketch *self, FILE *stream, void (*print_val)(FILE *, const void *))
+void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *, const void *))
 {
 	size_t l = vec_len(self->vals);
 	for (size_t i=0; i < l-1; i++) {

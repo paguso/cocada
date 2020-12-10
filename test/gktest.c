@@ -41,7 +41,7 @@ void test_gk_upd(CuTest *tc)
 	size_t univ = 1 << 10;
 	size_t *bfcount = calloc(univ, sizeof(size_t));
 	size_t nupd = 4 * univ;
-	gksketch *sk = gk_new(sizeof(int), cmp_int, 0.05);
+	gksumm *sk = gk_new(sizeof(int), cmp_int, 0.05);
 	size_t max_count = 0;
 	for (size_t i=0; i<nupd; i++) {
 		double xval;
