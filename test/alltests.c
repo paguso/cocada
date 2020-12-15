@@ -121,7 +121,9 @@ void run_all_tests(void)
 	printf("%s\n", output->buffer);
 }
 
+
 void print_count() ;
+
 
 int main(void)
 {

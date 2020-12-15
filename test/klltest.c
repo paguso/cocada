@@ -21,6 +21,7 @@
 
 #include "CuTest.h"
 
+#include "arrays.h"
 #include "errlog.h"
 #include "kll.h"
 #include "mathutil.h"
@@ -33,18 +34,40 @@ static void print_int(FILE *stream, const void *val)
 }
 
 
+
 void test_kll_upd(CuTest *tc)
 {
-	kllsumm *summ = kll_new(sizeof(int), cmp_int, 0.2, 0.6);
+	double err = 0.01;
+	kllsumm *summ = kll_new(sizeof(int), cmp_int, err);
 	kll_print(summ, stderr, print_int);
-	size_t n = 100;
-	int max_val = 30;
-	for (size_t i = 0; i < n; i++) {
-		int val =  rand_next() % max_val;
-        DEBUG("KLL insert %d\n", val);        
+	size_t n = 10000;
+	int univ = 300;
+	int *ranks = NEW_ARR_0(int, univ);
+	for (int i = 0; i < n; i++) {
+		double xval;
+		do {
+			xval = (rand_norm() + 1.0) / 7.0;
+		} while (xval < 0 || xval >= 1);
+		int val = xval * univ;
+		ranks[val]++;
+        DEBUG("KLL insert #%d value = %d\n", i, val);        
 		kll_upd(summ, &val);
-		DEBUG_ACTION(kll_print(summ, stderr, print_int));
 	}
+	DEBUG_ACTION(kll_print(summ, stderr, print_int));
+	double epsN = err * n;
+	int nerr = 0;
+	for (int sum=0, nxtsum=0, i=0; i<univ; i++) {
+		nxtsum += ranks[i];
+		ranks[i] = sum;
+		size_t kllrk =  kll_rank(summ, &i);
+		if( abs((double)kllrk - (double)ranks[i]) > epsN) {
+			DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk, abs(((double)kllrk - (double)ranks[i]))/(double)n);
+			nerr++;
+		}
+		sum = nxtsum;
+	}
+	DEBUG("# wrong ranks = %d\n", nerr);
+	DEBUG("Observed P[Err>eN] = %f  (Predicted = %f)", (double)nerr/n, err);
 
 }
 

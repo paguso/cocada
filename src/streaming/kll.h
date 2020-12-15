@@ -30,7 +30,9 @@
 typedef struct __kllsumm kllsumm;
 
 
-kllsumm *kll_new(size_t typesize, cmp_func cmp, double eps, double c);
+kllsumm *kll_new(size_t typesize, cmp_func cmp, double eps);
+
+kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap);
 
 void kll_upd(kllsumm *self, void *val);
 
