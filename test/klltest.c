@@ -50,7 +50,7 @@ void test_kll_upd(CuTest *tc)
 		} while (xval < 0 || xval >= 1);
 		int val = xval * univ;
 		ranks[val]++;
-        DEBUG("KLL insert #%d value = %d\n", i, val);        
+		DEBUG("KLL insert #%d value = %d\n", i, val);
 		kll_upd(summ, &val);
 	}
 	DEBUG_ACTION(kll_print(summ, stderr, print_int));
@@ -60,8 +60,8 @@ void test_kll_upd(CuTest *tc)
 		nxtsum += ranks[i];
 		ranks[i] = sum;
 		size_t kllrk =  kll_rank(summ, &i);
+		DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk, abs(((double)kllrk - (double)ranks[i]))/(double)n);
 		if( abs((double)kllrk - (double)ranks[i]) > epsN) {
-			DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk, abs(((double)kllrk - (double)ranks[i]))/(double)n);
 			nerr++;
 		}
 		sum = nxtsum;

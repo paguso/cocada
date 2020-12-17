@@ -33,8 +33,9 @@
 #include "vec.h"
 
 
-static const size_t DEFAULT_CAPACITY = 1024;
-static const double DEFAULT_C = 0.75;
+//static const size_t KLL_DEFAULT_CAP = 1024;
+//static const double KLL_DEFAULT_C = 0.75;
+//static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
 
 struct __kllsumm {
 	double err;
@@ -50,10 +51,10 @@ struct __kllsumm {
 };
 
 
+
 kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 {
-	double min_k = ceil( (1.0/(1.0-DEFAULT_C)) * ( (1.0/err) * sqrt(log(1.0/err)) ) );
-	size_t cap = MAX(DEFAULT_CAPACITY, (size_t)min_k);
+	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) * ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
 	return kll_new_with_cap(typesize, cmp, err, cap);
 }
 
@@ -66,25 +67,25 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err, size_t capa
 	ret->cmp = cmp;
 	ret->buffs = vec_new(sizeof(vec *));
 	ret->coins = vec_new(sizeof(byte_t));
-    vec *buf = vec_new(typesize);
+	vec *buf = vec_new(typesize);
 	vec_push_rawptr(ret->buffs, buf);
 	vec_push_byte_t(ret->coins, 0);
 	ret->npts = 0;
 	// adjust parameters
-	double cap = (double) MAX(DEFAULT_CAPACITY, capacity);
-	double min_k = (1.0/err) * sqrt(log(1.0/err));
-	ERROR_ASSERT( cap >= 2 * min_k, 
-		"KLL: Insufficient capacity (%zu) to ensure the intended error (%f).\n"
-		"Minimum required capacity is %zu.\n", (size_t)cap, err,  (size_t)(2 * min_k) );
-	double c = DEFAULT_C; 
-	if ( (cap * (1-c)) < min_k ) {
-		c = 1 - (min_k / cap);
+	double cap = (double) MAX(KLL_DEFAULT_CAP, capacity);
+	double k = KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err));
+	ERROR_ASSERT( cap >= 2 * k,
+	              "KLL: Insufficient capacity (%zu) to ensure the intended error (%f).\n"
+	              "Minimum required capacity is %zu.\n", (size_t)cap, err,  (size_t)(2 * k) );
+	double c = KLL_DEFAULT_C;
+	if ( (cap * (1-c)) < k ) {
+		c = 1 - (k / cap);
 	}
-	ret->k_const = (cap*(1-c)) / min_k;
-	min_k = cap * (1-c);
+	k = cap * (1-c);
 	ret->cap = cap;
 	ret->err = err;
-	ret->k = min_k;
+	ret->k = k;
+	ret->k_const = ret->k / ((1.0/err) * sqrt(log(1.0/err)));
 	ret->c = c;
 	return ret;
 }
@@ -183,22 +184,22 @@ size_t kll_rank(kllsumm *self, void *val)
 
 void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *, const void *))
 {
-    fprintf(stream, "KLL @%p:\n", self);
-    fprintf(stream, "\terr = %f\n", self->err);
-    fprintf(stream, "\tc = %f\n", self->c);
-    fprintf(stream, "\tk = %f\n", self->k);
-    fprintf(stream, "\tnpts = %zu\n", self->npts);
-    fprintf(stream, "\tcap = %zu\n", self->cap);
-    fprintf(stream, "\tk_const = %f\n", self->k_const);
-	
+	fprintf(stream, "KLL @%p:\n", self);
+	fprintf(stream, "\terr = %f\n", self->err);
+	fprintf(stream, "\tc = %f\n", self->c);
+	fprintf(stream, "\tk = %f\n", self->k);
+	fprintf(stream, "\tnpts = %zu\n", self->npts);
+	fprintf(stream, "\tcap = %zu\n", self->cap);
+	fprintf(stream, "\tk_const = %f\n", self->k_const);
+
 	for (size_t i = 0; i < _nlevels(self); i++) {
 		fprintf(stream, "\tB[%zu] = (", i);
 		bool comma = false;
 		//FOREACH_IN_ITER(val, void, vec_get_iter((vec*)vec_get(self->buffs, i))) {
 		vec *buf = (vec *)vec_get_rawptr(self->buffs, i);
-        for (size_t j=0; j<vec_len(buf); j++) {
-            const void *val = vec_get(buf, j);
-        	fprintf(stream, "%s", (comma)?", ":"");
+		for (size_t j=0; j<vec_len(buf); j++) {
+			const void *val = vec_get(buf, j);
+			fprintf(stream, "%s", (comma)?", ":"");
 			print_val(stream, val);
 			comma = true;
 		}

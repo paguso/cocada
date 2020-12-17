@@ -28,7 +28,7 @@
 #include "mathutil.h"
 
 
-const static size_t DEFAULT_CAPACITY = 8;
+const static size_t KLL_DEFAULT_CAP = 8;
 
 
 typedef struct _strbuf {
@@ -41,7 +41,7 @@ strbuf;
 
 strbuf *strbuf_new()
 {
-	return strbuf_new_with_capacity(DEFAULT_CAPACITY);
+	return strbuf_new_with_capacity(KLL_DEFAULT_CAP);
 }
 
 
