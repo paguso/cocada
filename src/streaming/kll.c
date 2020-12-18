@@ -33,9 +33,9 @@
 #include "vec.h"
 
 
-//static const size_t KLL_DEFAULT_CAP = 1024;
-//static const double KLL_DEFAULT_C = 0.75;
-//static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
+//extern const size_t KLL_DEFAULT_CAP = 1024;
+//extern const double KLL_DEFAULT_C = 0.75;
+//extern const double KLL_MIN_K_BIG_OH_CONST = 2.0;
 
 struct __kllsumm {
 	double err;

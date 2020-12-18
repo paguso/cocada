@@ -127,12 +127,12 @@ typedef struct __kllsumm kllsumm;
 /**
  * @brief Default minimum KLL summary capacity (nb. of physically stored data points)
  */
-const size_t KLL_DEFAULT_CAP = 1024;
+static const size_t KLL_DEFAULT_CAP = 1024;
 
 /**
  * @brief Default value of `c` constant (see kll.h module documentation)
  */
-const double KLL_DEFAULT_C = 0.75;
+static const double KLL_DEFAULT_C = 0.75;
 
 /**
  * @brief Default big-Oh multiplicative constant for `k`
@@ -140,7 +140,7 @@ const double KLL_DEFAULT_C = 0.75;
  * @see kll_new
  * @see kll_new_with_cap
  */
-const double KLL_MIN_K_BIG_OH_CONST = 2.0;
+static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
 
 
 /**
