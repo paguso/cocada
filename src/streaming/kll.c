@@ -33,10 +33,6 @@
 #include "vec.h"
 
 
-//extern const size_t KLL_DEFAULT_CAP = 1024;
-//extern const double KLL_DEFAULT_C = 0.75;
-//extern const double KLL_MIN_K_BIG_OH_CONST = 2.0;
-
 struct __kllsumm {
 	double err;
 	double c;
@@ -48,18 +44,32 @@ struct __kllsumm {
 	double k_const;
 	size_t npts;
 	size_t cap;
+	dtor *chd_dt;
 };
 
 
 
 kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 {
+	return kll_new_own(typesize, cmp, err, empty_dtor());
+}
+
+
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt)
+{
 	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) * ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
-	return kll_new_with_cap(typesize, cmp, err, cap);
+	return kll_new_own_with_cap(typesize, cmp, err, cap, chd_dt);
 }
 
 
 kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err, size_t capacity)
+{
+	return kll_new_own_with_cap(typesize, cmp, err, capacity, empty_dtor());
+}
+
+
+
+kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err, size_t capacity, dtor *chd_dt)
 {
 	assert (err > 0);
 	kllsumm *ret = NEW(kllsumm);
@@ -87,7 +97,20 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err, size_t capa
 	ret->k = k;
 	ret->k_const = ret->k / ((1.0/err) * sqrt(log(1.0/err)));
 	ret->c = c;
+	ret->chd_dt = chd_dt;
 	return ret;
+}
+
+
+void kll_dtor(void *ptr, const dtor *dt)
+{
+	kllsumm *self = (kllsumm *)ptr;
+	FREE(self->coins, vec);
+	if (dtor_nchd(dt)) {
+		DESTROY(self->buffs, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), dtor_chd(dt, 0)))));
+	} else {
+		DESTROY(self->buffs, dtor_cons(DTOR(vec), DTOR(vec)));
+	}
 }
 
 
@@ -132,6 +155,11 @@ static void _compress(kllsumm *self)
 				vec_push(nxtbuf, vec_get(buf, j));
 			}
 			self->npts -= ( l - ((j - coin) / 2) );
+			if (self->chd_dt) {
+				for (j = 1 - coin; j < l; j += 2) {
+					FINALISE(vec_get_mut(buf, j), self->chd_dt);
+				}
+			}
 			vec_clear(buf);
 			vec_fit(buf);
 		}
