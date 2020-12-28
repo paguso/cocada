@@ -51,7 +51,6 @@ CuSuite *kll_get_test_suite();
 CuSuite *kwayrng_get_test_suite();
 CuSuite *mathutil_get_test_suite();
 CuSuite *minqueue_get_test_suite();
-CuSuite *mmindex_get_test_suite();
 CuSuite *qdigest_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *randutil_get_test_suite();
@@ -84,7 +83,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
-	//CuSuiteAddSuite(suite, cli_get_test_suite());
+	CuSuiteAddSuite(suite, cli_get_test_suite());
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, fasta_get_test_suite());
 	//CuSuiteAddSuite(suite, fmalg_get_test_suite());
@@ -93,10 +92,9 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, huffcode_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, kwayrng_get_test_suite());
-	CuSuiteAddSuite(suite, kll_get_test_suite());
+	//CuSuiteAddSuite(suite, kll_get_test_suite());
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
-	//CuSuiteAddSuite(suite, mmindex_get_test_suite());
 	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
 	//CuSuiteAddSuite(suite, queue_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());

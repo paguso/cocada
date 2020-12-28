@@ -69,6 +69,7 @@ struct _cliarg {
 
 
 struct _cliparse {
+	bool dirty;					/* has this been processed/parsed yet? */
 	struct _cliparse *par;		/* parent command (fur subcommands) */
 	char *name;					/* command name */
 	char *help;					/* help message */
@@ -441,6 +442,7 @@ cliparse *cliparse_new(char *name, char *help)
 	// add help option directly
 	cliopt *help_opt = cliopt_new_defaults('h', "help", "Prints help message");
 	cliparse_add_option(ret, help_opt);
+	ret->dirty = false;
 	return ret;
 }
 
@@ -834,6 +836,7 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices, cl
 		if (vec_find(choices, &tok, _str_eq) == vec_len(choices)) {
 			return false;
 		}
+		vec_push_cstr(vals, cstr_clone(tok));
 		break;
 	}
 	return true;
@@ -848,6 +851,11 @@ typedef enum {
 
 void cliparse_parse(cliparse *clip, int argc, char **argv)
 {
+	WARN_IF( clip->dirty, "This CLI has already been processed!"
+		"Parsing the CLI more than once may cause unexpected errors!\n"
+		"Try resetting or creating a new parser." );
+	clip->dirty = true;
+
 	int t = 1;
 	parse_status state = PS_CMD;
 	cliparse *cur_parse = clip;
