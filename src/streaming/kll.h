@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "coretype.h"
+#include "new.h"
 #include "order.h"
 
 
@@ -144,7 +145,8 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
 
 
 /**
- * Creates a new KLL summary with no a priori space constraints.
+ * Creates a new KLL summary with no a priori space constraints
+ * for *NON-OWNED* data.
  *
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
@@ -156,15 +158,42 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * ```
  * and the other relevant constant `c` to KLL_DEFAULT_C.
  *
+ * @warning This constructor *SHOULD NOT* be used if the summary
+ * is supposed to contain *onwed* object references. If such is the
+ * case, use kll_new_own or kll_new_onw_with_cap. This is equivalent
+ * to kll_new_own(typesize, cmp, err, empty_dtor())
+ * 
  * @see order.h
+ * @see kll_new_own
  * @see kll_new_with_cap
+ * 
  */
 kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
 
 
 /**
+ * @brief Same as kll_new but for summaries storing owned references.
+ * 
+ * @param typesize the size of the stored elements in bytes
+ * @param cmp comparison function
+ * @param err The desired error level (see header file comments)
+ * @param chd_dt A destructor for the stored child objects (*moved*)
+ * 
+ * The KLL summary stores the added data in internal containers.
+ * If owned references are stored in the summary, then it needs to
+ * know how to properly destroy such objects because some of these
+ * references may have to be deleted during the lifecycle of the
+ * summary, even before its destruction.
+ * 
+ * @see new.h
+ */
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
+
+
+/**
  * @brief Creates a new KLL summary with a given maximum capacity
- * i.e. (maximum number of stored data points).
+ * i.e. (maximum number of stored data points) for *NON-OWNED*
+ * data.
  *
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
@@ -204,10 +233,31 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  * data points are that are physically stored. However, the implementation
  * will require additional memory depending on the actual data structures.
  *
+ * @warning This constructor *SHOULD NOT* be used if the summary
+ * is supposed to contain *onwed* object references. If such is the
+ * case, use  kll_new_onw_with_cap. This is equivalent
+ * to kll_new_own_with_cap(typesize, cmp, err, empty_dtor())
  *
  * @see errlog.h
  */
 kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap);
+
+
+/**
+ * @brief Same as kll_new_with_cap but for summaries storing owned references.
+ *
+ * @see kll_new_own
+ * @see kll_new_with_cap
+ */
+kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap, dtor *chd_dt);
+
+
+/**
+ * @brief Destructor
+ * If this summary is going to store
+ * @see new.h
+ */
+void kll_dtor(void *ptr, const dtor *dt);
 
 
 /**

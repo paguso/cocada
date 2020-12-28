@@ -128,7 +128,11 @@ size_t vec_typesize(const vec *v);
 
 
 /**
- * @brief Removes all elements.
+ * @brief Resets the vector **without** erasing its contents.
+ * 
+ * @warning This **DOES NOT** finalise the objects stored in the
+ * vector. If this vector contains references to **owned** objects,
+ * this might cause memory leaks.
  */
 void vec_clear(vec *v);
 
