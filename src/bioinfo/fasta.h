@@ -46,24 +46,33 @@ typedef struct _fasta fasta;
  * @brief A FASTA record with in-memory sequence
  */
 typedef struct {
-	char *descr; /**< Sequence descriptor (does not include the `>`) */
-	char *seq;   /**< In-memory sequence content */
+	char *descr;	/**< Sequence descriptor (does not include the `>`) */
+	char *seq;   	/**< In-memory sequence content */
+	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
+	size_t seq_offset;		/**< Sequence offset from the start of the file **/
 } fasta_rec;
 
 /**
  * @brief A FASTA record with sequence loaded as a stream
  */
 typedef struct {
-	char *descr;      /**< Sequence descriptor */
-	strread *seqrdr; /**< Sequence contents reader */
+	char *descr;      	/**< Sequence descriptor */
+	strread *seqrdr;	/**< Sequence contents reader */
+	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
+	size_t seq_offset;		/**< Sequence offset from the start of the file **/
 } fasta_rec_rdr;
 
 
 /**
- * @brief Opens a FASTA file and places the cursor at the beginning
+ * @brief Opens a FASTA file and places the cursor at its beginning.
  */
 fasta *fasta_open(char *filename);
 
+
+/**
+ * @brief Returns the FASTA file path
+ */
+const char *fasta_path(fasta *self);
 
 /**
  * @brief Checks whether there is a sequence *after* the current

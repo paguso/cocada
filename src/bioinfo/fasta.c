@@ -157,6 +157,12 @@ fasta *fasta_open(char *filename)
 }
 
 
+const char *fasta_path(fasta *self)
+{
+	return self->src_path;
+}
+
+
 static bool _goto_next(fasta *self)
 {
 	int c;
@@ -185,15 +191,15 @@ const fasta_rec *fasta_next(fasta *self)
 		return NULL;
 	}
 	// load description
+	self->cur_rec.descr_offset = ftell(self->src);
 	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
+	             "Expected '>' at position %ld of %s.\n", self->cur_rec.descr_offset, self->src_path );
 	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
 	size_t l = 0;
 	bool eol = false;
 	while(!eol) {
 		if (self->cur_rec_len[0] == l) {
 			self->cur_rec_len[0] *= 1.66f;
-			//(size_t)(1.66f * self->cur_rec_len[0]);
 			self->cur_rec.descr = cstr_resize(self->cur_rec.descr, self->cur_rec_len[0]);
 		}
 		fgets(self->cur_rec.descr + l, self->cur_rec_len[0] - l + 1, self->src);
@@ -203,7 +209,8 @@ const fasta_rec *fasta_next(fasta *self)
 			eol = true;
 		}
 	}
-	// load sequence
+	// load sequence	
+	self->cur_rec.seq_offset = ftell(self->src);
 	cstr_clear(self->cur_rec.seq, self->cur_rec_len[1]);
 	l = 0;
 	while( !feof(self->src) ) {
@@ -233,8 +240,9 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 		return NULL;
 	}
 	// load description
+	self->cur_rec_rd.descr_offset = ftell(self->src);
 	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", ftell(self->src), self->src_path );
+	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset, self->src_path );
 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
 	size_t l = 0;
 	bool eol = false;
@@ -252,6 +260,7 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 		}
 	}
 	// load sequence reader
+	self->cur_rec_rd.seq_offset = ftell(self->src);
 	self->rd.file_pos = ftell(self->src);
 	return &(self->cur_rec_rd);
 }

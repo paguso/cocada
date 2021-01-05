@@ -93,6 +93,7 @@ EQ_DECL( TYPE )
 
 XX_PRIMITIVES(CMPEQ_DECL)
 
+EQ_DECL(rawptr)
 ////@endcond
 
 

@@ -433,4 +433,5 @@ vec_iter *vec_get_iter(vec *self);
 
 DECL_TRAIT(vec_iter, iter)
 
+
 #endif

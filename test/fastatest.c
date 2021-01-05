@@ -55,17 +55,26 @@ static char *desc[4] = {
 	"seq2 short description",
 	"seq3 a very very very very a very very very very a very very very very a very very very very a very very very very a very very very very long sequence"
 };
-
+static size_t desc_offsets[4] = {-1, -1, -1, -1};
+static size_t seq_offsets[4] = {-1, -1, -1, -1};
 
 static void test_setup()
 {
 	FILE *file = fopen(filename, "w");
+	size_t offset = 0;
 	for (size_t i=0; i<nseq; i++) {
+		desc_offsets[i] = offset;
 		fputc('>', file);
+		offset += 1;
 		fputs(desc[i], file);
+		offset += strlen(desc[i]);
 		fputc('\n', file);
+		offset += 1;
+		seq_offsets[i] = offset;
 		fputs(seq[i], file);
+		offset += strlen(seq[i]);
 		fputc('\n', file);
+		offset += 1;
 	}
 	fclose(file);
 }
@@ -85,6 +94,8 @@ void test_fasta_next(CuTest *tc)
 	size_t i=0;
 	for(i=0; fasta_has_next(f); i++) {
 		const fasta_rec *rr = fasta_next(f);
+		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
+		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
 		size_t k = 0;
@@ -110,6 +121,8 @@ void test_fasta_next_read(CuTest *tc)
 	size_t i=0;
 	for(i=0; fasta_has_next(f); i++) {
 		const fasta_rec_rdr *rr = fasta_next_reader(f);
+		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
+		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t k = 0;
 		char c;
