@@ -1,139 +1,92 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "arrays.h"
 #include "hash.h"
 #include "hashmap.h"
+#include "hashset.h"
+#include "mathutil.h"
 #include "new.h"
 #include "serialise.h"
 
-typedef struct {
-    hashmap *ser_to_cur_mem_map;
-    hashmap *cur_to_ser_mem_map;
-}
-mem_context;
 
-
-mem_context *mem_context_new() 
+ser *ser_new(ser_t type, void *addr, size_t size)
 {
-    mem_context *ret = NEW(mem_context);
-    ret->ser_to_cur_mem_map = hashmap_new(sizeof(size_t), sizeof(size_t), ident_hash_size_t, eq_size_t); 
-    ret->cur_to_ser_mem_map = hashmap_new(sizeof(size_t), sizeof(size_t), ident_hash_size_t, eq_size_t); 
+    ser *ret = NEW(ser);
+    ret->type = type;
+    ret->addr = addr;
+    ret->size = size;
+    ret->nchd = 0;
+    ret->chd = NEW_ARR(ser *, 1) ;
     return ret;
 }
 
 
-typedef enum {
-    ser_char,           
-    ser_uchar,          
-    ser_short,          
-    ser_ushort,         
-    ser_int,            
-    ser_uint,           
-    ser_long,           
-    ser_ulong,          
-    ser_llong,          
-    ser_ullong,         
-    ser_float,          
-    ser_double,         
-    ser_ldouble,        
-    ser_bool,          
-    ser_size_t,         
-    ser_int8_t,         
-    ser_uint8_t,        
-    ser_int16_t,        
-    ser_uint16_t,       
-    ser_int32_t,        
-    ser_uint32_t,       
-    ser_int64_t,        
-    ser_uint64_t,       
-    ser_byte_t,        
-    //ARRAY TYPES
-    ser_arr_char,           
-    ser_arr_uchar,          
-    ser_arr_short,          
-    ser_arr_ushort,         
-    ser_arr_int,            
-    ser_arr_uint,           
-    ser_arr_long,           
-    ser_arr_ulong,          
-    ser_arr_llong,          
-    ser_arr_ullong,         
-    ser_arr_float,          
-    ser_arr_double,         
-    ser_arr_ldouble,        
-    ser_arr_bool,          
-    ser_arr_size_t,         
-    ser_arr_int8_t,         
-    ser_arr_uint8_t,        
-    ser_arr_int16_t,        
-    ser_arr_uint16_t,       
-    ser_arr_int32_t,        
-    ser_arr_uint32_t,       
-    ser_arr_int64_t,        
-    ser_arr_uint64_t,       
-    ser_arr_byte_t,        
-    ser_arr_rawptr,
-    ser_arr_struct,
-} ser_arr;          
-
-
-typedef enum {
-    ser_prim_ptr,
-    ser_flat_arr_ptr,
-    ser_ptr_arr_ptr,
-    ser_struct_ptr,
-} ser_ptr;
-
-#define SERIALISE_PRIM_IMPL(TYPE, ...)\
-void serialise_##TYPE( TYPE *src , FILE *stream)\
-{\
-    byte_t type_ind = (byte_t)(ser_##TYPE);\
-    fwrite(&type_ind, sizeof(byte_t), 1, stream);\
-    fwrite(src, sizeof(TYPE), 1, stream);\
-}
-
-#define DESERIALISE_PRIM_IMPL(TYPE, ...)\
-void deserialise_##TYPE( TYPE *dest , FILE *stream)\
-{\
-    byte_t type_ind;\
-    fread(&type_ind, sizeof(byte_t), 1, stream);\
-    fread(dest, sizeof(TYPE), 1, stream);\
-}
-
-XX_PRIMITIVES(SERIALISE_PRIM_IMPL)
-XX_PRIMITIVES(DESERIALISE_PRIM_IMPL)
-
-#define SERIALISE_ARR(TYPE, ...)\
-void serialise_arr_of_##TYPE(TYPE *src, size_t nmemb, FILE *stream)\
-{\
-    byte_t type_ind = (byte_t)(ser_arr_##TYPE);\
-    fwrite(&type_ind, sizeof(byte_t), 1, stream);\
-    size_t size = nmemb * sizeof(TYPE);\
-    fwrite(&size, sizeof(size_t), 1, stream);
-    fwrite(src, sizeof(TYPE), nmemb, stream);\
-}
-
-#define DESERIALISE_ARR(TYPE, ...)\
-void deserialise_arr_of_##TYPE(TYPE *dest, FILE *stream)\
-{\
-    byte_t type_ind;\
-    fread(&type_ind, sizeof(byte_t), 1, stream);\
-    size_t size;\
-    fread(&size, sizeof(size_t), 1, stream);\
-    fread(dest, size, 1, stream);\
-}
-
-XX_PRIMITIVES(SERIALISE_ARR)
-XX_PRIMITIVES(DESERIALISE_ARR)
-
-// Pointer to primitives
-#define SERIALISE_PTR(TYPE, ...)
-void serialise_ptr_to_##TYPE(void *src, FILE *stream, mem_context *ctx)\
-{\
-    size_t cur_mem_addr = (size_t)(*((void **)src));\
-    if (hashmap_has_key(ctx->cur_to_ser_mem_map, &cur_mem_addr)) {\
-    } else {\
-        serialise_##TYPE(*((TYPE **)src), stream );
+ser *ser_cons(ser *par, const ser *chd)
+{
+    if (IS_POW2(par->nchd)) {
+	    par->chd = (ser **) realloc(par->chd, ( 2 * par->nchd) * sizeof(ser *));
     }
+	par->chd[par->nchd++] = (ser *)chd;
+	return par;
 }
+
+
+size_t ser_nchd(ser *self)
+{
+    return self->nchd;
+}
+
+const ser *ser_chd(ser *self, size_t i)
+{
+    return self->chd[i];
+}
+
+
+ser *get_ser(serialisable *trait_obj)
+{
+    return trait_obj->vt->get_ser(trait_obj);
+}
+
+
+
+void _write(ser *root, FILE *stream) 
+{
+    byte_t type = (byte_t) root->type;
+    byte_t bytesize = (byte_t) root->size;
+    size_t addr = (size_t) root->addr;
+    fwrite(&type, 1, 1, stream);
+    fwrite(&addr, sizeof(size_t), 1, stream);
+    switch(root->type) {
+        case ser_arr:
+        case ser_struct:
+            fwrite(&root->size, sizeof(size_t), 1, stream);
+            break;
+        default:
+            fwrite(&bytesize, 1, 1, stream);
+            break;
+    }
+    fwrite(root->addr, root->size, 1, stream);
+}
+
+
+void _visit(ser *root, FILE *stream, hashset *done)
+{
+    if (hashset_contains_size_t(done, (size_t)(root->addr))) {
+        return;
+    }
+    hashset_add_size_t(done, (size_t)(root->addr));
+    FOREACH_IN_ARR(chd, ser*, root->chd, root->nchd) {
+        _visit(chd, stream, done);
+    }
+    _write(root, stream);
+}
+
+
+void serialise(ser *st, FILE *stream) {
+    hashset *done = hashset_new(sizeof(size_t), ident_hash_size_t, eq_size_t);
+    _visit(st, stream, done);
+    FREE(done, hashset);
+}
+
 
