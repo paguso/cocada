@@ -10,8 +10,29 @@
 #include "serialise.h"
 
 
-ser *ser_new(ser_t type, void *addr, size_t size)
+static ser _ser_null = {.type=ser_null, .addr=NULL, .size=0, .nchd=0, .chd=NULL};
+
+
+ser *ser_null_new(memmap *mm)
 {
+    if (!memmap_has_ser(mm, NULL)) {
+        memmap_add_ser(mm, &_ser_null);
+    }
+    return &_ser_null;
+}
+
+
+ser *ser_new(ser_t type, void *addr, size_t size, memmap *mm)
+{
+    if (addr == NULL) {
+        if (!memmap_has_ser(mm, NULL)) {
+            memmap_add_ser(mm, &_ser_null);
+        }
+        return &_ser_null;
+    }
+    if (memmap_has_ser(mm, addr)) {
+        return memmap_get_ser(mm, addr);
+    }
     ser *ret = NEW(ser);
     ret->type = type;
     ret->addr = addr;
@@ -43,10 +64,42 @@ const ser *ser_chd(ser *self, size_t i)
 }
 
 
-ser *get_ser(serialisable *trait_obj)
+ser *serialisable_get_ser(serialisable *trait_obj, memmap *mm)
 {
-    return trait_obj->vt->get_ser(trait_obj);
+    return trait_obj->vt->get_ser(trait_obj, mm);
 }
+
+
+
+struct _memmap {
+    hashmap *map_ser;
+};
+
+memmap *memmap_new() {
+    memmap *ret = NEW(memmap);
+    return ret;
+}
+
+bool memmap_has_ser(memmap *self, void *addr)
+{
+    if (!self->map_ser) return false;
+    return hashmap_has_key(self->map_ser, &addr);
+}
+
+ser *memmap_get_ser(memmap *self, void *addr)
+{
+    if (!self->map_ser) return NULL;
+    return (ser *)hashmap_get_rawptr(self->map_ser, &addr);
+}
+
+void memmap_add_ser(memmap *self, ser *st)
+{
+    if (!self->map_ser) {
+        self->map_ser = hashmap_new(sizeof(size_t), sizeof(rawptr), ident_hash_size_t, eq_size_t);
+    }
+    hashmap_set(self->map_ser, &st->addr, &st);
+}
+
 
 
 

@@ -4,12 +4,16 @@
 #include <stdio.h>
 
 #include "coretype.h"
+#include "hashset.h"
 #include "vec.h"
+
+
 
 /// serialisation template
 
 
 typedef enum {
+    ser_null,
     ser_char,           
     ser_uchar,          
     ser_short,          
@@ -67,6 +71,11 @@ typedef enum {
 } ser_t;          
 
 
+
+
+typedef struct _memmap memmap;
+
+
 typedef struct _ser {
     ser_t  type;
     void  *addr;
@@ -76,7 +85,9 @@ typedef struct _ser {
 } ser;
 
 
-ser *ser_new(ser_t type, void *addr, size_t size);
+ser *ser_null_new(memmap *mm);
+
+ser *ser_new(ser_t type, void *addr, size_t size, memmap *mm);
 
 ser *ser_cons(ser *par, const ser *chd);
 
@@ -86,12 +97,25 @@ const ser *ser_chd(ser *self, size_t i);
 
 
 
+
+
+memmap *memmap_new();
+
+bool memmap_has_ser(memmap *self, void *addr);
+
+ser *memmap_get_ser(memmap *self, void *addr);
+
+void memmap_add_ser(memmap *self, ser *st);
+
+
+
+
 ///////// serialisable trait
 
 typedef struct _serialisable serialisable;
 
 typedef struct {
-    ser* (*get_ser)(serialisable *trait_obj);
+    ser* (*get_ser)(serialisable *trait_obj, memmap *mm);
 } serialisable_vt;
 
 
@@ -101,8 +125,7 @@ struct _serialisable {
 };
 
 
-ser *get_ser(serialisable *trait_obj);
-
+ser *serialisable_get_ser(serialisable *trait_obj, memmap *mm);
 
 
 
