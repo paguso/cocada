@@ -86,6 +86,13 @@
 
 
 /**
+ * @brief Tests whether an unsigned int is a power or two
+ */
+#define IS_POW2(UNS_INT) (UNS_INT && !(UNS_INT & (UNS_INT - 1)))
+
+
+
+/**
  * @brief Computes the smallest power of 2 greater or equal to @p val
  */
 #define POW2CEIL_DECL( TYPE , ...)\
