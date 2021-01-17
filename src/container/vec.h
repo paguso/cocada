@@ -94,9 +94,9 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
  *        to the vector.
  *        To turn @p buf into a dynamic array without duplicating its
  *        values see #vec_new_from_arr.
- * @param buf (no transfer) The buffer containing the vector data.
+ * @param buf (**no transfer**) The buffer containing the vector data.
  * @param len The lenght of the vector.
- * @param typesize The  in bytes of each vector element.
+ * @param typesize The  size in bytes of each vector element.
  * @see vec_new_from_arr
  */
 vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);

@@ -177,7 +177,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
  * @param err The desired error level (see header file comments)
- * @param chd_dt A destructor for the stored child objects (*moved*)
+ * @param chd_dt (**move**) A destructor for the stored child objects
  * 
  * The KLL summary stores the added data in internal containers.
  * If owned references are stored in the summary, then it needs to

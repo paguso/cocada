@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef _CLI_H_
-#define _CLI_H_
+#ifndef CLI_H
+#define CLI_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -347,7 +347,7 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
 /**
  * @brief Creates a new single-valued positional argument.
  * @param name	(**no transfer**) The name of the argument used for
- * 				descritptive/documentation purposes only (<id> according).
+ * 				descritptive/documentation purposes only.
  * @param help	(**no transfer**) A short description of the argument
  * 				used for help messages.
  * @param type	The type of the argument.
