@@ -87,7 +87,8 @@ uint64_t xstrhash_lex(const xstrhash *self, const xstr *s)
 }
 
 
-uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to)
+uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from,
+                          size_t to)
 {
 	uint64_t hash = 0;
 	for (size_t i=from; i < to; i++) {
@@ -98,7 +99,8 @@ uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from, size
 }
 
 
-uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash, xchar_t c)
+uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash,
+                           xchar_t c)
 {
 	hash -= _pow(self, xstr_len(s)-1) * ab_rank(self->ab, xstr_get(s, 0));
 	hash += ab_rank(self->ab, c);
@@ -106,7 +108,8 @@ uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash, x
 }
 
 
-uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to,  uint64_t hash, xchar_t c)
+uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from,
+                               size_t to,  uint64_t hash, xchar_t c)
 {
 	hash -= _pow(self, to - from - 1) * ab_rank(self->ab, xstr_get(s, from));
 	hash *= ab_size(self->ab);

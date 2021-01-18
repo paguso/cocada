@@ -121,7 +121,8 @@ static void _check_and_resize(vec *v)
 {
 	if (v->len==v->capacity) {
 		_resize_to(v, GROW_BY * v->capacity);
-	} else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD*v->capacity) {
+	}
+	else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD*v->capacity) {
 		_resize_to(v, v->len / MIN_LOAD);
 	}
 }
@@ -272,7 +273,8 @@ void vec_ins(vec *v, size_t pos, const void *src)
 void vec_cat(vec *dest, const vec *src)
 {
 	_resize_to(dest, dest->len + src->len);
-	memcpy(dest->data + (dest->len * dest->typesize), src->data, src->len * src->typesize);
+	memcpy(dest->data + (dest->len * dest->typesize), src->data,
+	       src->len * src->typesize);
 	dest->len += src->len;
 }
 
@@ -328,17 +330,21 @@ static size_t _first_geq_bsearch(vec *v, void *val, cmp_func cmp)
 {
 	if (vec_len(v) == 0 ) {
 		return 0;
-	} else if (cmp(val, vec_first(v)) <= 0) {
+	}
+	else if (cmp(val, vec_first(v)) <= 0) {
 		return 0;
-	} else if (cmp(vec_last(v), val) < 0) {
+	}
+	else if (cmp(vec_last(v), val) < 0) {
 		return vec_len(v);
-	} else {
+	}
+	else {
 		size_t l = 0, r = vec_len(v) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
 			if (cmp(vec_get(v, m), val) < 0) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
@@ -352,7 +358,8 @@ size_t vec_bsearch(vec *v, void *val, cmp_func cmp)
 	size_t fgeq = _first_geq_bsearch(v, val, cmp);
 	if ( ( fgeq < vec_len(v) ) && (cmp(vec_get(v, fgeq), val) == 0) ) {
 		return fgeq;
-	} else {
+	}
+	else {
 		return vec_len(v);
 	}
 }
@@ -414,65 +421,65 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_NEW_IMPL( TYPE ) \
-   vec *vec_new_##TYPE()\
-   vecurn vec_new(sizeof(TYPE)); }
+	vec *vec_new_##TYPE()\
+	vecurn vec_new(sizeof(TYPE)); }
 
 
 #define VEC_GET_IMPL( TYPE ) \
-   TYPE vec_get_##TYPE(const vec *v, size_t pos)\
-    { return ((TYPE *)v->data)[pos]; }
+	TYPE vec_get_##TYPE(const vec *v, size_t pos)\
+	{ return ((TYPE *)v->data)[pos]; }
 
 
 #define VEC_FIRST_IMPL( TYPE ) \
-   TYPE vec_first_##TYPE(const vec *v)\
-    { return ((TYPE *)v->data)[0]; }
+	TYPE vec_first_##TYPE(const vec *v)\
+	{ return ((TYPE *)v->data)[0]; }
 
 
 #define VEC_LAST_IMPL( TYPE ) \
-   TYPE vec_last_##TYPE(const vec *v)\
-    { return ((TYPE *)v->data)[v->len - 1]; }
+	TYPE vec_last_##TYPE(const vec *v)\
+	{ return ((TYPE *)v->data)[v->len - 1]; }
 
 
 
 #define VEC_SET_IMPL( TYPE ) \
-void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
-{\
-	((TYPE *)v->data)[pos] = val;\
-}
+	void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
+	{\
+		((TYPE *)v->data)[pos] = val;\
+	}
 
 
 #define VEC_PUSH_IMPL( TYPE ) \
-void vec_push_##TYPE(vec *v, TYPE val)\
-{\
-	_check_and_resize(v);\
-	((TYPE *)v->data)[v->len++] = val;\
-}
+	void vec_push_##TYPE(vec *v, TYPE val)\
+	{\
+		_check_and_resize(v);\
+		((TYPE *)v->data)[v->len++] = val;\
+	}
 
 
 #define VEC_INS_IMPL( TYPE ) \
-void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
-{\
-	vec_ins(v, pos, &val);\
-}
+	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
+	{\
+		vec_ins(v, pos, &val);\
+	}
 
 
 #define VEC_POP_IMPL( TYPE ) \
-TYPE vec_pop_##TYPE(vec *v, size_t pos)\
-{\
-	TYPE r;\
-	vec_pop(v, pos, &r);\
-	return r;\
-}
+	TYPE vec_pop_##TYPE(vec *v, size_t pos)\
+	{\
+		TYPE r;\
+		vec_pop(v, pos, &r);\
+		return r;\
+	}
 
 
 #define TYPED_VEC_IMPL( TYPE , ...)\
-VEC_GET_IMPL(TYPE)\
-VEC_FIRST_IMPL(TYPE)\
-VEC_LAST_IMPL(TYPE)\
-VEC_SET_IMPL(TYPE)\
-VEC_PUSH_IMPL(TYPE)\
-VEC_INS_IMPL(TYPE)\
-VEC_POP_IMPL(TYPE)
+	VEC_GET_IMPL(TYPE)\
+	VEC_FIRST_IMPL(TYPE)\
+	VEC_LAST_IMPL(TYPE)\
+	VEC_SET_IMPL(TYPE)\
+	VEC_PUSH_IMPL(TYPE)\
+	VEC_INS_IMPL(TYPE)\
+	VEC_POP_IMPL(TYPE)
 
 
 XX_CORETYPES(TYPED_VEC_IMPL)
@@ -493,7 +500,7 @@ static bool _vec_iter_has_next(iter *it)
 }
 
 
-static const void * _vec_iter_next(iter *it)
+static const void *_vec_iter_next(iter *it)
 {
 	vec_iter *vit = (vec_iter *)it->impltor;
 	return vec_get(vit->src, vit->index++);

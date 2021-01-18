@@ -57,7 +57,8 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
  * @param cmp Comparator function
  * @see order.h
  */
-minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func, size_t capacity);
+minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func,
+                                     size_t capacity);
 
 
 /**
@@ -79,7 +80,7 @@ void minqueue_push(minqueue *queue, const void *elt);
 
 
 #define MINQUEUE_PUSH_DECL( TYPE )\
-void minqueue_push_##TYPE(minqueue *queue, TYPE val);
+	void minqueue_push_##TYPE(minqueue *queue, TYPE val);
 
 
 /**
@@ -98,7 +99,7 @@ void minqueue_remv(minqueue *queue);
 
 
 #define MINQUEUE_POP_DECL( TYPE )\
-TYPE minqueue_pop_##TYPE(minqueue *queue);
+	TYPE minqueue_pop_##TYPE(minqueue *queue);
 
 
 /**
@@ -116,13 +117,13 @@ void minqueue_min_cpy(const minqueue *queue, void *dest);
 
 
 #define MINQUEUE_MIN_DECL( TYPE )\
-TYPE minqueue_min_##TYPE(const minqueue *queue);
+	TYPE minqueue_min_##TYPE(const minqueue *queue);
 
 
 #define MINQUEUE_ALL_DECL( TYPE , ...)\
-MINQUEUE_PUSH_DECL(TYPE)\
-MINQUEUE_POP_DECL(TYPE)\
-MINQUEUE_MIN_DECL(TYPE)
+	MINQUEUE_PUSH_DECL(TYPE)\
+	MINQUEUE_POP_DECL(TYPE)\
+	MINQUEUE_MIN_DECL(TYPE)
 
 XX_CORETYPES(MINQUEUE_ALL_DECL)
 

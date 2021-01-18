@@ -32,7 +32,7 @@ static bool _arr_iter_has_next(iter *it)
 	return ait->index < ait->len;
 }
 
-static const void * _arr_iter_next(iter *it)
+static const void *_arr_iter_next(iter *it)
 {
 	arr_iter *ait = (arr_iter *)it->impltor;
 	return ait->src + (ait->typesize * ait->index++);

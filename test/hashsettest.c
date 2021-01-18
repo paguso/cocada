@@ -109,7 +109,7 @@ void test_hashset_indel(CuTest *tc)
 		//printf("element[%zu] = %u\n",i,*e);
 	}
 	qsort(elts, n, sizeof(uint), &_uint_cmp_fn);
-	for( size_t i=0; i<n; i++) {
+	for ( size_t i=0; i<n; i++) {
 		CuAssertSizeTEquals(tc, i*10, (size_t)elts[i]);
 		//printf("element[%zu] = %u\n",i, elts[i]);
 	}
@@ -122,7 +122,7 @@ void test_hashset_indel(CuTest *tc)
 
 CuSuite *hashset_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_hashset_indel);
 	return suite;
 }

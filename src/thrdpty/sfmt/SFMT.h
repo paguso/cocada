@@ -120,14 +120,14 @@ struct SFMT_T {
 
 typedef struct SFMT_T sfmt_t;
 
-void sfmt_fill_array32(sfmt_t * sfmt, uint32_t * array, int size);
-void sfmt_fill_array64(sfmt_t * sfmt, uint64_t * array, int size);
-void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed);
-void sfmt_init_by_array(sfmt_t * sfmt, uint32_t * init_key, int key_length);
-const char * sfmt_get_idstring(sfmt_t * sfmt);
-int sfmt_get_min_array_size32(sfmt_t * sfmt);
-int sfmt_get_min_array_size64(sfmt_t * sfmt);
-void sfmt_gen_rand_all(sfmt_t * sfmt);
+void sfmt_fill_array32(sfmt_t *sfmt, uint32_t *array, int size);
+void sfmt_fill_array64(sfmt_t *sfmt, uint64_t *array, int size);
+void sfmt_init_gen_rand(sfmt_t *sfmt, uint32_t seed);
+void sfmt_init_by_array(sfmt_t *sfmt, uint32_t *init_key, int key_length);
+const char *sfmt_get_idstring(sfmt_t *sfmt);
+int sfmt_get_min_array_size32(sfmt_t *sfmt);
+int sfmt_get_min_array_size64(sfmt_t *sfmt);
+void sfmt_gen_rand_all(sfmt_t *sfmt);
 
 #ifndef ONLY64
 /**
@@ -136,10 +136,10 @@ void sfmt_gen_rand_all(sfmt_t * sfmt);
  * @param sfmt SFMT internal state
  * @return 32-bit pseudorandom number
  */
-inline static uint32_t sfmt_genrand_uint32(sfmt_t * sfmt)
+inline static uint32_t sfmt_genrand_uint32(sfmt_t *sfmt)
 {
 	uint32_t r;
-	uint32_t * psfmt32 = &sfmt->state[0].u[0];
+	uint32_t *psfmt32 = &sfmt->state[0].u[0];
 
 	if (sfmt->idx >= SFMT_N32) {
 		sfmt_gen_rand_all(sfmt);
@@ -157,15 +157,15 @@ inline static uint32_t sfmt_genrand_uint32(sfmt_t * sfmt)
  * @param sfmt SFMT internal state
  * @return 64-bit pseudorandom number
  */
-inline static uint64_t sfmt_genrand_uint64(sfmt_t * sfmt)
+inline static uint64_t sfmt_genrand_uint64(sfmt_t *sfmt)
 {
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
-	uint32_t * psfmt32 = &sfmt->state[0].u[0];
+	uint32_t *psfmt32 = &sfmt->state[0].u[0];
 	uint32_t r1, r2;
 #else
 	uint64_t r;
 #endif
-	uint64_t * psfmt64 = &sfmt->state[0].u64[0];
+	uint64_t *psfmt64 = &sfmt->state[0].u64[0];
 	assert(sfmt->idx % 2 == 0);
 
 	if (sfmt->idx >= SFMT_N32) {
@@ -203,7 +203,7 @@ inline static double sfmt_to_real1(uint32_t v)
  * @param sfmt SFMT internal state
  * @return double on [0,1]-real-interval
  */
-inline static double sfmt_genrand_real1(sfmt_t * sfmt)
+inline static double sfmt_genrand_real1(sfmt_t *sfmt)
 {
 	return sfmt_to_real1(sfmt_genrand_uint32(sfmt));
 }
@@ -224,7 +224,7 @@ inline static double sfmt_to_real2(uint32_t v)
  * @param sfmt SFMT internal state
  * @return double on [0,1)-real-interval
  */
-inline static double sfmt_genrand_real2(sfmt_t * sfmt)
+inline static double sfmt_genrand_real2(sfmt_t *sfmt)
 {
 	return sfmt_to_real2(sfmt_genrand_uint32(sfmt));
 }
@@ -245,7 +245,7 @@ inline static double sfmt_to_real3(uint32_t v)
  * @param sfmt SFMT internal state
  * @return double on (0,1)-real-interval
  */
-inline static double sfmt_genrand_real3(sfmt_t * sfmt)
+inline static double sfmt_genrand_real3(sfmt_t *sfmt)
 {
 	return sfmt_to_real3(sfmt_genrand_uint32(sfmt));
 }
@@ -266,7 +266,7 @@ inline static double sfmt_to_res53(uint64_t v)
  * @param sfmt SFMT internal state
  * @return double on [0,1) with 53-bit resolution
  */
-inline static double sfmt_genrand_res53(sfmt_t * sfmt)
+inline static double sfmt_genrand_res53(sfmt_t *sfmt)
 {
 	return sfmt_to_res53(sfmt_genrand_uint64(sfmt));
 }
@@ -290,7 +290,7 @@ inline static double sfmt_to_res53_mix(uint32_t x, uint32_t y)
  * @param sfmt SFMT internal state
  * @return double on [0,1) with 53-bit resolution
  */
-inline static double sfmt_genrand_res53_mix(sfmt_t * sfmt)
+inline static double sfmt_genrand_res53_mix(sfmt_t *sfmt)
 {
 	uint32_t x, y;
 

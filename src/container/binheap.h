@@ -107,16 +107,16 @@ void binheap_pop(binheap *heap, void *dest);
 
 
 #define BINHEAP_PUSH_DECL( TYPE )\
-    void binheap_push_##TYPE(binheap *heap, TYPE val);
+	void binheap_push_##TYPE(binheap *heap, TYPE val);
 
 
 #define BINHEAP_POP_DECL( TYPE )\
-    TYPE binheap_pop_##TYPE(binheap *heap);
+	TYPE binheap_pop_##TYPE(binheap *heap);
 
 
 #define BINHEAP_ALL_DECL( TYPE, ... )\
-BINHEAP_PUSH_DECL(TYPE)\
-BINHEAP_POP_DECL(TYPE)
+	BINHEAP_PUSH_DECL(TYPE)\
+	BINHEAP_POP_DECL(TYPE)
 
 XX_CORETYPES(BINHEAP_ALL_DECL)
 

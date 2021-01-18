@@ -52,7 +52,8 @@ static xchar_wt _xstr_getc(xstrread *t)
 	xstr *src = (xstr *) rdr->src;
 	if (rdr->index < xstr_len(src))  {
 		return xstr_get(src, rdr->index++);
-	} else {
+	}
+	else {
 		return XEOF;
 	}
 }
@@ -95,7 +96,8 @@ static xchar_wt _str_getc(xstrread *t)
 	char *src = (char *) rdr->src;
 	if (rdr->index < rdr->len) {
 		return src[rdr->index++];
-	} else {
+	}
+	else {
 		return XEOF;
 	}
 }
@@ -106,7 +108,8 @@ size_t  _str_read(xstrread *t, xstr *dest, size_t n)
 	xstrreader *rdr = (xstrreader *) t->impltor;
 	char *src = (char *) rdr->src;
 	size_t i, j, l;
-	for (i = rdr->index, j = 0, l = MIN(xstr_len(dest), n); j < l && i < rdr->len ; i++, j++) {
+	for (i = rdr->index, j = 0, l = MIN(xstr_len(dest), n); j < l
+	        && i < rdr->len ; i++, j++) {
 		xstr_set(dest, j, src[i]);
 	}
 	for (; j < n && i < rdr->len ; i++, j++) {
@@ -122,7 +125,8 @@ size_t  _str_read_until(xstrread *t, xstr *dest, xchar_t delim)
 	xstrreader *rdr = (xstrreader *) t->impltor;
 	char *src = (char *) rdr->src;
 	size_t i, j, l;
-	for (i = rdr->index, j = 0, l = xstr_len(dest); j < l && i < rdr->len && (xchar_t) src[i] != delim; i++, j++) {
+	for (i = rdr->index, j = 0, l = xstr_len(dest); j < l && i < rdr->len
+	        && (xchar_t) src[i] != delim; i++, j++) {
 		xstr_set(dest, j, src[i]);
 	}
 	for (; i < rdr->len && (xchar_t) src[i] != delim; i++, j++) {

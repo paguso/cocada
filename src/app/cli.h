@@ -352,7 +352,7 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
  * 				used for help messages.
  * @param type	The type of the argument.
  */
-cliarg *cliarg_new(char *name, char*help, cliargtype type);
+cliarg *cliarg_new(char *name, char *help, cliargtype type);
 
 
 /**
@@ -364,7 +364,7 @@ cliarg *cliarg_new(char *name, char*help, cliargtype type);
  * 				used for help messages.
  * @param type	The type of the argument.
  */
-cliarg *cliarg_new_multi(char *name, char*help, cliargtype type);
+cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
 
 
 /**

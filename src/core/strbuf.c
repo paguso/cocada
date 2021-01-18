@@ -69,7 +69,7 @@ strbuf *strbuf_new_from_str(const char *src)
 
 void strbuf_dtor(void *ptr, const dtor *dt)
 {
-	FREE(((strbuf*)ptr)->str);
+	FREE(((strbuf *)ptr)->str);
 }
 
 
@@ -132,7 +132,7 @@ void strbuf_append(strbuf *sb, const char *suff)
 }
 
 
-void strbuf_join(strbuf *sb, size_t n, const char**arr, const char *sep)
+void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep)
 {
 	for (size_t i=0; i<n; i++) {
 		if (i) {

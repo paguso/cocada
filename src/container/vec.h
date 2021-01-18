@@ -129,7 +129,7 @@ size_t vec_typesize(const vec *v);
 
 /**
  * @brief Resets the vector **without** erasing its contents.
- * 
+ *
  * @warning This **DOES NOT** finalise the objects stored in the
  * vector. If this vector contains references to **owned** objects,
  * this might cause memory leaks.
@@ -378,47 +378,47 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_NEW_DECL( TYPE ) \
-   /** @brief Creates a new TYPE vector @see coretype.h */ \
-   TYPE vec_new_##TYPE();
+	/** @brief Creates a new TYPE vector @see coretype.h */ \
+	TYPE vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
-   /** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
-   TYPE vec_get_##TYPE(const vec *v, size_t pos);
+	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
+	TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
 #define VEC_FIRST_DECL( TYPE ) \
-   /** @brief Returns TYPE copy of the first element @see coretype.h */ \
-   TYPE vec_first_##TYPE(const vec *v);
+	/** @brief Returns TYPE copy of the first element @see coretype.h */ \
+	TYPE vec_first_##TYPE(const vec *v);
 
 #define VEC_LAST_DECL( TYPE ) \
-   /** @brief Returns TYPE copy of the last element @see coretype.h */ \
-   TYPE vec_last_##TYPE(const vec *v);
+	/** @brief Returns TYPE copy of the last element @see coretype.h */ \
+	TYPE vec_last_##TYPE(const vec *v);
 
 #define VEC_SET_DECL( TYPE ) \
-   /** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
-   void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
+	/** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
+	void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define VEC_PUSH_DECL( TYPE ) \
-   /** @brief Appends a TYPE copy of @p val @see coretype.h */ \
-   void vec_push_##TYPE(vec *v, TYPE val);
+	/** @brief Appends a TYPE copy of @p val @see coretype.h */ \
+	void vec_push_##TYPE(vec *v, TYPE val);
 
 #define VEC_INS_DECL( TYPE ) \
-   /** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
-   void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
+	/** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
+	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define VEC_POP_DECL( TYPE ) \
-   /** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
-   TYPE vec_pop_##TYPE(vec *v, size_t pos);
+	/** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
+	TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
 
 #define TYPED_VEC_DECL( TYPE , ...) \
-VEC_NEW_DECL(TYPE) \
-VEC_GET_DECL(TYPE) \
-VEC_FIRST_DECL(TYPE) \
-VEC_LAST_DECL(TYPE) \
-VEC_SET_DECL(TYPE) \
-VEC_PUSH_DECL(TYPE) \
-VEC_INS_DECL(TYPE) \
-VEC_POP_DECL(TYPE)
+	VEC_NEW_DECL(TYPE) \
+	VEC_GET_DECL(TYPE) \
+	VEC_FIRST_DECL(TYPE) \
+	VEC_LAST_DECL(TYPE) \
+	VEC_SET_DECL(TYPE) \
+	VEC_PUSH_DECL(TYPE) \
+	VEC_INS_DECL(TYPE) \
+	VEC_POP_DECL(TYPE)
 
 XX_CORETYPES(TYPED_VEC_DECL)
 

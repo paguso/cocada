@@ -30,7 +30,7 @@
 
 static void print_int(FILE *stream, const void *val)
 {
-	fprintf(stream, "%d", *((int*)val));
+	fprintf(stream, "%d", *((int *)val));
 }
 
 
@@ -47,7 +47,8 @@ void test_kll_upd(CuTest *tc)
 		double xval;
 		do {
 			xval = (rand_norm() + 1.0) / 7.0;
-		} while (xval < 0 || xval >= 1);
+		}
+		while (xval < 0 || xval >= 1);
 		int val = xval * univ;
 		ranks[val]++;
 		DEBUG("KLL insert #%d value = %d\n", i, val);
@@ -60,8 +61,9 @@ void test_kll_upd(CuTest *tc)
 		nxtsum += ranks[i];
 		ranks[i] = sum;
 		size_t kllrk =  kll_rank(summ, &i);
-		DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk, abs(((double)kllrk - (double)ranks[i]))/(double)n);
-		if( abs((double)kllrk - (double)ranks[i]) > epsN) {
+		DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk,
+		      abs(((double)kllrk - (double)ranks[i]))/(double)n);
+		if ( abs((double)kllrk - (double)ranks[i]) > epsN) {
 			nerr++;
 		}
 		sum = nxtsum;
@@ -83,7 +85,7 @@ int cmp_kll_obj(const void *l, const void *r)
 	kll_obj *lo = *((kll_obj **)l);
 	kll_obj *ro = *((kll_obj **)r);
 	if (lo->key < ro->key) return -1;
-	else if(lo->key > ro->key) return +1;
+	else if (lo->key > ro->key) return +1;
 	else return 0;
 }
 

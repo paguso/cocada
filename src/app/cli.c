@@ -48,7 +48,8 @@ struct _cliopt {
 	char *longname;		/* Long option name e.g. foo (--foo) */
 	char *help;			/* Help description */
 	clioptneed need;		/* true=mandatory argument(default); false=optional */
-	clioptmultiplicity multi;		/* true=can be declared multiple times, false=can appear only once(default) */
+	clioptmultiplicity
+	multi;		/* true=can be declared multiple times, false=can appear only once(default) */
 	cliargtype type;	/* The type of option values */
 	int min_val_no;	/* Minimum number of option values (default = 0) */
 	int max_val_no;	/* Maximum number of option values (default = 0) */
@@ -175,7 +176,8 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_STR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
+			                        ptr_dtor()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
@@ -185,7 +187,8 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_FILE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
+			                        ptr_dtor()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
@@ -195,7 +198,8 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_DIR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
+			                        ptr_dtor()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
@@ -205,7 +209,8 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_CHOICE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), ptr_dtor()))));
+			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
+			                        ptr_dtor()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
@@ -228,7 +233,8 @@ static bool _isid(char *id)
 	ok &= (*id!='\0');
 	ok &= ( ('A'<=*id && *id<='Z' ) || ('a'<=*id && *id<='z' ));
 	for (char c=*id; ok && c!='\0'; c=*(id++)) {
-		ok &= ( ('A'<=c && c<='Z' ) || ('a'<=c && c<='z' ) || ('0'<=c && c<='9' ) || (c=='_') || (c=='-'));
+		ok &= ( ('A'<=c && c<='Z' ) || ('a'<=c && c<='z' ) || ('0'<=c && c<='9' )
+		        || (c=='_') || (c=='-'));
 	}
 	return ok;
 }
@@ -372,7 +378,7 @@ void cliopt_dtor(void *ptr, const dtor *dt)
 }
 
 
-cliarg *cliarg_new(char *name, char*help, cliargtype type)
+cliarg *cliarg_new(char *name, char *help, cliargtype type)
 {
 	cliarg *ret = NEW(cliarg);
 	ret->name = (name) ? cstr_clone(name) : cstr_clone("Unnamed");
@@ -384,7 +390,7 @@ cliarg *cliarg_new(char *name, char*help, cliargtype type)
 }
 
 
-cliarg *cliarg_new_multi(char *name, char*help, cliargtype type)
+cliarg *cliarg_new_multi(char *name, char *help, cliargtype type)
 {
 	cliarg *ret = cliarg_new(name, help, type);
 	ret->single_val = false;
@@ -392,7 +398,7 @@ cliarg *cliarg_new_multi(char *name, char*help, cliargtype type)
 }
 
 
-cliarg *cliarg_new_choice(char *name, char*help, vec *choices)
+cliarg *cliarg_new_choice(char *name, char *help, vec *choices)
 {
 	assert( _arechoices(choices) );
 	cliarg *ret = cliarg_new(name, help, ARG_CHOICE);
@@ -401,7 +407,7 @@ cliarg *cliarg_new_choice(char *name, char*help, vec *choices)
 }
 
 
-cliarg *cliarg_new_choice_multi(char *name, char*help, vec *choices)
+cliarg *cliarg_new_choice_multi(char *name, char *help, vec *choices)
 {
 	cliarg *ret = cliarg_new_choice(name, help, choices);
 	ret->single_val = false;
@@ -433,11 +439,14 @@ cliparse *cliparse_new(char *name, char *help)
 	ret->par = NULL;
 	ret->name = cstr_clone(name);
 	ret->help = (help)?cstr_clone(help):cstr_new(0);
-	ret->subcommands = hashmap_new(sizeof(char *), sizeof(cliparse *),  _hash_str, _str_eq);
+	ret->subcommands = hashmap_new(sizeof(char *), sizeof(cliparse *),  _hash_str,
+	                               _str_eq);
 	ret->subcmd_names = vec_new(sizeof(char *));
 	ret->active_subcmd = NULL;
-	ret->options = hashmap_new(sizeof(char), sizeof(cliopt *), ident_hash_char, eq_char);
-	ret->long_to_short = hashmap_new(sizeof(char *), sizeof(char), _hash_str, _str_eq);
+	ret->options = hashmap_new(sizeof(char), sizeof(cliopt *), ident_hash_char,
+	                           eq_char);
+	ret->long_to_short = hashmap_new(sizeof(char *), sizeof(char), _hash_str,
+	                                 _str_eq);
 	ret->args = vec_new(sizeof(cliarg *));
 	// add help option directly
 	cliopt *help_opt = cliopt_new_defaults('h', "help", "Prints help message");
@@ -450,9 +459,11 @@ cliparse *cliparse_new(char *name, char *help)
 void cliparse_dtor(void *ptr, const dtor *dt)
 {
 	cliparse *clip = (cliparse *)ptr;
-	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()), dtor_cons(ptr_dtor(), DTOR(cliparse))));
+	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()),
+	                                     dtor_cons(ptr_dtor(), DTOR(cliparse))));
 	FREE(clip->subcmd_names, vec);
-	DESTROY(clip->options, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()), dtor_cons(ptr_dtor(), DTOR(cliopt))));
+	DESTROY(clip->options, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()),
+	                                 dtor_cons(ptr_dtor(), DTOR(cliopt))));
 	FREE(clip->long_to_short, hashmap);
 	DESTROY(clip->args, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(cliarg))));
 	FREE(clip->name);
@@ -475,7 +486,8 @@ const cliparse *cliparse_active_subcommand(const cliparse *cmd)
 static bool _not_a_subcmd_name(char *id, cliparse *cmd)
 {
 	for (cliparse *cur_cmd = cmd; cur_cmd != NULL; cur_cmd = cmd->par) {
-		ERROR_ASSERT(strcmp(id, cmd->name) && !hashmap_has_key(cur_cmd->subcommands, &id),
+		ERROR_ASSERT(strcmp(id, cmd->name)
+		             && !hashmap_has_key(cur_cmd->subcommands, &id),
 		             "Value '%s' is not allowed because it is a (sub)command name.\n", id);
 	}
 	return true;
@@ -487,7 +499,8 @@ void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 	assert(cmd->par==NULL); // subcommand cannot have subcommands
 	assert(cmd!=subcmd);	// avoid cycles
 	assert(subcmd->par==NULL); // a subcommand gets added at most once
-	assert(!hashmap_has_key(cmd->subcommands, &subcmd->name)); // all subcommand names are unique
+	assert(!hashmap_has_key(cmd->subcommands,
+	                        &subcmd->name)); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
 	hashmap_iter *it = hashmap_get_iter(subcmd->options);
 	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_iter(it)) {
@@ -516,7 +529,8 @@ void cliparse_add_subcommand(cliparse *cmd,  cliparse *subcmd)
 void cliparse_add_option(cliparse *cmd, cliopt *opt)
 {
 	assert( !hashmap_has_key(cmd->options, &(opt->shortname)) );
-	assert( opt->longname==NULL || !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
+	assert( opt->longname==NULL
+	        || !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
 	if (opt->type == ARG_CHOICE) {
 		for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
 			char *ch = vec_get_cstr(opt->choices, i);
@@ -542,7 +556,7 @@ void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg)
 	//assert(vec_len(cmd->subcommands)==0);
 	assert( arg->single_val ||
 	        vec_len(cmd->args) == 0 ||
-	        ((cliarg*)vec_last_rawptr(cmd->args))->single_val );
+	        ((cliarg *)vec_last_rawptr(cmd->args))->single_val );
 	vec_push_rawptr(cmd->args, arg);
 }
 
@@ -588,17 +602,21 @@ static void _cliopt_print_help(cliopt *opt)
 		strbuf_append(typedescr, " <");
 		if (opt->type==ARG_CHOICE) {
 			strbuf_join(typedescr, vec_len(opt->choices),
-			            (const char**)vec_as_array(opt->choices), "|");
-		} else {
+			            (const char **)vec_as_array(opt->choices), "|");
+		}
+		else {
 			strbuf_append(typedescr, type_lbl[opt->type]);
 		}
 		strbuf_append(typedescr, ">");
 		if (opt->min_val_no==1 && opt->max_val_no==1) {
-		} else if (opt->min_val_no==0 && opt->max_val_no==ARGNO_UNLIMITED) {
+		}
+		else if (opt->min_val_no==0 && opt->max_val_no==ARGNO_UNLIMITED) {
 			strbuf_append(typedescr,"*");
-		} else if (opt->min_val_no==1 && opt->max_val_no==ARGNO_UNLIMITED) {
+		}
+		else if (opt->min_val_no==1 && opt->max_val_no==ARGNO_UNLIMITED) {
 			strbuf_append(typedescr,"+");
-		} else {
+		}
+		else {
 			strbuf_append(typedescr, "[");
 			uint_to_cstr(nbstr, opt->min_val_no, 10);
 			strbuf_append(typedescr, nbstr);
@@ -629,7 +647,8 @@ void cliparse_print_help(const cliparse *cmd)
 	bool has_args = vec_len(cmd->args) > 0;
 	bool has_subcmds = hashmap_size(cmd->subcommands) > 0;
 	printf("Usage:\n\n");
-	printf("  %s%s%s", (cmd->par)?(cmd->par->name):"", (cmd->par)?" ":"", cmd->name);
+	printf("  %s%s%s", (cmd->par)?(cmd->par->name):"", (cmd->par)?" ":"",
+	       cmd->name);
 	if (has_options) {
 		printf(" <options>");
 	}
@@ -652,7 +671,8 @@ void cliparse_print_help(const cliparse *cmd)
 		FREE(it);
 		vec_qsort(shortnames, cmp_char);
 		for (size_t i=0, l=vec_len(shortnames); i<l; i++) {
-			cliopt *opt = (cliopt *) hashmap_get_rawptr(cmd->options, vec_get(shortnames, i));
+			cliopt *opt = (cliopt *) hashmap_get_rawptr(cmd->options, vec_get(shortnames,
+			              i));
 			_cliopt_print_help(opt);
 		}
 		printf("\n  usage : ! = required, ? = optional, + = one or more,  * = zero or more\n");
@@ -671,7 +691,8 @@ void cliparse_print_help(const cliparse *cmd)
 		printf("\nSubcommands:\n\n");
 		for (size_t i = 0, l = vec_len(cmd->subcmd_names); i < l; i++) {
 			char *subcmd_name = vec_get_cstr(cmd->subcmd_names, i);
-			cliparse *subcmd = (cliparse *)hashmap_get_rawptr(cmd->subcommands, &subcmd_name);
+			cliparse *subcmd = (cliparse *)hashmap_get_rawptr(cmd->subcommands,
+			                   &subcmd_name);
 			printf("  %s\t%s\n",subcmd->name, (subcmd->help)?subcmd->help:"");
 		}
 		printf("\n  Run \"%s%s%s <subcommand> --help\" for help on a specific subcommand.\n",
@@ -696,9 +717,11 @@ static void _check_missing_options(cliparse *cmd)
 			strbuf_append(longname, ", --");
 			strbuf_append(longname, opt->longname);
 		}
-		ERROR_ASSERT( opt->need == OPT_OPTIONAL || (opt->values != NULL && vec_len(opt->values) > 0 ),
+		ERROR_ASSERT( opt->need == OPT_OPTIONAL || (opt->values != NULL
+		              && vec_len(opt->values) > 0 ),
 		              "Undefined required option -%c%s.\n", opt->shortname, strbuf_as_str(longname));
-		if (opt->need == OPT_OPTIONAL && vec_len(opt->values)==0 && opt->defaults!=NULL) {
+		if (opt->need == OPT_OPTIONAL && vec_len(opt->values)==0
+		        && opt->defaults!=NULL) {
 			// add default values
 			vec *vals = _vals_vec_new(opt->multi, opt->type);
 			switch (opt->type) {
@@ -718,31 +741,31 @@ static void _check_missing_options(cliparse *cmd)
 				vec_cat(vals, opt->defaults);
 				break;
 			case ARG_STR:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+				for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_FILE:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+				for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_DIR:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+				for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_CHOICE:
-				for(size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
+				for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			}
-			switch(opt->multi) {
+			switch (opt->multi) {
 			case OPT_MULTIPLE:
 				vec_push(opt->values, &vals);
 				break;
@@ -763,7 +786,8 @@ static void _check_missing_options(cliparse *cmd)
  * If type=ARGV_CHOICE, a non-null choices vector must be informed.
  * Returns whether parsing went OK.
  */
-static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices, cliparse *cmd)
+static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
+                         cliparse *cmd)
 {
 	switch (type) {
 	case ARG_NONE:
@@ -772,9 +796,11 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices, cl
 	case ARG_BOOL:
 		if (cstr_equals_ignore_case(tok, "true") || cstr_equals(tok, "1")) {
 			vec_push__Bool(vals, true);
-		} else if (cstr_equals_ignore_case(tok, "false") || cstr_equals(tok, "0")) {
+		}
+		else if (cstr_equals_ignore_case(tok, "false") || cstr_equals(tok, "0")) {
 			vec_push__Bool(vals, false);
-		} else {
+		}
+		else {
 			return false;
 		}
 		break;
@@ -852,8 +878,8 @@ typedef enum {
 void cliparse_parse(cliparse *clip, int argc, char **argv)
 {
 	WARN_IF( clip->dirty, "This CLI has already been processed!"
-		"Parsing the CLI more than once may cause unexpected errors!\n"
-		"Try resetting or creating a new parser." );
+	         "Parsing the CLI more than once may cause unexpected errors!\n"
+	         "Try resetting or creating a new parser." );
 	clip->dirty = true;
 
 	int t = 1;
@@ -877,17 +903,21 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				ERROR_ASSERT( toklen > 1, "Invalid option name - at position %d.\n", t);
 				if (tok[1] == '-') { // long option
 					char *longname = &tok[2];
-					ERROR_ASSERT(_isid(longname), "Invalid option name %s at position %d.\n", tok, t);
+					ERROR_ASSERT(_isid(longname), "Invalid option name %s at position %d.\n", tok,
+					             t);
 					ERROR_ASSERT(hashmap_has_key(cur_parse->long_to_short, &longname),
 					             "Unknown option %s at position %d.\n", tok, t);
 					shortname = hashmap_get_char(cur_parse->long_to_short, &longname);
-				} else { // short option
+				}
+				else {   // short option
 					ERROR_ASSERT(toklen==2, "Invalid option name %s at position %d.\n", tok, t);
-					ERROR_ASSERT(_isletter(tok[1]), "Invalid option name %s at position %d.\n", tok, t);
+					ERROR_ASSERT(_isletter(tok[1]), "Invalid option name %s at position %d.\n", tok,
+					             t);
 					shortname = tok[1];
 				}
 				ERROR_ASSERT( hashmap_has_key(cur_parse->options, &shortname),
-				              "Unknown option %s of (sub)command %s at position %d.\n", tok, cur_parse->name, t);
+				              "Unknown option %s of (sub)command %s at position %d.\n", tok, cur_parse->name,
+				              t);
 				cur_opt = hashmap_get_rawptr(cur_parse->options, &shortname);
 				if (cur_opt->shortname=='h') {
 					cliparse_print_help(cur_parse);
@@ -903,17 +933,21 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 					              cur_opt->min_val_no, (cur_opt->min_val_no==1)?"":"s", type_lbl[cur_opt->type]);
 					cur_vals = _vals_vec_new(OPT_SINGLE, cur_opt->type);
 					state = PS_VAL;
-				} else { // no values, boolean assumed
+				}
+				else {   // no values, boolean assumed
 					if (vec_len(cur_opt->values)) {
 						vec_set__Bool(cur_opt->values, 0, true);
-					} else {
+					}
+					else {
 						vec_push__Bool(cur_opt->values, true);
 					}
 				}
 				t++;
-			} else if (hashmap_has_key(cur_parse->subcommands, &tok)) { // valid subcommand
+			}
+			else if (hashmap_has_key(cur_parse->subcommands, &tok)) {   // valid subcommand
 				ERROR_ASSERT( vec_len(cur_parse->args)==0 ||
-				              (cur_arg_no==0 && vec_len(((cliarg*)vec_first_rawptr(cur_parse->args))->values)==0),
+				              (cur_arg_no==0
+				               && vec_len(((cliarg *)vec_first_rawptr(cur_parse->args))->values)==0),
 				              "Subcommand %s at position %d cannot be called after arguments to the root command have been given.",
 				              tok, t );
 				cliparse *subcmd = hashmap_get_rawptr(cur_parse->subcommands, &tok);
@@ -921,21 +955,28 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				cur_parse = subcmd;
 				cur_arg_no = 0;
 				t++;
-			} else {
+			}
+			else {
 				// see if it is a correct positional argument
 				ERROR_ASSERT( cur_arg_no < vec_len(cur_parse->args),
 				              "Unexpected token %s at position %d.\n", tok, t);
 				cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, 0);
-				bool is_arg = _parse_value(cur_arg->values, tok, cur_arg->type, cur_arg->choices, cur_parse);
-				ERROR_ASSERT( is_arg, "Wrong value %s for argument #%d of type <%s> at position %d.\n",
+				bool is_arg = _parse_value(cur_arg->values, tok, cur_arg->type,
+				                           cur_arg->choices, cur_parse);
+				ERROR_ASSERT( is_arg,
+				              "Wrong value %s for argument #%d of type <%s> at position %d.\n",
 				              tok, cur_arg_no, type_lbl[cur_arg->type], t );
 				// positional argument value ok
 				if (cur_arg->single_val) cur_arg_no++;
 				t++;
 			}
-		} else if (state == PS_VAL) { // can only be here if expecting values for a valued option
-			bool val_ok = _parse_value(cur_vals, tok, cur_opt->type, cur_opt->choices, cur_parse);
-			bool max_val_no_reached =  val_ok && ( vec_len(cur_vals) == cur_opt->max_val_no );
+		}
+		else if (state ==
+		         PS_VAL) {   // can only be here if expecting values for a valued option
+			bool val_ok = _parse_value(cur_vals, tok, cur_opt->type, cur_opt->choices,
+			                           cur_parse);
+			bool max_val_no_reached =  val_ok
+			                           && ( vec_len(cur_vals) == cur_opt->max_val_no );
 			bool eof_argv = val_ok && ((t+1)==argc);
 			if (!val_ok || max_val_no_reached || eof_argv) {
 				ERROR_ASSERT ( cur_opt->min_val_no <= vec_len(cur_vals),
@@ -966,8 +1007,11 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 			if (val_ok) {
 				t++;
 			}
-		} else {
-			ERROR_ASSERT(false, "Uh-oh: undefined error parsing command arguments at position %d (WRONG STATE).\n", t);
+		}
+		else {
+			ERROR_ASSERT(false,
+			             "Uh-oh: undefined error parsing command arguments at position %d (WRONG STATE).\n",
+			             t);
 		}
 	}
 	// check if some arguments undefined
@@ -975,7 +1019,8 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 	              (vec_len(cur_parse->args)>0 && cur_arg_no == vec_len(cur_parse->args)-1
 	               && vec_len(((cliarg *)vec_last_rawptr(cur_parse->args))->values) > 0),
 	              "Missing value for argument #%d of type <%s>.\n",
-	              cur_arg_no, type_lbl[((cliarg *)vec_get_rawptr(cur_parse->args, cur_arg_no))->type]);
+	              cur_arg_no, type_lbl[((cliarg *)vec_get_rawptr(cur_parse->args,
+	                                    cur_arg_no))->type]);
 	// check if mandatory options with no default values undefined
 	_check_missing_options(clip);
 	if (clip->active_subcmd) _check_missing_options(clip->active_subcmd);
@@ -986,8 +1031,9 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 const vec *cliparse_opt_val_from_shortname(const cliparse *cmd, char shortname)
 {
 	if (hashmap_has_key(cmd->options, &shortname)) {
-		return ((cliopt*)hashmap_get_rawptr(cmd->options, &shortname))->values;
-	} else {
+		return ((cliopt *)hashmap_get_rawptr(cmd->options, &shortname))->values;
+	}
+	else {
 		return NULL;
 	}
 }
@@ -997,8 +1043,9 @@ const vec *cliparse_opt_val_from_longname(const cliparse *cmd, char *longname)
 {
 	if (hashmap_has_key(cmd->long_to_short, &longname)) {
 		char shortname = hashmap_get_char(cmd->long_to_short, &longname);
-		return ((cliopt*)hashmap_get_rawptr(cmd->options, &shortname))->values;
-	} else {
+		return ((cliopt *)hashmap_get_rawptr(cmd->options, &shortname))->values;
+	}
+	else {
 		return NULL;
 	}
 }
@@ -1008,7 +1055,8 @@ const vec *cliparse_arg_val_from_pos(const cliparse *cmd, size_t pos)
 {
 	if (pos < vec_len(cmd->args)) {
 		return ((cliarg *)vec_get_rawptr(cmd->args, pos))->values;
-	} else {
+	}
+	else {
 		return NULL;
 	}
 }

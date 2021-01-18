@@ -59,7 +59,8 @@ typedef struct _hashmap hashmap;
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
+                     eq_func keyeq);
 
 
 /**
@@ -67,7 +68,8 @@ hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func 
  * Analogous to ::hashmap_new
  * @see hashmap_new
  */
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq);
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
+                  hash_func keyhash, eq_func keyeq);
 
 
 /**
@@ -75,7 +77,8 @@ void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhas
  * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
+                                   hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity);
 
 
@@ -84,7 +87,8 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func key
  * Analogous to ::hashmap_new_with_capacit
  * @see hashmap_new_with_capacity
  */
-void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
+void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize,
+                                hash_func keyhash, eq_func keyeq,
                                 size_t min_capacity);
 
 
@@ -189,14 +193,14 @@ DECL_TRAIT(hashmap_iter, iter);
 
 
 #define HASHMAP_GET_DECL( TYPE ) \
-TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
+	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
 
 #define HASHMAP_SET_DECL( TYPE ) \
-void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val);
+	void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val);
 
 #define HASHMAP_ALL_DECL( TYPE , ...) \
-HASHMAP_GET_DECL(TYPE) \
-HASHMAP_SET_DECL(TYPE)
+	HASHMAP_GET_DECL(TYPE) \
+	HASHMAP_SET_DECL(TYPE)
 
 XX_CORETYPES(HASHMAP_ALL_DECL)
 

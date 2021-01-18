@@ -47,7 +47,8 @@ void test_fmalg(CuTest *tc)
 		if (i%10 == 0) {
 			uint64_t f0 = fmalg_query(fm);
 			error = abs((double)f0-(double)true_count)/(double)true_count;
-			DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0, true_count, error);
+			DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0,
+			      true_count, error);
 		}
 	}
 	fmalg_free(fm);

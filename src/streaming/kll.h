@@ -137,7 +137,7 @@ static const double KLL_DEFAULT_C = 0.75;
 
 /**
  * @brief Default big-Oh multiplicative constant for `k`
- * @see kll.h module docs 
+ * @see kll.h module docs
  * @see kll_new
  * @see kll_new_with_cap
  */
@@ -162,29 +162,29 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * is supposed to contain *onwed* object references. If such is the
  * case, use kll_new_own or kll_new_onw_with_cap. This is equivalent
  * to kll_new_own(typesize, cmp, err, empty_dtor())
- * 
+ *
  * @see order.h
  * @see kll_new_own
  * @see kll_new_with_cap
- * 
+ *
  */
 kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
 
 
 /**
  * @brief Same as kll_new but for summaries storing owned references.
- * 
+ *
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
  * @param err The desired error level (see header file comments)
  * @param chd_dt (**move**) A destructor for the stored child objects
- * 
+ *
  * The KLL summary stores the added data in internal containers.
  * If owned references are stored in the summary, then it needs to
  * know how to properly destroy such objects because some of these
  * references may have to be deleted during the lifecycle of the
  * summary, even before its destruction.
- * 
+ *
  * @see new.h
  */
 kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
@@ -226,10 +226,10 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
  * @warning As explained, an error can occur if the informed capacity is
  * insufficient to assure the error level.
  *
- * @warning If @p cap it is smaller than KLL_DEFAULT_CAP, the later value 
+ * @warning If @p cap it is smaller than KLL_DEFAULT_CAP, the later value
  * is used, i.e. the capacity is always at least KLL_DEFAULT_CAP.
- * 
- * @warning The capacity is an indicator of the maximum number of 
+ *
+ * @warning The capacity is an indicator of the maximum number of
  * data points are that are physically stored. However, the implementation
  * will require additional memory depending on the actual data structures.
  *
@@ -240,7 +240,8 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
  *
  * @see errlog.h
  */
-kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap);
+kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps,
+                          size_t cap);
 
 
 /**
@@ -249,7 +250,8 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap)
  * @see kll_new_own
  * @see kll_new_with_cap
  */
-kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps, size_t cap, dtor *chd_dt);
+kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
+                              size_t cap, dtor *chd_dt);
 
 
 /**
@@ -266,7 +268,7 @@ void kll_dtor(void *ptr, const dtor *dt);
 void kll_upd(kllsumm *self, void *val);
 
 /**
- * @brief Returns an `O(err*N)` approximation of the rank of @p val 
+ * @brief Returns an `O(err*N)` approximation of the rank of @p val
  * with constant `O(err)` error probability.
  * @see kll.h module documentation
  */
@@ -276,7 +278,8 @@ size_t kll_rank(kllsumm *self, void *val);
  * @brief Prints a representation of the summary to a given output stream
  * @param print_val A function to print the stored values.
  */
-void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *, const void *));
+void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *,
+               const void *));
 
 
 #endif

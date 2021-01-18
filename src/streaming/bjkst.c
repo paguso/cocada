@@ -51,7 +51,7 @@ static size_t get_buf_cap(double eps, double delta)
 }
 
 
-bjkst* bjkst_init(size_t nbits, double eps, double delta)
+bjkst *bjkst_init(size_t nbits, double eps, double delta)
 {
 	ERROR_ASSERT( 0 < nbits && nbits < 64,
 	              "BJKST: Allowed #bits range is 1..63.");
@@ -61,7 +61,7 @@ bjkst* bjkst_init(size_t nbits, double eps, double delta)
 	ret->eps = eps;
 	ret->delta = delta;
 	ret->g = twuhash_new(nbits, nbits);
-	ret->buf = NEW_ARR(hashset*, nbits + 1);
+	ret->buf = NEW_ARR(hashset *, nbits + 1);
 	ret->buf_cap = get_buf_cap(eps, delta);
 	ret->buf_size = 0;
 	ret->min_zeros = 0;
@@ -84,7 +84,8 @@ void bjkst_process(bjkst *counter, uint64_t val)
 	if ( zeros < counter->min_zeros
 	        || hashset_contains_uint64_t(counter->buf[zeros], hval)) return;
 	// make sure free space is available
-	while (counter->buf_size >= counter->buf_cap ) {//&& counter->min_zeros <= counter->nbits) {
+	while (counter->buf_size >=
+	        counter->buf_cap ) {//&& counter->min_zeros <= counter->nbits) {
 		counter->buf_size -= hashset_size(counter->buf[counter->min_zeros]);
 		FREE(counter->buf[counter->min_zeros], hashset);
 		counter->buf[counter->min_zeros] = NULL;
@@ -100,7 +101,7 @@ void bjkst_process(bjkst *counter, uint64_t val)
 uint64_t bjkst_qry(bjkst *counter)
 {
 	size_t min_nonempty_zeros = counter->min_zeros;
-	while(min_nonempty_zeros < counter->nbits
+	while (min_nonempty_zeros < counter->nbits
 	        && hashset_size(counter->buf[min_nonempty_zeros])==0 ) {
 		min_nonempty_zeros++;
 	}

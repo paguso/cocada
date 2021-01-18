@@ -66,7 +66,7 @@ inline static vector unsigned int vec_recursion(vector unsigned int a,
  * This function fills the internal state array with pseudorandom
  * integers.
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt)
+void sfmt_gen_rand_all(sfmt_t *sfmt)
 {
 	int i;
 	vector unsigned int r, r1, r2;
@@ -94,7 +94,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pesudorandom numbers to be generated.
  */
-inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size)
+inline static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
 {
 	int i, j;
 	vector unsigned int r, r1, r2;

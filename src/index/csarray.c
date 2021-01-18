@@ -77,9 +77,9 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		csa->nlevels++;
 
 	csa->lvl_len = NEW_ARR(size_t, csa->nlevels);
-	csa->even_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
-	csa->char_stop_bv = NEW_ARR(csrsbitarray*, csa->nlevels);
-	csa->phi_wt = NEW_ARR(wavtree*, csa->nlevels);
+	csa->even_bv = NEW_ARR(csrsbitarray *, csa->nlevels);
+	csa->char_stop_bv = NEW_ARR(csrsbitarray *, csa->nlevels);
+	csa->phi_wt = NEW_ARR(wavtree *, csa->nlevels);
 	//csa->phi_str = NEW_ARR(xstr*, csa->nlevels);
 
 	// build plain sarray and its inverse
@@ -149,16 +149,18 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		// push even entries to first half of sarr rescaling its value
 		// if not last level
 		bitvec *even_suff = bitvec_new_with_capacity(lvl_len);
-		if(lvl == csa->nlevels - 1) {
+		if (lvl == csa->nlevels - 1) {
 			for (size_t i = 0 ; i < lvl_len; i++)
 				bitvec_push(even_suff, IS_EVEN(sarr[i]));
 			break;
-		} else {
+		}
+		else {
 			for (size_t i = 0, last = 0; i < lvl_len; i++) {
 				if (IS_EVEN(sarr[i])) {
 					bitvec_push(even_suff, 1);
 					sarr[last++] = sarr[i]/2;
-				} else
+				}
+				else
 					bitvec_push(even_suff, 0);
 			}
 		}
@@ -200,7 +202,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	xstr_free(cur_xstr);
 
 	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
-	csa->root_sa_inv = realloc(sarr_inv, csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
+	csa->root_sa_inv = realloc(sarr_inv,
+	                           csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
 	return csa;
 }
 
@@ -230,8 +233,10 @@ void csarray_print(FILE *stream, csarray *csa)
 		//printf("%s\n", strbuf_as_str(phi));
 		//strbuf_free(phi);
 	}
-	FPRINT_ARR(stream, csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
-	FPRINT_ARR(stream, csa->root_sa_inv, root_sa_inv, %zu, 0, csa->lvl_len[csa->nlevels-1], 10);
+	FPRINT_ARR(stream, csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1],
+	           10);
+	FPRINT_ARR(stream, csa->root_sa_inv, root_sa_inv, %zu, 0,
+	           csa->lvl_len[csa->nlevels-1], 10);
 	fprintf (stream, "} #end of csarray@%p\n", csa);
 
 }
@@ -284,7 +289,8 @@ static size_t csa_get(csarray *csa, size_t lvl, size_t i)
 	if ( csrsbitarr_get(csa->even_bv[lvl], i) ) {
 		size_t epos = csrsbitarr_rank1(csa->even_bv[lvl], i);
 		return 2*csa_get( csa, lvl+1, epos );
-	} else {
+	}
+	else {
 		size_t phi = csa_phi(csa, lvl, i);
 		size_t sa_i_plus1 = csa_get( csa, lvl, phi );
 		return (sa_i_plus1 > 0) ? sa_i_plus1 - 1 : csa->lvl_len[lvl] - 1;
@@ -305,7 +311,8 @@ static size_t csa_get_inv(csarray *csa, size_t lvl, size_t i)
 	if ( IS_EVEN(i) ) {
 		size_t rec_inv = csa_get_inv(csa, lvl+1, i/2);
 		return csrsbitarr_select1(csa->even_bv[lvl], rec_inv);
-	} else {
+	}
+	else {
 		size_t inv_i_minus1 = csa_get_inv( csa, lvl, i-1 );
 		return csa_phi(csa, lvl, inv_i_minus1);
 	}

@@ -104,7 +104,7 @@ void bitvec_test_count(CuTest *tc)
 
 CuSuite *bitvec_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, bitvec_test_append);
 	SUITE_ADD_TEST(suite, bitvec_test_append_n);
 	SUITE_ADD_TEST(suite, bitvec_test_count);

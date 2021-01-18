@@ -27,8 +27,8 @@ extern "C" {
 
 #include "SFMT.h"
 
-inline static void do_recursion(w128_t * r, w128_t * a, w128_t * b,
-                                w128_t * c, w128_t * d);
+inline static void do_recursion(w128_t *r, w128_t *a, w128_t *b,
+                                w128_t *c, w128_t *d);
 
 inline static void rshift128(w128_t *out,  w128_t const *in, int shift);
 inline static void lshift128(w128_t *out,  w128_t const *in, int shift);

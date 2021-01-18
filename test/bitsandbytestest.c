@@ -148,7 +148,7 @@ void test_byte_rank(CuTest *tc)
 {
 	for (byte_t bit=0; bit<2; bit++) {
 		for (byte_t n=0; n<BYTE_MAX; n++) {
-			for(size_t i=0; i<BYTESIZE; i++) {
+			for (size_t i=0; i<BYTESIZE; i++) {
 				size_t rk = byte_rank(n, i, bit);
 				byte_t b = n;
 				byte_reverse(&b);
@@ -175,7 +175,7 @@ void test_byte_select(CuTest *tc)
 		for (byte_t n=0; n<BYTE_MAX; n++) {
 			size_t s = byte_select(n, BYTESIZE, bit);
 			CuAssertSizeTEquals(tc, BYTESIZE, s);
-			for(size_t rk=0, c=byte_bitcount(n, bit); rk<c; rk++) {
+			for (size_t rk=0, c=byte_bitcount(n, bit); rk<c; rk++) {
 				size_t s = byte_select(n, rk, bit);
 				byte_t b = n;
 				byte_reverse(&b);
@@ -193,9 +193,9 @@ void test_byte_select(CuTest *tc)
 }
 
 
-CuSuite* bitsandbytes_get_test_suite()
+CuSuite *bitsandbytes_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_byte_reverse);
 	SUITE_ADD_TEST(suite, test_byte_to_str);
 	SUITE_ADD_TEST(suite, test_byte_bitcount);

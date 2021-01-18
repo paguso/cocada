@@ -109,7 +109,7 @@ void test_binheap_push_pop_int(CuTest *tc)
 
 CuSuite *binheap_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_binheap_push_pop);
 	SUITE_ADD_TEST(suite, test_binheap_push_pop_int);
 	return suite;

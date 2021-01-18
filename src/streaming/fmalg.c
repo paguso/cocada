@@ -56,7 +56,7 @@ fmalg *fmalg_init(uint64_t maxval, size_t n, size_t m)
 	ret->m = m;
 	ret->p2ceil = uint64_lobit( pow2ceil_uint64_t(maxval) );
 	assert (ret->p2ceil <= 63);
-	NEW_MATRIX(rngs, kwayrng*, m, n);
+	NEW_MATRIX(rngs, kwayrng *, m, n);
 	FILL_MATRIX(rngs, m, n, kwayrng_new(2, ret->p2ceil));
 	ret->rng = rngs;
 	NEW_MATRIX_0(lsbs, byte_t, m, n);

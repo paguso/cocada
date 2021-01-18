@@ -95,13 +95,13 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
 {
 	size_t end = len;
 	for (size_t j=0; j<unw_len; j++) {
-		while(end && str[end-1]==unwanted[j]) end--;
+		while (end && str[end-1]==unwanted[j]) end--;
 	}
 	str[end] = '\0';
 	if (end) {
 		size_t begin = 0;
 		for (size_t j=0; j<unw_len; j++) {
-			while(str[begin]==unwanted[j]) begin++;
+			while (str[begin]==unwanted[j]) begin++;
 		}
 		if (begin) {
 			memmove(str, str + (begin*sizeof(char)), (end-begin)*sizeof(char));

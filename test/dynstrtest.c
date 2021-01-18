@@ -82,7 +82,7 @@ void strbuf_test_teardown(CuTest *tc)
 
 CuSuite *strbuf_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, strbuf_test_setup);
 	SUITE_ADD_TEST(suite, test_strbuf_new_from_str);
 	SUITE_ADD_TEST(suite, test_strbuf_get);

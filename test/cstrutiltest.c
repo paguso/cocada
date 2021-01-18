@@ -51,7 +51,7 @@ void test_sizet_to_cstr(CuTest *tc)
 
 CuSuite *cstrutil_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_sizet_to_cstr);
 	return suite;
 }

@@ -96,7 +96,8 @@ const void *deque_get(const deque *q, size_t pos)
 
 void deque_get_cpy(const deque *q, size_t pos, void *dest )
 {
-	memcpy(dest, q->data + ( ((q->start + pos) % q->cap) * q->typesize ), q->typesize);
+	memcpy(dest, q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
+	       q->typesize);
 }
 
 
@@ -124,10 +125,12 @@ static void check_and_resize(deque *q)
 		         q->data+(q->start*q->typesize),
 		         (q->len-q->start)*q->typesize );
 		q->start += offset;
-	} else if (q->len < MIN_LOAD*q->cap) {
+	}
+	else if (q->len < MIN_LOAD*q->cap) {
 		if (q->start+q->len < q->cap) {
 			memmove(q->data, q->data+(q->start*q->typesize), q->len*q->typesize);
-		} else {
+		}
+		else {
 			memmove( q->data + (q->cap - q->start)*q->typesize,
 			         q->data, ((q->start+q->len)%q->cap)*q->typesize );
 			memmove( q->data,  q->data + (q->start * q->typesize),
@@ -189,57 +192,57 @@ void deque_remv_front(deque *q)
 }
 
 #define DEQUE_NEW_IMPL( TYPE )\
-    deque *deque_new_##TYPE() {\
-        return deque_new(sizeof(TYPE));\
-    }
+	deque *deque_new_##TYPE() {\
+		return deque_new(sizeof(TYPE));\
+	}
 
 #define DEQUE_GET_IMPL( TYPE )\
-    TYPE deque_get_##TYPE(const deque *q, size_t pos) {\
-        return ((TYPE *)deque_get(q, pos))[0];\
-    }
+	TYPE deque_get_##TYPE(const deque *q, size_t pos) {\
+		return ((TYPE *)deque_get(q, pos))[0];\
+	}
 
 #define DEQUE_FRONT_IMPL( TYPE )\
-    TYPE deque_front_##TYPE(const deque *q) {\
-        return deque_get_##TYPE(q, 0);\
-    }
+	TYPE deque_front_##TYPE(const deque *q) {\
+		return deque_get_##TYPE(q, 0);\
+	}
 
 #define DEQUE_BACK_IMPL( TYPE )\
-    TYPE deque_back_##TYPE(const deque *q) {\
-        return deque_get_##TYPE(q, q->len-1);\
-    }
+	TYPE deque_back_##TYPE(const deque *q) {\
+		return deque_get_##TYPE(q, q->len-1);\
+	}
 
 #define DEQUE_PUSH_BACK_IMPL( TYPE )\
-    void deque_push_back_##TYPE(deque *q, TYPE val) {\
-        deque_push_back(q, &val);\
-    }
+	void deque_push_back_##TYPE(deque *q, TYPE val) {\
+		deque_push_back(q, &val);\
+	}
 
 #define DEQUE_PUSH_FRONT_IMPL( TYPE )\
-    void deque_push_front_##TYPE(deque *q, TYPE val) {\
-        deque_push_front(q, &val);\
-    }
+	void deque_push_front_##TYPE(deque *q, TYPE val) {\
+		deque_push_front(q, &val);\
+	}
 
 #define DEQUE_POP_BACK_IMPL( TYPE ) \
-    TYPE deque_pop_back_##TYPE(deque *q) { \
-        TYPE ret;\
-        deque_pop_back(q, &ret);\
-        return ret;\
-    }
+	TYPE deque_pop_back_##TYPE(deque *q) { \
+		TYPE ret;\
+		deque_pop_back(q, &ret);\
+		return ret;\
+	}
 
 #define DEQUE_POP_FRONT_IMPL( TYPE ) \
-    TYPE deque_pop_front_##TYPE(deque *q) {\
-        TYPE ret;\
-        deque_pop_front(q, &ret);\
-        return ret;\
-    }
+	TYPE deque_pop_front_##TYPE(deque *q) {\
+		TYPE ret;\
+		deque_pop_front(q, &ret);\
+		return ret;\
+	}
 
 #define DEQUE_ALL_IMPL( TYPE, ... ) \
-DEQUE_NEW_IMPL(TYPE)\
-DEQUE_GET_IMPL(TYPE)\
-DEQUE_FRONT_IMPL(TYPE)\
-DEQUE_BACK_IMPL(TYPE)\
-DEQUE_PUSH_BACK_IMPL(TYPE) \
-DEQUE_PUSH_FRONT_IMPL(TYPE)\
-DEQUE_POP_BACK_IMPL(TYPE)\
-DEQUE_POP_FRONT_IMPL(TYPE)
+	DEQUE_NEW_IMPL(TYPE)\
+	DEQUE_GET_IMPL(TYPE)\
+	DEQUE_FRONT_IMPL(TYPE)\
+	DEQUE_BACK_IMPL(TYPE)\
+	DEQUE_PUSH_BACK_IMPL(TYPE) \
+	DEQUE_PUSH_FRONT_IMPL(TYPE)\
+	DEQUE_POP_BACK_IMPL(TYPE)\
+	DEQUE_POP_FRONT_IMPL(TYPE)
 
 XX_CORETYPES(DEQUE_ALL_IMPL)

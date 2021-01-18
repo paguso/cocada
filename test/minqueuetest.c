@@ -107,7 +107,8 @@ void test_minqueue_push_pop(CuTest *tc)
 	}
 	CuAssert(tc, "must have at least one min", nmin>0);
 	while (minqueue_iter_has_next(&iter)) {
-		CuAssert(tc, "iterator returns not min", minqobj_cmp(min, minqueue_iter_next(&iter))==0);
+		CuAssert(tc, "iterator returns not min", minqobj_cmp(min,
+		         minqueue_iter_next(&iter))==0);
 		nmin--;
 	}
 	CuAssertSizeTEquals(tc, 0, nmin);

@@ -153,7 +153,7 @@ void test_ab_marshall(CuTest *tc)
 
 CuSuite *alphabet_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_ab_new);
 	//SUITE_ADD_TEST(suite, test_ab_new_with_rank_func);
 	//SUITE_ADD_TEST(suite, test_ab_new_with_rank_map);

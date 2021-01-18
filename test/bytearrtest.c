@@ -111,7 +111,8 @@ void test_bytearr_write_int(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
-			} else {
+			}
+			else {
 				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
 			}
 		}
@@ -139,7 +140,8 @@ void test_bytearr_write_uint(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
-			} else {
+			}
+			else {
 				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
 			}
 		}
@@ -166,7 +168,8 @@ void test_bytearr_write_size_t(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(size_t)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
-			} else {
+			}
+			else {
 				written >>= ((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
 			}
 		}
@@ -178,7 +181,7 @@ void test_bytearr_write_size_t(CuTest *tc)
 
 CuSuite *bytearray_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, bytearray_test_setup);
 	SUITE_ADD_TEST(suite, test_bytearr_write_int);
 	SUITE_ADD_TEST(suite, test_bytearr_write_uint);

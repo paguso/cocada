@@ -71,7 +71,7 @@ CuSuite *xstr_get_test_suite();
 void run_all_tests(void)
 {
 	CuString *output = CuStringNew();
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 
 	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
 	//CuSuiteAddSuite(suite, avl_get_test_suite());

@@ -47,7 +47,8 @@ void test_huffcode_new(CuTest *tc)
 
 static void _random_str(char *dest, alphabet *ab, size_t len)
 {
-	for (size_t i=0; i<len; dest[i++] = ab_char(ab, rand_range_size_t(0, ab_size(ab))));
+	for (size_t i=0; i<len;
+	        dest[i++] = ab_char(ab, rand_range_size_t(0, ab_size(ab))));
 }
 
 
@@ -76,7 +77,7 @@ void test_huffcode_codec(CuTest *tc)
 
 CuSuite *huffcode_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_huffcode_new);
 	SUITE_ADD_TEST(suite, test_huffcode_codec);
 	return suite;

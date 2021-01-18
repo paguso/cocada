@@ -54,14 +54,14 @@ static void random_seq(alphabet *ab, char *dest, size_t n)
 void dbgraph_test_setup(CuTest *tc)
 {
 	n = 20;
-	ab   = NEW_ARR(alphabet*, n);
+	ab   = NEW_ARR(alphabet *, n);
 	slen = NEW_ARR(size_t, n);
-	str  = NEW_ARR(char*, n);
-	padstr  = NEW_ARR(char*, n);
+	str  = NEW_ARR(char *, n);
+	padstr  = NEW_ARR(char *, n);
 	padslen = NEW_ARR(size_t, n);
 	dbg_order    = NEW_ARR(size_t, n);
-	g    = NEW_ARR(dbgraph*, n);
-	mg   = NEW_ARR(dbgraph*, n);
+	g    = NEW_ARR(dbgraph *, n);
+	mg   = NEW_ARR(dbgraph *, n);
 	for (size_t i=0; i<n; i++) {
 		ab[i] = alphabet_new(4, "acgt");
 
@@ -309,9 +309,12 @@ void test_dbgraph_child(CuTest *tc)
 		par_lbl     = cstr_new(dbg_k(dbg));
 		chd_lbl     = cstr_new(dbg_k(dbg));
 		chd_lbl_bf  = cstr_new(dbg_k(dbg));
-		xpar_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
-		xchd_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
-		xchd_lbl_bf = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))), dbg_k(dbg));
+		xpar_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))),
+		                                     dbg_k(dbg));
+		xchd_lbl    = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))),
+		                                     dbg_k(dbg));
+		xchd_lbl_bf = xstr_new_with_capacity(nbytes(ab_size(dbg_ext_ab(dbg))),
+		                                     dbg_k(dbg));
 
 		for (size_t nrk=0, V=dbg_nnodes(dbg); nrk<V; nrk++) {
 			size_t nid = dbg_node_id(dbg, nrk);
@@ -357,7 +360,7 @@ void test_dbgraph_child(CuTest *tc)
 
 CuSuite *dbgraph_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_dbgraph_new);
 	SUITE_ADD_TEST(suite, test_dbgraph_outdeg);
 	SUITE_ADD_TEST(suite, test_dbg_lbl_outdeg);

@@ -92,15 +92,15 @@ void test_fasta_next(CuTest *tc)
 
 	fasta *f = fasta_open(filename);
 	size_t i=0;
-	for(i=0; fasta_has_next(f); i++) {
+	for (i=0; fasta_has_next(f); i++) {
 		const fasta_rec *rr = fasta_next(f);
 		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
 		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
 		size_t k = 0;
-		for(size_t j=0, rl=strlen(rr->seq); j < rl; j++) {
-			while( k<seq_i_len && seq[i][k]=='\n') k++;
+		for (size_t j=0, rl=strlen(rr->seq); j < rl; j++) {
+			while ( k<seq_i_len && seq[i][k]=='\n') k++;
 			CuAssert(tc, "fasta read error: read too many chars", k<seq_i_len);
 			CuAssert(tc, "fasta read error: char mismatch", seq[i][k]==rr->seq[j]);
 			k++;
@@ -119,7 +119,7 @@ void test_fasta_next_read(CuTest *tc)
 
 	fasta *f = fasta_open(filename);
 	size_t i=0;
-	for(i=0; fasta_has_next(f); i++) {
+	for (i=0; fasta_has_next(f); i++) {
 		const fasta_rec_rdr *rr = fasta_next_reader(f);
 		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
 		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
@@ -127,8 +127,8 @@ void test_fasta_next_read(CuTest *tc)
 		size_t k = 0;
 		char c;
 		size_t l = strlen(seq[i]);
-		while((c=strread_getc(rr->seqrdr)) != EOF) {
-			while( k<l && seq[i][k]=='\n') k++;
+		while ((c=strread_getc(rr->seqrdr)) != EOF) {
+			while ( k<l && seq[i][k]=='\n') k++;
 			CuAssert(tc, "fasta read error: read too many chars", k<l);
 			CuAssert(tc, "fasta read error: char mismatch", seq[i][k]==c);
 			k++;

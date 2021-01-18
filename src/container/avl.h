@@ -232,9 +232,9 @@ void avl_print( const avl *self, FILE *stream,
 
 
 #define AVL_DECLARE_ALL(TYPE, ...)\
-bool avl_get_##TYPE(avl *self, TYPE val, TYPE *dest);\
-bool avl_ins_##TYPE(avl *self, TYPE val);\
-bool avl_del_##TYPE(avl *self, TYPE val, TYPE *dest);
+	bool avl_get_##TYPE(avl *self, TYPE val, TYPE *dest);\
+	bool avl_ins_##TYPE(avl *self, TYPE val);\
+	bool avl_del_##TYPE(avl *self, TYPE val, TYPE *dest);
 
 
 XX_CORETYPES(AVL_DECLARE_ALL)

@@ -56,15 +56,18 @@ struct _hashmap {
 
 
 
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq)
+void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
+                  hash_func keyhash, eq_func keyeq)
 {
 	hashmap_init_with_capacity(map, keysize, valsize, keyhash, keyeq, MIN_CAPACITY);
 }
 
 
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq)
+hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
+                     eq_func keyeq)
 {
-	return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq, MIN_CAPACITY);
+	return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq,
+	                                 MIN_CAPACITY);
 }
 
 
@@ -81,7 +84,8 @@ static void _reset_data(hashmap *hmap, size_t cap)
 }
 
 
-void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
+void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize,
+                                hash_func keyhash, eq_func keyeq,
                                 size_t min_capacity)
 {
 	ret->keysize = keysize;
@@ -92,7 +96,8 @@ void hashmap_init_with_capacity(hashmap *ret, size_t keysize, size_t valsize, ha
 }
 
 
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize, hash_func keyhash, eq_func keyeq,
+hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
+                                   hash_func keyhash, eq_func keyeq,
                                    size_t min_capacity)
 {
 	hashmap *ret = NEW(hashmap);
@@ -146,15 +151,16 @@ static inline uint64_t _h1(uint64_t h)
 }
 
 
-static inline void * _key_at(const hashmap *hmap, size_t pos)
+static inline void *_key_at(const hashmap *hmap, size_t pos)
 {
 	return hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
 }
 
 
-static inline void * _value_at(const hashmap *hmap, size_t pos)
+static inline void *_value_at(const hashmap *hmap, size_t pos)
 {
-	return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) + hmap->keysize);
+	return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) +
+	                         hmap->keysize);
 }
 
 
@@ -242,7 +248,8 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
 	_find_res qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		return _value_at(hmap, qry.pos);
-	} else {
+	}
+	else {
 		return NULL;
 	}
 }
@@ -421,21 +428,21 @@ IMPL_TRAIT(hashmap_iter, iter);
 
 
 #define HASHMAP_GET_IMPL( TYPE )\
-TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
-	const void *v = hashmap_get(hmap, key);\
-	return v ? ((TYPE *)v)[0] : (TYPE)0;\
-}
+	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
+		const void *v = hashmap_get(hmap, key);\
+		return v ? ((TYPE *)v)[0] : (TYPE)0;\
+	}
 
 
 #define HASHMAP_SET_IMPL( TYPE )\
-void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
-	hashmap_set(hmap, key, &val);\
-}
+	void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
+		hashmap_set(hmap, key, &val);\
+	}
 
 
 #define HASHMAP_ALL_IMPL( TYPE, ... )\
-HASHMAP_GET_IMPL(TYPE)\
-HASHMAP_SET_IMPL(TYPE)
+	HASHMAP_GET_IMPL(TYPE)\
+	HASHMAP_SET_IMPL(TYPE)
 
 
 XX_CORETYPES(HASHMAP_ALL_IMPL)

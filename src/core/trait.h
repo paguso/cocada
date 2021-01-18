@@ -218,7 +218,7 @@
  * @see Module documentation
  */
 #define DECL_TRAIT(TYPE, TRAIT)\
-TRAIT * TYPE##_as_##TRAIT( TYPE *self );
+	TRAIT * TYPE##_as_##TRAIT( TYPE *self );
 
 
 /**
@@ -235,9 +235,9 @@ TRAIT * TYPE##_as_##TRAIT( TYPE *self );
  * @see Module documentation
  */
 #define IMPL_TRAIT(TYPE, TRAIT)\
-TRAIT * TYPE##_as_##TRAIT( TYPE *obj) {\
-  return &(obj->_t_##TRAIT);\
-}
+	TRAIT * TYPE##_as_##TRAIT( TYPE *obj) {\
+		return &(obj->_t_##TRAIT);\
+	}
 
 
 /**

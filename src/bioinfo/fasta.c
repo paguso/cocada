@@ -53,15 +53,17 @@ static int _getc(strread *self)
 {
 	fastaread *fr = (fastaread *)self->impltor;
 	int c;
-	while(true) {
+	while (true) {
 		c = fgetc(fr->src);
 		if (c=='>') {
 			ungetc(c, fr->src);
 			c = EOF;
 			break;
-		} else if (c=='\n'|| c=='\r') {
+		}
+		else if (c=='\n'|| c=='\r') {
 			continue;
-		} else {
+		}
+		else {
 			break;
 		}
 	}
@@ -74,7 +76,7 @@ static size_t _read_str(strread *self, char *dest, size_t n)
 	FILE *src = ((fastaread *)self->impltor)->src;
 	char *origdest = dest;
 	memset(dest, '\0', n+1);
-	while( !feof(src) && n > 0 ) {
+	while ( !feof(src) && n > 0 ) {
 		fgets(dest, n+1, src);
 		size_t l = strlen(dest);
 		if (dest[0] == '>') {
@@ -97,12 +99,13 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 	FILE *src = ((fastaread *)self->impltor)->src;
 	size_t nread = 0;
 	char c;
-	while( !feof(src) ) {
+	while ( !feof(src) ) {
 		c = fgetc(src);
 		if ( c == delim || c == '>' ) {
 			ungetc(c, src);
 			break;
-		} else if ( c == '\n' || c=='\r' ) {
+		}
+		else if ( c == '\n' || c=='\r' ) {
 			continue;
 		}
 		dest[nread++] = c;
@@ -166,7 +169,7 @@ const char *fasta_path(fasta *self)
 static bool _goto_next(fasta *self)
 {
 	int c;
-	while(!feof(self->src)) {
+	while (!feof(self->src)) {
 		if ((c=fgetc(self->src)) == '>') {
 			ungetc(c, self->src);
 			return true;
@@ -193,11 +196,12 @@ const fasta_rec *fasta_next(fasta *self)
 	// load description
 	self->cur_rec.descr_offset = ftell(self->src);
 	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", self->cur_rec.descr_offset, self->src_path );
+	             "Expected '>' at position %ld of %s.\n", self->cur_rec.descr_offset,
+	             self->src_path );
 	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
 	size_t l = 0;
 	bool eol = false;
-	while(!eol) {
+	while (!eol) {
 		if (self->cur_rec_len[0] == l) {
 			self->cur_rec_len[0] *= 1.66f;
 			self->cur_rec.descr = cstr_resize(self->cur_rec.descr, self->cur_rec_len[0]);
@@ -209,11 +213,11 @@ const fasta_rec *fasta_next(fasta *self)
 			eol = true;
 		}
 	}
-	// load sequence	
+	// load sequence
 	self->cur_rec.seq_offset = ftell(self->src);
 	cstr_clear(self->cur_rec.seq, self->cur_rec_len[1]);
 	l = 0;
-	while( !feof(self->src) ) {
+	while ( !feof(self->src) ) {
 		if (self->cur_rec_len[1] == l) {
 			self->cur_rec_len[1] *= 1.66f;
 			//(size_t)(1.66f * self->cur_rec_len[1]);
@@ -242,15 +246,17 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 	// load description
 	self->cur_rec_rd.descr_offset = ftell(self->src);
 	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset, self->src_path );
+	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset,
+	             self->src_path );
 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
 	size_t l = 0;
 	bool eol = false;
-	while(!eol) {
+	while (!eol) {
 		if (self->cur_rec_rd_len[0] == l) {
 			self->cur_rec_rd_len[0] *= 1.66f;
 			//(size_t)(1.66f * self->cur_rec_rd_len[0]);
-			self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
+			self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr,
+			                                     self->cur_rec_rd_len[0]);
 		}
 		fgets(self->cur_rec_rd.descr + l, self->cur_rec_rd_len[0] - l + 1, self->src);
 		l = strlen(self->cur_rec_rd.descr);

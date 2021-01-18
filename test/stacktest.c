@@ -78,7 +78,7 @@ void test_stack_push_pop_int(CuTest *tc)
 
 CuSuite *stack_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_stack_push_pop);
 	SUITE_ADD_TEST(suite, test_stack_push_pop_int);
 	return suite;

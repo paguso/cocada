@@ -38,7 +38,7 @@
 static size_t Nab;
 static size_t Narr;
 static alphabet **ab;
-static char** strings;
+static char **strings;
 static size_t *slens;
 static csarray **csarrays;
 static size_t **sarrays;
@@ -64,7 +64,8 @@ void csarray_sanity_check(CuTest *tc, csarray *csarr, char *str, size_t len)
 	CuAssertSizeTEquals(tc, len+1, sa_len);
 	CuAssertSizeTEquals(tc, len, csarray_get(csarr, 0));
 	for (int i=1; i<sa_len-1; i++) {
-		int cmp = suffix_compare(str, len, csarray_get(csarr, i), csarray_get(csarr, i+1));
+		int cmp = suffix_compare(str, len, csarray_get(csarr, i), csarray_get(csarr,
+		                         i+1));
 		CuAssertIntEquals( tc, -1, cmp);
 	}
 }
@@ -100,12 +101,12 @@ void xxxcsarray_test_setup(CuTest *tc)
 {
 	Nab = 1;
 	Narr = 1;
-	ab = NEW_ARR(alphabet*, Narr);
-	strings = NEW_ARR(char*, Narr);
+	ab = NEW_ARR(alphabet *, Narr);
+	strings = NEW_ARR(char *, Narr);
 	slens = NEW_ARR(size_t, Narr);
-	csarrays = NEW_ARR(csarray*, Narr);
-	sarrays = NEW_ARR(size_t*, Narr);
-	sarrinvs = NEW_ARR(size_t*, Narr);
+	csarrays = NEW_ARR(csarray *, Narr);
+	sarrays = NEW_ARR(size_t *, Narr);
+	sarrinvs = NEW_ARR(size_t *, Narr);
 	ab[0] = alphabet_new(4,"elns");
 	strings[0] = cstr_new(strlen("senselessness"));
 	strcat(strings[0], "senselessness");
@@ -122,12 +123,12 @@ void csarray_test_setup(CuTest *tc)
 {
 	Nab = 10;
 	Narr = Nab*MAX_STR_SIZE;
-	ab = NEW_ARR(alphabet*, Narr);
-	strings = NEW_ARR(char*, Narr);
+	ab = NEW_ARR(alphabet *, Narr);
+	strings = NEW_ARR(char *, Narr);
 	slens = NEW_ARR(size_t, Narr);
-	sarrays = NEW_ARR(size_t*, Narr);
-	sarrinvs = NEW_ARR(size_t*, Narr);
-	csarrays = NEW_ARR(csarray*, Narr);
+	sarrays = NEW_ARR(size_t *, Narr);
+	sarrinvs = NEW_ARR(size_t *, Narr);
+	csarrays = NEW_ARR(csarray *, Narr);
 	for (int l=0; l<Nab; l++) {
 		for (int i=0, j=0; i<MAX_STR_SIZE; i++) {
 			//printf("l=%d i=%d\n",l,i);
@@ -241,7 +242,7 @@ void csarray_test_get_char(CuTest *tc)
 
 CuSuite *csarray_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, csarray_test_setup);
 	SUITE_ADD_TEST(suite, csarray_test_phi);
 	SUITE_ADD_TEST(suite, csarray_test_get);

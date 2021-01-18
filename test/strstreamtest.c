@@ -127,7 +127,7 @@ void test_strstream_reads(CuTest *tc)
 
 CuSuite *strstream_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_strstream_getc);
 	SUITE_ADD_TEST(suite, test_strstream_reads);
 	return suite;

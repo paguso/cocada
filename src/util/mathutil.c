@@ -28,16 +28,17 @@
 #include "coretype.h"
 #include "errlog.h"
 #include "mathutil.h"
+#include "new.h"
 #include "randutil.h"
 
 
 
 #define POW2CEIL_IMPL( TYPE, ... )\
-TYPE pow2ceil_##TYPE( TYPE val ) {\
-    TYPE pow = 1;\
-    while (pow < val) pow *= 2;\
-    return pow;\
-}
+	TYPE pow2ceil_##TYPE( TYPE val ) {\
+		TYPE pow = 1;\
+		while (pow < val) pow *= 2;\
+		return pow;\
+	}
 
 XX_UNSIGNED_INT(POW2CEIL_IMPL)
 
@@ -48,7 +49,8 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 	b %= m;
 	if ( a <= UINT64_MAX - b) {
 		return (a + b) % m;
-	} else {
+	}
+	else {
 		return b - ( m - a);
 	}
 
@@ -174,66 +176,66 @@ long double average_uint64_t(uint64_t *vals, size_t n)
 
 
 #define SWAP(X, Y, TMP) \
-{ TMP = X; X = Y; Y = TMP;}
+	{ TMP = X; X = Y; Y = TMP;}
 
 #define _PARTITION(TYPE, ...)\
-static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\
-	assert(l < r);\
-	TYPE tmp;\
-	size_t p = rand_range_size_t(l, r);\
-	SWAP(v[l], v[p], tmp);\
-	size_t i = l;\
-	size_t j = r-1;\
-	while ( i < j ) {\
-		while ( i < r && v[i] <= v[l] )\
-			i++;\
-		while ( v[j] > v[l] )\
-			j--;\
-		if ( i < j )\
-			SWAP(v[i], v[j], tmp);\
-	}\
-	SWAP(v[l], v[j], tmp);\
-	return j;\
-}
+	static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\
+		assert(l < r);\
+		TYPE tmp;\
+		size_t p = rand_range_size_t(l, r);\
+		SWAP(v[l], v[p], tmp);\
+		size_t i = l;\
+		size_t j = r-1;\
+		while ( i < j ) {\
+			while ( i < r && v[i] <= v[l] )\
+				i++;\
+			while ( v[j] > v[l] )\
+				j--;\
+			if ( i < j )\
+				SWAP(v[i], v[j], tmp);\
+		}\
+		SWAP(v[l], v[j], tmp);\
+		return j;\
+	}
 
 XX_PRIMITIVES(_PARTITION)
 
 
 #define KTH_SMALLEST_IMPL(TYPE, ...)\
-TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty)\
-{\
-	assert(k < len);\
-	TYPE *w = v;\
-	if (!dirty) {\
-		w = NEW_ARR(TYPE , len);\
-		memcpy(w, v, len * sizeof(TYPE));\
-	}\
-	size_t p = len;\
-	size_t l = 0, r = len;\
-	do {\
-		p = _partition_##TYPE(w, l, r);\
-		if ( p < k ) {\
-			l = p + 1;\
+	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty)\
+	{\
+		assert(k < len);\
+		TYPE *w = v;\
+		if (!dirty) {\
+			w = NEW_ARR(TYPE , len);\
+			memcpy(w, v, len * sizeof(TYPE));\
 		}\
-		else if ( p > k ) {\
-			r = p;\
-		}\
-	} while (p!=k);\
-	if (dirty) \
-		return w[p];\
-	TYPE ret = w[p];\
-	FREE(w);\
-	return ret;\
-}
+		size_t p = len;\
+		size_t l = 0, r = len;\
+		do {\
+			p = _partition_##TYPE(w, l, r);\
+			if ( p < k ) {\
+				l = p + 1;\
+			}\
+			else if ( p > k ) {\
+				r = p;\
+			}\
+		} while (p!=k);\
+		if (dirty) \
+			return w[p];\
+		TYPE ret = w[p];\
+		FREE(w);\
+		return ret;\
+	}
 
 XX_PRIMITIVES(KTH_SMALLEST_IMPL)
 
 
 #define MEDIAN_IMPL(TYPE, ...)\
-TYPE median_##TYPE(TYPE *v, size_t len, bool dirty)\
-{\
-	return kth_smallest_##TYPE(v, len, len/2, dirty);\
-}
+	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty)\
+	{\
+		return kth_smallest_##TYPE(v, len, len/2, dirty);\
+	}
 
 XX_PRIMITIVES(MEDIAN_IMPL)
 

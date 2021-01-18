@@ -110,7 +110,7 @@ alphabet *int_alphabet_new(size_t size)
 
 alphabet *alphabet_clone(const alphabet *src)
 {
-	switch(src->type) {
+	switch (src->type) {
 	case CHAR_TYPE:
 		return alphabet_new(src->size, src->letters);
 		break;
@@ -128,7 +128,8 @@ void ab_print(const alphabet *ab)
 	printf("  size = %zu\n", ab->size);
 	if (ab->type==CHAR_TYPE) {
 		printf("  letters = %s\n", ab->letters);
-	} else if (ab->type==INT_TYPE) {
+	}
+	else if (ab->type==INT_TYPE) {
 		printf("  letters = 0..%zu\n",ab->size-1);
 	}
 }

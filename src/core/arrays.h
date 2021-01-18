@@ -25,8 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bitbyte.h"
-#include "new.h"
+#include "coretype.h"
 
 /**
  * @file arrays.h
@@ -34,6 +33,31 @@
  *
  * @brief Assorted array utility macros and functions.
  */
+
+
+void *arr_new(size_t typesize, size_t len);
+
+void *arr_realloc(void *arr, size_t size);
+
+size_t arr_size(void *arr);
+
+void arr_free(void *arr);
+
+
+#define ARR_NEW_DECL(TYPE, ...)\
+	TYPE *arr_##TYPE##_new(size_t len);
+XX_CORETYPES(ARR_NEW_DECL)
+
+#define ARR_REALLOC_DECL(TYPE, ...)\
+	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t len);
+XX_CORETYPES(ARR_REALLOC_DECL)
+
+#define ARR_LEN_DECL(TYPE, ...)\
+	size_t arr_##TYPE##_len(TYPE *arr);
+XX_CORETYPES(ARR_LEN_DECL)
+
+
+
 
 /**
  * @brief Allocates a new array of N elements of a given TYPE.
@@ -54,7 +78,7 @@
  *          will be set to a different instance.
  */
 #define FILL_ARR( ARR, FROM, TO, EXPR ) \
-    for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
+	for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
 
 
 /**
@@ -62,8 +86,8 @@
  *        into an array DEST from position =FROMDEST.
  */
 #define COPY_ARR( DEST, FROMDEST, SRC, FROMSRC, N )\
-    for(size_t _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
-        (DEST)[_fd+_i]=(SRC)[_fs+_i]
+	for(size_t _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
+		(DEST)[_fd+_i]=(SRC)[_fs+_i]
 
 
 /**
@@ -72,11 +96,11 @@
  *        and using the printf format string FORMAT.
  */
 #define PRINT_ARR( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
-    { printf(#NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
-      for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
-        if(!((__i-FROM)%__el)) printf("\n%4zu: ",__i);\
-        printf(#FORMAT" " , ARR[__i]);}\
-      printf("\n");}
+	{ printf(#NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
+		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
+			if(!((__i-FROM)%__el)) printf("\n%4zu: ",__i);\
+			printf(#FORMAT" " , ARR[__i]);}\
+		printf("\n");}
 
 
 /**
@@ -85,39 +109,39 @@
  *        and using the printf format string FORMAT.
  */
 #define FPRINT_ARR(STREAM, ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
-    { fprintf(STREAM, #NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
-      for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
-        if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%4zu: ",__i);\
-        fprintf(STREAM, #FORMAT" " , ARR[__i]);}\
-      fprintf(STREAM, "\n");}
+	{ fprintf(STREAM, #NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
+		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
+			if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%4zu: ",__i);\
+			fprintf(STREAM, #FORMAT" " , ARR[__i]);}\
+		fprintf(STREAM, "\n");}
 
 
 #define FOREACH_IN_ARR( ELT, ELT_TYPE, ARR, ARR_LEN ) \
-for (ELT_TYPE* __arr = (ELT_TYPE *)(ARR); __arr; __arr = NULL) \
-for (size_t __i = 0, __l = (ARR_LEN); __i < __l; __i = __l) \
-for (ELT_TYPE ELT = __arr[__i]; __i < __l; ELT = ((++__i) < __l) ? __arr[__i] : ELT )
+	for (ELT_TYPE* __arr = (ELT_TYPE *)(ARR); __arr; __arr = NULL) \
+		for (size_t __i = 0, __l = (ARR_LEN); __i < __l; __i = __l) \
+			for (ELT_TYPE ELT = __arr[__i]; __i < __l; ELT = ((++__i) < __l) ? __arr[__i] : ELT )
 
 
 #define NEW_MATRIX(ID, TYPE, ROWS, COLS)\
-TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
-TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
-for (size_t __i=0; __i < (ROWS); __i++)\
-  ID[__i] = __ptr##ID + (__i * COLS);
+	TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
+	TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
+	for (size_t __i=0; __i < (ROWS); __i++)\
+		ID[__i] = __ptr##ID + (__i * COLS);
 
 
 #define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
-size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
-TYPE** ID = (TYPE**) malloc(__len##ID);\
-memset(ID, 0x0, __len##ID);\
-TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
-for (size_t __i=0; __i < (ROWS); __i++)\
-  ID[__i] = __ptr##ID + (__i * COLS);
+	size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
+	TYPE** ID = (TYPE**) malloc(__len##ID);\
+	memset(ID, 0x0, __len##ID);\
+	TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
+	for (size_t __i=0; __i < (ROWS); __i++)\
+		ID[__i] = __ptr##ID + (__i * COLS);
 
 
 #define FILL_MATRIX(ID, ROWS, COLS, EXPR)\
-for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
-for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
-ID[__i][__j] = (EXPR);\
+	for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
+		for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
+			ID[__i][__j] = (EXPR);\
 
 
 

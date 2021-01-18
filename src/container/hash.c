@@ -25,9 +25,9 @@
 #include "hash.h"
 
 #define IDENT_HASH_IMPL( TYPE, ... ) \
-uint64_t ident_hash_##TYPE(const void *key) {\
-    return (uint64_t)(*((TYPE *)key));\
-}
+	uint64_t ident_hash_##TYPE(const void *key) {\
+		return (uint64_t)(*((TYPE *)key));\
+	}
 
 XX_PRIMITIVES(IDENT_HASH_IMPL)
 

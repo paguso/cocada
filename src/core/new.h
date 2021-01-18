@@ -562,11 +562,11 @@ dtor *ptr_dtor();
  * The object is not deallocated, and the destructor is not destroyed.
  */
 #define FINALISE( OBJ, DTOR ) \
-if((OBJ)) {\
-    void *__obj = (OBJ);\
-    const dtor *__dt = (DTOR);\
-    __dt->df(__obj, __dt);\
-}
+	if((OBJ)) {\
+		void *__obj = (OBJ);\
+		const dtor *__dt = (DTOR);\
+		__dt->df(__obj, __dt);\
+	}
 
 
 /**
@@ -575,13 +575,13 @@ if((OBJ)) {\
  * The destructor @p DTOR is **also** destroyed.
  */
 #define DESTROY( OBJ, DTOR ) \
-if ((OBJ)) {\
-    void *__obj = (OBJ);\
-    const dtor *__dt = (DTOR);\
-    __dt->df(__obj, __dt);\
-    free(__obj);\
-    dtor_free((void *)__dt);\
-}
+	if ((OBJ)) {\
+		void *__obj = (OBJ);\
+		const dtor *__dt = (DTOR);\
+		__dt->df(__obj, __dt);\
+		free(__obj);\
+		dtor_free((void *)__dt);\
+	}
 
 
 ////@cond

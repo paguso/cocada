@@ -34,7 +34,8 @@
 
 void test_hashmap_int(CuTest *tc)
 {
-	hashmap *hmap = hashmap_new(sizeof(uint32_t), sizeof(uint32_t), ident_hash_uint32_t, eq_uint32_t);
+	hashmap *hmap = hashmap_new(sizeof(uint32_t), sizeof(uint32_t),
+	                            ident_hash_uint32_t, eq_uint32_t);
 
 	size_t n = 1000000;
 	for (int i=0; i<n; i++) {
@@ -90,7 +91,8 @@ bool bin_str_eq(const void *a, const void *b)
 
 void test_hashmap_obj(CuTest *tc)
 {
-	hashmap *hmap = hashmap_new(sizeof(char *), sizeof(object), hash_bin_str, bin_str_eq);
+	hashmap *hmap = hashmap_new(sizeof(char *), sizeof(object), hash_bin_str,
+	                            bin_str_eq);
 
 	uint64_t n = 10000;
 	uint64_t mink = 1;
@@ -138,7 +140,8 @@ void test_hashmap_obj(CuTest *tc)
 			CuAssert(tc, "wrong k1 value", i == v->k1);
 			CuAssert(tc, "wrong k2 value", i+1 == v->k2);
 			CuAssert(tc, "wrong k3 value", strcmp(k, v->k3)==0);
-		} else {
+		}
+		else {
 			object *v = (object *)hashmap_get(hmap, &k);
 			CuAssert(tc, "should be null", v==NULL);
 		}

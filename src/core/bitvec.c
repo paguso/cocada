@@ -74,7 +74,7 @@ bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 
 void bitvec_dtor(void *ptr, const dtor *dt)
 {
-	FREE(((bitvec*)ptr)->bits);
+	FREE(((bitvec *)ptr)->bits);
 }
 
 
@@ -227,7 +227,8 @@ void bitvec_push_n (bitvec *bv, size_t nbits, bool bit)
 		*(last_byte) |= ~(BYTE_MAX>>nleft);
 		bv->len += nbits;
 		//bv->count1 += nbits;
-	} else
+	}
+	else
 		bv->len += nbits;
 
 }

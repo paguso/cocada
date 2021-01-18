@@ -228,7 +228,8 @@ void xstr_cpy(xstr *dest, const xstr *src);
  * @warning The destination must be large enough, or a buffer overrun will occur.
  *       No out-of-bounds verification is performed.
  */
-void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src, size_t from_src, size_t n );
+void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src, size_t from_src,
+                size_t n );
 
 
 /**
@@ -253,9 +254,9 @@ int xstr_cmp(const xstr *this, const xstr *other);
 
 
 #define FOREACH_IN_XSTR(CHR, STR) \
-for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
-for (xchar_t CHR = 1; CHR ; CHR = 0) \
-for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
-for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
+	for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
+		for (xchar_t CHR = 1; CHR ; CHR = 0) \
+			for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
+				for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
 
 #endif // !XSTRING_H

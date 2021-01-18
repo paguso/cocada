@@ -154,7 +154,8 @@ xchar_t xstr_get(const xstr *xs, size_t pos)
 #if ENDIANNESS==LITTLE
 	memcpy(&ret, xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	memcpy(&ret + (XCHAR_BYTESIZE - xs->sizeof_char), xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
+	memcpy(&ret + (XCHAR_BYTESIZE - xs->sizeof_char),
+	       xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #endif
 	return ret;
 }
@@ -165,7 +166,8 @@ void xstr_set(xstr *xs, size_t pos, xchar_t val)
 #if ENDIANNESS==LITTLE
 	memcpy(xs->buf + (pos * xs->sizeof_char), &val, xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	memcpy(xs->buf + (pos * xs->sizeof_char), &val + (XCHAR_BYTESIZE - xs->sizeof_char));
+	memcpy(xs->buf + (pos * xs->sizeof_char),
+	       &val + (XCHAR_BYTESIZE - xs->sizeof_char));
 #endif
 }
 

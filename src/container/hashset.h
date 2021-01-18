@@ -80,21 +80,21 @@ void hashset_remove(hashset *set, const void *elt);
 
 
 #define HASHSET_CONTAINS_DECL( TYPE ) \
-   bool hashset_contains_##TYPE(hashset *set, TYPE elt );
+	bool hashset_contains_##TYPE(hashset *set, TYPE elt );
 
 
 #define HASHSET_ADD_DECL( TYPE ) \
-   void hashset_add_##TYPE(hashset *set, TYPE elt );
+	void hashset_add_##TYPE(hashset *set, TYPE elt );
 
 
 #define HASHSET_REMOVE_DECL( TYPE ) \
-   void hashset_remove_##TYPE(hashset *set, TYPE elt );
+	void hashset_remove_##TYPE(hashset *set, TYPE elt );
 
 
 #define HASHSET_ALL_DECL( TYPE, ... )\
-HASHSET_CONTAINS_DECL(TYPE)\
-HASHSET_ADD_DECL(TYPE)\
-HASHSET_REMOVE_DECL(TYPE)
+	HASHSET_CONTAINS_DECL(TYPE)\
+	HASHSET_ADD_DECL(TYPE)\
+	HASHSET_REMOVE_DECL(TYPE)
 
 XX_CORETYPES(HASHSET_ALL_DECL)
 

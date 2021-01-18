@@ -119,7 +119,7 @@ typedef long double         ldouble;
 #endif
 
 #ifndef rawptr
-typedef void *              rawptr;
+typedef void               *rawptr;
 #endif
 
 /**
@@ -130,54 +130,54 @@ typedef void *              rawptr;
 #endif
 
 #ifndef cstr
-typedef char *              cstr;
+typedef char               *cstr;
 #endif
 
 
 #define XX_UNSIGNED_INT(XX, ...) \
-XX(uchar, __VA_ARGS__) \
-XX(ushort, __VA_ARGS__) \
-XX(uint, __VA_ARGS__) \
-XX(ulong, __VA_ARGS__) \
-XX(ullong, __VA_ARGS__) \
-XX(size_t, __VA_ARGS__) \
-XX(uint8_t, __VA_ARGS__) \
-XX(uint16_t, __VA_ARGS__) \
-XX(uint32_t, __VA_ARGS__) \
-XX(uint64_t, __VA_ARGS__) \
-XX(byte_t, __VA_ARGS__)
+	XX(uchar, __VA_ARGS__) \
+	XX(ushort, __VA_ARGS__) \
+	XX(uint, __VA_ARGS__) \
+	XX(ulong, __VA_ARGS__) \
+	XX(ullong, __VA_ARGS__) \
+	XX(size_t, __VA_ARGS__) \
+	XX(uint8_t, __VA_ARGS__) \
+	XX(uint16_t, __VA_ARGS__) \
+	XX(uint32_t, __VA_ARGS__) \
+	XX(uint64_t, __VA_ARGS__) \
+	XX(byte_t, __VA_ARGS__)
 
 #define XX_SIGNED_INT(XX, ...) \
-XX(char, __VA_ARGS__) \
-XX(short, __VA_ARGS__) \
-XX(int, __VA_ARGS__) \
-XX(long, __VA_ARGS__) \
-XX(llong, __VA_ARGS__) \
-XX(bool, __VA_ARGS__) \
-XX(int8_t, __VA_ARGS__) \
-XX(int16_t, __VA_ARGS__) \
-XX(int32_t, __VA_ARGS__) \
-XX(int64_t, __VA_ARGS__)
+	XX(char, __VA_ARGS__) \
+	XX(short, __VA_ARGS__) \
+	XX(int, __VA_ARGS__) \
+	XX(long, __VA_ARGS__) \
+	XX(llong, __VA_ARGS__) \
+	XX(bool, __VA_ARGS__) \
+	XX(int8_t, __VA_ARGS__) \
+	XX(int16_t, __VA_ARGS__) \
+	XX(int32_t, __VA_ARGS__) \
+	XX(int64_t, __VA_ARGS__)
 
 #define XX_INTS( XX, ...) \
-XX_UNSIGNED_INT(XX, __VA_ARGS__) \
-XX_SIGNED_INT(XX, __VA_ARGS__)
+	XX_UNSIGNED_INT(XX, __VA_ARGS__) \
+	XX_SIGNED_INT(XX, __VA_ARGS__)
 
 #define XX_FLOATS( XX, ...) \
-XX(float, __VA_ARGS__) \
-XX(double, __VA_ARGS__) \
-XX(ldouble, __VA_ARGS__)
+	XX(float, __VA_ARGS__) \
+	XX(double, __VA_ARGS__) \
+	XX(ldouble, __VA_ARGS__)
 
 #define XX_PRIMITIVES( XX, ...) \
-XX_INTS(XX, __VA_ARGS__) \
-XX_FLOATS(XX, __VA_ARGS__)
+	XX_INTS(XX, __VA_ARGS__) \
+	XX_FLOATS(XX, __VA_ARGS__)
 
 #define XX_PTRS( XX, ...) \
-XX(rawptr, __VA_ARGS__) \
-XX(cstr , __VA_ARGS__)
+	XX(rawptr, __VA_ARGS__) \
+	XX(cstr , __VA_ARGS__)
 
 #define XX_CORETYPES(XX,...) \
-XX_PRIMITIVES(XX, __VA_ARGS__) \
-XX_PTRS(XX, __VA_ARGS__)
+	XX_PRIMITIVES(XX, __VA_ARGS__) \
+	XX_PTRS(XX, __VA_ARGS__)
 
 #endif //CORETYPE_H

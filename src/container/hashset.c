@@ -67,27 +67,27 @@ void hashset_remove(hashset *set, const void *elt)
 }
 
 #define HASHSET_CONTAINS_IMPL( TYPE ) \
-   bool hashset_contains_##TYPE(hashset *set, TYPE elt ) {\
-       return hashset_contains(set, &elt);\
-   }
+	bool hashset_contains_##TYPE(hashset *set, TYPE elt ) {\
+		return hashset_contains(set, &elt);\
+	}
 
 
 #define HASHSET_ADD_IMPL( TYPE ) \
-   void hashset_add_##TYPE(hashset *set, TYPE elt ) {\
-       hashset_add(set, &elt);\
-   }
+	void hashset_add_##TYPE(hashset *set, TYPE elt ) {\
+		hashset_add(set, &elt);\
+	}
 
 
 #define HASHSET_REMOVE_IMPL( TYPE ) \
-   void hashset_remove_##TYPE(hashset *set, TYPE elt ) {\
-       hashset_remove(set, &elt);\
-   }
+	void hashset_remove_##TYPE(hashset *set, TYPE elt ) {\
+		hashset_remove(set, &elt);\
+	}
 
 
 #define HASHSET_ALL_IMPL( TYPE, ... )\
-HASHSET_CONTAINS_IMPL(TYPE)\
-HASHSET_ADD_IMPL(TYPE)\
-HASHSET_REMOVE_IMPL(TYPE)
+	HASHSET_CONTAINS_IMPL(TYPE)\
+	HASHSET_ADD_IMPL(TYPE)\
+	HASHSET_REMOVE_IMPL(TYPE)
 
 XX_CORETYPES(HASHSET_ALL_IMPL)
 
@@ -101,13 +101,15 @@ struct _hashset_iter {
 
 bool _hashset_iter_has_next(iter *it)
 {
-	return iter_has_next(hashmap_iter_as_iter(((hashset_iter *)(it->impltor))->inner));
+	return iter_has_next(hashmap_iter_as_iter(((hashset_iter *)(
+	                         it->impltor))->inner));
 }
 
 
 const void *_hashset_iter_next(iter *it)
 {
-	return ((hashmap_entry *)iter_next(hashmap_iter_as_iter(((hashset_iter *)(it->impltor))->inner)))->key;
+	return ((hashmap_entry *)iter_next(hashmap_iter_as_iter(((hashset_iter *)(
+	                                       it->impltor))->inner)))->key;
 }
 
 

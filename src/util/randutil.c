@@ -63,10 +63,10 @@ uint64_t rand_next ()
 
 
 #define RAND_RANGE_IMPL( TYPE )\
-TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
-    assert(r > l);\
-    return l + (rand_next() % (r-l));\
-}
+	TYPE rand_range_##TYPE(TYPE l, TYPE r) {\
+		assert(r > l);\
+		return l + (rand_next() % (r-l));\
+	}
 
 
 void shuffle_arr(void *arr, size_t n, size_t typesize)
@@ -84,14 +84,14 @@ void shuffle_arr(void *arr, size_t n, size_t typesize)
 }
 
 #define SHUFFLE_ARR_IMPL(TYPE) \
-void shuffle_arr_##TYPE(TYPE *arr, size_t n) {\
-	shuffle_arr(arr, n, sizeof(TYPE));\
-}
+	void shuffle_arr_##TYPE(TYPE *arr, size_t n) {\
+		shuffle_arr(arr, n, sizeof(TYPE));\
+	}
 
 
 #define RAND_ALL_IMPL(TYPE, ...) \
-RAND_RANGE_IMPL(TYPE) \
-SHUFFLE_ARR_IMPL(TYPE)
+	RAND_RANGE_IMPL(TYPE) \
+	SHUFFLE_ARR_IMPL(TYPE)
 
 XX_INTS(RAND_ALL_IMPL)
 

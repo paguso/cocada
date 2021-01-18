@@ -10,7 +10,7 @@
 #ifndef SFMT_NEON_H
 #define SFMT_NEON_H
 
-inline static void neon_recursion(uint32x4_t * r, uint32x4_t a, uint32x4_t b,
+inline static void neon_recursion(uint32x4_t *r, uint32x4_t a, uint32x4_t b,
                                   uint32x4_t c, uint32x4_t d);
 
 
@@ -23,7 +23,7 @@ inline static void neon_recursion(uint32x4_t * r, uint32x4_t a, uint32x4_t b,
  * @param c a 128-bit part of the interal state array
  * @param d a 128-bit part of the interal state array
  */
-inline static void neon_recursion(uint32x4_t * r, uint32x4_t a, uint32x4_t b,
+inline static void neon_recursion(uint32x4_t *r, uint32x4_t a, uint32x4_t b,
                                   uint32x4_t c, uint32x4_t d)
 {
 	uint32x4_t v, x, y, z;
@@ -49,11 +49,11 @@ inline static void neon_recursion(uint32x4_t * r, uint32x4_t a, uint32x4_t b,
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt)
+void sfmt_gen_rand_all(sfmt_t *sfmt)
 {
 	int i;
 	uint32x4_t r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -63,7 +63,8 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
 		r2 = pstate[i].si;
 	}
 	for (; i < SFMT_N; i++) {
-		neon_recursion(&pstate[i].si, pstate[i].si, pstate[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+		neon_recursion(&pstate[i].si, pstate[i].si, pstate[i + SFMT_POS1 - SFMT_N].si,
+		               r1, r2);
 		r1 = r2;
 		r2 = pstate[i].si;
 	}
@@ -76,11 +77,11 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
+static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
 {
 	int i, j;
 	uint32x4_t r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -90,12 +91,14 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
 		r2 = array[i].si;
 	}
 	for (; i < SFMT_N; i++) {
-		neon_recursion(&array[i].si, pstate[i].si, array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+		neon_recursion(&array[i].si, pstate[i].si, array[i + SFMT_POS1 - SFMT_N].si, r1,
+		               r2);
 		r1 = r2;
 		r2 = array[i].si;
 	}
 	for (; i < size - SFMT_N; i++) {
-		neon_recursion(&array[i].si, array[i - SFMT_N].si, array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+		neon_recursion(&array[i].si, array[i - SFMT_N].si,
+		               array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
 		r1 = r2;
 		r2 = array[i].si;
 	}
@@ -103,7 +106,8 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
 		pstate[j] = array[j + size - SFMT_N];
 	}
 	for (; i < size; i++, j++) {
-		neon_recursion(&array[i].si, array[i - SFMT_N].si, array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+		neon_recursion(&array[i].si, array[i - SFMT_N].si,
+		               array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
 		r1 = r2;
 		r2 = pstate[j].si = array[i].si;
 	}

@@ -41,11 +41,14 @@ void xstrhash_dtor(void *ptr, const dtor *dt);
 
 uint64_t xstrhash_lex(const xstrhash *self, const xstr *s);
 
-uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to);
+uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from,
+                          size_t to);
 
-uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash, xchar_t c);
+uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash,
+                           xchar_t c);
 
-uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from, size_t to, uint64_t hash, xchar_t c);
+uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from,
+                               size_t to, uint64_t hash, xchar_t c);
 
 
 #endif

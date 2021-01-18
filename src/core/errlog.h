@@ -110,9 +110,9 @@ void print_trace(FILE *);
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define ERROR_IF(CONDITION, FORMAT, ...) \
-if ( CONDITION ) { \
-	ERROR(FORMAT, ##__VA_ARGS__)\
-}
+	if ( CONDITION ) { \
+		ERROR(FORMAT, ##__VA_ARGS__)\
+	}
 
 
 /**
@@ -217,9 +217,9 @@ if ( CONDITION ) { \
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define DEBUG_IF(CONDITION, FORMAT, ...) \
-if ( CONDITION ) { \
-	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
-}
+	if ( CONDITION ) { \
+		fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+	}
 
 /**
  * @brief Prints a DEBUG info message to `stderr`if an assertion is
@@ -232,9 +232,9 @@ if ( CONDITION ) { \
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
-if ( !(ASSERTION) ) { \
-	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
-}
+	if ( !(ASSERTION) ) { \
+		fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+	}
 
 /**
  * @brief Executes a statement if in DEBUG mode, i.e. if  DEBUG_LVL >= 3

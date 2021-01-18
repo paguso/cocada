@@ -44,28 +44,33 @@ void test_mult_floor(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			} else {
+			}
+			else {
 				expected = -INFINITY;
 			}
-		} else if (base<0) {
+		}
+		else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while (expected*base>value) {
 					expected+=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while ((expected-1)*base<value) {
 					expected-=1;
 				}
 			}
-		} else if (base>0) {
+		}
+		else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while (expected*base>value) {
 					expected-=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while ((expected+1)*base<value) {
 					expected+=1;
@@ -91,28 +96,33 @@ void test_mult_ceil(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			} else {
+			}
+			else {
 				expected = INFINITY;
 			}
-		} else if (base<0) {
+		}
+		else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while ((expected+1)*base>=value) {
 					expected+=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected-=1;
 				}
 			}
-		} else if (base>0) {
+		}
+		else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while ((expected-1)*base>=value) {
 					expected-=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected+=1;
@@ -160,9 +170,9 @@ void test_prime_succ(CuTest *tc)
 }
 
 
-CuSuite* mathutil_get_test_suite()
+CuSuite *mathutil_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_mult_floor);
 	SUITE_ADD_TEST(suite, test_mult_ceil);
 	//SUITE_ADD_TEST(suite, test_is_prime);

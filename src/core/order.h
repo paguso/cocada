@@ -72,7 +72,7 @@ typedef bool (*eq_func)(const void *left, const void *right);
  * in the usual (compiler-defined) sense.
  */
 #define CMP_DECL( TYPE )\
-int cmp_##TYPE(const void *left, const void *right);
+	int cmp_##TYPE(const void *left, const void *right);
 
 
 /**
@@ -83,13 +83,13 @@ int cmp_##TYPE(const void *left, const void *right);
  * in the usual (compiler-defined) sense.
  */
 #define EQ_DECL( TYPE )\
-bool eq_##TYPE(const void *left, const void *right);
+	bool eq_##TYPE(const void *left, const void *right);
 
 
 ///@cond
 #define CMPEQ_DECL( TYPE , ...)\
-CMP_DECL( TYPE )\
-EQ_DECL( TYPE )
+	CMP_DECL( TYPE )\
+	EQ_DECL( TYPE )
 
 XX_PRIMITIVES(CMPEQ_DECL)
 

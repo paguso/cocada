@@ -51,7 +51,8 @@ int cmp_obj_t (const void *l, const void *r)
 
 void print_obj_t(FILE *stream, const void *ptr)
 {
-	fprintf(stream, "(key=%d value=%f)", (*((obj_t **)ptr))->key, (*((obj_t **)ptr))->value);
+	fprintf(stream, "(key=%d value=%f)", (*((obj_t **)ptr))->key,
+	        (*((obj_t **)ptr))->value);
 }
 
 
@@ -96,7 +97,8 @@ void test_avl_ins(CuTest *tc)
 		vec_push(buf, &obj);
 		DEBUG("\n\nInsert non-owned obj %d\n", key);
 		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
-		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
+		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_rawptr(tree,
+		         (void *)vec_get(buf, i)));
 		DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
@@ -129,7 +131,8 @@ void test_avl_get(CuTest *tc)
 		obj_t *get_obj;
 		obj->key = key;
 		obj->value = (double)key;
-		CuAssert(tc, "Wrongly successful AVL search", !avl_get(tree, obj, (void **)&get_obj));
+		CuAssert(tc, "Wrongly successful AVL search", !avl_get(tree, obj,
+		         (void **)&get_obj));
 		CuAssert(tc, "Failed AVL push", avl_ins(tree, obj));
 		CuAssert(tc, "Failed AVL search", avl_get(tree, obj, (void **)&get_obj));
 		CuAssertPtrEquals(tc, obj, get_obj);
@@ -144,9 +147,11 @@ void test_avl_get(CuTest *tc)
 		obj_t obj = {.key = key, .value = (double)key};
 		obj_t *get_obj;
 		vec_push(buf, &obj);
-		CuAssert(tc, "Wrongly successful AVL search", !avl_get_rawptr(tree, (void *)vec_get(buf, i), (rawptr *)&get_obj));
+		CuAssert(tc, "Wrongly successful AVL search", !avl_get_rawptr(tree,
+		         (void *)vec_get(buf, i), (rawptr *)&get_obj));
 		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
-		CuAssert(tc, "Failed AVL search", avl_get_rawptr(tree, (void *)vec_get(buf, i), (rawptr *)&get_obj));
+		CuAssert(tc, "Failed AVL search", avl_get_rawptr(tree, (void *)vec_get(buf, i),
+		         (rawptr *)&get_obj));
 		CuAssertPtrEquals(tc, (void *)vec_get(buf,i), get_obj);
 	}
 	FREE(tree, avl);

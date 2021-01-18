@@ -21,16 +21,16 @@
  * CuStr
  *-------------------------------------------------------------------------*/
 
-char* CuStrAlloc(int size)
+char *CuStrAlloc(int size)
 {
-	char* newStr = (char*) malloc( sizeof(char) * (size) );
+	char *newStr = (char *) malloc( sizeof(char) * (size) );
 	return newStr;
 }
 
-char* CuStrCopy(const char* old)
+char *CuStrCopy(const char *old)
 {
 	int len = strlen(old);
-	char* newStr = CuStrAlloc(len + 1);
+	char *newStr = CuStrAlloc(len + 1);
 	strcpy(newStr, old);
 	return newStr;
 }
@@ -39,20 +39,20 @@ char* CuStrCopy(const char* old)
  * CuString
  *-------------------------------------------------------------------------*/
 
-void CuStringInit(CuString* str)
+void CuStringInit(CuString *str)
 {
 	str->length = 0;
 	str->size = STRING_MAX;
-	str->buffer = (char*) malloc(sizeof(char) * str->size);
+	str->buffer = (char *) malloc(sizeof(char) * str->size);
 	str->buffer[0] = '\0';
 }
 
-CuString* CuStringNew(void)
+CuString *CuStringNew(void)
 {
-	CuString* str = (CuString*) malloc(sizeof(CuString));
+	CuString *str = (CuString *) malloc(sizeof(CuString));
 	str->length = 0;
 	str->size = STRING_MAX;
-	str->buffer = (char*) malloc(sizeof(char) * str->size);
+	str->buffer = (char *) malloc(sizeof(char) * str->size);
 	str->buffer[0] = '\0';
 	return str;
 }
@@ -64,13 +64,13 @@ void CuStringDelete(CuString *str)
 	free(str);
 }
 
-void CuStringResize(CuString* str, int newSize)
+void CuStringResize(CuString *str, int newSize)
 {
-	str->buffer = (char*) realloc(str->buffer, sizeof(char) * newSize);
+	str->buffer = (char *) realloc(str->buffer, sizeof(char) * newSize);
 	str->size = newSize;
 }
 
-void CuStringAppend(CuString* str, const char* text)
+void CuStringAppend(CuString *str, const char *text)
 {
 	int length;
 
@@ -85,7 +85,7 @@ void CuStringAppend(CuString* str, const char* text)
 	strcat(str->buffer, text);
 }
 
-void CuStringAppendChar(CuString* str, char ch)
+void CuStringAppendChar(CuString *str, char ch)
 {
 	char text[2];
 	text[0] = ch;
@@ -93,7 +93,7 @@ void CuStringAppendChar(CuString* str, char ch)
 	CuStringAppend(str, text);
 }
 
-void CuStringAppendFormat(CuString* str, const char* format, ...)
+void CuStringAppendFormat(CuString *str, const char *format, ...)
 {
 	va_list argp;
 	char buf[HUGE_STRING_LEN];
@@ -103,7 +103,7 @@ void CuStringAppendFormat(CuString* str, const char* format, ...)
 	CuStringAppend(str, buf);
 }
 
-void CuStringInsert(CuString* str, const char* text, int pos)
+void CuStringInsert(CuString *str, const char *text, int pos)
 {
 	int length = strlen(text);
 	if (pos > str->length)
@@ -119,7 +119,7 @@ void CuStringInsert(CuString* str, const char* text, int pos)
  * CuTest
  *-------------------------------------------------------------------------*/
 
-void CuTestInit(CuTest* t, const char* name, TestFunction function)
+void CuTestInit(CuTest *t, const char *name, TestFunction function)
 {
 	t->name = CuStrCopy(name);
 	t->failed = 0;
@@ -129,9 +129,9 @@ void CuTestInit(CuTest* t, const char* name, TestFunction function)
 	t->jumpBuf = NULL;
 }
 
-CuTest* CuTestNew(const char* name, TestFunction function)
+CuTest *CuTestNew(const char *name, TestFunction function)
 {
-	CuTest* tc = CU_ALLOC(CuTest);
+	CuTest *tc = CU_ALLOC(CuTest);
 	CuTestInit(tc, name, function);
 	return tc;
 }
@@ -143,7 +143,7 @@ void CuTestDelete(CuTest *t)
 	free(t);
 }
 
-void CuTestRun(CuTest* tc)
+void CuTestRun(CuTest *tc)
 {
 	jmp_buf buf;
 	tc->jumpBuf = &buf;
@@ -154,7 +154,8 @@ void CuTestRun(CuTest* tc)
 	tc->jumpBuf = 0;
 }
 
-static void CuFailInternal(CuTest* tc, const char* file, int line, CuString* string)
+static void CuFailInternal(CuTest *tc, const char *file, int line,
+                           CuString *string)
 {
 	char buf[HUGE_STRING_LEN];
 
@@ -166,7 +167,8 @@ static void CuFailInternal(CuTest* tc, const char* file, int line, CuString* str
 	if (tc->jumpBuf != 0) longjmp(*(tc->jumpBuf), 0);
 }
 
-void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message)
+void CuFail_Line(CuTest *tc, const char *file, int line, const char *message2,
+                 const char *message)
 {
 	CuString string;
 
@@ -179,14 +181,16 @@ void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, c
 	CuFailInternal(tc, file, line, &string);
 }
 
-void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, int condition)
+void CuAssert_Line(CuTest *tc, const char *file, int line, const char *message,
+                   int condition)
 {
 	if (condition) return;
 	CuFail_Line(tc, file, line, NULL, message);
 }
 
-void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
-                               const char* expected, const char* actual)
+void CuAssertStrEquals_LineMsg(CuTest *tc, const char *file, int line,
+                               const char *message,
+                               const char *expected, const char *actual)
 {
 	CuString string;
 	if ((expected == NULL && actual == NULL) ||
@@ -208,7 +212,8 @@ void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	CuFailInternal(tc, file, line, &string);
 }
 
-void CuAssertCharEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+void CuAssertCharEquals_LineMsg(CuTest *tc, const char *file, int line,
+                                const char *message,
                                 char expected, char actual)
 {
 	char buf[STRING_MAX];
@@ -218,7 +223,8 @@ void CuAssertCharEquals_LineMsg(CuTest* tc, const char* file, int line, const ch
 }
 
 
-void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+void CuAssertIntEquals_LineMsg(CuTest *tc, const char *file, int line,
+                               const char *message,
                                int expected, int actual)
 {
 	char buf[STRING_MAX];
@@ -227,7 +233,8 @@ void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	CuFail_Line(tc, file, line, message, buf);
 }
 
-void CuAssertSizeTEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+void CuAssertSizeTEquals_LineMsg(CuTest *tc, const char *file, int line,
+                                 const char *message,
                                  size_t expected, size_t actual)
 {
 	char buf[STRING_MAX];
@@ -236,7 +243,8 @@ void CuAssertSizeTEquals_LineMsg(CuTest* tc, const char* file, int line, const c
 	CuFail_Line(tc, file, line, message, buf);
 }
 
-void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+void CuAssertDblEquals_LineMsg(CuTest *tc, const char *file, int line,
+                               const char *message,
                                double expected, double actual, double delta)
 {
 	char buf[STRING_MAX];
@@ -246,8 +254,9 @@ void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	CuFail_Line(tc, file, line, message, buf);
 }
 
-void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
-                               void* expected, void* actual)
+void CuAssertPtrEquals_LineMsg(CuTest *tc, const char *file, int line,
+                               const char *message,
+                               void *expected, void *actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -260,16 +269,16 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
  * CuSuite
  *-------------------------------------------------------------------------*/
 
-void CuSuiteInit(CuSuite* testSuite)
+void CuSuiteInit(CuSuite *testSuite)
 {
 	testSuite->count = 0;
 	testSuite->failCount = 0;
 	memset(testSuite->list, 0, sizeof(testSuite->list));
 }
 
-CuSuite* CuSuiteNew(void)
+CuSuite *CuSuiteNew(void)
 {
-	CuSuite* testSuite = CU_ALLOC(CuSuite);
+	CuSuite *testSuite = CU_ALLOC(CuSuite);
 	CuSuiteInit(testSuite);
 	return testSuite;
 }
@@ -286,27 +295,27 @@ void CuSuiteDelete(CuSuite *testSuite)
 
 }
 
-void CuSuiteAdd(CuSuite* testSuite, CuTest *testCase)
+void CuSuiteAdd(CuSuite *testSuite, CuTest *testCase)
 {
 	assert(testSuite->count < MAX_TEST_CASES);
 	testSuite->list[testSuite->count] = testCase;
 	testSuite->count++;
 }
 
-void CuSuiteAddSuite(CuSuite* testSuite, CuSuite* testSuite2)
+void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2)
 {
 	int i;
 	for (i = 0 ; i < testSuite2->count ; ++i) {
-		CuTest* testCase = testSuite2->list[i];
+		CuTest *testCase = testSuite2->list[i];
 		CuSuiteAdd(testSuite, testCase);
 	}
 }
 
-void CuSuiteRun(CuSuite* testSuite)
+void CuSuiteRun(CuSuite *testSuite)
 {
 	int i;
 	for (i = 0 ; i < testSuite->count ; ++i) {
-		CuTest* testCase = testSuite->list[i];
+		CuTest *testCase = testSuite->list[i];
 		CuTestRun(testCase);
 		if (testCase->failed) {
 			testSuite->failCount += 1;
@@ -314,33 +323,35 @@ void CuSuiteRun(CuSuite* testSuite)
 	}
 }
 
-void CuSuiteSummary(CuSuite* testSuite, CuString* summary)
+void CuSuiteSummary(CuSuite *testSuite, CuString *summary)
 {
 	int i;
 	for (i = 0 ; i < testSuite->count ; ++i) {
-		CuTest* testCase = testSuite->list[i];
+		CuTest *testCase = testSuite->list[i];
 		CuStringAppend(summary, testCase->failed ? "F" : ".");
 	}
 	CuStringAppend(summary, "\n\n");
 }
 
-void CuSuiteDetails(CuSuite* testSuite, CuString* details)
+void CuSuiteDetails(CuSuite *testSuite, CuString *details)
 {
 	int i;
 	int failCount = 0;
 
 	if (testSuite->failCount == 0) {
 		int passCount = testSuite->count - testSuite->failCount;
-		const char* testWord = passCount == 1 ? "test" : "tests";
+		const char *testWord = passCount == 1 ? "test" : "tests";
 		CuStringAppendFormat(details, "OK (%d %s)\n", passCount, testWord);
-	} else {
+	}
+	else {
 		if (testSuite->failCount == 1)
 			CuStringAppend(details, "There was 1 failure:\n");
 		else
-			CuStringAppendFormat(details, "There were %d failures:\n", testSuite->failCount);
+			CuStringAppendFormat(details, "There were %d failures:\n",
+			                     testSuite->failCount);
 
 		for (i = 0 ; i < testSuite->count ; ++i) {
-			CuTest* testCase = testSuite->list[i];
+			CuTest *testCase = testSuite->list[i];
 			if (testCase->failed) {
 				failCount++;
 				CuStringAppendFormat(details, "%d) %s: %s\n",
@@ -350,7 +361,8 @@ void CuSuiteDetails(CuSuite* testSuite, CuString* details)
 		CuStringAppend(details, "\n!!!FAILURES!!!\n");
 
 		CuStringAppendFormat(details, "Runs: %d ",   testSuite->count);
-		CuStringAppendFormat(details, "Passes: %d ", testSuite->count - testSuite->failCount);
+		CuStringAppendFormat(details, "Passes: %d ",
+		                     testSuite->count - testSuite->failCount);
 		CuStringAppendFormat(details, "Fails: %d\n",  testSuite->failCount);
 	}
 }

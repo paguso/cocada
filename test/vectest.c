@@ -119,7 +119,7 @@ void test_vec_set(CuTest *tc)
 void test_vec_ins(CuTest *tc)
 {
 	size_t len = 110;
-	vec *v = vec_new(sizeof(double*));
+	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i=1; i<len; i+=2) {
@@ -144,7 +144,7 @@ void test_vec_ins(CuTest *tc)
 void test_vec_del(CuTest *tc)
 {
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double*));
+	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i=0; i<len; i++) {
@@ -170,7 +170,7 @@ void test_vec_del(CuTest *tc)
 void test_vec_swap(CuTest *tc)
 {
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double*));
+	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i=0; i<len; i++) {
@@ -388,7 +388,8 @@ void test_vec_free(CuTest *tc)
 		vec_push(v, &c);
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
-	DESTROY(v,  dtor_cons(DTOR(vec), dtor_cons (ptr_dtor(),dtor_cons (DTOR(vec), ptr_dtor())))) ;
+	DESTROY(v,  dtor_cons(DTOR(vec), dtor_cons (ptr_dtor(),dtor_cons (DTOR(vec),
+	                      ptr_dtor())))) ;
 }
 
 void test_vec_flat_free(CuTest *tc)
@@ -416,13 +417,14 @@ void test_vec_flat_free(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
 
-	DESTROY(v,  dtor_cons  ( DTOR(vec),  dtor_cons ( DTOR(vec),  empty_dtor()  ) ) ) ;
+	DESTROY(v,  dtor_cons  ( DTOR(vec),  dtor_cons ( DTOR(vec),
+	                         empty_dtor()  ) ) ) ;
 
 }
 
 CuSuite *vec_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_vec_new);
 	SUITE_ADD_TEST(suite, test_vec_app);
 	SUITE_ADD_TEST(suite, test_vec_bsearch);

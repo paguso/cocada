@@ -148,44 +148,44 @@ void deque_remv_front(deque *q);
 
 
 #define DEQUE_NEW_DECL( TYPE )\
-    deque *deque_new_##TYPE();
+	deque *deque_new_##TYPE();
 
 #define DEQUE_GET_DECL( TYPE )\
-    TYPE deque_get_##TYPE(const deque *q, size_t pos);
+	TYPE deque_get_##TYPE(const deque *q, size_t pos);
 
 #define DEQUE_FRONT_DECL( TYPE )\
-    TYPE deque_front_##TYPE(const deque *q);
+	TYPE deque_front_##TYPE(const deque *q);
 
 #define DEQUE_BACK_DECL( TYPE )\
-    TYPE deque_back_##TYPE(const deque *q);
+	TYPE deque_back_##TYPE(const deque *q);
 
 #define DEQUE_PUSH_BACK_DECL( TYPE )\
-    void deque_push_back_##TYPE(deque *q, TYPE val);
+	void deque_push_back_##TYPE(deque *q, TYPE val);
 
 #define DEQUE_POP_BACK_DECL( TYPE )\
-    TYPE deque_pop_back_##TYPE(deque *q);
+	TYPE deque_pop_back_##TYPE(deque *q);
 
 #define DEQUE_REMV_BACK_DECL( TYPE )\
-    TYPE deque_remv_back_##TYPE(deque *q);
+	TYPE deque_remv_back_##TYPE(deque *q);
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
-    void deque_push_front_##TYPE(deque *q, TYPE val);
+	void deque_push_front_##TYPE(deque *q, TYPE val);
 
 #define DEQUE_POP_FRONT_DECL( TYPE )\
-    TYPE deque_pop_front_##TYPE(deque *q);
+	TYPE deque_pop_front_##TYPE(deque *q);
 
 #define DEQUE_REMV_FRONT_DECL( TYPE )\
-    TYPE deque_remv_front_##TYPE(deque *q);
+	TYPE deque_remv_front_##TYPE(deque *q);
 
 #define DEQUE_ALL_DECL( TYPE, ... )\
-DEQUE_NEW_DECL(TYPE)\
-DEQUE_GET_DECL(TYPE)\
-DEQUE_FRONT_DECL(TYPE)\
-DEQUE_BACK_DECL(TYPE)\
-DEQUE_PUSH_BACK_DECL(TYPE)\
-DEQUE_POP_BACK_DECL(TYPE)\
-DEQUE_PUSH_FRONT_DECL(TYPE)\
-DEQUE_POP_FRONT_DECL(TYPE)\
+	DEQUE_NEW_DECL(TYPE)\
+	DEQUE_GET_DECL(TYPE)\
+	DEQUE_FRONT_DECL(TYPE)\
+	DEQUE_BACK_DECL(TYPE)\
+	DEQUE_PUSH_BACK_DECL(TYPE)\
+	DEQUE_POP_BACK_DECL(TYPE)\
+	DEQUE_PUSH_FRONT_DECL(TYPE)\
+	DEQUE_POP_FRONT_DECL(TYPE)\
 
 XX_CORETYPES(DEQUE_ALL_DECL)
 

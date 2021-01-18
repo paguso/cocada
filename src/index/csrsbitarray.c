@@ -300,7 +300,8 @@ void csrsbitarr_print(FILE *stream, csrsbitarray *ba, size_t bytes_per_row)
 	for (unsigned int b=0; b<=1; b++) {
 		fprintf(stream, "->total_bits_count[%u] = %zu\n",b,  ba->total_bit_count[b]);
 	}
-	fprintf(stream, "->rank_bit_sample_interval = %zu\n", ba->rank_samples_bit_interval);
+	fprintf(stream, "->rank_bit_sample_interval = %zu\n",
+	        ba->rank_samples_bit_interval);
 	//fprintf(stream, "->rank_byte_sample_interval = %zu\n", ba->rank_samples_byte_interval);
 	fprintf(stream, "->rank_samples_count = %zu\n", ba->rank_samples_count);
 	//fprintf(stream, "->bits_per_rank = %zu\n", ba->bits_per_pos);
@@ -411,7 +412,8 @@ size_t csrsbitarr_rank1(csrsbitarray *ba, size_t pos)
 		byte_pos++;
 	}
 	//count the last few bits, if any
-	rank += byte_bitcount1( ba->data[byte_pos] & MSBMASK((pos%BYTESIZE)));//////////////+1)  );
+	rank += byte_bitcount1( ba->data[byte_pos] & MSBMASK((
+	                            pos%BYTESIZE)));//////////////+1)  );
 	return rank;
 }
 

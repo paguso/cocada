@@ -166,14 +166,20 @@ static void test_setup()
 	vec_push_rawptr(choices, cstr_clone("plain"));
 	vec_push_rawptr(choices, cstr_clone("fasta"));
 	//vec_push_rawptr(choices, cstr_clone("index"));
-	vec *deftype = vec_new(sizeof(char*));
+	vec *deftype = vec_new(sizeof(char *));
 	vec_push_rawptr(deftype, cstr_clone("fasta"));
 	cmd = cliparse_new("vmat", "Variable Minimizer Alignment Tool");
-	cliparse *index = cliparse_new("index", "Create variable-sized minimiser index");
-	cliparse_add_option(index, cliopt_new('w', "window-size", "window sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparse_add_option(index, cliopt_new('k', "kmer-size", "kmer sizes", OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparse_add_option(index, cliopt_new('t',"input-type", "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices, deftype));
-	cliparse_add_pos_arg(index, cliarg_new("sequence file", "Input sequence file", ARG_FILE));
+	cliparse *index = cliparse_new("index",
+	                               "Create variable-sized minimiser index");
+	cliparse_add_option(index, cliopt_new('w', "window-size", "window sizes",
+	                                      OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+	cliparse_add_option(index, cliopt_new('k', "kmer-size", "kmer sizes",
+	                                      OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
+	cliparse_add_option(index, cliopt_new('t',"input-type",
+	                                      "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices,
+	                                      deftype));
+	cliparse_add_pos_arg(index, cliarg_new("sequence file", "Input sequence file",
+	                                       ARG_FILE));
 	cliparse_add_subcommand(cmd, index);
 
 }
@@ -236,7 +242,7 @@ void test_cli_parse(CuTest *tc)
 	const cliparse *subcmd = cliparse_active_subcommand(cmd);
 	const vec *tvals = cliparse_opt_val_from_shortname(subcmd, 't');
 	CuAssertSizeTEquals(tc, 1, vec_len(tvals));
-	CuAssertStrEquals(tc, "fasta", (char*)vec_first_rawptr(tvals));
+	CuAssertStrEquals(tc, "fasta", (char *)vec_first_rawptr(tvals));
 
 	freeargv(argc, argv);
 

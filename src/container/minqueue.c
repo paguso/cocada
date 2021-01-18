@@ -49,7 +49,8 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp)
 }
 
 
-minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp, size_t capacity)
+minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
+                                     size_t capacity)
 {
 	minqueue *ret = NEW(minqueue);
 	ret->elts = deque_new_with_capacity(typesize, capacity);
@@ -77,7 +78,8 @@ size_t minqueue_len(const minqueue *queue)
 void minqueue_push(minqueue *queue, const void *elt)
 {
 	while ( deque_len(queue->mins)>0 &&
-	        queue->cmp( elt, deque_get(queue->elts, deque_back_size_t(queue->mins) - queue->dels) ) < 0 ) {
+	        queue->cmp( elt, deque_get(queue->elts,
+	                                   deque_back_size_t(queue->mins) - queue->dels) ) < 0 ) {
 		deque_pop_back_size_t(queue->mins);
 	}
 	deque_push_back_size_t(queue->mins, queue->dels + deque_len(queue->elts));
@@ -114,35 +116,36 @@ const void *minqueue_min(const minqueue *queue)
 
 void minqueue_min_cpy(const minqueue *queue, void *dest)
 {
-	deque_get_cpy(queue->elts, deque_front_size_t(queue->mins) - queue->dels, dest );
+	deque_get_cpy(queue->elts, deque_front_size_t(queue->mins) - queue->dels,
+	              dest );
 
 }
 
 
 #define MINQUEUE_PUSH_IMPL( TYPE )\
-void minqueue_push_##TYPE(minqueue *queue, TYPE val) {\
-    minqueue_push(queue, &val);\
-}
+	void minqueue_push_##TYPE(minqueue *queue, TYPE val) {\
+		minqueue_push(queue, &val);\
+	}
 
 
 #define MINQUEUE_POP_IMPL( TYPE )\
-TYPE minqueue_pop_##TYPE(minqueue *queue) {\
-    TYPE *ret;\
-    minqueue_pop(queue, &ret);\
-    return *ret;\
-}
+	TYPE minqueue_pop_##TYPE(minqueue *queue) {\
+		TYPE *ret;\
+		minqueue_pop(queue, &ret);\
+		return *ret;\
+	}
 
 
 #define MINQUEUE_MIN_IMPL( TYPE )\
-TYPE minqueue_min_##TYPE(const minqueue *queue){\
-    return ((TYPE *)minqueue_min(queue))[0];\
-}
+	TYPE minqueue_min_##TYPE(const minqueue *queue){\
+		return ((TYPE *)minqueue_min(queue))[0];\
+	}
 
 
 #define MINQUEUE_ALL_IMPL( TYPE , ... )\
-MINQUEUE_PUSH_IMPL(TYPE)\
-MINQUEUE_POP_IMPL(TYPE)\
-MINQUEUE_MIN_IMPL(TYPE)
+	MINQUEUE_PUSH_IMPL(TYPE)\
+	MINQUEUE_POP_IMPL(TYPE)\
+	MINQUEUE_MIN_IMPL(TYPE)
 
 XX_CORETYPES(MINQUEUE_ALL_IMPL)
 
@@ -161,7 +164,8 @@ static void _minqueue_iter_goto_next(minqueue_iter *iter)
 	const minqueue *src = iter->src;
 	if ( iter->index < deque_len(src->mins) &&
 	        src->cmp( deque_get(src->elts, deque_front_size_t(src->mins) - src->dels),
-	                  deque_get(src->elts, deque_get_size_t(src->mins, iter->index) - src->dels) ) < 0 ) {
+	                  deque_get(src->elts, deque_get_size_t(src->mins,
+	                            iter->index) - src->dels) ) < 0 ) {
 		iter->index = deque_len(src->mins);
 	}
 
@@ -185,7 +189,8 @@ bool minqueue_iter_has_next(const minqueue_iter *iter)
 const void *minqueue_iter_next(minqueue_iter *iter)
 {
 	const void *ret;
-	ret = deque_get(iter->src->elts, deque_get_size_t(iter->src->mins, iter->index) - iter->src->dels );
+	ret = deque_get(iter->src->elts, deque_get_size_t(iter->src->mins,
+	                iter->index) - iter->src->dels );
 	iter->index +=1;
 	_minqueue_iter_goto_next(iter);
 	return ret;

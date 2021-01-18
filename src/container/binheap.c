@@ -94,7 +94,8 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 		if ( m != i ) {
 			vec_swap(heap->data, i, m);
 			i = m;
-		} else {
+		}
+		else {
 			break;
 		}
 	}
@@ -120,17 +121,17 @@ void binheap_pop(binheap *heap, void *dest)
 
 
 #define BINHEAP_PUSH_IMPL( TYPE )\
-    void binheap_push_##TYPE(binheap *heap, TYPE val)\
-        {   binheap_push(heap, &val);   }
+	void binheap_push_##TYPE(binheap *heap, TYPE val)\
+	{   binheap_push(heap, &val);   }
 
 
 #define BINHEAP_POP_IMPL( TYPE )\
-    TYPE binheap_pop_##TYPE(binheap *heap)\
-        {   TYPE s; binheap_pop(heap, &s); return s; }
+	TYPE binheap_pop_##TYPE(binheap *heap)\
+	{   TYPE s; binheap_pop(heap, &s); return s; }
 
 
 #define BINHEAP_ALL_IMPL( TYPE , ...)\
-BINHEAP_PUSH_IMPL(TYPE)\
-BINHEAP_POP_IMPL(TYPE)
+	BINHEAP_PUSH_IMPL(TYPE)\
+	BINHEAP_POP_IMPL(TYPE)
 
 XX_CORETYPES(BINHEAP_ALL_IMPL)

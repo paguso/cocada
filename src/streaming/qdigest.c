@@ -87,7 +87,8 @@ static size_pair tree_size (qdnode *root)
 {
 	if (root==NULL) {
 		return zeropair;
-	} else {
+	}
+	else {
 		size_pair ret = {.fst=0, .snd=0};
 		size_pair l = tree_size(root->chd[LEFT]);
 		size_pair r = tree_size(root->chd[RIGHT]);
@@ -132,7 +133,8 @@ static comp_pair __qdigest_compress(qdnode *root, size_t cap, size_t spare_up)
 		free(root);
 		cp.new_root = NULL;
 		cp.move_up = move_up;
-	} else {
+	}
+	else {
 		cp.new_root = root;
 		cp.move_up = move_up;
 	}
@@ -160,7 +162,7 @@ void qdigest_upd(qdigest *self, size_t val, size_t qty)
 	qdnode *par = self->root, *cur = self->root;
 	int dir;
 	size_t l = 0, r = self->range, m;
-	while( qty ) {
+	while ( qty ) {
 		if (cur == NULL) {
 			cur = NEW(qdnode);
 			cur->qty = 0;
@@ -177,12 +179,14 @@ void qdigest_upd(qdigest *self, size_t val, size_t qty)
 			if (val < m) {
 				dir = LEFT;
 				r = m;
-			} else {
+			}
+			else {
 				dir = RIGHT;
 				l = m;
 			}
 			cur = cur->chd[dir];
-		} else { // leaf
+		}
+		else {   // leaf
 			cur->qty += qty;
 			qty = 0;
 		}
@@ -215,12 +219,13 @@ size_t qdigest_rank(qdigest *self, size_t val)
 	qdnode *cur = self->root;
 	size_t l = 0, r = self->range, m;
 	size_t ret = 0;
-	while( cur != NULL && HAS_CHD(cur) ) {
+	while ( cur != NULL && HAS_CHD(cur) ) {
 		m = (l + r) / 2;
 		if (val < m) {
 			r = m;
 			cur = cur->chd[LEFT];
-		} else {
+		}
+		else {
 			ret += _sum_tree(cur->chd[LEFT]);
 			l = m;
 			cur = cur->chd[RIGHT];
@@ -238,7 +243,8 @@ static void _print(FILE *stream, qdnode *root, size_t l, size_t r, size_t level)
 	}
 	if (r-l==1) {
 		fprintf(stream, "[val=%zu qty=%zu]\n", l, root->qty);
-	} else {
+	}
+	else {
 		fprintf(stream, "[l=%zu r=%zu qty=%zu]\n", l, r, root->qty);
 	}
 	_print(stream, root->chd[LEFT], l, (l+r)/2, level+1);

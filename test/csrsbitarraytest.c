@@ -37,7 +37,8 @@
 static size_t nof_arrays;
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
 static byte_t **all_ba;
-static csrsbitarray *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even, *csrsba_rand, *csrsba_alt;
+static csrsbitarray *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even,
+       *csrsba_rand, *csrsba_alt;
 static csrsbitarray **all_srsba;
 
 static size_t ba_size=7000;

@@ -129,7 +129,8 @@ bitvec *huffcode_encode(const char *src, size_t len, const huffcode *code);
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
-void huffcode_encode_to(bitvec *dest, const char *src, size_t len, const huffcode *hcode);
+void huffcode_encode_to(bitvec *dest, const char *src, size_t len,
+                        const huffcode *hcode);
 
 
 /**
@@ -141,7 +142,8 @@ bitvec *huffcode_encode_xstr(const xstr *src, const huffcode *code);
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
-void huffcode_encode_xstr_to(bitvec *dest, const xstr *src, const huffcode *hcode);
+void huffcode_encode_xstr_to(bitvec *dest, const xstr *src,
+                             const huffcode *hcode);
 
 
 /**
@@ -153,7 +155,8 @@ bitvec *huffcode_encode_strread(strread *src, const huffcode *hcode);
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_strread_to(bitvec *dest, strread *src, const huffcode *hcode);
+void huffcode_encode_strread_to(bitvec *dest, strread *src,
+                                const huffcode *hcode);
 
 
 /**
@@ -165,7 +168,8 @@ bitvec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode);
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src, const huffcode *hcode);
+void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src,
+                                 const huffcode *hcode);
 
 
 /**

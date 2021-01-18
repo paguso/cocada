@@ -32,7 +32,7 @@
 
 static void print_int(FILE *stream, const void *val)
 {
-	fprintf(stream, "%d", *((int*)val));
+	fprintf(stream, "%d", *((int *)val));
 }
 
 
@@ -47,7 +47,8 @@ void test_gk_upd(CuTest *tc)
 		double xval;
 		do {
 			xval = (rand_norm() + 1.0) / 7.0;
-		} while (xval < 0 || xval >= 1);
+		}
+		while (xval < 0 || xval >= 1);
 		int val = xval * univ;
 		//printf("Insert %d:\n", val);
 		gk_upd(sk, &val);
@@ -63,7 +64,8 @@ void test_gk_upd(CuTest *tc)
 
 	size_t nbins = 50;
 	double resol = 100.0 / (max_count * (univ/nbins));
-	printf("\n\nGK Values distribution (each * for approx %f units)", (max_count * ((double)univ/(double)nbins))/100.0 );
+	printf("\n\nGK Values distribution (each * for approx %f units)",
+	       (max_count * ((double)univ/(double)nbins))/100.0 );
 	for (size_t i = 0, bin = 0; bin < nbins; bin++) {
 		size_t bin_count = 0;
 		while ( i < ((bin + 1) * univ) / nbins ) {

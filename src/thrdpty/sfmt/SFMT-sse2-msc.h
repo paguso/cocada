@@ -54,11 +54,11 @@ inline static __m128i __vectorcall mm_recursion(__m128i a, __m128i b,
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt)
+void sfmt_gen_rand_all(sfmt_t *sfmt)
 {
 	int i;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -84,11 +84,11 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
+static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
 {
 	int i, j;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -132,30 +132,30 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
  * @param d a 128-bit part of the interal state array
  */
 #define mm_recursion(r, a, b, c, d)           \
-do {                                          \
-    __m128i v, x, y, z;                       \
-                                              \
-    y = _mm_srli_epi32((b), SFMT_SR1);        \
-    z = _mm_srli_si128((c), SFMT_SR2);        \
-    v = _mm_slli_epi32((d), SFMT_SL1);        \
-    z = _mm_xor_si128(z, (a));                \
-    z = _mm_xor_si128(z, v);                  \
-    x = _mm_slli_si128((a), SFMT_SL2);        \
-    y = _mm_and_si128(y, sse2_param_mask.si); \
-    z = _mm_xor_si128(z, x);                  \
-    r = _mm_xor_si128(z, y);                  \
-} while (0)
+	do {                                          \
+		__m128i v, x, y, z;                       \
+		\
+		y = _mm_srli_epi32((b), SFMT_SR1);        \
+		z = _mm_srli_si128((c), SFMT_SR2);        \
+		v = _mm_slli_epi32((d), SFMT_SL1);        \
+		z = _mm_xor_si128(z, (a));                \
+		z = _mm_xor_si128(z, v);                  \
+		x = _mm_slli_si128((a), SFMT_SL2);        \
+		y = _mm_and_si128(y, sse2_param_mask.si); \
+		z = _mm_xor_si128(z, x);                  \
+		r = _mm_xor_si128(z, y);                  \
+	} while (0)
 
 /**
  * This function fills the internal state array with pseudorandom
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt)
+void sfmt_gen_rand_all(sfmt_t *sfmt)
 {
 	int i;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -181,11 +181,11 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
+static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
 {
 	int i, j;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -219,8 +219,8 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
 	}
 }
 #else
-inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
-                                __m128i c, __m128i * d);
+inline static void mm_recursion(__m128i *r, __m128i a, __m128i b,
+                                __m128i c, __m128i *d);
 
 /**
  * This function represents the recursion formula.
@@ -230,8 +230,8 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
  * @param c a 128-bit part of the interal state array
  * @param d a 128-bit part of the interal state array
  */
-inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
-                                __m128i c, __m128i * d)
+inline static void mm_recursion(__m128i *r, __m128i a, __m128i b,
+                                __m128i c, __m128i *d)
 {
 	__m128i v, x, y, z;
 
@@ -252,11 +252,11 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt)
+void sfmt_gen_rand_all(sfmt_t *sfmt)
 {
 	int i;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;
@@ -282,11 +282,11 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
+static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
 {
 	int i, j;
 	__m128i r1, r2;
-	w128_t * pstate = sfmt->state;
+	w128_t *pstate = sfmt->state;
 
 	r1 = pstate[SFMT_N - 2].si;
 	r2 = pstate[SFMT_N - 1].si;

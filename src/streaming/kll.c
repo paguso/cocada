@@ -57,19 +57,22 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 
 kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt)
 {
-	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) * ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
+	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) *
+	                            ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
 	return kll_new_own_with_cap(typesize, cmp, err, cap, chd_dt);
 }
 
 
-kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err, size_t capacity)
+kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err,
+                          size_t capacity)
 {
 	return kll_new_own_with_cap(typesize, cmp, err, capacity, empty_dtor());
 }
 
 
 
-kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err, size_t capacity, dtor *chd_dt)
+kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
+                              size_t capacity, dtor *chd_dt)
 {
 	assert (err > 0);
 	kllsumm *ret = NEW(kllsumm);
@@ -107,8 +110,10 @@ void kll_dtor(void *ptr, const dtor *dt)
 	kllsumm *self = (kllsumm *)ptr;
 	FREE(self->coins, vec);
 	if (dtor_nchd(dt)) {
-		DESTROY(self->buffs, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec), dtor_chd(dt, 0)))));
-	} else {
+		DESTROY(self->buffs, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(),
+		                               dtor_cons(DTOR(vec), dtor_chd(dt, 0)))));
+	}
+	else {
 		DESTROY(self->buffs, dtor_cons(DTOR(vec), DTOR(vec)));
 	}
 }
@@ -137,7 +142,8 @@ static void _compress(kllsumm *self)
 			vec *nxtbuf;
 			if (i + 1 < _nlevels(self)) {
 				nxtbuf = (vec *)vec_get_rawptr(self->buffs, i + 1);
-			} else {
+			}
+			else {
 				nxtbuf = vec_new(self->typesize);
 				vec_push_rawptr(self->buffs, nxtbuf);
 				vec_push_byte_t(self->coins, 0);
@@ -146,7 +152,8 @@ static void _compress(kllsumm *self)
 			if (coin == 0) {
 				coin = rand_next() % 2;
 				vec_set_byte_t(self->coins, i, coin + 1);
-			} else {
+			}
+			else {
 				vec_set_byte_t(self->coins, i, 0);
 			}
 			size_t j = coin;
@@ -179,15 +186,18 @@ static size_t _rank(vec *buf, void *val, cmp_func cmp)
 {
 	if (vec_len(buf)==0 || cmp(vec_first(buf), val) >= 0) {
 		return 0;
-	} else if (cmp(vec_last(buf), val) < 0) {
+	}
+	else if (cmp(vec_last(buf), val) < 0) {
 		return vec_len(buf);
-	} else { // return first position >= val
+	}
+	else {   // return first position >= val
 		size_t l = 0, r = vec_len(buf) - 1;
 		while (r - l > 1) { // invariant: l < rank <= r
 			size_t m = (r + l) / 2;
 			if ( cmp(vec_get(buf, m), val) < 0 ) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
@@ -210,7 +220,8 @@ size_t kll_rank(kllsumm *self, void *val)
 }
 
 
-void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *, const void *))
+void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *,
+               const void *))
 {
 	fprintf(stream, "KLL @%p:\n", self);
 	fprintf(stream, "\terr = %f\n", self->err);

@@ -38,6 +38,7 @@ void gk_merge(gksumm *self, const gksumm *other);
 
 size_t gk_rank(gksumm *self, const void *val);
 
-void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *, const void *));
+void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *,
+              const void *));
 
 #endif

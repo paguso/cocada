@@ -66,7 +66,7 @@ void test_xstr_to_string(CuTest *tc)
 
 CuSuite *xstr_get_test_suite()
 {
-	CuSuite* suite = CuSuiteNew();
+	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_xstr_get_set);
 	//SUITE_ADD_TEST(suite, test_xstr_to_string);
 	return suite;
