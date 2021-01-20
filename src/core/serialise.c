@@ -115,7 +115,7 @@ typedef struct {
 
 
 typedef struct {
-	void *start;
+	size_t start;
 	size_t size;
 } mem_chunk;
 
@@ -140,10 +140,26 @@ static void write_type(som_t typ, FILE *stream)
 }
 
 
+static som_t read_type(FILE *stream)
+{
+	byte_t btyp;
+	fread(&btyp, 1, 1, stream);
+	return (som_t)btyp;
+}
+
+
 static void write_addr(void *ptr, FILE *stream)
 {
 	size_t addr = (size_t) ptr;
 	fwrite(&addr, sizeof(size_t), 1, stream);
+}
+
+
+static size_t read_addr(FILE *stream)
+{
+	size_t addr;
+	fread(&addr, sizeof(size_t), 1, stream);
+	return addr;
 }
 
 
@@ -153,7 +169,18 @@ static void write_size(size_t size, FILE *stream)
 }
 
 
+static size_t read_size(FILE *stream)
+{
+	size_t size;
+	fread(&size, sizeof(size_t), 1, stream);
+	return size;
+}
+
+
 static void write_obj(som *model, void *ptr, FILE *stream, deque *dq, vec *written);
+
+
+static void read_obj(som *model, void *ptr, FILE *stream, deque *dq, vec *read, hashmap *mem_map);
 
 
 static void write_prim(som *model, void *ptr, FILE *stream, vec *written)
@@ -162,8 +189,22 @@ static void write_prim(som *model, void *ptr, FILE *stream, vec *written)
     write_addr(ptr, stream);
     write_size(model->size, stream);
     fwrite(ptr, model->size, 1, stream);
-    mem_chunk chunk = {.start = ptr, .size=model->size};
+    mem_chunk chunk = {.start = (size_t)ptr, .size = model->size};
     vec_push(written, &chunk);
+}
+
+
+static void read_prim(som *model, void *dest, FILE *stream, vec *read, hashmap *mem_map)
+{
+	size_t type = read_type(stream);
+	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d", (int)model->type, (int)type);
+	size_t addr = read_addr(stream);
+	size_t size = read_size(stream);
+	WARN_ASSERT(model->size == size, "Wrong size. Expected %zu, found %zu", model->size, size);
+    fread(dest, model->size, 1, stream);
+    mem_chunk chunk = {.start = addr, .size=model->size};
+    vec_push(read, &chunk);
+	hashmap_set(mem_map, &addr, &dest);
 }
 
 
@@ -171,12 +212,66 @@ void write_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *written)
 {
 	write_type(som_rawptr, stream);
 	write_addr(ptr, stream);
+	write_size(sizeof(rawptr), stream);
 	fwrite(ptr, sizeof(rawptr), 1, stream);
-	mem_chunk chunk = {.start = ptr, .size=sizeof(rawptr)};
+	mem_chunk chunk = {.start = (size_t) ptr, .size=sizeof(rawptr)};
 	vec_push(written, &chunk);
 	if (som_nchd(model) > 0) {
 		sub_som chd = som_chd(model, 0);
 		obj_model om = {.model = chd.chd, .obj = *((rawptr *)ptr)};
+		deque_push_back(dq, &om);
+	}
+}
+
+
+void *map_addr(hashmap *mem_map, vec *read, void *addr) 
+{
+	if (addr == NULL) return NULL;
+	void *base = NULL;
+	for (size_t i=0, l=vec_len(read); i<l; i++) {
+		mem_chunk *chk = (mem_chunk *)vec_get(read, i);
+		if ( (size_t)chk->start <= (size_t)addr  &&
+		        (size_t)addr < (size_t)chk->start + (size_t)chk->size ) {
+			base = (void *) chk->start;
+			break;
+		}
+	}
+	size_t off = (size_t)addr - (size_t)base;
+	ERROR_ASSERT(hashmap_has_key(mem_map, &base), "Cannot map already read address %p.", base);
+	base = hashmap_get_rawptr(mem_map, &base);
+	return base + off;
+}
+
+
+void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read, hashmap *mem_map)
+{
+	rawptr *dest = (rawptr *)ptr;
+	size_t type = read_type(stream);
+	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d", (int)model->type, (int)type);
+	size_t addr = read_addr(stream);
+	size_t size = read_size(stream);
+	WARN_ASSERT(model->size == size, "Wrong size. Expected %zu, found %zu", model->size, size);
+	fread(dest, size, 1, stream);
+	mem_chunk chunk = {.start = addr, .size = size};
+	vec_push(read, &chunk);
+	hashmap_set(mem_map, &addr, &dest);
+	if (is_written(read, *dest)) {
+		*dest = map_addr(mem_map, read, dest);
+		return;
+	} 
+	if (som_nchd(model) > 0) {
+		som *pointee_model = som_chd(model, 0).chd;
+		while (pointee_model->type == som_proxy) {
+			pointee_model = pointee_model->get_som();
+		}
+		void *new_obj = NULL;
+		if (pointee_model->type == som_arr) {
+			new_obj = ptr;
+		} else {
+			new_obj = malloc(pointee_model->size);
+		}
+		*dest = new_obj;
+		obj_model om = {.model = pointee_model, .obj = new_obj};
 		deque_push_back(dq, &om);
 	}
 }
@@ -187,10 +282,30 @@ void write_struct(som *model, void *obj, FILE *stream, deque *dq, vec *written)
     write_type(som_struct, stream);
     write_addr(obj, stream);
     write_size(model->size, stream);
+	mem_chunk chunk = {.start = (size_t) obj, .size = model->size};
+	vec_push(written, &chunk);
 	for (size_t i = 0; i < som_nchd(model); i++) {
 		sub_som field_som_chd = som_chd(model, i);
 		som *field_som = field_som_chd.chd;
         write_obj(field_som, obj + field_som_chd.off, stream, dq, written);
+	}
+}
+
+
+void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read, hashmap *mem_map)
+{
+	size_t type = read_type(stream);
+	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d", (int)model->type, (int)type);
+	size_t addr = read_addr(stream);
+	size_t size = read_size(stream);
+	WARN_ASSERT(model->size == size, "Wrong size. Expected %zu, found %zu", model->size, size);
+	mem_chunk chunk = {.start = addr, .size = size};
+	vec_push(read, &chunk);
+	hashmap_set(mem_map, &addr, &dest);
+	for (size_t i = 0; i < som_nchd(model); i++) {
+		sub_som field_som_chd = som_chd(model, i);
+		som *field_som = field_som_chd.chd;
+        read_obj(field_som, dest + field_som_chd.off, stream, dq, read, mem_map);
 	}
 }
 
@@ -208,11 +323,14 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 	write_addr(arr, stream);
 	size_t size = arr_size(arr);
 	write_size(size, stream);
-	mem_chunk chunk = {.start=arr, .size=size};
+	mem_chunk chunk = {.start = (size_t) arr, .size = size};
 	vec_push(written, &chunk);
 	som *elt_som = som_chd(model, 0).chd;
 	size_t elt_size = elt_som->size;
 	switch (elt_som->type) {
+	case som_arr:
+		ERROR("Unsupported array of array serialisation");
+		break;
 	case som_rawptr:
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
 			write_rawptr(elt_som, elt, stream, dq, written);
@@ -225,6 +343,57 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 		break;
 	default: // primitive type: write blob
 		write_blob(arr, size, stream);
+		break;
+	}
+}
+
+
+static void read_blob(void *ptr, size_t size, FILE *stream)
+{
+	fread(ptr, size, 1, stream);
+}
+
+
+// ptr_addr contains the address of the pointer to the array to be read in
+// the space taken by the array is known only when it is read,
+// so the array could not have been allocated before
+void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read, hashmap *mem_map)
+{
+	size_t type = read_type(stream);
+	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d", (int)model->type, (int)type);
+	size_t addr = read_addr(stream);
+	ERROR_ASSERT((size_t)(*((rawptr *)ptr_addr)) == addr, "Array address error.");
+	size_t size = read_size(stream);
+	mem_chunk chunk = {.start = addr, .size = size};
+	vec_push(read, &chunk);
+	
+	som *elt_som = som_chd(model, 0).chd;
+	size_t elt_size = elt_som->size;
+	while (elt_som->type == som_proxy) {
+		elt_som = elt_som->get_som();
+	}
+	WARN_ASSERT((size % elt_som->size) == 0, "Incompatible array size for the element size.");
+	size_t len = size / elt_size;
+	void *arr = arr_new(elt_size, len);
+	hashmap_set(mem_map, &addr, &arr);
+	*((rawptr *)ptr_addr) = arr;
+
+	switch (elt_som->type) {
+	case som_arr:
+		ERROR("Unsupported array of array serialisation");
+		break;
+	case som_rawptr:
+		for (void *elt = arr; elt < arr + size; elt += elt_size) {
+			read_rawptr(elt_som, elt, stream, dq, read, mem_map);
+		}
+		break;
+	case som_struct:
+		for (void *elt = arr; elt < arr + size; elt += elt_size) {
+			read_struct(elt_som, elt, stream, dq, read, mem_map);
+		}
+		break;
+	default: // primitive type: write blob
+		read_blob(arr, size, stream);
 		break;
 	}
 }
@@ -254,9 +423,32 @@ static void write_obj(som *model, void *obj, FILE *stream, deque *dq, vec *writt
     }
 }
 
+
+static void read_obj(som *model, void *dest, FILE *stream, deque *dq, vec *read, hashmap *mem_map)
+{
+    while (model->type == som_proxy) {
+        model = model->get_som();
+    }
+    switch (model->type) {
+    case som_rawptr:
+        read_rawptr(model, dest, stream, dq, read, mem_map);
+        break;
+    case som_arr:
+        read_arr(model, dest, stream, dq, read, mem_map);
+        break;
+    case som_struct:
+        read_struct(model, dest, stream, dq, read, mem_map);
+        break;
+    default:
+        read_prim(model, dest, stream, read, mem_map);
+        break;
+    }
+}
+
+
 static void bfs_write(som *model, void *obj, FILE *stream)
 {
-	mem_chunk nullchunk = {.start=NULL, .size=1};
+	mem_chunk nullchunk = {.start=(size_t)NULL, .size=1};
     vec *written = vec_new(sizeof(mem_chunk));
 	vec_push(written, &nullchunk);
 	deque *dq = deque_new(sizeof(obj_model));
@@ -271,7 +463,35 @@ static void bfs_write(som *model, void *obj, FILE *stream)
 }
 
 
+static void *bfs_read(som *model, FILE *stream)
+{
+	mem_chunk nullchunk = {.start=(size_t)NULL, .size=1};
+    vec *read = vec_new(sizeof(mem_chunk));
+	vec_push(read, &nullchunk);
+	hashmap *mem_map = hashmap_new( sizeof(size_t), sizeof(size_t), 
+									ident_hash_size_t, eq_size_t );
+	deque *dq = deque_new(sizeof(obj_model));
+
+	void *dest = (model->type == som_arr) ? &dest : malloc(model->size);
+	obj_model om = {.model = model, .obj = dest};
+	deque_push_back(dq, &om);
+	while (!deque_empty(dq)) {
+		deque_pop_front(dq, &om);
+        read_obj(om.model, om.obj, stream, dq, read, mem_map);
+	}
+    FREE(read, vec);
+    FREE(dq, deque);
+	FREE(mem_map, hashmap);
+	return dest;
+}
+
+
 void serialise(void *obj, som *model, FILE *stream)
 {
     bfs_write(model, obj, stream);
+}
+
+
+void *deserialise(som *model, FILE *stream) {
+	return bfs_read(model, stream);
 }
