@@ -104,7 +104,6 @@ void test_serialise_arr(CuTest *tc)
 		arr[i] = i;
 	}
 	FILE *stream = fopen("serialised_arr.obj", "wb");
-	//som *model = som_cons(som_ptr_new(), 0, som_cons(som_arr_new(), 0, get_som_short()));
 	som *model = som_cons(som_arr_new(), 0, get_som_short());
 	serialise(arr, model, stream);
 	fclose(stream);
