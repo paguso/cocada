@@ -206,4 +206,6 @@ sub_som som_chd(som *self, size_t i);
 
 void serialise(void *obj, som *model, FILE *stream);
 
+void *deserialise(som *model, FILE *stream);
+
 #endif

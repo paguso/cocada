@@ -360,9 +360,8 @@ static void read_blob(void *ptr, size_t size, FILE *stream)
 void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read, hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d", (int)model->type, (int)type);
+	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d\n", (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
-	ERROR_ASSERT((size_t)(*((rawptr *)ptr_addr)) == addr, "Array address error.");
 	size_t size = read_size(stream);
 	mem_chunk chunk = {.start = addr, .size = size};
 	vec_push(read, &chunk);
@@ -372,7 +371,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read, ha
 	while (elt_som->type == som_proxy) {
 		elt_som = elt_som->get_som();
 	}
-	WARN_ASSERT((size % elt_som->size) == 0, "Incompatible array size for the element size.");
+	WARN_ASSERT((size % elt_som->size) == 0, "Incompatible array size for the element size.\n");
 	size_t len = size / elt_size;
 	void *arr = arr_new(elt_size, len);
 	hashmap_set(mem_map, &addr, &arr);
@@ -380,7 +379,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read, ha
 
 	switch (elt_som->type) {
 	case som_arr:
-		ERROR("Unsupported array of array serialisation");
+		ERROR("Unsupported array of array serialisation.\n");
 		break;
 	case som_rawptr:
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
@@ -472,17 +471,20 @@ static void *bfs_read(som *model, FILE *stream)
 									ident_hash_size_t, eq_size_t );
 	deque *dq = deque_new(sizeof(obj_model));
 
-	void *dest = (model->type == som_arr) ? &dest : malloc(model->size);
-	obj_model om = {.model = model, .obj = dest};
+	rawptr *ptr = NEW(rawptr);
+	*ptr = (model->type == som_arr) ? ptr : malloc(model->size);
+	obj_model om = {.model = model, .obj = *ptr};
 	deque_push_back(dq, &om);
 	while (!deque_empty(dq)) {
 		deque_pop_front(dq, &om);
         read_obj(om.model, om.obj, stream, dq, read, mem_map);
 	}
+	rawptr ret = *ptr;
+	FREE(ptr);
     FREE(read, vec);
     FREE(dq, deque);
 	FREE(mem_map, hashmap);
-	return dest;
+	return ret;
 }
 
 
