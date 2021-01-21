@@ -32,72 +32,72 @@
  * @file serialise.h
  * @brief COCADA Serialisation/deserialisation base infrastructure
  * @author Paulo Fonseca
- * 
+ *
  * COCADA provides basic infrastructure for the serialisation/deserialisation
  * of complex in-memory interconnected **data** objects, that is, to
  * (partially) write the **state** of an object to a byte stream, and to
  * rebuild a copy of such an object from its serialised form read from
  * a stream.
- * 
+ *
  * # Basic concepts
- * 
+ *
  * COCADA distinguishes four types of "objects" that can be (de)serialised:
  * 1. Primitive type values: any atomic numeric or character type defined
  * in the coretype.h header
- * 2. Raw pointers: values containing a memory address, that is a value 
- * of the `rawptr` (void *) type. Specialised (typed) pointers can be 
- * serialised/deserialised as raw pointers since they also hold just a 
+ * 2. Raw pointers: values containing a memory address, that is a value
+ * of the `rawptr` (void *) type. Specialised (typed) pointers can be
+ * serialised/deserialised as raw pointers since they also hold just a
  * memory location.
  * 3. Arrays:  A contiguous block of bytes in memory (more below)
  * 4. Structs: Any user-defined struct.
- * 
+ *
  * The serialise()/deserialise() function writes/reads an object, and
- * other objects directly and indirectly referred to by this first object 
- * to/from a binary stream. In order to do so, these functions require an 
+ * other objects directly and indirectly referred to by this first object
+ * to/from a binary stream. In order to do so, these functions require an
  * object model, named **Serialisable Object Model - SOM** which
  * describes the physical structure of the target object network.
- * 
+ *
  * ## The Serialisable Object Model - SOM
- * 
+ *
  * A SOM is a runtime-built object that describes the structure of
- * another object, called the **target object**. COCADA provides 
- * functions to build/obtain SOMs for any of the four types of 
+ * another object, called the **target object**. COCADA provides
+ * functions to build/obtain SOMs for any of the four types of
  * target objects.
- * 
+ *
  * ### Primitive-type SOMs
- * 
+ *
  * A SOM for a primitive type object can be obtained by the
  * corresponding `get_som_TYPE()` function. For example, a SOM for
  * an int value can be obtained by `get_som_int()`. These are
  * usually singleton objects because any primitive value of
- * a given type can be described in the same manner. 
- * 
+ * a given type can be described in the same manner.
+ *
  * ### Pointer SOMs
  * A rawptr SOM can be obtained via a call to som_ptr_new().
  * Serialising a pointer value simply caused the corresponding
  * memory address (the value of the pointer) to be written to
- * disk. Although this is possible, we often are interested in 
- * also saving the pointed memory content. We inform this 
+ * disk. Although this is possible, we often are interested in
+ * also saving the pointed memory content. We inform this
  * situation in the library by composing SOMs with the aid
  * of the som_cons() function.
- * 
+ *
  * #### Example
  * Suppose we have a pointer to an integer and
  * we want to serialise not only the pointer but also the
  * int pointee so that this scenario can be reconstructed
  * later. In this case, we'd use
- * 
+ *
  * ```C
  * som *foo = som_cons(som_ptr_new(), get_som_int());
  * ```
- * 
- * **Remark:** Notice that the SOM to a pointer is not a 
+ *
+ * **Remark:** Notice that the SOM to a pointer is not a
  * singleton, because we can have pointers to different objects
- * and so they must be uniquely described. 
- * 
- * 
+ * and so they must be uniquely described.
+ *
+ *
  * ### Array SOMs
- * 
+ *
  * An array SOM can be built with the som_arr_new() function.
  * This SOM is used to describe an array, i.e., a contiguous
  * memory chunk containing some data. However, we have here
@@ -105,44 +105,48 @@
  * has to know the physical size of the array, **this SOM can
  * only be applied to arrays created with the arr_new functions
  * defined in arrays.h**, which are created in such a way that
- * the physical array size is stored immediately before the 
- * useful part of the array itself. 
- * 
+ * the physical array size is stored immediately before the
+ * useful part of the array itself.
+ *
  * Any array SOM must also contain a unique nested sub-SOM
- * which describes the type of the elements of the array. 
+ * which describes the type of the elements of the array.
  * Notice also that the array SOM describes the array object
  * that is, the region of the memory where the data is stored.
  * A heap-allocated array, such as those created by the
- * arr_new() functions of arrays.h is usually represented 
- * by a pointer which points to the start of the array. 
+ * arr_new() functions of arrays.h is usually represented
+ * by a pointer which points to the start of the array.
  * Thus this situation must be modelled as a pointer SOM
  * containing an array SOM.
- * 
+ *
  * #### Example
  * Suppose we want to (de)serialise an int array. In this case
  * we need
- * 
+ *
  * ```C
  * som *foo = som_cons(som_ptr_new(), som_cons(som_arr_new(), 0, get_som_int()));
  * ```
  *
  * ### Struct SOM
- * 
+ *
  * Structs are used to define the state of complex heterogenous
  * objects. A struct can contain fields of several types, each
  * described by a unique name. Apart from primitive, atomis types,
  * a field can itselt be of an structured type. A struct field can
  * also be a pointer to an external object, in which case we say
  * that it is a '*reference*'. In any case, the struct must have
- * a fixed size which can be returned by the sizeof operator. 
- * 
- * 
+ * a fixed size which can be returned by the sizeof operator.
+ *
+ *
  * ### Self-referential (recursive) objects
- * 
+ *
  * ### Strings
- * 
- * 
- * 
+ *
+ * # LIMITATIONS
+ *
+ * - Array of arrays (OK to have an array of pointers to arrays)
+ * - Pointers to internal locations of structs or arrays
+ *
+ *
  */
 
 
@@ -182,6 +186,15 @@ struct _som {
 	som* get_som_##TYPE();
 
 XX_PRIMITIVES(GET_SOM_DECL)
+
+
+#define STR_SOM_INFO(STRUCT)\
+	static const STRUCT __dummy_##STRUCT;\
+
+
+#define STR_OFFSET(STRUCT, FIELD)\
+	((size_t)(&__dummy_##STRUCT.FIELD) - (size_t)(&(__dummy_##STRUCT)))
+
 
 
 som *som_arr_new();
