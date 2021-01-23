@@ -22,6 +22,7 @@
 #include "CuTest.h"
 
 #include "arrays.h"
+#include "cstrutil.h"
 #include "new.h"
 #include "trait.h"
 #include "serialise.h"
@@ -162,11 +163,12 @@ void test_serialise_struct(CuTest *tc)
 
 typedef struct _node {
 	int val;
+	char *str;
 	int *arr;
 	struct _node *next;
 } node;
 
-som *node_som = NULL;
+static som *node_som = NULL;
 STR_SOM_INFO(node)
 
 som *get_node_som ()
@@ -174,6 +176,8 @@ som *get_node_som ()
 	if (node_som==NULL) {
 		node_som = som_struct_new(sizeof(node), get_node_som);
 		som_cons(node_som, STR_OFFSET(node, val), get_som_int());
+		som_cons(node_som, STR_OFFSET(node, str),
+		         som_cons(som_ptr_new(), 0, get_som_cstr()));
 		som_cons(node_som, STR_OFFSET(node, arr),
 		         som_cons(som_ptr_new(), 0,
 		                  som_cons(som_arr_new(), 0, get_som_int())));
@@ -194,6 +198,8 @@ void test_serialise_list(CuTest *tc)
 	for (int i=1; i<=n; i++) {
 		tail = NEW(node);
 		tail->val = i;
+		tail->str = cstr_new(i);
+		for (int j = 0; j < i; tail->str[j++] = '0'+i);   
 		tail->arr = arr_int_new(i);
 		FILL_ARR(tail->arr, 0, i, i);
 		tail->next = NULL;
@@ -214,6 +220,7 @@ void test_serialise_list(CuTest *tc)
 		cur=cur->next, cur_cpy=cur_cpy->next ) 
 	{
 		CuAssertIntEquals(tc, cur->val, cur_cpy->val);
+		CuAssertStrEquals(tc, cur->str, cur_cpy->str);
 		CuAssertSizeTEquals(tc, arr_int_len(cur->arr), arr_int_len(cur_cpy->arr));
 		for (size_t i = 0; i < arr_int_len(cur->arr); i++) {
 			CuAssertIntEquals(tc, cur->arr[i], cur_cpy->arr[i]);

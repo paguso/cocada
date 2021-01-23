@@ -21,8 +21,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "arrays.h"
+#include "cstrutil.h"
 #include "errlog.h"
 #include "hash.h"
 #include "hashmap.h"
@@ -57,7 +59,7 @@ static som *_som_new(som_t type, size_t size, get_som_func get_som)
 	}
 
 XX_PRIMITIVES(GET_SOM_IMPL)
-
+GET_SOM_IMPL(cstr)
 
 
 
@@ -65,7 +67,6 @@ som *som_arr_new()
 {
 	return _som_new(som_arr, 0, NULL);
 }
-
 
 som *som_ptr_new()
 {
@@ -199,11 +200,12 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
                       hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d",
+	WARN_ASSERT(model->type == type, "Type mismatch. Expected SOM type %d; found %d.\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
-	WARN_ASSERT(model->size == size, "Wrong size. Expected %zu, found %zu",
+	WARN_ASSERT(model->size == size, "Primitive type size mismatch." 
+			    "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
 	            model->size, size);
 	fread(dest, model->size, 1, stream);
 	mem_chunk chunk = {.start = addr, .size=model->size};
@@ -242,7 +244,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
 	}
 	size_t off = (size_t)addr - (size_t)base;
 	ERROR_ASSERT(hashmap_has_key(mem_map, &base),
-	             "Cannot map already read address %p.", base);
+	             "Cannot map already read address %p.\n", base);
 	base = hashmap_get_rawptr(mem_map, &base);
 	return base + off;
 }
@@ -253,11 +255,12 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 {
 	rawptr *dest = (rawptr *)ptr;
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d",
+	WARN_ASSERT(model->type == type, "Pointer type mismatch. Expected SOM type %d; found %d.\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
-	WARN_ASSERT(model->size == size, "Wrong size. Expected %zu, found %zu",
+	WARN_ASSERT(model->size == size, "Pointer type size mismatch." 
+			    "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
 	            model->size, size);
 	fread(dest, size, 1, stream);
 	mem_chunk chunk = {.start = addr, .size = size};
@@ -273,7 +276,7 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 			pointee_model = pointee_model->get_som();
 		}
 		void *new_obj = NULL;
-		if (pointee_model->type == som_arr) {
+		if (pointee_model->type == som_arr || pointee_model->type == som_cstr) {
 			new_obj = ptr;
 		}
 		else {
@@ -306,7 +309,7 @@ void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read,
 {
 	size_t type = read_type(stream);
 	WARN_ASSERT(model->type == type,
-	            "Struct type mismatch. Expected %d, found %d.\n",
+	            "Struct type mismatch. Expected SOM type %d, found %d.\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
@@ -343,7 +346,10 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 	size_t elt_size = elt_som->size;
 	switch (elt_som->type) {
 	case som_arr:
-		ERROR("Unsupported array of array serialisation\n");
+		ERROR("Unsupported array of array serialisation. See module documentation.\n");
+		break;
+	case som_cstr:
+		ERROR("Unsupported array of string serialisation. See module documentation.\n");
 		break;
 	case som_rawptr:
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
@@ -362,6 +368,18 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 }
 
 
+void write_string(som *model, void *arr, FILE *stream, deque *dq, vec *written)
+{
+	write_type(model->type, stream);
+	write_addr(arr, stream);
+	size_t size = strlen(arr) + 1;
+	write_size(size, stream);
+	mem_chunk chunk = {.start = (size_t) arr, .size = size};
+	vec_push(written, &chunk);
+	write_blob(arr, size, stream);
+}
+
+
 static void read_blob(void *ptr, size_t size, FILE *stream)
 {
 	fread(ptr, size, 1, stream);
@@ -375,7 +393,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
               hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Wrong type. Expected %d, found %d\n",
+	WARN_ASSERT(model->type == type, "Array type mismatch. Expected SOM type %d; found %d\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
@@ -396,7 +414,10 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 
 	switch (elt_som->type) {
 	case som_arr:
-		ERROR("Unsupported array of array serialisation.\n");
+		ERROR("Unsupported array of array serialisation. See module documentation.\n");
+		break;
+	case som_cstr:
+		ERROR("Unsupported array of cstr serialisation. See module documentation.\n");
 		break;
 	case som_rawptr:
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
@@ -415,6 +436,25 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 }
 
 
+void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
+              hashmap *mem_map)
+{
+	size_t type = read_type(stream);
+	WARN_ASSERT(model->type == type, "String type mismatch. Expected SOM type %d; found %d\n",
+	            (int)model->type, (int)type);
+	size_t addr = read_addr(stream);
+	size_t size = read_size(stream);
+	mem_chunk chunk = {.start = addr, .size = size};
+	vec_push(read, &chunk);
+
+	void *str = cstr_new(size-1);
+	hashmap_set(mem_map, &addr, &str);
+	*((rawptr *)ptr_addr) = str;
+	read_blob(str, size, stream);
+}
+
+
+
 static void write_obj(som *model, void *obj, FILE *stream, deque *dq,
                       vec *written, bool check_if_written)
 {
@@ -430,6 +470,9 @@ static void write_obj(som *model, void *obj, FILE *stream, deque *dq,
 		break;
 	case som_arr:
 		write_arr(model, obj, stream, dq, written);
+		break;
+	case som_cstr:
+		write_string(model, obj, stream, dq, written);
 		break;
 	case som_struct:
 		write_struct(model, obj, stream, dq, written);
@@ -453,6 +496,9 @@ static void read_obj(som *model, void *dest, FILE *stream, deque *dq, vec *read,
 		break;
 	case som_arr:
 		read_arr(model, dest, stream, dq, read, mem_map);
+		break;
+	case som_cstr:
+		read_string(model, dest, stream, dq, read, mem_map);
 		break;
 	case som_struct:
 		read_struct(model, dest, stream, dq, read, mem_map);
