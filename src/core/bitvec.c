@@ -72,7 +72,7 @@ bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 }
 
 
-void bitvec_dtor(void *ptr, const dtor *dt)
+void bitvec_destroy(void *ptr, const dtor *dt)
 {
 	FREE(((bitvec *)ptr)->bits);
 }

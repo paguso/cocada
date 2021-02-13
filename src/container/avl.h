@@ -43,7 +43,7 @@
  *
  * 1. avl_new() creates a new AVL tree for indirect storage of objects of
  * given size
- * 2. avl_dtor() object destructor (see new.h)
+ * 2. avl_destroy() object destructor (see new.h)
  * 2. avl_get() searches for a node matching a given key
  * 3. avl_ins() inserts an **owned copy** of a given object
  * 4. avl_del() removes the **owned copy** of an object
@@ -167,7 +167,7 @@ avl *avl_new(cmp_func cmp);
  * @brief Destructor
  * @see new.h
  */
-void avl_dtor(void *ptr, const dtor *dt);
+void avl_destroy(void *ptr, const dtor *dt);
 
 
 /**

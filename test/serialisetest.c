@@ -29,9 +29,6 @@
 
 
 
-
-
-
 void test_serialise_prim(CuTest *tc)
 {
 	int *i = NEW(int);
@@ -43,6 +40,7 @@ void test_serialise_prim(CuTest *tc)
 	stream = fopen("serialised_int.obj", "rb");
 	int *j = (int *)deserialise(get_som_int(), stream);
 	fclose(stream);
+	remove("serialised_int.obj");
 
 	CuAssertIntEquals(tc, *i, *j);
 	FREE(i);
@@ -53,7 +51,7 @@ void test_serialise_prim(CuTest *tc)
 void test_serialise_arr(CuTest *tc)
 {
 	int n = 10;
-	short *arr = arr_short_new(10);
+	short *arr = arr_short_calloc(10);
 	for (int i=0; i < n; i++) {
 		arr[i] = i;
 	}
@@ -65,6 +63,7 @@ void test_serialise_arr(CuTest *tc)
 	stream = fopen("serialised_arr.obj", "rb");
 	short *arr_cpy = (short *)deserialise(model, stream);
 	fclose(stream);
+	remove("serialised_arr.obj");
 
 	CuAssertSizeTEquals(tc, arr_short_len(arr), arr_short_len(arr_cpy));
 	for (size_t i=0; i<arr_short_len(arr); i++) {
@@ -80,7 +79,6 @@ typedef struct {
 	bool b;
 } test_sub_struct;
 
-STR_SOM_INFO(test_sub_struct)
 
 static som *test_sub_struct_som;
 
@@ -108,7 +106,6 @@ typedef struct {
 	float f;
 } test_struct;
 
-STR_SOM_INFO(test_struct)
 
 static som *test_struct_som;
 
@@ -150,6 +147,7 @@ void test_serialise_struct(CuTest *tc)
 	test_struct *str_cpy = (test_struct *)deserialise(get_test_struct_som(),
 	                       stream);
 	fclose(stream);
+	remove("serialised_str.obj");
 
 	CuAssertIntEquals(tc, str.i, str_cpy->i);
 	CuAssertDblEquals(tc, str.f, str_cpy->f, 0);
@@ -169,7 +167,6 @@ typedef struct _node {
 } node;
 
 static som *node_som = NULL;
-STR_SOM_INFO(node)
 
 som *get_node_som ()
 {
@@ -200,7 +197,7 @@ void test_serialise_list(CuTest *tc)
 		tail->val = i;
 		tail->str = cstr_new(i);
 		for (int j = 0; j < i; tail->str[j++] = '0'+i);   
-		tail->arr = arr_int_new(i);
+		tail->arr = arr_int_calloc(i);
 		FILL_ARR(tail->arr, 0, i, i);
 		tail->next = NULL;
 		(*cur) = tail;
@@ -215,6 +212,7 @@ void test_serialise_list(CuTest *tc)
 	stream = fopen("serialised_node.out", "rb");
 	node *head_cpy = deserialise(model, stream);
 	fclose(stream);
+	remove("serialised_node.out");
 
 	for ( node *cur = head, *cur_cpy = head_cpy; cur != NULL && cur_cpy; 
 		cur=cur->next, cur_cpy=cur_cpy->next ) 

@@ -24,27 +24,30 @@
 #include "arrays.h"
 #include "errlog.h"
 
-void *arr_new (size_t typesize, size_t len)
+void *arr_calloc (size_t nmemb, size_t memb_size)
 {
-	size_t size = len * typesize;
+	size_t size = nmemb * memb_size;
 	void *ret = malloc(size + sizeof(size_t));
 	*((size_t *)ret) = size;
 	return ret + sizeof(size_t);
 }
 
 
-void *arr_realloc(void *arr, size_t size)
+void *arr_realloc(void *arr, size_t nmemb, size_t memb_size)
 {
+	size_t size = nmemb * memb_size;
 	arr -= sizeof(size_t);
 	arr = realloc(arr, size + sizeof(size_t));
 	*((size_t *)arr) = size;
 	return arr + sizeof(size_t);
 }
 
-size_t arr_size(void *arr)
+
+size_t arr_sizeof(void *arr)
 {
 	return *((size_t *)(arr - sizeof(size_t)));
 }
+
 
 void arr_free(void *arr)
 {
@@ -53,17 +56,17 @@ void arr_free(void *arr)
 
 
 #define ARR_NEW_IMPL(TYPE, ...)\
-	TYPE *arr_##TYPE##_new(size_t len)\
+	TYPE *arr_##TYPE##_calloc(size_t nmemb)\
 	{\
-		return (TYPE *)arr_new(sizeof(TYPE), len);\
+		return (TYPE *)arr_calloc(nmemb, sizeof(TYPE));\
 	}
 XX_CORETYPES(ARR_NEW_IMPL)
 
 
 #define ARR_REALLOC_IMPL(TYPE, ...)\
-	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t len)\
+	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
 	{\
-		return arr_realloc(arr, sizeof(TYPE) * len);\
+		return arr_realloc(arr, nmemb, sizeof(TYPE));\
 	}
 XX_CORETYPES(ARR_REALLOC_IMPL)
 
@@ -71,8 +74,8 @@ XX_CORETYPES(ARR_REALLOC_IMPL)
 #define ARR_LEN_IMPL(TYPE, ...)\
 	size_t arr_##TYPE##_len(TYPE *arr)\
 	{\
-		WARN_IF(arr_size(arr) % sizeof(TYPE),\
+		WARN_IF(arr_sizeof(arr) % sizeof(TYPE),\
 		        "Physical array size is not a multiple of TYPE size");\
-		return arr_size(arr) / sizeof(TYPE);\
+		return arr_sizeof(arr) / sizeof(TYPE);\
 	}
 XX_CORETYPES(ARR_LEN_IMPL)

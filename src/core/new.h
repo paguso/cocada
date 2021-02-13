@@ -243,10 +243,10 @@
  * dealing with the proper disposal of  complex hierarchies of objects.
  *
  * The basic concept is that of a **destructor** ::dtor which encapsulates and
- * provides a way of nesting **destructor functions** ::dtor_func used for
+ * provides a way of nesting **destructor functions** ::destroy_func used for
  * finalising object hierarchies. A destructor is a  *closure* object
  * composed of
- * - A reference to a *destructor function* ::dtor_func; and
+ * - A reference to a *destructor function* ::destroy_func; and
  * - An array of child destructors.
  *
  * A *destructor function* is a function used to dispose of the  memory used by an
@@ -284,7 +284,7 @@
  * ```
  *
  * will be made for each child `b` of type `B` held by the `C`-type container.
- * Likewise the `B`-type destructor function, `B_dtor(void *ptr, dstr *b_dt)`,
+ * Likewise the `B`-type destructor function, `B_destroy(void *ptr, dstr *b_dt)`,
  * will check whether `b_dt` contains references to a destructor for type
  * `A`-objects. After all `A`-objects of a type-`B` container are properly
  * disposed of, then its buffer can be deallocated.  Similarly, after all
@@ -415,7 +415,7 @@
  * references are fixed and known at compile time. The destructor functions of these
  * objects  actually don't need to look at the runtime-built destructors to know which
  * components to destroy. In such case, we can still define a standard destructor of
- * type ::dtor_func function which ignores the `dt` argument, but this is inefficient
+ * type ::destroy_func function which ignores the `dt` argument, but this is inefficient
  * and misleading. For such objects we define a simple destructor
  *
  * ```
@@ -492,14 +492,14 @@ typedef struct _dtor dtor;
 /**
  * Destructor function type
  */
-typedef void (*dtor_func) (void *, const dtor *);
+typedef void (*destroy_func) (void *, const dtor *);
 
 
 /**
  * Destructor object
  */
 struct _dtor {
-	dtor_func df;
+	destroy_func df;
 	size_t nchd;
 	struct _dtor **chd;
 };
@@ -508,7 +508,7 @@ struct _dtor {
 /**
  * @brief Creates a new destructor with destructof function.
  */
-dtor *dtor_new_with_func(dtor_func df);
+dtor *dtor_new_with_func(destroy_func df);
 
 
 /**
@@ -553,7 +553,7 @@ dtor *ptr_dtor();
 /**
  * Returns a default destructor for a given type with no nested destructor.
  */
-#define DTOR( TYPE ) dtor_new_with_func(TYPE##_dtor)
+#define DTOR( TYPE ) dtor_new_with_func(TYPE##_destroy)
 
 
 /**

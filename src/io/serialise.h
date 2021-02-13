@@ -47,7 +47,7 @@
  * of the `rawptr` type. Specialised (typed) pointers can be
  * serialised/deserialised as raw pointers since they also hold just a
  * memory address.
- * 3. Arrays:  A contiguous block of bytes in memory (more below)
+ * 3. Arrays:  A contiguous block of values.
  * 4. Strings:  A null-terminated '\0' char string. 
  * 5. Structs: Any user-defined struct.
  *
@@ -92,7 +92,7 @@
  * som *foo = som_cons(som_ptr_new(), 0, get_som_int());
  * ```
  *
- * **Remark:** Notice that the SOM to a pointer is not a
+ * **Remark:** Notice that the pointer SOM is not a
  * singleton, because we can have pointers to different objects
  * and so they must be uniquely described.
  *
@@ -104,7 +104,7 @@
  * memory chunk containing some data. However, we have here
  * an important limitation. Because the underlying mechanism
  * has to know the physical size of the array, **this SOM can
- * only be applied to arrays created with the arr_new functions
+ * only be applied to arrays created with the arr_calloc functions
  * defined in arrays.h**, which are created in such a way that
  * the physical array size is stored immediately before the
  * useful part of the array itself.
@@ -114,7 +114,7 @@
  * Notice also that the array SOM describes the array object
  * that is, the region of the memory where the data is stored.
  * A heap-allocated array, such as those created by the
- * arr_new() functions of arrays.h is usually represented
+ * arr_calloc() functions of arrays.h is usually represented
  * by a pointer which points to the start of the array.
  * Thus this situation must be modelled as a pointer SOM
  * containing an array SOM.
@@ -165,13 +165,10 @@
  * 		float radius;
  * } circle;
  * 
- * // (2) Creates a dummy circle object to be used with STR_OFFSET
- * STR_SOM_INFO(circle)
- * 
- * // (3) Struct SOM singleton. Should not be accessed directly
+ * // (2) Struct SOM singleton. Should not be accessed directly
  * static som *circle_som = NULL;
  * 
- * // (4) Returns the singleton struct SOM 
+ * // (3) Returns the singleton struct SOM 
  * som *get_circle_som() {
  * 		if (circle_som == NULL) {
  * 			circle_som = som_struct_new(sizeof(circle), get_circle_som);
@@ -318,7 +315,11 @@ typedef enum {
 } som_t;
 
 
+typedef struct _sub_som sub_som;
 
+/** 
+ * SOM object type
+ */
 typedef struct _som som;
 
 /**
@@ -326,20 +327,6 @@ typedef struct _som som;
  */
 typedef som *(*get_som_func) ();
 
-
-typedef struct _sub_som {
-	size_t off;
-	som *chd;
-} sub_som;
-
-
-struct _som {
-	som_t  type;
-	get_som_func get_som;
-	size_t size;
-	size_t nchd;
-	sub_som *chd;
-};
 
 
 #define GET_SOM_DECL(TYPE, ...) \
@@ -349,12 +336,8 @@ XX_PRIMITIVES(GET_SOM_DECL)
 GET_SOM_DECL(cstr)
 
 
-#define STR_SOM_INFO(STRUCT)\
-	static const STRUCT __dummy_##STRUCT;\
 
-
-#define STR_OFFSET(STRUCT, FIELD)\
-	((size_t)(&__dummy_##STRUCT.FIELD) - (size_t)(&(__dummy_##STRUCT)))
+#define STR_OFFSET(STRUCT, FIELD)	((size_t)(&(((STRUCT *)NULL)->FIELD))) 
 
 
 /**

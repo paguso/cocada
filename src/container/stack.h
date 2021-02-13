@@ -52,7 +52,7 @@ stack *stack_new(size_t typesize);
 /**
  * @brief Destructor.
  */
-void stack_dtor(void *ptr, const dtor *dt);
+void stack_destroy(void *ptr, const dtor *dt);
 
 
 /**

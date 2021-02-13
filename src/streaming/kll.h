@@ -259,7 +259,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
  * If this summary is going to store
  * @see new.h
  */
-void kll_dtor(void *ptr, const dtor *dt);
+void kll_destroy(void *ptr, const dtor *dt);
 
 
 /**

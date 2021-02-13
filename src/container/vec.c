@@ -128,7 +128,7 @@ static void _check_and_resize(vec *v)
 }
 
 
-void vec_dtor(void *ptr, const dtor *dt )
+void vec_destroy(void *ptr, const dtor *dt )
 {
 	vec *v = (vec *)ptr;
 	if (dtor_nchd(dt)) {
@@ -263,9 +263,10 @@ void vec_push_n(vec *v, const void *src, size_t n)
 void vec_ins(vec *v, size_t pos, const void *src)
 {
 	_check_and_resize(v);
-	memmove( v->data+((pos+1)*v->typesize), v->data+(pos*v->typesize),
-	         (v->len-pos)*v->typesize );
-	memcpy( v->data+(pos*v->typesize), src, v->typesize);
+	pos = MIN(pos, v->len);
+	memmove( v->data + ((pos + 1) * v->typesize), v->data + (pos * v->typesize),
+	         (v->len - pos) * v->typesize );
+	memcpy(v->data + (pos * v->typesize), src, v->typesize);
 	v->len++;
 }
 
@@ -325,7 +326,7 @@ size_t vec_find(vec *v, void *val, eq_func eq)
 }
 
 
-// returns the first position i s.t. v[i]>=val if any; else vec_len(v)
+// returns the first position i s.t. val <= v[i] if any; else vec_len(v)
 static size_t _first_geq_bsearch(vec *v, void *val, cmp_func cmp)
 {
 	if (vec_len(v) == 0 ) {

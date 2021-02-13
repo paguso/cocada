@@ -74,7 +74,7 @@ xstrhash *xstrhash_new(alphabet *ab)
 }
 
 
-void xstrhash_dtor(void *ptr, const dtor *dt)
+void xstrhash_destroy(void *ptr, const dtor *dt)
 {
 	xstrhash *self = (xstrhash *)ptr;
 	FREE(self->ab, alphabet);

@@ -34,9 +34,9 @@ stack *stack_new(size_t typesize)
 }
 
 
-void stack_dtor(void *ptr, const dtor *dt)
+void stack_destroy(void *ptr, const dtor *dt)
 {
-	vec_dtor(ptr, dt);
+	vec_destroy(ptr, dt);
 }
 
 

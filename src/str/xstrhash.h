@@ -37,7 +37,7 @@ typedef struct _xstrhash xstrhash;
  */
 xstrhash *xstrhash_new(alphabet *ab);
 
-void xstrhash_dtor(void *ptr, const dtor *dt);
+void xstrhash_destroy(void *ptr, const dtor *dt);
 
 uint64_t xstrhash_lex(const xstrhash *self, const xstr *s);
 

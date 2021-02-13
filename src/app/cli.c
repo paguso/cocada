@@ -221,7 +221,7 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 }
 
 
-static bool _isletter(char c)
+static  bool _isletter(char c)
 {
 	return (('A'<=c && c<='Z' ) || ('a'<=c && c<='z' ));
 }
@@ -358,7 +358,7 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
 }
 
 
-void cliopt_dtor(void *ptr, const dtor *dt)
+void cliopt_destroy(void *ptr, const dtor *dt)
 {
 	cliopt *opt = (cliopt *)ptr;
 	FREE(opt->longname);
@@ -415,7 +415,7 @@ cliarg *cliarg_new_choice_multi(char *name, char *help, vec *choices)
 }
 
 
-void cliarg_dtor(void *ptr, const dtor *dt)
+void cliarg_destroy(void *ptr, const dtor *dt)
 {
 	cliarg *arg = (cliarg *)ptr;
 	FREE(arg->name);
@@ -456,7 +456,7 @@ cliparse *cliparse_new(char *name, char *help)
 }
 
 
-void cliparse_dtor(void *ptr, const dtor *dt)
+void cliparse_destroy(void *ptr, const dtor *dt)
 {
 	cliparse *clip = (cliparse *)ptr;
 	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()),

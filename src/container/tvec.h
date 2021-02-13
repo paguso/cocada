@@ -58,7 +58,7 @@
 	\
 	void tvec_##TYPE##_fit(tvec_##TYPE *v);                                        \
 	\
-	void tvec_##TYPE##_dtor(void *ptr, const dtor *dt );                           \
+	void tvec_##TYPE##_destroy(void *ptr, const dtor *dt );                           \
 	\
 	size_t tvec_##TYPE##_len(const tvec_##TYPE *v);                                \
 	\
@@ -227,7 +227,7 @@ XX_CORETYPES(TVEC_DECL)
 	}                                                                              \
 	\
 	\
-	void tvec_##TYPE##_dtor(void *ptr, const dtor *dt )                            \
+	void tvec_##TYPE##_destroy(void *ptr, const dtor *dt )                            \
 	{                                                                              \
 		tvec_##TYPE *v = (tvec_##TYPE *)ptr;                                       \
 		if (dtor_nchd(dt)) {                                                       \

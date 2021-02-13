@@ -45,10 +45,10 @@ binheap *binheap_new( cmp_func cmp,
 }
 
 
-void binheap_dtor(void *ptr, const dtor *dt)
+void binheap_destroy(void *ptr, const dtor *dt)
 {
 	binheap *heap = (binheap *)ptr;
-	vec_dtor(heap->data, dt);
+	vec_destroy(heap->data, dt);
 	FREE(heap->data);
 }
 

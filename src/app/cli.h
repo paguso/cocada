@@ -381,7 +381,7 @@ cliparse *cliparse_new(char *name, char *help);
  * Use with default destructor `DTOR(cliparse)`, or
  * simply `FREE(obj, cliparse)`.
  */
-void cliparse_dtor(void *ptr, const dtor *dt);
+void cliparse_destroy(void *ptr, const dtor *dt);
 
 
 /**

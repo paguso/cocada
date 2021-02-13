@@ -51,7 +51,7 @@ hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc );
 /**
  * @brief Destructor
  */
-void hashset_dtor(void *ptr, const dtor *dt);
+void hashset_destroy(void *ptr, const dtor *dt);
 
 
 /**
@@ -113,7 +113,7 @@ hashset_iter *hashset_get_iter(hashset *set);
  * @brief Finaliser.
  * Takes NO destructor
  */
-void hashset_iter_dtor(void *ptr, const dtor *dt);
+void hashset_iter_destroy(void *ptr, const dtor *dt);
 
 
 DECL_TRAIT(hashset_iter, iter);

@@ -42,7 +42,7 @@ fastaidx *fastaidx_new(const char *src_path)
 }
 
 
-void fastaidx_dtor(void *ptr, const dtor *dt)
+void fastaidx_destroy(void *ptr, const dtor *dt)
 {
 	fastaidx *self = (fastaidx *)ptr;
 	FREE(self->path);

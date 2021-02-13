@@ -105,7 +105,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
 }
 
 
-void kll_dtor(void *ptr, const dtor *dt)
+void kll_destroy(void *ptr, const dtor *dt)
 {
 	kllsumm *self = (kllsumm *)ptr;
 	FREE(self->coins, vec);

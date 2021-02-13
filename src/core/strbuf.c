@@ -67,7 +67,7 @@ strbuf *strbuf_new_from_str(const char *src)
 }
 
 
-void strbuf_dtor(void *ptr, const dtor *dt)
+void strbuf_destroy(void *ptr, const dtor *dt)
 {
 	FREE(((strbuf *)ptr)->str);
 }

@@ -62,7 +62,7 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity)
 }
 
 
-void deque_dtor(void *ptr, const dtor *dt)
+void deque_destroy(void *ptr, const dtor *dt)
 {
 	deque *dq = (deque *)ptr;
 	if (dtor_nchd(dt)) {

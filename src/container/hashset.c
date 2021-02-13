@@ -35,10 +35,10 @@ hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
 }
 
 
-void hashset_dtor(void *ptr, const dtor *dt)
+void hashset_destroy(void *ptr, const dtor *dt)
 {
 
-	hashmap_dtor(ptr, dt);
+	hashmap_destroy(ptr, dt);
 }
 
 
@@ -129,7 +129,7 @@ hashset_iter *hashset_get_iter(hashset *set)
 }
 
 
-void hashset_iter_dtor(void *ptr, const dtor *dt)
+void hashset_iter_destroy(void *ptr, const dtor *dt)
 {
 	FREE(((hashset_iter *)ptr)->inner);
 }

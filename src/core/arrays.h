@@ -35,22 +35,27 @@
  */
 
 
-void *arr_new(size_t typesize, size_t len);
+void *arr_calloc(size_t nmemb, size_t memb_size);
 
-void *arr_realloc(void *arr, size_t size);
 
-size_t arr_size(void *arr);
+void *arr_realloc(void *arr, size_t nmemb, size_t memb_size);
+
+
+size_t arr_sizeof(void *arr);
+
 
 void arr_free(void *arr);
 
 
 #define ARR_NEW_DECL(TYPE, ...)\
-	TYPE *arr_##TYPE##_new(size_t len);
+	TYPE *arr_##TYPE##_calloc(size_t nmemb);
 XX_CORETYPES(ARR_NEW_DECL)
 
+
 #define ARR_REALLOC_DECL(TYPE, ...)\
-	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t len);
+	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t nmemb);
 XX_CORETYPES(ARR_REALLOC_DECL)
+
 
 #define ARR_LEN_DECL(TYPE, ...)\
 	size_t arr_##TYPE##_len(TYPE *arr);

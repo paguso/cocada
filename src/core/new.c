@@ -25,7 +25,7 @@
 #include "new.h"
 
 
-dtor *dtor_new_with_func( dtor_func df )
+dtor *dtor_new_with_func( destroy_func df )
 {
 	dtor *dt = NEW(dtor);
 	dt->df = df;
@@ -64,7 +64,7 @@ dtor *dtor_cons(dtor *par, const dtor *chd)
 }
 
 
-static void _empty_dtor(void *ptr, const dtor *dt )
+static void _empty_destroy(void *ptr, const dtor *dt )
 {
 }
 
@@ -72,14 +72,14 @@ static void _empty_dtor(void *ptr, const dtor *dt )
 dtor *empty_dtor()
 {
 	dtor *ret = NEW(dtor);
-	ret->df = _empty_dtor;
+	ret->df = _empty_destroy;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;
 }
 
 
-static void _ptr_dtor(void *ptr, const dtor *dt )
+static void _ptr_destroy(void *ptr, const dtor *dt )
 {
 	void *pointee = *((void **)ptr);
 	if ( dtor_nchd(dt) > 0 )
@@ -92,7 +92,7 @@ static void _ptr_dtor(void *ptr, const dtor *dt )
 dtor *ptr_dtor()
 {
 	dtor *ret = NEW(dtor);
-	ret->df = _ptr_dtor;
+	ret->df = _ptr_destroy;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;

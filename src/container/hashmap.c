@@ -106,7 +106,7 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
 }
 
 
-void hashmap_dtor(void *ptr, const dtor *dst)
+void hashmap_destroy(void *ptr, const dtor *dst)
 {
 	hashmap *hmap = (hashmap *)ptr;
 	if (dst != NULL) {

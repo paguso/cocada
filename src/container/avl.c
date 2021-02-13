@@ -80,7 +80,7 @@ static void __avl_dtor(avlnode *root, const dtor *dt)
 }
 
 
-void avl_dtor(void *ptr, const dtor *dt)
+void avl_destroy(void *ptr, const dtor *dt)
 {
 	avl *self = (avl *)ptr;
 	if (dt->nchd > 0) {
