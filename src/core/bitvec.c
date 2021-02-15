@@ -28,6 +28,7 @@
 #include "bitarr.h"
 #include "bitbyte.h"
 #include "bitvec.h"
+#include "cstrutil.h"
 #include "new.h"
 #include "mathutil.h"
 
@@ -72,7 +73,7 @@ bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 }
 
 
-void bitvec_destroy(void *ptr, const dtor *dt)
+void bitvec_finalise(void *ptr, const finaliser *fnr)
 {
 	FREE(((bitvec *)ptr)->bits);
 }

@@ -35,10 +35,9 @@ hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
 }
 
 
-void hashset_destroy(void *ptr, const dtor *dt)
+void hashset_finalise(void *ptr, const finaliser *fnr)
 {
-
-	hashmap_destroy(ptr, dt);
+	hashmap_finalise(ptr, fnr);
 }
 
 
@@ -129,7 +128,7 @@ hashset_iter *hashset_get_iter(hashset *set)
 }
 
 
-void hashset_iter_destroy(void *ptr, const dtor *dt)
+void hashset_iter_finalise(void *ptr, const finaliser *fnr)
 {
 	FREE(((hashset_iter *)ptr)->inner);
 }

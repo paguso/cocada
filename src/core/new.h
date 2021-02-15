@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include "coretype.h"
+#include "memdbg.h"
 
 /**
  * @file new.h
@@ -81,15 +82,16 @@
  * type_init(&obj);
  * ```
  *
- * Object destruction can be a lot trickier though, because an object may contain or
- * refer to other objects. The crucial question is whether to destroy
- * '*child* ' objects as part of the '*parent* ' object destruction. Two
+ * Object destruction, on the other hand, can be a lot trickier, because an object may 
+ * contain or refer to other objects. The crucial question is whether to destroy
+ * a '*child* ' objecs as part of the '*parent* ' object destruction. Two
  * main problems may arise.
  * - If a child object is not destroyed and no furhter references to it exist after
  * the parent object is destroyed, we have a *memory leak*.
  * - If a child object is destroyed and another reference to it exists outside the
  * parent object (shared reference), we have a *dangling reference*. In particular,
- * any subsequent attempt to destroy that same object will lead to '*double free*' problems.
+ * any subsequent attempt to destroy that same object will lead to '*double free*' 
+ * problems.
  *
  * So basically, we have to ensure that
  *
@@ -97,9 +99,9 @@
  * 2. Every object is destroyed at most once.
  *
  * This is a complex problem in general. Some languages offer automatic memory
- * management systems (garbage collection) whereas others, notably Rust,
- * enforce strict *ownership* rules. Ownership is the principle whereby every
- * object has at most one owner, and destroying the owner automatically triggers the
+ * management systems (garbage collection) whereas others, enforce 
+ * strict *ownership* rules. Ownership is the principle whereby every object has
+ * at  most one owner, and destroying the owner automatically triggers the
  * destruction of its owned components. Shared references integrity is maintained
  * via borrow and lifetime management mechanisms.
  *
@@ -107,8 +109,9 @@
  * maintain a simpler object dependency structure, trying to make clear
  * <b>in the documentation</b> when the ownership of an object is transferred to
  * another. Likewise, the documentation of the destructors (see below) should
- * indicate which child objects should be destroyed.
- *
+ * indicate which child objects should be destroyed. **As a rule of thumb, a 
+ * child object should be destroyed upon the destruction of its parent
+ * object if, and only if, it is owned".
  *
  * # Object composition
  *
@@ -222,17 +225,17 @@
  * Although a reference container conceptually stores external objects,
  * they are nothing but flat containers of pointers. So there is only one
  * implementation for both cases.
- * In whichever case, the buffer memory is normally allocated and initialised
+ * In both IV-V cases, the buffer memory is normally allocated and initialised
  * during the (container) object initialisation (Step 2).
  * This is important for understanding the discussion on object destruction below.
  *
  *
- * # Object destructor infrastructure
+ * # Object destruction infrastructure
  *
  * As mentioned above, destroying an object requires, first, `finalising´ it
  * (Step 4), that is cleaning its internal state and releasing the resources
- * (memory) held by the object in reverse order of allocation,
- * and then freeing the memory used by the struct (Step 5).
+ * (memory, file handlers, network connexions, etc) held by the object in reverse 
+ * order of allocation, and then freeing the memory used by the struct (Step 5).
  * In particular, finalising a flat container amounts to freeing the memory used by
  * its buffer plus some constant-sized housekeeping memory. For example,
  * the buffer of a flat vector with capacity for 100 4-byte integers will occupy
@@ -242,21 +245,21 @@
  * hierarchies of nested objects. COCADA provides some infrastructure for
  * dealing with the proper disposal of  complex hierarchies of objects.
  *
- * The basic concept is that of a **destructor** ::dtor which encapsulates and
- * provides a way of nesting **destructor functions** ::destroy_func used for
- * finalising object hierarchies. A destructor is a  *closure* object
+ * The basic concept is that of a **finaliser** ::finaliser which encapsulates and
+ * provides a way of nesting **finalise functions** ::finalise_func used for
+ * finalising object hierarchies. A finaliser is a  *closure* object
  * composed of
- * - A reference to a *destructor function* ::destroy_func; and
- * - An array of child destructors.
+ * - A reference to a *finalise function* ::finalise_func; and
+ * - An array of child finalisers.
  *
- * A *destructor function* is a function used to dispose of the  memory used by an
+ * A *finalise function* is a function used to dispose of the memory used by an
  * object, which would become otherwise unreachable after the object destruction
  * (memory leak). It receives a pointer to the object to be finalised
- * and a destructor object mirroring its composition.  The destructor function of
- * a `type` is named `type_dtor` (example ::vec_dtor).
+ * and a finaliser object mirroring its composition.  The finalise function of
+ * a `type` is named `type_finalise` (example ::vec_finalise).
  *
- * The implementation of a destructor function of a parent type uses the
- * provided destructor to call the destructor functions of the child (referenced)
+ * The implementation of a finalise function of a parent type uses the
+ * provided finaliser to call the finalise functions of the child (referenced)
  * objects, if any. For example, consider a generic container of type `C`
  * which contains objects of type `B` which are themselves containers of
  * objects of type `A`.
@@ -268,45 +271,36 @@
  * ```
  * For now let us suppose these are flat containers (we´ll come back to that later).
  *
- * The destruction of C would go roughly as follows.  First, the destructor function
+ * The finalisation of C would go roughly as follows.  First, the finalise function
  *
  * ```C
- * void C_dtor( void *ptr, dstr *c_dt )
+ * void C_finalise( void *ptr, finaliser *c_fr )
  * ```
  *
- * checks the destructor `c_dt` to see if contains a reference to a
- * destructor for its child objects, in this case of type `B`. Let us suppose
- * this is the case, that is `b_dt = c_dt->chd[0]` is a destructor for
- * `B` objects.  Then a call to the corresponding destructor function
+ * checks the finaliser `c_fr` to see if contains a reference to a
+ * finaliser for its child objects, in this case of type `B`. Let us suppose
+ * this is the case, that is `b_fr = c_fr->chd[0]` is a destructor for
+ * `B` objects.  Then a call to the corresponding finalise function
  *
  * ```C
- * b_dt->df(b, b_dt)
+ * b_fr->fn(b, b_fr)
  * ```
  *
  * will be made for each child `b` of type `B` held by the `C`-type container.
- * Likewise the `B`-type destructor function, `B_destroy(void *ptr, dstr *b_dt)`,
- * will check whether `b_dt` contains references to a destructor for type
+ * Likewise the `B`-type finalise function, `B_finalise(void *ptr, dstr *b_fr)`,
+ * will check whether `b_fr` contains references to a finaliser for type
  * `A`-objects. After all `A`-objects of a type-`B` container are properly
  * disposed of, then its buffer can be deallocated.  Similarly, after all
- * `B`-objects of a C` container are properly destroyed, then its buffer
+ * `B`-objects of a C` container are properly finalised, then its buffer
  * can be freed.
  *
- * ### Destructor functions are finalisers: a note on the nomenclature
+ * ### IMPORTANT: Finalise functions *SHOULD NOT* deallocate the object 
  *
- * A destructor function
- *
- * ```
- * void type_dtor (void *ptr, const dtor *dt)
- * {
- *     //// DON´T DO free(ptr)
- * }
- * ```
- *
- * is actually an object finaliser function. It should **NOT** attempt to deallocate
- * the memory pointed by the first argument, which need not even be a
+ * A finalise function corresponds to step 3 of the object lifecycle 
+ * mentioned above. Therefore it should **NOT** attempt to deallocate
+ * the memory pointed by the provided object handler, which need not even be a
  * dynamically-allocated heap location.
- * Destructor functions should be more properly called *finaliser* functions, but
- * we keep the term to match the more popular C++ nomenclature.
+ * 
  *
  * ## Pointer destructors
  *
@@ -323,7 +317,7 @@
  * of the `C` container is released.
  *
  * This indirection of reference containers must be reflected in the
- * destructor structure. You can think of a reference container, as mentioned
+ * finaliser structure. You can think of a reference container, as mentioned
  * above, as container of pointers, each pointer being itself a special case
  * container of just one element (like in CASE II above).
  * Hence, if `C` and `B` were reference containers in our running example
@@ -331,43 +325,43 @@
  *
  * <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
  *
- * So, the `C` destructor needs to have not a `B` destructor as child, but
- * rather a *pointer destructor*, which then will have a `B` destructor
+ * So, the `C` finaliser needs to have not a `B` finaliser as child, but
+ * rather a *pointer finaliser*, which then will have a `B` finaliser
  * as child. The difference is subtle but crucial.
  *
- * COCADA provides a function for obtaining a pointer destructor ::ptr_dtor.
- * The corresponding destructor function will call the nested destructor in the
+ * COCADA provides a function for obtaining a pointer finaliser ::ptr_finaliser.
+ * The corresponding finalise function will call the nested finaliser in the
  * pointed object and then free the memory pointed to. If the pointed type is
  * a simple type with no further external references, then we can simply use a
- * pointer destructor whith no nested destructors.
+ * pointer finaliser with no nested finalisers.
  *
  *
- * ## Composing destructors
+ * ## Composing finalisers
  *
  * In more complex cases an object may contain references to objects of
  * multiple types. As an example, a (flat) hashmap stores  keys of type `K`,
- * and values of type `V`. In such cases, a hashmap destructor `h_dt`
- * should have `K` and `V` type destructors as children, that is
- * `h_dt->nchd==2`, and `h_dt->chd[0]` and `h_dt->chd_dt[1]` should be `K` and
- * `V`-type destructors respectively.
+ * and values of type `V`. In such cases, a hashmap finaliser `h_fr`
+ * should have `K` and `V` type finaliser as children, that is
+ * `h_fr->nchd==2`, and `h_fr->chd[0]` and `h_fr->chd_fr[1]` should be `K` and
+ * `V`-type finalisers respectively.
  *
- * In general, we could have any tree-like destructor hierarchy. Although a specific
- * destructor could be implemented by the library user, for example, a function
+ * In general, we could have any tree-like finaliser hierarchy. Although a specific
+ * finaliser could be implemented by the library user, for example, a function
  *
- * `dtor *C_of_B_of_A_get_dtor()`
+ * `finaliser *C_of_B_of_A_get_finaliser()`
  *
- * could be implemented to return a destructor to the previous example, this would
+ * could be implemented to return a finaliser to the previous example, this would
  * be rather tedious. Instead, COCADA provides a more ergonomic way to construct
- * destructor hierarchies as follows.
+ * finaliser hierarchies as follows.
  *
- * - The macro ::DTOR is used to return a basic destructor to a given type.
- * That is `DTOR(type)` returns a destructor with destructor function
- * `type_dtor` (which must be provided for each particular type), and
- * whith no nested child destructors (yet);
+ * - The macro ::FNR is used to return a basic finaliser to a given type.
+ * That is `FNR(type)` returns a finaliser with finalise function
+ * `type_finalise` (which must be provided for each particular type), and
+ * whith no nested finalisers (yet);
  *
- * - Existing destructors can be composed via the ::dtor_cons function. This
- * function takes a pointer to a parent destructor `par` and a child destructor
- * `chd`. It appends `chd` to the list of child destructors of `par`, and returns the
+ * - Existing finalisers can be composed via the ::finaliser_cons function. This
+ * function takes a pointer to a parent finaliser `par` and a child finaliser
+ * `chd`. It appends `chd` to the list of child finalisers of `par`, and returns the
  * reference to the modified `par`. This can be used to create arbitrary tree-like
  * hierarchies. For example,
  *
@@ -385,37 +379,39 @@
  * could be created with
  *
  * ```C
- * dtor_cons(dtor_cons(DTOR(A), DTOR(B)), dtor_cons(dtor_cons(dtor_cons(DTOR(C), DTOR(D)), DTOR(E)), DTOR(F)))
+ * finaliser_cons(finaliser_cons(FNR(A), FNR(B)), finaliser_cons(finaliser_cons(finaliser_cons(FNR(C), FNR(D)), FNR(E)), FNR(F)))
  * ```
  *
- * ## Empty destructors
+ * ## Empty finalisers
  *
- * In the last example it could be that we do not wish to destroy the `B`-type
- * child objects of the root `A`-type object. For instance, they could be
- * shared objects whose deletion would cause dangling pointer problems.
- * An *empty destructor* obtained via ::empty_dtor can be used in such cases to
+ * In the last example above, it could be that we did not wish to destroy the `B`-type
+ * child objects. For instance, they could be shared objects whose deletion would cause 
+ * dangling pointer problems.
+ * An *empty finaliser* obtained via ::finaliser_new_empty can be used in such cases to
  * signal that the  corresponding child  objects should not be destroyed.
- * Notice that any object downstream the empty destructor point will be left untouched.
+ * In this case, all the objects downstream the empty finaliser point are also 
+ * left untouched.
  *
  *
  * ## Finalising and destroying objects
  *
- * An object can be *finalised* (Step 4 *only*) with a destructor via the ::FINALISE macro.
+ * An object can be *finalised* (Step 4 *only*)  via the ::FINALISE macro.
  * This will not deallocate the object, and is typically what would be used from
  * whithin a flat container destructor to clean memory used by its elements. It is also
- * used to finalise stack objects. The destructor object is also not destroyed.
+ * used to finalise stack objects. The finaliser object is also not destroyed 
+ * in the process.
  *
  * An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
  * In addition to finalising the object, it also deallocates its memory **and**
- * also consumes the destructor. If the default, childless destructor is to be used,
- * we can simply use `FREE(obj, type)` which is equivalent, but slightly more
- * convenient than `DESTROY(obj, DTOR(type))`.
+ * also consumes the finaliser. If the default, childless finaliser is to be used,
+ * we can simply use `DESTROY_PLAIN(obj, type)` which is equivalent, but slightly more
+ * convenient than `DESTROY(obj, FNR(type))`.
  *
  * Finally, we may have simpler objects without child objects, or objects whose inner
  * references are fixed and known at compile time. The destructor functions of these
- * objects  actually don't need to look at the runtime-built destructors to know which
+ * objects  actually don't need to look at the runtime-built finalisers to know which
  * components to destroy. In such case, we can still define a standard destructor of
- * type ::destroy_func function which ignores the `dt` argument, but this is inefficient
+ * type ::finalise_func function which ignores the `fnr` argument, but this is inefficient
  * and misleading. For such objects we define a simple destructor
  *
  * ```
@@ -453,10 +449,10 @@
  * </tr>
  * <tr>
  *     <td>4. Finalisation</td>
- *     <td>`FINALISE(obj, dtor )`</td>
+ *     <td>`FINALISE(obj, finaliser )`</td>
  *     <td rowspan=3>4+5. Destruction</td>
- *     <td rowspan=3>`DESTROY(obj, dtor)`<br>
- *     `FREE(obj, type)`<br>
+ *     <td rowspan=3>`DESTROY(obj, finaliser)`<br>
+ *     `DESTROY_PLAIN(obj, type)`<br>
  *     `type_free(obj)`</td>
  * </tr>
  * <tr>
@@ -471,7 +467,8 @@
 
 
 /**
- * Allocate memory
+ * Allocates a new non-initialised object of a given @p TYPE in the heap
+ * and returns a pointer to it.
  */
 #define NEW( TYPE ) ((TYPE*)(malloc(sizeof(TYPE))))
 
@@ -484,125 +481,119 @@
 
 /**
  * Destructor type
- * @see _dtor
+ * @see _finaliser
  */
-typedef struct _dtor dtor;
+typedef struct _finaliser finaliser;
 
 
 /**
  * Destructor function type
  */
-typedef void (*destroy_func) (void *, const dtor *);
+typedef void (*finalise_func) (void *ptr, const finaliser *fnr);
 
 
 /**
  * Destructor object
  */
-struct _dtor {
-	destroy_func df;
+struct _finaliser {
+	finalise_func fn;
 	size_t nchd;
-	struct _dtor **chd;
+	struct _finaliser **chd;
 };
 
 
 /**
  * @brief Creates a new destructor with destructof function.
  */
-dtor *dtor_new_with_func(destroy_func df);
+finaliser *finaliser_new(finalise_func fn);
 
 
 /**
  * @brief Recursively frees a destructor.
  */
-void dtor_free(dtor *dt);
+void finaliser_free(finaliser *self);
 
 
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
-size_t dtor_nchd(const dtor *dt);
+size_t finaliser_nchd(const finaliser *self);
 
 
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
-const dtor *dtor_chd(const dtor *par, size_t index);
+const finaliser *finaliser_chd(const finaliser *par, size_t index);
 
 
 /**
  * @brief Composes two destructor by appending @p chd to the children list of @p par.
  * Returns a reference to the modified @p par
  */
-dtor *dtor_cons(dtor *par, const dtor *chd);
+finaliser *finaliser_cons(finaliser *par, const finaliser *chd);
 
 
 /**
- * @brief Returns a new empty destructor with no children.
+ * @brief Returns a new empty finaliser with no children.
  * @see Module documentation for details.
  */
-dtor *empty_dtor();
+finaliser *finaliser_new_empty();
 
 
 /**
- * @brief Returns a new raw-pointer destructor with no children.
+ * @brief Returns a new raw-pointer finaliser with no children.
  * @see Module documentation for details.
  */
-dtor *ptr_dtor();
+finaliser *finaliser_new_ptr();
 
 
 /**
- * Returns a default destructor for a given type with no nested destructor.
+ * Returns a default finaliser for a given type with no nested destructor.
  */
-#define DTOR( TYPE ) dtor_new_with_func(TYPE##_destroy)
+#define FNR( TYPE ) finaliser_new(TYPE##_finalise)
 
 
 /**
  * Finalises an object @p OBJ (and its referenced objects) based on a given
- * destructor @p DTOR.
- * The object is not deallocated, and the destructor is not destroyed.
+ * finaliser @p FNR.
+ * The object is not deallocated, and neither is the finaliser object destroyed.
  */
-#define FINALISE( OBJ, DTOR ) \
-	if((OBJ)) {\
-		void *__obj = (OBJ);\
-		const dtor *__dt = (DTOR);\
-		__dt->df(__obj, __dt);\
-	}
+#define FINALISE( OBJ, FNR ) \
+	if ((OBJ)) ((finaliser *)(FNR))->fn((void *)(OBJ), (const finaliser *)(FNR));
 
 
 /**
- * Destroys an object @pOBJ, that is finalises it (and its referenced objects)
- * based on a given destructor @p DTOR **and** deallocates its memory.
- * The destructor @p DTOR is **also** destroyed.
+ * Finalises an object @p OBJ with the default plain typed finaliser
+ * TYPE_finalise(). Same as FINALISE(OBJ, FNR(TYPE)).
  */
-#define DESTROY( OBJ, DTOR ) \
+#define FINALISE_PLAIN( OBJ, TYPE ) FINALISE(OBJ, FNR(TYPE))
+
+
+/**
+ * Destroys an object @p OBJ, that is finalises it (and its referenced objects)
+ * based on a given finaliser @p FNR **and** deallocates its memory.
+ * The finaliser @p FNR is **also** destroyed.
+ */
+#define DESTROY( OBJ, FNR ) \
 	if ((OBJ)) {\
-		void *__obj = (OBJ);\
-		const dtor *__dt = (DTOR);\
-		__dt->df(__obj, __dt);\
-		free(__obj);\
-		dtor_free((void *)__dt);\
+		((finaliser *)(FNR))->fn((void *)(OBJ), (const finaliser *)(FNR));\
+		free((OBJ));\
+		finaliser_free((void *)(FNR));\
 	}
 
 
-////@cond
-#define FREE1( OBJ ) if((OBJ)) free(OBJ)
+/**
+ * Destroys an object @p OBJ with the default plain typed finaliser
+ * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
+ */
+#define DESTROY_PLAIN( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, FNR(TYPE))
 
-#define FREE2( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, DTOR(TYPE))
-
-#define _SELECT_FREE(_1, _2, NAME,...) NAME
-////@endcond
 
 /**
- * @brief Convenience variable argument macro for destroying objects.
- * - `FREE(p)` deallocates the memory pointed by the raw pointer `p`
- *    by calling `stdlib free()`.
- * - `FREE(obj, type)` is equivalent to `DESTROY(obj, DTOR(type))`
- *    i.e. destroys the object `obj` of a given `type` by using its
- *    default (flat) destructor.
- * @see DESTROY
- * @see DTOR
+ * Deallocates an object @p OBJ after checking that it is non-null
+ * by calling `stdlib free()`
  */
-#define FREE(...) _SELECT_FREE(__VA_ARGS__, FREE2, FREE1)(__VA_ARGS__)
+#define FREE( OBJ ) if((OBJ)) free(OBJ)
 
 
 #endif

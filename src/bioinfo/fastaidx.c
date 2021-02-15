@@ -42,12 +42,12 @@ fastaidx *fastaidx_new(const char *src_path)
 }
 
 
-void fastaidx_destroy(void *ptr, const dtor *dt)
+void fastaidx_finalise(void *ptr, const finaliser *fnr)
 {
 	fastaidx *self = (fastaidx *)ptr;
 	FREE(self->path);
-	FREE(self->dscs, vec);
-	FREE(self->seqs, vec);
+	DESTROY_PLAIN(self->dscs, vec);
+	DESTROY_PLAIN(self->seqs, vec);
 	FREE(self);
 }
 

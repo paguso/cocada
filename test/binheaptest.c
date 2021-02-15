@@ -74,7 +74,7 @@ void test_binheap_push_pop(CuTest *tc)
 		CuAssertDblEquals(tc, (double)(len-i-1), *d, 0.1);
 	}
 
-	DESTROY(maxheap, DTOR(binheap));
+	DESTROY(maxheap, FNR(binheap));
 }
 
 
@@ -102,7 +102,7 @@ void test_binheap_push_pop_int(CuTest *tc)
 		CuAssertIntEquals(tc, (int)(len-i-1), d);
 	}
 
-	DESTROY(maxheap, DTOR(binheap));
+	DESTROY(maxheap, FNR(binheap));
 }
 
 

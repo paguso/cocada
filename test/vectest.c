@@ -38,7 +38,7 @@ void test_vec_new(CuTest *tc)
 {
 	vec *v = vec_new_with_capacity(sizeof(int), 10);
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -61,7 +61,7 @@ void test_vec_app(CuTest *tc)
 		CuAssertIntEquals(tc, (int)i, *d);
 	}
 
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -84,7 +84,7 @@ void test_vec_get_cpy(CuTest *tc)
 		CuAssertDblEquals(tc, (double)i, d, 0.2);
 	}
 
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -112,7 +112,7 @@ void test_vec_set(CuTest *tc)
 		CuAssertIntEquals(tc, (i%2)?-i:i, *d);
 	}
 
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -136,7 +136,7 @@ void test_vec_ins(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)i, *d, 0.2);
 	}
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -163,7 +163,7 @@ void test_vec_del(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)(2*i)+1.0, *d, 0.2);
 	}
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -186,7 +186,7 @@ void test_vec_swap(CuTest *tc)
 		//printf("get da[%zu]=%f\n",i,*d);
 		CuAssertDblEquals(tc, (double)(len-1-i), *d, 0.2);
 	}
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -212,7 +212,7 @@ void test_vec_iter(CuTest *tc)
 		i++;
 	}
 	FREE(it);
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 
 	char *strings[8] = {"The", "quick", "fox", "jumps", "over", "the", "lazy", "dog"};
 	v = vec_new(sizeof(char *));
@@ -228,7 +228,7 @@ void test_vec_iter(CuTest *tc)
 		i++;
 	}
 	FREE(it);
-	DESTROY(v, dtor_cons(DTOR(vec), ptr_dtor()));
+	DESTROY(v, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 }
 
 
@@ -342,7 +342,7 @@ void test_vec_qsort(CuTest *tc)
 		CuAssertIntEquals(tc, -1, triple_cmp(p, q));
 	}
 
-	FREE(v, vec);
+	DESTROY_PLAIN(v, vec);
 }
 
 
@@ -388,8 +388,8 @@ void test_vec_free(CuTest *tc)
 		vec_push(v, &c);
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
-	DESTROY(v,  dtor_cons(DTOR(vec), dtor_cons (ptr_dtor(),dtor_cons (DTOR(vec),
-	                      ptr_dtor())))) ;
+	DESTROY(v,  finaliser_cons(FNR(vec), finaliser_cons (finaliser_new_ptr(),finaliser_cons (FNR(vec),
+	                      finaliser_new_ptr())))) ;
 }
 
 void test_vec_flat_free(CuTest *tc)
@@ -417,8 +417,8 @@ void test_vec_flat_free(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
 
-	DESTROY(v,  dtor_cons  ( DTOR(vec),  dtor_cons ( DTOR(vec),
-	                         empty_dtor()  ) ) ) ;
+	DESTROY(v,  finaliser_cons  ( FNR(vec),  finaliser_cons ( FNR(vec),
+	                         finaliser_new_empty()  ) ) ) ;
 
 }
 

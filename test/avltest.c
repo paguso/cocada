@@ -70,7 +70,7 @@ void test_avl_ins(CuTest *tc)
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-	FREE(tree, avl);
+	DESTROY_PLAIN(tree, avl);
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -86,7 +86,7 @@ void test_avl_ins(CuTest *tc)
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
-	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));
+	DESTROY(tree, finaliser_cons(FNR(avl), finaliser_new_ptr()));
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -103,8 +103,8 @@ void test_avl_ins(CuTest *tc)
 	}
 	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
-	FREE(tree, avl);
-	FREE(buf, vec);
+	DESTROY_PLAIN(tree, avl);
+	DESTROY_PLAIN(buf, vec);
 }
 
 
@@ -121,7 +121,7 @@ void test_avl_get(CuTest *tc)
 		CuAssert(tc, "Failed AVL search", avl_get_int(tree, val, &getval));
 		CuAssertIntEquals(tc, val, getval);
 	}
-	FREE(tree, avl);
+	DESTROY_PLAIN(tree, avl);
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -137,7 +137,7 @@ void test_avl_get(CuTest *tc)
 		CuAssert(tc, "Failed AVL search", avl_get(tree, obj, (void **)&get_obj));
 		CuAssertPtrEquals(tc, obj, get_obj);
 	}
-	DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));
+	DESTROY(tree, finaliser_cons(FNR(avl), finaliser_new_ptr()));
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -154,8 +154,8 @@ void test_avl_get(CuTest *tc)
 		         (rawptr *)&get_obj));
 		CuAssertPtrEquals(tc, (void *)vec_get(buf,i), get_obj);
 	}
-	FREE(tree, avl);
-	FREE(buf, vec);
+	DESTROY_PLAIN(tree, avl);
+	DESTROY_PLAIN(buf, vec);
 }
 
 
@@ -205,7 +205,7 @@ void test_avl_del(CuTest *tc)
 	DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
-	FREE(tree, avl);
+	DESTROY_PLAIN(tree, avl);
 }
 
 

@@ -44,35 +44,35 @@ struct __kllsumm {
 	double k_const;
 	size_t npts;
 	size_t cap;
-	dtor *chd_dt;
+	finaliser *chd_fr;
 };
 
 
 
 kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 {
-	return kll_new_own(typesize, cmp, err, empty_dtor());
+	return kll_new_own(typesize, cmp, err, finaliser_new_empty());
 }
 
 
-kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt)
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, finaliser *chd_fr)
 {
 	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) *
 	                            ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
-	return kll_new_own_with_cap(typesize, cmp, err, cap, chd_dt);
+	return kll_new_own_with_cap(typesize, cmp, err, cap, chd_fr);
 }
 
 
 kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err,
                           size_t capacity)
 {
-	return kll_new_own_with_cap(typesize, cmp, err, capacity, empty_dtor());
+	return kll_new_own_with_cap(typesize, cmp, err, capacity, finaliser_new_empty());
 }
 
 
 
 kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
-                              size_t capacity, dtor *chd_dt)
+                              size_t capacity, finaliser *chd_fr)
 {
 	assert (err > 0);
 	kllsumm *ret = NEW(kllsumm);
@@ -100,21 +100,21 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
 	ret->k = k;
 	ret->k_const = ret->k / ((1.0/err) * sqrt(log(1.0/err)));
 	ret->c = c;
-	ret->chd_dt = chd_dt;
+	ret->chd_fr = chd_fr;
 	return ret;
 }
 
 
-void kll_destroy(void *ptr, const dtor *dt)
+void kll_finalise(void *ptr, const finaliser *fnr)
 {
 	kllsumm *self = (kllsumm *)ptr;
-	FREE(self->coins, vec);
-	if (dtor_nchd(dt)) {
-		DESTROY(self->buffs, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(),
-		                               dtor_cons(DTOR(vec), dtor_chd(dt, 0)))));
+	DESTROY_PLAIN(self->coins, vec);
+	if (finaliser_nchd(fnr)) {
+		DESTROY(self->buffs, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+		                               finaliser_cons(FNR(vec), finaliser_chd(fnr, 0)))));
 	}
 	else {
-		DESTROY(self->buffs, dtor_cons(DTOR(vec), DTOR(vec)));
+		DESTROY(self->buffs, finaliser_cons(FNR(vec), FNR(vec)));
 	}
 }
 
@@ -162,9 +162,9 @@ static void _compress(kllsumm *self)
 				vec_push(nxtbuf, vec_get(buf, j));
 			}
 			self->npts -= ( l - ((j - coin) / 2) );
-			if (self->chd_dt) {
+			if (self->chd_fr) {
 				for (j = 1 - coin; j < l; j += 2) {
-					FINALISE(vec_get_mut(buf, j), self->chd_dt);
+					FINALISE(vec_get_mut(buf, j), self->chd_fr);
 				}
 			}
 			vec_clear(buf);

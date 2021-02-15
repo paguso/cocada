@@ -112,7 +112,7 @@ size_t vec_sizeof();
  * @brief Finaliser
  * @see new.h
  */
-void vec_destroy(void *v, const dtor *dt);
+void vec_finalise(void *v, const finaliser *fnr);
 
 
 /**

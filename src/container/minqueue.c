@@ -61,11 +61,11 @@ minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
 }
 
 
-void minqueue_destroy(void *ptr, const dtor *dt )
+void minqueue_finalise(void *ptr, const finaliser *fnr )
 {
 	minqueue *mq = (minqueue *)ptr;
-	deque_destroy(mq->elts, dt);
-	FREE(mq->mins, deque);
+	deque_finalise(mq->elts, fnr);
+	DESTROY_PLAIN(mq->mins, deque);
 }
 
 

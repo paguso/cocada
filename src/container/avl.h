@@ -43,7 +43,7 @@
  *
  * 1. avl_new() creates a new AVL tree for indirect storage of objects of
  * given size
- * 2. avl_destroy() object destructor (see new.h)
+ * 2. avl_finalise() object destructor (see new.h)
  * 2. avl_get() searches for a node matching a given key
  * 3. avl_ins() inserts an **owned copy** of a given object
  * 4. avl_del() removes the **owned copy** of an object
@@ -82,12 +82,12 @@
  * should care to provide the appropriate destructor when freeing the tree,
  * for instance
  * ```C
- * DESTROY(tree, dtor_cons(DTOR(avl), ptr_dtor()));
+ * DESTROY(tree, finaliser_cons(FNR(avl), ptr_finaliser()));
  * ```
  * if `obj_t` is a flat type with no owned references to external
  * objects; or
  * ```C
- * DESTROY(tree, dtor_cons(DTOR(avl), dtor_cons(DTOR(obj_t), ...));
+ * DESTROY(tree, finaliser_cons(FNR(avl), finaliser_cons(FNR(obj_t), ...));
  * ```
  * if nested destruction is necessary (see new.h).
  *
@@ -137,7 +137,7 @@
  * in the nodes. In this case, as well as for non-owned indirect data,
  * a simple call to
  * ```C
- * FREE(tree, avl);
+ * DESTROY_PLAIN(tree, avl);
  * ```
  * should suffice for tree disposal.
  *
@@ -167,7 +167,7 @@ avl *avl_new(cmp_func cmp);
  * @brief Destructor
  * @see new.h
  */
-void avl_destroy(void *ptr, const dtor *dt);
+void avl_finalise(void *ptr, const finaliser *fnr);
 
 
 /**

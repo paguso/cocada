@@ -128,14 +128,14 @@ static void _check_and_resize(vec *v)
 }
 
 
-void vec_destroy(void *ptr, const dtor *dt )
+void vec_finalise(void *ptr, const finaliser *fnr )
 {
 	vec *v = (vec *)ptr;
-	if (dtor_nchd(dt)) {
-		const dtor *chd_dt = dtor_chd(dt, 0);
+	if (finaliser_nchd(fnr)) {
+		const finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i=0, l=vec_len(v); i<l; i++) {
 			void *chd =  vec_get_mut(v, i);
-			FINALISE(chd, chd_dt);
+			FINALISE(chd, chd_fr);
 		}
 	}
 	FREE(v->data);

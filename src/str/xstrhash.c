@@ -74,10 +74,10 @@ xstrhash *xstrhash_new(alphabet *ab)
 }
 
 
-void xstrhash_destroy(void *ptr, const dtor *dt)
+void xstrhash_finalise(void *ptr, const finaliser *fnr)
 {
 	xstrhash *self = (xstrhash *)ptr;
-	FREE(self->ab, alphabet);
+	DESTROY_PLAIN(self->ab, alphabet);
 }
 
 

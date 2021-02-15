@@ -53,7 +53,7 @@ strbuf *strbuf_new_with_capacity(size_t init_capacity);
  * @brief Finaliser
  * @see new.h
  */
-void strbuf_destroy(void *ptr, const dtor *dt);
+void strbuf_finalise(void *ptr, const finaliser *fnr);
 
 
 /**

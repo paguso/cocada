@@ -131,89 +131,89 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 {
 	switch (type) {
 	case ARG_NONE:
-		FREE(vals, vec);
+		DESTROY_PLAIN(vals, vec);
 		break;
 	case ARG_BOOL:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			FREE(vals, vec);
+			DESTROY_PLAIN(vals, vec);
 			break;
 		}
 		break;
 	case ARG_CHAR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			FREE(vals, vec);
+			DESTROY_PLAIN(vals, vec);
 			break;
 		}
 		break;
 	case ARG_INT:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			FREE(vals, vec);
+			DESTROY_PLAIN(vals, vec);
 			break;
 		}
 		break;
 	case ARG_FLOAT:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			FREE(vals, vec);
+			DESTROY_PLAIN(vals, vec);
 			break;
 		}
 		break;
 	case ARG_STR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
-			                        ptr_dtor()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
+			                        finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 			break;
 		}
 		break;
 	case ARG_FILE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
-			                        ptr_dtor()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
+			                        finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 			break;
 		}
 		break;
 	case ARG_DIR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
-			                        ptr_dtor()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
+			                        finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 			break;
 		}
 		break;
 	case ARG_CHOICE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), dtor_cons(DTOR(vec),
-			                        ptr_dtor()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
+			                        finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
-			DESTROY(vals, dtor_cons(DTOR(vec), ptr_dtor()));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 			break;
 		}
 		break;
@@ -358,20 +358,20 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
 }
 
 
-void cliopt_destroy(void *ptr, const dtor *dt)
+void cliopt_finalise(void *ptr, const finaliser *fnr)
 {
 	cliopt *opt = (cliopt *)ptr;
 	FREE(opt->longname);
 	FREE(opt->help);
-	DESTROY(opt->choices, dtor_cons(DTOR(vec), ptr_dtor()));
+	DESTROY(opt->choices, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 	switch (opt->type) {
 	case ARG_STR:
 	case ARG_FILE:
 	case ARG_DIR:
-		DESTROY(opt->defaults, dtor_cons(DTOR(vec), ptr_dtor()));
+		DESTROY(opt->defaults, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 		break;
 	default:
-		FREE(opt->defaults, vec);
+		DESTROY_PLAIN(opt->defaults, vec);
 		break;
 	}
 	_vals_vec_free(opt->values, opt->multi, opt->type);
@@ -415,12 +415,12 @@ cliarg *cliarg_new_choice_multi(char *name, char *help, vec *choices)
 }
 
 
-void cliarg_destroy(void *ptr, const dtor *dt)
+void cliarg_finalise(void *ptr, const finaliser *fnr)
 {
 	cliarg *arg = (cliarg *)ptr;
 	FREE(arg->name);
 	FREE(arg->help);
-	DESTROY(arg->choices, dtor_cons(DTOR(vec), ptr_dtor()));
+	DESTROY(arg->choices, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 	_vals_vec_free(arg->values, false, arg->type);
 }
 
@@ -456,16 +456,16 @@ cliparse *cliparse_new(char *name, char *help)
 }
 
 
-void cliparse_destroy(void *ptr, const dtor *dt)
+void cliparse_finalise(void *ptr, const finaliser *fnr)
 {
 	cliparse *clip = (cliparse *)ptr;
-	DESTROY(clip->subcommands, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()),
-	                                     dtor_cons(ptr_dtor(), DTOR(cliparse))));
-	FREE(clip->subcmd_names, vec);
-	DESTROY(clip->options, dtor_cons(dtor_cons(DTOR(hashmap), empty_dtor()),
-	                                 dtor_cons(ptr_dtor(), DTOR(cliopt))));
-	FREE(clip->long_to_short, hashmap);
-	DESTROY(clip->args, dtor_cons(DTOR(vec), dtor_cons(ptr_dtor(), DTOR(cliarg))));
+	DESTROY(clip->subcommands, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_empty()),
+	                                     finaliser_cons(finaliser_new_ptr(), FNR(cliparse))));
+	DESTROY_PLAIN(clip->subcmd_names, vec);
+	DESTROY(clip->options, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_empty()),
+	                                 finaliser_cons(finaliser_new_ptr(), FNR(cliopt))));
+	DESTROY_PLAIN(clip->long_to_short, hashmap);
+	DESTROY(clip->args, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(cliarg))));
 	FREE(clip->name);
 	FREE(clip->help);
 }
@@ -771,7 +771,7 @@ static void _check_missing_options(cliparse *cmd)
 				break;
 			case OPT_SINGLE:
 				vec_cat(opt->values, vals);
-				FREE(vals, vec);
+				DESTROY_PLAIN(vals, vec);
 				break;
 			}
 		}
@@ -994,7 +994,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				switch (cur_opt->multi) {
 				case OPT_SINGLE:
 					vec_cat(cur_opt->values, cur_vals);
-					FREE(cur_vals, vec);
+					DESTROY_PLAIN(cur_vals, vec);
 					cur_vals = NULL;
 					break;
 				case OPT_MULTIPLE:

@@ -64,7 +64,7 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity);
  * @brief Finaliser
  * @see new.h
  */
-void deque_destroy(void *ptr, const dtor *dt);
+void deque_finalise(void *ptr, const finaliser *fnr);
 
 
 /**

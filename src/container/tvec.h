@@ -58,7 +58,7 @@
 	\
 	void tvec_##TYPE##_fit(tvec_##TYPE *v);                                        \
 	\
-	void tvec_##TYPE##_destroy(void *ptr, const dtor *dt );                           \
+	void tvec_##TYPE##_finalise(void *ptr, const finaliser *fnr );                           \
 	\
 	size_t tvec_##TYPE##_len(const tvec_##TYPE *v);                                \
 	\
@@ -227,14 +227,14 @@ XX_CORETYPES(TVEC_DECL)
 	}                                                                              \
 	\
 	\
-	void tvec_##TYPE##_destroy(void *ptr, const dtor *dt )                            \
+	void tvec_##TYPE##_finalise(void *ptr, const finaliser *fnr )                            \
 	{                                                                              \
 		tvec_##TYPE *v = (tvec_##TYPE *)ptr;                                       \
-		if (dtor_nchd(dt)) {                                                       \
-			const dtor *chd_dt = dtor_chd(dt, 0);                                  \
+		if (finaliser_nchd(fnr)) {                                                       \
+			const finaliser *chd_fr = finaliser_chd(fnr, 0);                                  \
 			for (size_t i=0, l=tvec_##TYPE##_len(v); i<l; i++) {                   \
 				void *chd =  (void *)tvec_##TYPE##_get_ref(v, i);                  \
-				FINALISE(chd, chd_dt);                                             \
+				FINALISE(chd, chd_fr);                                             \
 			}                                                                      \
 		}                                                                          \
 		FREE(v->data);                                                             \

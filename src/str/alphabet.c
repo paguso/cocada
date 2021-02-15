@@ -150,7 +150,7 @@ void alphabet_free(alphabet *ab)
 }
 
 
-void alphabet_destroy(void *ptr, const dtor *dt)
+void alphabet_finalise(void *ptr, const finaliser *fnr)
 {
 	alphabet *ab = (alphabet *)ab;
 	if (ab==NULL) return;

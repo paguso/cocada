@@ -293,7 +293,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	// clean up temporary stuff
 	xstr_free(padstr);
 	xstr_free(edge_labels);
-	DESTROY(kp1mers, dtor_cons(DTOR(vec), ptr_dtor()));
+	DESTROY(kp1mers, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 	FREE(lastkm1mers[0]);
 	FREE(lastkm1mers[1]);
 	FREE(lastkp1mers[0]);

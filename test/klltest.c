@@ -110,7 +110,7 @@ void test_kll_upd_obj (CuTest *tc)
 		DEBUG("KLL Obj rank (key=%d) = %zu\n", i, r);
 	}
 	FREE(val);
-	DESTROY(summ, dtor_cons(DTOR(kll), ptr_dtor()));
+	DESTROY(summ, finaliser_cons(FNR(kll), finaliser_new_ptr()));
 }
 
 

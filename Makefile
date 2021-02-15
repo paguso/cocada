@@ -72,7 +72,7 @@ TEST_SRCS      := $(notdir $(TEST_SRC_PATHS))
 
 VPATH          =  $(SRC_DIRS) $(TEST_DIR)
 
-.PHONY: clean doc debugclean debugbuild debugrebuild build staticlib install-static
+.PHONY: clean doc debugclean debugbuild debugrebuild build staticlib install-static confirm_uninstall_static uninstall-static
 
 ###############################################################################
 # Debug build
@@ -157,6 +157,16 @@ install-static: staticlib
 	@echo Installing static library to $(INSTALL_DIR)
 	$(MKDIR) $(INSTALL_DIR)
 	cp $(LIB_DIR)/$(STLIB) $(INSTALL_DIR)
+	@echo Done
+
+confirm_uninstall_static:
+	@echo Removing headers dir $(INCLUDE_DIR)
+	@echo Removing static library dir $(INSTALL_DIR)
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+
+uninstall-static: confirm_uninstall_static
+	$(RMDIR) $(INCLUDE_DIR)
+	$(RMDIR) $(INSTALL_DIR)
 	@echo Done
 
 

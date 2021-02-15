@@ -102,7 +102,7 @@ void alphabet_free(alphabet *ab);
 /**
  * @brief Destructor
  */
-void alphabet_destroy(void *ptr, const dtor *dt);
+void alphabet_finalise(void *ptr, const finaliser *fnr);
 
 
 /**

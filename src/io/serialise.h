@@ -302,25 +302,13 @@
  * 
  */
 
-
-#define SOM_T(TYPE,...) som_##TYPE,
-
-typedef enum {
-	XX_PRIMITIVES(SOM_T)
-	SOM_T(rawptr)
-	SOM_T(arr)
-	SOM_T(cstr)
-	SOM_T(struct)
-	SOM_T(proxy)
-} som_t;
-
-
 typedef struct _sub_som sub_som;
 
 /** 
  * SOM object type
  */
 typedef struct _som som;
+
 
 /**
  * @brief get_som function type, required for the proxy SOM.

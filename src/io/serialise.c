@@ -19,12 +19,14 @@
  *
  */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "arrays.h"
 #include "cstrutil.h"
+#include "coretype.h"
 #include "errlog.h"
 #include "hash.h"
 #include "hashmap.h"
@@ -33,6 +35,22 @@
 #include "new.h"
 #include "serialise.h"
 #include "deque.h"
+
+extern int errno;
+
+
+#define SOM_T(TYPE,...) som_##TYPE,
+
+typedef enum {
+	//SOM_T(error) // should be first = 0
+	XX_PRIMITIVES(SOM_T)
+	SOM_T(rawptr)
+	SOM_T(arr)
+	SOM_T(cstr)
+	SOM_T(struct)
+	SOM_T(proxy)
+} som_t;
+
 
 struct _sub_som {
 	size_t off;
@@ -585,8 +603,8 @@ static void bfs_write(som *model, void *obj, FILE *stream)
 		deque_pop_front(dq, &om);
 		write_obj(om.model, om.obj, stream, dq, written, true);
 	}
-	FREE(written, vec);
-	FREE(dq, deque);
+	DESTROY_PLAIN(written, vec);
+	DESTROY_PLAIN(dq, deque);
 }
 
 
@@ -612,9 +630,9 @@ static void *bfs_read(som *model, FILE *stream)
 	}
 	rawptr ret = *ptr;
 	FREE(ptr);
-	FREE(read, vec);
-	FREE(dq, deque);
-	FREE(mem_map, hashmap);
+	DESTROY_PLAIN(read, vec);
+	DESTROY_PLAIN(dq, deque);
+	DESTROY_PLAIN(mem_map, hashmap);
 	return ret;
 }
 

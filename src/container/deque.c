@@ -26,14 +26,13 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "arrays.h"
 #include "new.h"
 #include "mathutil.h"
 #include "deque.h"
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
-const static float  MIN_LOAD = 0.5;   // (!) GROW_BY*MIN_LOAD < 1
+const static float  MIN_LOAD = 0.5;   // (!) GROW_BY * MIN_LOAD < 1
 
 struct _deque {
 	size_t typesize;
@@ -57,19 +56,19 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity)
 	q->start = 0;
 	q->len = 0;
 	q->cap = MAX(MIN_CAPACITY, capacity);
-	q->data = malloc(q->cap*q->typesize);
+	q->data = malloc(q->cap * q->typesize);
 	return q;
 }
 
 
-void deque_destroy(void *ptr, const dtor *dt)
+void deque_finalise(void *ptr, const finaliser *fnr)
 {
 	deque *dq = (deque *)ptr;
-	if (dtor_nchd(dt)) {
-		const dtor *chd_dt = dtor_chd(dt, 0);
+	if (finaliser_nchd(fnr)) {
+		const finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i=0, l=deque_len(dq); i<l; i++) {
 			void *chd = ((void **)deque_get(dq, i))[0];
-			FINALISE(chd, chd_dt);
+			FINALISE(chd, chd_fr);
 		}
 	}
 	FREE(dq->data);
@@ -117,27 +116,27 @@ static void check_and_resize(deque *q)
 {
 	if (q->len == q->cap) {
 		size_t offset = q->cap;
-		q->cap = MAX(GROW_BY*q->cap, MIN_CAPACITY);
-		q->data = realloc(q->data, q->cap*q->typesize);
+		q->cap = MAX(GROW_BY * q->cap, MIN_CAPACITY);
+		q->data = realloc(q->data, q->cap * q->typesize);
 		if (q->start==0) return;
 		offset = q->cap - offset;
-		memmove( q->data+(q->start+offset)*q->typesize,
-		         q->data+(q->start*q->typesize),
-		         (q->len-q->start)*q->typesize );
+		memmove( q->data + (q->start + offset) * q->typesize,
+		         q->data + (q->start * q->typesize),
+		         (q->len - q->start) * q->typesize );
 		q->start += offset;
 	}
-	else if (q->len < MIN_LOAD*q->cap) {
-		if (q->start+q->len < q->cap) {
-			memmove(q->data, q->data+(q->start*q->typesize), q->len*q->typesize);
+	else if (q->len < (MIN_LOAD * q->cap)) {
+		if ((q->start + q->len) < q->cap) {
+			memmove(q->data, q->data + (q->start * q->typesize), q->len * q->typesize);
 		}
 		else {
-			memmove( q->data + (q->cap - q->start)*q->typesize,
-			         q->data, ((q->start+q->len)%q->cap)*q->typesize );
+			memmove( q->data + (q->cap - q->start) * q->typesize,
+			         q->data, ((q->start + q->len) % q->cap) * q->typesize );
 			memmove( q->data,  q->data + (q->start * q->typesize),
-			         (q->cap - q->start)*q->typesize );
+			         (q->cap - q->start) * q->typesize );
 		}
-		q->cap = MAX(q->len/MIN_LOAD, MIN_CAPACITY);
-		q->data = realloc(q->data, q->cap*q->typesize);
+		q->cap = MAX(q->len / MIN_LOAD, MIN_CAPACITY);
+		q->data = realloc(q->data, q->cap * q->typesize);
 		q->start = 0;
 	}
 }
@@ -146,7 +145,7 @@ static void check_and_resize(deque *q)
 void deque_push_back(deque *q, const void *elt)
 {
 	check_and_resize(q);
-	memcpy(q->data+(((q->start+q->len)%q->cap)*q->typesize), elt, q->typesize);
+	memcpy(q->data + (((q->start + q->len) % q->cap) * q->typesize), elt, q->typesize);
 	q->len++;
 }
 
@@ -155,14 +154,14 @@ void deque_push_front(deque *q, const void *elt)
 {
 	check_and_resize(q);
 	q->start = (q->start + (q->cap-1)) % q->cap;
-	memcpy(q->data+(q->start * q->typesize), elt, q->typesize);
+	memcpy(q->data + (q->start * q->typesize), elt, q->typesize);
 	q->len++;
 }
 
 
 void deque_pop_back(deque *q, void *dest)
 {
-	memcpy(dest, q->data+(((q->start+q->len-1)%q->cap)*q->typesize), q->typesize);
+	memcpy(dest, q->data + (((q->start + q->len - 1) % q->cap) * q->typesize), q->typesize);
 	q->len--;
 	check_and_resize(q);
 }
@@ -177,7 +176,7 @@ void deque_remv_back(deque *q)
 
 void deque_pop_front(deque *q, void *dest)
 {
-	memcpy(dest, q->data+(q->start*q->typesize), q->typesize);
+	memcpy(dest, q->data + (q->start * q->typesize), q->typesize);
 	q->len--;
 	q->start = (q->start+1)%q->cap;
 	check_and_resize(q);

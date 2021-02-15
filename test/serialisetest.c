@@ -23,6 +23,7 @@
 
 #include "arrays.h"
 #include "cstrutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "trait.h"
 #include "serialise.h"

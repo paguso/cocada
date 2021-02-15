@@ -25,74 +25,75 @@
 #include "new.h"
 
 
-dtor *dtor_new_with_func( destroy_func df )
+finaliser *finaliser_new( finalise_func fn )
 {
-	dtor *dt = NEW(dtor);
-	dt->df = df;
-	dt->nchd = 0;
-	dt->chd = NULL;//calloc(1, sizeof(dtor *));
-	return dt;
+	finaliser *fnr = NEW(finaliser);
+	fnr->fn = fn;
+	fnr->nchd = 0;
+	fnr->chd = NULL;
+	return fnr;
 }
 
 
-void dtor_free(dtor *dt)
+void finaliser_free(finaliser *self)
 {
-	if (dt==NULL) return;
-	for (size_t i=0; i<dt->nchd; i++) {
-		dtor_free(dt->chd[i]);
+	if (self == NULL) return;
+	for (size_t i = 0; i < self->nchd; i++) {
+		finaliser_free(self->chd[i]);
 	}
-	FREE(dt->chd);
-	FREE(dt);
-}
-
-size_t dtor_nchd(const dtor *dt)
-{
-	return dt->nchd;
-}
-
-const dtor *dtor_chd(const dtor *par, size_t index)
-{
-	return ((dtor **)par->chd)[index];
+	FREE(self->chd);
+	FREE(self);
 }
 
 
-dtor *dtor_cons(dtor *par, const dtor *chd)
+size_t finaliser_nchd(const finaliser *self)
 {
-	par->chd = (dtor **) realloc(par->chd, ( par->nchd + 1) * sizeof(dtor *));
-	par->chd[par->nchd++] =  (dtor *)chd;
+	return self->nchd;
+}
+
+
+const finaliser *finaliser_chd(const finaliser *self, size_t index)
+{
+	return ((finaliser **)self->chd)[index];
+}
+
+
+finaliser *finaliser_cons(finaliser *par, const finaliser *chd)
+{
+	par->chd = (finaliser **) realloc(par->chd, ( par->nchd + 1) * sizeof(finaliser *));
+	par->chd[par->nchd++] =  (finaliser *)chd;
 	return par;
 }
 
 
-static void _empty_destroy(void *ptr, const dtor *dt )
-{
-}
+static void _empty_finalise(void *ptr, const finaliser *fnr ) {}
 
 
-dtor *empty_dtor()
+finaliser *finaliser_new_empty()
 {
-	dtor *ret = NEW(dtor);
-	ret->df = _empty_destroy;
+	finaliser *ret = NEW(finaliser);
+	ret->fn = _empty_finalise;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;
 }
 
 
-static void _ptr_destroy(void *ptr, const dtor *dt )
+// ptr is a pointer to an object reference (pointer)
+static void _ptr_finalise(void *ptr, const finaliser *fr )
 {
 	void *pointee = *((void **)ptr);
-	if ( dtor_nchd(dt) > 0 )
-		FINALISE( pointee, dtor_chd(dt, 0) );
+	if ( finaliser_nchd(fr) > 0 )
+		FINALISE( pointee, finaliser_chd(fr, 0) );
 	FREE(pointee);
 	*((void **)ptr) = NULL;
 }
 
 
-dtor *ptr_dtor()
+finaliser *finaliser_new_ptr()
 {
-	dtor *ret = NEW(dtor);
-	ret->df = _ptr_destroy;
+	finaliser *ret = NEW(finaliser);
+	ret->fn = _ptr_finalise;
 	ret->nchd = 0;
 	ret->chd = NULL;
 	return ret;

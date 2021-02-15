@@ -66,28 +66,28 @@ avl *avl_new(cmp_func cmp)
 }
 
 
-static void __avl_dtor(avlnode *root, const dtor *dt)
+static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 {
 	if (root==NULL) {
 		return;
 	}
 	else {
-		__avl_dtor(root->left, dt);
-		__avl_dtor(root->right, dt);
-		FINALISE(&(root->val), dt);
+		__avl_finaliser(root->left, fnr);
+		__avl_finaliser(root->right, fnr);
+		FINALISE(&(root->val), fnr);
 		FREE(root);
 	}
 }
 
 
-void avl_destroy(void *ptr, const dtor *dt)
+void avl_finalise(void *ptr, const finaliser *fnr)
 {
 	avl *self = (avl *)ptr;
-	if (dt->nchd > 0) {
-		__avl_dtor(self->root, dtor_chd(dt, 0));
+	if (fnr->nchd > 0) {
+		__avl_finaliser(self->root, finaliser_chd(fnr, 0));
 	}
 	else {
-		__avl_dtor(self->root, empty_dtor());
+		__avl_finaliser(self->root, finaliser_new_empty());
 	}
 }
 

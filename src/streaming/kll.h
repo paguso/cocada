@@ -161,7 +161,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * @warning This constructor *SHOULD NOT* be used if the summary
  * is supposed to contain *onwed* object references. If such is the
  * case, use kll_new_own or kll_new_onw_with_cap. This is equivalent
- * to kll_new_own(typesize, cmp, err, empty_dtor())
+ * to kll_new_own(typesize, cmp, err, finaliser_new_empty())
  *
  * @see order.h
  * @see kll_new_own
@@ -177,7 +177,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
  * @param err The desired error level (see header file comments)
- * @param chd_dt (**move**) A destructor for the stored child objects
+ * @param chd_fr (**move**) A destructor for the stored child objects
  *
  * The KLL summary stores the added data in internal containers.
  * If owned references are stored in the summary, then it needs to
@@ -187,7 +187,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  *
  * @see new.h
  */
-kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, finaliser *chd_fr);
 
 
 /**
@@ -236,7 +236,7 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, dtor *chd_dt);
  * @warning This constructor *SHOULD NOT* be used if the summary
  * is supposed to contain *onwed* object references. If such is the
  * case, use  kll_new_onw_with_cap. This is equivalent
- * to kll_new_own_with_cap(typesize, cmp, err, empty_dtor())
+ * to kll_new_own_with_cap(typesize, cmp, err, finaliser_new_empty())
  *
  * @see errlog.h
  */
@@ -251,7 +251,7 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps,
  * @see kll_new_with_cap
  */
 kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
-                              size_t cap, dtor *chd_dt);
+                              size_t cap, finaliser *chd_fr);
 
 
 /**
@@ -259,7 +259,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
  * If this summary is going to store
  * @see new.h
  */
-void kll_destroy(void *ptr, const dtor *dt);
+void kll_finalise(void *ptr, const finaliser *fnr);
 
 
 /**

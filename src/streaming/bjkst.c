@@ -87,7 +87,7 @@ void bjkst_process(bjkst *counter, uint64_t val)
 	while (counter->buf_size >=
 	        counter->buf_cap ) {//&& counter->min_zeros <= counter->nbits) {
 		counter->buf_size -= hashset_size(counter->buf[counter->min_zeros]);
-		FREE(counter->buf[counter->min_zeros], hashset);
+		DESTROY_PLAIN(counter->buf[counter->min_zeros], hashset);
 		counter->buf[counter->min_zeros] = NULL;
 		counter->min_zeros++;
 	}

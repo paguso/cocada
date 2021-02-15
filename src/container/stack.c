@@ -34,9 +34,9 @@ stack *stack_new(size_t typesize)
 }
 
 
-void stack_destroy(void *ptr, const dtor *dt)
+void stack_finalise(void *ptr, const finaliser *fnr)
 {
-	vec_destroy(ptr, dt);
+	vec_finalise(ptr, fnr);
 }
 
 

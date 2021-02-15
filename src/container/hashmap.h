@@ -99,7 +99,7 @@ void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize,
  * the values.
  * @see new.h
  */
-void hashmap_destroy(void *ptr, const dtor *dt);
+void hashmap_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
