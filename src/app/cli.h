@@ -217,9 +217,9 @@ typedef enum {
 	ARG_FLOAT = 4, /* Floating point type, stored as double */
 	ARG_STR = 5,   /* Free-form string literal type */
 	ARG_FILE = 6,  /* File type (no validation, used for
-						descriptive/cumentation purposes) */
-	ARG_DIR = 7,   /* Directory type (no validafnrio, used for
-						descriptive/cumentation purposes) */
+						descriptive/documentation purposes) */
+	ARG_DIR = 7,   /* Directory type (no validation, used for
+						descriptive/documentation purposes) */
 	ARG_CHOICE = 8 /* Finite set of string alternatives */
 } cliargtype;
 
@@ -379,7 +379,7 @@ cliparse *cliparse_new(char *name, char *help);
 /**
  * @brief Destructor.
  * Use with default destructor `FNR(cliparse)`, or
- * simply `DESTROY_PLAIN(obj, cliparse)`.
+ * simply `DESTROY_FLAT(obj, cliparse)`.
  */
 void cliparse_finalise(void *ptr, const finaliser *fnr);
 

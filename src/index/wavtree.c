@@ -265,7 +265,7 @@ static void tmp_wt_free(tmp_wavtree *twt)
 {
 	alphabet_free(twt->ab);
 	huffcode_free(twt->hcode);
-	DESTROY_PLAIN(twt->chrcodes, vec);
+	DESTROY_FLAT(twt->chrcodes, vec);
 	tmp_wtnode_free(twt->tmp_root);
 	FREE(twt);
 }
@@ -408,9 +408,9 @@ static void _tmp_wavtree_init_veb_layout( tmp_wtnode *node, size_t heig,
 				stack_push_size_t(stknxtchd, 0);
 			}
 		}
-		DESTROY_PLAIN(stknode, stack);
-		DESTROY_PLAIN(stkdepth, stack);
-		DESTROY_PLAIN(stknxtchd, stack);
+		DESTROY_FLAT(stknode, stack);
+		DESTROY_FLAT(stkdepth, stack);
+		DESTROY_FLAT(stknxtchd, stack);
 	}
 }
 
@@ -611,7 +611,7 @@ void wavtree_free(wavtree *wt)
 {
 	if (wt==NULL) return;
 	if (wt->own_ab) alphabet_free(wt->ab);
-	DESTROY_PLAIN(wt->chrcodes, vec);
+	DESTROY_FLAT(wt->chrcodes, vec);
 	csrsbitarr_free(wt->bitarr, true);
 	FREE(wt->nodes);
 	FREE(wt);

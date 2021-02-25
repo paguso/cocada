@@ -26,8 +26,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "new.h"
 #include "cstrutil.h"
+#include "memdbg.h"
+#include "new.h"
 
 
 char *cstr_new(size_t len)

@@ -77,7 +77,7 @@ xstrhash *xstrhash_new(alphabet *ab)
 void xstrhash_finalise(void *ptr, const finaliser *fnr)
 {
 	xstrhash *self = (xstrhash *)ptr;
-	DESTROY_PLAIN(self->ab, alphabet);
+	DESTROY_FLAT(self->ab, alphabet);
 }
 
 

@@ -30,8 +30,8 @@
 #include "cstrutil.h"
 #include "huffcode.h"
 #include "mathutil.h"
-#include "xstr.h"
 #include "randutil.h"
+#include "xstr.h"
 
 
 void test_huffcode_new(CuTest *tc)

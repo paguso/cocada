@@ -14,6 +14,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#include "memdbg.h"
+
 #define CUTEST_VERSION  "CuTest 1.5"
 
 /* CuString */

@@ -27,14 +27,15 @@
 #include "arrays.h"
 #include "cstrutil.h"
 #include "coretype.h"
+#include "deque.h"
 #include "errlog.h"
 #include "hash.h"
 #include "hashmap.h"
 #include "hashset.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "serialise.h"
-#include "deque.h"
 
 extern int errno;
 
@@ -165,7 +166,7 @@ static bool contains_addr(vec *chunks, size_t addr)
 			r = m;
 		}
 		else if ( chk->start <= addr  && addr < chk->start + chk->size ) {
-			return true;		
+			return true;
 		}
 		else {
 			l = m + 1;
@@ -181,17 +182,21 @@ static void add_chunk(vec *chunks, mem_chunk ck)
 	size_t addr = ck.start;
 	if (vec_len(chunks) == 0) {
 		pos = 0;
-	} else if (addr <= ((mem_chunk*)(vec_first(chunks)))->start) {
+	}
+	else if (addr <= ((mem_chunk *)(vec_first(chunks)))->start) {
 		pos = 0;
-	} else if (((mem_chunk*)(vec_last(chunks)))->start < addr) {
+	}
+	else if (((mem_chunk *)(vec_last(chunks)))->start < addr) {
 		pos =  vec_len(chunks);
-	} else {
+	}
+	else {
 		size_t l = 0, r = vec_len(chunks) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
-			if (((mem_chunk*)(vec_get(chunks, m)))->start < addr) {
+			if (((mem_chunk *)(vec_get(chunks, m)))->start < addr) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
@@ -199,7 +204,7 @@ static void add_chunk(vec *chunks, mem_chunk ck)
 	}
 	vec_ins(chunks, pos, &ck);
 }
-	
+
 
 
 
@@ -271,12 +276,13 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
                       hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Type mismatch. Expected SOM type %d; found %d.\n",
+	WARN_ASSERT(model->type == type,
+	            "Type mismatch. Expected SOM type %d; found %d.\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
-	WARN_ASSERT(model->size == size, "Primitive type size mismatch." 
-			    "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
+	WARN_ASSERT(model->size == size, "Primitive type size mismatch."
+	            "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
 	            model->size, size);
 	fread(dest, model->size, 1, stream);
 	mem_chunk chunk = {.start = addr, .size=model->size};
@@ -328,12 +334,13 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 {
 	rawptr *dest = (rawptr *)ptr;
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Pointer type mismatch. Expected SOM type %d; found %d.\n",
+	WARN_ASSERT(model->type == type,
+	            "Pointer type mismatch. Expected SOM type %d; found %d.\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
-	WARN_ASSERT(model->size == size, "Pointer type size mismatch." 
-			    "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
+	WARN_ASSERT(model->size == size, "Pointer type size mismatch."
+	            "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
 	            model->size, size);
 	fread(dest, size, 1, stream);
 	mem_chunk chunk = {.start = addr, .size = size};
@@ -471,7 +478,8 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
               hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "Array type mismatch. Expected SOM type %d; found %d\n",
+	WARN_ASSERT(model->type == type,
+	            "Array type mismatch. Expected SOM type %d; found %d\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
@@ -516,10 +524,11 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 
 
 void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
-              hashmap *mem_map)
+                 hashmap *mem_map)
 {
 	size_t type = read_type(stream);
-	WARN_ASSERT(model->type == type, "String type mismatch. Expected SOM type %d; found %d\n",
+	WARN_ASSERT(model->type == type,
+	            "String type mismatch. Expected SOM type %d; found %d\n",
 	            (int)model->type, (int)type);
 	size_t addr = read_addr(stream);
 	size_t size = read_size(stream);
@@ -603,8 +612,8 @@ static void bfs_write(som *model, void *obj, FILE *stream)
 		deque_pop_front(dq, &om);
 		write_obj(om.model, om.obj, stream, dq, written, true);
 	}
-	DESTROY_PLAIN(written, vec);
-	DESTROY_PLAIN(dq, deque);
+	DESTROY_FLAT(written, vec);
+	DESTROY_FLAT(dq, deque);
 }
 
 
@@ -630,9 +639,9 @@ static void *bfs_read(som *model, FILE *stream)
 	}
 	rawptr ret = *ptr;
 	FREE(ptr);
-	DESTROY_PLAIN(read, vec);
-	DESTROY_PLAIN(dq, deque);
-	DESTROY_PLAIN(mem_map, hashmap);
+	DESTROY_FLAT(read, vec);
+	DESTROY_FLAT(dq, deque);
+	DESTROY_FLAT(mem_map, hashmap);
 	return ret;
 }
 

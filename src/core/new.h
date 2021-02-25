@@ -82,15 +82,15 @@
  * type_init(&obj);
  * ```
  *
- * Object destruction, on the other hand, can be a lot trickier, because an object may 
+ * Object destruction, on the other hand, can be a lot trickier, because an object may
  * contain or refer to other objects. The crucial question is whether to destroy
- * a '*child* ' objecs as part of the '*parent* ' object destruction. Two
+ * a '*child* ' object as part of the '*parent* ' object destruction. Two
  * main problems may arise.
  * - If a child object is not destroyed and no furhter references to it exist after
  * the parent object is destroyed, we have a *memory leak*.
  * - If a child object is destroyed and another reference to it exists outside the
  * parent object (shared reference), we have a *dangling reference*. In particular,
- * any subsequent attempt to destroy that same object will lead to '*double free*' 
+ * any subsequent attempt to destroy that same object will lead to '*double free*'
  * problems.
  *
  * So basically, we have to ensure that
@@ -99,7 +99,7 @@
  * 2. Every object is destroyed at most once.
  *
  * This is a complex problem in general. Some languages offer automatic memory
- * management systems (garbage collection) whereas others, enforce 
+ * management systems (garbage collection) whereas others, enforce
  * strict *ownership* rules. Ownership is the principle whereby every object has
  * at  most one owner, and destroying the owner automatically triggers the
  * destruction of its owned components. Shared references integrity is maintained
@@ -109,9 +109,9 @@
  * maintain a simpler object dependency structure, trying to make clear
  * <b>in the documentation</b> when the ownership of an object is transferred to
  * another. Likewise, the documentation of the destructors (see below) should
- * indicate which child objects should be destroyed. **As a rule of thumb, a 
- * child object should be destroyed upon the destruction of its parent
- * object if, and only if, it is owned".
+ * indicate which child objects should be destroyed. **As a rule of thumb, we
+ * should destroy a referenced object as part of the destruction of its parent
+ * if, and only if, it is owned**.
  *
  * # Object composition
  *
@@ -147,10 +147,6 @@
  *                     +-------------+
  * ```
  *
- * In the first case, the memory for holding the internal `B` instance is
- * allocated as part of the memory for holding `A`. In the second case, the
- * memory for `B` must be allocated during object initialisation (Step 2).
- *
  * Object *containers* implement generalised versions of those relations.
  * A container is called *flat* when the contained objects are
  * physically stored within the container buffer (array). If the container
@@ -172,8 +168,8 @@
  *                     +-----------------------------------+
  * ```
  *
- * More typically, though, we have arbitrary size containers whose
- * elements live outside the container, in an array of other dynamic
+ * More frequently, we have arbitrary size containers whose
+ * elements live outside, in an array of other dynamic
  * data strucutre, something like
  *
  * ```
@@ -225,19 +221,18 @@
  * Although a reference container conceptually stores external objects,
  * they are nothing but flat containers of pointers. So there is only one
  * implementation for both cases.
- * In both IV-V cases, the buffer memory is normally allocated and initialised
- * during the (container) object initialisation (Step 2).
- * This is important for understanding the discussion on object destruction below.
+ * In both IV-V cases, the buffer memory is often allocated and initialised
+ * during the (container) object initialisation (Step 2), although
+ * it can be modified (e.g. resized) later.
  *
- *
- * # Object destruction infrastructure
+ * # Object destruction
  *
  * As mentioned above, destroying an object requires, first, `finalising´ it
  * (Step 4), that is cleaning its internal state and releasing the resources
- * (memory, file handlers, network connexions, etc) held by the object in reverse 
+ * (memory, file handlers, network connexions, etc) held by the object in reverse
  * order of allocation, and then freeing the memory used by the struct (Step 5).
- * In particular, finalising a flat container amounts to freeing the memory used by
- * its buffer plus some constant-sized housekeeping memory. For example,
+ * Finalising a flat container might include freeing the memory used by
+ * its buffer plus some fixed-sized memory. For example,
  * the buffer of a flat vector with capacity for 100 4-byte integers will occupy
  * 400 bytes of heap memory. However, by deallocating the buffer of a reference
  * container, we are not freeing the referenced objects, which might cause a
@@ -245,8 +240,8 @@
  * hierarchies of nested objects. COCADA provides some infrastructure for
  * dealing with the proper disposal of  complex hierarchies of objects.
  *
- * The basic concept is that of a **finaliser** ::finaliser which encapsulates and
- * provides a way of nesting **finalise functions** ::finalise_func used for
+ * The basic concept is that of a **finaliser** (::finaliser) which encapsulates and
+ * provides a way of nesting **finalise functions** (::finalise_func) used for
  * finalising object hierarchies. A finaliser is a  *closure* object
  * composed of
  * - A reference to a *finalise function* ::finalise_func; and
@@ -271,7 +266,7 @@
  * ```
  * For now let us suppose these are flat containers (we´ll come back to that later).
  *
- * The finalisation of C would go roughly as follows.  First, the finalise function
+ * The finalisation of `C` would go roughly as follows.  First, the finalise function
  *
  * ```C
  * void C_finalise( void *ptr, finaliser *c_fr )
@@ -291,31 +286,23 @@
  * will check whether `b_fr` contains references to a finaliser for type
  * `A`-objects. After all `A`-objects of a type-`B` container are properly
  * disposed of, then its buffer can be deallocated.  Similarly, after all
- * `B`-objects of a C` container are properly finalised, then its buffer
+ * `B`-objects of a `C` container are properly finalised, then its buffer
  * can be freed.
  *
- * ### IMPORTANT: Finalise functions *SHOULD NOT* deallocate the object 
+ * ### IMPORTANT: Finalise functions *SHOULD NOT* deallocate the object
  *
- * A finalise function corresponds to step 3 of the object lifecycle 
+ * A finalise function corresponds to step 3 of the object lifecycle
  * mentioned above. Therefore it should **NOT** attempt to deallocate
  * the memory pointed by the provided object handler, which need not even be a
- * dynamically-allocated heap location.
- * 
+ * dynamically-allocated heap location. This is why we use the term "finaliser"
+ * instead of "destructor".
  *
- * ## Pointer destructors
+ *
+ * ## Pointer finalisers
  *
  * The situation above is slightly different for reference containers.
  * Let us suppose that the container `C` is a reference  container. Then each
- * element of `C` is actually a pointer to a type-`B` container.
- * After finalising one such child containers, we also typically want to have
- * the its corresponding object memory deallocated.
- * If `C` is a flat container as before, then its type-`B` container
- * elements structs are directly stored within its buffer. Thus we want
- * to finalise one such type-`B` container (to delete its `A`-elements
- * and release their buffers), but we cannot call a ::free on them individually.
- * All the type-`B` structs memory will be released at once when the buffer
- * of the `C` container is released.
- *
+ * element of `C` is actually an owned pointer to a type-`B` container.
  * This indirection of reference containers must be reflected in the
  * finaliser structure. You can think of a reference container, as mentioned
  * above, as container of pointers, each pointer being itself a special case
@@ -325,7 +312,7 @@
  *
  * <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
  *
- * So, the `C` finaliser needs to have not a `B` finaliser as child, but
+ * So, the `C` finaliser should not have a `B` finaliser as child, but
  * rather a *pointer finaliser*, which then will have a `B` finaliser
  * as child. The difference is subtle but crucial.
  *
@@ -385,11 +372,11 @@
  * ## Empty finalisers
  *
  * In the last example above, it could be that we did not wish to destroy the `B`-type
- * child objects. For instance, they could be shared objects whose deletion would cause 
+ * child objects. For instance, they could be shared objects whose deletion would cause
  * dangling pointer problems.
  * An *empty finaliser* obtained via ::finaliser_new_empty can be used in such cases to
  * signal that the  corresponding child  objects should not be destroyed.
- * In this case, all the objects downstream the empty finaliser point are also 
+ * In this case, all the objects downstream the empty finaliser point are also
  * left untouched.
  *
  *
@@ -398,21 +385,20 @@
  * An object can be *finalised* (Step 4 *only*)  via the ::FINALISE macro.
  * This will not deallocate the object, and is typically what would be used from
  * whithin a flat container destructor to clean memory used by its elements. It is also
- * used to finalise stack objects. The finaliser object is also not destroyed 
+ * used to finalise stack objects. The finaliser object is also not destroyed
  * in the process.
  *
  * An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
  * In addition to finalising the object, it also deallocates its memory **and**
- * also consumes the finaliser. If the default, childless finaliser is to be used,
- * we can simply use `DESTROY_PLAIN(obj, type)` which is equivalent, but slightly more
+ * consumes the finaliser. If the default, childless finaliser is to be used,
+ * we can simply use `DESTROY_FLAT(obj, type)` which is equivalent, but slightly more
  * convenient than `DESTROY(obj, FNR(type))`.
  *
  * Finally, we may have simpler objects without child objects, or objects whose inner
  * references are fixed and known at compile time. The destructor functions of these
- * objects  actually don't need to look at the runtime-built finalisers to know which
- * components to destroy. In such case, we can still define a standard destructor of
- * type ::finalise_func function which ignores the `fnr` argument, but this is inefficient
- * and misleading. For such objects we define a simple destructor
+ * objects don't need to look at runtime-built finalisers to know which
+ * components to destroy. In such case, although we can still define a finalise function
+ * which ignores the `fnr` argument, we might rather define a simple destructor
  *
  * ```
  * void type_free(type *obj)
@@ -424,7 +410,7 @@
  *
  * # Limitations: Backward/Cyclic references
  *
- * No check is performed for backward references, which can cause *double free*
+ * No check is performed for backward of self-references, which can cause *double free*
  * problems.
  *
  *
@@ -452,7 +438,7 @@
  *     <td>`FINALISE(obj, finaliser )`</td>
  *     <td rowspan=3>4+5. Destruction</td>
  *     <td rowspan=3>`DESTROY(obj, finaliser)`<br>
- *     `DESTROY_PLAIN(obj, type)`<br>
+ *     `DESTROY_FLAT(obj, type)`<br>
  *     `type_free(obj)`</td>
  * </tr>
  * <tr>
@@ -566,7 +552,7 @@ finaliser *finaliser_new_ptr();
  * Finalises an object @p OBJ with the default plain typed finaliser
  * TYPE_finalise(). Same as FINALISE(OBJ, FNR(TYPE)).
  */
-#define FINALISE_PLAIN( OBJ, TYPE ) FINALISE(OBJ, FNR(TYPE))
+#define FINALISE_FLAT( OBJ, TYPE ) FINALISE(OBJ, FNR(TYPE))
 
 
 /**
@@ -586,7 +572,7 @@ finaliser *finaliser_new_ptr();
  * Destroys an object @p OBJ with the default plain typed finaliser
  * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
  */
-#define DESTROY_PLAIN( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, FNR(TYPE))
+#define DESTROY_FLAT( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, FNR(TYPE))
 
 
 /**

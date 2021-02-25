@@ -65,7 +65,7 @@ void minqueue_finalise(void *ptr, const finaliser *fnr )
 {
 	minqueue *mq = (minqueue *)ptr;
 	deque_finalise(mq->elts, fnr);
-	DESTROY_PLAIN(mq->mins, deque);
+	DESTROY_FLAT(mq->mins, deque);
 }
 
 

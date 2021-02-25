@@ -25,9 +25,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "bitbyte.h"
 #include "coretype.h"
-#include "minqueue.h"
 #include "new.h"
 #include "order.h"
 
@@ -57,7 +55,7 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
  * @param cmp Comparator function
  * @see order.h
  */
-minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func,
+minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
                                      size_t capacity);
 
 

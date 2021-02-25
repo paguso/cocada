@@ -21,16 +21,17 @@
 
 //#include <immintrin.h>
 
-#include "coretype.h"
 #include "arrays.h"
 #include "bitbyte.h"
-#include "new.h"
+#include "coretype.h"
 #include "cstrutil.h"
 #include "hashmap.h"
+#include "iter.h"
 #include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 #include "order.h"
 #include "string.h"
-#include "iter.h"
 
 
 static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE

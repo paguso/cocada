@@ -137,7 +137,7 @@
  * in the nodes. In this case, as well as for non-owned indirect data,
  * a simple call to
  * ```C
- * DESTROY_PLAIN(tree, avl);
+ * DESTROY_FLAT(tree, avl);
  * ```
  * should suffice for tree disposal.
  *

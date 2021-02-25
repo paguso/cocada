@@ -131,53 +131,58 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 {
 	switch (type) {
 	case ARG_NONE:
-		DESTROY_PLAIN(vals, vec);
+		DESTROY_FLAT(vals, vec);
 		break;
 	case ARG_BOOL:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			DESTROY_PLAIN(vals, vec);
+			DESTROY_FLAT(vals, vec);
 			break;
 		}
 		break;
 	case ARG_CHAR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			DESTROY_PLAIN(vals, vec);
+			DESTROY_FLAT(vals, vec);
 			break;
 		}
 		break;
 	case ARG_INT:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			DESTROY_PLAIN(vals, vec);
+			DESTROY_FLAT(vals, vec);
 			break;
 		}
 		break;
 	case ARG_FLOAT:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             FNR(vec))));
 			break;
 		case OPT_SINGLE:
-			DESTROY_PLAIN(vals, vec);
+			DESTROY_FLAT(vals, vec);
 			break;
 		}
 		break;
 	case ARG_STR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
-			                        finaliser_new_ptr()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             finaliser_cons(FNR(vec),
+			                                     finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
@@ -187,8 +192,9 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_FILE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
-			                        finaliser_new_ptr()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             finaliser_cons(FNR(vec),
+			                                     finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
@@ -198,8 +204,9 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_DIR:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
-			                        finaliser_new_ptr()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             finaliser_cons(FNR(vec),
+			                                     finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
@@ -209,8 +216,9 @@ static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
 	case ARG_CHOICE:
 		switch (multi)	{
 		case OPT_MULTIPLE:
-			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), finaliser_cons(FNR(vec),
-			                        finaliser_new_ptr()))));
+			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+			                             finaliser_cons(FNR(vec),
+			                                     finaliser_new_ptr()))));
 			break;
 		case OPT_SINGLE:
 			DESTROY(vals, finaliser_cons(FNR(vec), finaliser_new_ptr()));
@@ -371,7 +379,7 @@ void cliopt_finalise(void *ptr, const finaliser *fnr)
 		DESTROY(opt->defaults, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 		break;
 	default:
-		DESTROY_PLAIN(opt->defaults, vec);
+		DESTROY_FLAT(opt->defaults, vec);
 		break;
 	}
 	_vals_vec_free(opt->values, opt->multi, opt->type);
@@ -459,13 +467,16 @@ cliparse *cliparse_new(char *name, char *help)
 void cliparse_finalise(void *ptr, const finaliser *fnr)
 {
 	cliparse *clip = (cliparse *)ptr;
-	DESTROY(clip->subcommands, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_empty()),
-	                                     finaliser_cons(finaliser_new_ptr(), FNR(cliparse))));
-	DESTROY_PLAIN(clip->subcmd_names, vec);
-	DESTROY(clip->options, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_empty()),
-	                                 finaliser_cons(finaliser_new_ptr(), FNR(cliopt))));
-	DESTROY_PLAIN(clip->long_to_short, hashmap);
-	DESTROY(clip->args, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(), FNR(cliarg))));
+	DESTROY(clip->subcommands, finaliser_cons(finaliser_cons(FNR(hashmap),
+	        finaliser_new_empty()),
+	        finaliser_cons(finaliser_new_ptr(), FNR(cliparse))));
+	DESTROY_FLAT(clip->subcmd_names, vec);
+	DESTROY(clip->options, finaliser_cons(finaliser_cons(FNR(hashmap),
+	                                      finaliser_new_empty()),
+	                                      finaliser_cons(finaliser_new_ptr(), FNR(cliopt))));
+	DESTROY_FLAT(clip->long_to_short, hashmap);
+	DESTROY(clip->args, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
+	                                   FNR(cliarg))));
 	FREE(clip->name);
 	FREE(clip->help);
 }
@@ -771,7 +782,7 @@ static void _check_missing_options(cliparse *cmd)
 				break;
 			case OPT_SINGLE:
 				vec_cat(opt->values, vals);
-				DESTROY_PLAIN(vals, vec);
+				DESTROY_FLAT(vals, vec);
 				break;
 			}
 		}
@@ -994,7 +1005,7 @@ void cliparse_parse(cliparse *clip, int argc, char **argv)
 				switch (cur_opt->multi) {
 				case OPT_SINGLE:
 					vec_cat(cur_opt->values, cur_vals);
-					DESTROY_PLAIN(cur_vals, vec);
+					DESTROY_FLAT(cur_vals, vec);
 					cur_vals = NULL;
 					break;
 				case OPT_MULTIPLE:

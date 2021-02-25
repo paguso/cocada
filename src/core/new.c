@@ -60,7 +60,8 @@ const finaliser *finaliser_chd(const finaliser *self, size_t index)
 
 finaliser *finaliser_cons(finaliser *par, const finaliser *chd)
 {
-	par->chd = (finaliser **) realloc(par->chd, ( par->nchd + 1) * sizeof(finaliser *));
+	par->chd = (finaliser **) realloc(par->chd,
+	                                  ( par->nchd + 1) * sizeof(finaliser *));
 	par->chd[par->nchd++] =  (finaliser *)chd;
 	return par;
 }

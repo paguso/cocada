@@ -20,15 +20,16 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "new.h"
-#include "mathutil.h"
 #include "deque.h"
+#include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 
 const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
@@ -145,7 +146,8 @@ static void check_and_resize(deque *q)
 void deque_push_back(deque *q, const void *elt)
 {
 	check_and_resize(q);
-	memcpy(q->data + (((q->start + q->len) % q->cap) * q->typesize), elt, q->typesize);
+	memcpy(q->data + (((q->start + q->len) % q->cap) * q->typesize), elt,
+	       q->typesize);
 	q->len++;
 }
 
@@ -161,7 +163,8 @@ void deque_push_front(deque *q, const void *elt)
 
 void deque_pop_back(deque *q, void *dest)
 {
-	memcpy(dest, q->data + (((q->start + q->len - 1) % q->cap) * q->typesize), q->typesize);
+	memcpy(dest, q->data + (((q->start + q->len - 1) % q->cap) * q->typesize),
+	       q->typesize);
 	q->len--;
 	check_and_resize(q);
 }

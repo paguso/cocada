@@ -66,11 +66,11 @@ void test_avl_ins(CuTest *tc)
 		DEBUG("Insert %d\n", val);
 		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
 		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_int(tree, val));
-		DEBUG_ACTION(avl_print(tree, stderr, print_int));
+		DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	}
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
-	DESTROY_PLAIN(tree, avl);
+	DESTROY_FLAT(tree, avl);
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -82,9 +82,9 @@ void test_avl_ins(CuTest *tc)
 		DEBUG("\n\nInsert owned obj %d\n", key);
 		CuAssert(tc, "Failed AVL push", avl_ins(tree, obj));
 		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins(tree, obj));
-		DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
+		DEBUG_EXEC(avl_print(tree, stderr, print_obj_t));
 	}
-	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
+	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
 	DESTROY(tree, finaliser_cons(FNR(avl), finaliser_new_ptr()));
 
@@ -99,12 +99,12 @@ void test_avl_ins(CuTest *tc)
 		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
 		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_rawptr(tree,
 		         (void *)vec_get(buf, i)));
-		DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
+		DEBUG_EXEC(avl_print(tree, stderr, print_obj_t));
 	}
-	DEBUG_ACTION(avl_print(tree, stderr, print_obj_t));
+	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
-	DESTROY_PLAIN(tree, avl);
-	DESTROY_PLAIN(buf, vec);
+	DESTROY_FLAT(tree, avl);
+	DESTROY_FLAT(buf, vec);
 }
 
 
@@ -121,7 +121,7 @@ void test_avl_get(CuTest *tc)
 		CuAssert(tc, "Failed AVL search", avl_get_int(tree, val, &getval));
 		CuAssertIntEquals(tc, val, getval);
 	}
-	DESTROY_PLAIN(tree, avl);
+	DESTROY_FLAT(tree, avl);
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -154,8 +154,8 @@ void test_avl_get(CuTest *tc)
 		         (rawptr *)&get_obj));
 		CuAssertPtrEquals(tc, (void *)vec_get(buf,i), get_obj);
 	}
-	DESTROY_PLAIN(tree, avl);
-	DESTROY_PLAIN(buf, vec);
+	DESTROY_FLAT(tree, avl);
+	DESTROY_FLAT(buf, vec);
 }
 
 
@@ -170,42 +170,42 @@ void test_avl_del(CuTest *tc)
 		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
 		//DEBUG_ACTION(avl_print(tree, stderr, print_int));
 	}
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	int res;
 	// remove non-existent value
 	CuAssert(tc, "Attempt to delete non-existent element should return false",
 	         ! avl_del_int(tree, 2*half_univ, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	// remove leaf node
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 2, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 4, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 6, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 13, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 17, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	CuAssert(tc, "Failed deletion", avl_del_int(tree, 19, &res));
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
-	DESTROY_PLAIN(tree, avl);
+	DESTROY_FLAT(tree, avl);
 }
 
 
@@ -219,9 +219,9 @@ void test_avl_get_iter(CuTest *tc)
 		int val = half_univ + ((i % 2) ? i : -i);
 		//DEBUG("Insert %d\n", val);
 		CuAssert(tc, "Failed AVL push", avl_ins_int(tree, val));
-		//DEBUG_ACTION(avl_print(tree, stderr, print_int));
+		//DEBUG_EXECUTE(avl_print(tree, stderr, print_int));
 	}
-	DEBUG_ACTION(avl_print(tree, stderr, print_int));
+	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
 	avl_iter *it = avl_get_iter(tree, PRE_ORDER);

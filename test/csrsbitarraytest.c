@@ -24,15 +24,16 @@
 #include <stdio.h>
 
 
-#include "CuTest.h"
 
 #include "arrays.h"
-#include "bitbyte.h"
 #include "bitarr.h"
-#include "new.h"
+#include "bitbyte.h"
 #include "csrsbitarray.h"
 #include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 
+#include "CuTest.h"
 
 static size_t nof_arrays;
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;

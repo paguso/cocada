@@ -189,6 +189,7 @@ som *get_node_som ()
 
 void test_serialise_list(CuTest *tc)
 {
+	memdbg_print_stats(stdout);
 	node *head = NULL;
 	int n = 3;
 	node **cur = &head;
@@ -197,7 +198,7 @@ void test_serialise_list(CuTest *tc)
 		tail = NEW(node);
 		tail->val = i;
 		tail->str = cstr_new(i);
-		for (int j = 0; j < i; tail->str[j++] = '0'+i);   
+		for (int j = 0; j < i; tail->str[j++] = '0'+i);
 		tail->arr = arr_int_calloc(i);
 		FILL_ARR(tail->arr, 0, i, i);
 		tail->next = NULL;
@@ -215,9 +216,8 @@ void test_serialise_list(CuTest *tc)
 	fclose(stream);
 	remove("serialised_node.out");
 
-	for ( node *cur = head, *cur_cpy = head_cpy; cur != NULL && cur_cpy; 
-		cur=cur->next, cur_cpy=cur_cpy->next ) 
-	{
+	for ( node *cur = head, *cur_cpy = head_cpy; cur != NULL && cur_cpy;
+	        cur=cur->next, cur_cpy=cur_cpy->next ) {
 		CuAssertIntEquals(tc, cur->val, cur_cpy->val);
 		CuAssertStrEquals(tc, cur->str, cur_cpy->str);
 		CuAssertSizeTEquals(tc, arr_int_len(cur->arr), arr_int_len(cur_cpy->arr));
@@ -225,6 +225,7 @@ void test_serialise_list(CuTest *tc)
 			CuAssertIntEquals(tc, cur->arr[i], cur_cpy->arr[i]);
 		}
 	}
+	memdbg_print_stats(stdout);
 
 }
 
@@ -234,9 +235,9 @@ void test_serialise_list(CuTest *tc)
 CuSuite *serialise_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_serialise_prim);
-	SUITE_ADD_TEST(suite, test_serialise_arr);
-	SUITE_ADD_TEST(suite, test_serialise_struct);
+	//SUITE_ADD_TEST(suite, test_serialise_prim);
+	//SUITE_ADD_TEST(suite, test_serialise_arr);
+	//SUITE_ADD_TEST(suite, test_serialise_struct);
 	SUITE_ADD_TEST(suite, test_serialise_list);
 	return suite;
 }

@@ -19,7 +19,6 @@
  *
  */
 
-#include "CuTest.h"
 
 #include "arrays.h"
 #include "errlog.h"
@@ -27,6 +26,7 @@
 #include "randutil.h"
 #include "twuhash.h"
 
+#include "CuTest.h"
 
 
 void twuhash_test_hash(CuTest *tc)

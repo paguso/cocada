@@ -29,8 +29,9 @@
 #include "arrays.h"
 #include "bitbyte.h"
 #include "errlog.h"
-#include "new.h"
 #include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 #include "xstr.h"
 
 

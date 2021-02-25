@@ -59,7 +59,7 @@
  * but not an Error. A Debug event is just a Debug info event and nothing
  * else. Conversely, an event is only considered if its level is
  * >= DEBUG_LVL. For example, all Warning events are disregarded if
- * DEBUG_LVL=0 (Error level). This module provides macros for triggering
+ * DEBUG_LVL=1 (Error level). This module provides macros for triggering
  * and reporting  such events.
  */
 
@@ -87,52 +87,81 @@ void print_trace(FILE *);
 #if DEBUG_LVL>=1
 
 /**
- * @brief Triggers an ERROR and prints an error message to `stderr`,
- * after which the program exits with `EXIT_FAILURE` status.
+ * @brief Triggers an ERROR and prints an error message to an
+ * output stream after which the program exits with `
+ * EXIT_FAILURE` status.
  *
+ * @param STREAM The output stream
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define ERROR(FORMAT, ...)\
-	fprintf(stderr,  "Error: "FORMAT, ##__VA_ARGS__ ); \
+#define FERROR(STREAM, FORMAT, ...)\
+	fprintf(STREAM,  "Error: "FORMAT, ##__VA_ARGS__ ); \
 	print_trace(stderr);\
 	exit(EXIT_FAILURE);
 
 
 /**
+ * @brief Same as FERROR(stderr, FORMAT, ...)
+ * @see FERROR
+ */
+#define ERROR(FORMAT, ...) FERROR(stderr, FORMAT, ##__VA_ARGS__)
+
+
+/**
  * @brief Conditionally triggers an ERROR and prints an error
- * message to `stderr`, after which the program exits with
+ * message to an output stream, after which the program exits with
  * `EXIT_FAILURE` status.
  *
+ * @param STREAM The output stream
  * @param CONDITION The condition that has to be satisfied for
  * the Error to occur.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define ERROR_IF(CONDITION, FORMAT, ...) \
+#define FERROR_IF(CONDITION, STREAM, FORMAT, ...) \
 	if ( CONDITION ) { \
-		ERROR(FORMAT, ##__VA_ARGS__)\
+		FERROR(STREAM, FORMAT, ##__VA_ARGS__)\
 	}
 
 
 /**
+ * @brief Same as FERROR_IF(CONDITION, stderr, FORMAT, ...)
+ * @see FERROR_IF
+ */
+#define ERROR_IF(CONDITION, FORMAT, ...) \
+	FERROR_IF(CONDITION, stderr, FORMAT, ##__VA_ARGS__)
+
+
+/**
  * @brief Triggers an ERROR if an assertion is false and prints
- * an error message to `stderr`, after which the program exits with
- * `EXIT_FAILURE` status.
+ * an error message to an output stream, after which the program 
+ * exits with `EXIT_FAILURE` status.
  *
+ * @param STREAM The output stream
  * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define ERROR_ASSERT(ASSERTION, FORMAT, ...) \
-	ERROR_IF(!(ASSERTION), FORMAT, ##__VA_ARGS__)
+#define FERROR_ASSERT(ASSERTION, STREAM, FORMAT, ...) \
+	FERROR_IF(!(ASSERTION), STREAM, FORMAT, ##__VA_ARGS__)
 
+
+/**
+ * @brief Same as FERROR_ASSERT(ASSERTION, stderr, FORMAT, ...)
+ * @see FERROR_ASSERT
+ */
+#define ERROR_ASSERT(ASSERTION, FORMAT, ...) \
+	FERROR_ASSERT(ASSERTION, stderr, FORMAT, ##__VA_ARGS__)
 
 #else
 
+#define FERROR(IGN, ORE, ...) ((void)0)
 #define ERROR(IGNORE, ...) ((void)0)
+#define FERROR_IF(IG, NO, RE, ...) ((void)0)
 #define ERROR_IF(IGN, ORE, ...) ((void)0)
+#define FERROR_ASSERT(IG, NO, RE, ...) ((void)0)
 #define ERROR_ASSERT(IGN, ORE, ...) ((void)0)
 
 #endif
@@ -143,51 +172,80 @@ void print_trace(FILE *);
 #if DEBUG_LVL>=2
 
 /**
- * @brief Issues a WARNING and prints an error message to `stderr`
- * if DEBUG_LVL>=1. Otherwise nothing takes place.
+ * @brief Issues a WARNING and prints an error message to 
+ * an output stream if DEBUG_LVL>=2. Otherwise nothing takes place.
  *
+ * @param STREAM The output stream
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define WARN(FORMAT, ...) \
-	fprintf(stderr,  "Warning: "FORMAT, ##__VA_ARGS__ )
+#define FWARN(STREAM, FORMAT, ...) \
+	fprintf(STREAM,  "Warning: "FORMAT, ##__VA_ARGS__ )
+
+
+/**
+ * @brief Same as FWARN(stderr, FORMAT, ...)
+ * @see FWARN
+ */
+#define WARN(FORMAT, ...) FWARN(stderr, FORMAT, ##__VA_ARGS__)
 
 
 /**
  * @brief Conditionally issues a WARNING and prints a message to
- * `stderr`. If DEBUG_LVL<1 nothing takes place regardless of
+ * an output stream. If DEBUG_LVL < 2 nothing takes place regardless of
  * the condition.
  *
+ * @param STREAM The output stream
  * @param CONDITION The condition that has to be satisfied for
  * the warning.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define WARN_IF(CONDITION, FORMAT, ...) \
+#define FWARN_IF(CONDITION, STREAM, FORMAT, ...) \
 	if ( CONDITION ) { \
-		fprintf(stderr,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
+		fprintf(STREAM,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
 	}
 
 
 /**
+ * @brief Same as FWARN_IF(CONDITION, stderr, FORMAT, ...)
+ * @see FWARN_IF
+ */
+#define WARN_IF(CONDITION, FORMAT, ...) \
+	FWARN_IF(CONDITION, stderr, FORMAT, ##__VA_ARGS__)
+
+
+/**
  * @brief Issues a WARNING if an assertion is false and prints
- * an error message to `stderr`.
- * If DEBUG_LVL<1 nothing takes place regardless of  the assertion.
+ * an error message to an output stream.
+ * If DEBUG_LVL < 2 nothing takes place regardless of the assertion.
  *
+ * @param STREAM The output stream
  * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define WARN_ASSERT(ASSERTION, FORMAT, ...) \
+#define FWARN_ASSERT(ASSERTION, STREAM, FORMAT, ...) \
 	if ( !(ASSERTION) ) { \
-		fprintf(stderr,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
+		fprintf(STREAM,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
 	}
+
+
+/**
+ * @brief Same as FWARN_ASSERT(ASSERTION, stderr, FORMAT, ...)
+ * @see FWARN_ASSERT
+ */
+#define WARN_ASSERT(ASSERTION, FORMAT, ...) \
+	FWARN_ASSERT(ASSERTION, stderr, FORMAT, ##__VA_ARGS__)
 
 #else
 
+#define FWARN(IGN, ORE, ...) ((void)0)
 #define WARN(IGNORE, ...) ((void)0)
+#define FWARN_IF(IG, NO, RE, ...) ((void)0)
 #define WARN_IF(IGN, ORE, ...) ((void)0)
+#define FWARN_ASSERT(IG, NO, RE, ...) ((void)0)
 #define WARN_ASSERT(IGN, ORE, ...) ((void)0)
 
 #endif
@@ -197,55 +255,87 @@ void print_trace(FILE *);
 #if DEBUG_LVL>=3
 
 /**
- * @brief Prints a DEBUG info message to `stderr`
- * if DEBUG_LVL==2. Otherwise nothing takes place.
+ * @brief Prints a DEBUG info message to an output stream
+ * if DEBUG_LVL=3. Otherwise nothing takes place.
  *
+ * @param STREAM The output stream
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define DEBUG(FORMAT, ...) \
-	fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );
+#define FDEBUG(STREAM, FORMAT, ...) \
+	fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );
+
+
+/**
+ * @brief Same as FDEBUG(stderr, FORMAT, ...)
+ * @see FDEBUG
+ */
+#define DEBUG(FORMAT, ...) FDEBUG(stderr, FORMAT, ##__VA_ARGS__)
+
 
 /**
  * @brief Conditionally prints a DEBUG info message to
- * `stderr`. If DEBUG_LVL<2 nothing takes place regardless of
- * the condition.
+ * an output stream. If DEBUG_LVL < 3 nothing takes place 
+ * regardless of the condition.
  *
+ * @param STREAM The output stream
  * @param CONDITION The condition that has to be satisfied for
  * the warning.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define DEBUG_IF(CONDITION, FORMAT, ...) \
+#define FDEBUG_IF(CONDITION, STREAM, FORMAT, ...) \
 	if ( CONDITION ) { \
-		fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+		fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 	}
 
+
 /**
- * @brief Prints a DEBUG info message to `stderr`if an assertion is
- * false.
- * If DEBUG_LVL<2 nothing takes place regardless of the assertion.
+ * @brief Same as FDEBUG_IF(CONDITION, stderr, FORMAT, ...)
+ * @see FDEBUG_IF
+ */
+#define DEBUG_IF(CONDITION, FORMAT, ...) \
+	FDEBUG_IF(CONDITION, stderr, FORMAT, ##__VA_ARGS__)
+
+
+/**
+ * @brief Prints a DEBUG info message to an output stream if 
+ * an assertion is false.
+ * If DEBUG_LVL < 3 nothing takes place regardless of the assertion.
  *
+ * @param STREAM The output stream
  * @param ASSERTION The condition which, if not satisfied, triggers
  * the Error.
  * @param FORMAT Is the format string of the message, followed
  * by the variable list of arguments as in `printf`-like functions.
  */
-#define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
+#define FDEBUG_ASSERT(ASSERTION, STREAM, FORMAT, ...) \
 	if ( !(ASSERTION) ) { \
-		fprintf(stderr,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+		fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );\
 	}
+
+
+/**
+ * @brief Same as FDEBUG_ASSERT(ASSERTION, stderr, FORMAT, ...)
+ * @see FDEBUG_ASSERT
+ */
+#define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
+	FDEBUG_ASSERT(ASSERTION, stederr, FORMAT, ##__VA_ARGS__) 
+
 
 /**
  * @brief Executes a statement if in DEBUG mode, i.e. if  DEBUG_LVL >= 3
  */
-#define DEBUG_ACTION(STATEMENT)\
+#define DEBUG_EXEC(STATEMENT)\
 	{STATEMENT;}\
 
 #else
 
+#define FDEBUG(IGN, ORE, ...) ((void)0)
 #define DEBUG(IGNORE , ...) ((void)0)
+#define FDEBUG_IF(IG, NO, RE , ...) ((void)0)
 #define DEBUG_IF(IGN, ORE , ...) ((void)0)
+#define FDEBUG_ASSERT(IG, NO, RE , ...) ((void)0)
 #define DEBUG_ASSERT(IGN, ORE , ...) ((void)0)
 #define DEBUG_ACTION(IGNORE) ((void)0)
 

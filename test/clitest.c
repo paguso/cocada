@@ -187,7 +187,7 @@ static void test_setup()
 
 static void test_teardown()
 {
-	DESTROY_PLAIN(cmd, cliparse);
+	DESTROY_FLAT(cmd, cliparse);
 }
 
 
@@ -215,7 +215,7 @@ static char **make_argv(char *call, int *argc)
 	for (i=0; i<*argc; i++) {
 		argv[i] = (char *)vec_get_rawptr(ret, i);
 	}
-	DESTROY_PLAIN(ret, vec);
+	DESTROY_FLAT(ret, vec);
 	return argv;
 }
 

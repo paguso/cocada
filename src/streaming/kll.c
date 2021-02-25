@@ -55,7 +55,8 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 }
 
 
-kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, finaliser *chd_fr)
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
+                     finaliser *chd_fr)
 {
 	size_t cap = (size_t) ceil( (1.0/(1.0-KLL_DEFAULT_C)) *
 	                            ( KLL_MIN_K_BIG_OH_CONST * (1.0/err) * sqrt(log(1.0/err)) ) );
@@ -66,7 +67,8 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, finaliser *chd_f
 kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err,
                           size_t capacity)
 {
-	return kll_new_own_with_cap(typesize, cmp, err, capacity, finaliser_new_empty());
+	return kll_new_own_with_cap(typesize, cmp, err, capacity,
+	                            finaliser_new_empty());
 }
 
 
@@ -108,10 +110,11 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
 void kll_finalise(void *ptr, const finaliser *fnr)
 {
 	kllsumm *self = (kllsumm *)ptr;
-	DESTROY_PLAIN(self->coins, vec);
+	DESTROY_FLAT(self->coins, vec);
 	if (finaliser_nchd(fnr)) {
-		DESTROY(self->buffs, finaliser_cons(FNR(vec), finaliser_cons(finaliser_new_ptr(),
-		                               finaliser_cons(FNR(vec), finaliser_chd(fnr, 0)))));
+		DESTROY(self->buffs, finaliser_cons(FNR(vec),
+		                                    finaliser_cons(finaliser_new_ptr(),
+		                                            finaliser_cons(FNR(vec), finaliser_chd(fnr, 0)))));
 	}
 	else {
 		DESTROY(self->buffs, finaliser_cons(FNR(vec), FNR(vec)));

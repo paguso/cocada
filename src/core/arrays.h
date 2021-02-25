@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "coretype.h"
+#include "memdbg.h"
 
 /**
  * @file arrays.h

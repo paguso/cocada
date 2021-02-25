@@ -57,7 +57,7 @@ void test_hashmap_int(CuTest *tc)
 		n--;
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
-	DESTROY_PLAIN(hmap, hashmap);
+	DESTROY_FLAT(hmap, hashmap);
 }
 
 
@@ -151,7 +151,8 @@ void test_hashmap_obj(CuTest *tc)
 
 
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
-	DESTROY(hmap, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_ptr()), finaliser_new_empty()));
+	DESTROY(hmap, finaliser_cons(finaliser_cons(FNR(hashmap), finaliser_new_ptr()),
+	                             finaliser_new_empty()));
 }
 
 

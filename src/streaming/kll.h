@@ -187,7 +187,8 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  *
  * @see new.h
  */
-kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err, finaliser *chd_fr);
+kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
+                     finaliser *chd_fr);
 
 
 /**

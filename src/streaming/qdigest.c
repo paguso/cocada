@@ -195,12 +195,12 @@ void qdigest_upd(qdigest *self, size_t val, size_t qty)
 	if (cap == self->next_compress_cap) {
 		self->next_compress_cap *= 2;
 		DEBUG("Before compress:\n");
-		DEBUG_ACTION(qdigest_print(self, stdout));
+		DEBUG_EXEC(qdigest_print(self, stdout));
 		size_pair nh = tree_size(self->root);
 		DEBUG("#nodes=%zu  height=%zu\n", nh.fst, nh.snd);
 		qdigest_compress(self);
 		DEBUG("After compress:\n");
-		DEBUG_ACTION(qdigest_print(self, stdout));
+		DEBUG_EXEC(qdigest_print(self, stdout));
 		nh = tree_size(self->root);
 		DEBUG("#nodes=%zu  height=%zu\n\n", nh.fst, nh.snd);
 	}

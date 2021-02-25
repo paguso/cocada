@@ -46,8 +46,8 @@ void fastaidx_finalise(void *ptr, const finaliser *fnr)
 {
 	fastaidx *self = (fastaidx *)ptr;
 	FREE(self->path);
-	DESTROY_PLAIN(self->dscs, vec);
-	DESTROY_PLAIN(self->seqs, vec);
+	DESTROY_FLAT(self->dscs, vec);
+	DESTROY_FLAT(self->seqs, vec);
 	FREE(self);
 }
 

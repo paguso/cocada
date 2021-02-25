@@ -195,7 +195,7 @@ void huffcode_free(huffcode *hcode)
 	if (hcode==NULL) return;
 	alphabet_free(hcode->ab);
 	for (size_t i=0; i<hcode->size; i++) {
-		//DESTROY_PLAIN(hcode->code[i], bitvec); // no null codes
+		//DESTROY_FLAT(hcode->code[i], bitvec); // no null codes
 		bitvec_free(hcode->code[i]);
 	}
 	FREE(hcode->code);

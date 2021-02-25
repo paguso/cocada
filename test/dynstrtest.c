@@ -25,6 +25,7 @@
 
 #include "CuTest.h"
 
+#include "memdbg.h"
 #include "strbuf.h"
 
 

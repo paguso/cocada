@@ -23,6 +23,7 @@
 
 #include "arrays.h"
 #include "errlog.h"
+#include "memdbg.h"
 
 void *arr_calloc (size_t nmemb, size_t memb_size)
 {

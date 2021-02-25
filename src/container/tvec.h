@@ -30,6 +30,7 @@
 #include "new.h"
 #include "errlog.h"
 #include "order.h"
+#include "memdbg.h"
 #include "mathutil.h"
 #include "arrays.h"
 

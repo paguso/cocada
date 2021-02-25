@@ -30,7 +30,7 @@
 
 /**
  * @file serialise.h
- * @brief COCADA Serialisation/deserialisation 
+ * @brief COCADA Serialisation/deserialisation
  * @author Paulo Fonseca
  *
  * COCADA provides basic infrastructure for the serialisation/deserialisation
@@ -48,7 +48,7 @@
  * serialised/deserialised as raw pointers since they also hold just a
  * memory address.
  * 3. Arrays:  A contiguous block of values.
- * 4. Strings:  A null-terminated '\0' char string. 
+ * 4. Strings:  A null-terminated '\0' char string.
  * 5. Structs: Any user-defined struct.
  *
  * The serialise()/deserialise() function writes/reads an object, and
@@ -68,12 +68,12 @@
  *
  * A SOM for a primitive type object can be obtained by the
  * corresponding `get_som_TYPE()` function. For example, a SOM for
- * an int value can be obtained by `get_som_int()`. 
- * **Primitive type SOMs are singleton objects** since any primitive value 
+ * an int value can be obtained by `get_som_int()`.
+ * **Primitive type SOMs are singleton objects** since any primitive value
  * of a given type can be described in the same manner.
  *
  * ### Pointer SOMs
- * 
+ *
  * A rawptr SOM can be obtained via a call to som_ptr_new().
  * Serialising a pointer value simply causes the corresponding
  * memory address (the value of the pointer) to be written to
@@ -128,20 +128,20 @@
  * ```
  *
  * ### String SOMs
- * 
+ *
  * String SOMs are treated very similarly to array SOMs since
  * a string is a special case of an array. The difference is
  * that, with a string SOM, we do not indicate the type of
  * the element because it is naturally supposed to be `char`.
- * Also, because strings are null-terminated ('\0'), their 
+ * Also, because strings are null-terminated ('\0'), their
  * size can be determined with the `strlen` function, and so
- * we can use them without having to have their size known 
- * at a specific location, as with other type of arrays. 
- * Hence a string SOM has no distinctive characteristic apart from its 
- * type, which is why, like the primitive type SOMs, we need only a 
+ * we can use them without having to have their size known
+ * at a specific location, as with other type of arrays.
+ * Hence a string SOM has no distinctive characteristic apart from its
+ * type, which is why, like the primitive type SOMs, we need only a
  * singleton string SOM returned by the `get_som_cstr()` function.
- * 
- * 
+ *
+ *
  * ### Struct SOMs
  *
  * Structs are used to define the state of complex heterogenous
@@ -154,36 +154,36 @@
  *
  * For each serialisable struct, a get_som_func function must be defined
  * that returns a **singleton** SOM describing the structure.
- * 
+ *
  * ### Example
- * 
+ *
  * ```C
  * // (1) Struct type declaration
- * typedef struct {   
+ * typedef struct {
  * 		float x;
  * 		float y;
  * 		float radius;
  * } circle;
- * 
+ *
  * // (2) Struct SOM singleton. Should not be accessed directly
  * static som *circle_som = NULL;
- * 
- * // (3) Returns the singleton struct SOM 
+ *
+ * // (3) Returns the singleton struct SOM
  * som *get_circle_som() {
  * 		if (circle_som == NULL) {
  * 			circle_som = som_struct_new(sizeof(circle), get_circle_som);
- * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, x), get_float_som()); 
- * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, y), get_float_som()); 
- * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, radius), get_float_som()); 
+ * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, x), get_float_som());
+ * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, y), get_float_som());
+ * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, radius), get_float_som());
  * 		}
  * 		return circle_som;
  * }
- * 
+ *
  * ```
- * 
- * The example above illustrates the four components required for 
+ *
+ * The example above illustrates the four components required for
  * providing a SOM for a struct object.
- * 
+ *
  * 1. The struct type declaration itself
  * 2. The STR_SOM_INFO is a required preparation for being able to use the STR_OFFSET macro
  * for composing the struct SOM with its fields´ SOMs.
@@ -191,33 +191,33 @@
  * the get_som_func function defined for this struct on step 4
  * 4. The definition of the get_som_func that returns the struct SOM singleton
  * after initialisation, if needed.
- * 
- * Notice that when composing the struct SOM with the SOMs of its fields via calls 
+ *
+ * Notice that when composing the struct SOM with the SOMs of its fields via calls
  * to som_cons, we have to inform the relative offset of the field´s memory location
  * w.r.t. the struct's start location. This information is required in particular for
  * deserialisation, and can be obtained via the STR_OFFSET macro.
- * 
+ *
  *
  * ### Self-referential (recursive) objects
  *
  * Some objects may include refernces to objects of the same type. For example, a typical
  * linked list node object would be defined as
- * 
+ *
  * ```C
  * typedef struct _node {
  * 		int val;
  * 		struct _node *next; // recursive reference
  * }
  * ```
- * 
+ *
  * Notice that the `next` pointer is a recursive reference to another `node` object.
  * Now, consider how a SOM for one such an object could be (wrongly) defined.
- * 
+ *
  * ``` C
  * STR_SOM_INFO(node)
- * 
+ *
  * som *node_som = NULL;
- * 
+ *
  * // wrongly defined
  * som *get_node_som() {
  * 		if (node_som == NULL) {
@@ -229,21 +229,21 @@
  * 		return node_som;
  * }
  * ```
- * 
+ *
  * The problem arises in the line indicated by the "INFINITE LOOP" comment.
  * Because the node has a pointer to another node, the corresponding SOM
- * should somehow include a pointer SOM composed with a node SOM. 
+ * should somehow include a pointer SOM composed with a node SOM.
  * However, if we simply include a call to get_node_som, as shown, this would
  * result in an infinite loop. Likewise, we cannot include a new node SOM at
  * this point because then this new node SOM would also need a reference to
  * another node SOM, and so forth.
- * 
+ *
  * To cope with situations like that, COCADA provides a **proxy SOM**
  * which contains a reference to get_som_func function such that a
  * reference to a SOM could be obtained 'on demand', eliminating the loop
  * in the SOM definition. The corrected version of the function is shown below
  *
- * ```C 
+ * ```C
  * som *get_node_som() {
  * 		if (node_som == NULL) {
  * 			node_som = som_struct_new(sizeof(node));
@@ -254,57 +254,57 @@
  * 		return node_som;
  * }
  * ```
- * 
+ *
  * Notice that the recursive reference to the get_node_som method has been
  * encapsulated inside a proxy_som object which prevents it from being
  * immediately called.
- * 
+ *
  * The bottom line is that **a struct SOM should not include direct references
  * to other struct SOMs**. Instead, they should normally be inserted as
- * proxy SOMs with references to the corresponding get_som_func functions 
+ * proxy SOMs with references to the corresponding get_som_func functions
  * that return singleton struct SOM objects.
- * 
- * 
+ *
+ *
  * # LIMITATIONS
- * 
+ *
  * The correct deserialisation of an object depends on the type sizes and
  * encoding (in particular endianess) being the same or, at least, compatible.
  * Therefore the serialisation/deserialisation is not portable and
- * is actually a *very memory unsafe operation*. 
- * 
+ * is actually a *very memory unsafe operation*.
+ *
  * Be warned and use it at your own risk!
- * 
- * However, by default COCADA writes the object sizes and checks whether 
- * they are compatible during deserialisation and issues a **warning** 
+ *
+ * However, by default COCADA writes the object sizes and checks whether
+ * they are compatible during deserialisation and issues a **warning**
  * if they are not. Notice that this requires the application to
  * have been compiled with `DEBUG_LVL >= 2` (see errlog.h).
  *
  * Other noteworthy limitations are the following.
- * 
+ *
  * 1. We cannot have references (pointers) to internal locations within other
- * objects, including structs or arrays. That is, if we serialise a pointer 
- * to a memory location inside a struct (e.g. a struct field), or a position 
+ * objects, including structs or arrays. That is, if we serialise a pointer
+ * to a memory location inside a struct (e.g. a struct field), or a position
  * inside an array, the result is unpredictable. Chances are that the memory
  * will be duplicated on (de)serialisation but other more serious memory
  * corruption is possible. So *be careful to have pointers only to
- * entire objects*. 
- * 
+ * entire objects*.
+ *
  * 2. On the same token of the previous item, *be careful with uinitialised
  * pointers*, and always have a serialisable reference set to a valid
  * object or NULL. COCADA will try to follow the pointer and serialise
  * the pointed memory contents if the SOM tells it to. It has no way
  * of knowing if the pointer is valid or not. Particular care has to be
- * taken with pointer arrays. Make sure to have the unused elements set 
+ * taken with pointer arrays. Make sure to have the unused elements set
  * to NULL.
- * 
+ *
  * 3. Although it is possible to serialise objects living in the stack,
  * all deserialised objects will be heap allocated.
- * 
+ *
  */
 
 typedef struct _sub_som sub_som;
 
-/** 
+/**
  * SOM object type
  */
 typedef struct _som som;
@@ -325,7 +325,7 @@ GET_SOM_DECL(cstr)
 
 
 
-#define STR_OFFSET(STRUCT, FIELD)	((size_t)(&(((STRUCT *)NULL)->FIELD))) 
+#define STR_OFFSET(STRUCT, FIELD)	((size_t)(&(((STRUCT *)NULL)->FIELD)))
 
 
 /**
@@ -347,7 +347,7 @@ som *som_ptr_new();
  * @warning Only one such struct SOM should normally be
  * created for each struct type, and this singleton should be
  * returned by the corresponding @p get_som function.
- * @see Module documentation 
+ * @see Module documentation
  */
 som *som_struct_new(size_t size, get_som_func get_som);
 
@@ -390,7 +390,7 @@ sub_som som_chd(som *self, size_t i);
  * @brief Writes a serialised form of an object @p obj and its
  * directly and indirectly referred objects, according to a SOM
  * @p model, to a binary @p stream.
- * 
+ *
  * @see deserialise
  */
 void serialise(void *obj, som *model, FILE *stream);
@@ -399,10 +399,10 @@ void serialise(void *obj, som *model, FILE *stream);
  * @brief Reads the serialised form of an object @p obj and its
  * directly and indirectly referred objects, according to a SOM
  * @p model, from a binary @p stream.
- * 
- * @returns A pointer to a heap allocated copy of the 
+ *
+ * @returns A pointer to a heap allocated copy of the
  * deserialised object (and the objects referred by it).
- * 
+ *
  * @see serialise
  */
 void *deserialise(som *model, FILE *stream);

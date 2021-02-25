@@ -22,6 +22,7 @@
 #include "arrays.h"
 #include "coretype.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "segtree.h"
 #include "vec.h"

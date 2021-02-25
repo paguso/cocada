@@ -54,7 +54,7 @@ void test_kll_upd(CuTest *tc)
 		DEBUG("KLL insert #%d value = %d\n", i, val);
 		kll_upd(summ, &val);
 	}
-	DEBUG_ACTION(kll_print(summ, stderr, print_int));
+	DEBUG_EXEC(kll_print(summ, stderr, print_int));
 	double epsN = err * n;
 	int nerr = 0;
 	for (int sum=0, nxtsum=0, i=0; i<univ; i++) {

@@ -29,8 +29,9 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "cstrutil.h"
-#include "new.h"
 #include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 
 
 static const float GROW_BY = 1.5f;

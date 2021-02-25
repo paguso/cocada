@@ -114,8 +114,8 @@ void test_hashset_indel(CuTest *tc)
 		//printf("element[%zu] = %u\n",i, elts[i]);
 	}
 
-	DESTROY_PLAIN(it, hashset_iter);
-	DESTROY_PLAIN(set, hashset);
+	DESTROY_FLAT(it, hashset_iter);
+	DESTROY_FLAT(set, hashset);
 	FREE(elts);
 }
 
