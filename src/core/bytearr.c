@@ -35,7 +35,7 @@
 byte_t *bytearr_new(size_t len)
 {
 	byte_t *ret;
-	ret = NEW_ARR(byte_t, len);
+	ret = ARR_NEW(byte_t, len);
 	bytearr_fill(ret, 0, len, 0);
 	return ret;
 }

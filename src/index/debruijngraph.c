@@ -126,7 +126,7 @@ static void _init_cumul_char_count(dbgraph *graph, size_t *cumul_char_count)
 	graph->char_cumul_count = cumul_char_count;
 	size_t eabsize = ab_size(graph->ext_ab);
 	assert(graph->nedges == cumul_char_count[eabsize]);
-	//PRINT_ARR(cumul_char_count, cumul_char_count, %zu, 0, eabsize, eabsize);
+	//ARR_PRINT(cumul_char_count, cumul_char_count, %zu, 0, eabsize, eabsize);
 	size_t l = eabsize + graph->nedges;
 	byte_t *bits = bitarr_new(l);
 	for (size_t i=0; i<eabsize; i++)
@@ -192,8 +192,8 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
 	xstr *edge_labels  = xstr_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
 	byte_t *last_node   = bitarr_new(vec_len(kp1mers));
-	size_t *char_count = NEW_ARR(size_t, ab_size(ext_ab)+1);
-	FILL_ARR(char_count, 0, ab_size(ext_ab)+1, 0);
+	size_t *char_count = ARR_NEW(size_t, ab_size(ext_ab)+1);
+	ARR_FILL(char_count, 0, ab_size(ext_ab)+1, 0);
 
 	size_t nnodes = 0; // # of *distinct* nodes (k-mers)
 	size_t nedges = 0; // # of *distinct* edges (k+1-mers)
@@ -245,7 +245,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 		// we clear edge labels marks and start afresh
 		xstr_ncpy(lastkm1mers[this_line], 0, kp1mer->txt, kp1mer->pos+1, k-1);
 		if (xstr_cmp(lastkm1mers[this_line], lastkm1mers[last_line])) {
-			FILL_ARR(km1mers_chars, 0, sizeof_ext_char, 0x0);
+			ARR_FILL(km1mers_chars, 0, sizeof_ext_char, 0x0);
 		}
 
 		// then, if we are adding another edge...
@@ -506,7 +506,7 @@ void dbg_print(dbgraph *g)
 	//csrsbitarr_print(g->node_lbl_last_char, 10);
 	size_t ncols = 4;
 	char *headers[4] = {"nid", "real", "node", "edge"};
-	int *cols = NEW_ARR(int, ncols);
+	int *cols = ARR_NEW(int, ncols);
 	for (size_t c=0; c<ncols; c++)
 		cols[c] = strlen(headers[c]);
 	cols[0] = MAX(cols[0], (int)ceil(log(g->nedges))+1);

@@ -62,9 +62,35 @@ typedef struct __segtree segtree;
 /**
  * @brief Merge function type.
  *
- * The merge function cobines the results of the queries on two adjacent
- * intervals `[l,m)` and `[m,r)`, pointed by @p left and @p right,
- * and stores the result into the address pointed at by @p dest.
+ * The merge function dictates how to combine the results of the queries 
+ * on two adjacent intervals `[l,m)` and `[m,r)` to give the 
+ * result of the query over the combined interval `[l,r)`.
+ * The partial results are pointed by @p left and @p right,
+ * and the combined result gets stored in the location pointed  by @p dest.
+ * 
+ * Typical merge functions include sum, min and max.
+ * For example, the sum merge function for a segtree storing int values
+ * could be reasonably defined as
+ * 
+ * ```C
+ * void merge_sum_int(const void *left, const void *right, void *dest) {
+ * 		int l = *((int *)left);
+ * 		int r = *((int *)right);
+ * 		*dest = l + r;
+ * }
+ * ```
+ * 
+ * Predefined sum, min and max merge functions for TYPE value are 
+ * provided as
+ * 
+ * ```
+ * segtree_merge_sum_TYPE
+ * segtree_merge_min_TYPE
+ * segtree_merge_max_TYPE
+ * ```
+ * 
+ * where TYPE is one of the basic types defined in coretype.h.
+ * 
  */
 typedef void (*merge_func)(const void *left, const void *right, void *dest);
 

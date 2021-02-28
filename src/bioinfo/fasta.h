@@ -27,8 +27,8 @@
 
 /**
  * @file fasta.h
+ * @brief FASTA file sequence reader.
  * @author Paulo Fonseca
- * @brief FASTA file sequence reader
  *
  * A FASTA file is a plain text sequence of *records*, each consisting
  * of *description* and the *sequence itself*.
@@ -37,7 +37,7 @@
  * During the iteration, each sequence can *either* be entirely loaded to
  * memory as a string, or be treated as a char input stream with a
  * buffered string reader (::strread), which avoids having to load
- * potentially large sequences to memory.
+ * potentially large sequences fully into memory.
  */
 
 typedef struct _fasta fasta;

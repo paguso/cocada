@@ -52,7 +52,7 @@ void test_serialise_prim(CuTest *tc)
 void test_serialise_arr(CuTest *tc)
 {
 	int n = 10;
-	short *arr = arr_short_calloc(10);
+	short *arr = sa_arr_short_calloc(10);
 	for (int i=0; i < n; i++) {
 		arr[i] = i;
 	}
@@ -66,12 +66,12 @@ void test_serialise_arr(CuTest *tc)
 	fclose(stream);
 	remove("serialised_arr.obj");
 
-	CuAssertSizeTEquals(tc, arr_short_len(arr), arr_short_len(arr_cpy));
-	for (size_t i=0; i<arr_short_len(arr); i++) {
+	CuAssertSizeTEquals(tc, sa_arr_short_len(arr), sa_arr_short_len(arr_cpy));
+	for (size_t i = 0; i < sa_arr_short_len(arr); i++) {
 		CuAssertIntEquals(tc, arr[i], arr_cpy[i]);
 	}
-	arr_free(arr);
-	arr_free(arr_cpy);
+	sa_arr_free(arr);
+	sa_arr_free(arr_cpy);
 }
 
 
@@ -189,7 +189,7 @@ som *get_node_som ()
 
 void test_serialise_list(CuTest *tc)
 {
-	memdbg_print_stats(stdout);
+	memdbg_reset();
 	node *head = NULL;
 	int n = 3;
 	node **cur = &head;
@@ -199,8 +199,8 @@ void test_serialise_list(CuTest *tc)
 		tail->val = i;
 		tail->str = cstr_new(i);
 		for (int j = 0; j < i; tail->str[j++] = '0'+i);
-		tail->arr = arr_int_calloc(i);
-		FILL_ARR(tail->arr, 0, i, i);
+		tail->arr = sa_arr_int_calloc(i);
+		ARR_FILL(tail->arr, 0, i, i);
 		tail->next = NULL;
 		(*cur) = tail;
 		cur = &tail->next;
@@ -220,13 +220,12 @@ void test_serialise_list(CuTest *tc)
 	        cur=cur->next, cur_cpy=cur_cpy->next ) {
 		CuAssertIntEquals(tc, cur->val, cur_cpy->val);
 		CuAssertStrEquals(tc, cur->str, cur_cpy->str);
-		CuAssertSizeTEquals(tc, arr_int_len(cur->arr), arr_int_len(cur_cpy->arr));
-		for (size_t i = 0; i < arr_int_len(cur->arr); i++) {
+		CuAssertSizeTEquals(tc, sa_arr_int_len(cur->arr), sa_arr_int_len(cur_cpy->arr));
+		for (size_t i = 0; i < sa_arr_int_len(cur->arr); i++) {
 			CuAssertIntEquals(tc, cur->arr[i], cur_cpy->arr[i]);
 		}
 	}
 	memdbg_print_stats(stdout);
-
 }
 
 
@@ -235,9 +234,9 @@ void test_serialise_list(CuTest *tc)
 CuSuite *serialise_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	//SUITE_ADD_TEST(suite, test_serialise_prim);
-	//SUITE_ADD_TEST(suite, test_serialise_arr);
-	//SUITE_ADD_TEST(suite, test_serialise_struct);
+	SUITE_ADD_TEST(suite, test_serialise_prim);
+	SUITE_ADD_TEST(suite, test_serialise_arr);
+	SUITE_ADD_TEST(suite, test_serialise_struct);
 	SUITE_ADD_TEST(suite, test_serialise_list);
 	return suite;
 }

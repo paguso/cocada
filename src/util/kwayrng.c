@@ -46,7 +46,7 @@ kwayrng *kwayrng_new(size_t k, size_t nbits)
 	ret->k = k;
 	ret->maxval = (uint64_t)1 << nbits;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
-	ret->coefs = NEW_ARR(uint64_t, k);
+	ret->coefs = ARR_NEW(uint64_t, k);
 	for (size_t i=0; i<k; i++) {
 		ret->coefs[i] = rand_range_uint64_t(1, ret->maxval);
 	}
@@ -62,7 +62,7 @@ kwayrng *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
 	ret->k = k;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
 	ret->maxval = (uint64_t)1 << nbits;
-	ret->coefs = NEW_ARR(uint64_t, k);
+	ret->coefs = ARR_NEW(uint64_t, k);
 	for (size_t i=0; i<k; i++) {
 		ret->coefs[i] = coefs[i] % ret->maxval;
 	}

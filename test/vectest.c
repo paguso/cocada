@@ -301,7 +301,7 @@ void test_vec_radixsort(CuTest *tc)
 void test_vec_qsort(CuTest *tc)
 {
 	size_t max_key = 10000;
-	triple *arr = NEW_ARR(triple, max_key);
+	triple *arr = ARR_NEW(triple, max_key);
 	for (size_t i=0; i<max_key; i++) {
 		triple t;
 		t.values[0] = rand_range_int(0, max_key);

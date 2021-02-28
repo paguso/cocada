@@ -104,7 +104,7 @@
  * memory chunk containing some data. However, we have here
  * an important limitation. Because the underlying mechanism
  * has to know the physical size of the array, **this SOM can
- * only be applied to arrays created with the arr_calloc functions
+ * only be applied to arrays created with the sa_arr_calloc functions
  * defined in arrays.h**, which are created in such a way that
  * the physical array size is stored immediately before the
  * useful part of the array itself.
@@ -114,7 +114,7 @@
  * Notice also that the array SOM describes the array object
  * that is, the region of the memory where the data is stored.
  * A heap-allocated array, such as those created by the
- * arr_calloc() functions of arrays.h is usually represented
+ * sa_arr_calloc() functions of arrays.h is usually represented
  * by a pointer which points to the start of the array.
  * Thus this situation must be modelled as a pointer SOM
  * containing an array SOM.

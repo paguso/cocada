@@ -36,7 +36,7 @@ void twuhash_test_hash(CuTest *tc)
 	twuhash *h = twuhash_new(in_bits, out_bits);
 	uint64_t *sample;
 	size_t samplesize = 1 << 20;
-	sample = NEW_ARR(uint64_t, samplesize);
+	sample = ARR_NEW(uint64_t, samplesize);
 	for (size_t i = 0; i < samplesize; i++) {
 		uint64_t x = rand_next();
 		x >>= (64 - in_bits);

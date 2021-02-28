@@ -98,7 +98,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	hcode->size = ab_size(ab);
 
 	size_t ab_bytesize = (size_t)DIVCEIL(hcode->size, BYTESIZE);
-	hcode->tree = NEW_ARR(hufftnode, MAX(0, 2 * hcode->size - 1));
+	hcode->tree = ARR_NEW(hufftnode, MAX(0, 2 * hcode->size - 1));
 	for (size_t i = 0; i < hcode->size; i++) {
 		hcode->tree[i].chr_rank = i;
 		hcode->tree[i].chd[LEFT]     = &hcode->tree[i];
@@ -132,7 +132,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	}
 	//assert(next==(2*hcode->size-1));
 
-	hcode->code = NEW_ARR(bitvec *, hcode->size);
+	hcode->code = ARR_NEW(bitvec *, hcode->size);
 	if (hcode->size) {
 		byte_t *chrcode = bitarr_new(hcode->size);
 		fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
@@ -144,7 +144,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 
 huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 {
-	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	size_t *counts =  ARR_OF_0_NEW(size_t, ab_size(ab));
 	FOREACH_IN_CSTR(c, src) {
 		counts[ab_rank(ab, c)]++;
 	}
@@ -156,7 +156,7 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 
 huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader)
 {
-	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	size_t *counts =  ARR_OF_0_NEW(size_t, ab_size(ab));
 	for (int c; (c=strread_getc(reader)) != EOF;) {
 		counts[ab_rank(ab, c)]++;
 	}
@@ -168,7 +168,7 @@ huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader)
 
 huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src)
 {
-	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	size_t *counts =  ARR_OF_0_NEW(size_t, ab_size(ab));
 	FOREACH_IN_XSTR(c, src) {
 		counts[ab_rank(ab, c)]++ ;
 	}
@@ -180,7 +180,7 @@ huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src)
 
 huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *reader)
 {
-	size_t *counts =  NEW_ARR_0(size_t, ab_size(ab));
+	size_t *counts =  ARR_OF_0_NEW(size_t, ab_size(ab));
 	for (xchar_wt c; (c=xstrread_getc(reader)) != XEOF;) {
 		counts[ab_rank(ab, c)]++;
 	}

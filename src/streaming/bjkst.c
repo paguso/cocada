@@ -61,11 +61,11 @@ bjkst *bjkst_init(size_t nbits, double eps, double delta)
 	ret->eps = eps;
 	ret->delta = delta;
 	ret->g = twuhash_new(nbits, nbits);
-	ret->buf = NEW_ARR(hashset *, nbits + 1);
+	ret->buf = ARR_NEW(hashset *, nbits + 1);
 	ret->buf_cap = get_buf_cap(eps, delta);
 	ret->buf_size = 0;
 	ret->min_zeros = 0;
-	FILL_ARR(ret->buf, 0, nbits + 1, \
+	ARR_FILL(ret->buf, 0, nbits + 1, \
 	         hashset_new(64, ident_hash_uint64_t, eq_uint64_t));
 	return ret;
 }

@@ -75,7 +75,7 @@ static som *_som_new(som_t type, size_t size, get_som_func get_som)
 	ret->get_som = get_som;
 	ret->size = size;
 	ret->nchd = 0;
-	ret->chd = NEW_ARR(sub_som, 1) ;
+	ret->chd = ARR_NEW(sub_som, 1) ;
 	return ret;
 }
 
@@ -421,7 +421,7 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 	ERROR_ASSERT(som_nchd(model) == 1, "Array SOM requires one nested child.\n");
 	write_type(som_arr, stream);
 	write_addr(arr, stream);
-	size_t size = arr_sizeof(arr);
+	size_t size = sa_arr_sizeof(arr);
 	write_size(size, stream);
 	mem_chunk chunk = {.start = (size_t) arr, .size = size};
 	//vec_push(written, &chunk);
@@ -495,7 +495,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	WARN_ASSERT((size % elt_som->size) == 0,
 	            "Incompatible array size for the element size.\n");
 	size_t len = size / elt_size;
-	void *arr = arr_calloc(len, elt_size);
+	void *arr = sa_arr_calloc(len, elt_size);
 	hashmap_set(mem_map, &addr, &arr);
 	*((rawptr *)ptr_addr) = arr;
 

@@ -25,7 +25,7 @@
 #include "errlog.h"
 #include "memdbg.h"
 
-void *arr_calloc (size_t nmemb, size_t memb_size)
+void *sa_arr_calloc(size_t nmemb, size_t memb_size)
 {
 	size_t size = nmemb * memb_size;
 	void *ret = malloc(size + sizeof(size_t));
@@ -34,7 +34,7 @@ void *arr_calloc (size_t nmemb, size_t memb_size)
 }
 
 
-void *arr_realloc(void *arr, size_t nmemb, size_t memb_size)
+void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size)
 {
 	size_t size = nmemb * memb_size;
 	arr -= sizeof(size_t);
@@ -44,39 +44,34 @@ void *arr_realloc(void *arr, size_t nmemb, size_t memb_size)
 }
 
 
-size_t arr_sizeof(void *arr)
+size_t sa_arr_sizeof(void *arr)
 {
 	return *((size_t *)(arr - sizeof(size_t)));
 }
 
 
-void arr_free(void *arr)
+void sa_arr_free(void *arr)
 {
 	free (arr - sizeof(size_t));
 }
 
 
-#define ARR_NEW_IMPL(TYPE, ...)\
-	TYPE *arr_##TYPE##_calloc(size_t nmemb)\
-	{\
-		return (TYPE *)arr_calloc(nmemb, sizeof(TYPE));\
-	}
-XX_CORETYPES(ARR_NEW_IMPL)
+#define SA_ARR_IMPL(TYPE, ...)\
+TYPE *sa_arr_##TYPE##_calloc(size_t nmemb)\
+{\
+	return (TYPE *)sa_arr_calloc(nmemb, sizeof(TYPE));\
+}\
+\
+TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
+{\
+	return (TYPE *)sa_arr_realloc(arr, nmemb, sizeof(TYPE));\
+}\
+\
+size_t sa_arr_##TYPE##_len(TYPE *arr)\
+{\
+	WARN_IF(sa_arr_sizeof(arr) % sizeof(TYPE),\
+			"Physical array size is not a multiple of TYPE size");\
+	return sa_arr_sizeof(arr) / sizeof(TYPE);\
+}
 
-
-#define ARR_REALLOC_IMPL(TYPE, ...)\
-	TYPE *arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
-	{\
-		return arr_realloc(arr, nmemb, sizeof(TYPE));\
-	}
-XX_CORETYPES(ARR_REALLOC_IMPL)
-
-
-#define ARR_LEN_IMPL(TYPE, ...)\
-	size_t arr_##TYPE##_len(TYPE *arr)\
-	{\
-		WARN_IF(arr_sizeof(arr) % sizeof(TYPE),\
-		        "Physical array size is not a multiple of TYPE size");\
-		return arr_sizeof(arr) / sizeof(TYPE);\
-	}
-XX_CORETYPES(ARR_LEN_IMPL)
+XX_CORETYPES(SA_ARR_IMPL)

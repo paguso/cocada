@@ -46,7 +46,7 @@ static void _initpow(xstrhash *self)
 		p *= base;
 	}
 	self->max_exp = e;
-	self->pow = NEW_ARR(uint64_t, e);
+	self->pow = ARR_NEW(uint64_t, e);
 	p = 1;
 	for (size_t i=0; i<e; i++) {
 		self->pow[i] = p;

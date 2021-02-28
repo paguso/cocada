@@ -109,7 +109,7 @@ void wavtree_test_setup(CuTest *tc)
 		ascii[(size_t)c] = (char)c;
 	nwt = 2 * 3 * 3; // shape * ab * len
 
-	alphabets = NEW_ARR(alphabet *, nwt);
+	alphabets = ARR_NEW(alphabet *, nwt);
 	for (int i=0; i<nwt; i++) {
 		if (((i/3)%3) == 0)
 			alphabets[i] = alphabet_new(1, "a");
@@ -119,8 +119,8 @@ void wavtree_test_setup(CuTest *tc)
 			alphabets[i] = alphabet_new('~'-' ', cstr_substr(ascii, ' ', '~'));
 	}
 
-	strings = NEW_ARR(char *, nwt);
-	slens = NEW_ARR(size_t, nwt);
+	strings = ARR_NEW(char *, nwt);
+	slens = ARR_NEW(size_t, nwt);
 	size_t max_len_mult = 10;
 	for (int i=0; i<nwt; i+=3) {
 		strings[i+0] = random_str(alphabets[i+0], 0);
@@ -132,7 +132,7 @@ void wavtree_test_setup(CuTest *tc)
 	}
 
 	wtshape shp[2] = {WT_BALANCED, WT_HUFFMAN};
-	wts = NEW_ARR(wavtree *, nwt);
+	wts = ARR_NEW(wavtree *, nwt);
 	for (int i=0; i<nwt; i++) {
 		wts[i] = wavtree_new(alphabets[i], strings[i], slens[i], shp[i/9]);
 	}
@@ -304,7 +304,7 @@ static xstr *random_xstr(alphabet *ab, size_t len)
 void xwavtree_test_setup(CuTest *tc)
 {
 	nwt = 2 * 3 * 3; // shape * ab * len
-	alphabets = NEW_ARR(alphabet *, nwt);
+	alphabets = ARR_NEW(alphabet *, nwt);
 	for (int i=0; i<nwt; i++) {
 		if (((i/3)%3) == 0)
 			alphabets[i] = int_alphabet_new(1);
@@ -314,7 +314,7 @@ void xwavtree_test_setup(CuTest *tc)
 			alphabets[i] = int_alphabet_new(300);
 	}
 
-	xstrs = NEW_ARR(xstr *, nwt);
+	xstrs = ARR_NEW(xstr *, nwt);
 	for (int i=0; i<nwt; i+=3) {
 		xstrs[i+0] = random_xstr(alphabets[i+0], 0);
 		xstrs[i+1] = random_xstr(alphabets[i+1], 1);
@@ -322,7 +322,7 @@ void xwavtree_test_setup(CuTest *tc)
 	}
 
 	wtshape shp[2] = {WT_BALANCED, WT_HUFFMAN};
-	wts = NEW_ARR(wavtree *, nwt);
+	wts = ARR_NEW(wavtree *, nwt);
 	for (int i=0; i<nwt; i++) {
 		wts[i] = wavtree_new_from_xstr(alphabets[i], xstrs[i], shp[i/9]);
 	}

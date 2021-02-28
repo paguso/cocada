@@ -211,7 +211,7 @@ static char **make_argv(char *call, int *argc)
 		vec_push_rawptr(ret, tok );
 	}
 	*argc = i;
-	char **argv = NEW_ARR(char *, *argc);
+	char **argv = ARR_NEW(char *, *argc);
 	for (i=0; i<*argc; i++) {
 		argv[i] = (char *)vec_get_rawptr(ret, i);
 	}

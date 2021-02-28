@@ -54,14 +54,14 @@ static void random_seq(alphabet *ab, char *dest, size_t n)
 void dbgraph_test_setup(CuTest *tc)
 {
 	n = 20;
-	ab   = NEW_ARR(alphabet *, n);
-	slen = NEW_ARR(size_t, n);
-	str  = NEW_ARR(char *, n);
-	padstr  = NEW_ARR(char *, n);
-	padslen = NEW_ARR(size_t, n);
-	dbg_order    = NEW_ARR(size_t, n);
-	g    = NEW_ARR(dbgraph *, n);
-	mg   = NEW_ARR(dbgraph *, n);
+	ab   = ARR_NEW(alphabet *, n);
+	slen = ARR_NEW(size_t, n);
+	str  = ARR_NEW(char *, n);
+	padstr  = ARR_NEW(char *, n);
+	padslen = ARR_NEW(size_t, n);
+	dbg_order    = ARR_NEW(size_t, n);
+	g    = ARR_NEW(dbgraph *, n);
+	mg   = ARR_NEW(dbgraph *, n);
 	for (size_t i=0; i<n; i++) {
 		ab[i] = alphabet_new(4, "acgt");
 
@@ -153,8 +153,8 @@ size_t _outdeg_bf(size_t cs, char *node, bool multigraph)
 	size_t slen = padslen[cs];
 	size_t k = dbg_order[cs];
 	alphabet *abt = dbg_ab(g[cs]);
-	bool *outletters = NEW_ARR(bool, ab_size(abt));
-	FILL_ARR(outletters, 0, ab_size(abt), false);
+	bool *outletters = ARR_NEW(bool, ab_size(abt));
+	ARR_FILL(outletters, 0, ab_size(abt), false);
 	size_t ret = 0;
 	for (size_t i=0, l=slen-k; i<l; i++) {
 		size_t j = 0;

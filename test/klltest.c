@@ -42,7 +42,7 @@ void test_kll_upd(CuTest *tc)
 	kll_print(summ, stderr, print_int);
 	size_t n = 10000;
 	int univ = 300;
-	int *ranks = NEW_ARR_0(int, univ);
+	int *ranks = ARR_OF_0_NEW(int, univ);
 	for (int i = 0; i < n; i++) {
 		double xval;
 		do {

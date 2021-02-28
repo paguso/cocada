@@ -61,7 +61,7 @@ fmalg *fmalg_init(uint64_t maxval, size_t n, size_t m)
 	ret->rng = rngs;
 	NEW_MATRIX_0(lsbs, byte_t, m, n);
 	ret->maxlsb = lsbs;
-	ret->avgs = NEW_ARR_0(long double, m);
+	ret->avgs = ARR_OF_0_NEW(long double, m);
 	return ret;
 }
 
@@ -122,12 +122,12 @@ static long double pow_avg(byte_t *vals, size_t n)
 
 uint64_t fmalg_query(fmalg *fm)
 {
-	FILL_ARR(fm->avgs, 0, fm->m, 0);
+	ARR_FILL(fm->avgs, 0, fm->m, 0);
 	for (size_t i = 0; i < fm->m; i++) {
 		fm->avgs[i] = pow_avg(fm->maxlsb[i], fm->n);
 	}
-	PRINT_ARR(fm->avgs, "FM estimates ", "%Lf", 0, fm->m, fm->m );
+	ARR_PRINT(fm->avgs, "FM estimates ", "%Lf", 0, fm->m, fm->m );
 	long double med =  median_ldouble(fm->avgs, fm->m, true);
-	//PRINT_ARR(fm->avgs, "FM estimates after ", "%Lf", 0, fm->m, fm->m );
+	//ARR_PRINT(fm->avgs, "FM estimates after ", "%Lf", 0, fm->m, fm->m );
 	return med;
 }

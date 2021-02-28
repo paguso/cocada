@@ -39,7 +39,7 @@
  * is used as follows.
  *
  * ```C
- * citer *cit = // get a concreteiter reference
+ * citer *cit = // get a concrete iter reference
  * iter *it = citer_as_iter(cit); // ASTRAIT(cit, citer, iter)
  * while (iter_has_next(it)) {
  * 		void *elt = iter_next(it);
@@ -47,7 +47,7 @@
  * FREE(cit);
  * ```
  *
- * or, alternatively, with the FOREACH_IN_ITER macro.
+ * or, alternatively, with the ::FOREACH_IN_ITER macro.
  *
  * @see trait.h
  */

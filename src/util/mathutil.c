@@ -207,7 +207,7 @@ XX_PRIMITIVES(_PARTITION)
 		assert(k < len);\
 		TYPE *w = v;\
 		if (!dirty) {\
-			w = NEW_ARR(TYPE , len);\
+			w = ARR_NEW(TYPE , len);\
 			memcpy(w, v, len * sizeof(TYPE));\
 		}\
 		size_t p = len;\

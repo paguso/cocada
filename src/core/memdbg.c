@@ -19,10 +19,12 @@
  *
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <stddef.h>
+
 
 #define  DEBUG_MEM_OFF
 #include "memdbg.h"
@@ -61,7 +63,7 @@ static const double MIN_LOAD = 0.25;
 memtable tally = {.nact = 0, .ndel = 0, .cap = 0, .data = NULL};
 
 
-void memtable_init(memtable *tally)
+static void memtable_init(memtable *tally)
 {
 	if (tally->cap) return;
 	tally->nact = 0;
@@ -72,7 +74,7 @@ void memtable_init(memtable *tally)
 }
 
 
-size_t hash(void *addr, size_t capacity)
+static size_t hash(void *addr, size_t capacity)
 {
 	size_t h = (size_t)(addr);
 	h *= 11400714819323198485llu;
@@ -80,7 +82,7 @@ size_t hash(void *addr, size_t capacity)
 }
 
 
-memchunk memtable_get(memtable *tally, void *addr)
+static memchunk memtable_get(memtable *tally, void *addr)
 {
 	memtable_init(tally);
 	size_t pos = hash(addr, tally->cap);
@@ -95,7 +97,7 @@ memchunk memtable_get(memtable *tally, void *addr)
 }
 
 
-void memtable_check_and_resize(memtable *tally)
+static void memtable_check_and_resize(memtable *tally)
 {
 	double load = (double)( tally->nact + tally->ndel ) / (double)(tally->cap);
 	size_t newcap = tally->cap;
@@ -123,7 +125,7 @@ void memtable_check_and_resize(memtable *tally)
 }
 
 
-void memtable_set(memtable *tally, void *addr, size_t size)
+static void memtable_set(memtable *tally, void *addr, size_t size)
 {
 	#ifndef DEBUG_MEM
 		return;
@@ -149,7 +151,7 @@ void memtable_set(memtable *tally, void *addr, size_t size)
 }
 
 
-void memtable_unset(memtable *tally, void *addr)
+static void memtable_unset(memtable *tally, void *addr)
 {
 	#ifndef DEBUG_MEM
 		return;
@@ -161,6 +163,7 @@ void memtable_unset(memtable *tally, void *addr)
 		        tally->data[pos].addr == addr) {
 			tally->data[pos].flag = DELETED;
 			tally->ndel++;
+			tally->nact--;
 			tally->total -= tally->data[pos].size;
 			break;
 		}
@@ -170,10 +173,11 @@ void memtable_unset(memtable *tally, void *addr)
 }
 
 
-const char *prefixes[7] = {"", "Kilo", "Mega", "Giga", "Tera", "Peta", "Exa"};
+static const char *prefixes[7] = {"", "Kilo", "Mega", "Giga", "Tera", "Peta", "Exa"};
 
+typedef struct {double size; const char *prefix;} hr_t;
 
-void human_readable(size_t size, double *hsize, size_t *pow)
+static hr_t human_readable(size_t size)
 {
 	double total = (double) size;
 	size_t i = 0;
@@ -181,18 +185,54 @@ void human_readable(size_t size, double *hsize, size_t *pow)
 		size >>= 10;
 		i++;
 	}
-	*hsize = total / (double)(1 << (i * 10));
-	*pow = i;
+	hr_t ret = {.size = total / (double)(1 << (i * 10)), .prefix = prefixes[i]};
+	return ret;
 }
 
 
-void memtable_print_stats(FILE *stream, memtable *tally)
+typedef struct {size_t no, pos;} pair;
+
+static int cmp_pair(const void *l, const void *r) 
 {
-	double hrtotal;
-	size_t pow;
-	human_readable(tally->total, &hrtotal, &pow);
-	fprintf(stream, "%f %sBytes (%zu Bytes) allocated in %zu chunks.\n",
-	        hrtotal, prefixes[pow], tally->total,  tally->nact);
+	if ( ((pair *)l)->no == ((pair *)r)->no )
+		return 0;
+	else if ( ((pair *)l)->no < ((pair *)r)->no )
+		return -1;
+	else	
+		return +1;
+}
+
+static void memtable_print_stats(FILE *stream, memtable *tally)
+{
+	fprintf(stream, "================================================================================\n");
+	fprintf(stream, "Heap memory info\n");
+	fprintf(stream, "--------------------------------------------------------------------------------\n");
+	fprintf(stream, "Chunks in chronological order of allocation\n\n");
+	size_t n = tally->nact, k=0;
+	pair *pairs = (pair *)malloc(n * sizeof(pair));
+	for (size_t i=0; i < tally->cap; i++) {
+		if (tally->data[i].flag == ACTIVE) {
+			pairs[k].no = tally->data[i].alloc_no;
+			pairs[k].pos = i;
+			k++;
+		}
+	}
+	assert(k==n);
+	qsort(pairs, n, sizeof(pair), cmp_pair);
+	for (size_t i=0; i < n; i++) {
+		size_t pos = pairs[i].pos;
+		fprintf(stream, "#%zu:  %zu bytes @%p\n", 
+				pairs[i].no, tally->data[pos].size, tally->data[pos].addr);
+	}
+	fprintf(stream, "--------------------------------------------------------------------------------\n");
+	hr_t hrsize = human_readable(tally->total);
+	fprintf(stream, "Heap memory usage summary\n\n");
+	fprintf(stream, "Total memory  : %zu bytes (%.3lf %sbytes)\n",
+	        tally->total, hrsize.size, hrsize.prefix);
+	fprintf(stream, "Nb. of chunks : %zu\n", tally->nact);
+
+	fprintf(stream, "================================================================================\n");
+	free(pairs);
 }
 
 
@@ -206,6 +246,7 @@ void memdbg_reset()
 {
 	tally.cap = 0;
 	tally.nact = 0;
+	tally.total = 0;
 	tally.ndel = 0;
 	free(tally.data);
 	tally.data = NULL;
@@ -216,8 +257,12 @@ void memdbg_reset()
 void *memdbg_malloc(size_t size, char *file, int line)
 {
 	void *ret = malloc(size);
-	printf("malloc [%s:%d]  %zu bytes @%p\n", file, line, size, ret);
 	memtable_set(&tally, ret, size);
+#ifdef MEMDEBUG_PRINT_ALL
+	hr_t hrsize = human_readable(tally.total);
+	printf("malloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n", 
+		  file, line, size, ret, hrsize.size, hrsize.prefix);
+#endif
 	return ret;
 }
 
@@ -225,8 +270,12 @@ void *memdbg_malloc(size_t size, char *file, int line)
 void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 {
 	void *ret = calloc(nmemb, size);
-	printf("calloc [%s:%d]  %zu bytes @%p\n", file, line, nmemb * size, ret);
 	memtable_set(&tally, ret, nmemb * size);
+#ifdef MEMDEBUG_PRINT_ALL
+	hr_t hrsize = human_readable(tally.total);
+	printf("calloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n", 
+		  file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);	
+#endif
 	return ret;
 }
 
@@ -234,11 +283,15 @@ void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 {
 	void *ret = realloc(ptr, size);
-	printf("realloc [%s:%d]  %zu bytes @%p\n", file, line, size, ret);
 	if (ret != ptr) {
 		memtable_unset(&tally, ptr);
 	}
 	memtable_set(&tally, ret, size);
+#ifdef MEMDEBUG_PRINT_ALL
+	hr_t hrsize = human_readable(tally.total);
+	printf("realloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n", 
+		  file, line, size, ret, hrsize.size, hrsize.prefix);
+#endif
 	return ret;
 }
 
@@ -246,7 +299,11 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 void memdbg_free(void *ptr, char *file, int line)
 {
 	free(ptr);
-	printf("free [%s:%d] @%p\n", file, line, ptr);
+#ifdef MEMDEBUG_PRINT_ALL
+	hr_t hrsize = human_readable(tally.total);
+	printf("free [%s:%d] @%p (total: %.3lf %sbytes)\n", 
+			file, line, ptr, hrsize.size, hrsize.prefix);
+#endif
 	memtable_unset(&tally, ptr);
 }
 

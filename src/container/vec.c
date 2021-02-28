@@ -70,7 +70,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 	ret->typesize = typesize;
 	ret->capacity = MAX(MIN_CAPACITY, init_capacity);
 	ret->len = 0;
-	ret->data = malloc(ret->capacity*ret->typesize);
+	ret->data = malloc(ret->capacity * ret->typesize);
 	ret->swp = malloc(typesize);
 	return ret;
 }
@@ -311,7 +311,7 @@ void vec_rotate_left(vec *v, size_t npos)
 {
 	if (v->len == 0 || npos % v->len == 0) return;
 	npos = npos % v->len;
-	void *buf = (void *) ( NEW_ARR(byte_t, npos * v->typesize ) );
+	void *buf = (void *) ( ARR_NEW(byte_t, npos * v->typesize ) );
 	memcpy(buf, v->data, npos * v->typesize);
 	memmove(v->data, v->data + (npos * v->typesize), (v->len - npos) * v->typesize);
 	memcpy(v->data + ((v->len - npos) * v->typesize), buf, npos * v->typesize);
@@ -400,7 +400,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 {
 	size_t n = vec_len(v);
 	void *vcpy = malloc(n*(v->typesize));
-	size_t *count = NEW_ARR(size_t, max_key);
+	size_t *count = ARR_NEW(size_t, max_key);
 	size_t i, k;
 	for (size_t d=0; d<key_size; d++) {
 		memset(count, 0, max_key*sizeof(size_t));

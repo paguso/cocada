@@ -101,7 +101,7 @@ void test_hashset_indel(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, hashset_size(set));
 
-	elts = NEW_ARR(uint, n);
+	elts = ARR_NEW(uint, n);
 	hashset_iter *it = hashset_get_iter(set);
 	size_t i = 0;
 	FOREACH_IN_ITER(e, uint, hashset_iter_as_iter(it)) {

@@ -39,7 +39,7 @@ byte_t *bitarr_new(size_t len)
 byte_t *bitarr_new_from_str(const char *str, size_t len)
 {
 	byte_t *ret;
-	ret = NEW_ARR(byte_t, (size_t)DIVCEIL(len, BYTESIZE));
+	ret = ARR_NEW(byte_t, (size_t)DIVCEIL(len, BYTESIZE));
 	bitarr_parse_str(ret, str, len);
 	return ret;
 }

@@ -407,7 +407,7 @@ XX_CORETYPES(TVEC_DECL)
 		if (v->len == 0 || npos % v->len == 0) return;                             \
 		npos = npos % v->len;                                                      \
 		const size_t typesize = sizeof(TYPE);                                      \
-		TYPE *buf =  NEW_ARR(TYPE, npos);                                          \
+		TYPE *buf =  ARR_NEW(TYPE, npos);                                          \
 		memcpy(buf, v->data, npos * typesize);                                     \
 		memmove(v->data, v->data + (npos * typesize), (v->len - npos) * typesize); \
 		memcpy(v->data + ((v->len - npos) * typesize), buf, npos * typesize);      \
