@@ -545,7 +545,9 @@ finaliser *finaliser_new_ptr();
  * The object is not deallocated, and neither is the finaliser object destroyed.
  */
 #define FINALISE( OBJ, FNR ) \
-	if ((OBJ)) ((finaliser *)(FNR))->fn((void *)(OBJ), (const finaliser *)(FNR));
+	{void *__OBJ = (void *)(OBJ);\
+		finaliser *__FNR = (finaliser *)(FNR);\
+		if (__OBJ) __FNR->fn(__OBJ, (const finaliser *)(__FNR));}
 
 
 /**
@@ -561,18 +563,22 @@ finaliser *finaliser_new_ptr();
  * The finaliser @p FNR is **also** destroyed.
  */
 #define DESTROY( OBJ, FNR ) \
-	if ((OBJ)) {\
-		((finaliser *)(FNR))->fn((void *)(OBJ), (const finaliser *)(FNR));\
-		free((OBJ));\
-		finaliser_free((void *)(FNR));\
-	}
+	{void *__OBJ = (void *)(OBJ);\
+		finaliser *__FNR = (finaliser *)(FNR);\
+		if ((__OBJ)) {\
+			__FNR->fn(__OBJ, (const finaliser *)(__FNR));\
+			free(__OBJ);\
+		}\
+		finaliser_free((void *)(__FNR));}
 
 
 /**
  * Destroys an object @p OBJ with the default plain typed finaliser
  * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
  */
-#define DESTROY_FLAT( OBJ, TYPE ) if((OBJ)) DESTROY(OBJ, FNR(TYPE))
+#define DESTROY_FLAT( OBJ, TYPE ) \
+	{void *__OBJ = (void *)(OBJ);\
+		if(__OBJ) DESTROY(__OBJ, FNR(TYPE))}
 
 
 /**

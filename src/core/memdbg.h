@@ -31,27 +31,27 @@
  * @file memdbg.h
  * @brief Memory allocation debug
  * @author Paulo Fonseca
- * 
+ *
  * Including this header causes the stdlib.h memory allocation/deallocation
- * functions (malloc, calloc, realloc and free) be replaced by 
- * corresponding wrapper functions that keep a tally of the allocated 
- * memory chunks along with other debug info. 
- * 
+ * functions (malloc, calloc, realloc and free) be replaced by
+ * corresponding wrapper functions that keep a tally of the allocated
+ * memory chunks along with other debug info.
+ *
  * <b>This change only takes place if the DEBUG_MEM macro is defined</b>.
- * This can be done locally in the code, but most likely this is 
+ * This can be done locally in the code, but most likely this is
  * done via a compiler option. For example, in gcc
- * 
+ *
  * ```
  * gcc -DDEBUG_MEM
- * ```  
+ * ```
  * To deactivate memory debugging locally for a given compilation unit, the macro
- * 
+ *
  * ```C
  * #define DEBUG_MEM_OFF
  * ```
  * must be inserted at the begining of the file, before this header gets
  * included. At the end of the file, the macro should be undefined
- * 
+ *
  * ```C
  * #undef DEBUG_MEM_OFF
  * ```

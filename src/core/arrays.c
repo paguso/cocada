@@ -57,21 +57,21 @@ void sa_arr_free(void *arr)
 
 
 #define SA_ARR_IMPL(TYPE, ...)\
-TYPE *sa_arr_##TYPE##_calloc(size_t nmemb)\
-{\
-	return (TYPE *)sa_arr_calloc(nmemb, sizeof(TYPE));\
-}\
-\
-TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
-{\
-	return (TYPE *)sa_arr_realloc(arr, nmemb, sizeof(TYPE));\
-}\
-\
-size_t sa_arr_##TYPE##_len(TYPE *arr)\
-{\
-	WARN_IF(sa_arr_sizeof(arr) % sizeof(TYPE),\
-			"Physical array size is not a multiple of TYPE size");\
-	return sa_arr_sizeof(arr) / sizeof(TYPE);\
-}
+	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb)\
+	{\
+		return (TYPE *)sa_arr_calloc(nmemb, sizeof(TYPE));\
+	}\
+	\
+	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
+	{\
+		return (TYPE *)sa_arr_realloc(arr, nmemb, sizeof(TYPE));\
+	}\
+	\
+	size_t sa_arr_##TYPE##_len(TYPE *arr)\
+	{\
+		WARN_IF(sa_arr_sizeof(arr) % sizeof(TYPE),\
+		        "Physical array size is not a multiple of TYPE size");\
+		return sa_arr_sizeof(arr) / sizeof(TYPE);\
+	}
 
 XX_CORETYPES(SA_ARR_IMPL)

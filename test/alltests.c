@@ -51,6 +51,7 @@ CuSuite *kll_get_test_suite();
 CuSuite *kwayrng_get_test_suite();
 CuSuite *mathutil_get_test_suite();
 CuSuite *minqueue_get_test_suite();
+CuSuite *quadtree_get_test_suite();
 CuSuite *qdigest_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *randutil_get_test_suite();
@@ -96,8 +97,9 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
+	CuSuiteAddSuite(suite, quadtree_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
-	CuSuiteAddSuite(suite, serialise_get_test_suite());
+	//CuSuiteAddSuite(suite, serialise_get_test_suite());
 	//CuSuiteAddSuite(suite, segtree_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());

@@ -135,7 +135,7 @@ void print_trace(FILE *);
 
 /**
  * @brief Triggers an ERROR if an assertion is false and prints
- * an error message to an output stream, after which the program 
+ * an error message to an output stream, after which the program
  * exits with `EXIT_FAILURE` status.
  *
  * @param STREAM The output stream
@@ -172,7 +172,7 @@ void print_trace(FILE *);
 #if DEBUG_LVL>=2
 
 /**
- * @brief Issues a WARNING and prints an error message to 
+ * @brief Issues a WARNING and prints an error message to
  * an output stream if DEBUG_LVL>=2. Otherwise nothing takes place.
  *
  * @param STREAM The output stream
@@ -275,7 +275,7 @@ void print_trace(FILE *);
 
 /**
  * @brief Conditionally prints a DEBUG info message to
- * an output stream. If DEBUG_LVL < 3 nothing takes place 
+ * an output stream. If DEBUG_LVL < 3 nothing takes place
  * regardless of the condition.
  *
  * @param STREAM The output stream
@@ -299,7 +299,7 @@ void print_trace(FILE *);
 
 
 /**
- * @brief Prints a DEBUG info message to an output stream if 
+ * @brief Prints a DEBUG info message to an output stream if
  * an assertion is false.
  * If DEBUG_LVL < 3 nothing takes place regardless of the assertion.
  *
@@ -320,7 +320,7 @@ void print_trace(FILE *);
  * @see FDEBUG_ASSERT
  */
 #define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
-	FDEBUG_ASSERT(ASSERTION, stederr, FORMAT, ##__VA_ARGS__) 
+	FDEBUG_ASSERT(ASSERTION, stederr, FORMAT, ##__VA_ARGS__)
 
 
 /**
