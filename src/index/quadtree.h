@@ -41,6 +41,8 @@ void quadtree_node_set_data(quadtree_node *node, void *data);
 
 typedef void (*quadtree_node_upd_func)(quadtree_node *node, void *data);
 
+typedef void (*quadtree_node_qry_func)(quadtree_node *node, void *dest);
+
 
 
 typedef struct _quadtree quadtree;
@@ -63,5 +65,7 @@ void quadtree_finalise(void *ptr, const finaliser *fnr);
 bool quadtree_ins(quadtree *self, point2d p, void *payload,
                   quadtree_node_upd_func upd_func);
 
+void quadtree_qry(quadtree *self, rectangle area,
+                  quadtree_node_qry_func qry_func, void *dest, bool backtrack);
 
 #endif
