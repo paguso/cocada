@@ -114,7 +114,6 @@ void quadtree_node_set_data(quadtree_node *node, void *data)
 }
 
 
-
 struct _quadtree {
 	quadtree_node *root;
 	uint width;
@@ -180,7 +179,7 @@ static rectangle rectangle_clip(rectangle rect, rectangle viewport)
 }
 
 
-bool quadtree_ins(quadtree *self, point2d p, void *payload,
+void quadtree_ins(quadtree *self, point2d p, void *payload,
                   quadtree_node_upd_func upd_func)
 {
 	WARN_ASSERT(p.x < self->width,
@@ -188,7 +187,7 @@ bool quadtree_ins(quadtree *self, point2d p, void *payload,
 	WARN_ASSERT(p.y < self->height,
 	            "Quadtree insertion ignored (point.y=%u > height=%u)\n", p.x, self->height);
 	if (p.x > self->width || p.y > self->height) {
-		return false;
+		return;
 	}
 	quadtree_node *cur_node = self->root;
 	upd_func(self->root, payload);
@@ -217,7 +216,6 @@ bool quadtree_ins(quadtree *self, point2d p, void *payload,
 		upd_func(cur_node, payload);
 		cur_depth++;
 	}
-	return true;
 }
 
 
