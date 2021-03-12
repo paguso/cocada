@@ -45,7 +45,7 @@ Quadrant encoding
 
 
 struct _quadtree_node {
-	quad_dir dir;
+	quad_pos dir;
 	void *payload;
 	quadtree_node *first_chd;
 	quadtree_node *next_sibl;
@@ -53,7 +53,7 @@ struct _quadtree_node {
 
 #define IS_LEAF(NODE) ((NODE)->first_chd == NULL)
 
-static quadtree_node *quadtree_node_new(quad_dir dir)
+static quadtree_node *quadtree_node_new(quad_pos dir)
 {
 	quadtree_node *ret = NEW(quadtree_node);
 	ret->dir = dir;
@@ -64,7 +64,7 @@ static quadtree_node *quadtree_node_new(quad_dir dir)
 }
 
 
-quadtree_node *quadtree_node_get_chd(quadtree_node *node, quad_dir dir)
+quadtree_node *quadtree_node_get_chd(quadtree_node *node, quad_pos dir)
 {
 	quadtree_node *cur = node->first_chd;
 	while (cur != NULL && cur->dir != dir) {
@@ -72,6 +72,34 @@ quadtree_node *quadtree_node_get_chd(quadtree_node *node, quad_dir dir)
 	}
 	return cur;
 }
+
+
+static quadtree_node *quadtree_node_get_or_ins_chd(quadtree_node *node,
+        quad_pos dir)
+{
+	quadtree_node *cur = node->first_chd;
+	quadtree_node *prev = NULL;
+	while (cur != NULL && cur->dir < dir) {
+		prev = cur;
+		cur = cur->next_sibl;
+	}
+	if (cur == NULL || dir < cur->dir) {
+		if (prev == NULL) {
+			node->first_chd = quadtree_node_new(dir);
+			return node->first_chd;
+		}
+		else {
+			quadtree_node *new_chd = quadtree_node_new(dir);
+			new_chd->next_sibl = cur;
+			prev->next_sibl = new_chd;
+			return new_chd;
+		}
+	}
+	else {
+		return cur;
+	}
+}
+
 
 
 void *quadtree_node_get_data(quadtree_node *node)
@@ -127,6 +155,30 @@ void quadtree_finalise(void *ptr, const finaliser *fnr)
 }
 
 
+#define FST_HALF(LEN) ((LEN) / 2)
+
+#define SND_HALF(LEN) ((LEN) - ((LEN) / 2))
+
+static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0, .width = 0, .height = 0 };
+
+static rectangle rectangle_clip(rectangle rect, rectangle viewport)
+{
+	if (rect.top_left.x + rect.width < viewport.top_left.x ||
+	        rect.top_left.x >= viewport.top_left.x + viewport.width ||
+	        rect.top_left.y + rect.height < viewport.top_left.y ||
+	        rect.top_left.y >= viewport.top_left.y + viewport.height) {
+		return EMPTY_REC;
+	}
+	rectangle clr;
+	clr.top_left.x = MAX(rect.top_left.x, viewport.top_left.x);
+	clr.top_left.y = MAX(rect.top_left.y, viewport.top_left.y);
+	clr.width = MIN(rect.top_left.x + rect.width,
+	                viewport.top_left.x + viewport.width) - clr.top_left.x;
+	clr.height = MIN(rect.top_left.y + rect.height,
+	                 viewport.top_left.y + viewport.height) - clr.top_left.y;
+	return clr;
+}
+
 
 bool quadtree_ins(quadtree *self, point2d p, void *payload,
                   quadtree_node_upd_func upd_func)
@@ -142,50 +194,26 @@ bool quadtree_ins(quadtree *self, point2d p, void *payload,
 	upd_func(self->root, payload);
 	rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = self->width, .height = self->height};
 	point2d centre = {.x = rect.width / 2, .y = rect.height / 2};
-	uint cur_depth = 1;
+	uint cur_depth = 0;
 	while (cur_depth < self->depth && (rect.width > 1 || rect.height > 1)) {
-		quad_dir dir = (((byte_t)(p.y >= centre.y)) << 1) | ((byte_t)(p.x >= centre.x));
+		quad_pos dir = (((byte_t)(p.y >= centre.y)) << 1) | ((byte_t)(p.x >= centre.x));
 		if (IS_EAST(dir)) {
 			rect.top_left.x = centre.x;
-			rect.width -= (rect.width / 2);
+			rect.width = SND_HALF(rect.width);
 		}
 		else {
-			rect.width = (rect.width / 2);
+			rect.width = FST_HALF(rect.width);
 		}
 		if (IS_SOUTH(dir) ) {
 			rect.top_left.y = centre.y;
-			rect.height -= (rect.height / 2);
+			rect.height = SND_HALF(rect.height);
 		}
 		else {
-			rect.height = (rect.height / 2);
+			rect.height = FST_HALF(rect.height);
 		}
 		centre.x = rect.top_left.x + (rect.width / 2);
 		centre.y = rect.top_left.y + (rect.height / 2);
-		if (cur_node->first_chd == NULL) {
-			cur_node->first_chd = quadtree_node_new(dir);
-			cur_node = cur_node->first_chd;
-		}
-		else if (dir < cur_node->first_chd->dir) {
-			quadtree_node *new_first_chd = quadtree_node_new(dir);
-			new_first_chd->next_sibl = cur_node->first_chd;
-			cur_node->first_chd = new_first_chd;
-			cur_node = new_first_chd;
-		}
-		else {
-			quadtree_node *cur_sibl = cur_node->first_chd;
-			while (cur_sibl->next_sibl != NULL && cur_sibl->next_sibl->dir < dir) {
-				cur_sibl = cur_sibl->next_sibl;
-			}
-			if (cur_sibl->next_sibl != NULL && cur_sibl->next_sibl->dir == dir) {
-				cur_node = cur_sibl->next_sibl;
-			}
-			else {
-				quadtree_node *new_sibl = quadtree_node_new(dir);
-				new_sibl->next_sibl = cur_sibl->next_sibl;
-				cur_sibl->next_sibl = new_sibl;
-				cur_node = new_sibl;
-			}
-		}
+		cur_node = quadtree_node_get_or_ins_chd(cur_node, dir);
 		upd_func(cur_node, payload);
 		cur_depth++;
 	}
@@ -193,7 +221,61 @@ bool quadtree_ins(quadtree *self, point2d p, void *payload,
 }
 
 
-
+rectangle rectangle_snap_to_grid(quadtree *self, rectangle rect, snap_t anchor)
+{
+	point2d bounds[2]; // top_left, bot_right
+	bounds[0] = rect.top_left;
+	bounds[1].x = rect.top_left.x + rect.width;
+	bounds[1].y = rect.top_left.y + rect.height;
+	for (uint i=0; i<2; i++) {
+		rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = self->width, .height = self->height};
+		point2d centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
+		uint cur_depth = 0;
+		while (cur_depth < self->depth && (rect.width > 1 || rect.height > 1)) {
+			quad_pos dir = (((byte_t)(bounds[i].y >= centre.y)) << 1) | ((byte_t)(
+			                   bounds[i].x >= centre.x));
+			if (IS_EAST(dir)) {
+				rect.top_left.x = centre.x;
+				rect.width = SND_HALF(rect.width);
+			}
+			else {
+				rect.width = FST_HALF(rect.width);
+			}
+			if (IS_SOUTH(dir) ) {
+				rect.top_left.y = centre.y;
+				rect.height = SND_HALF(rect.height);
+			}
+			else {
+				rect.height = FST_HALF(rect.height);
+			}
+			centre.x = rect.top_left.x + FST_HALF(rect.width);
+			centre.y = rect.top_left.y + FST_HALF(rect.height);
+			cur_depth++;
+		}
+		point2d rectbounds[2];
+		rectbounds[0] = rect.top_left;
+		rectbounds[1].x = rect.top_left.x + rect.width;
+		rectbounds[1].y = rect.top_left.x + rect.height;
+		if (bounds[i].x == rectbounds[0].x && bounds[i].y == rectbounds[0].y) {
+			bounds[i] = rectbounds[0];
+		}
+		else if (bounds[i].x == rectbounds[1].x && bounds[i].y == rectbounds[1].y) {
+			bounds[i] = rectbounds[1];
+		}
+		else {
+			switch (anchor) {
+			case SNAP_IN:
+				bounds[i] = rectbounds[1-i];
+				break;
+			case SNAP_OUT:
+				bounds[i] = rectbounds[i];
+				break;
+			}
+		}
+	}
+	rectangle ret = {.top_left = bounds[0], .width = bounds[1].x - bounds[0].x, .height = bounds[1].y - bounds[0].y};
+	return ret;
+}
 
 
 static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
@@ -204,73 +286,83 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 	}
 
 	if (search_area.top_left.x  == rect.top_left.x
-		&& search_area.top_left.y == rect.top_left.y 
-		&& search_area.width == rect.width
-		&& search_area.height == rect.height) {
+	        && search_area.top_left.y == rect.top_left.y
+	        && search_area.width == rect.width
+	        && search_area.height == rect.height) {
 		qry_func(root, dest);
 		if (backtrack) {
 			return;
 		}
-	} else if(root->first_chd == NULL) { // LEAF NODE
+	}
+	else if (root->first_chd == NULL) {  // LEAF NODE
 		return;
 	}
 
-	point2d centre = {.x = search_area.top_left.x + (search_area.width / 2), 
-					  .y = search_area.top_left.y + (search_area.height / 2) };
+	point2d centre = {.x = search_area.top_left.x + FST_HALF(search_area.width),
+	                  .y = search_area.top_left.y + FST_HALF(search_area.height)
+	                 };
 
 	if (rect.top_left.x < centre.x && rect.top_left.y < centre.y) {
-		rectangle NW_area = {	
-			.top_left = search_area.top_left, 
-			.width = search_area.width / 2, 
-			.height = search_area.height / 2 };
+		rectangle NW_area = {
+			.top_left = search_area.top_left,
+			.width = FST_HALF(search_area.width),
+			.height = FST_HALF(search_area.height)
+		};
 		rectangle NW_rect = {
-			.top_left = rect.top_left, 
-			.width = MIN(rect.width, centre.x - rect.top_left.x), 
-			.height = MIN(rect.height,  centre.y - rect.top_left.y)};
+			.top_left = rect.top_left,
+			.width = MIN(rect.width, centre.x - rect.top_left.x),
+			.height = MIN(rect.height,  centre.y - rect.top_left.y)
+		};
 		quadtree_qry_node(quadtree_node_get_chd(root, NW), NW_area, NW_rect, qry_func,
 		                  dest, backtrack );
 	}
-	if (rect.top_left.x + rect.width >= centre.x 
-			&& rect.top_left.y < centre.y) {
+	if (rect.top_left.x + rect.width >= centre.x
+	        && rect.top_left.y < centre.y) {
 		rectangle NE_area = {
-			.top_left.x = centre.x, 
-			.top_left.y = search_area.top_left.y, 
-			.width = search_area.width - (search_area.width / 2), 
-			.height = search_area.height / 2 };
+			.top_left.x = centre.x,
+			.top_left.y = search_area.top_left.y,
+			.width = SND_HALF(search_area.width),
+			.height = FST_HALF(search_area.height)
+		};
 		rectangle NE_rect = {
-			.top_left.x = MAX(rect.top_left.x, centre.x), 
-			.top_left.y = rect.top_left.y, 
-			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x), 
-			.height = MIN(rect.height, centre.y - rect.top_left.y) };
+			.top_left.x = MAX(rect.top_left.x, centre.x),
+			.top_left.y = rect.top_left.y,
+			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
+			.height = MIN(rect.height, centre.y - rect.top_left.y)
+		};
 		quadtree_qry_node(quadtree_node_get_chd(root, NE), NE_area, NE_rect, qry_func,
 		                  dest, backtrack);
 	}
-	if (rect.top_left.x < centre.x 
-			&& rect.top_left.y + rect.height >= centre.y) {
+	if (rect.top_left.x < centre.x
+	        && rect.top_left.y + rect.height >= centre.y) {
 		rectangle SW_area = {
-			.top_left.x = search_area.top_left.x, 
-			.top_left.y = centre.y, 
-			.width = search_area.width / 2, 
-			.height = search_area.height - (search_area.height / 2) };
+			.top_left.x = search_area.top_left.x,
+			.top_left.y = centre.y,
+			.width = FST_HALF(search_area.width),
+			.height = SND_HALF(search_area.height)
+		};
 		rectangle SW_rect = {
-			.top_left.x = rect.top_left.x, 
-			.top_left.y = MAX(rect.top_left.y, centre.y), 
-			.width = MIN(rect.width, centre.x - rect.top_left.x), 
-			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y) };
+			.top_left.x = rect.top_left.x,
+			.top_left.y = MAX(rect.top_left.y, centre.y),
+			.width = MIN(rect.width, centre.x - rect.top_left.x),
+			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y)
+		};
 		quadtree_qry_node(quadtree_node_get_chd(root, SW), SW_area, SW_rect, qry_func,
 		                  dest, backtrack);
 	}
 	if (rect.top_left.x + rect.width >= centre.x
 	        && rect.top_left.y + rect.height >= centre.y) {
 		rectangle SE_area = {
-			.top_left = centre, 
-			.width = search_area.width - (search_area.width / 2), 
-			.height = search_area.height - (search_area.height / 2) };
+			.top_left = centre,
+			.width = SND_HALF(search_area.width),
+			.height = SND_HALF(search_area.height)
+		};
 		rectangle SE_rect = {
 			.top_left.x = MAX(rect.top_left.x, centre.x),
-			.top_left.y = MAX(rect.top_left.y, centre.y), 
-			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x), 
-			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y) };
+			.top_left.y = MAX(rect.top_left.y, centre.y),
+			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
+			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y)
+		};
 		quadtree_qry_node(quadtree_node_get_chd(root, SE), SE_area, SE_rect, qry_func,
 		                  dest, backtrack);
 	}
