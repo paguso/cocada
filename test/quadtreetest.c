@@ -29,6 +29,7 @@
 
 void rectangle_snap_to_grid_test(CuTest *tc)
 {
+	memdbg_reset();
 	uint w = 1024;
 	uint h = 1024;
 	uint d = 2;
@@ -83,6 +84,7 @@ void rectangle_snap_to_grid_test(CuTest *tc)
 	CuAssertIntEquals(tc, 512, b.width);
 	CuAssertIntEquals(tc, 512, b.height);
 	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_new_empty()));
+	CuAssert(tc, "memory leak", memdbg_is_empty());
 }
 
 
@@ -115,10 +117,13 @@ void quadtree_ins_test(CuTest *tc)
 		point2d pt = {.x = rand_range_uint(0, width), .y = rand_range_uint(0, height) };
 		quadtree_ins(tree, pt, &pt, upd_node_ins_pt);
 	}
+	//memdbg_print_stats(stdout, false);
 	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_cons(finaliser_new_ptr(),
 	                             FNR(vec))));
-	memdbg_print_stats(stdout);
+	//memdbg_print_stats(stdout, false);
+	CuAssert(tc, "memory leak", memdbg_is_empty());
 }
+
 
 void quadtree_qry_test(CuTest *tc)
 {
@@ -143,9 +148,38 @@ void quadtree_qry_test(CuTest *tc)
 	}
 	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_cons(finaliser_new_ptr(),
 	                             FNR(vec))));
-	memdbg_print_stats(stdout);
+	//memdbg_print_stats(stdout, false);
+	CuAssert(tc, "memory leak", memdbg_is_empty());
 }
 
+
+void quadtree_ins_count_upd(quadtree_node *node, void *data)
+{
+	size_t *count = (size_t *) quadtree_node_get_data(node);
+	if (count == NULL) {
+		count = NEW(size_t);
+		quadtree_node_set_data(node, count);
+	}
+	*count = *count + 1;
+}
+
+
+void quadtree_count_test(CuTest *tc)
+{
+	uint depth = 10;
+	uint side = 1 << depth;
+	memdbg_reset();
+	quadtree *tree = quadtree_new(side, side, depth);
+	size_t n = side * side;
+	for (size_t i = 0; i < n; i++) {
+		point2d p = {.x = rand_range_uint(0, side), .y = rand_range_uint(0, side)};
+		quadtree_ins(tree, p, NULL, quadtree_ins_count_upd);
+	}
+	//memdbg_print_stats(stdout, false);
+	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_new_ptr()));
+	//memdbg_print_stats(stdout, false);
+	CuAssert(tc, "memory leak", memdbg_is_empty());
+}
 
 
 
@@ -153,7 +187,8 @@ CuSuite *quadtree_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, rectangle_snap_to_grid_test);
-	//SUITE_ADD_TEST(suite, quadtree_ins_test);
-	//SUITE_ADD_TEST(suite, quadtree_qry_test);
+	SUITE_ADD_TEST(suite, quadtree_ins_test);
+	SUITE_ADD_TEST(suite, quadtree_qry_test);
+	SUITE_ADD_TEST(suite, quadtree_count_test);
 	return suite;
 }

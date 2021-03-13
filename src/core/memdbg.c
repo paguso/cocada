@@ -60,7 +60,7 @@ static const double GROW_BY = 1.62;
 static const double MAX_LOAD = 0.66;
 static const double MIN_LOAD = 0.25;
 
-memtable tally = {.nact = 0, .ndel = 0, .cap = 0, .data = NULL};
+static memtable tally = {.nact = 0, .ndel = 0, .cap = 0, .data = NULL};
 
 
 static void memtable_init(memtable *tally)
@@ -81,7 +81,7 @@ static size_t hash(void *addr, size_t capacity)
 	return h % capacity;
 }
 
-
+/* Ok but unused
 static memchunk memtable_get(memtable *tally, void *addr)
 {
 	memtable_init(tally);
@@ -95,7 +95,7 @@ static memchunk memtable_get(memtable *tally, void *addr)
 	}
 	return tally->data[pos];
 }
-
+*/
 
 static void memtable_check_and_resize(memtable *tally)
 {
@@ -207,32 +207,35 @@ static int cmp_pair(const void *l, const void *r)
 		return +1;
 }
 
-static void memtable_print_stats(FILE *stream, memtable *tally)
+static void memtable_print_stats(FILE *stream, memtable *tally, bool print_chunks)
 {
 	fprintf(stream,
 	        "================================================================================\n");
 	fprintf(stream, "Heap memory info\n");
-	fprintf(stream,
-	        "--------------------------------------------------------------------------------\n");
-	fprintf(stream, "Chunks in chronological order of allocation\n\n");
-	size_t n = tally->nact, k=0;
-	pair *pairs = (pair *)malloc(n * sizeof(pair));
-	for (size_t i=0; i < tally->cap; i++) {
-		if (tally->data[i].flag == ACTIVE) {
-			pairs[k].no = tally->data[i].alloc_no;
-			pairs[k].pos = i;
-			k++;
+	if (print_chunks) {
+		fprintf(stream,
+				"--------------------------------------------------------------------------------\n");
+		fprintf(stream, "Chunks in chronological order of allocation\n\n");
+		size_t n = tally->nact, k=0;
+		pair *pairs = (pair *)malloc(n * sizeof(pair));
+		for (size_t i=0; i < tally->cap; i++) {
+			if (tally->data[i].flag == ACTIVE) {
+				pairs[k].no = tally->data[i].alloc_no;
+				pairs[k].pos = i;
+				k++;
+			}
 		}
+		assert(k==n);
+		qsort(pairs, n, sizeof(pair), cmp_pair);
+		for (size_t i=0; i < n; i++) {
+			size_t pos = pairs[i].pos;
+			fprintf(stream, "#%zu:  %zu bytes @%p\n",
+					pairs[i].no, tally->data[pos].size, tally->data[pos].addr);
+		}
+		fprintf(stream,
+				"--------------------------------------------------------------------------------\n");
+		free(pairs);
 	}
-	assert(k==n);
-	qsort(pairs, n, sizeof(pair), cmp_pair);
-	for (size_t i=0; i < n; i++) {
-		size_t pos = pairs[i].pos;
-		fprintf(stream, "#%zu:  %zu bytes @%p\n",
-		        pairs[i].no, tally->data[pos].size, tally->data[pos].addr);
-	}
-	fprintf(stream,
-	        "--------------------------------------------------------------------------------\n");
 	hr_t hrsize = human_readable(tally->total);
 	fprintf(stream, "Heap memory usage summary\n\n");
 	fprintf(stream, "Total memory  : %zu bytes (%.3lf %sbytes)\n",
@@ -241,13 +244,12 @@ static void memtable_print_stats(FILE *stream, memtable *tally)
 
 	fprintf(stream,
 	        "================================================================================\n");
-	free(pairs);
 }
 
 
-void memdbg_print_stats(FILE *stream)
+void memdbg_print_stats(FILE *stream, bool print_chunks)
 {
-	memtable_print_stats(stream, &tally);
+	memtable_print_stats(stream, &tally, print_chunks);
 }
 
 
@@ -260,6 +262,24 @@ void memdbg_reset()
 	free(tally.data);
 	tally.data = NULL;
 	alloc_no = 0;
+}
+
+
+size_t memdbg_total() 
+{
+	return tally.total;
+}
+
+
+size_t memdbg_nchunks() 
+{
+	return tally.nact;
+}
+
+
+bool memdbg_is_empty()
+{
+	return (tally.total == 0 && tally.nact == 0);
 }
 
 

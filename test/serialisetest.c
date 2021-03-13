@@ -225,7 +225,7 @@ void test_serialise_list(CuTest *tc)
 			CuAssertIntEquals(tc, cur->arr[i], cur_cpy->arr[i]);
 		}
 	}
-	memdbg_print_stats(stdout);
+	memdbg_print_stats(stdout, false);
 }
 
 

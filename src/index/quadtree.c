@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
+#include <assert.h>
 
 #include "errlog.h"
 #include "mathutil.h"
@@ -84,9 +85,11 @@ static quadtree_node *quadtree_node_get_or_ins_chd(quadtree_node *node,
 		cur = cur->next_sibl;
 	}
 	if (cur == NULL || dir < cur->dir) {
-		if (prev == NULL) {
-			node->first_chd = quadtree_node_new(dir);
-			return node->first_chd;
+		if (prev == NULL) { // cur == node->first_chd
+			quadtree_node *new_chd = quadtree_node_new(dir);
+			new_chd->next_sibl = node->first_chd;
+			node->first_chd = new_chd;
+			return new_chd;
 		}
 		else {
 			quadtree_node *new_chd = quadtree_node_new(dir);
@@ -96,6 +99,7 @@ static quadtree_node *quadtree_node_get_or_ins_chd(quadtree_node *node,
 		}
 	}
 	else {
+		assert(cur->dir == dir);
 		return cur;
 	}
 }

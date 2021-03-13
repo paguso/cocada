@@ -64,30 +64,58 @@
  */
 extern void *memdbg_malloc(size_t size, char *file, int line);
 
+
 /**
  * @brief calloc wrapper. Not meant do be called directly.
  */
 extern void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line);
+
 
 /**
  * @brief realloc wrapper. Not meant do be called directly.
  */
 extern void *memdbg_realloc(void *ptr, size_t size, char *file, int line);
 
+
 /**
  * @brief free wrapper. Not meant do be called directly.
  */
 extern void memdbg_free(void *ptr, char *file, int line);
 
+
 /**
  * @brief Print memory usage stats.
+ * @param stream Output stream
+ * @param print_chunks Display size and address of all allocated chunks
  */
-extern void memdbg_print_stats(FILE *stream);
+extern void memdbg_print_stats(FILE *stream, bool print_chunks);
+
 
 /**
  * @brief Resets the memory tally.
  */
 extern void memdbg_reset();
+
+
+/**
+ * @brief Returns the total memory (in bytes) accounted for in the tally.
+ */
+extern size_t memdbg_total();
+
+
+/**
+ * @brief Return the current number of allocated chunks in the tally
+ */
+extern size_t memdbg_nchunks();
+
+
+/**
+ * @briefs Returns true if the memory tally is empty, and false otherwise.
+ * @warn If true, it doesn't mean that no memory is allocated, but only
+ * that none is accounted for in the tally.
+ */
+extern bool memdbg_is_empty();
+
 
 
 #ifdef DEBUG_MEM
