@@ -35,6 +35,23 @@ finaliser *finaliser_new( finalise_func fn )
 }
 
 
+finaliser *finaliser_clone(finaliser *src)
+{
+	if (src == NULL) {
+		return NULL;
+	}
+	finaliser *fnr = NEW(finaliser);
+	fnr->fn = src->fn;
+	fnr->nchd = src->nchd;
+	fnr->chd = (finaliser **) calloc(src->nchd, sizeof(finaliser *));
+	for (size_t i = 0; i < src->nchd; i++ ) {
+		fnr->chd[i] = finaliser_clone(src->chd[i]);
+	}
+	return fnr;
+}
+
+
+
 void finaliser_free(finaliser *self)
 {
 	if (self == NULL) return;

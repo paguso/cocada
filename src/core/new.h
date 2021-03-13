@@ -495,6 +495,12 @@ finaliser *finaliser_new(finalise_func fn);
 
 
 /**
+ * @brief Recursively lones a finaliser
+ */
+finaliser *finaliser_clone(finaliser *src);
+
+
+/**
  * @brief Recursively frees a destructor.
  */
 void finaliser_free(finaliser *self);

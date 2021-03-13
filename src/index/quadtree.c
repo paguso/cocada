@@ -24,6 +24,7 @@
 #include "mathutil.h"
 #include "new.h"
 #include "quadtree.h"
+#include "vec.h"
 
 /*
 Quadrant encoding
@@ -45,86 +46,75 @@ Quadrant encoding
 #define IS_NORTH(DIR) ( 0x01 - IS_SOUTH(DIR) )
 
 
-struct _quadtree_node {
-	quad_pos dir;
-	void *payload;
-	quadtree_node *first_chd;
-	quadtree_node *next_sibl;
-};
-
-#define IS_LEAF(NODE) ((NODE)->first_chd == NULL)
-
-static quadtree_node *quadtree_node_new(quad_pos dir)
-{
-	quadtree_node *ret = NEW(quadtree_node);
-	ret->dir = dir;
-	ret->payload = NULL;
-	ret->first_chd = NULL;
-	ret->next_sibl = NULL;
-	return ret;
-}
-
-
-quadtree_node *quadtree_node_get_chd(quadtree_node *node, quad_pos dir)
-{
-	quadtree_node *cur = node->first_chd;
-	while (cur != NULL && cur->dir != dir) {
-		cur = cur->next_sibl;
-	}
-	return cur;
-}
-
-
-static quadtree_node *quadtree_node_get_or_ins_chd(quadtree_node *node,
-        quad_pos dir)
-{
-	quadtree_node *cur = node->first_chd;
-	quadtree_node *prev = NULL;
-	while (cur != NULL && cur->dir < dir) {
-		prev = cur;
-		cur = cur->next_sibl;
-	}
-	if (cur == NULL || dir < cur->dir) {
-		if (prev == NULL) { // cur == node->first_chd
-			quadtree_node *new_chd = quadtree_node_new(dir);
-			new_chd->next_sibl = node->first_chd;
-			node->first_chd = new_chd;
-			return new_chd;
-		}
-		else {
-			quadtree_node *new_chd = quadtree_node_new(dir);
-			new_chd->next_sibl = cur;
-			prev->next_sibl = new_chd;
-			return new_chd;
-		}
-	}
-	else {
-		assert(cur->dir == dir);
-		return cur;
-	}
-}
-
-
-
-void *quadtree_node_get_data(quadtree_node *node)
-{
-	return node->payload;
-}
-
-
-void quadtree_node_set_data(quadtree_node *node, void *data)
-{
-	node->payload = data;
-}
-
-
 struct _quadtree {
-	quadtree_node *root;
 	uint width;
 	uint height;
 	uint depth;
+	vec *nodes;
 };
 
+
+typedef struct _quadtree_node {
+	void *payload;
+	size_t first_chd;
+} quadtree_node;
+
+
+#define IS_LEAF(NODE) ((NODE)->first_chd == 0)
+
+
+static quadtree_node DUMMY_NODE = {.payload = NULL, .first_chd = 0};
+
+
+static size_t quadtree_node_new(quadtree *tree)
+{
+	size_t new_node_pos = vec_len(tree->nodes);
+	vec_push(tree->nodes, &DUMMY_NODE);
+	vec_push(tree->nodes, &DUMMY_NODE);
+	vec_push(tree->nodes, &DUMMY_NODE);
+	vec_push(tree->nodes, &DUMMY_NODE);
+	return new_node_pos;
+}
+
+
+bool quadtree_node_is_leaf(quadtree *tree, size_t node)
+{
+	return (((quadtree_node *) vec_get(tree->nodes, node))->first_chd) == 0;
+}
+
+
+size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos dir)
+{
+	size_t fch = ((quadtree_node *) vec_get(tree->nodes, node))->first_chd;
+	return (fch == 0) ? fch : fch + dir;
+}
+
+
+static size_t quadtree_node_get_or_ins_chd(quadtree *tree, size_t node,
+        quad_pos dir)
+{
+	size_t fchd = ((const quadtree_node *)vec_get(tree->nodes, node))->first_chd;
+	if ( fchd == 0 ) {
+		 fchd = quadtree_node_new(tree);
+	}
+	((quadtree_node *)vec_get_mut(tree->nodes, node))->first_chd = fchd;
+	return fchd + dir;
+}
+
+
+const void *quadtree_node_get_data(quadtree *tree, size_t node)
+{
+	return (const void *)(((const quadtree_node*)vec_get(tree->nodes, node))->payload);
+}
+
+
+void quadtree_node_set_data(quadtree *tree, size_t node, void *data)
+{
+	((quadtree_node*)vec_get_mut(tree->nodes, node))->payload = data;
+}
+
+
+#define ROOT 3
 
 quadtree *quadtree_new(uint width, uint height, uint depth)
 {
@@ -132,11 +122,12 @@ quadtree *quadtree_new(uint width, uint height, uint depth)
 	ret->width = width;
 	ret->height = height;
 	ret->depth = depth;
-	ret->root = quadtree_node_new(NE);
+	ret->nodes = vec_new_with_capacity(sizeof(quadtree_node), 4);
+	quadtree_node_new(ret);
 	return ret;
 }
 
-
+/*
 static void destroy_tree(quadtree_node *root, const finaliser *fnr)
 {
 	for (quadtree_node *chd = root->first_chd; chd != NULL;) {
@@ -147,14 +138,20 @@ static void destroy_tree(quadtree_node *root, const finaliser *fnr)
 	FINALISE(&(root->payload), fnr);
 	FREE(root);
 }
+*/
+
+void quadtree_fit(quadtree *self)
+{
+	vec_fit(self->nodes);
+}
+
 
 
 void quadtree_finalise(void *ptr, const finaliser *fnr)
 {
 	quadtree *self = (quadtree *)ptr;
-	const finaliser *node_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
-	                            0) : NULL;
-	destroy_tree(self->root, node_fnr);
+	finaliser *vec_fnr = finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
+	DESTROY(self->nodes, vec_fnr);
 }
 
 
@@ -193,8 +190,8 @@ void quadtree_ins(quadtree *self, point2d p, void *payload,
 	if (p.x > self->width || p.y > self->height) {
 		return;
 	}
-	quadtree_node *cur_node = self->root;
-	upd_func(self->root, payload);
+	size_t cur_node = ROOT;
+	upd_func(self, cur_node, payload);
 	rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = self->width, .height = self->height};
 	point2d centre = {.x = rect.width / 2, .y = rect.height / 2};
 	uint cur_depth = 0;
@@ -216,8 +213,8 @@ void quadtree_ins(quadtree *self, point2d p, void *payload,
 		}
 		centre.x = rect.top_left.x + (rect.width / 2);
 		centre.y = rect.top_left.y + (rect.height / 2);
-		cur_node = quadtree_node_get_or_ins_chd(cur_node, dir);
-		upd_func(cur_node, payload);
+		cur_node = quadtree_node_get_or_ins_chd(self, cur_node, dir);
+		upd_func(self, cur_node, payload);
 		cur_depth++;
 	}
 }
@@ -280,10 +277,10 @@ rectangle rectangle_snap_to_grid(quadtree *self, rectangle rect, snap_t anchor)
 }
 
 
-static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
+static void quadtree_qry_node(quadtree *self, size_t root,  rectangle search_area,
                               rectangle rect, quadtree_node_qry_func qry_func, void *dest, bool backtrack)
 {
-	if (root == NULL) {
+	if (root == 0) {
 		return;
 	}
 
@@ -291,12 +288,12 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 	        && search_area.top_left.y == rect.top_left.y
 	        && search_area.width == rect.width
 	        && search_area.height == rect.height) {
-		qry_func(root, dest);
+		qry_func(self, root, dest);
 		if (backtrack) {
 			return;
 		}
-	}
-	else if (root->first_chd == NULL) {  // LEAF NODE
+	} 
+	else if (quadtree_node_is_leaf(self, root)) {
 		return;
 	}
 
@@ -315,7 +312,7 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 			.width = MIN(rect.width, centre.x - rect.top_left.x),
 			.height = MIN(rect.height,  centre.y - rect.top_left.y)
 		};
-		quadtree_qry_node(quadtree_node_get_chd(root, NW), NW_area, NW_rect, qry_func,
+		quadtree_qry_node(self, quadtree_node_get_chd(self, root, NW), NW_area, NW_rect, qry_func,
 		                  dest, backtrack );
 	}
 	if (rect.top_left.x + rect.width >= centre.x
@@ -332,7 +329,7 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
 			.height = MIN(rect.height, centre.y - rect.top_left.y)
 		};
-		quadtree_qry_node(quadtree_node_get_chd(root, NE), NE_area, NE_rect, qry_func,
+		quadtree_qry_node(self, quadtree_node_get_chd(self, root, NE), NE_area, NE_rect, qry_func,
 		                  dest, backtrack);
 	}
 	if (rect.top_left.x < centre.x
@@ -349,7 +346,7 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 			.width = MIN(rect.width, centre.x - rect.top_left.x),
 			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y)
 		};
-		quadtree_qry_node(quadtree_node_get_chd(root, SW), SW_area, SW_rect, qry_func,
+		quadtree_qry_node(self, quadtree_node_get_chd(self, root, SW), SW_area, SW_rect, qry_func,
 		                  dest, backtrack);
 	}
 	if (rect.top_left.x + rect.width >= centre.x
@@ -365,7 +362,7 @@ static void quadtree_qry_node(quadtree_node *root, rectangle search_area,
 			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
 			.height = MIN(rect.height, rect.top_left.y + rect.height - centre.y)
 		};
-		quadtree_qry_node(quadtree_node_get_chd(root, SE), SE_area, SE_rect, qry_func,
+		quadtree_qry_node(self, quadtree_node_get_chd(self, root, SE), SE_area, SE_rect, qry_func,
 		                  dest, backtrack);
 	}
 
@@ -377,6 +374,6 @@ void quadtree_qry(quadtree *self, rectangle rect,
                   quadtree_node_qry_func qry_func, void *dest, bool backtrack)
 {
 	rectangle search_area = {.top_left.x = 0, .top_left.y = 0, .width = self->width, .height = self->height};
-	quadtree_qry_node(self->root, search_area, rect, qry_func, dest, backtrack);
+	quadtree_qry_node(self, ROOT, search_area, rect, qry_func, dest, backtrack);
 
 }

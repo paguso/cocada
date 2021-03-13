@@ -138,45 +138,40 @@ typedef enum {
 
 
 /**
- * @brief Quadtree node opaque type.
+ * @brief Quadtree opaque type.
  */
-typedef struct _quadtree_node quadtree_node;
+typedef struct _quadtree quadtree;
 
 
 /**
  * @brief Returns the child of a node.
  */
-quadtree_node *quadtree_node_get_chd(quadtree_node *node, quad_pos dir);
+size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos dir);
 
 
 /**
  * @brief Gets the node data (payload).
  */
-void *quadtree_node_get_data(quadtree_node *node);
+const void *quadtree_node_get_data(quadtree *tree, size_t node);
 
 
 /**
  * @brief Sets the node data (payload).
  */
-void quadtree_node_set_data(quadtree_node *node, void *data);
+void quadtree_node_set_data(quadtree *tree, size_t node, void *data);
 
 
 /**
  * @brief Node update callback function type
  */
-typedef void (*quadtree_node_upd_func)(quadtree_node *node, void *data);
+typedef void (*quadtree_node_upd_func)(quadtree *tree, size_t node, void *data);
 
 
 /**
  * @brief Node query callback function type
  */
-typedef void (*quadtree_node_qry_func)(quadtree_node *node, void *dest);
+typedef void (*quadtree_node_qry_func)(quadtree *tree, size_t node, void *dest);
 
-
-/**
- * @brief Quadtree opaque type.
- */
-typedef struct _quadtree quadtree;
 
 
 /**
@@ -249,6 +244,8 @@ rectangle rectangle_snap_to_grid(quadtree *self, rectangle rect, snap_t anchor);
  */
 quadtree *quadtree_new(uint width, uint height, uint depth);
 
+
+void quadtree_fit(quadtree *self);
 
 /**
  * @brief Finaliser.

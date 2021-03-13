@@ -83,25 +83,57 @@ void rectangle_snap_to_grid_test(CuTest *tc)
 	CuAssertIntEquals(tc, 256, b.top_left.y);
 	CuAssertIntEquals(tc, 512, b.width);
 	CuAssertIntEquals(tc, 512, b.height);
+	//memdbg_print_stats(stdout, true);
 	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_new_empty()));
+	//memdbg_print_stats(stdout, true);
 	CuAssert(tc, "memory leak", memdbg_is_empty());
 }
 
 
-void upd_node_ins_pt(quadtree_node *node, void *pt)
+
+void quadtree_do_nothing(quadtree *tree, size_t node, void *data)
 {
-	vec *pts = (vec *) quadtree_node_get_data(node);
+}
+
+
+void quadtree_ins_hollow_test(CuTest *tc)
+{
+	uint depth = 10;
+	uint side = 1 << depth;
+	memdbg_reset();
+	quadtree *tree = quadtree_new(side, side, depth);
+	size_t n = side * side;
+	for (uint x = 0; x < side; x++) {
+		for (uint y = 0; y < side; y++) {
+			point2d p = {.x = x, .y = y};
+			quadtree_ins(tree, p, NULL, quadtree_do_nothing);
+		}
+	}
+	quadtree_fit(tree);
+	//memdbg_print_stats(stdout, false);
+	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_new_empty()));
+	//memdbg_print_stats(stdout, false);
+	CuAssert(tc, "memory leak", memdbg_is_empty());
+}
+
+
+void upd_node_ins_pt(quadtree *tree, size_t node, void *pt)
+{
+	vec *pts = (vec *) quadtree_node_get_data(tree, node);
 	if (pts == NULL) {
 		pts = vec_new(sizeof(point2d));
-		quadtree_node_set_data(node, pts);
+		quadtree_node_set_data(tree, node, pts);
 	}
 	vec_push(pts, pt);
 }
 
 
-void qry_node_qty(quadtree_node *node, void *dest)
+void qry_node_qty(quadtree *tree, size_t node, void *dest)
 {
-	*((size_t *)dest) += vec_len((vec *)quadtree_node_get_data(node));
+	vec *pts = (vec *)quadtree_node_get_data(tree, node); 
+	if (pts != NULL) {
+		*((size_t *)dest) += vec_len(pts);
+	}
 }
 
 
@@ -138,46 +170,23 @@ void quadtree_qry_test(CuTest *tc)
 			quadtree_ins(tree, pt, &pt, upd_node_ins_pt);
 		}
 	}
-	for (uint x = 0; x < width; x++) {
-		for (uint y = 0; y < height; y++) {
-			rectangle rect = {.top_left.x = x, .top_left.y = y, .width = 1, .height = 1};
-			size_t qty = 0;
-			quadtree_qry(tree, rect, qry_node_qty, &qty, false);
-			CuAssertSizeTEquals(tc, qty, 1);
+	uint nqrys = 1024;
+	for (uint i = 0; i < nqrys; i++) {
+		uint x = rand_range_uint(0, width - 1);
+		uint y = rand_range_uint(0, height - 1);
+		uint w = rand_range_uint(0, width - x);
+		uint h = rand_range_uint(0, height - y);
+		rectangle rect = {.top_left.x = x, .top_left.y = y, .width = w, .height = h};
+		size_t qty = 0;
+		quadtree_qry(tree, rect, qry_node_qty, &qty, true);
+		if (qty != (w * h)) {
+			printf("erro\n");
 		}
+		CuAssertSizeTEquals(tc, (w * h), qty);
 	}
+	//memdbg_print_stats(stdout, false);
 	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_cons(finaliser_new_ptr(),
 	                             FNR(vec))));
-	//memdbg_print_stats(stdout, false);
-	CuAssert(tc, "memory leak", memdbg_is_empty());
-}
-
-
-void quadtree_ins_count_upd(quadtree_node *node, void *data)
-{
-	size_t *count = (size_t *) quadtree_node_get_data(node);
-	if (count == NULL) {
-		count = NEW(size_t);
-		quadtree_node_set_data(node, count);
-	}
-	*count = *count + 1;
-}
-
-
-void quadtree_count_test(CuTest *tc)
-{
-	uint depth = 10;
-	uint side = 1 << depth;
-	memdbg_reset();
-	quadtree *tree = quadtree_new(side, side, depth);
-	size_t n = side * side;
-	for (size_t i = 0; i < n; i++) {
-		point2d p = {.x = rand_range_uint(0, side), .y = rand_range_uint(0, side)};
-		quadtree_ins(tree, p, NULL, quadtree_ins_count_upd);
-	}
-	//memdbg_print_stats(stdout, false);
-	DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_new_ptr()));
-	//memdbg_print_stats(stdout, false);
 	CuAssert(tc, "memory leak", memdbg_is_empty());
 }
 
@@ -187,8 +196,8 @@ CuSuite *quadtree_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, rectangle_snap_to_grid_test);
+	SUITE_ADD_TEST(suite, quadtree_ins_hollow_test);
 	SUITE_ADD_TEST(suite, quadtree_ins_test);
 	SUITE_ADD_TEST(suite, quadtree_qry_test);
-	SUITE_ADD_TEST(suite, quadtree_count_test);
 	return suite;
 }
