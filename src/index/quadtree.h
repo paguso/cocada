@@ -206,9 +206,9 @@ typedef enum {
 
 /**
  * @brief Snaps the rectangle to the grid implied by the quadtree.
- * If @p anchor is ::SNAP_OUT, returns the smallest rectangle containing
- * @p rect, with corners in the grid. If @p anchor is ::SNAP_IN, returns
- * the largest rectangle contained by @p rect, with corners in the grid.
+ * If @p anchor is ::SNAP_OUT, returns the smallest rectangle with corners
+ * in the grid containing @p rect. If @p anchor is ::SNAP_IN, returns
+ * the largest rectangle with corners in the grid contained by @p rect.
  *
  * ## Example
  * Consider the diagram below. If this method is called with the
