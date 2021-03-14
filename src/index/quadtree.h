@@ -146,7 +146,7 @@ typedef struct _quadtree quadtree;
 /**
  * @brief Returns the child of a node.
  */
-size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos dir);
+size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos pos);
 
 
 /**
@@ -234,7 +234,7 @@ typedef enum {
  *  + - - - + - - - + - - - + - - - +
  * ```
  */
-rectangle rectangle_snap_to_grid(quadtree *self, rectangle rect, snap_t anchor);
+rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor);
 
 
 /**
@@ -244,8 +244,6 @@ rectangle rectangle_snap_to_grid(quadtree *self, rectangle rect, snap_t anchor);
  */
 quadtree *quadtree_new(uint width, uint height, uint depth);
 
-
-void quadtree_fit(quadtree *self);
 
 /**
  * @brief Finaliser.
@@ -266,6 +264,12 @@ void quadtree_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
+ * @brief Adjusts internal representation trimming off unused memory
+ */
+void quadtree_fit(quadtree *tree);
+
+
+/**
  * @brief Inserts a point @p p in the quadtree with associated @p payload data.
  * The algorithm follows a path from the root to the corresponding leaf
  * containing the point according to the subdivision process described in
@@ -274,7 +278,7 @@ void quadtree_finalise(void *ptr, const finaliser *fnr);
  * update the node data via the public interface methods
  * ::quadtree_node_get_data and ::quadtree_node_set_data.
  */
-void quadtree_ins(quadtree *self, point2d p, void *payload,
+void quadtree_ins(quadtree *tree, point2d pt, void *payload,
                   quadtree_node_upd_func upd_func);
 
 
@@ -341,7 +345,7 @@ void quadtree_ins(quadtree *self, point2d p, void *payload,
  *
  *
  */
-void quadtree_qry(quadtree *self, rectangle area,
+void quadtree_qry(quadtree *tree, rectangle area,
                   quadtree_node_qry_func qry_func, void *dest, bool backtrack);
 
 #endif

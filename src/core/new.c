@@ -35,7 +35,7 @@ finaliser *finaliser_new( finalise_func fn )
 }
 
 
-finaliser *finaliser_clone(finaliser *src)
+finaliser *finaliser_clone(const finaliser *src)
 {
 	if (src == NULL) {
 		return NULL;

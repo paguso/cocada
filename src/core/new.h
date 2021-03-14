@@ -497,7 +497,7 @@ finaliser *finaliser_new(finalise_func fn);
 /**
  * @brief Recursively lones a finaliser
  */
-finaliser *finaliser_clone(finaliser *src);
+finaliser *finaliser_clone(const finaliser *src);
 
 
 /**

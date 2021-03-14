@@ -207,14 +207,15 @@ static int cmp_pair(const void *l, const void *r)
 		return +1;
 }
 
-static void memtable_print_stats(FILE *stream, memtable *tally, bool print_chunks)
+static void memtable_print_stats(FILE *stream, memtable *tally,
+                                 bool print_chunks)
 {
 	fprintf(stream,
 	        "================================================================================\n");
 	fprintf(stream, "Heap memory info\n");
 	if (print_chunks) {
 		fprintf(stream,
-				"--------------------------------------------------------------------------------\n");
+		        "--------------------------------------------------------------------------------\n");
 		fprintf(stream, "Chunks in chronological order of allocation\n\n");
 		size_t n = tally->nact, k=0;
 		pair *pairs = (pair *)malloc(n * sizeof(pair));
@@ -230,10 +231,10 @@ static void memtable_print_stats(FILE *stream, memtable *tally, bool print_chunk
 		for (size_t i=0; i < n; i++) {
 			size_t pos = pairs[i].pos;
 			fprintf(stream, "#%zu:  %zu bytes @%p\n",
-					pairs[i].no, tally->data[pos].size, tally->data[pos].addr);
+			        pairs[i].no, tally->data[pos].size, tally->data[pos].addr);
 		}
 		fprintf(stream,
-				"--------------------------------------------------------------------------------\n");
+		        "--------------------------------------------------------------------------------\n");
 		free(pairs);
 	}
 	hr_t hrsize = human_readable(tally->total);
@@ -265,13 +266,13 @@ void memdbg_reset()
 }
 
 
-size_t memdbg_total() 
+size_t memdbg_total()
 {
 	return tally.total;
 }
 
 
-size_t memdbg_nchunks() 
+size_t memdbg_nchunks()
 {
 	return tally.nact;
 }
