@@ -68,7 +68,7 @@
  * ## Discretisation
  *
  * This quadtree is disctretised. It represents a rectangle with
- * top-left point `(tl.x, tl.y) = (0,0)`, and given width `w`and
+ * top-left point `(tl.x, tl.y) = (0,0)`, and given width `w` and
  * height `h`, both integers.
  * Thus, the x-coordinates of points inside the rectangle lie
  * in the range `0..w-1`, from left to right, whereas y-coordinates
@@ -92,8 +92,8 @@
  *
  * ```
  *
- * Subdivision occurs until the maximum depth is reached **or**
- * the dimension is greater than one. Notice that it may happen
+ * Subdivision occurs if the maximum depth has not been reached **and**
+ * at least one dimension is greater than one. Notice that it may happen
  * that one dimension reaches 1 sooner than the other. However,
  * the diagram above remains valid. For instance, if `w=3`
  * and `h=1` we'd have
@@ -102,7 +102,11 @@
  *       0             w/2 = 1                              w=3
  *       +--------------- C ---------------------------------+
  *       |                |                                  |
+ *       |                |                                  |
+ *       |                |                                  |
  *       |    SW = 10     |            SE = 11               |
+ *       |                |                                  |
+ *       |                |                                  |
  *       |                |                                  |
  *   h=1 +----------------+----------------------------------+
  *
@@ -113,8 +117,8 @@
  * ## Node data (payload)
  *
  * Each node has associated data accessible via the public interface methods
- * ::quadtree_node_get_data and ::quadtree_node_set_data. Whereas this
- * data is owned or not is left to the user. If the data is owned, though
+ * ::quadtree_node_get_data and ::quadtree_node_set_data. Whether this
+ * data is owned or not is left to the user. If the data is owned,
  * the finaliser should be defined accordingly with a nested finaliser
  * to a pointer to the owned type. For instance, if the data contains
  * a (pointer to) a vec:
@@ -123,7 +127,6 @@
  * DESTROY(tree, finaliser_cons(FNR(quadtree), finaliser_cons(finaliser_new_ptr(), FNR(vec))));
  * ```
  */
-
 
 
 /**
@@ -171,7 +174,6 @@ typedef void (*quadtree_node_upd_func)(quadtree *tree, size_t node, void *data);
  * @brief Node query callback function type
  */
 typedef void (*quadtree_node_qry_func)(quadtree *tree, size_t node, void *dest);
-
 
 
 /**
@@ -277,6 +279,42 @@ void quadtree_fit(quadtree *tree);
  * is called on each node in this path from the root to the leaf. This may be used to
  * update the node data via the public interface methods
  * ::quadtree_node_get_data and ::quadtree_node_set_data.
+ *
+ * ## Example
+ * 
+ * ```
+ *  + - - - + - - - + - - - + - - - +
+ *  .       .       .       .       .
+ *  .   F   .   G   .   J   .   K   .
+ *  .       .       .       .       .
+ *  + - - - B - - - + - - - C - - - +
+ *  .       .       .       .       .
+ *  .   H   .   I   .   L   .   M   .
+ *  .       .       .       .       .
+ *  + - - - + - - - A - - - + - - - +
+ *  .       .       .       .       .
+ *  .   N   .   O   .   R   .   S   .
+ *  .       .       .       .       .
+ *  + - - - D - - - + - - - E - - - +
+ *  .       .       .       .       .
+ *  .   P   .   Q   .   T   .   U   .
+ *  .       .       .  (*)  .       .
+ *  + - - - + - - - + - ^ - + - - - + 
+ *                      |
+ *                      |
+ *    insert here -----´
+ *
+ * 
+ *  Nodes visited are indicated by an asterisk *:
+ * 
+ *         __________  A* ___________
+ *       /         __/   \__         \
+ *      /         /         \         \
+ *   _ B_      _ C_        _ D_      _E*_
+ *  / /\ \    / /\ \      / /\ \    / /\ \
+ * F G  H I  J K  L M    N O  P Q  R S T* U
+ *
+ * ```
  */
 void quadtree_ins(quadtree *tree, point2d pt, void *payload,
                   quadtree_node_upd_func upd_func);

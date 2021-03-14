@@ -134,8 +134,8 @@ void quadtree_fit(quadtree *tree)
 void quadtree_finalise(void *ptr, const finaliser *fnr)
 {
 	quadtree *self = (quadtree *)ptr;
-	finaliser *vec_fnr = finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr,
-	                                    0)));
+	finaliser *vec_fnr = 
+		finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
 	DESTROY(self->nodes, vec_fnr);
 }
 
@@ -144,7 +144,8 @@ void quadtree_finalise(void *ptr, const finaliser *fnr)
 
 #define SND_HALF(LEN) ((LEN) - ((LEN) / 2))
 
-static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0, .width = 0, .height = 0 };
+static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0, 
+									.width = 0, .height = 0 };
 
 static rectangle rectangle_clip(rectangle rect, rectangle viewport)
 {
@@ -359,5 +360,4 @@ void quadtree_qry(quadtree *tree, rectangle rect,
 {
 	rectangle search_area = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
 	quadtree_qry_node(tree, ROOT, search_area, rect, qry_func, dest, backtrack);
-
 }
