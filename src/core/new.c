@@ -25,6 +25,13 @@
 #include "new.h"
 
 
+struct _finaliser {
+	finalise_func fn;
+	size_t nchd;
+	struct _finaliser **chd;
+};
+
+
 finaliser *finaliser_new( finalise_func fn )
 {
 	finaliser *fnr = NEW(finaliser);
@@ -51,7 +58,6 @@ finaliser *finaliser_clone(const finaliser *src)
 }
 
 
-
 void finaliser_free(finaliser *self)
 {
 	if (self == NULL) return;
@@ -60,6 +66,12 @@ void finaliser_free(finaliser *self)
 	}
 	FREE(self->chd);
 	FREE(self);
+}
+
+
+void finaliser_call(const finaliser *self, void *ptr)
+{
+	self->fn((finaliser *)self, ptr);
 }
 
 

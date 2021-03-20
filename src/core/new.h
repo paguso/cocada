@@ -466,26 +466,16 @@
 
 
 /**
- * Destructor type
+ * Finaliser type
  * @see _finaliser
  */
 typedef struct _finaliser finaliser;
 
 
 /**
- * Destructor function type
+ * Finaliser function type
  */
 typedef void (*finalise_func) (void *ptr, const finaliser *fnr);
-
-
-/**
- * Destructor object
- */
-struct _finaliser {
-	finalise_func fn;
-	size_t nchd;
-	struct _finaliser **chd;
-};
 
 
 /**
@@ -504,6 +494,12 @@ finaliser *finaliser_clone(const finaliser *src);
  * @brief Recursively frees a destructor.
  */
 void finaliser_free(finaliser *self);
+
+
+/**
+ * @brief Calls the finaliser function on @p ptr
+ */
+void finaliser_call(const finaliser *self, void *ptr);
 
 
 /**
@@ -551,9 +547,11 @@ finaliser *finaliser_new_ptr();
  * The object is not deallocated, and neither is the finaliser object destroyed.
  */
 #define FINALISE( OBJ, FNR ) \
-	{void *__OBJ = (void *)(OBJ);\
-		finaliser *__FNR = (finaliser *)(FNR);\
-		if (__OBJ) __FNR->fn(__OBJ, (const finaliser *)(__FNR));}
+{\
+	void *__OBJ = (void *)(OBJ);\
+	const finaliser *__FNR = (const finaliser *)(FNR);\
+	if (__OBJ) 	finaliser_call(__FNR, __OBJ);\
+}
 
 
 /**
@@ -569,13 +567,15 @@ finaliser *finaliser_new_ptr();
  * The finaliser @p FNR is **also** destroyed.
  */
 #define DESTROY( OBJ, FNR ) \
-	{void *__OBJ = (void *)(OBJ);\
-		finaliser *__FNR = (finaliser *)(FNR);\
-		if ((__OBJ)) {\
-			__FNR->fn(__OBJ, (const finaliser *)(__FNR));\
-			free(__OBJ);\
-		}\
-		finaliser_free((void *)(__FNR));}
+{\
+	void *__OBJ = (void *)(OBJ);\
+	finaliser *__FNR = (finaliser *)(FNR);\
+	if ((__OBJ)) {\
+		finaliser_call((const finaliser *)(__FNR), __OBJ);\
+		free(__OBJ);\
+	}\
+	finaliser_free((void *)(__FNR));\
+}
 
 
 /**
@@ -583,8 +583,10 @@ finaliser *finaliser_new_ptr();
  * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
  */
 #define DESTROY_FLAT( OBJ, TYPE ) \
-	{void *__OBJ = (void *)(OBJ);\
-		if(__OBJ) DESTROY(__OBJ, FNR(TYPE))}
+{\
+	void *__OBJ = (void *)(OBJ);\
+	if(__OBJ) DESTROY(__OBJ, FNR(TYPE))\
+}
 
 
 /**

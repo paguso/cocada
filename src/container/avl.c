@@ -83,7 +83,7 @@ static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 void avl_finalise(void *ptr, const finaliser *fnr)
 {
 	avl *self = (avl *)ptr;
-	if (fnr->nchd > 0) {
+	if (finaliser_nchd(fnr) > 0) {
 		__avl_finaliser(self->root, finaliser_chd(fnr, 0));
 	}
 	else {
