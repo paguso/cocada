@@ -38,6 +38,12 @@ struct _minqueue {
 };
 
 
+struct _minqueue_iter {
+	const minqueue *src;
+	size_t index;
+};
+
+
 minqueue *minqueue_new(size_t typesize,  cmp_func cmp)
 {
 	minqueue *ret = NEW(minqueue);
@@ -172,11 +178,19 @@ static void _minqueue_iter_goto_next(minqueue_iter *iter)
 }
 
 
-minqueue_iter minqueue_all_min(const minqueue *queue)
+minqueue_iter *minqueue_all_min(const minqueue *queue)
 {
-	minqueue_iter iter = {.src=queue, .index=0};
-	_minqueue_iter_goto_next(&iter);
+	minqueue_iter *iter = NEW(minqueue_iter);
+	iter->src=queue;
+	iter->index=0;
+	_minqueue_iter_goto_next(iter);
 	return iter;
+}
+
+
+void minqueue_free(minqueue_iter *iter)
+{
+	FREE(iter);
 }
 
 

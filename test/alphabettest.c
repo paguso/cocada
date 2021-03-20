@@ -25,138 +25,51 @@
 #include "CuTest.h"
 
 #include "alphabet.h"
+#include "memdbg.h"
 
 
-void test_ab_new(CuTest *tc)
+void test_ab(CuTest *tc)
 {
-	size_t size=16;
+    memdbg_reset();
+	size_t size = 16;
 	char *letters = "0123456789ABCDEF";
 	alphabet *ab;
 	ab = alphabet_new(size, letters);
-	for (size_t i=0; i<size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		size_t rk = ab_rank(ab, letters[i]);
 		CuAssertSizeTEquals(tc, i, rk);
+        xchar_t c = ab_char(ab, i);
+        CuAssert(tc, "ab_char error", letters[i] == c);
 	}
-	for (size_t i=size; i<2*size; i++) {
-		size_t rk = ab_rank(ab, letters[i]);
-		CuAssertSizeTEquals(tc, size, rk);
-	}
+    CuAssertSizeTEquals(tc, size, ab_rank(ab, 'G'));
 	alphabet_free(ab);
+    CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
-/*
-void test_ab_new_with_rank_map(CuTest *tc)
+
+void test_int_ab(CuTest *tc)
 {
-    size_t size=16;
-    char *letters = "0123456789ABCDEF";
-    alphabet *ab;
-    ab = alphabet_new_with_rank_map(size, letters);
-    for (size_t i=0; i<size; i++) {
-        size_t rk = ab_rank(ab, letters[i]);
-        CuAssertSizeTEquals(tc, i, rk);
-    }
-    for (size_t i=size; i<2*size; i++) {
-        size_t rk = ab_rank(ab, letters[i]);
-        CuAssertSizeTEquals(tc, size, rk);
-    }
-    alphabet_free(ab);
-}
-*/
-
-extern size_t rankfn(char c)
-{
-	char *letters = "0123456789ABCDEF";
-	size_t p;
-	for (p=0; p<strlen(letters) && letters[p]!=c; p++);
-	return p;
+    memdbg_reset();
+	size_t size = 16;
+	alphabet *ab;
+	ab = int_alphabet_new(size);
+	for (size_t i = 0; i < size; i++) {
+        xchar_t c = (xchar_t)i;
+		size_t rk = ab_rank(ab, c);
+		CuAssertSizeTEquals(tc, i, rk);
+        xchar_t d = ab_char(ab, i);
+        CuAssert(tc, "ab_char error", c == d);
+	}
+    CuAssertSizeTEquals(tc, size, ab_rank(ab, size + 1));
+	alphabet_free(ab);
+    CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
-/*
-void test_ab_new_with_rank_func(CuTest *tc)
-{
-    size_t size=16;
-    char *letters = "0123456789ABCDEF";
-    alphabet *ab;
-    ab = alphabet_new_with_rank_func(size, letters, rankfn);
-    for (size_t i=0; i<size; i++) {
-        size_t rk = ab_rank(ab, letters[i]);
-        CuAssertSizeTEquals(tc, i, rk);
-    }
-    for (size_t i=size; i<2*size; i++) {
-        size_t rk = ab_rank(ab, letters[i]);
-        CuAssertSizeTEquals(tc, size, rk);
-    }
-    alphabet_free(ab);
-}
-*/
-
-
-/*
-void test_ab_marshall(CuTest *tc)
-{
-    char *filename = "test_ab_marshall.bin";
-    size_t size=16;
-    char *letters = "0123456789ABCDEF";
-    alphabet *abp, *abm, *abf;
-    abp = alphabet_new(size, letters);
-    abm = alphabet_new_with_rank_map(size, letters);
-    REGISTER_FUNCTION(rankfn);
-    abf = alphabet_new_with_rank_func(size, letters, rankfn);
-    marshallctx *ctx = marshallctx_new(filename, MARSHALL);
-    ab_marshall(ctx, abp);
-    ab_marshall(ctx, abm);
-    ab_marshall(ctx, abf);
-    ab_marshall(ctx, abp);
-    ab_marshall(ctx, abm);
-    ab_marshall(ctx, abf);
-    alphabet_free(abp);
-    alphabet_free(abm);
-    alphabet_free(abf);
-    marshallctx_free(ctx);
-
-    alphabet *abp2, *abm2, *abf2;
-    ctx = marshallctx_new(filename, UNMARSHALL);
-    abp = ab_unmarshall(ctx);
-    abm = ab_unmarshall(ctx);
-    abf = ab_unmarshall(ctx);
-    abp2 = ab_unmarshall(ctx);
-    abm2 = ab_unmarshall(ctx);
-    abf2 = ab_unmarshall(ctx);
-    marshallctx_free(ctx);
-
-    CuAssertPtrEquals(tc, abp, abp2);
-    CuAssertPtrEquals(tc, abf, abf2);
-    CuAssertPtrEquals(tc, abm, abm2);
-
-    for (size_t i=0; i<size; i++) {
-        size_t rkp = ab_rank(abp, letters[i]);
-        size_t rkm = ab_rank(abm, letters[i]);
-        size_t rkf = ab_rank(abf, letters[i]);
-        CuAssertSizeTEquals(tc, i, rkp);
-        CuAssertSizeTEquals(tc, i, rkm);
-        CuAssertSizeTEquals(tc, i, rkf);
-    }
-    for (size_t i=size; i<2*size; i++) {
-        size_t rkp = ab_rank(abp, letters[i]);
-        size_t rkm = ab_rank(abm, letters[i]);
-        size_t rkf = ab_rank(abf, letters[i]);
-        CuAssertSizeTEquals(tc, size, rkp);
-        CuAssertSizeTEquals(tc, size, rkm);
-        CuAssertSizeTEquals(tc, size, rkf);
-    }
-    alphabet_free(abp);
-    alphabet_free(abm);
-    alphabet_free(abf);
-}
-
-*/
 
 CuSuite *alphabet_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_ab_new);
-	//SUITE_ADD_TEST(suite, test_ab_new_with_rank_func);
-	//SUITE_ADD_TEST(suite, test_ab_new_with_rank_map);
-	//SUITE_ADD_TEST(suite, test_ab_marshall);
+	SUITE_ADD_TEST(suite, test_ab);
+	SUITE_ADD_TEST(suite, test_int_ab);
 	return suite;
 }

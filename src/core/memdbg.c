@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2016  Paulo G S Fonseca
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or mody
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
@@ -26,7 +26,7 @@
 #include <stddef.h>
 
 
-#define  DEBUG_MEM_OFF
+#define  MEM_DEBUG_OFF
 #include "memdbg.h"
 
 //  Implement the tally as a linear probing closed hashtable
@@ -127,7 +127,7 @@ static void memtable_check_and_resize(memtable *tally)
 
 static void memtable_set(memtable *tally, void *addr, size_t size)
 {
-#ifndef DEBUG_MEM
+#ifndef MEM_DEBUG
 	return;
 #endif
 	memtable_init(tally);
@@ -153,7 +153,7 @@ static void memtable_set(memtable *tally, void *addr, size_t size)
 
 static void memtable_unset(memtable *tally, void *addr)
 {
-#ifndef DEBUG_MEM
+#ifndef MEM_DEBUG
 	return;
 #endif
 	memtable_init(tally);
@@ -288,10 +288,10 @@ void *memdbg_malloc(size_t size, char *file, int line)
 {
 	void *ret = malloc(size);
 	memtable_set(&tally, ret, size);
-#ifdef MEMDEBUG_PRINT_ALL
+#ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
 	printf("malloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
-	       file, line, size, ret, hrsize.size, hrsize.prefix);
+	        file, line, size, ret, hrsize.size, hrsize.prefix);
 #endif
 	return ret;
 }
@@ -301,7 +301,7 @@ void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 {
 	void *ret = calloc(nmemb, size);
 	memtable_set(&tally, ret, nmemb * size);
-#ifdef MEMDEBUG_PRINT_ALL
+#ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
 	printf("calloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);
@@ -317,7 +317,7 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 		memtable_unset(&tally, ptr);
 	}
 	memtable_set(&tally, ret, size);
-#ifdef MEMDEBUG_PRINT_ALL
+#ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
 	printf("realloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       file, line, size, ret, hrsize.size, hrsize.prefix);
@@ -329,7 +329,7 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 void memdbg_free(void *ptr, char *file, int line)
 {
 	free(ptr);
-#ifdef MEMDEBUG_PRINT_ALL
+#ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
 	printf("free [%s:%d] @%p (total: %.3lf %sbytes)\n",
 	       file, line, ptr, hrsize.size, hrsize.prefix);
@@ -337,4 +337,4 @@ void memdbg_free(void *ptr, char *file, int line)
 	memtable_unset(&tally, ptr);
 }
 
-#undef DEBUG_MEM_OFF
+#undef MEM_DEBUG_OFF

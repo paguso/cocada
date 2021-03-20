@@ -40,7 +40,12 @@
  * potentially large sequences fully into memory.
  */
 
+
+/**
+ * @brief FASTA file/stream type.
+ */
 typedef struct _fasta fasta;
+
 
 /**
  * @brief A FASTA record with in-memory sequence
@@ -51,6 +56,7 @@ typedef struct {
 	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
 	size_t seq_offset;		/**< Sequence offset from the start of the file **/
 } fasta_rec;
+
 
 /**
  * @brief A FASTA record with sequence loaded as a stream

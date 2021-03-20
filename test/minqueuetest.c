@@ -99,19 +99,20 @@ void test_minqueue_push_pop(CuTest *tc)
 
 	min = minqueue_min(q);
 	size_t nmin = 0;
-	minqueue_iter iter = minqueue_all_min(q);
+	minqueue_iter *iter = minqueue_all_min(q);
 	for (int j=0; j<deque_len(v); j++) {
 		if (minqobj_cmp(min, deque_get(v, j))==0) {
 			nmin++;
 		}
 	}
 	CuAssert(tc, "must have at least one min", nmin>0);
-	while (minqueue_iter_has_next(&iter)) {
+	while (minqueue_iter_has_next(iter)) {
 		CuAssert(tc, "iterator returns not min", minqobj_cmp(min,
-		         minqueue_iter_next(&iter))==0);
+		         minqueue_iter_next(iter))==0);
 		nmin--;
 	}
 	CuAssertSizeTEquals(tc, 0, nmin);
+	minqueue_free(iter);
 
 }
 

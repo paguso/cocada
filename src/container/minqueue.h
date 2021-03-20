@@ -48,6 +48,7 @@ typedef struct _minqueue_iter minqueue_iter;
  */
 minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
 
+
 /**
  * @brief Constructor
  * Creates a min queue with initial capacity.
@@ -126,18 +127,17 @@ void minqueue_min_cpy(const minqueue *queue, void *dest);
 XX_CORETYPES(MINQUEUE_ALL_DECL)
 
 
-
-struct _minqueue_iter {
-	const minqueue *src;
-	size_t index;
-};
-
-
 /**
  * @brief Returns an iterator over all min elements of the queue
  * in FIFO order.
  */
-minqueue_iter minqueue_all_min(const minqueue *queue);
+minqueue_iter *minqueue_all_min(const minqueue *queue);
+
+
+/**
+ * @brief  Destructor.
+ */
+void minqueue_free(minqueue_iter *iter);
 
 
 /**

@@ -19,10 +19,12 @@
  *
  */
 
+
 #include "CuTest.h"
 #include "avl.h"
 #include "errlog.h"
 #include "iter.h"
+#include "memdbg.h"
 #include "order.h"
 #include "randutil.h"
 #include "vec.h"
@@ -58,6 +60,7 @@ void print_obj_t(FILE *stream, const void *ptr)
 
 void test_avl_ins(CuTest *tc)
 {
+	memdbg_reset();
 	int half_univ = 100;
 	// typed primitive values
 	avl *tree = avl_new(cmp_int);
@@ -71,6 +74,8 @@ void test_avl_ins(CuTest *tc)
 	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 	DESTROY_FLAT(tree, avl);
+	memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -87,6 +92,7 @@ void test_avl_ins(CuTest *tc)
 	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t));
 	DEBUG("\n\n\n");
 	DESTROY(tree, finaliser_cons(FNR(avl), finaliser_new_ptr()));
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -105,11 +111,13 @@ void test_avl_ins(CuTest *tc)
 	DEBUG("\n\n\n");
 	DESTROY_FLAT(tree, avl);
 	DESTROY_FLAT(buf, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_avl_get(CuTest *tc)
 {
+	memdbg_reset();
 	int half_univ = 100;
 	// typed primitive values
 	avl *tree = avl_new(cmp_int);
@@ -122,6 +130,7 @@ void test_avl_get(CuTest *tc)
 		CuAssertIntEquals(tc, val, getval);
 	}
 	DESTROY_FLAT(tree, avl);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// owned references with plain methods
 	tree = avl_new(cmp_obj_t);
@@ -138,6 +147,7 @@ void test_avl_get(CuTest *tc)
 		CuAssertPtrEquals(tc, obj, get_obj);
 	}
 	DESTROY(tree, finaliser_cons(FNR(avl), finaliser_new_ptr()));
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
 	vec *buf = vec_new(sizeof(obj_t));
@@ -156,11 +166,13 @@ void test_avl_get(CuTest *tc)
 	}
 	DESTROY_FLAT(tree, avl);
 	DESTROY_FLAT(buf, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_avl_del(CuTest *tc)
 {
+	memdbg_reset();
 	int half_univ = 10;
 	// typed primitive values
 	avl *tree = avl_new(cmp_int);
@@ -206,12 +218,14 @@ void test_avl_del(CuTest *tc)
 	DEBUG("\n\n\n");
 
 	DESTROY_FLAT(tree, avl);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 
 void test_avl_get_iter(CuTest *tc)
 {
+	memdbg_reset();
 	int half_univ = 10;
 	// typed primitive values
 	avl *tree = avl_new(cmp_int);
@@ -246,14 +260,8 @@ void test_avl_get_iter(CuTest *tc)
 		DEBUG("Post-order[%d] = %d\n",k, val);
 	}
 	avl_iter_free(it);
-
-	DEBUG("\n\n");
-	it = avl_get_iter(tree, IN_ORDER);
-	int k = 0;
-	FOREACH_IN_ITER(val, int, avl_iter_as_iter(it)) {
-		DEBUG("In-order[%d] = %d\n",k++, *val);
-	}
-	avl_iter_free(it);
+	DESTROY_FLAT(tree, avl);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 }
 

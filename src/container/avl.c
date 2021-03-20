@@ -38,13 +38,17 @@
 
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
+
 typedef union {
 	XX_CORETYPES(AVL_FIELD_DECL);
 } core_t;
 
+
+typedef int8_t bf_t;
+
 typedef struct _avlnode {
 	core_t val;
-	char bf; // balance factor
+	bf_t bf; // balance factor
 	struct _avlnode *left;
 	struct _avlnode *right;
 } avlnode;
@@ -53,7 +57,6 @@ typedef struct _avlnode {
 struct _avl {
 	avlnode *root;
 	cmp_func cmp;
-	size_t typesize;
 };
 
 
@@ -74,7 +77,9 @@ static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 	else {
 		__avl_finaliser(root->left, fnr);
 		__avl_finaliser(root->right, fnr);
-		FINALISE(&(root->val), fnr);
+		if (fnr != NULL) {
+			FINALISE(&(root->val), fnr);
+		}
 		FREE(root);
 	}
 }
@@ -87,7 +92,7 @@ void avl_finalise(void *ptr, const finaliser *fnr)
 		__avl_finaliser(self->root, finaliser_chd(fnr, 0));
 	}
 	else {
-		__avl_finaliser(self->root, finaliser_new_empty());
+		__avl_finaliser(self->root, NULL);
 	}
 }
 
@@ -170,7 +175,8 @@ static push_t __avl_ins(avl *self, avlnode *root, void *val, size_t val_size,
 		push_t ret;
 		ret.node = NEW(avlnode);
 		ret.node->bf = 0;
-		ret.node->left = ret.node->right = NULL;
+		ret.node->left = NULL;
+		ret.node->right = NULL;
 		memcpy(&(ret.node->val), val, sizeof(core_t));
 		memcpy(&(ret.node->val), val, val_size);
 		ret.height_chgd = 1;
@@ -574,8 +580,8 @@ avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
 void avl_iter_free(avl_iter *self)
 {
 	if (!self) return;
-	FREE(self->node_stack);
-	FREE(self->next_chd_stack);
+	DESTROY_FLAT(self->node_stack, stack);
+	DESTROY_FLAT(self->next_chd_stack, stack);
 	FREE(self);
 }
 

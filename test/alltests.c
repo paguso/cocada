@@ -73,8 +73,8 @@ void run_all_tests(void)
 {
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
-	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	//CuSuiteAddSuite(suite, avl_get_test_suite());
+	CuSuiteAddSuite(suite, alphabet_get_test_suite());
+	CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	//CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
@@ -97,7 +97,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
-	CuSuiteAddSuite(suite, quadtree_get_test_suite());
+	//CuSuiteAddSuite(suite, quadtree_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
 	//CuSuiteAddSuite(suite, serialise_get_test_suite());
 	//CuSuiteAddSuite(suite, segtree_get_test_suite());

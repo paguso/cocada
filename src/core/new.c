@@ -71,7 +71,7 @@ void finaliser_free(finaliser *self)
 
 void finaliser_call(const finaliser *self, void *ptr)
 {
-	self->fn((finaliser *)self, ptr);
+	self->fn(ptr, (finaliser *)self);
 }
 
 

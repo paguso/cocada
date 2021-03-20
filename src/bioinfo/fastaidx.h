@@ -26,21 +26,54 @@
 
 #include "new.h"
 
+/**
+ * @file fastaidx.h
+ * @brief FASTA file index
+ * @author Paulo Fonseca
+ */
+
+/**
+ * @brief 
+ */
 typedef struct _fastaidx fastaidx;
 
+
+/**
+ * @brief 
+ */
 fastaidx *fastaidx_new(const char *src_path);
 
+
+/**
+ * @brief Finaliser
+ */
 void fastaidx_finalise(void *ptr, const finaliser *fnr);
 
+
+/**
+ * @brief
+ */
 size_t fastaidx_size(fastaidx *self);
 
+
+/**
+ * @brief
+ */
 void fastaidx_add(fastaidx *self, size_t descr_offset, size_t seq_offset);
 
+
+/**
+ * @brief FASTA record offset.
+ */
 typedef struct {
-	size_t descr_off;
-	size_t seq_off;
+	size_t descr_off;	/**< Record description offset. */
+	size_t seq_off;	/**< Record sequence offset. */
 } fasta_rec_offs;
 
+
+/**
+ * @brief Returns the offsets (description, sequence) of the record #@p rec_no.
+ */
 fasta_rec_offs fastaidx_get(fastaidx *self, size_t rec_no);
 
 #endif

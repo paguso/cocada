@@ -85,7 +85,7 @@ DBG_EXE := cocada
 # -DDEBUG_LVL=2  Only errors and warnings are captured
 # -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
 DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) \
--DDEBUG_LVL=3 -DDEBUG_MEM -DXCHAR_BYTESIZE=4
+-DDEBUG_LVL=3 -DMEM_DEBUG -DXCHAR_BYTESIZE=4
 
 DBG_DIR := $(BUILD_DIR)/debug
 

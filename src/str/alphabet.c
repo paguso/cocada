@@ -73,22 +73,6 @@ alphabet *alphabet_new(const size_t size, const char *letters)
 }
 
 
-static alphabet *alphabet_new_with_rank_func( const size_t size,
-        const char *letters,
-        char_rank_func crfunc )
-{
-	alphabet *ret;
-	ret =  NEW(alphabet);
-	ret->type = CHAR_TYPE;
-	ret->rank_mode = FUNC;
-	ret->size = size;
-	ret->letters = cstr_new(size);
-	strncpy(ret->letters, letters, size);
-	ret->ranks.func = crfunc;
-	return ret;
-}
-
-
 static inline size_t int_ab_rank(xchar_t c)
 {
 	return (size_t)c;
@@ -137,7 +121,7 @@ void ab_print(const alphabet *ab)
 
 void alphabet_free(alphabet *ab)
 {
-	if (ab==NULL) return;
+	if (ab == NULL) return;
 	switch (ab->rank_mode) {
 	case ARRAY:
 		FREE(ab->ranks.arr);
@@ -153,7 +137,7 @@ void alphabet_free(alphabet *ab)
 void alphabet_finalise(void *ptr, const finaliser *fnr)
 {
 	alphabet *ab = (alphabet *)ab;
-	if (ab==NULL) return;
+	if (ab == NULL) return;
 	switch (ab->rank_mode) {
 	case ARRAY:
 		FREE(ab->ranks.arr);
@@ -179,7 +163,7 @@ size_t ab_size(const alphabet *ab)
 
 bool ab_contains(const alphabet *ab, xchar_t c)
 {
-	return (bool)(ab_rank(ab, c) < ab->size);
+	return (ab_rank(ab, c) < ab->size);
 }
 
 

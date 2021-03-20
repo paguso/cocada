@@ -239,6 +239,7 @@ void avl_print( const avl *self, FILE *stream,
 
 XX_CORETYPES(AVL_DECLARE_ALL)
 
+
 /**
  * @brief AVL traversal order
  */
@@ -247,6 +248,7 @@ typedef enum {
 	IN_ORDER   = 1,
 	POST_ORDER = 2,
 } avl_traversal_order;
+
 
 /**
  * @brief AVL iterator. Implements the iter trait.

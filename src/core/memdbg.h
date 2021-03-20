@@ -37,23 +37,23 @@
  * corresponding wrapper functions that keep a tally of the allocated
  * memory chunks along with other debug info.
  *
- * <b>This change only takes place if the DEBUG_MEM macro is defined</b>.
+ * <b>This change only takes place if the MEM_DEBUG macro is defined</b>.
  * This can be done locally in the code, but most likely this is
  * done via a compiler option. For example, in gcc
  *
  * ```
- * gcc -DDEBUG_MEM
+ * gcc -DMEM_DEBUG
  * ```
  * To deactivate memory debugging locally for a given compilation unit, the macro
  *
  * ```C
- * #define DEBUG_MEM_OFF
+ * #define MEM_DEBUG_OFF
  * ```
  * must be inserted at the begining of the file, before this header gets
  * included. At the end of the file, the macro should be undefined
  *
  * ```C
- * #undef DEBUG_MEM_OFF
+ * #undef MEM_DEBUG_OFF
  * ```
  * to re-enable memory debugging.
  */
@@ -110,7 +110,7 @@ extern size_t memdbg_nchunks();
 
 
 /**
- * @briefs Returns true if the memory tally is empty, and false otherwise.
+ * @brief Returns true if the memory tally is empty, and false otherwise.
  * @warn If true, it doesn't mean that no memory is allocated, but only
  * that none is accounted for in the tally.
  */
@@ -118,9 +118,11 @@ extern bool memdbg_is_empty();
 
 
 
-#ifdef DEBUG_MEM
+#ifdef MEM_DEBUG
 
-#ifndef DEBUG_MEM_OFF
+#define MEM_DEBUG_PRINT_ALL
+
+#ifndef MEM_DEBUG_OFF
 
 #define malloc(size) (memdbg_malloc(size, __FILE__ , __LINE__))
 

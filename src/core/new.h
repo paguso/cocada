@@ -582,11 +582,8 @@ finaliser *finaliser_new_ptr();
  * Destroys an object @p OBJ with the default plain typed finaliser
  * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
  */
-#define DESTROY_FLAT( OBJ, TYPE ) \
-{\
-	void *__OBJ = (void *)(OBJ);\
-	if(__OBJ) DESTROY(__OBJ, FNR(TYPE))\
-}
+#define DESTROY_FLAT( OBJ, TYPE ) DESTROY(OBJ, FNR(TYPE))
+
 
 
 /**
