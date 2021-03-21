@@ -4,12 +4,14 @@ body, table, div, p, dl {
         font-family: "Verdana", "Helvetica", "Arial", sans-serif;
         font-size: medium;
         font-style: normal;
+        line-height: 150% ;
 }
 
 p.reference, p.definition {
         font-family: "Verdana", "Helvetica", "Arial", sans-serif;
         font-size: medium;
         font-style: normal;
+        line-height: 150% ;
 }
 
 /* @group Heading Levels */
@@ -49,6 +51,7 @@ h1, h2, h3, h4, h5, h6 {
 	-o-transition: text-shadow 0.5s linear;
 	transition: text-shadow 0.5s linear;
 	margin-right: 15px;
+        font-size: large;
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {

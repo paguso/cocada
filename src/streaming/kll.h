@@ -58,8 +58,13 @@
  * ```
  * can be estimated from the KLL summary of `X` as
  * ```
- * r(v) = sum_l=0^h r_l(v) * c^l
+ * r(v) = sum { r_l(v) * c^l ; l = 0..h }
  * ```
+ * 
+ * \f[
+ * r(v)
+ * \f]
+ * 
  * where
  * ```
  * r_l(v) = # { y in B[l] | y < v },
