@@ -30,13 +30,12 @@ h1.groupheader {
 }
 
 h2.groupheader {
-	border-bottom: 1px solid #879ECB;
-	color: #354C7B;
+	border-bottom: 0px solid #FFFFFF;
+	color: #4a86cf;
 	font-size: 150%;
 	font-weight: normal;
-	margin-top: 1.75em;
-	padding-top: 8px;
-	padding-bottom: 4px;
+	padding-top: 12pt;
+	padding-bottom: 8pt;
 	width: 100%;
 }
 
@@ -139,13 +138,13 @@ div.navtab {
 /* @group Link Styling */
 
 a {
-	color: #3D578C;
+	color: #706d63;
 	font-weight: normal;
 	text-decoration: none;
 }
 
 .contents a:visited {
-	color: #4665A2;
+	color: #706d63;
 }
 
 a:hover {
@@ -228,7 +227,7 @@ div.fragment {
 }
 
 div.line {
-        font-family: "DejaVu Sans Mono","Lucida Console", "Monaco", monospace;
+        font-family: "Monaco", "DejaVu Sans Mono", "Courier New", monospace;
         font-size: medium;
 	line-height: 1.0;
 	text-wrap: unrestricted;
@@ -505,8 +504,9 @@ table.memberdecls {
 	padding: 0px;
 }
 
+
 .memberdecls td, .fieldtable tr {
-	-webkit-transition-property: background-color, box-shadow;
+/*	-webkit-transition-property: background-color, box-shadow;
 	-webkit-transition-duration: 0.5s;
 	-moz-transition-property: background-color, box-shadow;
 	-moz-transition-duration: 0.5s;
@@ -515,7 +515,7 @@ table.memberdecls {
 	-o-transition-property: background-color, box-shadow;
 	-o-transition-duration: 0.5s;
 	transition-property: background-color, box-shadow;
-	transition-duration: 0.5s;
+	transition-duration: 0.5s;*/
 }
 
 .memberdecls td.glow, .fieldtable tr.glow {
@@ -526,22 +526,47 @@ table.memberdecls {
 .mdescLeft, .mdescRight,
 .memItemLeft, .memItemRight,
 .memTemplItemLeft, .memTemplItemRight, .memTemplParams {
-	background-color: #F9FAFC;
+	background-color: #F5F5F5;
 	border: none;
 	margin: 4px;
 	padding: 10pt 0pt 10pt 10pt;
 }
 
+.memItemLeft {
+        border-left: 1px solid #fff;
+        border-top: 1px solid #fff;
+        border-top-left-radius: 4px;
+}
+
+.memItemRight {
+        border-right: 1px solid #fff;
+        border-top: 1px solid #fff;
+        border-top-right-radius: 4px;
+}
+
+.mdescLeft {
+        border-left: 1px solid #fff;
+        border-bottom: 1px solid #fff;
+        border-bottom-left-radius: 4px;
+}
+
+.mdescRight {
+        border-right: 1px solid #fff;
+        border-bottom: 1px solid #fff;
+        border-bottom-right-radius: 4px;
+}
+
+
 .mdescLeft, .mdescRight {
-	padding: 0pt 0pt 10pt 10pt;
+	padding: 0pt 10pt 10pt 10pt;
 	color: #555;
 }
 
 .memSeparator {
-        border-bottom: 1px solid #DEE4F0;
-        line-height: 1px;
+        border-bottom: 0px solid #DEE4F0;
+        line-height: 0px;
         margin: 0px;
-        padding: 0px;
+        padding-top: 1px;
 }
 
 .memItemLeft, .memTemplItemLeft {
@@ -560,21 +585,21 @@ table.memberdecls {
 
 /* @end */
 
-/* @group Member Details */
+/* @group Member Details *
 
 /* Styles for detailed member documentation */
 
 .memtitle {
 	padding: 8px;
-	border-top: 1px solid #A8B8D9;
-	border-left: 1px solid #A8B8D9;
-	border-right: 1px solid #A8B8D9;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
 	border-top-right-radius: 4px;
 	border-top-left-radius: 4px;
 	margin-bottom: -1px;
-	background-image: url('nav_f.png');
-	background-repeat: repeat-x;
-	background-color: #E2E8F2;
+	/*background-image: url('nav_f.png');
+	background-repeat: repeat-x;*/
+	background: #f5f5f5;
 	line-height: 1.25;
         font-size: medium;
         font-weight: bold;
@@ -612,11 +637,11 @@ table.memberdecls {
 	padding: 0;
 	margin-bottom: 10px;
 	margin-right: 5px;
-        -webkit-transition: box-shadow 0.5s linear;
+        /*-webkit-transition: box-shadow 0.5s linear;
         -moz-transition: box-shadow 0.5s linear;
         -ms-transition: box-shadow 0.5s linear;
         -o-transition: box-shadow 0.5s linear;
-        transition: box-shadow 0.5s linear;
+        transition: box-shadow 0.5s linear;*/
         display: table !important;
         width: 100%;
 }
@@ -635,22 +660,24 @@ table.memberdecls {
 }
 
 .memproto, dl.reflist dt {
-        border-top: 1px solid #A8B8D9;
-        border-left: 1px solid #A8B8D9;
-        border-right: 1px solid #A8B8D9;
+        border-top: 1px solid #ccc;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
         padding: 6px 0px 6px 0px;
         color: #253555;
         font-weight: bold;
-        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
-        background-color: #DFE5F1;
+        /*text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);*/
+        /*background-color: #DFE5F1;*/
+        background-color: #f5f5f5;
+        
         /* opera specific markup */
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
         border-top-right-radius: 4px;
         /* firefox specific markup */
-        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px;
         -moz-border-radius-topright: 4px;
         /* webkit specific markup */
-        -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
         -webkit-border-top-right-radius: 4px;
 
 }
@@ -661,27 +688,27 @@ table.memberdecls {
 }
 
 .memdoc, dl.reflist dd {
-        border-bottom: 1px solid #A8B8D9;      
-        border-left: 1px solid #A8B8D9;      
-        border-right: 1px solid #A8B8D9; 
+        border-bottom: 1px solid #ccc;      
+        border-left: 1px solid #ccc;      
+        border-right: 1px solid #ccc; 
         padding: 6px 10px 2px 10px;
         background-color: #FBFCFD;
         border-top-width: 0;
-        background-image:url('nav_g.png');
-        background-repeat:repeat-x;
+        /*background-image:url('nav_g.png');
+        background-repeat:repeat-x;*/
         background-color: #FFFFFF;
         /* opera specific markup */
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
         /* firefox specific markup */
         -moz-border-radius-bottomleft: 4px;
         -moz-border-radius-bottomright: 4px;
-        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px;
         /* webkit specific markup */
         -webkit-border-bottom-left-radius: 4px;
         -webkit-border-bottom-right-radius: 4px;
-        -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
 }
 
 dl.reflist dt {
@@ -951,14 +978,14 @@ table.doxtable th {
 table.fieldtable {
         /*width: 100%;*/
         margin-bottom: 10px;
-        border: 1px solid #A8B8D9;
+        border: 1px solid #ccc;
         border-spacing: 0px;
         -moz-border-radius: 4px;
         -webkit-border-radius: 4px;
         border-radius: 4px;
-        -moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
-        -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
-        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px;
+        -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.15);
 }
 
 .fieldtable td, .fieldtable th {
@@ -967,8 +994,8 @@ table.fieldtable {
 
 .fieldtable td.fieldtype, .fieldtable td.fieldname {
         white-space: nowrap;
-        border-right: 1px solid #A8B8D9;
-        border-bottom: 1px solid #A8B8D9;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
         vertical-align: top;
 }
 
@@ -994,9 +1021,10 @@ table.fieldtable {
 }
 
 .fieldtable th {
-        background-image:url('nav_f.png');
+        /*background-image:url('nav_f.png');
         background-repeat:repeat-x;
-        background-color: #E2E8F2;
+        background-color: #E2E8F2;*/
+        background: whitesmoke;
         font-size: 90%;
         color: #253555;
         padding-bottom: 4px;
@@ -1083,6 +1111,7 @@ table.fieldtable {
 
 div.summary
 {
+        background: whitesmoke;
 	float: right;
 	font-size: 8pt;
 	padding-right: 5px;
@@ -1121,15 +1150,17 @@ div.ingroups a
 
 div.header
 {
-        background-image:url('nav_h.png');
-        background-repeat:repeat-x;
-	background-color: #F9FAFC;
+        /*background-image:url('nav_h.png');
+        background-repeat:repeat-x;*/
+	background-color: whitesmoke;
+        color: darkslategray;
 	margin:  0px;
-	border-bottom: 1px solid #C4CFE5;
+	border-bottom: 1px solid #ccc;
 }
 
 div.headertitle
 {
+        background: whitesmoke;
 	padding: 5px 5px 5px 10px;
 }
 
@@ -1324,7 +1355,8 @@ dl.section dd {
 	padding: 6pt 6pt 6pt 6pt;
 	margin: 0px;
 	width: 100%;
-	border-bottom: 1px solid #5373B4;
+//      border-bottom: 1px solid #5373B4;
+        border-bottom: 1px solid #bebcb6;
 }
 
 .image
@@ -1780,7 +1812,7 @@ tt, code, kbd, samp
 
 code 
 {
-        font-family: "DejaVu Sans Mono","Lucida Console", "Monaco", monospace;
+        font-family: "Monaco", "DejaVu Sans Mono", "Courier New", monospace;
         font-size: medium;
 }
 /* @end */
