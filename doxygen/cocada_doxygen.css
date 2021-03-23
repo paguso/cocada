@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
-	text-shadow: 0 0 15px cyan;
+	text-shadow: 0 0 15px gold;
 }
 
 dt {
@@ -220,10 +220,13 @@ pre.fragment {
 }
 
 div.fragment {
-  padding: 0 0 1px 0; /*Fixed: last line underline overlap border*/
-  margin: 4px 8px 4px 2px;
-	background-color: #FBFCFD;
-	border: 1px solid #C4CFE5;
+        padding: 0 0 1px 0; /*Fixed: last line underline overlap border*/
+        margin: 4pt 8pt 4pt 2pt;
+	/*background-color: #FBFCFD;*/
+        background: #eff3fd;
+	border: 1px solid #9cafd4;
+        border-radius: 4px;
+
 }
 
 div.line {
@@ -258,8 +261,8 @@ div.line:after {
 }
 
 div.line.glow {
-	background-color: cyan;
-	box-shadow: 0 0 10px cyan;
+	background-color: gold;
+	box-shadow: 0 0 10px gold;
 }
 
 
@@ -519,8 +522,8 @@ table.memberdecls {
 }
 
 .memberdecls td.glow, .fieldtable tr.glow {
-	background-color: cyan;
-	box-shadow: 0 0 15px cyan;
+	background-color: gold;
+	box-shadow: 0 0 15px gold;
 }
 
 .mdescLeft, .mdescRight,
@@ -647,7 +650,7 @@ table.memberdecls {
 }
 
 .memitem.glow {
-         box-shadow: 0 0 15px cyan;
+         box-shadow: 0 0 15px gold;
 }
 
 .memname {
@@ -1004,7 +1007,7 @@ table.fieldtable {
 }
 
 .fieldtable td.fielddoc {
-        border-bottom: 1px solid #A8B8D9;
+        border-bottom: 1px solid #ccc;
         /*width: 100%;*/
 }
 
@@ -1026,7 +1029,7 @@ table.fieldtable {
         background-color: #E2E8F2;*/
         background: whitesmoke;
         font-size: 90%;
-        color: #253555;
+        color: #706d63;
         padding-bottom: 4px;
         padding-top: 5px;
         text-align:left;
@@ -1037,7 +1040,7 @@ table.fieldtable {
         -webkit-border-top-right-radius: 4px;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
-        border-bottom: 1px solid #A8B8D9;
+        border-bottom: 1px solid #ccc;
 }
 
 
@@ -1054,9 +1057,11 @@ table.fieldtable {
 .navpath ul
 {
 	font-size: 11px;
+        /*
 	background-image:url('tab_b.png');
 	background-repeat:repeat-x;
-	background-position: 0 -5px;
+	background-position: 0 -5px;*/
+        background: whitesmoke;
 	height:30px;
 	line-height:30px;
 	color:#8AA0CC;

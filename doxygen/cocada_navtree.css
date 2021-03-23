@@ -20,8 +20,9 @@
 }
 
 #nav-tree .selected {
-  background-image: url('tab_a.png');
-  background-repeat:repeat-x;
+  background: #4a86cf;
+  /*background-image: url('tab_a.png');
+  background-repeat:repeat-x;*/
   color: #fff;
   text-shadow: 0px 1px 1px rgba(0, 0, 0, 1.0);
 }
@@ -43,7 +44,7 @@
 #nav-tree .label {
   margin:0px;
   padding:0px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Verdana, Helvetica, Arial, sans-serif;
   font-size: medium;
 }
 
@@ -94,11 +95,13 @@
   display:block;
 }
 
-.ui-resizable-e {
+.ui-resizable-e {/*
   background-image:url("splitbar.png");
   background-size:100%;
   background-repeat:repeat-y;
   background-attachment: scroll;
+  */
+  background: #ccc;
   cursor:ew-resize;
   height:100%;
   right:0;
@@ -118,9 +121,11 @@
 }
 
 #nav-tree {
+  /*
   background-image:url('nav_h.png');
   background-repeat:repeat-x;
-  background-color: #F9FAFC;
+  background-color: #F9FAFC;*/
+  background: white;
   -webkit-overflow-scrolling : touch; /* iOS 5+ */
 }
 
