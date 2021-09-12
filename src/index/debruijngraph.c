@@ -30,7 +30,7 @@
 #include "bitbyte.h"
 #include "bytearr.h"
 #include "new.h"
-#include "csrsbitarray.h"
+#include "csrsbitarr.h"
 #include "cstrutil.h"
 #include "debruijngraph.h"
 #include "vec.h"
@@ -49,9 +49,9 @@ struct _dbgraph {
 	size_t        nnodes;
 	size_t        nedges;
 	wavtree      *edge_lbl_wt;
-	csrsbitarray *true_node;
+	csrsbitarr *true_node;
 	size_t       *char_cumul_count;
-	csrsbitarray *node_lbl_last_char;
+	csrsbitarr *node_lbl_last_char;
 };
 
 

@@ -33,7 +33,7 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "bytearr.h"
-#include "csrsbitarray.h"
+#include "csrsbitarr.h"
 #include "cstrutil.h"
 #include "hashmap.h"
 #include "huffcode.h"
@@ -491,7 +491,7 @@ struct _wavtree {
 	bool          own_ab;
 	vec     *chrcodes;
 	size_t        len;
-	csrsbitarray *bitarr;
+	csrsbitarr *bitarr;
 };
 
 

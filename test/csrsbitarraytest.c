@@ -28,7 +28,7 @@
 #include "arrays.h"
 #include "bitarr.h"
 #include "bitbyte.h"
-#include "csrsbitarray.h"
+#include "csrsbitarr.h"
 #include "mathutil.h"
 #include "memdbg.h"
 #include "new.h"
@@ -38,9 +38,9 @@
 static size_t nof_arrays;
 static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
 static byte_t **all_ba;
-static csrsbitarray *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even,
+static csrsbitarr *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even,
        *csrsba_rand, *csrsba_alt;
-static csrsbitarray **all_srsba;
+static csrsbitarr **all_srsba;
 
 static size_t ba_size=7000;
 
@@ -105,7 +105,7 @@ void csrsbitarr_test_setup(CuTest *tc)
 	//csrsbitarr_print(csrsba_rand,  4);
 	//printf("------------ csrsba_alt  -------------\n");
 	//csrsbitarr_print(csrsba_alt,  4);
-	all_srsba = malloc(nof_arrays*sizeof(csrsbitarray *));
+	all_srsba = malloc(nof_arrays*sizeof(csrsbitarr *));
 	all_srsba[0] = csrsba_zeros;
 	all_srsba[1] = csrsba_ones;
 	all_srsba[2] = csrsba_odd;
@@ -134,7 +134,7 @@ void csrsbitarr_test_teardown(CuTest *tc)
 
 void test_csrsbitarr_rank0(CuTest *tc)
 {
-	csrsbitarray *ba;
+	csrsbitarr *ba;
 	size_t b, i, count;
 	size_t *bf_ranks;
 	size_t max_rank;
@@ -173,7 +173,7 @@ void test_csrsbitarr_rank0(CuTest *tc)
 
 void test_csrsbitarr_rank1(CuTest *tc)
 {
-	csrsbitarray *ba;
+	csrsbitarr *ba;
 	size_t b, i, count;
 	size_t *bf_ranks;
 	size_t max_rank;
@@ -211,7 +211,7 @@ void test_csrsbitarr_rank1(CuTest *tc)
 
 void test_csrsbitarr_select0(CuTest *tc)
 {
-	csrsbitarray *ba;
+	csrsbitarr *ba;
 	size_t *bf_selects;
 
 	bf_selects = calloc(ba_size+1, sizeof(size_t));
@@ -246,7 +246,7 @@ void test_csrsbitarr_select0(CuTest *tc)
 
 void test_csrsbitarr_select1(CuTest *tc)
 {
-	csrsbitarray *ba;
+	csrsbitarr *ba;
 	size_t *bf_selects;
 
 	bf_selects = calloc(ba_size+1, sizeof(size_t));
@@ -284,7 +284,7 @@ void test_csrsbitarr_pred(CuTest *tc)
 {
 	for (byte_t bit=0; bit<=1; bit++) {
 		for (size_t b=0; b<nof_arrays; b++) {
-			csrsbitarray *ba = all_srsba[b];
+			csrsbitarr *ba = all_srsba[b];
 
 			size_t exp_pred = ba_size;
 			for (size_t i=0; i<ba_size; i++) {
@@ -304,7 +304,7 @@ void test_csrsbitarr_succ(CuTest *tc)
 {
 	for (byte_t bit=0; bit<=1; bit++) {
 		for (size_t b=0; b<nof_arrays; b++) {
-			csrsbitarray *ba = all_srsba[b];
+			csrsbitarr *ba = all_srsba[b];
 
 			size_t exp_succ = ba_size;
 			for (long i=ba_size-1; i>0; i--) {
@@ -323,7 +323,7 @@ void test_csrsbitarr_succ(CuTest *tc)
 void csrsbitarr_test_empty(CuTest *tc)
 {
 	byte_t *ba_empty = ARR_NEW(byte_t, 0);
-	csrsbitarray *b = csrsbitarr_new(ba_empty, 0);
+	csrsbitarr *b = csrsbitarr_new(ba_empty, 0);
 	for (size_t i=0; i<2; i++) {
 		//csrsbitarr_get(b, i);
 		CuAssertSizeTEquals(tc, 0, csrsbitarr_rank0(b, i));

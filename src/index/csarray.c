@@ -31,7 +31,7 @@
 #include "bytearr.h"
 #include "new.h"
 #include "csarray.h"
-#include "csrsbitarray.h"
+#include "csrsbitarr.h"
 #include "strbuf.h"
 #include "math.h"
 #include "mathutil.h"
@@ -51,8 +51,8 @@ struct _csarray {
 	alphabet *xab;
 	size_t nlevels;
 	size_t *lvl_len;
-	csrsbitarray **even_bv;
-	csrsbitarray **char_stop_bv;
+	csrsbitarr **even_bv;
+	csrsbitarr **char_stop_bv;
 	wavtree **phi_wt;
 	size_t *root_sa;
 	size_t *root_sa_inv;
@@ -77,8 +77,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		csa->nlevels++;
 
 	csa->lvl_len = ARR_NEW(size_t, csa->nlevels);
-	csa->even_bv = ARR_NEW(csrsbitarray *, csa->nlevels);
-	csa->char_stop_bv = ARR_NEW(csrsbitarray *, csa->nlevels);
+	csa->even_bv = ARR_NEW(csrsbitarr *, csa->nlevels);
+	csa->char_stop_bv = ARR_NEW(csrsbitarr *, csa->nlevels);
 	csa->phi_wt = ARR_NEW(wavtree *, csa->nlevels);
 	//csa->phi_str = NEW_ARR(xstr*, csa->nlevels);
 
