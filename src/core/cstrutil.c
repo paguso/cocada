@@ -20,6 +20,7 @@
  */
 
 #include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -42,6 +43,9 @@ char *cstr_new(size_t len)
 
 char *cstr_clone(const char *src)
 {
+	if (src == NULL) {
+		return NULL;
+	}
 	char *ret = cstr_new(strlen(src));
 	strcpy(ret, src);
 	return ret;
@@ -51,7 +55,17 @@ char *cstr_clone(const char *src)
 char *cstr_clone_len(const char *src, size_t len)
 {
 	char *ret = cstr_new(len);
-	strcpy(ret, src);
+	strncpy(ret, src, len);
+	return ret;
+}
+
+
+char *cstr_reassign(char *dest, const char *src)
+{
+	const size_t n = strlen(src);
+	char *ret = (char *) realloc(dest, (n + 1) * sizeof(char));
+	strncpy(ret, src, n);
+	ret[n] = '\0';
 	return ret;
 }
 
@@ -132,7 +146,7 @@ void cstr_revert(char *str, size_t len)
 {
 	size_t i=0, j=len-1;
 	char c;
-	while (i<j) {
+	while (i < j) {
 		c = str[i];
 		str[i] = str[j];
 		str[j] = c;
@@ -142,40 +156,38 @@ void cstr_revert(char *str, size_t len)
 }
 
 
-static const char *DIGITS = "0123456789abcdef";
+static const char DIGITS[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
 
 char *uint_to_cstr(char *dest, uintmax_t val, char base)
 {
 	if (val==0) {
-		strcpy(dest, "0");
+		dest[0] = '0';
+		dest[1] = '\0';
 		return dest;
 	}
-	size_t b, l;
+	uintmax_t b, l;
 	switch (base) {
 	case 'h':
 		b = 16;
-		l = (size_t)ceil(log2(val+1)/4.0);
 		break;
 	case 'o':
 		b = 8;
-		l = (size_t)ceil(log2(val+1)/3.0);
 		break;
 	case 'b':
 		b = 2;
-		l = (size_t)ceil(log2(val+1));
 		break;
 	default:
 		b = 10;
-		l = (size_t)ceil(log10(val+1));
 		break;
 	}
-	memset(dest, '0', l);
-	dest[l]='\0';
+	l = 0;
 	while (val) {
-		dest[--l] = DIGITS[val%b];
+		dest[l++] = DIGITS[val%b];
 		val /= b;
 	}
+	dest[l] = '\0';
+	cstr_revert(dest, l);
 	return dest;
 }
 
@@ -197,4 +209,32 @@ bool cstr_equals_ignore_case(const char *left, const char *right)
 		return false;
 	for (i = 0; i < l && tolower(left[i]) == tolower(right[i]); i++);
 	return i==l;
+}
+
+
+char *cstr_join(const char *sep, size_t n, ...)
+{
+	va_list valist;
+	size_t len = 0;
+	{
+		va_start(valist, n);
+		for (size_t i = 0; i < n; i++) {
+			len += strlen(va_arg(valist, char *));
+		}
+		va_end(valist);
+	}
+	len += ( ((n > 0) ? (n - 1) : 0) * strlen(sep));
+	char *ret = cstr_new(len);
+	{
+		va_start(valist, n);
+		for (size_t i = 0; i < n; i++) {
+			strcat(ret, va_arg(valist, char *));
+			if (i + 1 < n) {
+				strcat(ret, sep);
+			}
+		}
+		va_end(valist);
+	}
+	ret[len] = '\0';
+	return ret;
 }

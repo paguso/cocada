@@ -24,13 +24,23 @@
 
 /**
  * @file strfilereader.h
- * @brief String file reader. Implements the strread trait.
  * @author Paulo Fonseca
+ * @brief String file reader. Implements the strread trait for reading char
+ * strings from a FILE stream.
  * @see strread.h
  *
- * This string reader is backed by a text FILE, and therefore is
- * likely to be a *buffered* reader.
+ * # Example
+ *
+ * ```C
+ * strfilereader *sfr = strfilereader_open(filename);
+ * strread *ftrait = strfilereader_as_strread(sfr);
+ * for (int c; (c=strread_getc(ftrait)) != EOF;)
+ *     printf ("Read c=%c\n", (char)c);
+ * strfilereader_close(sfr);
+ * ```
  */
+
+#include <stdio.h>
 
 #include "trait.h"
 
@@ -45,9 +55,18 @@ DECL_TRAIT(strfilereader, strread)
 
 
 /**
- * @brief Opens a character file for reading.
+ * @brief Opens a character file for reading from its @p path.
+ * @returns NULL if the FILE at specified @p path cannot be open in "r" mode.
  */
-strfilereader *strfilereader_open(char *filename);
+strfilereader *strfilereader_open_path(const char *path);
+
+
+/**
+ * @brief Opens a character FILE for reading.
+ * @warning stream is supposed to be a proper text FILE open for reading.
+ * No checks performed.
+ */
+strfilereader *strfilereader_open(FILE *stream);
 
 
 /**

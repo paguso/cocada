@@ -47,8 +47,7 @@ void test_kll_upd(CuTest *tc)
 		double xval;
 		do {
 			xval = (rand_norm() + 1.0) / 7.0;
-		}
-		while (xval < 0 || xval >= 1);
+		} while (xval < 0 || xval >= 1);
 		int val = xval * univ;
 		ranks[val]++;
 		DEBUG("KLL insert #%d value = %d\n", i, val);

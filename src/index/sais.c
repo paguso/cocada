@@ -172,9 +172,8 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
 			        bitvec_get_bit(ls, prev_lms+k)!=bitvec_get_bit(ls,cur_lms+k)) {
 				diff = true;
 				break;
-			}
-			else if ( k>0 && ( bitvec_get_bit(lms, prev_lms+k)
-			                   || bitvec_get_bit(lms, cur_lms+k) ) ) {
+			} else if ( k>0 && ( bitvec_get_bit(lms, prev_lms+k)
+			                     || bitvec_get_bit(lms, cur_lms+k) ) ) {
 				break;
 			}
 		}

@@ -262,7 +262,6 @@ void test_avl_get_iter(CuTest *tc)
 	avl_iter_free(it);
 	DESTROY_FLAT(tree, avl);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
-
 }
 
 

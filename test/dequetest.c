@@ -71,8 +71,7 @@ void test_deque_push_pop(CuTest *tc)
 			CuAssertIntEquals(tc, n-1-(i/2), o.i);
 			CuAssertDblEquals(tc, (double)(n-1-(i/2)), o.f, 0.1);
 			CuAssertCharEquals(tc, (char)(n-1-(i/2)), o.c);
-		}
-		else {
+		} else {
 			deque_pop_front(q, &o);
 			CuAssertIntEquals(tc, (n/2)+((i-1)/2), o.i);
 			CuAssertDblEquals(tc, (double)((n/2)+((i-1)/2)), o.f, 0.1);
@@ -120,8 +119,7 @@ void test_deque_push_pop_int(CuTest *tc)
 		if (i%2==0) {
 			o = deque_pop_back_int(q);
 			CuAssertIntEquals(tc, n-1-(i/2), o);
-		}
-		else {
+		} else {
 			o = deque_pop_front_int(q);
 			CuAssertIntEquals(tc, (n/2)+((i-1)/2), o);
 		}

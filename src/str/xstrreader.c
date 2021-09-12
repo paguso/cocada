@@ -52,8 +52,7 @@ static xchar_wt _xstr_getc(xstrread *t)
 	xstr *src = (xstr *) rdr->src;
 	if (rdr->index < xstr_len(src))  {
 		return xstr_get(src, rdr->index++);
-	}
-	else {
+	} else {
 		return XEOF;
 	}
 }
@@ -96,8 +95,7 @@ static xchar_wt _str_getc(xstrread *t)
 	char *src = (char *) rdr->src;
 	if (rdr->index < rdr->len) {
 		return src[rdr->index++];
-	}
-	else {
+	} else {
 		return XEOF;
 	}
 }

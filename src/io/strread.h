@@ -24,8 +24,8 @@
 
 /**
  * @file strread.h
- * @author Paulo Fonseca
  * @brief String Read trait
+ * @author Paulo Fonseca
  *
  * The String Read trait allows for reading characters and strings
  * of characters from a source stream. Implementors of this trait
@@ -61,7 +61,8 @@ strread_vt strread_vt_new();
 
 
 /**
- * @brief Resets the stream, i.e. moves cursor to initial position.
+ * @brief Resets the reader, that is moves cursor to initial position,
+ * if supported by the underlying stream.
  */
 void strread_reset(strread *trait);
 
@@ -71,19 +72,12 @@ void strread_reset(strread *trait);
  * @returns The next character as an int, or EOF if the stream has
  *          reached its end.
  *
- * Example of usage:
- * @code
- * strread *ftrait = strread_open_file(filename);
- * for (int c; (c=strread_getc(ftrait)) != EOF;)
- *     printf ("Read c=%c\n", (char)c);
- * strread_close(ftrait);
- * @endcode
  */
 int strread_getc(strread *trait);
 
 
 /**
- * @brief Attempts to read the next @p n chars into the string *dest.
+ * @brief Attempts to read the next @p n chars into @p dest.
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
@@ -91,8 +85,9 @@ size_t strread_read_str(strread *trait, char *dest, size_t n);
 
 
 /**
- * @brief Attempts to read the next @p n chars into the string *dest.
- *        Less than @p n characters can be read if the stream reaches its end.
+ * @brief Attempts to read the next chars into the @p dest until
+ * 		  the next occurrence of the delimiter @p delim is found,
+ * 		  or the end of the stream is reached.
  * @returns The number of chars actually read.
  */
 size_t strread_read_str_until(strread *trait, char *dest, char delim);

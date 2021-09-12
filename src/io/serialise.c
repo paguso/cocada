@@ -164,11 +164,9 @@ static bool contains_addr(vec *chunks, size_t addr)
 		mem_chunk *chk = (mem_chunk *)vec_get(chunks, m);
 		if ( addr < chk->start) {
 			r = m;
-		}
-		else if ( chk->start <= addr  && addr < chk->start + chk->size ) {
+		} else if ( chk->start <= addr  && addr < chk->start + chk->size ) {
 			return true;
-		}
-		else {
+		} else {
 			l = m + 1;
 		}
 	}
@@ -182,21 +180,17 @@ static void add_chunk(vec *chunks, mem_chunk ck)
 	size_t addr = ck.start;
 	if (vec_len(chunks) == 0) {
 		pos = 0;
-	}
-	else if (addr <= ((mem_chunk *)(vec_first(chunks)))->start) {
+	} else if (addr <= ((mem_chunk *)(vec_first(chunks)))->start) {
 		pos = 0;
-	}
-	else if (((mem_chunk *)(vec_last(chunks)))->start < addr) {
+	} else if (((mem_chunk *)(vec_last(chunks)))->start < addr) {
 		pos =  vec_len(chunks);
-	}
-	else {
+	} else {
 		size_t l = 0, r = vec_len(chunks) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
 			if (((mem_chunk *)(vec_get(chunks, m)))->start < addr) {
 				l = m;
-			}
-			else {
+			} else {
 				r = m;
 			}
 		}
@@ -359,8 +353,7 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 		void *new_obj = NULL;
 		if (pointee_model->type == som_arr || pointee_model->type == som_cstr) {
 			new_obj = ptr;
-		}
-		else {
+		} else {
 			new_obj = malloc(pointee_model->size);
 		}
 		*dest = new_obj;

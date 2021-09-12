@@ -33,8 +33,6 @@
 #include "cstrutil.h"
 #include "hashmap.h"
 #include "mathutil.h"
-//#include "marshall.h"
-#include "strstream.h"
 
 
 
@@ -112,8 +110,7 @@ void ab_print(const alphabet *ab)
 	printf("  size = %zu\n", ab->size);
 	if (ab->type==CHAR_TYPE) {
 		printf("  letters = %s\n", ab->letters);
-	}
-	else if (ab->type==INT_TYPE) {
+	} else if (ab->type==INT_TYPE) {
 		printf("  letters = 0..%zu\n",ab->size-1);
 	}
 }

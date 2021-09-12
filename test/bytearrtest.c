@@ -112,8 +112,7 @@ void test_bytearr_write_int(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
-			}
-			else {
+			} else {
 				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
 			}
 		}
@@ -141,8 +140,7 @@ void test_bytearr_write_uint(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
-			}
-			else {
+			} else {
 				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
 			}
 		}
@@ -169,8 +167,7 @@ void test_bytearr_write_size_t(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(size_t)-(bytecrop*BYTESIZE));
 			if (written<0) {
 				written = ~0 & written>>((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
-			}
-			else {
+			} else {
 				written >>= ((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
 			}
 		}

@@ -229,8 +229,7 @@ void bitvec_push_n (bitvec *bv, size_t nbits, bool bit)
 		*(last_byte) |= ~(BYTE_MAX>>nleft);
 		bv->len += nbits;
 		//bv->count1 += nbits;
-	}
-	else
+	} else
 		bv->len += nbits;
 
 }
@@ -270,18 +269,18 @@ void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 	size_t bits_per_line = bytes_per_line * BYTESIZE;
 	for (size_t i=0; i<bv->len; i++ )  {
 		if ( i % bits_per_line == 0) {
-			if (i) strbuf_append(dest, "\n");
-			strbuf_append(dest, "[");
+			if (i) strbuf_append_char(dest, '\n');
+			strbuf_append_char(dest, '[');
 			sprintf(lbl, "%*zu", line_label_width, i);
-			strbuf_append(dest, lbl);
-			strbuf_append(dest, ":");
+			strbuf_append(dest, lbl, strlen(lbl));
+			strbuf_append_char(dest, ':');
 			sprintf(lbl, "%*zu", line_label_width, MAX(bv->len, i+bits_per_line));
-			strbuf_append(dest, lbl);
-			strbuf_append(dest, "]");
+			strbuf_append(dest, lbl, strlen(lbl));
+			strbuf_append_char(dest, ']');
 		}
 		if ( i % BYTESIZE == 0 )
-			strbuf_append(dest, " ");
-		strbuf_append(dest, bitvec_get_bit(bv,i)?"1":"0" );
+			strbuf_append_char(dest, ' ');
+		strbuf_append_char(dest, bitvec_get_bit(bv,i) ? '1' : '0' );
 	}
 }
 

@@ -117,9 +117,9 @@ const void *iter_next(iter *it);
 #define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
 	for (iter* __it = (iter *) (ITER); __it ; __it = NULL) \
 		for (bool __has = iter_has_next(__it); __has; __has = false ) \
-			for ( ELT_TYPE *ELT_NAME = (ELT_TYPE *) iter_next(__it) \
-			                           ; __has && ( (__has = iter_has_next(__it)) || !__has ) \
-			        ; ELT_NAME = (__has) ? (ELT_TYPE *) iter_next(__it) : ELT_NAME )
+			for ( ELT_TYPE *ELT_NAME = (ELT_TYPE *) iter_next(__it); \
+				  __has && ( (__has = iter_has_next(__it)) || !__has ); \
+			      ELT_NAME = (__has) ? (ELT_TYPE *) iter_next(__it) : ELT_NAME )
 
 
 

@@ -1,0 +1,11 @@
+[environment]
+compiler = "{compiler}"
+debug_flags = "{debug_flags}"
+release_flags = "{release_flags}"
+
+[package]
+name = "{name}"
+type = "{type}"
+version = "{version}"
+author = "{author}"
+e-mail = "{e-mail}"

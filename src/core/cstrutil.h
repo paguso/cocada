@@ -22,6 +22,7 @@
 #ifndef CSTRUTIL_H
 #define CSTRUTIL_H
 
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,9 +54,27 @@ char *cstr_clone(const char *src);
 
 
 /**
- * @brief Creates a clone of a source string up to a given length.
+ * @brief Creates a clone of a source string up to a given length @p len.
  */
 char *cstr_clone_len(const char *src, size_t len);
+
+
+/**
+ * @brief Changes the contents of @p dest to @p src.
+ * @return A pointer to the reassigned string.
+ * @warning The string @p dest may be relocated if the previous location
+ * is not large enough to hold the new value @p src. Make sure to use it
+ * as "`dest = cstr_reassign(dest, src)`" to avoid pointer inconsistence.
+ *
+ * # Example
+ * ```C
+ * char *s = "foo";
+ * printf("%s\n", s); // prints "foo"
+ * s = reassign(s, "bar");
+ * printf("%s\n", s); // prints "bar"
+ * ```
+ */
+char *cstr_reassign(char *dest, const char *src);
 
 
 /**
@@ -147,6 +166,19 @@ bool cstr_equals(const char *left, const char *right);
  * @brief Compares two ASCII strings for equality ignoring case.
  */
 bool cstr_equals_ignore_case(const char *left, const char *right);
+
+
+/**
+ * @brief Joins @p n strings into a single string, 
+ * intercalating them with a given separator @p sep.
+ * 
+ * #Example
+ * ```C
+ * char *lifecicle = cstr_join("-", 3, "code", "test", "repeat");
+ * printf("%s\n",lifecicle);// prints "code-test-repeat" 
+ * ```
+ */
+char *cstr_join(const char *sep, size_t n, ...);
 
 
 #define FOREACH_IN_SUBSTR(CHR, STR, FROM, TO) \

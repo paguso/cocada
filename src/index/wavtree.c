@@ -184,15 +184,13 @@ static void _tmp_wt_init_bal( tmp_wtnode *node, alphabet *ab,
 	size_t mid = (size_t)(ceil((l+r)/2.0));
 	if (mid-l == 1) {
 		node->chr[LEFT] = ab_char(ab, crk);
-	}
-	else if (mid-l >= 2) {
+	} else if (mid-l >= 2) {
 		node->chd[LEFT] = tmp_wtnode_new(0);
 		_tmp_wt_init_bal(node->chd[LEFT], ab, l, mid, crk, depth+1);
 	}
 	if (r-mid == 1) {
 		node->chr[RIGHT] = ab_char(ab, crk|(1<<depth));
-	}
-	else if (r-mid >= 2) {
+	} else if (r-mid >= 2) {
 		node->chd[RIGHT] = tmp_wtnode_new(0);
 		_tmp_wt_init_bal(node->chd[RIGHT], ab, mid, r, crk|(1<<depth), depth+1);
 	}
@@ -229,8 +227,7 @@ static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
 			set_charcode( twt->chrcodes, c,
 			              bitvec_clone(huffcode_charcode(hcode, crk)) );
 			node->chr[dir] = c;
-		}
-		else {
+		} else {
 			node->chd[dir]  = tmp_wtnode_new(0);
 			_tmp_wt_init_huff(twt, node->chd[dir], chd, hcode);
 		}
@@ -250,8 +247,7 @@ static tmp_wavtree *tmp_wt_init_huff(const huffcode *hcode, bool own_ab)
 		twt->tmp_root->chr[LEFT] = c;
 		set_charcode( twt->chrcodes, c,
 		              bitvec_clone(huffcode_charcode(hcode, 0)) );
-	}
-	else if (twt->nchars > 1) {
+	} else if (twt->nchars > 1) {
 		_tmp_wt_init_huff(twt, twt->tmp_root, huffcode_tree(hcode), hcode);
 	}
 	//huffcode_print(hcode);
@@ -292,8 +288,7 @@ static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, bitvec *chcode)
 			parent = node;
 			node = node->chd[node->nxt_chd];
 			parent->nxt_chd ^= 0x1;
-		}
-		else {
+		} else {
 			// case first & second symbols: 'ignore'
 			if (bitvec_len(chcode) < 2) return;
 			// add new leaf
@@ -330,8 +325,7 @@ static void tmp_wt_fill_online( tmp_wavtree *twt, strread *src )
 		bitvec *chcode = (bitvec *) get_charcode(twt->chrcodes, c);
 		if (chcode != NULL_CODE) {
 			tmp_wt_app_char(twt->tmp_root, chcode);
-		}
-		else {
+		} else {
 			chcode = bitvec_clone(twt->nxt_charcode);
 			chrcode_incr(twt->nxt_charcode);
 			set_charcode(twt->chrcodes, c, chcode);
@@ -349,8 +343,7 @@ static size_t tmp_wt_init_height(tmp_wtnode *root)
 {
 	if (root==NULL) {
 		return 0;
-	}
-	else {
+	} else {
 		size_t l = tmp_wt_init_height(root->chd[LEFT]);
 		size_t r = tmp_wt_init_height(root->chd[RIGHT]);
 		root->height = 1 + MAX(l, r);
@@ -368,8 +361,7 @@ static void _tmp_wavtree_init_veb_layout( tmp_wtnode *node, size_t heig,
 		(*offset) += bitvec_len(node->bv);
 		bitvec_cat(raw_bits, node->bv);
 		//printf("[id=%zu pos=%zu len=%zu]\n",node->id, node->offset, node->len);
-	}
-	else {
+	} else {
 		size_t depth, nxtchd;
 		_tmp_wavtree_init_veb_layout(node, heig/2, vebindex, offset, raw_bits);
 		stack *stknode = stack_new(sizeof(tmp_wtnode *));
@@ -397,8 +389,7 @@ static void _tmp_wavtree_init_veb_layout( tmp_wtnode *node, size_t heig,
 					                                   heig-(heig/2) ),
 					                              vebindex, offset, raw_bits );
 				}
-			}
-			else if (nxtchd<2) {
+			} else if (nxtchd<2) {
 				stack_push(stknode, &node);
 				stack_push_size_t(stkdepth, depth);
 				stack_push_size_t(stknxtchd, nxtchd+1);
@@ -443,8 +434,7 @@ static void tmp_wtnode_print(FILE *stream, tmp_wtnode *node, size_t depth)
 	margin[i++] = '\0';
 	if (node==NULL) {
 		fprintf (stream, "%s@tmp_wtree_node NULL\n",margin);
-	}
-	else {
+	} else {
 		fprintf(stream, "%s@tmp_wtree_node %p\n",margin, node);
 		fprintf(stream, "%ssize: %zu\n", margin, bitvec_len(node->bv));
 		fprintf(stream, "%snxt_chd: %c\n",margin, node->nxt_chd?'1':'0');
@@ -505,16 +495,14 @@ static void _wt_build_from_tmp(wtnode *nodes, tmp_wtnode *tnode)
 		nodes[tnode->index].has_chd |= 0x1;
 		nodes[tnode->index].cc[LEFT].chd = tnode->chd[LEFT]->index;
 		_wt_build_from_tmp(nodes, tnode->chd[LEFT]);
-	}
-	else {
+	} else {
 		nodes[tnode->index].cc[LEFT].chr = tnode->chr[LEFT];
 	}
 	if (tnode->chd[RIGHT] != NULL) {
 		nodes[tnode->index].has_chd |= 0x2;
 		nodes[tnode->index].cc[RIGHT].chd = tnode->chd[RIGHT]->index;
 		_wt_build_from_tmp(nodes, tnode->chd[RIGHT]);
-	}
-	else {
+	} else {
 		nodes[tnode->index].cc[RIGHT].chr = tnode->chr[RIGHT];
 	}
 }
@@ -681,8 +669,7 @@ static size_t _wavtree_select( wavtree *wt, size_t cur,
 		sel = csrsbitarr_select( wt->bitarr,
 		                         wt->nodes[cur].cumul_bits[bit]+rank, bit )
 		      - wt->nodes[cur].offset;
-	}
-	else {
+	} else {
 		sel = _wavtree_select( wt, wt->nodes[cur].cc[bit].chd, codeit, rank );
 		sel = csrsbitarr_select( wt->bitarr,
 		                         wt->nodes[cur].cumul_bits[bit]+sel, bit )
@@ -742,13 +729,12 @@ void _wt_node_print(wavtree *wt, size_t cur, size_t depth)
 	size_t i;
 	strbuf *dmargin = strbuf_new_with_capacity(2*depth+2);
 	for (i=0; i<depth; i++)
-		strbuf_append(dmargin, "  ");
-	strbuf_append(dmargin, "| ");
+		strbuf_append(dmargin, "  ", 2);
+	strbuf_append(dmargin, "| ", 2);
 	char *margin = strbuf_detach(dmargin);
 	if (cur >= wt->nnodes) {
 		printf ("%s@wtree_node NULL\n",margin);
-	}
-	else {
+	} else {
 		printf ("%s@wtree_node #%zu\n",margin, cur);
 		printf ("%slen: %zu\n", margin, wt->nodes[cur].len);
 		printf ("%soffset: %zu\n", margin, wt->nodes[cur].offset);

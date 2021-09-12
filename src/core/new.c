@@ -128,3 +128,9 @@ finaliser *finaliser_new_ptr()
 	ret->chd = NULL;
 	return ret;
 }
+
+
+finaliser *finaliser_new_ptr_to_obj(const finaliser *chd)
+{
+	return finaliser_cons(finaliser_new_ptr(), chd);
+}
