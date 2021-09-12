@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file strreader.h
+ * @author Paulo Fonseca
+ * @brief String reader. Implements the strread trait over an in-memory char string.
+ */
+
 
 #ifndef STRREADER_H
 #define STRREADER_H
@@ -27,9 +33,18 @@
 
 typedef struct _strreader strreader;
 
+/**
+ * @brief "Opens" the in-memory source string @p src of length @p len as a stream reader.
+ */
 strreader *strreader_open(char *src, size_t len);
 
+
+/**
+ * @brief Closes the string reader.
+ * @warning This *does not* deallocate de source string.
+ */
 void strreader_close(strreader *rdr);
+
 
 DECL_TRAIT(strreader, strread)
 

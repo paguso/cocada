@@ -49,7 +49,7 @@ static void test_teardown()
 void test_getc(CuTest *tc)
 {
 	test_setup();
-	strfilereader *sfr = strfilereader_open(filename);
+	strfilereader *sfr = strfilereader_open_path(filename);
 	size_t n = strlen(file_content);
 	char c;
 	for (size_t i=0; i<n; i++) {

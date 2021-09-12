@@ -225,8 +225,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 				bitarr_set_bit(last_node, nedges-1, 1);
 			nnodes++;
 			new_edge = true;
-		}
-		else {
+		} else {
 			// else if the first k chars (node label) are the same, but the
 			// last one (edge label) is different, then it is new edge
 			if ( xstr_get(lastkp1mers[this_line], k)
@@ -530,8 +529,7 @@ void dbg_print(dbgraph *g)
 		if (is_neg_chr(g->input_ab, e)) {
 			edge[0] = '-';
 			edge[1] = ext2inp(g->input_ab, pos_chr(g->input_ab, e));
-		}
-		else {
+		} else {
 			edge[0] = ' ';
 			edge[1] = e==0 ? '$' : ab_char(g->input_ab, e-1);
 		}

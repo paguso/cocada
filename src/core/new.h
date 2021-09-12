@@ -289,7 +289,7 @@
  * `B`-objects of a `C` container are properly finalised, then its buffer
  * can be freed.
  *
- * ### IMPORTANT: Finalise functions *SHOULD NOT* deallocate the object
+ * ### IMPORTANT: **Finalise functions SHOULD NOT deallocate the object**
  *
  * A finalise function corresponds to step 3 of the object lifecycle
  * mentioned above. Therefore it should **NOT** attempt to deallocate
@@ -536,9 +536,25 @@ finaliser *finaliser_new_ptr();
 
 
 /**
+ * @brief Shortcut for creating frequently-used finalisers for object references
+ * (pointers). Same as finaliser_cons(finaliser_new_ptr(), chd).
+ * @param chd Pointed object finaliser
+ */
+finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
+
+
+/**
  * Returns a default finaliser for a given type with no nested destructor.
  */
 #define FNR( TYPE ) finaliser_new(TYPE##_finalise)
+
+
+/**
+ * Returns a default finaliser for a pointer to an object
+ * of a given type with no other nested destructor.
+ * Same as finaliser_new_ptr_to_obj(FNR(TYPE)).
+ */
+#define FNR_PTR_TO_OBJ( TYPE ) finaliser_new_ptr_to_obj(FNR(TYPE))
 
 
 /**

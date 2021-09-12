@@ -97,7 +97,6 @@ void print_trace(FILE *);
  */
 #define FERROR(STREAM, FORMAT, ...)\
 	fprintf(STREAM,  "Error: "FORMAT, ##__VA_ARGS__ ); \
-	print_trace(stderr);\
 	exit(EXIT_FAILURE);
 
 
@@ -337,7 +336,7 @@ void print_trace(FILE *);
 #define DEBUG_IF(IGN, ORE , ...) ((void)0)
 #define FDEBUG_ASSERT(IG, NO, RE , ...) ((void)0)
 #define DEBUG_ASSERT(IGN, ORE , ...) ((void)0)
-#define DEBUG_ACTION(IGNORE) ((void)0)
+#define DEBUG_EXEC(IGNORE) ((void)0)
 
 #endif
 

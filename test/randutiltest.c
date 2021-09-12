@@ -66,8 +66,7 @@ void test_rand_norm(CuTest *tc)
 		double x;
 		do {
 			x = rand_norm();
-		}
-		while (x < range_min || x > range_max);
+		} while (x < range_min || x > range_max);
 		size_t bin = ( ( x - range_min) / range ) * nbins;
 		counts[bin]++;
 		max_count = MAX(max_count, counts[bin]);

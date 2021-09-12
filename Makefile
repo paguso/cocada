@@ -39,6 +39,7 @@ SRC_DIR      := $(ROOT_DIR)/src
 THRDPTY_DIR  := $(SRC_DIR)/thrdpty
 TEST_DIR     := $(ROOT_DIR)/test
 BUILD_DIR    := $(ROOT_DIR)/build
+CPM_DIR      := $(ROOT_DIR)/cpm
 DOC_DIR      := $(ROOT_DIR)/doc
 
 INSTALL_DIR  := /usr/local/lib/$(LIB_NAME)
@@ -70,7 +71,7 @@ TEST_HEAD_PATHS := $(shell find $(TEST_DIR) -name '*.$(HEAD_EXT)')
 TEST_HEAD_DIRS := $(sort $(dir $(TEST_SRC_PATHS)))
 TEST_SRCS      := $(notdir $(TEST_SRC_PATHS)) 
 
-VPATH          =  $(SRC_DIRS) $(TEST_DIR)
+VPATH          =  $(SRC_DIRS) $(TEST_DIR) $(CPM_DIR)
 
 .PHONY: clean doc debugclean debugbuild debugrebuild build staticlib install-static confirm_uninstall_static uninstall-static
 
@@ -82,7 +83,7 @@ DBG_EXE := cocada
 
 # -DDEBUG_LVL=0  No checks performed
 # -DDEBUG_LVL=1  Only errors are captured 
-# -DDEBUG_LVL=2  Only errors and warnings are captured
+# -DDEBUG_LVL=2  Errors and warnings are captured
 # -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
 DBG_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) \
 -DDEBUG_LVL=3 -DMEM_DEBUG -DXCHAR_BYTESIZE=4
@@ -116,7 +117,7 @@ debugrebuild: debugclean debug
 
 # -DDEBUG_LVL=0  No checks performed
 # -DDEBUG_LVL=1  Only errors are captured 
-# -DDEBUG_LVL=2  Only errors and warnings are captured
+# -DDEBUG_LVL=2  Errors and warnings are captured
 # -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
 CFLAGS  := -Wall -g -O3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) -DDEBUG_LVL=1
 
@@ -222,6 +223,43 @@ testrun:
 	
 
 test: testbuild testrun
+
+
+###############################################################################
+# CPM
+###############################################################################
+
+CPM_OBJ_DIR := $(BUILD_DIR)/cpm
+CPM_EXE := cpm
+
+# -DDEBUG_LVL=0  No checks performed
+# -DDEBUG_LVL=1  Only errors are captured 
+# -DDEBUG_LVL=2  Errors and warnings are captured
+# -DDEBUG_LVL=3  Errors, warnings, and debug messages are captured
+CPM_CFLAGS := -Wall -g3 $(patsubst %, -I %,  $(HEAD_DIRS) $(TEST_HEAD_DIRS)) \
+-DDEBUG_LVL=3 -DMEM_DEBUG -DXCHAR_BYTESIZE=4
+
+CPM_SRC_PATHS	:= $(shell find $(SRC_DIR)/core $(SRC_DIR)/util $(SRC_DIR)/io $(SRC_DIR)/thrdpty $(SRC_DIR)/container $(SRC_DIR)/app $(ROOT_DIR)/cpm -name '*.$(SRC_EXT)')
+CPM_SRCS	:= $(notdir $(CPM_SRC_PATHS))
+CPM_OBJS	:= $(patsubst %.$(SRC_EXT), $(CPM_OBJ_DIR)/%.$(OBJ_EXT) , $(CPM_SRCS))
+
+
+$(CPM_OBJ_DIR)/%.$(OBJ_EXT): %.$(SRC_EXT)
+	@echo "Running target $@"
+	@echo "First prerequisite is $<"
+	@echo "Compiling $< to $(CPM_OBJ_DIR)/$(notdir $@)..."
+	$(CC) $(CPM_CFLAGS) -c $< -o $(CPM_OBJ_DIR)/$(notdir $@)
+
+$(CPM_OBJ_DIR):
+	$(MKDIR) $(CPM_OBJ_DIR)
+
+cpmclean:
+	$(RMDIR) $(CPM_OBJ_DIR)
+
+cpmbuild: $(CPM_OBJ_DIR) $(CPM_OBJS)
+	$(CC) $(CPM_DBG_CFLAGS) $(CPM_OBJ_DIR)/*.$(OBJ_EXT) -lm -o $(CPM_OBJ_DIR)/$(CPM_EXE) 
+
+cpmrebuild: cpmclean cpmbuild
 
 
 ###############################################################################

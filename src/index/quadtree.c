@@ -134,8 +134,8 @@ void quadtree_fit(quadtree *tree)
 void quadtree_finalise(void *ptr, const finaliser *fnr)
 {
 	quadtree *self = (quadtree *)ptr;
-	finaliser *vec_fnr = 
-		finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
+	finaliser *vec_fnr =
+	    finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
 	DESTROY(self->nodes, vec_fnr);
 }
 
@@ -144,8 +144,9 @@ void quadtree_finalise(void *ptr, const finaliser *fnr)
 
 #define SND_HALF(LEN) ((LEN) - ((LEN) / 2))
 
-static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0, 
-									.width = 0, .height = 0 };
+static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0,
+                                    .width = 0, .height = 0
+                                   };
 
 static rectangle rectangle_clip(rectangle rect, rectangle viewport)
 {
@@ -186,15 +187,13 @@ void quadtree_ins(quadtree *tree, point2d p, void *payload,
 		if (IS_EAST(pos)) {
 			rect.top_left.x = centre.x;
 			rect.width = SND_HALF(rect.width);
-		}
-		else {
+		} else {
 			rect.width = FST_HALF(rect.width);
 		}
 		if (IS_SOUTH(pos) ) {
 			rect.top_left.y = centre.y;
 			rect.height = SND_HALF(rect.height);
-		}
-		else {
+		} else {
 			rect.height = FST_HALF(rect.height);
 		}
 		centre.x = rect.top_left.x + FST_HALF(rect.width);
@@ -217,20 +216,18 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 		point2d centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
 		uint cur_depth = 0;
 		while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-			quad_pos pos = (((byte_t)(bounds[i].y >= centre.y)) << 1) | 
-							((byte_t)(bounds[i].x >= centre.x));
+			quad_pos pos = (((byte_t)(bounds[i].y >= centre.y)) << 1) |
+			               ((byte_t)(bounds[i].x >= centre.x));
 			if (IS_EAST(pos)) {
 				rect.top_left.x = centre.x;
 				rect.width = SND_HALF(rect.width);
-			}
-			else {
+			} else {
 				rect.width = FST_HALF(rect.width);
 			}
 			if (IS_SOUTH(pos) ) {
 				rect.top_left.y = centre.y;
 				rect.height = SND_HALF(rect.height);
-			}
-			else {
+			} else {
 				rect.height = FST_HALF(rect.height);
 			}
 			centre.x = rect.top_left.x + FST_HALF(rect.width);
@@ -243,11 +240,9 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 		rectbounds[1].y = rect.top_left.x + rect.height;
 		if (bounds[i].x == rectbounds[0].x && bounds[i].y == rectbounds[0].y) {
 			bounds[i] = rectbounds[0];
-		}
-		else if (bounds[i].x == rectbounds[1].x && bounds[i].y == rectbounds[1].y) {
+		} else if (bounds[i].x == rectbounds[1].x && bounds[i].y == rectbounds[1].y) {
 			bounds[i] = rectbounds[1];
-		}
-		else {
+		} else {
 			switch (anchor) {
 			case SNAP_IN:
 				bounds[i] = rectbounds[1-i];
@@ -279,8 +274,7 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 		if (backtrack) {
 			return;
 		}
-	}
-	else if (quadtree_node_is_leaf(tree, node)) {
+	} else if (quadtree_node_is_leaf(tree, node)) {
 		return;
 	}
 

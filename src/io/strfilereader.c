@@ -23,10 +23,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "strread.h"
 #include "strfilereader.h"
 #include "new.h"
+
+
 
 struct _strfilereader {
 	strread _t_strread;
@@ -80,15 +83,31 @@ static strread_vt _strread_vt  = {
 };
 
 
-strfilereader *strfilereader_open(char *filename)
+strfilereader *strfilereader_open_path(const char *path)
+{
+	FILE *src = fopen(path, "r");
+	if (!src) {
+		return NULL;
+	}
+	strfilereader *ret = NEW(strfilereader);
+	ret->_t_strread.impltor = ret;
+	ret->_t_strread.vt = &_strread_vt;
+	ret->src = src;
+	ret->pos = 0;
+	return ret;
+}
+
+
+strfilereader *strfilereader_open(FILE *stream)
 {
 	strfilereader *ret = NEW(strfilereader);
 	ret->_t_strread.impltor = ret;
 	ret->_t_strread.vt = &_strread_vt;
-	ret->src = fopen(filename, "r");
+	ret->src = stream;
 	ret->pos = 0;
 	return ret;
 }
+
 
 
 void strfilereader_close(strfilereader *self)

@@ -70,28 +70,23 @@ ltqnorm(double p)
 	if (p < 0 || p > 1) {
 		errno = EDOM;
 		return 0.0;
-	}
-	else if (p == 0) {
+	} else if (p == 0) {
 		errno = ERANGE;
 		return -HUGE_VAL /* minus "infinity" */;
-	}
-	else if (p == 1) {
+	} else if (p == 1) {
 		errno = ERANGE;
 		return HUGE_VAL /* "infinity" */;
-	}
-	else if (p < LOW) {
+	} else if (p < LOW) {
 		/* Rational approximation for lower region */
 		q = sqrt(-2*log(p));
 		return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
 		       ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
-	}
-	else if (p > HIGH) {
+	} else if (p > HIGH) {
 		/* Rational approximation for upper region */
 		q  = sqrt(-2*log(1-p));
 		return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
 		       ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
-	}
-	else {
+	} else {
 		/* Rational approximation for central region */
 		q = p - 0.5;
 		r = q*q;

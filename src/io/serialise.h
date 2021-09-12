@@ -200,7 +200,7 @@
  *
  * ### Self-referential (recursive) objects
  *
- * Some objects may include refernces to objects of the same type. For example, a typical
+ * Some objects may include references to objects of the same type. For example, a typical
  * linked list node object would be defined as
  *
  * ```C
@@ -289,9 +289,9 @@
  * corruption is possible. So *be careful to have pointers only to
  * entire objects*.
  *
- * 2. On the same token of the previous item, *be careful with uinitialised
- * pointers*, and always have a serialisable reference set to a valid
- * object or NULL. COCADA will try to follow the pointer and serialise
+ * 2. On the same token, *be careful with uinitialised pointers*, and *always*
+ * have a serialisable reference set to a valid object or NULL.
+ * COCADA will try to follow the pointer and serialise
  * the pointed memory contents if the SOM tells it to. It has no way
  * of knowing if the pointer is valid or not. Particular care has to be
  * taken with pointer arrays. Make sure to have the unused elements set

@@ -30,7 +30,7 @@
 
 void test_ab(CuTest *tc)
 {
-    memdbg_reset();
+	memdbg_reset();
 	size_t size = 16;
 	char *letters = "0123456789ABCDEF";
 	alphabet *ab;
@@ -38,31 +38,31 @@ void test_ab(CuTest *tc)
 	for (size_t i = 0; i < size; i++) {
 		size_t rk = ab_rank(ab, letters[i]);
 		CuAssertSizeTEquals(tc, i, rk);
-        xchar_t c = ab_char(ab, i);
-        CuAssert(tc, "ab_char error", letters[i] == c);
+		xchar_t c = ab_char(ab, i);
+		CuAssert(tc, "ab_char error", letters[i] == c);
 	}
-    CuAssertSizeTEquals(tc, size, ab_rank(ab, 'G'));
+	CuAssertSizeTEquals(tc, size, ab_rank(ab, 'G'));
 	alphabet_free(ab);
-    CuAssert(tc, "Memory leak", memdbg_is_empty());
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
 
 void test_int_ab(CuTest *tc)
 {
-    memdbg_reset();
+	memdbg_reset();
 	size_t size = 16;
 	alphabet *ab;
 	ab = int_alphabet_new(size);
 	for (size_t i = 0; i < size; i++) {
-        xchar_t c = (xchar_t)i;
+		xchar_t c = (xchar_t)i;
 		size_t rk = ab_rank(ab, c);
 		CuAssertSizeTEquals(tc, i, rk);
-        xchar_t d = ab_char(ab, i);
-        CuAssert(tc, "ab_char error", c == d);
+		xchar_t d = ab_char(ab, i);
+		CuAssert(tc, "ab_char error", c == d);
 	}
-    CuAssertSizeTEquals(tc, size, ab_rank(ab, size + 1));
+	CuAssertSizeTEquals(tc, size, ab_rank(ab, size + 1));
 	alphabet_free(ab);
-    CuAssert(tc, "Memory leak", memdbg_is_empty());
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
 

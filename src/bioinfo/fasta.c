@@ -59,11 +59,9 @@ static int _getc(strread *self)
 			ungetc(c, fr->src);
 			c = EOF;
 			break;
-		}
-		else if (c=='\n'|| c=='\r') {
+		} else if (c=='\n'|| c=='\r') {
 			continue;
-		}
-		else {
+		} else {
 			break;
 		}
 	}
@@ -104,8 +102,7 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 		if ( c == delim || c == '>' ) {
 			ungetc(c, src);
 			break;
-		}
-		else if ( c == '\n' || c=='\r' ) {
+		} else if ( c == '\n' || c=='\r' ) {
 			continue;
 		}
 		dest[nread++] = c;

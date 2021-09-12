@@ -124,6 +124,7 @@ void hashmap_finalise(void *ptr, const finaliser *dst)
 			FREE(it);
 		}
 	}
+	FREE(hmap->data);
 }
 
 
@@ -249,10 +250,21 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
 	_find_res qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		return _value_at(hmap, qry.pos);
-	}
-	else {
+	} else {
 		return NULL;
 	}
+}
+
+
+const hashmap_entry hashmap_get_entry(const hashmap *hmap, const void *key)
+{
+	_find_res qry = _find(hmap, key, _hash(hmap, key));
+	hashmap_entry ret = {.key = NULL, .val = NULL};
+	if (qry.found) {
+		ret.key = _key_at(hmap, qry.pos);
+		ret.val = _value_at(hmap, qry.pos);
+	}
+	return ret;
 }
 
 
@@ -348,6 +360,20 @@ void hashmap_unset(hashmap *hmap, const void *key)
 	uint64_t h = _hash(hmap, key);
 	_find_res qry = _find(hmap, key, h);
 	if (qry.found) {
+		hmap->tally[qry.pos] = ST_DEL;
+		hmap->size--;
+		_check_resize(hmap);
+	}
+}
+
+
+void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key, void *dest_val)
+{
+	assert(key != NULL);
+	_find_res qry = _find(hmap, key, _hash(hmap, key));
+	if (qry.found) {
+		memcpy(dest_key, _key_at(hmap, qry.pos), hmap->keysize);
+		memcpy(dest_val, _value_at(hmap, qry.pos), hmap->valsize);
 		hmap->tally[qry.pos] = ST_DEL;
 		hmap->size--;
 		_check_resize(hmap);

@@ -49,8 +49,7 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 	b %= m;
 	if ( a <= UINT64_MAX - b) {
 		return (a + b) % m;
-	}
-	else {
+	} else {
 		return b - ( m - a);
 	}
 
@@ -158,7 +157,6 @@ uint64_t prime_succ(uint64_t n)
 }
 
 
-
 long double average_uint64_t(uint64_t *vals, size_t n)
 {
 	long double avg = 0;
@@ -177,6 +175,7 @@ long double average_uint64_t(uint64_t *vals, size_t n)
 
 #define SWAP(X, Y, TMP) \
 	{ TMP = X; X = Y; Y = TMP;}
+
 
 #define _PARTITION(TYPE, ...)\
 	static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\

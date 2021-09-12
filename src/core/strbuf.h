@@ -67,7 +67,7 @@ void strbuf_free(strbuf *sb);
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
  */
-strbuf *strbuf_new_from_str(const char *src);
+strbuf *strbuf_new_from_str(const char *src, size_t len);
 
 
 /**
@@ -101,11 +101,47 @@ void strbuf_clear(strbuf *sb);
 void strbuf_set(strbuf *sb, size_t pos, char c);
 
 
+
 /**
  * @brief Appends a copy of the contents of a static string @p suff.
  * @warning The source string @p suff is left untouched.
  */
-void strbuf_append(strbuf *sb, const char *suff);
+void strbuf_append(strbuf *sb, const char *suff, size_t len);
+
+
+/**
+ * @brief Appends a character @p c.
+ */
+void strbuf_append_char(strbuf *sb, char c);
+
+
+/**
+ * @brief Inserts a string @p str of length @p len at position @p pos.
+ * @warning No bound checks performed.
+ */
+void strbuf_ins(strbuf *sb, size_t pos, const char *str, size_t len);
+
+
+/**
+ * @brief Cuts the substring @p sb[@p from:@pfrom + @p len] from the buffer.
+ * If @p dest is not NULL, the removed substring is copied there.
+ * @warning No bound checks performed.
+ * @warning If @p dest is non-null, it should have space for at least @p len + 1
+ * chars, since a '\0' is added right after the copied substring such that
+ * @p dest is a prorperly null-terminated C string.
+ */
+void strbuf_cut(strbuf *sb, size_t from, size_t len, char *dest);
+
+
+/**
+ * @brief Pastes the string @p src of length @p len over the contents
+ * of the string buffer @p sb, starting from position @p from.
+ * The string buffer will be extended if the pasted over string goes
+ * past the end of the buffer.
+ *
+ * @warning No bound checks performed.
+ */
+void strbuf_paste(strbuf *sb, size_t from, const char *src, size_t len);
 
 
 /**
@@ -123,9 +159,48 @@ void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep);
 
 
 /**
- * @brief Appends a character @p c.
+ * @brief Concatenates two stringbuffers.
  */
-void strbuf_append_char(strbuf *sb, char c);
+void strbuf_cat(strbuf *dest, const strbuf *src);
+
+
+/**
+ * @brief Concatenates the @p n-prefix of @p src (or all @p src if its
+ * length is <= @p n ) to @p dest.
+ */
+void strbuf_ncat(strbuf *dest, const strbuf *src, size_t n);
+
+
+/**
+ * @brief Replaces the first @p n  left-to-right non-overlapping occurrences
+ * of the substring @p old in the string buffer @p sb, with the substring @p new.
+ *
+ * # Example
+ * ```
+ * strbuf *sb = strbuf_new_from_str("macaca", 6);
+ * strbuf_replace_n(sb, "ca", "na", 2);
+ * // yelds "manana"
+ * strbuf_replace_n(sb, "ma", "ba", 2);
+ * // yelds "banana" . only 1 <= 2 occurrence found
+ * strbuf_replace_n(sb, "ana", "aca", 2);
+ * // yelds "bacana" . only 1 <= 2 "non-overlapping" occurrence found
+ * ```
+ */
+void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n);
+
+
+/**
+ * @brief Same as `strbuf_replace_n(sb, old, new, 1)`
+ * @see strbuf_replace_n
+ */
+void strbuf_replace(strbuf *sb, const char *old, const char *new);
+
+
+/**
+ * @brief Same as `strbuf_replace_n(sb, old, new, strbuf_len(sb) + 1)`
+ * @see strbuf_replace_n
+ */
+void strbuf_replace_all(strbuf *sb, const char *old, const char *new);
 
 
 /**

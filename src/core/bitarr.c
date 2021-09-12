@@ -109,12 +109,10 @@ void bitarr_print(FILE *stream, const byte_t *ba, size_t nbits,
 			if (i+c < nbits) {
 				if (b & onemask) {
 					fprintf(stream, "1");
-				}
-				else {
+				} else {
 					fprintf(stream, "0");
 				}
-			}
-			else {
+			} else {
 				fprintf(stream, "*");
 			}
 			b <<= 1;
@@ -387,8 +385,7 @@ void bitarr_write(byte_t *dest, size_t from_bit_dest, const byte_t *src,
 				                           (BYTESIZE-hang-last_byte_content) );
 				dest[curr_byte_dest] |= ( (src[curr_byte_src]&
 				                           MSBMASK(last_byte_content))>>hang );
-			}
-			else {
+			} else {
 				dest[curr_byte_dest] &= MSBMASK(hang);
 				dest[curr_byte_dest] |= src[curr_byte_src]>>hang;
 				dest[curr_byte_dest+1] &= LSBMASK(BYTESIZE+overlap
@@ -397,8 +394,7 @@ void bitarr_write(byte_t *dest, size_t from_bit_dest, const byte_t *src,
 				                              & MSBMASK(last_byte_content) )
 				                            << overlap );
 			}
-		}
-		else {   // loff_src >= loff_dest
+		} else { // loff_src >= loff_dest
 			hang = loff_src - loff_dest;
 			overlap = BYTESIZE-hang;
 			// first byte
@@ -424,8 +420,7 @@ void bitarr_write(byte_t *dest, size_t from_bit_dest, const byte_t *src,
 				dest[curr_byte_dest-1] |= ( src[curr_byte_src]
 				                            & MSBMASK(last_byte_content) )
 				                          >> overlap;
-			}
-			else {
+			} else {
 				dest[curr_byte_dest-1] &= MSBMASK(overlap);
 				dest[curr_byte_dest-1] |= src[curr_byte_src] >> overlap;
 				dest[curr_byte_dest] &=LSBMASK(BYTESIZE+hang-last_byte_content);
@@ -434,16 +429,14 @@ void bitarr_write(byte_t *dest, size_t from_bit_dest, const byte_t *src,
 				                          << hang );
 			}
 		}
-	}
-	else {
+	} else {
 		if (loff_src < loff_dest) {
 			hang = loff_dest - loff_src;
 			if (nbits<=(BYTESIZE-loff_dest)) {
 				dest[curr_byte_dest] &= ~(MSBMASK(nbits)>>loff_dest);
 				dest[curr_byte_dest] |= ( src[curr_byte_src]
 				                          &(MSBMASK(nbits)>>loff_src) ) >> hang;
-			}
-			else {
+			} else {
 				dest[curr_byte_dest] &= MSBMASK(loff_dest);
 				dest[curr_byte_dest] |= ( src[curr_byte_src]
 				                          & LSBMASK(BYTESIZE-loff_src) )>> hang;
@@ -452,8 +445,7 @@ void bitarr_write(byte_t *dest, size_t from_bit_dest, const byte_t *src,
 				                            & MSBMASK(nbits)>>loff_src )
 				                          << (BYTESIZE-hang);
 			}
-		}
-		else {   // loff_src >= loff_dest
+		} else { // loff_src >= loff_dest
 			hang = loff_src - loff_dest;
 			dest[curr_byte_dest] &= ~(MSBMASK(nbits)>>loff_dest);
 			dest[curr_byte_dest] |= ( src[curr_byte_src]

@@ -132,7 +132,7 @@ void xstr_print(FILE *stream, const xstr *xs)
 void xstr_to_string (const xstr *xs, strbuf *dest)
 {
 	for (size_t i=0, l=xstr_len(xs); i < l; i++) {
-		if (i) strbuf_append(dest, "-");
+		if (i) strbuf_append_char(dest, '-');
 		xchar_t c = xstr_get(xs, i);
 		size_t  n = c;
 		size_t  ord = 1;
@@ -143,7 +143,7 @@ void xstr_to_string (const xstr *xs, strbuf *dest)
 			d[0] = '0' + (n/ord);
 			n = n % ord;
 			ord /= 10;
-			strbuf_append(dest, d);
+			strbuf_append(dest, d, strlen(d));
 		}
 	}
 }

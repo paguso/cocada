@@ -33,13 +33,13 @@
  */
 
 /**
- * @brief 
+ * @brief
  */
 typedef struct _fastaidx fastaidx;
 
 
 /**
- * @brief 
+ * @brief
  */
 fastaidx *fastaidx_new(const char *src_path);
 

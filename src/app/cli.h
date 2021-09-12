@@ -270,7 +270,7 @@ typedef struct _cliarg cliarg;
  * Currently only one level of program nesting is supported (subprograms
  * cannot contain sub-subprograms),
  */
-typedef struct _cliparse cliparse;
+typedef struct _cliparser cliparser;
 
 
 /**
@@ -373,21 +373,21 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
  * @param help	(**no transfer**) A short description of the (sub)program
  * 				used for help messages.
  */
-cliparse *cliparse_new(char *name, char *help);
+cliparser *cliparser_new(char *name, char *help);
 
 
 /**
  * @brief Destructor.
- * Use with default destructor `FNR(cliparse)`, or
- * simply `DESTROY_FLAT(obj, cliparse)`.
+ * Use with default destructor `FNR(cliparser)`, or
+ * simply `DESTROY_FLAT(obj, cliparser)`.
  */
-void cliparse_finalise(void *ptr, const finaliser *fnr);
+void cliparser_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
  * @brief Returns the name of a command parser
  */
-const char *cliparse_name(const cliparse *cmd);
+const char *cliparser_name(const cliparser *cmd);
 
 
 /**
@@ -405,7 +405,7 @@ const char *cliparse_name(const cliparse *cmd);
  *   none of its choice values can be equal to a command
  *   or subcommand name of the @p cmd parser.
  */
-void cliparse_add_subcommand(cliparse *cmd, cliparse *subcmd);
+void cliparser_add_subcommand(cliparser *cmd, cliparser *subcmd);
 
 
 /**
@@ -415,11 +415,11 @@ void cliparse_add_subcommand(cliparse *cmd, cliparse *subcmd);
  *
  * - Both the short (`-`) and long (`--`) names of the option must
  *   be unique for the command. In particular, a help option with names
- *  `-h`, `--help` is automatically added to every cliparse.
+ *  `-h`, `--help` is automatically added to every cliparser.
  * - if @p opt is of type ARG_CHOICE, then none of its choice values
  *   can be equal to any command or subcommand name of the parser @p cmd
  */
-void cliparse_add_option(cliparse *cmd, cliopt *opt);
+void cliparser_add_option(cliparser *cmd, cliopt *opt);
 
 
 /**
@@ -428,14 +428,14 @@ void cliparse_add_option(cliparse *cmd, cliopt *opt);
  * Ir
  *
  */
-void cliparse_add_pos_arg(cliparse *cmd, cliarg *arg);
+void cliparser_add_pos_arg(cliparser *cmd, cliarg *arg);
 
 
 /**
  * @brief Prints the automatically-generated help message of a program
  * 			to the standard output.
  */
-void cliparse_print_help(const cliparse *cmd);
+void cliparser_print_help(const cliparser *cmd);
 
 
 /**
@@ -484,16 +484,16 @@ void cliparse_print_help(const cliparse *cmd);
  * `3`, `4`, and `5`.
  *
  */
-void cliparse_parse(cliparse *cmd, int argc, char **argv);
+void cliparser_parse(cliparser *cmd, int argc, char **argv);
 
 
 /**
  * @brief Returns the invoked subcommand of a command, if any.
- * @return Prior to parsing a call with ::cliparse_parse (cmd), returns NULL.
+ * @return Prior to parsing a call with ::cliparser_parse (cmd), returns NULL.
  * After parsing a call, if a subcommand was called, returns the
  * corresponding (populated) parser, else returns NULL.
  */
-const cliparse *cliparse_active_subcommand(const cliparse *cmd);
+const cliparser *cliparser_active_subcommand(const cliparser *cmd);
 
 
 /**
@@ -518,7 +518,7 @@ const cliparse *cliparse_active_subcommand(const cliparse *cmd);
  * vector with with two child vectors, the first with three long ints
  * and the second with two long ints.
  */
-const vec *cliparse_opt_val_from_shortname(const cliparse *cmd, char shortname);
+const vec *cliparser_opt_val_from_shortname(const cliparser *cmd, char shortname);
 
 
 /**
@@ -527,10 +527,10 @@ const vec *cliparse_opt_val_from_shortname(const cliparse *cmd, char shortname);
  * @param cmd The (sub)command parser
  * @param longname The long (`--`) name of the option.
  *
- * @see cliparse_opt_val_from_shortname
+ * @see cliparser_opt_val_from_shortname
  *
  */
-const vec *cliparse_opt_val_from_longname(const cliparse *cmd, char *longname);
+const vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname);
 
 
 /**
@@ -545,7 +545,7 @@ const vec *cliparse_opt_val_from_longname(const cliparse *cmd, char *longname);
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */
-const vec *cliparse_arg_val_from_pos(const cliparse *cmd, size_t pos);
+const vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos);
 
 
 

@@ -32,27 +32,30 @@
 //  Implement the tally as a linear probing closed hashtable
 //  with Fibonacci hashing
 
-static size_t alloc_no = 0;
-
+// hashtable entry status flag type
 typedef enum {
 	FREE, // must be zero
 	ACTIVE,
 	DELETED
 } flag_t;
 
+// memory chunk table entry
 typedef struct {
-	size_t alloc_no;
-	void *addr;
-	size_t size;
-	flag_t flag;
+	size_t alloc_no;	// entry sequential id
+	void *addr;			// block start address
+	size_t size;		// block size (in bytes)
+	flag_t flag;		// entry status flag
 } memchunk;
 
+// implement a linear probing hashtable
+// with memory addresses as keys
 typedef struct {
-	size_t nact;
-	size_t ndel;
-	size_t cap;
-	size_t total;
-	memchunk *data;
+	size_t count;       //
+	size_t nact;		// nb of active entries
+	size_t ndel;		// nb of deleted entries
+	size_t cap;			// table capacity
+	size_t total;		// total memory size (in bytes) accounted for
+	memchunk *data;		// memory chunks table
 } memtable;
 
 static const size_t MIN_CAP = 128;
@@ -60,12 +63,13 @@ static const double GROW_BY = 1.62;
 static const double MAX_LOAD = 0.66;
 static const double MIN_LOAD = 0.25;
 
-static memtable tally = {.nact = 0, .ndel = 0, .cap = 0, .data = NULL};
+static memtable tally = {.count = 0, .nact = 0, .ndel = 0, .cap = 0, .data = NULL};
 
 
 static void memtable_init(memtable *tally)
 {
 	if (tally->cap) return;
+	tally->count = 0;
 	tally->nact = 0;
 	tally->ndel = 0;
 	tally->cap = MIN_CAP;
@@ -104,8 +108,7 @@ static void memtable_check_and_resize(memtable *tally)
 	if (load < MIN_LOAD) {
 		newcap = tally->cap / GROW_BY;
 		newcap = (newcap > MIN_CAP) ? newcap : MIN_CAP;
-	}
-	else if (load > MAX_LOAD) {
+	} else if (load > MAX_LOAD) {
 		newcap = tally->cap * GROW_BY;
 	}
 	if (newcap != tally->cap) {
@@ -125,10 +128,10 @@ static void memtable_check_and_resize(memtable *tally)
 }
 
 
-static void memtable_set(memtable *tally, void *addr, size_t size)
+static size_t memtable_set(memtable *tally, void *addr, size_t size)
 {
 #ifndef MEM_DEBUG
-	return;
+	return 0;
 #endif
 	memtable_init(tally);
 	size_t pos = hash(addr, tally->cap);
@@ -137,17 +140,20 @@ static void memtable_set(memtable *tally, void *addr, size_t size)
 		        tally->data[pos].addr == addr) {
 			tally->total += (size - tally->data[pos].size);
 			tally->data[pos].size = size;
-			return;
+			return tally->data[pos].alloc_no;
 		}
 		pos = (pos + 1) % tally->cap;
 	}
-	tally->data[pos].alloc_no = alloc_no++;
+	size_t ret = tally->count;
+	tally->data[pos].alloc_no = tally->count;
+	tally->count++;
 	tally->data[pos].addr = addr;
 	tally->data[pos].size = size;
 	tally->data[pos].flag = ACTIVE;
 	tally->total += size;
 	tally->nact++;
 	memtable_check_and_resize(tally);
+	return ret;
 }
 
 
@@ -256,13 +262,13 @@ void memdbg_print_stats(FILE *stream, bool print_chunks)
 
 void memdbg_reset()
 {
+	tally.count = 0;
 	tally.cap = 0;
 	tally.nact = 0;
 	tally.total = 0;
 	tally.ndel = 0;
 	free(tally.data);
 	tally.data = NULL;
-	alloc_no = 0;
 }
 
 
@@ -287,11 +293,11 @@ bool memdbg_is_empty()
 void *memdbg_malloc(size_t size, char *file, int line)
 {
 	void *ret = malloc(size);
-	memtable_set(&tally, ret, size);
+	size_t alloc_no = memtable_set(&tally, ret, size);
 #ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
-	printf("malloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
-	        file, line, size, ret, hrsize.size, hrsize.prefix);
+	printf("malloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
+	       alloc_no, file, line, size, ret, hrsize.size, hrsize.prefix);
 #endif
 	return ret;
 }
@@ -300,11 +306,11 @@ void *memdbg_malloc(size_t size, char *file, int line)
 void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 {
 	void *ret = calloc(nmemb, size);
-	memtable_set(&tally, ret, nmemb * size);
+	size_t alloc_no = memtable_set(&tally, ret, nmemb * size);
 #ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
-	printf("calloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
-	       file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);
+	printf("calloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
+	       alloc_no, file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);
 #endif
 	return ret;
 }
@@ -316,11 +322,11 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 	if (ret != ptr) {
 		memtable_unset(&tally, ptr);
 	}
-	memtable_set(&tally, ret, size);
+	size_t alloc_no = memtable_set(&tally, ret, size);
 #ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);
-	printf("realloc [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
-	       file, line, size, ret, hrsize.size, hrsize.prefix);
+	printf("realloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
+	       alloc_no, file, line, size, ret, hrsize.size, hrsize.prefix);
 #endif
 	return ret;
 }

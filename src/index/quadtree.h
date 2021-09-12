@@ -281,7 +281,7 @@ void quadtree_fit(quadtree *tree);
  * ::quadtree_node_get_data and ::quadtree_node_set_data.
  *
  * ## Example
- * 
+ *
  * ```
  *  + - - - + - - - + - - - + - - - +
  *  .       .       .       .       .
@@ -299,14 +299,14 @@ void quadtree_fit(quadtree *tree);
  *  .       .       .       .       .
  *  .   P   .   Q   .   T   .   U   .
  *  .       .       .  (*)  .       .
- *  + - - - + - - - + - ^ - + - - - + 
+ *  + - - - + - - - + - ^ - + - - - +
  *                      |
  *                      |
  *    insert here -----´
  *
- * 
+ *
  *  Nodes visited are indicated by an asterisk *:
- * 
+ *
  *         __________  A* ___________
  *       /         __/   \__         \
  *      /         /         \         \

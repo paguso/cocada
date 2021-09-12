@@ -94,8 +94,7 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 		if ( m != i ) {
 			vec_swap(heap->data, i, m);
 			i = m;
-		}
-		else {
+		} else {
 			break;
 		}
 	}

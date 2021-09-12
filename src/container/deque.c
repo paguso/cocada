@@ -125,12 +125,10 @@ static void check_and_resize(deque *q)
 		         q->data + (q->start * q->typesize),
 		         (q->len - q->start) * q->typesize );
 		q->start += offset;
-	}
-	else if (q->len < (MIN_LOAD * q->cap)) {
+	} else if (q->len < (MIN_LOAD * q->cap)) {
 		if ((q->start + q->len) < q->cap) {
 			memmove(q->data, q->data + (q->start * q->typesize), q->len * q->typesize);
-		}
-		else {
+		} else {
 			memmove( q->data + (q->cap - q->start) * q->typesize,
 			         q->data, ((q->start + q->len) % q->cap) * q->typesize );
 			memmove( q->data,  q->data + (q->start * q->typesize),

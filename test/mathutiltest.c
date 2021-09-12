@@ -44,33 +44,28 @@ void test_mult_floor(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			}
-			else {
+			} else {
 				expected = -INFINITY;
 			}
-		}
-		else if (base<0) {
+		} else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while (expected*base>value) {
 					expected+=1;
 				}
-			}
-			else if (value>=0) {
+			} else if (value>=0) {
 				expected = 0;
 				while ((expected-1)*base<value) {
 					expected-=1;
 				}
 			}
-		}
-		else if (base>0) {
+		} else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while (expected*base>value) {
 					expected-=1;
 				}
-			}
-			else if (value>=0) {
+			} else if (value>=0) {
 				expected = 0;
 				while ((expected+1)*base<value) {
 					expected+=1;
@@ -96,33 +91,28 @@ void test_mult_ceil(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			}
-			else {
+			} else {
 				expected = INFINITY;
 			}
-		}
-		else if (base<0) {
+		} else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while ((expected+1)*base>=value) {
 					expected+=1;
 				}
-			}
-			else if (value>=0) {
+			} else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected-=1;
 				}
 			}
-		}
-		else if (base>0) {
+		} else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while ((expected-1)*base>=value) {
 					expected-=1;
 				}
-			}
-			else if (value>=0) {
+			} else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected+=1;
