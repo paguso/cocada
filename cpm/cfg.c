@@ -14,34 +14,9 @@
 #include "cfg.h"
 
 
-
-static const char *CFG = 
-"[environment]\n"
-"compiler = \"{compiler}\"\n"
-"debug_flags = \"{debug_flags}\"\n"
-"release_flags = \"{release_flags}\"\n"
-"\n"
-"[package]\n"
-"name = \"{name}\"\n"
-"type = \"{type}\"\n"
-"version = \"{version}\"\n"
-"author = \"{author}\"\n"
-"e-mail = \"{e-mail}\"\n";
-
-
-#define BUFSIZE 200
+#define BUFSIZE 255
 void read_file_to_strbuf(strbuf *dest, const char *path)
 {
-/*
-    strfilereader *sfr = strfilereader_open_path(path);
-    ERROR_IF(sfr == NULL, "Failed to read '%s' (%s).\n", path, strerror(errno));
-    strread *rdr = strfilereader_as_strread(sfr);
-    char c;
-    while ((c = strread_getc(rdr)) != EOF) {
-        strbuf_append_char(dest, c);        
-    }
-    strfilereader_close(sfr);
-*/
     char *buf = cstr_new(BUFSIZE);
     strfilereader *sfr = strfilereader_open_path(path);
     ERROR_IF(sfr == NULL, "Failed to read '%s' (%s).\n", path, strerror(errno));
