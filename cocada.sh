@@ -1,14 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 
-function help {
-	echo "COCADA Collection Of Algorithms and DAta Structures"
+help() {
+	echo "COCADA Collection of Algorithms and DAta structures"
     echo "(c) 2016- Paulo Fonseca"
 	echo ""
 }
 
 INSTALL_DIR=$HOME/.cocada
 
-function write_env_setup {
+write_env_setup() {
 	ENV_FILE=$INSTALL_DIR/env.sh
 	echo "#!/bin/sh" > $ENV_FILE
 	echo "# COCADA environment setup" >> $ENV_FILE
@@ -22,28 +22,26 @@ function write_env_setup {
 	echo "esac" >> $ENV_FILE
 }
 
-function patch_profile {
+patch_profile() {
 	write_env_setup
 	echo ""
 	echo "COCADA needs the environment variable \$CODADA_HOME to be defined and added to the PATH"
 	case $SHELL in
 	*"bash" )
 		echo "It seems your system uses the bash shell. Great!"
-		echo "I can patch the configuration files "
-		echo "(Don't worry, I'll backup the original files)"
+		echo "I can patch the configuration file $HOME/.bash_profile"
+		echo "(Don't worry, I'll backup the original file)"
 		echo "Proceed? (Y)es | (N)o "
-		read -s -N 1 ANS
-		if [[ "$ANS" == "Y" || "$ANS" == "y" || "$ANS" == "" ]]
-		then
-			echo "Patching configuration files"
-			if [[ -e $HOME/.bash_profile ]]
+		read ANS 
+		if [ "$ANS" = "Y" ] || [ "$ANS" = "y" ] || [ "$ANS" = "" ]; then
+			if [ -e $HOME/.bash_profile ]
 			then
 				cp $HOME/.bash_profile $HOME/.bash_profile.cocada_bkp.`date +%Y%m%d%H%M`
 				echo "" >> $HOME/.bash_profile
 				echo "# COCADA  environment setup" >> $HOME/.bash_profile
 				echo ". $INSTALL_DIR/env.sh" >> $HOME/.bash_profile
 			fi
-			echo "Done"
+			echo "Done."
 		else 
 			echo "OK, but please make the appropriate changes to your configuration files"
 		fi
@@ -56,21 +54,21 @@ function patch_profile {
 
 
 
-function install {
+install() {
     echo "Enter install destination, or just press Return for default '$INSTALL_DIR':"
     read ANS
-    if [[ ! "$ANS" == "" ]]
-    then
+    if [ ! "$ANS" = "" ] 
+	then
         INSTALL_DIR=$ANS 
     fi 
-    if [[ -d $INSTALL_DIR ]]
+    if [ -d $INSTALL_DIR ]
     then
 		echo ""
-        echo "WARNING: Install directory $INSTALL_DIR already exists!"
+        echo "WARNING: Installation directory $INSTALL_DIR already exists!"
         echo "Proceeding will overwrite its contents."
-        echo "Continue anyway? (Type \"Yes\" to confirm)"
+        echo "Continue anyway? (Type \"Yes\" to confirm or anything else to abort)"
         read ANS
-        if [[ "$ANS" == "Yes" || "$ANS" == "yes" ]]
+        if [ "$ANS" = "Yes" ] || [ "$ANS" = "yes" ]
         then
             echo "Overwriting $INSTALL_DIR"
         else
@@ -80,12 +78,14 @@ function install {
         fi
     fi
     mkdir -p $INSTALL_DIR
+	INSTALL_DIR=`readlink -f $INSTALL_DIR`
+	
 	cd $INSTALL_DIR
+	
 	patch_profile 
-
 }
 
-if [ $# -lt 1 ]; 
+if [ $# -lt 1 ] 
 then
 	help
 	exit 0
@@ -98,7 +98,8 @@ NOWWHAT="op"
 
 while [ "$1" != "" ]; do
 	case $1 in
-		"help" ) if [ ! "$NOWWHAT" == "op" ];
+		"help" ) 
+			if [ ! "$NOWWHAT" = "op" ]
 			then
 				help
 				exit 1
@@ -106,7 +107,8 @@ while [ "$1" != "" ]; do
 			help
 			exit 0
 			;;
-		"install" ) if [ ! "$NOWWHAT" == "op" ];
+		"install" ) 
+			if [ ! "$NOWWHAT" = "op" ]
 			then
 				help
 				exit 1
@@ -121,7 +123,9 @@ done
 echo $OPERATION $TARGETS $OPTION
 
 case $OPERATION in
-	"install" )	if [ "$TARGETS" == "" ]; then
+	"install" )	
+		if [ "$TARGETS" = "" ]
+		then
 			help
 			#exit 1
 		fi
