@@ -438,6 +438,21 @@ void cliparser_add_pos_arg(cliparser *cmd, cliarg *arg);
 void cliparser_print_help(const cliparser *cmd);
 
 
+typedef enum {
+	PARSE_SUCC = 0,
+	UNPARSED,
+	INVALID_OPTION,
+	INVALID_MULT_OPTION,
+	INVALID_OPT_VAL_NO,
+	MISSING_REQ_OPT,
+	INVALID_SUBCMD,
+	UNEXPECTED_TK,
+	INVALID_ARG_VAL,
+	INVALID_ARG_VAL_NO,
+	UNDEF_ERR
+} cliparse_exit_status;
+
+
 /**
  * @brief Parses a program call.
  * If the call is sucessfully parsed, the @p cmd is populated with the
@@ -484,8 +499,10 @@ void cliparser_print_help(const cliparser *cmd);
  * `3`, `4`, and `5`.
  *
  */
-void cliparser_parse(cliparser *cmd, int argc, char **argv);
+cliparse_exit_status cliparser_parse(cliparser *cmd, int argc, char **argv);
 
+
+const char *cliparser_parse_status_msg(cliparser *cmd);
 
 /**
  * @brief Returns the invoked subcommand of a command, if any.

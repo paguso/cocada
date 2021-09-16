@@ -6,20 +6,26 @@ help() {
 	echo ""
 }
 
+CWD=`pwd`
+CPM_DIR=cpm
 INSTALL_DIR=$HOME/.cocada
+BASH_PROFILE=$HOME/.bash_profile
+ENV_SCRIPT=$INSTALL_DIR/cocadaenv.sh
+DEFAULT_LOCAL_REPO=$INSTALL_DIR/cocada
+LOCAL_REPO_CONF=$INSTALL_DIR/cocadareg.conf
+REMOTE_REPO=https://github.com/paguso/cocada
 
 write_env_setup() {
-	ENV_FILE=$INSTALL_DIR/env.sh
-	echo "#!/bin/sh" > $ENV_FILE
-	echo "# COCADA environment setup" >> $ENV_FILE
-	echo "export COCADA_HOME=\"$INSTALL_DIR\"" >> $ENV_FILE
-	echo "case \":\${PATH}:\" in" >> $ENV_FILE
-    echo "*:\"\$COCADA_HOME/bin\":*)" >> $ENV_FILE
-    echo "	;;" >> $ENV_FILE
-    echo "*)" >> $ENV_FILE
-    echo "	export PATH=\"\$COCADA_HOME/bin:\$PATH\"" >> $ENV_FILE
-    echo "	;;" >> $ENV_FILE
-	echo "esac" >> $ENV_FILE
+	echo "#!/bin/sh" > $ENV_SCRIPT
+	echo "# COCADA environment setup" >> $ENV_SCRIPT
+	echo "export COCADA_HOME=\"$INSTALL_DIR\"" >> $ENV_SCRIPT
+	echo "case \":\${PATH}:\" in" >> $ENV_SCRIPT
+    echo "*:\"\$COCADA_HOME/bin\":*)" >> $ENV_SCRIPT
+    echo "	;;" >> $ENV_SCRIPT
+    echo "*)" >> $ENV_SCRIPT
+    echo "	export PATH=\"\$COCADA_HOME/bin:\$PATH\"" >> $ENV_SCRIPT
+    echo "	;;" >> $ENV_SCRIPT
+	echo "esac" >> $ENV_SCRIPT
 }
 
 patch_profile() {
@@ -36,10 +42,22 @@ patch_profile() {
 		if [ "$ANS" = "Y" ] || [ "$ANS" = "y" ] || [ "$ANS" = "" ]; then
 			if [ -e $HOME/.bash_profile ]
 			then
-				cp $HOME/.bash_profile $HOME/.bash_profile.cocada_bkp.`date +%Y%m%d%H%M`
-				echo "" >> $HOME/.bash_profile
-				echo "# COCADA  environment setup" >> $HOME/.bash_profile
-				echo ". $INSTALL_DIR/env.sh" >> $HOME/.bash_profile
+				doit=false 
+				if ! grep -q ". $ENV_SCRIPT" $BASH_PROFILE 
+				then 
+					doit=true
+				else
+					echo ""
+					echo "$BASH_PROFILE already contains the following line:"
+					grep -n ". $ENV_SCRIPT" $BASH_PROFILE
+				fi
+				if [ "$doit" = true ]
+				then
+					cp $BASH_PROFILE $BASH_PROFILE.cocada_bkp.`date +%Y%m%d%H%M`
+					echo "" >> $BASH_PROFILE
+					echo "# COCADA environment setup" >> $BASH_PROFILE
+					echo ". $ENV_SCRIPT" >> $BASH_PROFILE
+				fi 
 			fi
 			echo "Done."
 		else 
@@ -53,6 +71,52 @@ patch_profile() {
 }
 
 
+config_repo() {
+	echo ""
+	echo "Configuring COCADA repository"
+	echo "COCADA needs to configure a git repository from which to pull source files."
+	USE_CWD_REPO=false
+	if [ -d $CWD/.git ] && [ -d $CWD/cocada ]
+	then
+		echo "It seem that the current directory $CWD"
+		echo "is a COCADA git repository. You can choose to:"
+		echo "1. Use the current directory as local repository; or"
+		echo "2. Clone a separate local repository inside the installation directory. (default)"
+		echo "Please, choose your option (Type '1' or '2')"
+		read ANS
+		if [ "$ANS" = "1" ] 
+		then
+			USE_CWD_REPO=true
+		fi
+	else 
+		echo "A local COCADA repository will be cloned inside the installation directory."
+	fi
+	LOCAL_REPO=""
+	if [ "$USE_CWD_REPO" = true ]
+	then
+		LOCAL_REPO=$CWD 
+	else
+		LOCAL_REPO=$DEFAULT_LOCAL_REPO
+		if [ -d $LOCAL_REPO ]
+		then
+			rm -rf $LOCAL_REPO
+		fi
+		git clone $REMOTE_REPO $LOCAL_REPO
+	fi
+	echo 
+	echo $LOCAL_REPO > $LOCAL_REPO_CONF
+	echo "Done configuring COCADA repository."
+}
+
+
+install_cpm() {
+	echo "Installing CPM"
+	cd $LOCAL_REPO/cpm
+	make release
+	cp $LOCAL_REPO/cpm/build/release/cpm $INSTALL_DIR/bin
+	echo "Done installing CPM"
+}
+
 
 install() {
     echo "Enter install destination, or just press Return for default '$INSTALL_DIR':"
@@ -65,12 +129,13 @@ install() {
     then
 		echo ""
         echo "WARNING: Installation directory $INSTALL_DIR already exists!"
-        echo "Proceeding will overwrite its contents."
+        echo "Proceeding will PERMANENTLY OVERWRITE its contents."
         echo "Continue anyway? (Type \"Yes\" to confirm or anything else to abort)"
         read ANS
         if [ "$ANS" = "Yes" ] || [ "$ANS" = "yes" ]
         then
             echo "Overwriting $INSTALL_DIR"
+			rm -rf $INSTALL_DIR/*
         else
 			echo ""
             echo "Aborting installation."
@@ -78,12 +143,16 @@ install() {
         fi
     fi
     mkdir -p $INSTALL_DIR
+    mkdir -p $INSTALL_DIR/bin
 	INSTALL_DIR=`readlink -f $INSTALL_DIR`
-	
-	cd $INSTALL_DIR
-	
+
+	config_repo
+	install_cpm
 	patch_profile 
 }
+
+
+
 
 if [ $# -lt 1 ] 
 then

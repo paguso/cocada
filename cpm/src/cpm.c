@@ -92,15 +92,22 @@ int main(int argc, char **argv)
 {
     memdbg_reset();
     cliparser *clip = init_cliparser();    
-    cliparser_parse(clip, argc, argv);
+    cliparse_exit_status res = cliparser_parse(clip, argc, argv);
+    if ( res != PARSE_SUCC ) {
+        ERROR("%s\n", cliparser_parse_status_msg(clip));
+    }
     const cliparser *act = cliparser_active_subcommand(clip);
-    if (!strcmp(cliparser_name(act), NEW_CMD)) {
+    if (act == NULL) {
+        cliparser_print_help(clip);
+        goto cleanup;
+    }
+    else if (!strcmp(cliparser_name(act), NEW_CMD)) {
         new(act);
     }
     else {
-        printf("Nothing to do.\n");
         cliparser_print_help(clip);
     }
+cleanup:
     DESTROY_FLAT(clip, cliparser);
     memdbg_print_stats(stdout, true);
 }
