@@ -14,6 +14,8 @@ typedef enum {
     LIB_PKG
 } pkg_type_t;
 
+#define TYPE_LBL(i) ((i==BIN_PKG)?"bin":(i==LIB_PKG)?"lib":"")
+
 
 typedef struct {
     const char *name;
@@ -21,6 +23,7 @@ typedef struct {
     const char *root_path;
     const char *src_path;
 } pkg;
+
 
 pkg *pkg_new(const char *name, pkg_type_t type, const char *base_dir);
 

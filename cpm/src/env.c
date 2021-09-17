@@ -41,7 +41,7 @@ static void init_cocada_paths(env *e)
     buf = cstr_join(DIR_SEP, 2, e->cocada_path, CPM_DIR);
     e->cpm_path = cstr_reassign(e->cpm_path, buf);
     FREE(buf);
-    buf = cstr_join(DIR_SEP, 2, e->cpm_path, RESOURCES_DIR);
+    buf = cstr_join(DIR_SEP, 2, e->cocada_path, RESOURCES_DIR);
     e->cpm_resources_path = cstr_reassign(e->cpm_resources_path, buf);
     FREE(buf);
 }

@@ -10,9 +10,10 @@
 
 
 #define TAG_NAME "{name}"
+#define TAG_TYPE "{type}"
+#define TAG_VERSION "{version}"
 #define TAG_AUTHOR "{author}"
 #define TAG_EMAIL "{e-mail}"
-#define TAG_VERSION "{version}"
 #define TAG_COMPILER "{compiler}"
 #define TAG_DEBUG_FLAGS "{debug_flags}"
 #define TAG_RELEASE_FLAGS "{release_flags}"

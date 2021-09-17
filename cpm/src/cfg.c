@@ -12,7 +12,7 @@
 
 #include "env.h"
 #include "cfg.h"
-
+#include "pkg.h"
 
 #define BUFSIZE 255
 void read_file_to_strbuf(strbuf *dest, const char *path)
@@ -31,7 +31,6 @@ void read_file_to_strbuf(strbuf *dest, const char *path)
     strfilereader_close(sfr);
 }
 
-
 strbuf *create_config(env *e, pkg *p)
 {
     strbuf *config = strbuf_new();
@@ -44,6 +43,7 @@ strbuf *create_config(env *e, pkg *p)
     strbuf_replace(config, TAG_RELEASE_FLAGS, DEFAULT_RELEASE_FLAGS);
     // package section
     strbuf_replace(config, TAG_NAME, p->name);
+    strbuf_replace(config, TAG_TYPE, TYPE_LBL(p->type));
     strbuf_replace(config, TAG_VERSION, DEFAULT_VERSION);
 
     FREE(cfg_template_path); 

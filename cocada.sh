@@ -8,14 +8,44 @@ help() {
 
 CWD=`pwd`
 CPM_DIR=cpm
-INSTALL_DIR=$HOME/.cocada
-BASH_PROFILE=$HOME/.bash_profile
-ENV_SCRIPT=$INSTALL_DIR/cocadaenv.sh
-DEFAULT_LOCAL_REPO=$INSTALL_DIR/cocada
-LOCAL_REPO_CONF=$INSTALL_DIR/cocadareg.conf
-REMOTE_REPO=https://github.com/paguso/cocada
+DEFAULT_INSTALL_DIR="$HOME/.cocada"
+INSTALL_DIR=$DEFAULT_INSTALL_DIR
+BASH_PROFILE="$HOME/.bash_profile"
+REMOTE_REPO="https://github.com/paguso/cocada"
+
+config_install_dir() {
+    echo "Enter the install destination, or just press Return for the default '$INSTALL_DIR':"
+    read ANS
+    if [ ! "$ANS" = "" ] 
+	then
+        INSTALL_DIR=$ANS 
+    fi 
+    if [ -d $INSTALL_DIR ]
+    then
+		echo ""
+        echo "WARNING: Installation directory $INSTALL_DIR already exists!"
+        echo "Proceeding will PERMANENTLY OVERWRITE its contents."
+        echo "Continue anyway? (Type \"Yes\" to confirm or anything else to abort)"
+        read ANS
+        if [ "$ANS" = "Yes" ] || [ "$ANS" = "yes" ]
+        then
+            echo "Overwriting $INSTALL_DIR"
+			rm -rf $INSTALL_DIR/*
+        else
+			echo 
+            echo "Aborting installation."
+            exit 1
+        fi
+    fi
+	INSTALL_DIR=`readlink -f $INSTALL_DIR`
+    mkdir -p $INSTALL_DIR
+    mkdir -p $INSTALL_DIR/bin
+    mkdir -p $INSTALL_DIR/resources
+}
+
 
 write_env_setup() {
+	ENV_SCRIPT=$INSTALL_DIR/cocadaenv.sh
 	echo "#!/bin/sh" > $ENV_SCRIPT
 	echo "# COCADA environment setup" >> $ENV_SCRIPT
 	echo "export COCADA_HOME=\"$INSTALL_DIR\"" >> $ENV_SCRIPT
@@ -27,6 +57,7 @@ write_env_setup() {
     echo "	;;" >> $ENV_SCRIPT
 	echo "esac" >> $ENV_SCRIPT
 }
+
 
 patch_profile() {
 	write_env_setup
@@ -72,13 +103,15 @@ patch_profile() {
 
 
 config_repo() {
+	DEFAULT_LOCAL_REPO=$INSTALL_DIR/cocada
+	LOCAL_REPO_CONF=$INSTALL_DIR/cocadareg.conf
+	USE_CWD_REPO=false
 	echo ""
 	echo "Configuring COCADA repository"
 	echo "COCADA needs to configure a git repository from which to pull source files."
-	USE_CWD_REPO=false
 	if [ -d $CWD/.git ] && [ -d $CWD/cocada ]
 	then
-		echo "It seem that the current directory $CWD"
+		echo "It seems that the current directory $CWD"
 		echo "is a COCADA git repository. You can choose to:"
 		echo "1. Use the current directory as local repository; or"
 		echo "2. Clone a separate local repository inside the installation directory. (default)"
@@ -114,38 +147,13 @@ install_cpm() {
 	cd $LOCAL_REPO/cpm
 	make release
 	cp $LOCAL_REPO/cpm/build/release/cpm $INSTALL_DIR/bin
+	cp -r $LOCAL_REPO/cpm/resources/* $INSTALL_DIR/resources
 	echo "Done installing CPM"
 }
 
 
 install() {
-    echo "Enter install destination, or just press Return for default '$INSTALL_DIR':"
-    read ANS
-    if [ ! "$ANS" = "" ] 
-	then
-        INSTALL_DIR=$ANS 
-    fi 
-    if [ -d $INSTALL_DIR ]
-    then
-		echo ""
-        echo "WARNING: Installation directory $INSTALL_DIR already exists!"
-        echo "Proceeding will PERMANENTLY OVERWRITE its contents."
-        echo "Continue anyway? (Type \"Yes\" to confirm or anything else to abort)"
-        read ANS
-        if [ "$ANS" = "Yes" ] || [ "$ANS" = "yes" ]
-        then
-            echo "Overwriting $INSTALL_DIR"
-			rm -rf $INSTALL_DIR/*
-        else
-			echo ""
-            echo "Aborting installation."
-            exit 1
-        fi
-    fi
-    mkdir -p $INSTALL_DIR
-    mkdir -p $INSTALL_DIR/bin
-	INSTALL_DIR=`readlink -f $INSTALL_DIR`
-
+	config_install_dir
 	config_repo
 	install_cpm
 	patch_profile 

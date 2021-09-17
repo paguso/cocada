@@ -130,7 +130,7 @@
 
 
 /**
- * @brief Qadrant position type
+ * @brief Quadrant position type
  */
 typedef enum {
 	NW, /**< Northwest = top-left */

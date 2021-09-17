@@ -106,7 +106,6 @@ debugclean:
 
 debug: $(DBG_DIR) $(DBG_OBJS)
 	$(CC) $(DBG_CFLAGS) $(DBG_DIR)/*.$(OBJ_EXT) -lm -o $(DBG_DIR)/$(DBG_EXE) 
-	rm $(DBG_OBJS)
 
 debugrebuild: debugclean debug
 
