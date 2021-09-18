@@ -19,7 +19,7 @@ SRC_EXT      := c
 HEAD_EXT     := h
 OBJ_EXT      := o
 
-COCADA_ROOT			:= ../cocada
+COCADA_ROOT			:= ../libcocada
 COCADA_SRC_DIR		:= $(COCADA_ROOT)/src
 COCADA_SRC_PATHS	:= $(shell find $(COCADA_SRC_DIR)/core -name '*.$(SRC_EXT)') 
 COCADA_SRC_PATHS	+= $(shell find $(COCADA_SRC_DIR)/util -name '*.$(SRC_EXT)') 

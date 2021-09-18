@@ -1,12 +1,34 @@
 #ifndef PKG_H
 #define PKG_H
 
+#include "vec.h"
+
+
 #define SRC_DIR "src"
 #define BUILD_DIR "build"
 #define ERRBUF_SIZE 200
 #define MAIN_BIN_C  "main.c"
 #define MAIN_LIB_C  "lib.c"
 #define MAIN_LIB_H  "lib.h"
+
+
+typedef struct {
+    int major;
+    int minor;
+    int patch;
+    //char *pre_rel;
+    //char *build;
+} pkg_ver;
+
+
+pkg_ver parse_version(const char *vstr);
+
+
+typedef struct {
+    char *name;
+    char *local_repo;
+    char *remote_repo;
+} srcdep;
 
 
 typedef enum {
@@ -22,6 +44,8 @@ typedef struct {
     pkg_type_t type;
     const char *root_path;
     const char *src_path;
+    vec *src_deps;
+    vec *lib_deps;
 } pkg;
 
 

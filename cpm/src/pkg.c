@@ -6,6 +6,16 @@
 #include "strbuf.h"
 #include "env.h"
 
+pkg_ver parse_version(const char *vstr)
+{
+    
+}
+
+
+
+
+
+
 pkg *pkg_new(const char *name,  pkg_type_t type, const char *base_dir)
 {
     pkg *ret = NEW(pkg);
