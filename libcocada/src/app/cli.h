@@ -28,6 +28,8 @@
 #include "hashmap.h"
 #include "vec.h"
 #include "new.h"
+#include "result.h"
+
 
 /**
  * @file cli.h
@@ -422,6 +424,17 @@ void cliparser_add_subcommand(cliparser *cmd, cliparser *subcmd);
 void cliparser_add_option(cliparser *cmd, cliopt *opt);
 
 
+typedef enum {
+	ONE_OF,
+	ALL_OF,
+	ONE_IF_ANY,
+	ALL_IF_ANY
+} clioptcombotype;
+
+
+void cliparser_add_opt_combo(cliparser *cmd, clioptcombotype type, size_t n, ...);
+
+
 /**
  * @brief Adds a positional argument to a (sub)program CLI parser.
  *
@@ -439,19 +452,27 @@ void cliparser_print_help(const cliparser *cmd);
 
 
 typedef enum {
-	PARSE_SUCC = 0,
 	UNPARSED,
 	INVALID_OPTION,
 	INVALID_MULT_OPTION,
 	INVALID_OPT_VAL_NO,
 	MISSING_REQ_OPT,
+	INVALID_OPT_COMBO,
 	INVALID_SUBCMD,
 	UNEXPECTED_TK,
 	INVALID_ARG_VAL,
 	INVALID_ARG_VAL_NO,
 	UNDEF_ERR
-} cliparse_exit_status;
+} cliparse_err_code;
 
+#define CLIPARSE_ERROR_BUFSZ 128
+
+typedef struct {
+	cliparse_err_code code;
+	char msg[CLIPARSE_ERROR_BUFSZ];
+} cliparse_error;
+
+DECL_RESULT_ERR(cliparse, cliparser*, cliparse_error)
 
 /**
  * @brief Parses a program call.
@@ -499,10 +520,10 @@ typedef enum {
  * `3`, `4`, and `5`.
  *
  */
-cliparse_exit_status cliparser_parse(cliparser *cmd, int argc, char **argv);
+cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv);
 
 
-const char *cliparser_parse_status_msg(cliparser *cmd);
+//const char *cliparser_parse_status_msg(cliparser *cmd);
 
 /**
  * @brief Returns the invoked subcommand of a command, if any.

@@ -6,14 +6,23 @@ help() {
 	echo ""
 }
 
+
 CWD=`pwd`
 CPM_DIR=cpm
 DEFAULT_INSTALL_DIR="$HOME/.cocada"
 INSTALL_DIR=$DEFAULT_INSTALL_DIR
 BASH_PROFILE="$HOME/.bash_profile"
 REMOTE_REPO="https://github.com/paguso/cocada"
+INSTALL_STEP=0
+
+install_step() {
+	INSTALL_STEP=`expr $INSTALL_STEP + 1`
+	echo $INSTALL_STEP
+}
+
 
 config_install_dir() {
+	echo
     echo "Enter the install destination, or just press Return for the default '$INSTALL_DIR':"
     read ANS
     if [ ! "$ANS" = "" ] 
@@ -22,7 +31,6 @@ config_install_dir() {
     fi 
     if [ -d $INSTALL_DIR ]
     then
-		echo ""
         echo "WARNING: Installation directory $INSTALL_DIR already exists!"
         echo "Proceeding will PERMANENTLY OVERWRITE its contents."
         echo "Continue anyway? (Type \"Yes\" to confirm or anything else to abort)"
@@ -61,7 +69,7 @@ write_env_setup() {
 
 patch_profile() {
 	write_env_setup
-	echo ""
+	echo 
 	echo "COCADA needs the environment variable \$CODADA_HOME to be defined and added to the PATH"
 	case $SHELL in
 	*"bash" )
@@ -78,7 +86,6 @@ patch_profile() {
 				then 
 					doit=true
 				else
-					echo ""
 					echo "$BASH_PROFILE already contains the following line:"
 					grep -n ". $ENV_SCRIPT" $BASH_PROFILE
 				fi
@@ -106,10 +113,9 @@ config_repo() {
 	DEFAULT_LOCAL_REPO=$INSTALL_DIR/cocada
 	LOCAL_REPO_CONF=$INSTALL_DIR/cocadareg.conf
 	USE_CWD_REPO=false
-	echo ""
-	echo "Configuring COCADA repository"
+	echo 
 	echo "COCADA needs to configure a git repository from which to pull source files."
-	if [ -d $CWD/.git ] && [ -d $CWD/cocada ]
+	if [ -d $CWD/.git ] && [ -d $CWD/libcocada ]
 	then
 		echo "It seems that the current directory $CWD"
 		echo "is a COCADA git repository. You can choose to:"
@@ -134,6 +140,13 @@ config_repo() {
 		then
 			rm -rf $LOCAL_REPO
 		fi
+		echo "The default remote COCADA repository is $REMOTE_REPO."
+		echo "Press Return to use this repo or type an alternative repository address."
+		read ANS
+		if [ "$ANS" != "" ]; then
+			REMOTE_REPO=$ANS
+			echo "Remote repo set to $REMOTE_REPO"
+		fi
 		git clone $REMOTE_REPO $LOCAL_REPO
 	fi
 	echo 
@@ -143,19 +156,29 @@ config_repo() {
 
 
 install_cpm() {
+	echo
 	echo "Installing CPM"
 	cd $LOCAL_REPO/cpm
 	make release
 	cp $LOCAL_REPO/cpm/build/release/cpm $INSTALL_DIR/bin
 	cp -r $LOCAL_REPO/cpm/resources/* $INSTALL_DIR/resources
+	echo
 	echo "Done installing CPM"
 }
 
 
 install() {
+	echo
+	echo "STEP `install_step`: Configure install destination"
 	config_install_dir
+	echo
+	echo "STEP `install_step`: Configure local repository"
 	config_repo
+	echo
+	echo "STEP `install_step`: Install CPM"
 	install_cpm
+	echo
+	echo "STEP `install_step`: Patch user profile"
 	patch_profile 
 }
 

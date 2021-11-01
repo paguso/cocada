@@ -272,10 +272,10 @@ void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 			if (i) strbuf_append_char(dest, '\n');
 			strbuf_append_char(dest, '[');
 			sprintf(lbl, "%*zu", line_label_width, i);
-			strbuf_append(dest, lbl, strlen(lbl));
+			strbuf_nappend(dest, lbl, strlen(lbl));
 			strbuf_append_char(dest, ':');
 			sprintf(lbl, "%*zu", line_label_width, MAX(bv->len, i+bits_per_line));
-			strbuf_append(dest, lbl, strlen(lbl));
+			strbuf_nappend(dest, lbl, strlen(lbl));
 			strbuf_append_char(dest, ']');
 		}
 		if ( i % BYTESIZE == 0 )

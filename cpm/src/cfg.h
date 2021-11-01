@@ -1,33 +1,33 @@
 #ifndef CFG_H
 #define CFG_H
 
+#include <stdio.h>
+
 #include "env.h"
 #include "pkg.h"
 #include "strbuf.h"
+#include "toml.h"
 
 
 #define CONFIG_FILE "cfg.toml"
 
+#define TAG_DEBUG_COMPILER "debug_compiler"
+#define TAG_DEBUG_ARGS "debug_args"
+#define TAG_RELEASE_COMPILER "release_compiler"
+#define TAG_RELEASE_ARGS "release_args"
 
-#define TAG_NAME "{name}"
-#define TAG_TYPE "{type}"
-#define TAG_VERSION "{version}"
-#define TAG_AUTHOR "{author}"
-#define TAG_EMAIL "{e-mail}"
-#define TAG_COMPILER "{compiler}"
-#define TAG_DEBUG_FLAGS "{debug_flags}"
-#define TAG_RELEASE_FLAGS "{release_flags}"
+#define TAG_NAME "name"
+#define TAG_TYPE "type"
+#define TAG_VERSION "version"
+#define TAG_AUTHOR "author"
+#define TAG_EMAIL "e-mail"
 
-#define DEFAULT_NAME "untitled"
-#define DEFAULT_AUTHOR ""
-#define DEFAULT_EMAIL ""
-#define DEFAULT_VERSION "0.1"
-#define DEFAULT_COMPILER "gcc"
-#define DEFAULT_DEBUG_FLAGS "-Wall -g3 -DDEBUG_LVL=3 -DMEM_DEBUG"
-#define DEFAULT_RELEASE_FLAGS "-O3 -DDEBUG_LVL=1"
+#define BRACKET(TAG) "{"TAG"}"
 
-strbuf *create_config(env *e, pkg *p);
 
+pkg *pkg_read_from_cfg(FILE *stream, env *e, strbuf *errbuf);
+
+void pkg_write_to_cfg(FILE *stream, env *e, const pkg *p);
 
 
 #endif

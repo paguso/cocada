@@ -143,7 +143,7 @@ void xstr_to_string (const xstr *xs, strbuf *dest)
 			d[0] = '0' + (n/ord);
 			n = n % ord;
 			ord /= 10;
-			strbuf_append(dest, d, strlen(d));
+			strbuf_nappend(dest, d, strlen(d));
 		}
 	}
 }

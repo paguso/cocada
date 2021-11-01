@@ -132,25 +132,31 @@ void strbuf_set(strbuf *sb, size_t pos, char c)
 }
 
 
-void strbuf_append(strbuf *sb, const char *suff, size_t len)
+void strbuf_nappend(strbuf *sb, const char *src, size_t len)
 {
 	_resize_to(sb, sb->len + len);
-	strcpy(sb->str + sb->len, suff);
+	strcpy(sb->str + sb->len, src);
 	sb->len += len;
 	sb->str[sb->len] = '\0';
 
 }
 
 
+void strbuf_append(strbuf *sb, const char *src)
+{
+	strbuf_nappend(sb, src, strlen(src));	
+}
+
+
 void strbuf_ncat(strbuf *dest, const strbuf *src, size_t n)
 {
-	strbuf_append(dest, (const char *)src->str, MIN(n, src->len));
+	strbuf_nappend(dest, (const char *)src->str, MIN(n, src->len));
 }
 
 
 void strbuf_cat(strbuf *dest, const strbuf *src)
 {
-	strbuf_append(dest, (const char *)src->str, src->len);
+	strbuf_nappend(dest, (const char *)src->str, src->len);
 }
 
 
@@ -168,12 +174,11 @@ void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep)
 	size_t seplen = strlen(sep);
 	for (size_t i=0; i<n; i++) {
 		if (i) {
-			strbuf_append(sb, sep, seplen);
+			strbuf_nappend(sb, sep, seplen);
 		}
-		strbuf_append(sb, arr[i], strlen(arr[i]));
+		strbuf_nappend(sb, arr[i], strlen(arr[i]));
 	}
 }
-
 
 
 const char *strbuf_as_str(strbuf *sb)
@@ -222,7 +227,7 @@ void strbuf_paste(strbuf *sb, size_t from, const char *src, size_t len)
 	} else {
 		size_t hang = len - (sb->len - from);
 		memcpy(sb->str + (from * sizeof(char)), src, (len - hang) * sizeof(char));
-		strbuf_append(sb, src + (len - hang) * sizeof(char), hang);
+		strbuf_nappend(sb, src + (len - hang) * sizeof(char), hang);
 	}
 }
 

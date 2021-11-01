@@ -101,18 +101,23 @@ void strbuf_clear(strbuf *sb);
 void strbuf_set(strbuf *sb, size_t pos, char c);
 
 
-
-/**
- * @brief Appends a copy of the contents of a static string @p suff.
- * @warning The source string @p suff is left untouched.
- */
-void strbuf_append(strbuf *sb, const char *suff, size_t len);
-
-
 /**
  * @brief Appends a character @p c.
  */
 void strbuf_append_char(strbuf *sb, char c);
+
+
+/**
+ * @brief Appends a copy of the first @p len chars of a static string @p str.
+ * @warning No bounds checks performed.
+ */
+void strbuf_nappend(strbuf *sb, const char *src, size_t len);
+
+
+/**
+ * @brief Same as `strbuf_nappend(sb, src, strlen(src))`.
+ */
+void strbuf_append(strbuf *sb, const char *src);
 
 
 /**

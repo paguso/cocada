@@ -60,7 +60,7 @@ char *cstr_clone_len(const char *src, size_t len);
 
 
 /**
- * @brief Changes the contents of @p dest to @p src.
+ * @brief Changes the contents of @p dest to @p src. Use as `dest = cstr_reassign(dest, src);`
  * @return A pointer to the reassigned string.
  * @warning The string @p dest may be relocated if the previous location
  * is not large enough to hold the new value @p src. Make sure to use it

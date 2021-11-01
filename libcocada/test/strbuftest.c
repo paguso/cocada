@@ -93,14 +93,14 @@ void test_strbuf_append(CuTest *tc)
 {
 	memdbg_reset();
 	strbuf *sb = strbuf_new_with_capacity(0);
-	strbuf_append(sb, "", 0);
+	strbuf_nappend(sb, "", 0);
 	CuAssertSizeTEquals(tc, strbuf_len(sb), 0);
-	strbuf_append(sb, "The", 3);
+	strbuf_nappend(sb, "The", 3);
 	CuAssertSizeTEquals(tc, strbuf_len(sb), 3);
 	CuAssertStrEquals(tc, strbuf_as_str(sb), "The");
-	strbuf_append(sb, " quick brown fox", 16);
+	strbuf_nappend(sb, " quick brown fox", 16);
 	CuAssertStrEquals(tc, strbuf_as_str(sb), "The quick brown fox");
-	strbuf_append(sb, " jumps over the lazy dog.", 25);
+	strbuf_nappend(sb, " jumps over the lazy dog.", 25);
 	CuAssertStrEquals(tc, strbuf_as_str(sb), "The quick brown fox jumps over the lazy dog.");
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());

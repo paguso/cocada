@@ -1,6 +1,9 @@
 #ifndef ENV_H
 #define ENV_H
 
+#include "result.h"
+#include "strbuf.h"
+
 #define DIR_SEP "/"  
 #define DIR_PERM 0755
 
@@ -12,23 +15,41 @@
 #define RESOURCES_DIR "resources"
 
 
-#include "strbuf.h"
+typedef struct toolkit {
+    char compiler[30];
+    char linker[30];
+} toolkit;
+
+extern toolkit linux_gcc_toolkit;
+
 
 
 typedef struct 
 {
     const char *home;
     const char *cocada_path;
-    const char *cpm_path;
+    //const char *cpm_path;
     const char *cpm_resources_path;
     const char *cwd;
 } env;
 
 
+/**
+ * @brief Returns a new unintialised environment. The returned environment has to
+ * be initialised via the env_init before use.
+ * @see env_init
+ */
 env *env_new();
 
-void env_init(env *e);
+#define ENV_ERR_BUF_SIZE 128
+typedef struct {
+    char msg[ENV_ERR_BUF_SIZE];
+} env_error;
 
 void env_free(env *e);
+
+DECL_RESULT_ERR(env, env*, env_error);
+
+env_res env_init(env *e);
 
 #endif

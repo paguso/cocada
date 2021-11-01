@@ -1,7 +1,7 @@
-[environment]
-compiler = "{compiler}"
-debug_flags = "{debug_flags}"
-release_flags = "{release_flags}"
+[compiler]
+compiler_cmd = "{compiler_cmd}"
+debug_args = [{debug_args}]
+release_args = [{release_args}]
 
 [package]
 name = "{name}"

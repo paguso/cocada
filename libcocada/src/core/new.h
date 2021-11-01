@@ -606,7 +606,7 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
  * Deallocates an object @p OBJ after checking that it is non-null
  * by calling `stdlib free()`
  */
-#define FREE( OBJ ) if((OBJ)) free(OBJ)
+#define FREE( OBJ ) if((OBJ)) free((void *)(OBJ))
 
 
 #endif

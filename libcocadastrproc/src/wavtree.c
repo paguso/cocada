@@ -729,8 +729,8 @@ void _wt_node_print(wavtree *wt, size_t cur, size_t depth)
 	size_t i;
 	strbuf *dmargin = strbuf_new_with_capacity(2*depth+2);
 	for (i=0; i<depth; i++)
-		strbuf_append(dmargin, "  ", 2);
-	strbuf_append(dmargin, "| ", 2);
+		strbuf_nappend(dmargin, "  ", 2);
+	strbuf_nappend(dmargin, "| ", 2);
 	char *margin = strbuf_detach(dmargin);
 	if (cur >= wt->nnodes) {
 		printf ("%s@wtree_node NULL\n",margin);
