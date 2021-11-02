@@ -15,6 +15,7 @@
 #include "pkg.h"
 #include "toml.h"
 
+
 #define BUFSIZE 255
 void read_file_to_strbuf(strbuf *dest, const char *path)
 {
@@ -32,6 +33,7 @@ void read_file_to_strbuf(strbuf *dest, const char *path)
     strfilereader_close(sfr);
 }
 
+
 void pkg_write_to_cfg(FILE *stream, env *e, const pkg *p)
 {
     fprintf(stream, "[package]\n");
@@ -46,25 +48,8 @@ void pkg_write_to_cfg(FILE *stream, env *e, const pkg *p)
     if (pkg_get_e_mail(p)) {
         fprintf(stream, "%s = \"%s\"\n", TAG_EMAIL, pkg_get_e_mail(p));
     }
+    
 }
-/*{
-    strbuf *config = strbuf_new();
-    char *cfg_template_path = cstr_join(DIR_SEP, 2, e->cpm_resources_path, CONFIG_FILE);
-    read_file_to_strbuf(config, cfg_template_path);
-    // strbuf_append(config, CFG, strlen(CFG));
-    // environment section
-    strbuf_replace(config, BRACKET(TAG_DEBUG_COMPILER), DEFAULT_COMPILER_CMD);
-    strbuf_replace(config, BRACKET(TAG_DEBUG_ARGS), DEFAULT_DEBUG_ARGS);
-    strbuf_replace(config, BRACKET(TAG_RELEASE_ARGS), DEFAULT_RELEASE_ARGS);
-    // package section
-    strbuf_replace(config, BRACKET(TAG_NAME), p->name);
-    strbuf_replace(config, BRACKET(TAG_TYPE), TYPE_LBL(p->type));
-    strbuf_replace(config, BRACKET(TAG_VERSION), DEFAULT_VERSION);
-
-    FREE(cfg_template_path); 
-    return config;    
-}*/
-
 
 
 #define READ_TOML_REQ_DATUM(SERVER, DATUM, TAG, TYPE) \

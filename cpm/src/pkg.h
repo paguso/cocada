@@ -31,60 +31,15 @@
 
 
 typedef enum {
-    BIN_TGT,
-    LIB_TGT,
-    TEST_TGT,
-    DOC_TGT
-} tgt_type_t;
-
-extern const char* const tgt_type_str[];// = {"bin", "lib", "test", "doc"};
-
-typedef enum {
     BIN_PKG,
     LIB_PKG
 } pkg_type_t;
 
 extern const char* const pkg_type_str[];// = {"bin", "lib"};
 
+typedef struct pkg pkg;
+
 typedef struct tgt tgt;
-
-bool is_valid_tgt_name(const char *str);
-
-tgt *tgt_new(char *name, tgt_type_t type);
-
-void tgt_finalise(void *ptr, const finaliser *fnr);
-
-const char *tgt_get_name(tgt *t);
-
-void tgt_set_name(tgt *t, char *name);
-
-tgt_type_t tgt_get_type(tgt *t);
-
-void tgt_set_type(tgt *t, tgt_type_t typ);
-
-const char *tgt_get_build_path(tgt *t);
-
-void tgt_set_build_path(tgt *t, char *path); 
-
-const char *tgt_get_dbg_build_cmd(tgt *t);
-
-void tgt_set_dbg_build_cmd(tgt *t, char *cmd);
-
-const char *tgt_get_rel_build_cmd(tgt *t);
-
-void tgt_set_rel_build_cmd(tgt *t, char *cmd);
-
-void tgt_add_dbg_build_arg(tgt *t, char *arg);
-
-const vec *tgt_get_dbg_build_args(tgt *t);
-
-void tgt_add_rel_build_arg(tgt *t, char *arg);
-
-const vec *tgt_get_rel_build_args(tgt *t);
-
-
-
-typedef struct _pkg pkg;
 
 
 bool is_valid_pkg_name(const char *str);
@@ -119,8 +74,6 @@ void pkg_set_root_path(pkg *p, char *path);
 
 const char *pkg_get_src_path(const pkg *p);
 
-const char *pkg_get_build_path(const pkg *p);
-
 const char *pkg_get_cfg_file_path(const pkg *p);
 
 void pkg_add_target(pkg *p, tgt *t);
@@ -128,22 +81,52 @@ void pkg_add_target(pkg *p, tgt *t);
 const vec *pkg_get_targets(pkg *p);
 
 
-/*
-const char *pkg_get_debug_compiler(pkg *p);
 
-void pkg_set_debug_compiler(pkg *p, char *cmd);
 
-const vec* pkg_get_debug_args(pkg *p);
+typedef enum {
+    TGT_BIN,
+    TGT_LIB,
+} tgt_type_t;
 
-void pkg_add_debug_arg(pkg *p, char *arg);
+extern const char* const tgt_type_str[];// = {"bin", "lib", "test", "doc"};
 
-const char *pkg_get_release_compiler(pkg *p);
 
-void pkg_set_release_compiler(pkg *p, char *cmd);
+typedef enum {
+    TGT_LIB_STATIC,
+    TGT_LIB_DYNAMIC
+} tgt_lib_type_t;
 
-const vec* pkg_get_release_args(pkg *p);
+extern const char* const tgt_lib_type_str[];// = {"debug", "release"};
 
-void pkg_add_release_arg(pkg *p, char *arg);
-*/
+
+typedef enum {
+    TGT_DEBUG,
+    TGT_RELEASE
+} tgt_mode_t;
+
+extern const char* const tgt_mode_str[];// = {"debug", "release"};
+
+
+bool is_valid_tgt_name(const char *str);
+
+
+void tgt_finalise(void *ptr, const finaliser *fnr);
+
+const char *tgt_get_name(tgt *t);
+
+void tgt_set_name(tgt *t, char *name);
+
+tgt_type_t tgt_get_type(tgt *t);
+
+void tgt_set_type(tgt *t, tgt_type_t typ);
+
+tgt_mode_t tgt_get_mode(tgt *t);
+
+void tgt_set_mode(tgt *t, tgt_mode_t mode);
+
+const char *tgt_get_output_path(tgt *t);
+
+void tgt_set_output_path(tgt *t, char *path); 
+
 
 #endif

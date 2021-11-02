@@ -16,12 +16,14 @@
 
 
 typedef struct toolkit {
-    char compiler[30];
-    char linker[30];
+    char name[16];
+    char compiler[16];
+    char linker[16];
 } toolkit;
 
 extern toolkit linux_gcc_toolkit;
 
+extern toolkit *default_toolkit;
 
 
 typedef struct 
@@ -31,6 +33,7 @@ typedef struct
     //const char *cpm_path;
     const char *cpm_resources_path;
     const char *cwd;
+    const toolkit *tkt;
 } env;
 
 

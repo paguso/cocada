@@ -14,9 +14,12 @@
 
 
 toolkit linux_gcc_toolkit = {
+    .name = "linux-gcc",
     .compiler = "gcc -c",
     .linker = "gcc"
 };
+
+toolkit *default_toolkit = &linux_gcc_toolkit;
 
 
 static bool dir_exists(const char *path)
@@ -103,6 +106,7 @@ env_res env_init(env *e)
     init_cocada_paths(e, &result);
     if (!result.ok) return result;
     init_cwd(e, &result);
+    e->tkt = default_toolkit;
     return result;
 }
 

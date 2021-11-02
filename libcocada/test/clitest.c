@@ -37,7 +37,6 @@ static cliparser *cmd;
 
 static void test_setup()
 {
-	/*
 	cmd = cliparser_new("test", "A Test Program");
 	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
 	vec *choices = vec_new(sizeof(char *));
@@ -50,7 +49,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'b',
 	                        cstr_clone("bbb"),
 	                        cstr_clone("non-mandatory single option with one boolean value"),
@@ -62,15 +61,15 @@ static void test_setup()
 	vec_push_long(def,4321);
 	vec_push_long(def,2143);
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'c',
 	                        cstr_clone("ccc"),
-	                        cstr_clone("non-mandatory multiple option with two int values"),
+	                        cstr_clone("non-mandatory multiple option with two to five int values"),
 	                        OPT_OPTIONAL, OPT_MULTIPLE, ARG_INT, 2, 5, NULL, def
 	                    )
 	                   );
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'd',
 	                        cstr_clone("ddd"),
 	                        cstr_clone("mandatory single option with one string value"),
@@ -78,7 +77,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'e',
 	                        cstr_clone("eee"),
 	                        cstr_clone("non-mandatory multiple option with one tp three file value"),
@@ -86,7 +85,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'f',
 	                        cstr_clone("fff"),
 	                        cstr_clone("non-mandatory single option with unlimited float values"),
@@ -94,7 +93,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(cmd,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'g',
 	                        cstr_clone("ggg"),
 	                        cstr_clone("non-mandatory single option three or more  values"),
@@ -120,7 +119,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(scmd1,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'k',
 	                        cstr_clone("kkk"),
 	                        cstr_clone("mandatory single option with one boolean value"),
@@ -128,7 +127,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(scmd1,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'l',
 	                        cstr_clone("lll"),
 	                        cstr_clone("non-mandatory multiple option with two values"),
@@ -136,7 +135,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(scmd1,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'm',
 	                        cstr_clone("mmm"),
 	                        cstr_clone("non-mandatory single option with no value"),
@@ -144,7 +143,7 @@ static void test_setup()
 	                    )
 	                   );
 	cliparser_add_option(scmd1,
-	                    cliopt_new_valued(
+	                    cliopt_new(
 	                        'n',
 	                        cstr_clone("nnn"),
 	                        cstr_clone("non-mandatory single option with one string value"),
@@ -161,26 +160,6 @@ static void test_setup()
 	                     cliarg_new_multi("arg3", "third file argument", ARG_FILE)
 	                    );
 	cliparser_add_subcommand(cmd, scmd1);
-	*/
-	vec *choices = vec_new(sizeof(char *));
-	vec_push_rawptr(choices, cstr_clone("plain"));
-	vec_push_rawptr(choices, cstr_clone("fasta"));
-	//vec_push_rawptr(choices, cstr_clone("index"));
-	vec *deftype = vec_new(sizeof(char *));
-	vec_push_rawptr(deftype, cstr_clone("fasta"));
-	cmd = cliparser_new("vmat", "Variable Minimizer Alignment Tool");
-	cliparser *index = cliparser_new("index",
-	                                 "Create variable-sized minimiser index");
-	cliparser_add_option(index, cliopt_new('w', "window-size", "window sizes",
-	                                       OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparser_add_option(index, cliopt_new('k', "kmer-size", "kmer sizes",
-	                                       OPT_REQUIRED, OPT_SINGLE, ARG_INT, 1, 3, NULL, NULL));
-	cliparser_add_option(index, cliopt_new('t',"input-type",
-	                                       "Input sequence file type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, choices,
-	                                       deftype));
-	cliparser_add_pos_arg(index, cliarg_new("sequence file", "Input sequence file",
-	                                        ARG_FILE));
-	cliparser_add_subcommand(cmd, index);
 
 }
 
@@ -190,13 +169,6 @@ static void test_teardown()
 	DESTROY_FLAT(cmd, cliparser);
 }
 
-
-void test_cli_help(CuTest *tc)
-{
-	test_setup();
-	cliparser_print_help(cmd);
-	test_teardown();
-}
 
 static char **make_argv(char *call, int *argc)
 {
@@ -219,6 +191,7 @@ static char **make_argv(char *call, int *argc)
 	return argv;
 }
 
+
 void freeargv(int argc, char **argv)
 {
 	for (int i=0; i<argc; i++)
@@ -232,21 +205,14 @@ void test_cli_parse(CuTest *tc)
 	test_setup();
 
 	int argc;
-	//char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
-	char call[] = "vmat index -w 20 30 -k 5 15 input.fasta";
-	//char call[] = "vmat index --help";
+	char call[] = "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
 	char **argv = make_argv(call, &argc);
 
-	cliparser_parse(cmd, argc, argv);
-
-	const cliparser *subcmd = cliparser_active_subcommand(cmd);
-	const vec *tvals = cliparser_opt_val_from_shortname(subcmd, 't');
-	CuAssertSizeTEquals(tc, 1, vec_len(tvals));
-	CuAssertStrEquals(tc, "fasta", (char *)vec_first_rawptr(tvals));
+	cliparse_res result = cliparser_parse(cmd, argc, argv, false);
+	CuAssert(tc, "CLI Parse error", result.ok);
 
 	freeargv(argc, argv);
-
-
+	
 	test_teardown();
 }
 
@@ -254,7 +220,6 @@ void test_cli_parse(CuTest *tc)
 CuSuite *cli_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	//SUITE_ADD_TEST(suite, test_cli_help);
 	SUITE_ADD_TEST(suite, test_cli_parse);
 	return suite;
 }

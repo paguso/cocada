@@ -271,7 +271,7 @@ typedef enum {
 /**
  * @brief Indicates an unlimited number of option/argument values
  */
-#define ARGNO_UNLIMITED  SIZE_MAX
+#define ARGNO_UNLIMITED INT_MAX
 
 
 /**
@@ -309,25 +309,6 @@ typedef struct _cliarg cliarg;
  * cannot contain sub-subprograms),
  */
 typedef struct _cliparser cliparser;
-
-
-/**
- * @brief Creates a new option with default characteristics.
- * Default characteristics are:
- * - Optional (non-mandatory)
- * - Single usage (can appear at most once per program call)
- * - No associated value (boolean switch).
- * @param shortname (**no transfer**) The one-character distinct name
- * @param longname  (**no transfer**) The multi-character distinct name
- * @param help      (**no transfer**) A short description of the option
- *                  used for help messages.
- *
- * This is equivalent to
- * ```C
- * clopt_new_valued(shortname, longname, help, OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL )
- * ```
- */
-cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
 
 
 /**
@@ -381,6 +362,26 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
                    cliargtype type, int min_val_no, int max_val_no,
                    vec *choices, vec *defaults );
 
+
+/**
+ * @brief Creates a new option with default settings:
+ * - Optional (non-mandatory)
+ * - Single usage (can appear at most once per program call)
+ * - No associated value (boolean switch).
+ * 
+ * @param shortname (**no transfer**) The one-character distinct name
+ * @param longname  (**no transfer**) The multi-character distinct name
+ * @param help      (**no transfer**) A short description of the option
+ *                  used for help messages.
+ *
+ * This is equivalent to
+ * ```C
+ * clopt_new(shortname, longname, help, OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL )
+ * ```
+ */
+cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
+
+
 /**
  * @brief Creates a new short circuit (sc) option.
  * @see cliopt_new
@@ -401,7 +402,6 @@ cliopt *cliopt_new_sc_defaults(char shortname,  char *longname, char *help);
  * @brief Returns the option shortname.
  */
 const char cliopt_shortname(const cliopt *opt);
-
 
 
 /**

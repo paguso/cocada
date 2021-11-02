@@ -48,7 +48,7 @@ struct _cliopt {
 	char *longname;		/* Long option name e.g. foo (--foo) */
 	char *help;			/* Help description */
 	clioptneed need;	/* true=mandatory argument(default); false=optional */
-	bool sc;
+	bool sc;			/* Is short-circuit option? */
 	clioptmultiplicity
 	multi;				/* true=can be declared multiple times, false=can appear only once(default) */
 	cliargtype type;	/* The type of option values */
