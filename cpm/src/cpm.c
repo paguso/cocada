@@ -61,15 +61,6 @@ void new(const cliparser *newclip)
 
     pkg *p = pkg_new(cstr_clone(pkg_name), pkg_type,  pkg_version, cstr_clone(e->cwd));
 
-    /*
-    if (pkg_type == BIN_PKG) {
-        tgt *t = tgt_new(cstr_clone("debug"), BIN_TGT);
-        tgt_set_build_path(t, cstr_join(DIR_SEP, 2, pkg_get_build_path(p), "debug"));
-        tgt_set_dbg_build_cmd(t, cstr_clone(tk.compiler));
-    } else if (pkg_type == LIB_PKG) {
-
-    }*/
-
     // create root dir
     if (mkdir(pkg_get_root_path(p), DIR_PERM)) {
         ERROR("Unable to create package root dir: %s.\n", strerror(errno));
@@ -118,8 +109,8 @@ cliparser *init_cliparser()
     vec *mod_default = vec_new(sizeof(char *));
     vec_push_cstr(mod_default, cstr_clone(BIN_TYPE));
     cliparser_add_option(newclip, 
-        cliopt_new( TYPE_OPT, "type", "Module type", OPT_OPTIONAL, OPT_SINGLE, ARG_CHOICE, 1, 1, 
-                    mod_types, mod_default ));
+        cliopt_new( TYPE_OPT, "type", "Module type", OPT_OPTIONAL, 
+            OPT_SINGLE, ARG_CHOICE, 1, 1, mod_types, mod_default ));
     cliparser_add_subcommand(clip, newclip);
     // Config subconmmand
     cliparser *configclip = cliparser_new(CONFIG_CMD, "Configure current package.");
@@ -131,7 +122,7 @@ cliparser *init_cliparser()
         dopt = cliopt_new( 'd', "debug", "debug build", OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL)); 
     cliparser_add_option(buildclip,
         bopt = cliopt_new( 'r', "release", "release build", OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL)); 
-    cliparser_add_opt_combo(buildclip, ONE_IF_ANY, 2, bopt, dopt);
+    cliparser_add_option_combo(buildclip, ONE_IF_ANY, 2, bopt, dopt);
     cliparser_add_subcommand(clip, buildclip);
     return clip;
 }
@@ -141,7 +132,7 @@ int main(int argc, char **argv)
 {
     memdbg_reset();
     cliparser *clip = init_cliparser();    
-    cliparse_res result = cliparser_parse(clip, argc, argv);
+    cliparse_res result = cliparser_parse(clip, argc, argv, true);
     if ( !result.ok ) {
         ERROR("%s\n", result.res.err.msg);
         goto cleanup;
@@ -149,6 +140,11 @@ int main(int argc, char **argv)
     const cliparser *act = cliparser_active_subcommand(clip);
     if (act == NULL) {
         cliparser_print_help(clip);
+        goto cleanup;
+    }
+    const cliopt *sc_opt = cliparser_active_sc_option(clip);
+    if (sc_opt && cliopt_shortname(sc_opt) == 'h') {
+        cliparser_print_help(act);
         goto cleanup;
     }
     else if (!strcmp(cliparser_name(act), NEW_CMD)) {

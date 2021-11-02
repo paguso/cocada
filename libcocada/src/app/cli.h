@@ -98,7 +98,31 @@
  * or either *multiple* times. For example, the `gcc -I <include dir>`
  * option can be declared multiple times for specifying several
  * directories where to look for the header files.
+ * 
+ * ## Short-circuit (s/c) options
+ * 
+ * A short-circuit option is an option that, when found, causes the CLI 
+ * parse to be interrupted and other options  and positional arguments to 
+ * be ignored.  The archeypical example of such an option is the 
+ * `--help (-h)` option, which ususally signals that the program should 
+ * print the usage help message and exit.
+ * The s/c help function is automatically added to every command. 
+ * Another very common example is  the `--version (-v)`.
+ * A s/c option is meant to be used alone, is always optional and can 
+ * be used at most once. It can however take values just like other options.
+ * As soon as the first s/c option is  found in a program call, the parsing
+ * is interrupted and further validations concerning other options and 
+ * positional arguments are ignored, even though some of them might have 
+ * already been performed.
+ * 
+ * ## Option combos
+ * 
+ * Sometimes there can be dependencies between options. For example, 
+ * there can be a situation in which if an option is used, then a 
+ * complementary option should also be used. COCADA lets such dependencies
+ * be specified via "option combos" ::clioptcombotype.
  *
+ *  
  * # Positional arguments
  *
  * The required inputs to a program are given as a list of positional
@@ -257,6 +281,18 @@ typedef struct _cliopt cliopt;
 
 
 /**
+ * @brief Option combo type which specifies how groups of inderdependent 
+ * options should be used together.
+ */
+typedef enum {
+	ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
+	ALL_OF,		/**< All of the options in the combo should be used. **/
+	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
+	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
+} clioptcombotype;
+
+
+/**
  * @brief CLI Positional argument type (opaque)
  */
 typedef struct _cliarg cliarg;
@@ -295,7 +331,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
 
 
 /**
- * @brief Creates a new option.
+ * @brief Creates a new non-sc option.
  *
  * @param shortname		(**no transfer**) The one-character distinct name
  * @param longname		(**no transfer**) The multi-character distinct name
@@ -344,6 +380,28 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
                    clioptneed need, clioptmultiplicity multiplicity,
                    cliargtype type, int min_val_no, int max_val_no,
                    vec *choices, vec *defaults );
+
+/**
+ * @brief Creates a new short circuit (sc) option.
+ * @see cliopt_new
+ */
+cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
+                   cliargtype type, int min_val_no, int max_val_no,
+                   vec *choices, vec *defaults );
+
+
+/**
+ * @brief Creates a new short circuit (sc) option with default settings.
+ * @see cliopt_new_defaults
+ */
+cliopt *cliopt_new_sc_defaults(char shortname,  char *longname, char *help);
+
+
+/**
+ * @brief Returns the option shortname.
+ */
+const char cliopt_shortname(const cliopt *opt);
+
 
 
 /**
@@ -424,15 +482,14 @@ void cliparser_add_subcommand(cliparser *cmd, cliparser *subcmd);
 void cliparser_add_option(cliparser *cmd, cliopt *opt);
 
 
-typedef enum {
-	ONE_OF,
-	ALL_OF,
-	ONE_IF_ANY,
-	ALL_IF_ANY
-} clioptcombotype;
-
-
-void cliparser_add_opt_combo(cliparser *cmd, clioptcombotype type, size_t n, ...);
+/**
+ * @brief Adds an option combo specification to the parser. A variable 
+ * list of  @p n cliopt  references should be passed as arguments.
+ * 
+ * @warning The combo specifies the dependencies between the options only,
+ * and they must be independently added via ::cliparser_add_option.
+ */
+void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n, ...);
 
 
 /**
@@ -451,6 +508,9 @@ void cliparser_add_pos_arg(cliparser *cmd, cliarg *arg);
 void cliparser_print_help(const cliparser *cmd);
 
 
+/**
+ * @brief CLI parse error codes
+ */
 typedef enum {
 	UNPARSED,
 	INVALID_OPTION,
@@ -467,22 +527,30 @@ typedef enum {
 
 #define CLIPARSE_ERROR_BUFSZ 128
 
+/**
+ * CLI parse error result type.
+ */
 typedef struct {
 	cliparse_err_code code;
 	char msg[CLIPARSE_ERROR_BUFSZ];
 } cliparse_error;
 
+
 DECL_RESULT_ERR(cliparse, cliparser*, cliparse_error)
 
 /**
  * @brief Parses a program call.
+ * 
  * If the call is sucessfully parsed, the @p cmd is populated with the
  * option and argument values, including default values for undeclared
- * non-required options, if available. If a parse error occurs, an error message
- * id printed to stderr and the program exits.
+ * non-required options, if available. If a parse error occurs, an error object
+ * cliparser_error is returned containing an error message, unless the 
+ * paramater @p exit_on_error is set to true, in which case the error message
+ * is printed to stderr and the program exits.
  *
  * @param argc The number of tokens (normally received by main())
  * @param argv (*no transfer*) The program call tokens (also received by main())
+ * @param exit_on_error Indicates whether the program should exit if a parse error is found.
  *
  * The parser assumes @p argv to contain the tokens of a program call to be
  * parsed according to the CLI grammar shown in the module
@@ -520,7 +588,7 @@ DECL_RESULT_ERR(cliparse, cliparser*, cliparse_error)
  * `3`, `4`, and `5`.
  *
  */
-cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv);
+cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv, bool exit_on_error);
 
 
 //const char *cliparser_parse_status_msg(cliparser *cmd);
@@ -532,6 +600,15 @@ cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv);
  * corresponding (populated) parser, else returns NULL.
  */
 const cliparser *cliparser_active_subcommand(const cliparser *cmd);
+
+
+/**
+ * @brief Returns the declared sc option of a (sub)command, if any.
+ * @return Prior to parsing a call with ::cliparser_parse(cmd), returns NULL.
+ * After parsing a call, if an sc option was declared, returns the
+ * corresponding (populated) cliopt, else returns NULL.
+ */
+const cliopt* cliparser_active_sc_option(const cliparser *cmd);
 
 
 /**
