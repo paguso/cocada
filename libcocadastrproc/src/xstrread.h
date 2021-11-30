@@ -31,7 +31,7 @@
 typedef struct _xstrread xstrread;
 
 
-typedef struct _xstrread_vt {
+typedef struct {
 	void 	 (*reset) (xstrread *self);
 	xchar_wt (*getch) (xstrread *self);
 	size_t   (*read) (xstrread *self, xstr *dest, size_t n);
