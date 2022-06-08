@@ -9,11 +9,13 @@
 
 
 # library identification and version
-LIB_NAME     := cocadastrproc
-LIB_MAJOR    := 0
-LIB_MINOR    := 1
-LIB_RELEASE  := 1
+lib_name     := cocadastrproc
+lib_major    := 0
+lib_minor    := 1
+lib_release  := 1
 
-DEP_LIBS		:= cocada
+# library dependencies (only direct compilation dependencies)
+lib_deps	 := cocada
+
 
 include ../lib.mk

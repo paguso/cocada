@@ -9,11 +9,13 @@
 
 
 # library identification and version
-LIB_NAME     := cocadabio
-LIB_MAJOR    := 0
-LIB_MINOR    := 1
-LIB_RELEASE  := 1
+lib_name     := cocadabio
+lib_major    := 0
+lib_minor    := 1
+lib_release  := 1
 
-DEP_LIBS		:= cocada cocadastrproc
+# library dependencies (only direct compilation dependencies)
+lib_deps	 := cocada cocadastrproc
+
 
 include ../lib.mk

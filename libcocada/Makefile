@@ -9,17 +9,13 @@
 
 
 # library identification and version
+lib_name     := cocada
+lib_major    := 0
+lib_minor    := 1
+lib_release  := 1
 
-LIB_NAME     := cocada
-LIB_MAJOR    := 0
-LIB_MINOR    := 1
-LIB_RELEASE  := 1
+# library dependencies (only direct compilation dependencies)
+lib_deps	 :=
 
-# dependency libraries
-
-DEP_LIBS		:=
-
-
-# include library build recipes
 
 include ../lib.mk

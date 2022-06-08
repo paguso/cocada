@@ -5,7 +5,7 @@
 
 ## What is COCADA?
 
-COCADA is a C programming library, or rather a collection of libraries. It is composed of assorted things that I have written and used in my personal projects, and decided to start getting organised. COCADA is intended mainly for the author's educational and academic work. Although it can be used for any purpose, it has not been thoroughly tested neither it comes with any guarantees. It is also a perpetual work in progress. 
+COCADA is a C programming collection of libraries. It is composed of assorted things that I have written and used in my personal projects. COCADA is intended mainly for the author's educational and academic work, it has not been thoroughly tested, and it comes with no guarantees. It is also a perpetual work in progress. 
 
 ## What about the name?
 
@@ -15,10 +15,10 @@ First and foremost, COCADA is a traditional sweet from the Northeast of Brazil, 
 
 COCADA is composed of interdependent sub-libraries or modules. Currently, they are
 
-- **libcocada** This is the basic stuff upon which the rest is constructed. It contains convenience abstractions over low-level C-language constructs, minimal infrastructure for the object model used by most other modules, common ADT for dynamic collections such as vectors, hashtables and trees, and support for I/O and user interaction
-- **libcocadastrproc** String-processing (matching, indexing) data structures and algorithms
-- **libcocadabio** Bioinformatics-related stuff
-- **libcocadasketch** Data Sketches (mainly) for big data streaming applications
+- **libcocada** is the basic stuff upon which the rest is constructed. It contains convenience abstractions over low-level C-language constructs, minimal infrastructure for the object model used by most other modules, common ADT for dynamic collections such as vectors, hashtables and trees, and support for I/O and user interaction
+- **libcocadastrproc** contains string-processing (matching, indexing) data structures and algorithms
+- **libcocadabio** contains Bioinformatics-related stuff
+- **libcocadasketch** contains Data Sketches (mainly) for big data streaming applications
 
 The dependency graph is as follows
 
@@ -29,12 +29,12 @@ libcocadasketh
   |              |       |
   |              v       |
   |  libcocadastrproc    |
-   \    \               /
-    \    \             /
-     \___ \__    _____/
-         |   |  |
-         v   v  v  
-        libcocada
+   \         |          /
+    \        |         /
+     \___    |    ____/
+         |   |   |
+         v   v   v  
+         libcocada
 ```
 
 I plan to keep the libraries free from cyclic dependencies.
