@@ -46,45 +46,60 @@ COCADA libraries can be used in a few different ways. First you can just copy th
 
 #### Installing COCADA as a static library
 
-Each COCADA library has a separate Makefile. In order to build the static library, `cd` to the library directory and run
+In order to build and install a COCADA static library, we just have to `cd` to the library directory and run
 
 ```
 $ make staticlib
 ```
 
-This will compile the source files and create one static library for each library in the dependency path. The static libraries `.a` files will be put into the `build/lib/static` subdir. For example, if you do
+This will compile the source files and create one static archive for each library in the dependency closure. Generally speaking, when a library `A` depends on library `B`, both libraries will be built and installed (almost) independently. It is important to understand how exactly this is done in order to use and update the libraries correctly.
+
+Let's take for example the `codadabio` library. This library depends on `cocadastrproc` and `cocada`, with `cocadastrproc` also depending itself on `cocada`, and therefore the dependency closure consists of these three libraries.  Thus if we run
 
 ```
 $ cd libcocadabio
 $ make staticlib
 ```
 
-Then the libcocadabio could look like something as
+we would end up with something like this
 
 ```
-libcocadabio/
-├── build
-│   ├── debug/ 
-│   ├── lib
-│   │   ├── shared/
-│   │   └── static
-│   │       ├── include
-│   │       │   ├── alphabet.h
-│   │       │   ├── arrays.h
-│   │       │   ... 
-│   │       ├── libcocada.a
-│   │       ├── libcocadabio.a
-│   │       └── libcocadastrproc.a
-│   └── release/
-│   Makefile
-├── src/
+.
+├── libcocada
+│   ├── build
+│   │   ├── libcocada.a
+│   │   ├── lib.deps
+│   │   └── release/
+│   ├── Makefile
+│   ├── src/
+│   └── test/
+├── libcocadabio
+│   ├── build
+│   │   ├── libcocadabio.a
+│   │   ├── lib.deps
+│   │   └── release/
+│   ├── Makefile
+│   ├── src/
+│   └── test/
+...
+├── libcocadastrproc
+│   ├── build
+│   │   ├── libcocadastrproc.a
+│   │   ├── lib.deps
+│   │   └── release/
+│   ├── Makefile
+│   ├── src
+│   └── test
+├── lib.mk
 ...
 ```
-Notice in particular the three `.a` files and the `include/` subdir that will contain all the header files used in these three libraries.
+Notice that all the three libraries in the dependency closure were compiled for `release`, and the archives `libcocada.a`, `libcocadastrproc.a` and `libcocadabio.a` were created from the object files, and each put in the `build` subdirectory of the corresponding library.
 
-By default this static library file will be copied to the`/usr/local/lib/cocada`, and the header (`.h`) files will be copied to `/usr/local/include/cocada`.
+After that, the just-built libraries are copied to `/use/local/lib` (or another directory given to the makefile via the `static_install_dir` variable - run `make help` for more instructions). In addition to that, the `.h` header files of each library are copied to a separate subirectory inside `usr/local/include`, named after the library. 
 
-> NOTE: You will need writing permissions to the system directory `/usr/local/` which means you will likely need to run make via [sudo](http://www.sudo.ws/man/sudo.man.html).
+> NOTE: You will need writing permissions to the system directory `/usr/local/` which means that you might be prompted for the appropriate password required by [sudo](http://www.sudo.ws/man/sudo.man.html).
+
+This modular installation procedure results in all sublibraries in the dependency closure to be independently available for use as a static library. However this also implies that if we update one of the libraries later, this will likely break or cause inconsitencies with the other installed libraries that depend on it. In our example, if we later update the `cocadastrproc` library, this will trigger the update of the `cocada` base library, but **not** the `cocadabio` library. It is therefore advisable to update **all** installed cocada libraries at once.
 
 
 #### Installing COCADA as a shared library

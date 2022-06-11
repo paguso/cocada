@@ -24,13 +24,13 @@ VPATH += $(test_src_dirs)
 
 build_dir = ./build
 debug_build_dir = $(build_dir)/debug
+release_build_dir = $(build_dir)/release
+target_build_dir = $(build_dir)/$(build_type)
 
 INCLUDE_CFLAGS = $(addprefix -I, $(lib_hdr_dirs) $(test_hdr_dirs) $(all_deps_hdr_dirs)) 
 
-ALL_CFLAGS = $(INCLUDE_CFLAGS) $(CFLAGS)
-
 $(build_dir):
-	mkdir -p $(build_dir)
+	mkdir -p $@ 
 
 .PHONY: help
 
@@ -61,15 +61,15 @@ reset_deps_%:
 	cd ../$(@:reset_deps_%=lib%) && $(MAKE) reset_deps
 
 grab_deps: $(addprefix grab_deps_, $(lib_deps))
-	@echo "grab_deps for $(lib_name) chain is $(dep_chain)"
-	@echo "(foreach f, $(chain_deps_files), (shell echo -n "$(lib_name) " >> (f)))"
+#	@echo "grab_deps for $(lib_name) chain is $(dep_chain)"
+#	@echo "(foreach f, $(chain_deps_files), (shell echo -n "$(lib_name) " >> (f)))"
 	$(foreach f, $(chain_deps_files), $(shell echo -n "$(lib_name) " >> $(f)))
 
 grab_deps_%:
 	cd ../$(@:grab_deps_%=lib%) && $(MAKE) grab_deps
 	
 deps: reset_deps grab_deps ;
-	@echo "INCLUDES $(all_deps_hdr_dirs)"
+#	@echo "INCLUDES $(all_deps_hdr_dirs)"
 
 all_deps = $(sort $(shell cat $(deps_file)))
 all_deps_hdr_paths = $(foreach lib, $(all_deps), $(shell find ../lib$(lib)/$(src_dir) -name '*.h'))
@@ -84,18 +84,18 @@ strict_deps = $(filter-out $(lib_name), $(all_deps))
 
 # Debug compiler extra flags
 
-DEBUG_CFLAGS = -Wall -g3
-DEBUG_CFLAGS += -DDEBUG_LVL=3 
-DEBUG_CFLAGS += -DMEM_DEBUG   
-DEBUG_CFLAGS += -DXCHAR_BYTESIZE=4
-
-# Recursively build library and its prerequisite libraries for debugging
+debug_cflags = -Wall -g3
+debug_cflags += -DDEBUG_LVL=3 
+debug_cflags += -DMEM_DEBUG   
+debug_cflags += -DXCHAR_BYTESIZE=4
 
 $(debug_build_dir):
 	mkdir -p $@
 
 $(debug_build_dir)/%.o: %.c
-	$(CC) -c $(ALL_CFLAGS) $< -o $@
+	$(CC) -c $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $< -o $@
+
+# Recursively build library and its prerequisite libraries for debugging
 
 debug_lib_deps = $(addprefix debug_lib_build_,$(lib_deps))
 
@@ -108,30 +108,108 @@ $(debug_lib_objs): | $(debug_build_dir)
 
 .PHONY: debug_lib_build
 
-debug_lib_build: CFLAGS += $(DEBUG_CFLAGS)
 debug_lib_build: deps $(debug_lib_deps) $(debug_lib_objs) ;
 
 
-# Finish debug build by adding tests
+# Add tests to debug build
 
 debug_test_objs = $(patsubst %.c,$(debug_build_dir)/%.o,$(test_srcs))
 
 $(debug_test_objs): | $(debug_build_dir)
 
 .PHONY: debug_test_build 
-debug_test_build: CFLAGS += $(DEBUG_CFLAGS)
 debug_test_build: deps $(debug_test_objs) ;
 
+debug_strict_deps_objs = $(foreach lib, $(strict_deps), \
+	$(patsubst %.c, ../lib$(lib)/$(debug_build_dir)/%.o,\
+		$(notdir $(shell find ../lib$(lib)/$(src_dir) -name '*.c'))))
 
-strict_deps_objs = $(foreach lib, $(strict_deps), \
-	$(patsubst %.c, ../lib$(lib)/build/debug/%.o,\
-		$(notdir $(shell find ../lib$(lib)/src -name '*.c'))))
+# Wrap debug build as libraries + tests
 
-.PHONY: debug 
+.PHONY: debug release 
 debug: debug_lib_build debug_test_build 
-	$(CC) $(CFLAGS) $(strict_deps_objs) $(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
+	$(CC) $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $(debug_strict_deps_objs) $(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
 
+
+
+
+relase_cflags =  -O3
+relase_cflags += -DDEBUG_LVL=1 
+relase_cflags += -DXCHAR_BYTESIZE=4
+
+$(release_build_dir):
+	mkdir -p $@
+
+$(release_build_dir)/%.o: %.c
+	$(CC) -c $(INCLUDE_CFLAGS) $(relase_cflags) $(CFLAGS) $< -o $@
+
+# Recursively build library and its prerequisite libraries 
+
+release_lib_deps = $(addprefix release_lib_build_,$(lib_deps))
+
+release_lib_build_%: 
+	cd ../$(@:release_lib_build_%=lib%) && $(MAKE) release_lib_build
+
+release_lib_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(lib_srcs))
+
+$(release_lib_objs): | $(release_build_dir)
+
+.PHONY: release_lib_build
+
+release_lib_build: deps $(release_lib_deps) $(release_lib_objs) ;
+
+release_strict_deps_objs = $(foreach lib, $(strict_deps), \
+	$(patsubst %.c, ../lib$(lib)/$(release_build_dir)/%.o,\
+		$(notdir $(shell find ../lib$(lib)/$(src_dir) -name '*.c'))))
+
+.PHONY: release
+release: release_lib_build
+#	$(CC) $(INCLUDE_CFLAGS) $(relase_cflags) $(CFLAGS) $(release_strict_deps_objs) $(target_build_dir)/*.o -lm -o $(target_build_dir)/$(build_type)
+
+
+
+
+staticlib_name = lib$(lib_name).a
+staticlib_deps = $(addprefix staticlib_build_, $(lib_deps))
+
+staticlib_build_%:
+	cd ../$(@:staticlib_build_%=lib%) && $(MAKE) staticlib_build
+
+dep_objs=$(patsubst %.c, %.o,\
+	$(addprefix ../lib$(1)/$(release_build_dir)/,\
+	$(notdir $(shell find ../lib$(1)/$(src_dir) -name *.c))))
+
+staticlib_build: $(staticlib_deps) release 
+	ar rcs $(build_dir)/lib$(lib_name).a\
+		$(foreach lib,$(lib_deps),$(call dep_objs,$(lib)))\
+		$(release_lib_objs)
+
+
+include_dir = /usr/local/include/$(lib_name)
+static_install_dir = /usr/local/lib/
+
+$(include_dir):
+	sudo mkdir -p $@
+
+$(static_install_dir):
+	sudo mkdir -p $@
+
+
+staticlib_deps_install = $(addprefix staticlib_install_, $(lib_deps))
+
+staticlib_install_%:
+	cd ../$(@:staticlib_install_%=lib%) && $(MAKE) staticlib_install
+
+staticlib_install: $(staticlib_deps_install) $(include_dir) $(install_dir)
+	@echo Installing headers to $(include_dir)
+	sudo $(RM) $(include_dir)/*
+	sudo cp -p $(lib_hdr_paths) $(include_dir)
+	@echo installing static library to $(static_install_dir)
+	sudo cp -p $(build_dir)/*.a $(static_install_dir)
+	@echo done
+
+.PHONY: staticlib
+staticlib: staticlib_build staticlib_install
 
 clean: 
 	rm -rf $(build_dir)
-
