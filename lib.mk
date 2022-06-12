@@ -211,5 +211,10 @@ staticlib_install: $(staticlib_deps_install) $(include_dir) $(install_dir)
 .PHONY: staticlib
 staticlib: staticlib_build staticlib_install
 
+
+.PHONY: info
+info: 
+	@echo This library is $(lib_name)
+
 clean: 
 	rm -rf $(build_dir)
