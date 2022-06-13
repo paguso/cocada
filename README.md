@@ -42,9 +42,32 @@ I plan to keep the libraries free from cyclic dependencies.
 
 ## How to use it
 
-COCADA libraries can be used in a few different ways. First you can just copy the source files and use them in a separate project, as long as you respect the dependencies above. Alternatively - and perhaps more appropriately - they can be compiled and used as either  [static](http://www.tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html)  or  [shared](http://www.tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html) libraries.
+COCADA libraries can be used in a few different ways. First you can just clone the source files and use them in a separate project, as long as you respect the dependencies above. Alternatively they can be compiled and used as either  [static](http://www.tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html)  or  [shared](http://www.tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html) libraries.
 
-#### Installing COCADA as a static library
+COCADA uses GNU Make as a build and installation manager. Running 
+```
+make help
+```
+in the COCADA root directory will give you a brief help on the available options. 
+Generally speaking, running
+```
+make <target> <libraries> 
+```
+will perform the given `<target>` in the given list of `<libraries>`. You can input `all` instead of a list of library names to make the target on all libraries.
+
+
+### Copying COCADA sources
+
+The most straightforward way of using COCADA in your project is by copying the source files into your project's source directory. This can be acomplished by running
+```
+make clone <libraries> -e clone_dest=<destination>
+``` 
+This will copy the header and source files of the given libraries to the given `<destination>` directory (default=`~/cocada`). By default, and for simplicity, the copy is "flat", that is, all the files will be put directly under the `<destination>` directory. However, if you want to reproduce the source directory structure of the original COCADA repositories, you can define the variable `clone_tree` by entering the option `-e clone_tree=true`.
+
+Finally, it is important to notice that cloning is recursive. That is, when you clone a given library, not only its header and source files get copyied, but also those of all libraries upon which it depends.
+
+
+### Installing COCADA as a static library
 
 In order to build and install a COCADA static library, we just have to `cd` to the library directory and run
 
@@ -102,7 +125,7 @@ After that, the just-built libraries are copied to `/use/local/lib` (or another 
 This modular installation procedure results in all sublibraries in the dependency closure to be independently available for use as a static library. However this also implies that if we update one of the libraries later, this will likely break or cause inconsitencies with the other installed libraries that depend on it. In our example, if we later update the `cocadastrproc` library, this will trigger the update of the `cocada` base library, but **not** the `cocadabio` library. It is therefore advisable to update **all** installed cocada libraries at once.
 
 
-#### Installing COCADA as a shared library
+### Installing COCADA as a shared library
 
 To build COCADA as a *shared* library, simply run
 

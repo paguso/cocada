@@ -1,6 +1,36 @@
+# COCADA - COCADA Collection of Algorithms and DAta Structures
+#
+# Copyright (C) 2016  Paulo G S Fonseca
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+#
+ 
+
+.PHONY: help
+
+help: 
+	@echo "choose the appropriate target to build"
+
+
+#
+# Global variable definitions
+#
+
 # Input dirs and files
 
-src_dir = ./src 
+src_dir = ./src
 test_src_dir = ./test
 
 lib_src_paths = $(shell find $(src_dir) -name '*.c')
@@ -27,15 +57,16 @@ debug_build_dir = $(build_dir)/debug
 release_build_dir = $(build_dir)/release
 target_build_dir = $(build_dir)/$(build_type)
 
+
+# 
+# Common compilation options and targets
+#
+
+
 INCLUDE_CFLAGS = $(addprefix -I, $(lib_hdr_dirs) $(test_hdr_dirs) $(all_deps_hdr_dirs)) 
 
 $(build_dir):
 	mkdir -p $@ 
-
-.PHONY: help
-
-help: 
-	@echo "choose the appropriate target to build"
 
 #
 # Recursively collects library dependencies 
@@ -79,10 +110,58 @@ strict_deps = $(filter-out $(lib_name), $(all_deps))
 
 
 #
+# Source code cloning
+#
+
+clone_dest = ~/cocada
+clone_dir = $(strip $(clone_dest))
+
+clone_tree =
+
+clone_lib_deps = $(addprefix clone_lib_,$(lib_deps))
+
+clone_lib_%:
+	$(MAKE) -C ../$(@:clone_lib_%=lib%) clone 
+
+$(clone_dir):
+	mkdir -p $@
+
+clone_tree_dirs =
+
+ifdef clone_tree
+
+define clone_tree_dir_template
+clone_tree_dirs += $$(patsubst $(strip $(src_dir))%, $(clone_dir)/$(lib_name)%, $(1)) 
+
+$$(patsubst $(strip $(src_dir))%, $(clone_dir)/$(lib_name)%, $(1)):
+	mkdir -p $$@
+
+endef 
+
+$(foreach dir, $(lib_src_dirs), $(eval $(call clone_tree_dir_template, $(dir))))
+endif
+
+.PHONY: clone
+
+define copy_template
+$$(shell cp $(1) $$(patsubst $(strip $(src_dir))%, $(clone_dir)/$(lib_name)%, $(1))) 
+endef
+
+clone: $(clone_lib_deps) | $(clone_dir) $(clone_tree_dirs)
+ifdef clone_tree
+	$(foreach f,$(lib_hdr_paths),$(eval $(call copy_template, $(f))))
+	$(foreach f,$(lib_src_paths),$(eval $(call copy_template, $(f))))
+else
+	cp $(lib_hdr_paths) $(clone_dir)
+	cp $(lib_src_paths) $(clone_dir)
+endif
+
+
+#
 # Debug build
 #
 
-# Debug compiler extra flags
+# Debug extra compiler flags
 
 debug_cflags = -Wall -g3
 debug_cflags += -DDEBUG_LVL=3 
@@ -131,7 +210,11 @@ debug: debug_lib_build debug_test_build
 	$(CC) $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $(debug_strict_deps_objs) $(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
 
 
+#
+# Release build
+#
 
+# Release extra compiler flags
 
 relase_cflags =  -O3
 relase_cflags += -DDEBUG_LVL=1 
@@ -142,6 +225,7 @@ $(release_build_dir):
 
 $(release_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(relase_cflags) $(CFLAGS) $< -o $@
+
 
 # Recursively build library and its prerequisite libraries 
 
@@ -155,19 +239,16 @@ release_lib_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(lib_srcs))
 $(release_lib_objs): | $(release_build_dir)
 
 .PHONY: release_lib_build
-
 release_lib_build: deps $(release_lib_deps) $(release_lib_objs) ;
 
-release_strict_deps_objs = $(foreach lib, $(strict_deps), \
-	$(patsubst %.c, ../lib$(lib)/$(release_build_dir)/%.o,\
-		$(notdir $(shell find ../lib$(lib)/$(src_dir) -name '*.c'))))
 
 .PHONY: release
-release: release_lib_build
-#	$(CC) $(INCLUDE_CFLAGS) $(relase_cflags) $(CFLAGS) $(release_strict_deps_objs) $(target_build_dir)/*.o -lm -o $(target_build_dir)/$(build_type)
+release: release_lib_build;
 
 
-
+#
+# Static lib build and installation
+#
 
 staticlib_name = lib$(lib_name).a
 staticlib_deps = $(addprefix staticlib_build_, $(lib_deps))
@@ -179,9 +260,9 @@ dep_objs=$(patsubst %.c, %.o,\
 	$(addprefix ../lib$(1)/$(release_build_dir)/,\
 	$(notdir $(shell find ../lib$(1)/$(src_dir) -name *.c))))
 
-staticlib_build: $(staticlib_deps) release 
+staticlib_build: deps $(staticlib_deps) release 
 	ar rcs $(build_dir)/lib$(lib_name).a\
-		$(foreach lib,$(lib_deps),$(call dep_objs,$(lib)))\
+		$(foreach lib,$(strict_deps),$(call dep_objs,$(lib)))\
 		$(release_lib_objs)
 
 
@@ -210,6 +291,9 @@ staticlib_install: $(staticlib_deps_install) $(include_dir) $(install_dir)
 
 .PHONY: staticlib
 staticlib: staticlib_build staticlib_install
+
+
+
 
 
 .PHONY: info
