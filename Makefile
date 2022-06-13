@@ -18,7 +18,7 @@
 #
  
 all_valid_targets := clone debug staticlib help
-all_libs := cocada cocadastrproc cocadabio cocadasketch
+all_libs := cocada cocadaapp cocadastrproc cocadabio cocadasketch
 all_valid_args := $(all_valid_targets) $(all_libs) all
 invalid_args := $(filter-out $(all_valid_args), $(MAKECMDGOALS))
 
