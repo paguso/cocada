@@ -16,6 +16,7 @@ First and foremost, COCADA is a traditional sweet from the Northeast of Brazil, 
 COCADA is composed of interdependent sub-libraries or modules. Currently, they are
 
 - **libcocada** is the basic stuff upon which the rest is constructed. It contains convenience abstractions over low-level C-language constructs, minimal infrastructure for the object model used by most other modules, common ADT for dynamic collections such as vectors, hashtables and trees, and support for I/O and user interaction
+- **libcocadaapp** Things for building apps, like a CLI parser
 - **libcocadastrproc** contains string-processing (matching, indexing) data structures and algorithms
 - **libcocadabio** contains Bioinformatics-related stuff
 - **libcocadasketch** contains Data Sketches (mainly) for big data streaming applications
@@ -23,18 +24,16 @@ COCADA is composed of interdependent sub-libraries or modules. Currently, they a
 The dependency graph is as follows
 
 ```
-libcocadasketh
-  |
-  |             libcocadabio
-  |              |       |
-  |              v       |
-  |  libcocadastrproc    |
-   \         |          /
-    \        |         /
-     \___    |    ____/
-         |   |   |
-         v   v   v  
-         libcocada
+cocadaapp  cocadasketch    cocadabio
+  |              |         |       |
+  |              |         v       |
+  |              |  cocadastrproc  |
+   \             |     /          /
+    \            |    /          /
+     \________   |   /  ________/
+              |  |  |  |
+              v  v  v  v
+                cocada
 ```
 
 I plan to keep the libraries free from cyclic dependencies.
