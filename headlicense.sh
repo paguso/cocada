@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-LIC_HEADER=$'/*
+LIC_HEADER='/*
  * COCADA - COCADA Collection of Algorithms and DAta Structures
  *
  * Copyright (C) 2016  Paulo G S Fonseca
