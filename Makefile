@@ -49,7 +49,7 @@ help:
 	@echo 
 	@echo Available targets:
 	@echo
-	@echo - clean [\<libs\>]: wipeout all library builds (non-recursive)
+	@echo - clean [\<libs\>]: wipeout all library builds \(non-recursive\)
 	@echo - clone [\<libs\>]: copy library sources
 	@echo - debug [\<libs\>]: build library and tests for debugging
 	@echo - staticlib_build [\<libs\>]: build static libraries
@@ -60,7 +60,7 @@ help:
 	@echo - sharedlib_install [\<libs\>]: install built shared libraries
 	@echo - sharedlib_uninstall [\<libs\>]: uninstall shared libraries
 	@echo - sharedlib [\<libs\>]: build and install shared libraries 
-	@echo - fmt [\<libs\>]: format library source files (non-recursive) 
+	@echo - fmt [\<libs\>]: format library source files \(non-recursive\) 
 	@echo - doc: generate API documentation for all libraries
 	@echo - doc_clean: wipeout API documentation for all libraries
 	@echo - help: prints this message
