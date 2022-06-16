@@ -137,7 +137,7 @@ doc:
 clean_doc:
 	$(RM) -r $(doc_dir)	
 
-head_license_cmd := headlicense.sh
+head_license_cmd := sh headlicense.sh
 fmt_cmd := astyle
-fmt_options := --style=kr --indent=tab --recursive -n
+fmt_options := --style=kr --indent=tab -n #--recursive
 
