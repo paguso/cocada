@@ -25,97 +25,63 @@
 #include "CuTest.h"
 
 
-//CuSuite *alphabet_get_test_suite();
 CuSuite *avl_get_test_suite();
 CuSuite *binheap_get_test_suite();
 CuSuite *bitarray_get_test_suite();
 CuSuite *bitsandbytes_get_test_suite();
 CuSuite *bitvec_get_test_suite();
-//CuSuite *bjkst_get_test_suite();
 CuSuite *bytearray_get_test_suite();
 CuSuite *cli_get_test_suite();
-//CuSuite *csarray_get_test_suite();
 CuSuite *csrsbitarr_get_test_suite();
 CuSuite *cstrutil_get_test_suite();
-//CuSuite *dbgraph_get_test_suite();
 CuSuite *deque_get_test_suite();
 CuSuite *strbuf_get_test_suite();
-//CuSuite *fasta_get_test_suite();
-//CuSuite *fmalg_get_test_suite();
-//CuSuite *gk_get_test_suite();
 CuSuite *hashmap_get_test_suite();
 CuSuite *hashset_get_test_suite();
 CuSuite *hashtable_get_test_suite();
-//CuSuite *huffcode_get_test_suite();
-//CuSuite *kll_get_test_suite();
 CuSuite *kwayrng_get_test_suite();
 CuSuite *mathutil_get_test_suite();
 CuSuite *minqueue_get_test_suite();
 CuSuite *quadtree_get_test_suite();
-//CuSuite *qdigest_get_test_suite();
 CuSuite *queue_get_test_suite();
 CuSuite *randutil_get_test_suite();
 CuSuite *segtree_get_test_suite();
-CuSuite *semver_get_test_suite();
 CuSuite *serialise_get_test_suite();
 CuSuite *stack_get_test_suite();
 CuSuite *strfileread_get_test_suite();
-//CuSuite *strstream_get_test_suite();
-//CuSuite *vebwtree_get_test_suite();
 //CuSuite *tvec_get_test_suite();
 CuSuite *twuhash_get_test_suite();
 CuSuite *vec_get_test_suite();
-//CuSuite *wavtree_get_test_suite();
-//CuSuite *wtree_get_test_suite();
-//CuSuite *xstr_get_test_suite();
 
 
 void run_all_tests(void)
 {
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
-	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
 	//CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	//CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
 	//CuSuiteAddSuite(suite, bitvec_get_test_suite());
-	//CuSuiteAddSuite(suite, bjkst_get_test_suite());
 	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
-	//CuSuiteAddSuite(suite, csarray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
 	//CuSuiteAddSuite(suite, cli_get_test_suite());
 	//CuSuiteAddSuite(suite, deque_get_test_suite());
-	//CuSuiteAddSuite(suite, fasta_get_test_suite());
-	//CuSuiteAddSuite(suite, fmalg_get_test_suite());
-	//CuSuiteAddSuite(suite, gk_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
-	//CuSuiteAddSuite(suite, huffcode_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
-	//CuSuiteAddSuite(suite, kwayrng_get_test_suite());
-	//CuSuiteAddSuite(suite, kll_get_test_suite());
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
-	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
-	//CuSuiteAddSuite(suite, quadtree_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
 	//CuSuiteAddSuite(suite, serialise_get_test_suite());
 	//CuSuiteAddSuite(suite, segtree_get_test_suite());
-	CuSuiteAddSuite(suite, semver_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());
 	//CuSuiteAddSuite(suite, strstream_get_test_suite());
 	//CuSuiteAddSuite(suite, tvec_get_test_suite());
 	//CuSuiteAddSuite(suite, twuhash_get_test_suite());
-	//CuSuiteAddSuite(suite, vec_get_test_suite());
-	//CuSuiteAddSuite(suite, xstr_get_test_suite());
-
-
-	//CuSuiteAddSuite(suite, dbgraph_get_test_suite());
-	//CuSuiteAddSuite(suite, wavtree_get_test_suite());
-
+	CuSuiteAddSuite(suite, vec_get_test_suite());
 
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);

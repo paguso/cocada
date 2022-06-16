@@ -18,12 +18,6 @@
 #
  
 
-.PHONY: help
-
-help: 
-	@echo "choose the appropriate target to build"
-
-
 #
 # Global variable definitions
 #
@@ -50,12 +44,26 @@ test_hdrs = $(notdir $(test_hdr_paths))
 VPATH += $(lib_src_dirs)
 VPATH += $(test_src_dirs)
 
-# Output dirs
+# Build output dirs
 
 build_dir = ./build
 debug_build_dir = $(build_dir)/debug
 static_build_dir = $(build_dir)/static
 shared_build_dir = $(build_dir)/shared
+
+
+# Library installation dirs
+
+include_dir = /usr/local/include/
+lib_include_dir=$(include_dir)/$(lib_name)
+install_dir = /usr/local/lib/
+
+
+# Make directory targets
+
+$(build_dir) $(debug_build_dir) $(static_build_dir) $(shared_build_dir)\
+$(include_dir) $(lib_include_dir) $(install_dir):
+	mkdir -p $@ 
 
 
 # 
@@ -64,8 +72,7 @@ shared_build_dir = $(build_dir)/shared
 
 INCLUDE_CFLAGS = $(addprefix -I, $(lib_hdr_dirs) $(test_hdr_dirs) $(all_deps_hdr_dirs)) 
 
-$(build_dir):
-	mkdir -p $@ 
+
 
 #
 # Recursively collects library dependencies 
@@ -78,7 +85,6 @@ export dep_chain += $(lib_name)
 chain_deps_files = $(patsubst %,../lib%/$(deps_file), $(dep_chain))
 
 $(deps_file): | $(build_dir)
-#$(file > $(deps_file))
 	$(shell echo -n > $(deps_file))
 
 
@@ -157,15 +163,18 @@ else
 endif
 
 
-
 #
-# Generic build command
-# ALL_CFLAGS should be redefined on a per build type basis
-# 
-
-#%.o: %.c
-#	$(CC) -c $(INCLUDE_CFLAGS) $(ALL_CFLAGS) $< -o $@
+# Template for dependency libraries targets
+# Many targets require that the same action be performed on 
+# dependency libraries before. The makefile structure for these
+# targets is repetitive and can be generalised in the following
+# template. 
+# In order to create a target that triggers the same operation on
+# the dependency libraries, include something like
 #
+# $(eval $(call deps_tgt_templ,target,lib_deps))
+# target: ... $(target_deps) ...
+#	recipe
 
 define deps_tgt_templ
 $(1)_deps = $$(addprefix $(1)_,$$($(2)))
@@ -174,7 +183,6 @@ $(1)_%:
 	$(MAKE) -C ../$$(@:$(1)_%=lib%) $(1)
 
 endef
-
 
 
 #
@@ -188,8 +196,8 @@ debug_cflags += -DDEBUG_LVL=3
 debug_cflags += -DMEM_DEBUG   
 debug_cflags += -DXCHAR_BYTESIZE=4
 
-$(debug_build_dir):
-	mkdir -p $@
+#$(debug_build_dir):
+#	mkdir -p $@
 
 $(debug_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $< -o $@
@@ -224,25 +232,16 @@ debug_strict_deps_objs = $(foreach lib, $(strict_deps), \
 
 .PHONY: debug  
 debug: debug_lib_build debug_test_build 
-	$(CC) $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $(debug_strict_deps_objs)\
+	$(CC) $(INCLUDE_CFLAGS) $(debug_cflags) $(CFLAGS) $(debug_strict_deps_objs) \
 	$(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
 
 
 
+#$(lib_include_dir):
+#	mkdir -p $@
 #
-# Library installation dirs
-#
-
-
-include_dir = /usr/local/include/
-lib_include_dir=$(include_dir)/$(lib_name)
-install_dir = /usr/local/lib/
-
-$(lib_include_dir):
-	mkdir -p $@
-
-$(install_dir):
-	mkdir -p $@
+#$(install_dir):
+#	mkdir -p $@
 
 
 #
@@ -255,8 +254,8 @@ static_cflags =  -O3
 static_cflags += -DDEBUG_LVL=1 
 static_cflags += -DXCHAR_BYTESIZE=4
 
-$(static_build_dir):
-	mkdir -p $@
+#$(static_build_dir):
+#	mkdir -p $@
 
 $(static_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(static_cflags) $(CFLAGS) $< -o $@
@@ -319,8 +318,8 @@ shared_cflags += -DDEBUG_LVL=1
 shared_cflags += -DXCHAR_BYTESIZE=4
 shared_cflags += -fpic
 
-$(shared_build_dir):
-	mkdir -p $@
+#$(shared_build_dir):
+#	mkdir -p $@
 
 $(shared_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(shared_cflags) $(CFLAGS) $< -o $@
@@ -339,16 +338,11 @@ sharedlib_soname = $(sharedlib_linkname).$(lib_major)
 sharedlib_realname = $(sharedlib_soname).$(lib_minor).$(lib_release)
 sharedlib_path = $(shared_build_dir)/$(sharedlib_realname)
 
-dep_objs=$(patsubst %.c, %.o,\
-	$(addprefix ../lib$(1)/$(shared_build_dir)/,\
-	$(notdir $(shell find ../lib$(1)/$(src_dir) -name *.c))))
-
 .PHONY: sharedlib_build
 sharedlib_build: deps $(sharedlib_build_deps) $(shared_objs) ;
 	$(CC) -shared -Wl,-soname,$(sharedlib_soname) \
-		-o $(sharedlib_path)\
+		-o $(sharedlib_path) \
 		$(shared_objs) -lc
-#		$(foreach l,$(strict_deps),$(call dep_objs,$(l)))\
 
 
 $(eval $(call deps_tgt_templ,sharedlib_install,lib_deps))
@@ -383,7 +377,8 @@ sharedlib_uninstall: $(sharedlib_uninstall_deps)
 
 .PHONY: info
 info: 
-	@echo This library is $(lib_name)
+	@echo This is library $(lib_name)
+
 
 .PHONY: clean
 clean: 
