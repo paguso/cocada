@@ -126,7 +126,7 @@ fmt: check_call
 # API documentation
 
 doc_dir = apidoc
-doxygen_cfg := cocada.doxy
+doxygen_cfg := doxygen/cocada.doxy
 
 cocada_doxygen_input = $(patsubst %,lib%/src,$(all_libs))
 

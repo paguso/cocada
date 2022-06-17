@@ -87,32 +87,37 @@ we would end up with something like this
 
 ```
 .
-├── libcocada
-│   ├── build
-│   │   ├── libcocada.a
-│   │   ├── lib.deps
-│   │   └── release/
-│   ├── Makefile
-│   ├── src/
-│   └── test/
-├── libcocadabio
-│   ├── build
-│   │   ├── libcocadabio.a
-│   │   ├── lib.deps
-│   │   └── release/
-│   ├── Makefile
-│   ├── src/
-│   └── test/
+|-- libcocada
+|   |-- Makefile
+|   |-- build
+|   |   |-- lib.deps
+|   |   `-- static
+|   |       |-- ...
+|   |       |-- libcocada.a
+|   |       `-- ...
+|   |-- src/
+|   `-- test/
 ...
-├── libcocadastrproc
-│   ├── build
-│   │   ├── libcocadastrproc.a
-│   │   ├── lib.deps
-│   │   └── release/
-│   ├── Makefile
-│   ├── src
-│   └── test
-├── lib.mk
+|-- libcocadabio
+|   |-- Makefile
+|   |-- build
+|   |   |-- lib.deps
+|   |   `-- static
+|   |       |-- ... 
+|   |       `-- libcocadabio.a
+|   |-- src/
+|   `-- test/
+...
+|-- libcocadastrproc
+|   |-- Makefile
+|   |-- build
+|   |   |-- lib.deps
+|   |   `-- static
+|   |       |-- ...
+|   |       |-- libcocadastrproc.a
+|   |       `-- ...
+|   |-- src/
+|   `-- test/
 ...
 ```
 Notice that all the three libraries in the dependency closure were compiled for `release`, and the archives `libcocada.a`, `libcocadastrproc.a` and `libcocadabio.a` were created from the object files, and each put in the `build` subdirectory of the corresponding library.
