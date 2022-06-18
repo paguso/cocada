@@ -115,7 +115,8 @@ void kll_finalise(void *ptr, const finaliser *fnr)
 		DESTROY(self->buffs, finaliser_cons(FNR(vec),
 		                                    finaliser_cons(finaliser_new_ptr(),
 		                                            finaliser_cons(FNR(vec), finaliser_chd(fnr, 0)))));
-	} else {
+	}
+	else {
 		DESTROY(self->buffs, finaliser_cons(FNR(vec), FNR(vec)));
 	}
 }
@@ -144,7 +145,8 @@ static void _compress(kllsumm *self)
 			vec *nxtbuf;
 			if (i + 1 < _nlevels(self)) {
 				nxtbuf = (vec *)vec_get_rawptr(self->buffs, i + 1);
-			} else {
+			}
+			else {
 				nxtbuf = vec_new(self->typesize);
 				vec_push_rawptr(self->buffs, nxtbuf);
 				vec_push_byte_t(self->coins, 0);
@@ -153,7 +155,8 @@ static void _compress(kllsumm *self)
 			if (coin == 0) {
 				coin = rand_next() % 2;
 				vec_set_byte_t(self->coins, i, coin + 1);
-			} else {
+			}
+			else {
 				vec_set_byte_t(self->coins, i, 0);
 			}
 			size_t j = coin;
@@ -186,15 +189,18 @@ static size_t _rank(vec *buf, void *val, cmp_func cmp)
 {
 	if (vec_len(buf)==0 || cmp(vec_first(buf), val) >= 0) {
 		return 0;
-	} else if (cmp(vec_last(buf), val) < 0) {
+	}
+	else if (cmp(vec_last(buf), val) < 0) {
 		return vec_len(buf);
-	} else { // return first position >= val
+	}
+	else {   // return first position >= val
 		size_t l = 0, r = vec_len(buf) - 1;
 		while (r - l > 1) { // invariant: l < rank <= r
 			size_t m = (r + l) / 2;
 			if ( cmp(vec_get(buf, m), val) < 0 ) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
