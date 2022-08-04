@@ -160,7 +160,7 @@ typedef struct _avl avl;
  * types, then @p cmp receives pointers to pointers as arguments.
  * See the header file documentation for an example.
  */
-avl *avl_new(cmp_func cmp);
+avl *avl_new(size_t typesize, cmp_func cmp);
 
 
 /**
@@ -200,7 +200,7 @@ bool avl_ins(avl *self, void *val);
  * @returns A boolean indicating whether the deletion was
  * successful.
  */
-bool avl_del(avl *self, void *key, void **dest);
+bool avl_del(avl *self, void *key, void *dest);
 
 
 /**
