@@ -291,8 +291,9 @@ indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 		root->bf -= ret.height_chgd;
 	} else { //delete this root node
 		ret.ok = true;
-		assert(dest);
-		memcpy(dest, NODE_DATA(root), self->typesize);
+		if (dest) {
+			memcpy(dest, NODE_DATA(root), self->typesize);
+		}
 		if (root->left == NULL) { // leaf or has only right chd
 			ret.height_chgd = true;
 			ret.new_root = root->right;
@@ -352,13 +353,19 @@ bool avl_remv(avl *self, void *val, void *dest)
 }
 
 
-#define AVL_REMV_IMPL(TYPE, ...) \
-	bool avl_remv_##TYPE(avl *self, TYPE val, TYPE *dest) \
+bool avl_del(avl *self, void *key)
+{
+	return avl_remv(self, key, NULL);
+}
+
+
+#define AVL_DEL_IMPL(TYPE, ...) \
+	bool avl_del_##TYPE(avl *self, TYPE val) \
 	{\
-		return avl_remv(self, &val, dest);\
+		return avl_del(self, &val);\
 	}
 
-XX_CORETYPES(AVL_REMV_IMPL)
+XX_CORETYPES(AVL_DEL_IMPL)
 
 
 static void __avl_print(avlnode *root, size_t level, FILE *stream,
