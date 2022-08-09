@@ -177,7 +177,7 @@ void avl_finalise(void *ptr, const finaliser *fnr);
  * @returns A boolean indicating whether the search was
  * successful.
  */
-bool avl_get(avl *self, void *key, void **dest);
+const void *avl_get(const avl *self, const void *key);
 
 
 /**
@@ -192,15 +192,18 @@ bool avl_ins(avl *self, void *val);
 
 
 /**
- * @brief Deletes the node matching a given @p key
- * (according to the AVL comparison function) , if any, and
- * copies of the reference stored therein prior to removal
- * into @p dest. If no such node is found, the operation
+ * @brief Removes the node matching a given @p key
+ * (according to the AVL comparison function) , if any, 
+ * and copies the value to @p dest. 
+ * If no such node is found, the operation
  * has no effect.
+ * After the operation, the tree has no longer a reference
+ * to the removed value whose ownership must be assumed by
+ * the caller.
  * @returns A boolean indicating whether the deletion was
  * successful.
  */
-bool avl_del(avl *self, void *key, void *dest);
+bool avl_remv(avl *self, void *key, void *dest);
 
 
 /**
@@ -232,9 +235,9 @@ void avl_print( const avl *self, FILE *stream,
 
 
 #define AVL_DECLARE_ALL(TYPE, ...)\
-	bool avl_get_##TYPE(avl *self, TYPE val, TYPE *dest);\
+	bool avl_contains_##TYPE(const avl *self, TYPE val);\
 	bool avl_ins_##TYPE(avl *self, TYPE val);\
-	bool avl_del_##TYPE(avl *self, TYPE val, TYPE *dest);
+	bool avl_remv_##TYPE(avl *self, TYPE val, TYPE *dest);
 
 
 XX_CORETYPES(AVL_DECLARE_ALL)
