@@ -272,13 +272,21 @@ void vec_clip(vec *v, size_t from, size_t to);
 
 
 /**
- * @brief Rotates the vector contents npos positions to the left.
+ * @brief Rotates the vector contents @p npos positions to the left.
  *        If @p v has length `n`, then @p v[@p npos + i % n] becomes @p v[i],
  *        for i=0..n-1. If @p npos > `n`, this is the same as rotating
- *        @npos % `n` positions.
+ *        @p npos % `n` positions.
  *        Example: `vec_rotate_left(v=[a,b,c,d,e,f,g], 3)` => `v[d,e,f,g,a,b,c]`.
  */
 void vec_rotate_left(vec *v, size_t npos);
+
+
+/**
+ * @brief Rotates the vector contents @p npos positions to the right.
+ * @see vec_rotate_left
+ */
+void vec_rotate_right(vec *v, size_t npos);
+
 
 
 /**
@@ -287,7 +295,7 @@ void vec_rotate_left(vec *v, size_t npos);
  *        If no element satisfies the condition, returns vec_len(v)
  * @note That is a linear search that performs O(n) comparisons
  */
-size_t vec_find(vec *v, void *val, eq_func eq);
+size_t vec_find(const vec *v, const void *val, eq_func eq);
 
 
 /**
@@ -296,21 +304,23 @@ size_t vec_find(vec *v, void *val, eq_func eq);
  * returns the length of @p v.
  * @param cmp Comparison function
  * @see order.h
+ * @warning Requires that the vector be in ascending order according
+ * to the @p cmp order.
  */
-size_t vec_bsearch(vec *v, void *val, cmp_func cmp);
+size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp);
 
 /**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
-size_t vec_min(vec *v, cmp_func cmp);
+size_t vec_min(const vec *v, cmp_func cmp);
 
 
 /**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
-size_t vec_max(vec *v, cmp_func cmp);
+size_t vec_max(const vec *v, cmp_func cmp);
 
 
 /**
@@ -429,7 +439,13 @@ XX_CORETYPES(TYPED_VEC_DECL)
  */
 typedef struct _vec_iter vec_iter;
 
-vec_iter *vec_get_iter(vec *self);
+
+/**
+ * @brief Returns an iterator to the vector.
+ * @see iter.h
+ */
+vec_iter *vec_get_iter(const vec *self);
+
 
 DECL_TRAIT(vec_iter, iter)
 

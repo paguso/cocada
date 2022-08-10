@@ -563,11 +563,11 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
  * The object is not deallocated, and neither is the finaliser object destroyed.
  */
 #define FINALISE( OBJ, FNR ) \
-{\
-	void *__OBJ = (void *)(OBJ);\
-	const finaliser *__FNR = (const finaliser *)(FNR);\
-	if (__OBJ) 	finaliser_call(__FNR, __OBJ);\
-}
+	{\
+		void *__OBJ = (void *)(OBJ);\
+		const finaliser *__FNR = (const finaliser *)(FNR);\
+		if (__OBJ) 	finaliser_call(__FNR, __OBJ);\
+	}
 
 
 /**
@@ -583,15 +583,15 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
  * The finaliser @p FNR is **also** destroyed.
  */
 #define DESTROY( OBJ, FNR ) \
-{\
-	void *__OBJ = (void *)(OBJ);\
-	finaliser *__FNR = (finaliser *)(FNR);\
-	if ((__OBJ)) {\
-		finaliser_call((const finaliser *)(__FNR), __OBJ);\
-		free(__OBJ);\
-	}\
-	finaliser_free((void *)(__FNR));\
-}
+	{\
+		void *__OBJ = (void *)(OBJ);\
+		finaliser *__FNR = (finaliser *)(FNR);\
+		if ((__OBJ)) {\
+			finaliser_call((const finaliser *)(__FNR), __OBJ);\
+			free(__OBJ);\
+		}\
+		finaliser_free((void *)(__FNR));\
+	}
 
 
 /**

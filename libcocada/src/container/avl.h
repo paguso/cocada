@@ -37,24 +37,24 @@
  *
  * The AVL tree is a height-balanced search tree with O(lg n) worst-case
  * search, insertion and deletion.
- * 
+ *
  * The AVL tree stores elements of a totally ordered set. As such
  * it requires a pointer to a total-order comparison function of
- * type `cmp_func` (see order.h), to be given on construction. 
- * For the primitive types with the usual semantics, the default 
- * typed comparison functions defined in the order.h (e.g. `cmp_int`, 
- * `cmp_double`,...) can be passed to the object constructor. 
+ * type `cmp_func` (see order.h), to be given on construction.
+ * For the primitive types with the usual semantics, the default
+ * typed comparison functions defined in the order.h (e.g. `cmp_int`,
+ * `cmp_double`,...) can be passed to the object constructor.
  * For structured user-defined types, one should provide a custom
- * `cmp_func` comparator. Keep in mind that such a function 
- * receives pointers to whatever is stored in the node. In the case of 
- * indirect storage, that is when the node stores a reference/pointer 
- * to an external object, the comparator should be called with 
- * pointers to pointers. 
- * 
- * For example, consider the case illustrated in the diagram below, 
- * in which the tree node value (`val`) is a pointer to an externally 
- * stored object of type `obj_t`, and suppose that `obj_t` has an 
- * integer key field which should be used for  comparison. 
+ * `cmp_func` comparator. Keep in mind that such a function
+ * receives pointers to whatever is stored in the node. In the case of
+ * indirect storage, that is when the node stores a reference/pointer
+ * to an external object, the comparator should be called with
+ * pointers to pointers.
+ *
+ * For example, consider the case illustrated in the diagram below,
+ * in which the tree node value (`val`) is a pointer to an externally
+ * stored object of type `obj_t`, and suppose that `obj_t` has an
+ * integer key field which should be used for  comparison.
  * In this case the comparison function could be something like
  * ```C
  * int cmp_obj_t (const void *l, const void *r) {
@@ -66,7 +66,7 @@
  * }
  * ```
  * Notice that `l` and `r` are pointers to pointers to `obj_t`.
- * 
+ *
  * ```
  *             AVL tree
  * +--------------------------------------------+
@@ -89,9 +89,9 @@
  * +--------------------------------------------+
  *
  * ```
- * 
- * Also, in case the user wants to treat external references as owned, 
- * she or he should care to provide the appropriate destructor when 
+ *
+ * Also, in case the user wants to treat external references as owned,
+ * she or he should care to provide the appropriate destructor when
  * freeing the tree,
  * for instance
  * ```C
@@ -167,14 +167,14 @@ bool avl_ins(avl *self, void *val);
 
 /**
  * @brief Removes the node matching a given @p key
- * (according to the AVL comparison function) , if any, 
- * and copies the value to @p dest. 
+ * (according to the AVL comparison function) , if any,
+ * and copies the value to @p dest.
  * If however @p dest is NULL, the node is just deleted.
  * If no node matching the @p key is found, the operation
  * has no effect and the function returns false.
  * @returns A boolean indicating whether the removal was
  * successful.
- * @warning After the operation, the tree has no longer a 
+ * @warning After the operation, the tree has no longer a
  * reference to the removed value.
  */
 bool avl_remv(avl *self, void *key, void *dest);

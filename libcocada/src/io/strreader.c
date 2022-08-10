@@ -47,7 +47,8 @@ static int _strreader_getc(strread *t)
 	strreader *rdr = (strreader *) t->impltor;
 	if (rdr->index < rdr->len) {
 		return rdr->src[rdr->index++];
-	} else {
+	}
+	else {
 		return EOF;
 	}
 }

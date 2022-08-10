@@ -49,7 +49,8 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 	b %= m;
 	if ( a <= UINT64_MAX - b) {
 		return (a + b) % m;
-	} else {
+	}
+	else {
 		return b - ( m - a);
 	}
 

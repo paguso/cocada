@@ -101,7 +101,8 @@ void test_strbuf_append(CuTest *tc)
 	strbuf_nappend(sb, " quick brown fox", 16);
 	CuAssertStrEquals(tc, strbuf_as_str(sb), "The quick brown fox");
 	strbuf_nappend(sb, " jumps over the lazy dog.", 25);
-	CuAssertStrEquals(tc, strbuf_as_str(sb), "The quick brown fox jumps over the lazy dog.");
+	CuAssertStrEquals(tc, strbuf_as_str(sb),
+	                  "The quick brown fox jumps over the lazy dog.");
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
@@ -117,7 +118,8 @@ void test_strbuf_insert(CuTest *tc)
 	strbuf_ins(sb, 3, " quick brown fox", 16);
 	strbuf_ins(sb, 19, " jumps over", 11);
 	strbuf_ins(sb, 19, " jumps over", 0); // do nothing
-	CuAssertStrEquals(tc, strbuf_as_str(sb), "The quick brown fox jumps over the lazy dog.");
+	CuAssertStrEquals(tc, strbuf_as_str(sb),
+	                  "The quick brown fox jumps over the lazy dog.");
 	CuAssertSizeTEquals(tc, 44, strbuf_len(sb));
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
@@ -127,7 +129,8 @@ void test_strbuf_insert(CuTest *tc)
 void test_strbuf_cut(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.", 44);
+	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
+	                                 44);
 	char dest[40];
 	// "The quick brown fox jumps over the lazy dog."
 	strbuf_cut(sb, 0, 4, dest);
@@ -164,7 +167,8 @@ void test_strbuf_paste(CuTest *tc)
 	CuAssertStrEquals(tc, "The quick brown", strbuf_as_str(sb));
 	strbuf_paste(sb, 10, "brown fox jumps over the lazy dog.", 34);
 	CuAssertSizeTEquals(tc, 44, strbuf_len(sb));
-	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.",
+	                  strbuf_as_str(sb));
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
@@ -188,15 +192,20 @@ void test_strbuf_replace_n(CuTest *tc)
 void test_strbuf_replace(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.", 44);
+	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
+	                                 44);
 	strbuf_replace(sb, "black fox", "yellow arara"); // do nothing
-	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.",
+	                  strbuf_as_str(sb));
 	strbuf_replace(sb, "brown fox", "yellow arara");
-	CuAssertStrEquals(tc, "The quick yellow arara jumps over the lazy dog.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick yellow arara jumps over the lazy dog.",
+	                  strbuf_as_str(sb));
 	strbuf_replace(sb, "The quick", "My");
-	CuAssertStrEquals(tc, "My yellow arara jumps over the lazy dog.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "My yellow arara jumps over the lazy dog.",
+	                  strbuf_as_str(sb));
 	strbuf_replace(sb, "ara", "cob");
-	CuAssertStrEquals(tc, "My yellow cobra jumps over the lazy dog.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "My yellow cobra jumps over the lazy dog.",
+	                  strbuf_as_str(sb));
 	strbuf_replace(sb, "yellow cobra jumps over the lazy ", "");
 	CuAssertStrEquals(tc, "My dog.", strbuf_as_str(sb));
 	strbuf_replace(sb, "", "-");
@@ -209,13 +218,18 @@ void test_strbuf_replace(CuTest *tc)
 void test_strbuf_replace_all(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("The__quick__brown__arara__jumps__over__the__lazy__arara.", 56);
+	strbuf *sb =
+	    strbuf_new_from_str("The__quick__brown__arara__jumps__over__the__lazy__arara.",
+	                        56);
 	strbuf_replace_all(sb, "__", " ");
-	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.",
+	                  strbuf_as_str(sb));
 	strbuf_replace_all(sb, "ara", "ara");
-	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.",
+	                  strbuf_as_str(sb));
 	strbuf_replace_all(sb, "ara", "cob");
-	CuAssertStrEquals(tc, "The quick brown cobra jumps over the lazy cobra.", strbuf_as_str(sb));
+	CuAssertStrEquals(tc, "The quick brown cobra jumps over the lazy cobra.",
+	                  strbuf_as_str(sb));
 	strbuf_replace_all(sb, "quick brown cobra jumps over the lazy ", "");
 	CuAssertStrEquals(tc, "The cobra.", strbuf_as_str(sb));
 	strbuf_replace_all(sb, "", "-");

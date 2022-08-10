@@ -68,7 +68,7 @@ void deque_finalise(void *ptr, const finaliser *fnr)
 	if (finaliser_nchd(fnr)) {
 		const finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i=0, l=deque_len(dq); i<l; i++) {
-			void *chd = ((void **)deque_get(dq, i))[0];
+			void *chd = deque_get(dq, i);
 			FINALISE(chd, chd_fr);
 		}
 	}
@@ -125,10 +125,12 @@ static void check_and_resize(deque *q)
 		         q->data + (q->start * q->typesize),
 		         (q->len - q->start) * q->typesize );
 		q->start += offset;
-	} else if (q->len < (MIN_LOAD * q->cap)) {
+	}
+	else if (q->len < (MIN_LOAD * q->cap)) {
 		if ((q->start + q->len) < q->cap) {
 			memmove(q->data, q->data + (q->start * q->typesize), q->len * q->typesize);
-		} else {
+		}
+		else {
 			memmove( q->data + (q->cap - q->start) * q->typesize,
 			         q->data, ((q->start + q->len) % q->cap) * q->typesize );
 			memmove( q->data,  q->data + (q->start * q->typesize),
@@ -168,7 +170,7 @@ void deque_pop_back(deque *q, void *dest)
 }
 
 
-void deque_remv_back(deque *q)
+void deque_del_back(deque *q)
 {
 	q->len--;
 	check_and_resize(q);
@@ -184,7 +186,7 @@ void deque_pop_front(deque *q, void *dest)
 }
 
 
-void deque_remv_front(deque *q)
+void deque_del_front(deque *q)
 {
 	q->len--;
 	q->start = (q->start+1)%q->cap;

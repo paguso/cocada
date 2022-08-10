@@ -109,16 +109,16 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	binheap *nfheap = binheap_new(nodefreq_cmp, sizeof(nodefreq));
 	for (size_t i=0; i<hcode->size; i++) {
 		nodefreq nf = {.node =i, .freq=freqs[i]};
-		binheap_push(nfheap, &nf);
+		binheap_ins(nfheap, &nf);
 	}
 	size_t next = hcode->size;
 	while (binheap_size(nfheap)>1) {
 		nodefreq smallest, snd_smallest, new_nf;
-		binheap_pop(nfheap, &smallest);
-		binheap_pop(nfheap, &snd_smallest);
+		binheap_remv(nfheap, &smallest);
+		binheap_remv(nfheap, &snd_smallest);
 		new_nf.node = next;
 		new_nf.freq = smallest.freq + snd_smallest.freq;
-		binheap_push(nfheap, &new_nf);
+		binheap_ins(nfheap, &new_nf);
 		hcode->tree[next].chd[LEFT]  = &hcode->tree[smallest.node];
 		hcode->tree[next].chd[RIGHT] = &hcode->tree[snd_smallest.node];
 		hcode->tree[next].ab_mask = bytearr_new(ab_bytesize);

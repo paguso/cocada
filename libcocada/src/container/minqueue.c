@@ -109,7 +109,7 @@ void minqueue_remv(minqueue *queue)
 		deque_pop_front_size_t(queue->mins);
 	}
 	queue->dels++;
-	deque_remv_front(queue->elts);
+	deque_del_front(queue->elts);
 
 }
 

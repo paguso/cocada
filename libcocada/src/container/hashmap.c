@@ -250,7 +250,8 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
 	_find_res qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		return _value_at(hmap, qry.pos);
-	} else {
+	}
+	else {
 		return NULL;
 	}
 }
@@ -367,7 +368,8 @@ void hashmap_unset(hashmap *hmap, const void *key)
 }
 
 
-void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key, void *dest_val)
+void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key,
+                          void *dest_val)
 {
 	assert(key != NULL);
 	_find_res qry = _find(hmap, key, _hash(hmap, key));

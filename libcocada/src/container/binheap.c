@@ -35,8 +35,8 @@ struct _binheap {
 	cmp_func cmp;
 };
 
-binheap *binheap_new( cmp_func cmp,
-                      size_t typesize )
+binheap *binheap_new( size_t typesize,
+                      cmp_func cmp )
 {
 	binheap *heap = NEW(binheap);
 	heap->data = vec_new(typesize);
@@ -94,7 +94,8 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 		if ( m != i ) {
 			vec_swap(heap->data, i, m);
 			i = m;
-		} else {
+		}
+		else {
 			break;
 		}
 	}
@@ -102,14 +103,14 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 }
 
 
-void binheap_push(binheap *heap, const void *elt)
+void binheap_ins(binheap *heap, const void *elt)
 {
 	vec_push(heap->data, elt);
 	_bubble_up(heap);
 }
 
 
-void binheap_pop(binheap *heap, void *dest)
+void binheap_remv(binheap *heap, void *dest)
 {
 	if (vec_len(heap->data)==0) return;
 	vec_swap(heap->data, 0, vec_len(heap->data)-1);
@@ -120,13 +121,13 @@ void binheap_pop(binheap *heap, void *dest)
 
 
 #define BINHEAP_PUSH_IMPL( TYPE )\
-	void binheap_push_##TYPE(binheap *heap, TYPE val)\
-	{   binheap_push(heap, &val);   }
+	void binheap_ins_##TYPE(binheap *heap, TYPE val)\
+	{   binheap_ins(heap, &val);   }
 
 
 #define BINHEAP_POP_IMPL( TYPE )\
-	TYPE binheap_pop_##TYPE(binheap *heap)\
-	{   TYPE s; binheap_pop(heap, &s); return s; }
+	TYPE binheap_remv_##TYPE(binheap *heap)\
+	{   TYPE s; binheap_remv(heap, &s); return s; }
 
 
 #define BINHEAP_ALL_IMPL( TYPE , ...)\

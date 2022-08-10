@@ -153,7 +153,8 @@ void test_hashmap_obj(CuTest *tc)
 			CuAssert(tc, "wrong k1 value", i == v->k1);
 			CuAssert(tc, "wrong k2 value", i+1 == v->k2);
 			CuAssert(tc, "wrong k3 value", strcmp(k, v->k3)==0);
-		} else {
+		}
+		else {
 			object *v = (object *)hashmap_get(hmap, &k);
 			CuAssert(tc, "should be null", v==NULL);
 		}

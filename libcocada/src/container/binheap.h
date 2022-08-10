@@ -72,10 +72,8 @@ typedef struct _binheap binheap;
 
 /**
  * @brief Creates a new empty binary heap.
- * @param typesize The size (in bytes) of the individual elements.
- * @param mode The mode of the heap
  */
-binheap *binheap_new(cmp_func cmp, size_t typesize);
+binheap *binheap_new(size_t typesize, cmp_func cmp);
 
 
 /**
@@ -94,7 +92,7 @@ size_t binheap_size(const binheap *heap);
 /**
  * @brief Stores a new element in the heap.
  */
-void binheap_push(binheap *heap, const void *elt);
+void binheap_ins(binheap *heap, const void *elt);
 
 
 /**
@@ -102,16 +100,16 @@ void binheap_push(binheap *heap, const void *elt);
  *        at least one such that no other element has
  *        greater priority) and copies it to @p dest.
  */
-void binheap_pop(binheap *heap, void *dest);
+void binheap_remv(binheap *heap, void *dest);
 
 
 
 #define BINHEAP_PUSH_DECL( TYPE )\
-	void binheap_push_##TYPE(binheap *heap, TYPE val);
+	void binheap_ins_##TYPE(binheap *heap, TYPE val);
 
 
 #define BINHEAP_POP_DECL( TYPE )\
-	TYPE binheap_pop_##TYPE(binheap *heap);
+	TYPE binheap_remv_##TYPE(binheap *heap);
 
 
 #define BINHEAP_ALL_DECL( TYPE, ... )\

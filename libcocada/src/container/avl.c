@@ -74,7 +74,8 @@ static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 {
 	if (root==NULL) {
 		return;
-	} else {
+	}
+	else {
 		__avl_finaliser(root->left, fnr);
 		__avl_finaliser(root->right, fnr);
 		if (fnr != NULL) {
@@ -90,7 +91,8 @@ void avl_finalise(void *ptr, const finaliser *fnr)
 	avl *self = (avl *)ptr;
 	if (finaliser_nchd(fnr) > 0) {
 		__avl_finaliser(self->root, finaliser_chd(fnr, 0));
-	} else {
+	}
+	else {
 		__avl_finaliser(self->root, NULL);
 	}
 }
@@ -101,10 +103,12 @@ const void *avl_get(const avl *self, const void *key)
 	while (cur != NULL) {
 		int where = self->cmp(key, NODE_DATA(cur));
 		if (where == 0) {
-			return (const void*)NODE_DATA(cur);
-		} else if (where < 0) {
+			return (const void *)NODE_DATA(cur);
+		}
+		else if (where < 0) {
 			cur = cur->left;
-		} else if (where > 0) {
+		}
+		else if (where > 0) {
 			cur = cur->right;
 		}
 	}
@@ -172,11 +176,13 @@ static indel_result __avl_ins(avl *self, avlnode *root, void *val)
 		ret.new_root = root;
 		ret.height_chgd = 0;
 		return ret;
-	} else if (where < 0) {
+	}
+	else if (where < 0) {
 		ret = __avl_ins(self, root->left, val);
 		root->left = ret.new_root;
 		root->bf -= ret.height_chgd;
-	} else if (where > 0) {
+	}
+	else if (where > 0) {
 		ret = __avl_ins(self, root->right, val);
 		root->right = ret.new_root;
 		root->bf += ret.height_chgd;
@@ -186,15 +192,18 @@ static indel_result __avl_ins(avl *self, avlnode *root, void *val)
 	if (!ret.height_chgd) {
 		ret.new_root = root;
 		return ret;
-	} else if (root->bf == 0) {
+	}
+	else if (root->bf == 0) {
 		ret.new_root = root;
 		ret.height_chgd = 0;
 		return ret;
-	} else if (root->bf == -1 || root->bf == +1) {
+	}
+	else if (root->bf == -1 || root->bf == +1) {
 		ret.new_root = root;
 		ret.height_chgd = 1;
 		return ret;
-	} else if (root->bf == -2) {
+	}
+	else if (root->bf == -2) {
 		assert (root->left != NULL);
 		if (root->left->bf > 0) {
 			root->left = __rotate_left(root->left);
@@ -202,7 +211,8 @@ static indel_result __avl_ins(avl *self, avlnode *root, void *val)
 		ret.new_root = __rotate_right(root);
 		ret.height_chgd = 0;
 		return ret;
-	} else { //  (root->bf == +2)
+	}
+	else {   //  (root->bf == +2)
 		assert (root->right != NULL);
 		if (root->right->bf < 0) {
 			root->right = __rotate_right(root->right);
@@ -244,7 +254,8 @@ remv_min_result __avl_remv_min(avlnode *root)
 	if (root->left == NULL) { //root is the min node
 		remv_min_result ret = {.height_chgd = true, .root = root->right, .remvd_node = root};
 		return ret;
-	} else {
+	}
+	else {
 		remv_min_result ret = __avl_remv_min(root->left);
 		root->left = ret.root;
 		root->bf += ret.height_chgd;
@@ -253,15 +264,18 @@ remv_min_result __avl_remv_min(avlnode *root)
 			ret.root = root;
 			ret.height_chgd = false;
 			return ret;
-		} else if (root->bf == 0) { // was -1 now 0
+		}
+		else if (root->bf == 0) {   // was -1 now 0
 			ret.root = root;
 			ret.height_chgd = true;
 			return ret;
-		} else if (root->bf == +1) { // was 0 now +1
+		}
+		else if (root->bf == +1) {   // was 0 now +1
 			ret.root = root;
 			ret.height_chgd = false;
 			return ret;
-		} else { // was +1 now +2
+		}
+		else {   // was +1 now +2
 			if (root->right->bf < 0) {
 				root->right = __rotate_right(root->right);
 			}
@@ -285,11 +299,13 @@ indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 		ret = __avl_remv(self, root->left, val, dest);
 		root->left = ret.new_root;
 		root->bf += ret.height_chgd;
-	} else if (where > 0) {
+	}
+	else if (where > 0) {
 		ret = __avl_remv(self, root->right, val, dest);
 		root->right = ret.new_root;
 		root->bf -= ret.height_chgd;
-	} else { //delete this root node
+	}
+	else {   //delete this root node
 		ret.ok = true;
 		if (dest) {
 			memcpy(dest, NODE_DATA(root), self->typesize);
@@ -299,12 +315,14 @@ indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 			ret.new_root = root->right;
 			free(root);
 			return ret;
-		} else if (root->right == NULL) { // has only left chd
+		}
+		else if (root->right == NULL) {   // has only left chd
 			ret.height_chgd = true;
 			ret.new_root = root->left;
 			free(root);
 			return ret;
-		} else { // has two children
+		}
+		else {   // has two children
 			remv_min_result rmin_res = __avl_remv_min(root->right);
 			root->right = rmin_res.root;
 			memcpy(NODE_DATA(root), NODE_DATA(rmin_res.remvd_node), self->typesize);
@@ -319,22 +337,26 @@ indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 		ret.new_root = root;
 		ret.height_chgd = false;
 		return ret;
-	} else if (root->bf == 0) { // was +-1 now 0
+	}
+	else if (root->bf == 0) {   // was +-1 now 0
 		ret.new_root = root;
 		ret.height_chgd = true;
 		return ret;
-	} else if (root->bf == -1 || root->bf == +1) { // was 0 now +-1
+	}
+	else if (root->bf == -1 || root->bf == +1) {   // was 0 now +-1
 		ret.new_root = root;
 		ret.height_chgd = false;
 		return ret;
-	} else if (root->bf == -2 ) { // was -1 now -2
+	}
+	else if (root->bf == -2 ) {   // was -1 now -2
 		if (root->left->bf > 0) {
 			root->left = __rotate_left(root->left);
 		}
 		ret.new_root = __rotate_right(root);
 		ret.height_chgd = true;
 		return ret;
-	} else { // was +1 now +2
+	}
+	else {   // was +1 now +2
 		if (root->right->bf < 0) {
 			root->right = __rotate_right(root->right);
 		}
@@ -435,14 +457,16 @@ static void __next(avl *tree, avl_traversal_order order, stack *node_stack,
 			read = true;
 			stack_push_rawptr(node_stack, cur->left);
 			stack_push_byte_t(next_chd_stack, 0);
-		} else if (nc == 1) {
+		}
+		else if (nc == 1) {
 			if (order == IN_ORDER && read) {
 				return;
 			}
 			read = true;
 			stack_push_byte_t(next_chd_stack, 0);
 			stack_push_rawptr(node_stack, cur->right);
-		} else { //nc == 2
+		}
+		else {   //nc == 2
 			if (order == POST_ORDER && read) {
 				return;
 			}
@@ -514,7 +538,8 @@ avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
 				//stack_push_byte_t(ret->next_chd_stack, 1);
 				stack_push_rawptr(ret->node_stack, cur->left);
 				stack_push_byte_t(ret->next_chd_stack, 0);
-			} else { // has cur->right
+			}
+			else {   // has cur->right
 				//stack_pop_byte_t(ret->next_chd_stack);
 				//stack_push_byte_t(ret->next_chd_stack, 1);
 				stack_push_rawptr(ret->node_stack, cur->right);

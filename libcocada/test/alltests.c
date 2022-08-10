@@ -58,7 +58,7 @@ void run_all_tests(void)
 {
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
-	CuSuiteAddSuite(suite, avl_get_test_suite());
+	//CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	//CuSuiteAddSuite(suite, bitsandbytes_get_test_suite());
@@ -67,7 +67,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
 	//CuSuiteAddSuite(suite, cli_get_test_suite());
-	//CuSuiteAddSuite(suite, deque_get_test_suite());
+	CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());

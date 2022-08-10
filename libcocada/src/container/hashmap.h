@@ -215,7 +215,8 @@ void hashmap_unset(hashmap *hmap, const void *key);
  * @warning If the map does not contain the provided @p key, an error may occur.
  * @warning This does not destroy the key or its value.
  */
-void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key, void *dest_val);
+void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key,
+                          void *dest_val);
 
 
 /**
