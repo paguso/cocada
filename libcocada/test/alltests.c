@@ -67,14 +67,14 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
 	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
 	//CuSuiteAddSuite(suite, cli_get_test_suite());
-	CuSuiteAddSuite(suite, deque_get_test_suite());
+	//CuSuiteAddSuite(suite, deque_get_test_suite());
 	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
 	//CuSuiteAddSuite(suite, hashset_get_test_suite());
 	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
 	//CuSuiteAddSuite(suite, serialise_get_test_suite());
-	//CuSuiteAddSuite(suite, segtree_get_test_suite());
+	CuSuiteAddSuite(suite, segtree_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());

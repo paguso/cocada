@@ -20,6 +20,7 @@
  *
  */
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -68,7 +69,7 @@ void deque_finalise(void *ptr, const finaliser *fnr)
 	if (finaliser_nchd(fnr)) {
 		const finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i=0, l=deque_len(dq); i<l; i++) {
-			void *chd = deque_get(dq, i);
+			void *chd = (void *)deque_get(dq, i);
 			FINALISE(chd, chd_fr);
 		}
 	}
@@ -90,12 +91,14 @@ size_t deque_len(const deque *q)
 
 const void *deque_get(const deque *q, size_t pos)
 {
+	assert(pos < q->len);
 	return q->data + ( ((q->start + pos) % q->cap) * q->typesize );
 }
 
 
 void deque_get_cpy(const deque *q, size_t pos, void *dest )
 {
+	assert(pos < q->len);
 	memcpy(dest, q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
 	       q->typesize);
 }
@@ -163,6 +166,7 @@ void deque_push_front(deque *q, const void *elt)
 
 void deque_pop_back(deque *q, void *dest)
 {
+	assert(q->len > 0);
 	memcpy(dest, q->data + (((q->start + q->len - 1) % q->cap) * q->typesize),
 	       q->typesize);
 	q->len--;
@@ -172,6 +176,7 @@ void deque_pop_back(deque *q, void *dest)
 
 void deque_del_back(deque *q)
 {
+	assert(q->len > 0);
 	q->len--;
 	check_and_resize(q);
 }
@@ -179,6 +184,7 @@ void deque_del_back(deque *q)
 
 void deque_pop_front(deque *q, void *dest)
 {
+	assert(q->len > 0);
 	memcpy(dest, q->data + (q->start * q->typesize), q->typesize);
 	q->len--;
 	q->start = (q->start+1)%q->cap;
@@ -188,10 +194,12 @@ void deque_pop_front(deque *q, void *dest)
 
 void deque_del_front(deque *q)
 {
+	assert(q->len > 0);
 	q->len--;
 	q->start = (q->start+1)%q->cap;
 	check_and_resize(q);
 }
+
 
 #define DEQUE_NEW_IMPL( TYPE )\
 	deque *deque_new_##TYPE() {\

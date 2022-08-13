@@ -548,7 +548,7 @@ static bool _not_a_subcmd_name(char *id, cliparser *cmd)
 {
 	for (cliparser *cur_cmd = cmd; cur_cmd != NULL; cur_cmd = cmd->par) {
 		ERROR_ASSERT(strcmp(id, cmd->name)
-		             && !hashmap_has_key(cur_cmd->subcommands, &id),
+		             && !hashmap_contains(cur_cmd->subcommands, &id),
 		             "Value '%s' is not allowed because it is a (sub)command name.\n", id);
 	}
 	return true;
@@ -560,7 +560,7 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 	assert(cmd->par==NULL); // subcommand cannot have subcommands
 	assert(cmd!=subcmd);	// avoid cycles
 	assert(subcmd->par==NULL); // a subcommand gets added at most once
-	assert(!hashmap_has_key(cmd->subcommands,
+	assert(!hashmap_contains(cmd->subcommands,
 	                        &subcmd->name)); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
 	hashmap_iter *it = hashmap_get_iter(subcmd->options);
@@ -583,15 +583,15 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 	FREE(it);
 	subcmd->par = cmd;
 	vec_push_cstr(cmd->subcmd_names, subcmd->name);
-	hashmap_set(cmd->subcommands, &(subcmd->name), &subcmd);
+	hashmap_ins(cmd->subcommands, &(subcmd->name), &subcmd);
 }
 
 
 void cliparser_add_option(cliparser *cmd, cliopt *opt)
 {
-	assert( !hashmap_has_key(cmd->options, &(opt->shortname)) );
+	assert( !hashmap_contains(cmd->options, &(opt->shortname)) );
 	assert( opt->longname==NULL
-	        || !hashmap_has_key(cmd->long_to_short, &(opt->longname)) );
+	        || !hashmap_contains(cmd->long_to_short, &(opt->longname)) );
 	if (opt->type == ARG_CHOICE) {
 		for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
 			char *ch = vec_get_cstr(opt->choices, i);
@@ -605,9 +605,9 @@ void cliparser_add_option(cliparser *cmd, cliopt *opt)
 			assert(_not_a_subcmd_name(val, cmd));
 		}
 	}
-	hashmap_set(cmd->options, &(opt->shortname), &opt);
+	hashmap_ins(cmd->options, &(opt->shortname), &opt);
 	if (opt->longname) {
-		hashmap_set(cmd->long_to_short, &(opt->longname), &(opt->shortname));
+		hashmap_ins(cmd->long_to_short, &(opt->longname), &(opt->shortname));
 	}
 }
 
@@ -877,7 +877,7 @@ static cliparse_res _check_option_combos(cliparser *cmd)
 		size_t nused = 0;
 		for (size_t j = 0; j<c->size; j++) {
 			char shortname = c->shortnames[j];
-			if (hashmap_has_key(cmd->options, &shortname)) {
+			if (hashmap_contains(cmd->options, &shortname)) {
 				nused++;
 			}
 		}
@@ -969,7 +969,7 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
 		break;
 	case ARG_STR:
 		for (cliparser *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
-			if (tok[0] == '-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+			if (tok[0] == '-' || hashmap_contains(cur_cmd->subcommands, &tok)) {
 				return false;
 			}
 		}
@@ -978,7 +978,7 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
 		break;
 	case ARG_FILE:
 		for (cliparser *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
-			if (tok[0] == '-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+			if (tok[0] == '-' || hashmap_contains(cur_cmd->subcommands, &tok)) {
 				return false;
 			}
 		}
@@ -987,7 +987,7 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
 		break;
 	case ARG_DIR:
 		for (cliparser *cur_cmd = cmd; cur_cmd!=NULL; cur_cmd = cur_cmd->par) {
-			if (tok[0] == '-' || hashmap_has_key(cur_cmd->subcommands, &tok)) {
+			if (tok[0] == '-' || hashmap_contains(cur_cmd->subcommands, &tok)) {
 				return false;
 			}
 		}
@@ -1057,7 +1057,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 						         "Invalid option name %s at position %d.", tok, t);
 						goto cleanup;
 					}
-					if (!hashmap_has_key(cur_parse->long_to_short, &longname)) {
+					if (!hashmap_contains(cur_parse->long_to_short, &longname)) {
 						result.ok = false;
 						result.res.err.code = INVALID_OPTION;
 						snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
@@ -1083,7 +1083,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 					}
 					shortname = tok[1];
 				}
-				if (!hashmap_has_key(cur_parse->options, &shortname)) {
+				if (!hashmap_contains(cur_parse->options, &shortname)) {
 					result.ok = false;
 					result.res.err.code = INVALID_OPTION;
 					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
@@ -1135,7 +1135,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				}
 				t++;
 			}
-			else if (hashmap_has_key(cur_parse->subcommands, &tok)) { // valid subcommand
+			else if (hashmap_contains(cur_parse->subcommands, &tok)) { // valid subcommand
 				if ( vec_len(cur_parse->args)!=0 &&
 				        ( cur_arg_no != 0
 				          || vec_len(((cliarg *)vec_first_rawptr(cur_parse->args))->values) > 0) ) {
@@ -1285,7 +1285,7 @@ cleanup:
 const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
         char shortname)
 {
-	if (hashmap_has_key(cmd->options, &shortname)) {
+	if (hashmap_contains(cmd->options, &shortname)) {
 		return ((cliopt *)hashmap_get_rawptr(cmd->options, &shortname))->values;
 	}
 	else {
@@ -1296,7 +1296,7 @@ const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
 
 const vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname)
 {
-	if (hashmap_has_key(cmd->long_to_short, &longname)) {
+	if (hashmap_contains(cmd->long_to_short, &longname)) {
 		char shortname = hashmap_get_char(cmd->long_to_short, &longname);
 		return ((cliopt *)hashmap_get_rawptr(cmd->options, &shortname))->values;
 	}

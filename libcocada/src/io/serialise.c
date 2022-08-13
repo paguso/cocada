@@ -288,7 +288,7 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
 	mem_chunk chunk = {.start = addr, .size=model->size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 }
 
 
@@ -322,7 +322,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
 		}
 	}
 	size_t off = (size_t)addr - (size_t)base;
-	ERROR_ASSERT(hashmap_has_key(mem_map, &base),
+	ERROR_ASSERT(hashmap_contains(mem_map, &base),
 	             "Cannot map already read address %p.\n", base);
 	base = hashmap_get_rawptr(mem_map, &base);
 	return base + off;
@@ -346,7 +346,7 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 	mem_chunk chunk = {.start = addr, .size = size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 	if ( contains_addr(read, (size_t)(*dest)) ) {
 		*dest = map_addr(mem_map, read, *dest);
 		return;
@@ -401,7 +401,7 @@ void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read,
 	mem_chunk chunk = {.start = addr, .size = size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 	for (size_t i = 0; i < som_nchd(model); i++) {
 		sub_som field_som_chd = som_chd(model, i);
 		som *field_som = field_som_chd.chd;
@@ -496,7 +496,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	            "Incompatible array size for the element size.\n");
 	size_t len = size / elt_size;
 	void *arr = sa_arr_calloc(len, elt_size);
-	hashmap_set(mem_map, &addr, &arr);
+	hashmap_ins(mem_map, &addr, &arr);
 	*((rawptr *)ptr_addr) = arr;
 
 	switch (elt_som->type) {
@@ -537,7 +537,7 @@ void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	add_chunk(read, chunk);
 
 	void *str = cstr_new(size-1);
-	hashmap_set(mem_map, &addr, &str);
+	hashmap_ins(mem_map, &addr, &str);
 	*((rawptr *)ptr_addr) = str;
 	read_blob(str, size, stream);
 }
@@ -626,7 +626,7 @@ static void *bfs_read(som *model, FILE *stream)
 	hashmap *mem_map = hashmap_new( sizeof(size_t), sizeof(size_t),
 	                                ident_hash_size_t, eq_size_t );
 	void *nullptr = NULL;
-	hashmap_set(mem_map, &nullptr, &nullptr);
+	hashmap_ins(mem_map, &nullptr, &nullptr);
 	deque *dq = deque_new(sizeof(obj_model));
 
 	rawptr *ptr = NEW(rawptr);

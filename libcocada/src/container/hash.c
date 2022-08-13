@@ -63,13 +63,15 @@ uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize)
 }
 
 
+/*
 size_t djb2_hash(const unsigned char *str)
 {
 	size_t hash = 5381;
 	int c;
 
 	while ( (c = *(str++)) )
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		hash = ((hash << 5) + hash) + c; // hash * 33 + c 
 
 	return hash;
 }
+*/
