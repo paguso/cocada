@@ -82,7 +82,7 @@ static strread_vt _strreader_vt = { .reset = _strreader_reset,
                                   };
 
 
-strreader *strreader_open(char *src, size_t len)
+strreader *strreader_new(char *src, size_t len)
 {
 	strreader *ret = NEW(strreader);
 	ret->_t_strread.impltor = ret;
@@ -94,7 +94,7 @@ strreader *strreader_open(char *src, size_t len)
 }
 
 
-void strreader_close(strreader *rdr)
+void strreader_free(strreader *rdr)
 {
 	FREE(rdr);
 }

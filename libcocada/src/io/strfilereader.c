@@ -35,6 +35,7 @@ struct _strfilereader {
 	strread _t_strread;
 	FILE *src;
 	size_t pos;
+	bool own_stream;
 };
 
 
@@ -83,7 +84,7 @@ static strread_vt _strread_vt  = {
 };
 
 
-strfilereader *strfilereader_open_path(const char *path)
+strfilereader *strfilereader_new_from_path(const char *path)
 {
 	FILE *src = fopen(path, "r");
 	if (!src) {
@@ -93,25 +94,29 @@ strfilereader *strfilereader_open_path(const char *path)
 	ret->_t_strread.impltor = ret;
 	ret->_t_strread.vt = &_strread_vt;
 	ret->src = src;
+	ret->own_stream = true;
 	ret->pos = 0;
 	return ret;
 }
 
 
-strfilereader *strfilereader_open(FILE *stream)
+strfilereader *strfilereader_new(FILE *stream)
 {
 	strfilereader *ret = NEW(strfilereader);
 	ret->_t_strread.impltor = ret;
 	ret->_t_strread.vt = &_strread_vt;
 	ret->src = stream;
+	ret->own_stream = false;
 	ret->pos = 0;
 	return ret;
 }
 
 
 
-void strfilereader_close(strfilereader *self)
+void strfilereader_free(strfilereader *self)
 {
-	fclose(self->src);
+	if(self->own_stream) {
+		fclose(self->src);
+	}
 	FREE(self);
 }

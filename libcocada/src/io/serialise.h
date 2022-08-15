@@ -124,7 +124,7 @@
  * we need
  *
  * ```C
- * som *foo = som_cons(som_ptr_new(), som_cons(som_arr_new(), 0, get_som_int()));
+ * som *foo = som_cons(som_ptr_new(), 0, som_cons(som_arr_new(), 0, get_som_int()));
  * ```
  *
  * ### String SOMs
@@ -270,9 +270,9 @@
  * The correct deserialisation of an object depends on the type sizes and
  * encoding (in particular endianess) being the same or, at least, compatible.
  * Therefore the serialisation/deserialisation is not portable and
- * is actually a *very memory unsafe operation*.
+ * is actually a *very unsafe memory operation*.
  *
- * Be warned and use it at your own risk!
+ * <b>Be warned and use it at your own risk!</b>
  *
  * However, by default COCADA writes the object sizes and checks whether
  * they are compatible during deserialisation and issues a **warning**

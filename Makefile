@@ -125,13 +125,16 @@ fmt: check_call
 
 # API documentation
 
-doc_dir = apidoc
+doc_dir = doc/api
 doxygen_cfg := doxygen/cocada.doxy
 
 cocada_doxygen_input = $(patsubst %,lib%/src,$(all_libs))
 
+$(doc_dir):
+	mkdir -p $@
+
 .PHONY: doc clean_doc
-doc:
+doc: $(doc_dir)
 	COCADA_DOXYGEN_INPUT='$(cocada_doxygen_input)' doxygen $(doxygen_cfg)
 
 clean_doc:

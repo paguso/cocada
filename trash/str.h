@@ -24,8 +24,8 @@
 
 /**
  * @file str.h
+ * @brief Unmutable string
  * @author Paulo Fonseca
- * Unmutable string
  */
 
 #include <stddef.h>

@@ -32,17 +32,18 @@
  * # Example
  *
  * ```C
- * strfilereader *sfr = strfilereader_open(filename);
- * strread *ftrait = strfilereader_as_strread(sfr);
- * for (int c; (c=strread_getc(ftrait)) != EOF;)
+ * strfilereader *sfr = strfilereader_new_from_path(filename);
+ * strread *r = strfilereader_as_strread(sfr);
+ * for (int c; (c=strread_getc(r)) != EOF;)
  *     printf ("Read c=%c\n", (char)c);
- * strfilereader_close(sfr);
+ * strfilereader_free(sfr);
  * ```
  */
 
 #include <stdio.h>
 
 #include "trait.h"
+#include "strread.h"
 
 
 /**
@@ -55,24 +56,28 @@ DECL_TRAIT(strfilereader, strread)
 
 
 /**
- * @brief Opens a character file for reading from its @p path.
- * @returns NULL if the FILE at specified @p path cannot be open in "r" mode.
- */
-strfilereader *strfilereader_open_path(const char *path);
-
-
-/**
- * @brief Opens a character FILE for reading.
- * @warning stream is supposed to be a proper text FILE open for reading.
+ * @brief Creates a new reader attached to an already open character input stream.
+ * The reader assumes no ownership of the stream, which must be closed separately.
+ * @warning The stream is supposed to be a proper text FILE open for reading.
  * No checks performed.
  */
-strfilereader *strfilereader_open(FILE *stream);
+strfilereader *strfilereader_new(FILE *stream);
 
 
 /**
- * @brief Closes the source file and destroys the reader.
+ * @brief Creates a new reader attached to a character input stream from its @p path. 
+ * A new input stream is created and opened for reading.
+ * @returns NULL if the FILE at specified @p path cannot be open in "r" mode.
  */
-void strfilereader_close(strfilereader *self);
+strfilereader *strfilereader_new_from_path(const char *path);
+
+
+/**
+ * @brief Destructor. If the reader was created with strfilereader_new(),
+ * the underlying stream is not closed. If the reader was created with the 
+ * strfilereader_new_from_path() constructor, the stream is closed.
+ */
+void strfilereader_free(strfilereader *self);
 
 
 

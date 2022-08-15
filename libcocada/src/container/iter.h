@@ -40,7 +40,7 @@
  *
  * ```C
  * citer *cit = // get a concrete iter reference
- * iter *it = citer_as_iter(cit); // ASTRAIT(cit, citer, iter)
+ * iter *it = citer_as_iter(cit); // AS_TRAIT(cit, citer, iter)
  * while (iter_has_next(it)) {
  * 		void *elt = iter_next(it);
  * }
