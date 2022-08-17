@@ -11,7 +11,7 @@
 # library identification and version
 lib_name     := cocada
 lib_major    := 0
-lib_minor    := 1
+lib_minor    := 2
 lib_release  := 1
 
 # library dependencies (only direct compilation dependencies)
