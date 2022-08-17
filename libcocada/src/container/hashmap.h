@@ -33,7 +33,7 @@
  * @file hashmap.h
  * @author Paulo Fonseca
  *
- * @brief Generic key->val hash map, for <b>non-null</b> keys.
+ * @brief Generic N:1 key->val map (for <b>non-null</b> keys) implemented as a hash table.
  */
 
 /**
@@ -43,16 +43,12 @@ typedef struct _hashmap hashmap;
 
 
 /**
- * @brief Hashmap entry type.
- *
- * This is a simple wrapper containing two pointers for the internal
- * address of a key and its associated value.
- *
+ * @brief Hashmap entry type representing a key->value association.
  * @warning Do not alter the key or value directly.
  */
 typedef struct  {
-	void *key;
-	void *val;
+	const void *key; /**< key */
+	const void *val; /**< value */
 } hashmap_entry;
 
 
@@ -78,7 +74,7 @@ hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
 
 
 /**
- * @Initialiser
+ * @brief Initialiser for an already allocated hashmap
  * Analogous to ::hashmap_new
  * @see hashmap_new
  */
@@ -97,7 +93,7 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
 
 
 /**
- * @Initialiser
+ * @brief Initialiser for an already allocated hashmap.
  * Analogous to ::hashmap_new_with_capacit
  * @see hashmap_new_with_capacity
  */
@@ -131,7 +127,7 @@ void hashmap_fit(hashmap *hmap);
 /**
  * @brief Checks whether the @p map already contains a given @p key.
  */
-bool hashmap_has_key(const hashmap *hmap, const void *key);
+bool hashmap_contains(const hashmap *hmap, const void *key);
 
 
 /**
@@ -164,28 +160,28 @@ void *hashmap_get_mut(const hashmap *hmap, const void *key);
  * @warning If the map already contains the provided @p key, the current value
  * gets overwitten.
  */
-void hashmap_set(hashmap *hmap, const void *key, const void *val);
+void hashmap_ins(hashmap *hmap, const void *key, const void *val);
 
 
 /**
  * @brief Deletes the association corresponding to a given @p key.
  *
- * @warning If the map does not contain the provided @p key, an error may occur.
- * @warning This does not destroy the key or its value.
- * @see hashmap_remove_entry
+ * @warning If the map does not contain the provided @p key, the operation has no effect.
+ * @warning This operation does not destroy the key or its value.
+ * @see hashmap_remv
  */
-void hashmap_unset(hashmap *hmap, const void *key);
+void hashmap_del(hashmap *hmap, const void *key);
 
 
 /**
- * @brief Removes a (key,value) association corresponding to a given @p key,
- * if it exists, and copies the internal representation of the correponding
- * key and value onto @p dest_key and @p dest_val locations.
+ * @brief Removes an association corresponding to a given @p key,
+ * if it exists, and returns the previously stored key and value 
+ * by copying them to @p dest_key and @p dest_val respectively.
  *
  * This is particularly useful when the key/value is an owned reference to
- * a heap-allocated object. Neither this method nor the ::hashmap_unset method
+ * a heap-allocated object. Neither this method nor the ::hashmap_del method
  * destroy the dissociated key or value, which may cause a memory leak.
- * The copies of the internal handlers returned via @p dest_key and
+ * The copies returned via @p dest_key and
  * @p dest_val can be used by the caller to explicitly destroy those objects
  * after removal from the hashmap.
  *
@@ -196,26 +192,27 @@ void hashmap_unset(hashmap *hmap, const void *key);
  * keyobj *key2 = keyobj_new("key2");
  * valobj *val2 = valobj_new("val2");
  * // insert references in the map
- * hashmap_set(map, &key1, &val1);
- * hashmap_set(map, &key2, &val2);
+ * hashmap_ins(map, &key1, &val1);
+ * hashmap_ins(map, &key2, &val2);
  * // later elsewhere...
  * keyobj *k1 = keyobj_new("key1");
- * hashmap_unset(map, &k1);
+ * hashmap_del(map, &k1);
  * keyobj_free(k1);
  * // k1 is deallocated but the original key1 and val1 are leaking (!)
  * keyobj *k2 = keyobj_new("key2");
  * keyobj *destk2;
  * valobj *destv2;
- * hashmap_remove_entry(map, k2, &destk2, &destv2);
+ * hashmap_remv(map, k2, &destk2, &destv2);
  * // destk2 and destv2 have the same values as key2 and val2
  * FREE(destk2);
  * FREE(destv2);
  * // key2 and val2 properly destroyed
  * ```
- * @warning If the map does not contain the provided @p key, an error may occur.
+ * @warning If the map does not contain the provided @p key, this operation has no effect.
  * @warning This does not destroy the key or its value.
  */
-void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key, void *dest_val);
+void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
+                          void *dest_val);
 
 
 /**
@@ -249,7 +246,7 @@ DECL_TRAIT(hashmap_iter, iter);
 	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
 
 #define HASHMAP_SET_DECL( TYPE ) \
-	void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val);
+	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val);
 
 #define HASHMAP_ALL_DECL( TYPE , ...) \
 	HASHMAP_GET_DECL(TYPE) \

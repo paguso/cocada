@@ -23,8 +23,10 @@
 
 #include "errlog.h"
 #include "mathutil.h"
+#include "memdbg.h"
+#include "new.h"
 #include "segtree.h"
-
+#include "vec.h"
 
 void sum_int(const void *left, const void *right, void *dest)
 {
@@ -41,6 +43,7 @@ void max_float(const void *left, const void *right, void *dest)
 
 void test_segtree_upd(CuTest *tc)
 {
+	memdbg_reset();
 	int zero = 0;
 	size_t range = 10;
 	segtree *tree = segtree_new(range, sizeof(int), segtree_merge_sum_int, &zero);
@@ -78,6 +81,51 @@ void test_segtree_upd(CuTest *tc)
 		}
 	}
 	segtree_free(tree);
+	memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+typedef struct {
+	int val;
+	double dval;
+} obj_t;
+
+void merge_obj(const void* left, const void *right, void *dest)
+{
+	obj_t *l = (obj_t*)left;
+	obj_t *r = (obj_t*)right;
+	obj_t *d = (obj_t*)dest;
+	d->val = l->val + r->val;
+	d->dval = l->dval + r->dval;
+}
+
+
+void test_segtree_upd_obj(CuTest *tc)
+{
+	memdbg_reset();
+	obj_t zero =  {.val = 0, .dval = 0};
+	size_t range = 10;
+	segtree *tree = segtree_new(range, sizeof(obj_t), merge_obj, &zero);
+	for (size_t i=0; i<range; i++) {
+		obj_t v  =(obj_t){.val=(int)i, .dval = (double)i * 2};
+		segtree_upd(tree, i, &v);
+	}
+	for (size_t i=0; i<range; i++) {
+		int v = (*((obj_t *)segtree_qry(tree, i))).val;
+		CuAssertIntEquals(tc, i, v);
+	}
+	obj_t v;
+	for (size_t l=0; l<range; l++) {
+		for (size_t r=l; r<range; r++) {
+			int ex=0;
+			for (size_t i=l; i<r; ex+=(i++));
+			segtree_range_qry(tree, l, r, &v);
+			CuAssertIntEquals(tc, ex, v.val);
+		}
+	}
+	segtree_free(tree);
+	memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
 
@@ -86,6 +134,7 @@ CuSuite *segtree_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_segtree_upd);
+	SUITE_ADD_TEST(suite, test_segtree_upd_obj);
 	return suite;
 }
 

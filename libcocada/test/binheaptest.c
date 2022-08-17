@@ -48,10 +48,10 @@ int cmp_ptr_dbl(const void *p1, const void *p2)
 /*
  * Tests storing pointers to double
  */
-void test_binheap_push_pop(CuTest *tc)
+void test_binheap_ins_remv(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *maxheap = binheap_new(&cmp_ptr_dbl, sizeof(double *));
+	binheap *maxheap = binheap_new(sizeof(double *), &cmp_ptr_dbl);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
@@ -61,14 +61,14 @@ void test_binheap_push_pop(CuTest *tc)
 
 	for (size_t i =0; i<len; i++) {
 		double *d = &rv[i];
-		binheap_push(maxheap, &d);
+		binheap_ins(maxheap, &d);
 		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
 	}
 
 
 	for (size_t i =0; i<len; i++) {
 		double *d;
-		binheap_pop(maxheap, &d);
+		binheap_remv(maxheap, &d);
 		//printf("maxheap #%zu = %f\n",i,d);
 		CuAssertSizeTEquals(tc, len-i-1, binheap_size(maxheap));
 		CuAssertDblEquals(tc, (double)(len-i-1), *d, 0.1);
@@ -78,10 +78,10 @@ void test_binheap_push_pop(CuTest *tc)
 }
 
 
-void test_binheap_push_pop_int(CuTest *tc)
+void test_binheap_ins_remv_int(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *maxheap = binheap_new(cmp_int, sizeof(int));
+	binheap *maxheap = binheap_new(sizeof(int), cmp_int);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	int rv[len];
@@ -89,14 +89,14 @@ void test_binheap_push_pop_int(CuTest *tc)
 	shuffle_arr(rv, len, sizeof(int));
 
 	for (size_t i =0; i<len; i++) {
-		binheap_push_int(maxheap, rv[i]);
+		binheap_ins_int(maxheap, rv[i]);
 		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
 	}
 
 
 	for (size_t i =0; i<len; i++) {
 		int d;
-		d = binheap_pop_int(maxheap);
+		d = binheap_remv_int(maxheap);
 		//printf("maxheap #%zu = %d\n",i,d);
 		CuAssertSizeTEquals(tc, len-i-1, binheap_size(maxheap));
 		CuAssertIntEquals(tc, (int)(len-i-1), d);
@@ -110,7 +110,7 @@ void test_binheap_push_pop_int(CuTest *tc)
 CuSuite *binheap_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_binheap_push_pop);
-	SUITE_ADD_TEST(suite, test_binheap_push_pop_int);
+	SUITE_ADD_TEST(suite, test_binheap_ins_remv);
+	SUITE_ADD_TEST(suite, test_binheap_ins_remv_int);
 	return suite;
 }

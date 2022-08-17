@@ -47,7 +47,8 @@ static int _strreader_getc(strread *t)
 	strreader *rdr = (strreader *) t->impltor;
 	if (rdr->index < rdr->len) {
 		return rdr->src[rdr->index++];
-	} else {
+	}
+	else {
 		return EOF;
 	}
 }
@@ -81,7 +82,7 @@ static strread_vt _strreader_vt = { .reset = _strreader_reset,
                                   };
 
 
-strreader *strreader_open(char *src, size_t len)
+strreader *strreader_new(char *src, size_t len)
 {
 	strreader *ret = NEW(strreader);
 	ret->_t_strread.impltor = ret;
@@ -93,7 +94,7 @@ strreader *strreader_open(char *src, size_t len)
 }
 
 
-void strreader_close(strreader *rdr)
+void strreader_free(strreader *rdr)
 {
 	FREE(rdr);
 }

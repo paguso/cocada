@@ -123,7 +123,8 @@ void test_bitarr_get_bit(CuTest *tc)
 			////printf("even\n");
 			//bit = ba_get_bit(ba_even, i);
 			CuAssertTrue(tc, bitarr_get_bit(ba_even, i));
-		} else { // i is ODD
+		}
+		else {   // i is ODD
 			////printf("odd\n");
 			//bit = ba_get_bit(ba_odd, i);
 			CuAssertTrue(tc, bitarr_get_bit(ba_odd, i));
@@ -155,7 +156,8 @@ void test_bitarr_set_bit(CuTest *tc)
 			bitarr_set_bit(ba_even, i, 1);
 			CuAssertTrue(tc, !bitarr_get_bit(ba_odd, i));
 			CuAssertTrue(tc, bitarr_get_bit(ba_even, i));
-		} else { // i is ODD
+		}
+		else {   // i is ODD
 			bitarr_set_bit(ba_odd, i, 1);
 			bitarr_set_bit(ba_even, i, 0);
 			CuAssertTrue(tc, bitarr_get_bit(ba_odd, i));
@@ -232,7 +234,8 @@ void test_bitarr_write_char(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(char)-bitscrop);
 			if (written<0) {
 				written = ~0 & written>>(BYTESIZE*sizeof(char)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(char)-bitscrop);
 			}
 		}
@@ -279,7 +282,8 @@ void test_bitarr_write_short(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(short)-bitscrop);
 			if (written<0) {
 				written = ~0 & written>>(BYTESIZE*sizeof(short)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(short)-bitscrop);
 			}
 		}
@@ -327,7 +331,8 @@ void test_bitarr_write_int(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(int)-bitscrop);
 			if (written<0) {
 				written = ~0 & written>>(BYTESIZE*sizeof(int)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(int)-bitscrop);
 			}
 		}
@@ -375,7 +380,8 @@ void test_bitarr_write_long(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(long)-bitscrop);
 			if (written<0) {
 				written = ~0l & written>>(BYTESIZE*sizeof(long)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(long)-bitscrop);
 			}
 		}
@@ -423,7 +429,8 @@ void test_bitarr_write_longlong(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(long long)-bitscrop);
 			if (written<0) {
 				written = ~0ll & written>>(BYTESIZE*sizeof(long long)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(long long)-bitscrop);
 			}
 		}
@@ -471,7 +478,8 @@ void test_bitarr_write_size_t(CuTest *tc)
 			written <<= (BYTESIZE*sizeof(size_t)-bitscrop);
 			if (written<0) {
 				written = ~0 & written>>(BYTESIZE*sizeof(size_t)-bitscrop);
-			} else {
+			}
+			else {
 				written >>= (BYTESIZE*sizeof(size_t)-bitscrop);
 			}
 		}

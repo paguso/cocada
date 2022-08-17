@@ -124,7 +124,7 @@ void deque_pop_back(deque *q, void *dest);
  * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
-void deque_remv_back(deque *q);
+void deque_del_back(deque *q);
 
 
 /**
@@ -144,7 +144,7 @@ void deque_pop_front(deque *q, void *dest);
  * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
-void deque_remv_front(deque *q);
+void deque_del_front(deque *q);
 
 
 #define DEQUE_NEW_DECL( TYPE )\
@@ -166,7 +166,7 @@ void deque_remv_front(deque *q);
 	TYPE deque_pop_back_##TYPE(deque *q);
 
 #define DEQUE_REMV_BACK_DECL( TYPE )\
-	TYPE deque_remv_back_##TYPE(deque *q);
+	TYPE deque_del_back_##TYPE(deque *q);
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
 	void deque_push_front_##TYPE(deque *q, TYPE val);
@@ -175,7 +175,7 @@ void deque_remv_front(deque *q);
 	TYPE deque_pop_front_##TYPE(deque *q);
 
 #define DEQUE_REMV_FRONT_DECL( TYPE )\
-	TYPE deque_remv_front_##TYPE(deque *q);
+	TYPE deque_del_front_##TYPE(deque *q);
 
 #define DEQUE_ALL_DECL( TYPE, ... )\
 	DEQUE_NEW_DECL(TYPE)\

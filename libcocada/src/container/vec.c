@@ -122,7 +122,8 @@ static void _check_and_resize(vec *v)
 {
 	if (v->len==v->capacity) {
 		_resize_to(v, GROW_BY * v->capacity);
-	} else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD*v->capacity) {
+	}
+	else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD*v->capacity) {
 		_resize_to(v, v->len / MIN_LOAD);
 	}
 }
@@ -318,7 +319,14 @@ void vec_rotate_left(vec *v, size_t npos)
 }
 
 
-size_t vec_find(vec *v, void *val, eq_func eq)
+void vec_rotate_right(vec *v, size_t npos)
+{
+	vec_rotate_left(v, v->len - (npos % v->len));
+}
+
+
+
+size_t vec_find(const vec *v, const void *val, eq_func eq)
 {
 	size_t i, l;
 	for (i=0, l=vec_len(v); i < l && !eq(val, vec_get(v, i)); i++);
@@ -327,21 +335,25 @@ size_t vec_find(vec *v, void *val, eq_func eq)
 
 
 // returns the first position i s.t. val <= v[i] if any; else vec_len(v)
-static size_t _first_geq_bsearch(vec *v, void *val, cmp_func cmp)
+static size_t _first_geq_bsearch(const vec *v, const void *val, cmp_func cmp)
 {
 	if (vec_len(v) == 0 ) {
 		return 0;
-	} else if (cmp(val, vec_first(v)) <= 0) {
+	}
+	else if (cmp(val, vec_first(v)) <= 0) {
 		return 0;
-	} else if (cmp(vec_last(v), val) < 0) {
+	}
+	else if (cmp(vec_last(v), val) < 0) {
 		return vec_len(v);
-	} else {
+	}
+	else {
 		size_t l = 0, r = vec_len(v) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
 			if (cmp(vec_get(v, m), val) < 0) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
@@ -350,12 +362,13 @@ static size_t _first_geq_bsearch(vec *v, void *val, cmp_func cmp)
 }
 
 
-size_t vec_bsearch(vec *v, void *val, cmp_func cmp)
+size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp)
 {
 	size_t fgeq = _first_geq_bsearch(v, val, cmp);
 	if ( ( fgeq < vec_len(v) ) && (cmp(vec_get(v, fgeq), val) == 0) ) {
 		return fgeq;
-	} else {
+	}
+	else {
 		return vec_len(v);
 	}
 }
@@ -369,7 +382,7 @@ void vec_qsort(vec *v, cmp_func cmp)
 }
 
 
-size_t vec_min(vec *v, cmp_func cmp)
+size_t vec_min(const vec *v, cmp_func cmp)
 {
 	size_t m = 0;
 	for (size_t i=1, l=vec_len(v); i<l; ++i) {
@@ -379,7 +392,7 @@ size_t vec_min(vec *v, cmp_func cmp)
 }
 
 
-size_t vec_max(vec *v, cmp_func cmp)
+size_t vec_max(const vec *v, cmp_func cmp)
 {
 	size_t m = 0;
 	for (size_t i=1, l=vec_len(v); i<l; ++i) {
@@ -484,7 +497,7 @@ XX_CORETYPES(TYPED_VEC_IMPL)
 
 struct _vec_iter {
 	iter _t_iter;
-	vec *src;
+	const vec *src;
 	size_t index;
 };
 
@@ -506,7 +519,7 @@ static const void *_vec_iter_next(iter *it)
 static iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
 
 
-vec_iter *vec_get_iter(vec *v)
+vec_iter *vec_get_iter(const vec *v)
 {
 	vec_iter *ret = NEW(vec_iter);
 	ret->_t_iter.impltor = ret;

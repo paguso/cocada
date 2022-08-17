@@ -68,6 +68,10 @@ typedef bool (*equals_func)(const void *, const void *);
 
 XX_PRIMITIVES(IDENT_HASH_DECL)
 
+/**
+ * @brief Fibonacci hashing
+ * @see source: https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
+ */
 uint64_t fib_hash(uint64_t key);
 
 /**
@@ -75,14 +79,6 @@ uint64_t fib_hash(uint64_t key);
  * @see source: http://www.isthe.com/chongo/tech/comp/fnv
  */
 uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize);
-
-
-/**
- * @brief djb2 string hash function
- * @see Source: http://www.cse.yorku.ca/~oz/hash.html
- */
-size_t djb2_hash(const unsigned char *str);
-
 
 
 #endif

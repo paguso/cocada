@@ -69,14 +69,16 @@ static size_t succ(vec *data, cmp_func cmp, const void *val)
 	if ( vec_len(data) == 0
 	        || cmp(val, vec_get(data, 0)) < 0 ) { // treat last elt as INFINITY
 		return 0;
-	} else {
+	}
+	else {
 		size_t l = 0;
 		size_t r = vec_len(data) - 1;
 		while ( r - l > 1 ) {
 			size_t m = (l + r) / 2;
 			if ( cmp(val, vec_get(data, m)) < 0 ) {
 				r = m;
-			} else {
+			}
+			else {
 				l = m;
 			}
 		}
@@ -93,7 +95,8 @@ void gk_upd(gksumm *self, const void *val)
 	const size_t qty_thres = ceil(2.0 * self->err * self->total_qty);
 	if ( succ_qty->qty + succ_qty->delta + 1 < qty_thres ) {
 		succ_qty->qty++;
-	} else {
+	}
+	else {
 		vec_ins(self->vals, succ_pos, val);
 		gk_qty new_qty = {.qty = 1, .delta = succ_qty->qty + succ_qty->delta - 1};
 		vec_ins(self->qtys, succ_pos, &new_qty);
@@ -128,7 +131,8 @@ void gk_merge(gksumm *self, const gksumm *other)
 			i_qty->delta += (j_qty->qty + j_qty->delta - 1 );
 			i++;
 			i_qty = (gk_qty *) vec_get(self->qtys, i);
-		} else {
+		}
+		else {
 			vec_ins(self->vals, i, vec_get(other->vals, j));
 			gk_qty new_qty = {.qty = j_qty->qty, .delta = (j_qty->delta + i_qty->qty + i_qty->delta - 1)};
 			vec_ins(self->qtys, i, &new_qty);
@@ -155,7 +159,8 @@ void gk_merge(gksumm *self, const gksumm *other)
 			iplus1th_qty->qty += ith_qty->qty;
 			vec_del(self->vals, i);
 			vec_del(self->qtys, i);
-		} else {
+		}
+		else {
 			i++;
 		}
 	}

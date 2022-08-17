@@ -103,13 +103,13 @@ void minqueue_pop(minqueue *queue, void *dest)
 }
 
 
-void minqueue_remv(minqueue *queue)
+void minqueue_del(minqueue *queue)
 {
 	if ( deque_front_size_t(queue->mins) == queue->dels ) {
 		deque_pop_front_size_t(queue->mins);
 	}
 	queue->dels++;
-	deque_remv_front(queue->elts);
+	deque_del_front(queue->elts);
 
 }
 
@@ -188,7 +188,7 @@ minqueue_iter *minqueue_all_min(const minqueue *queue)
 }
 
 
-void minqueue_free(minqueue_iter *iter)
+void minqueue_iter_free(minqueue_iter *iter)
 {
 	FREE(iter);
 }

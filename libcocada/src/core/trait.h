@@ -187,9 +187,9 @@
  * 'get the dimension of circle `c` seen AS a `shape` TRAIT implementor'.
  * For that, we should used the preferred form
  * ```C
- * dimension dc = get_dimension( ASTRAIT(c, circle, shape) );
+ * dimension dc = get_dimension( AS_TRAIT(c, circle, shape) );
  * ```
- * using the general ::ASTRAIT macro.
+ * using the general ::AS_TRAIT macro.
  * Alternatively, we could define a function
  * ```C
  * shape *circle_as_shape(circle *c);
@@ -246,7 +246,7 @@
  * @param TYPE The concrete type of the implementor object
  * @param TRAIT The name of the trait
  */
-#define ASTRAIT(IMPLTOR, TYPE, TRAIT) (&(((TYPE *)(IMPLTOR))->_t_##TRAIT))
+#define AS_TRAIT(IMPLTOR, TYPE, TRAIT) (&(((TYPE *)(IMPLTOR))->_t_##TRAIT))
 
 
 #endif

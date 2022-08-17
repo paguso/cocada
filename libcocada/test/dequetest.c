@@ -26,6 +26,7 @@
 #include "CuTest.h"
 
 #include "deque.h"
+#include "memdbg.h"
 
 typedef struct _dequeobj {
 	int i;
@@ -36,6 +37,7 @@ typedef struct _dequeobj {
 
 void test_deque_push_pop(CuTest *tc)
 {
+	memdbg_reset();
 	size_t n = 10000;
 	deque *q = deque_new(sizeof(dequeobj));
 	CuAssertSizeTEquals(tc, 0, deque_len(q));
@@ -71,7 +73,8 @@ void test_deque_push_pop(CuTest *tc)
 			CuAssertIntEquals(tc, n-1-(i/2), o.i);
 			CuAssertDblEquals(tc, (double)(n-1-(i/2)), o.f, 0.1);
 			CuAssertCharEquals(tc, (char)(n-1-(i/2)), o.c);
-		} else {
+		}
+		else {
 			deque_pop_front(q, &o);
 			CuAssertIntEquals(tc, (n/2)+((i-1)/2), o.i);
 			CuAssertDblEquals(tc, (double)((n/2)+((i-1)/2)), o.f, 0.1);
@@ -79,6 +82,65 @@ void test_deque_push_pop(CuTest *tc)
 		}
 	}
 	CuAssertSizeTEquals(tc, n-(n/2)-(n/4), deque_len(q));
+	DESTROY_FLAT(q, deque);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+
+void test_deque_push_pop_refs(CuTest *tc)
+{
+	memdbg_reset();
+	size_t n = 10000;
+	deque *q = deque_new(sizeof(dequeobj *));
+	CuAssertSizeTEquals(tc, 0, deque_len(q));
+	CuAssertTrue(tc, deque_empty(q));
+
+	for (int i=0; i<n; i++) {
+		dequeobj *o = NEW(dequeobj);
+		*o = (dequeobj){.i=i, .f=(double)i, .c=(char)i};
+		deque_push_back_rawptr(q, o);
+	}
+	CuAssertSizeTEquals(tc, n, deque_len(q));
+
+	dequeobj *o;
+	for (int i=0; i<n/2; i++) {
+		o = deque_pop_front_rawptr(q);
+		CuAssertIntEquals(tc, i, o->i);
+		CuAssertDblEquals(tc, (double)i, o->f, 0.1);
+		CuAssertCharEquals(tc, (char)i, o->c);
+		deque_push_back(q, &o);
+	}
+	CuAssertSizeTEquals(tc, n, deque_len(q));
+
+	for (int i=n/2-1; i>=0; i--) {
+		deque_pop_back(q, &o);
+		CuAssertIntEquals(tc, i, o->i);
+		CuAssertDblEquals(tc, (double)(i), o->f, 0.1);
+		CuAssertCharEquals(tc, (char)(i), o->c);
+		free(o);
+	}
+	CuAssertSizeTEquals(tc, n-(n/2), deque_len(q));
+
+	for (int i=0; i<n/4; i++) {
+		if (i%2==0) {
+			deque_pop_back(q, &o);
+			CuAssertIntEquals(tc, n-1-(i/2), o->i);
+			CuAssertDblEquals(tc, (double)(n-1-(i/2)), o->f, 0.1);
+			CuAssertCharEquals(tc, (char)(n-1-(i/2)), o->c);
+			free(o);
+		}
+		else {
+			deque_pop_front(q, &o);
+			CuAssertIntEquals(tc, (n/2)+((i-1)/2), o->i);
+			CuAssertDblEquals(tc, (double)((n/2)+((i-1)/2)), o->f, 0.1);
+			CuAssertCharEquals(tc, (char)((n/2)+((i-1)/2)), o->c);
+			free(o);
+		}
+	}
+	CuAssertSizeTEquals(tc, n-(n/2)-(n/4), deque_len(q));
+	DESTROY(q, finaliser_cons(FNR(deque), finaliser_new_ptr()));
+	memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 
 
@@ -119,7 +181,8 @@ void test_deque_push_pop_int(CuTest *tc)
 		if (i%2==0) {
 			o = deque_pop_back_int(q);
 			CuAssertIntEquals(tc, n-1-(i/2), o);
-		} else {
+		}
+		else {
 			o = deque_pop_front_int(q);
 			CuAssertIntEquals(tc, (n/2)+((i-1)/2), o);
 		}
@@ -133,6 +196,7 @@ CuSuite *deque_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_deque_push_pop);
+	SUITE_ADD_TEST(suite, test_deque_push_pop_refs);
 	SUITE_ADD_TEST(suite, test_deque_push_pop_int);
 	return suite;
 }

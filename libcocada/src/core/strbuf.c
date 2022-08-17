@@ -45,7 +45,7 @@ static void _resize_to(strbuf *sb, size_t min_cap)
 {
 	min_cap = MAX(min_cap, sb->len); // losing data not allowed
 	size_t cap;
-	for(cap = MAX(DEFAULT_CAP, sb->capacity); cap < min_cap; cap *= GROW_BY);
+	for (cap = MAX(DEFAULT_CAP, sb->capacity); cap < min_cap; cap *= GROW_BY);
 	sb->str = realloc(sb->str, (cap + 1) * sizeof(char));
 	cstr_fill(sb->str, sb->len, cap, '\0');
 	sb->capacity = cap;
@@ -144,7 +144,7 @@ void strbuf_nappend(strbuf *sb, const char *src, size_t len)
 
 void strbuf_append(strbuf *sb, const char *src)
 {
-	strbuf_nappend(sb, src, strlen(src));	
+	strbuf_nappend(sb, src, strlen(src));
 }
 
 
@@ -200,7 +200,8 @@ void strbuf_ins(strbuf *sb, size_t pos, const char *str, size_t len)
 {
 	assert(pos <= sb->len);
 	_resize_to(sb, sb->len + len);
-	memmove(sb->str + ((pos + len) * sizeof(char)), sb->str + (pos * sizeof(char)), (sb->len - pos) * sizeof(char));
+	memmove(sb->str + ((pos + len) * sizeof(char)), sb->str + (pos * sizeof(char)),
+	        (sb->len - pos) * sizeof(char));
 	memcpy(sb->str + (pos * sizeof(char)), str, len * sizeof(char));
 	sb->len += len;
 }
@@ -213,7 +214,9 @@ void strbuf_cut(strbuf *sb, size_t from, size_t len, char *dest)
 		strncpy(dest, sb->str + (from * sizeof(char)), len);
 		dest[len] = '\0';
 	}
-	memmove(sb->str + (from * sizeof(char)), sb->str + ((from + len) * sizeof(char)), (sb->len - (from + len)) * sizeof(char));
+	memmove(sb->str + (from * sizeof(char)),
+	        sb->str + ((from + len) * sizeof(char)),
+	        (sb->len - (from + len)) * sizeof(char));
 	sb->len -= len;
 	memset(sb->str + (sb->len * sizeof(char)), '\0', len);
 }
@@ -224,7 +227,8 @@ void strbuf_paste(strbuf *sb, size_t from, const char *src, size_t len)
 	assert (from <= sb->len);
 	if (from + len <= sb->len) {
 		memcpy(sb->str + (from * sizeof(char)), src, len * sizeof(char));
-	} else {
+	}
+	else {
 		size_t hang = len - (sb->len - from);
 		memcpy(sb->str + (from * sizeof(char)), src, (len - hang) * sizeof(char));
 		strbuf_nappend(sb, src + (len - hang) * sizeof(char), hang);
@@ -293,10 +297,12 @@ void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n)
 		if (repllen > patlen) {
 			strbuf_paste(sb, pos, new, patlen);
 			strbuf_ins(sb, pos + patlen, new + patlen, repllen - patlen);
-		} else if (repllen < patlen) {
+		}
+		else if (repllen < patlen) {
 			strbuf_cut(sb, pos, patlen - repllen, NULL);
 			strbuf_paste(sb, pos, new, repllen);
-		} else { // equals
+		}
+		else {   // equals
 			strbuf_paste(sb, pos, new, patlen);
 		}
 	}

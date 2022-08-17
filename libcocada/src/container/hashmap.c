@@ -239,7 +239,7 @@ static _find_res _find_sse(hashmap *hmap, void *key, uint64_t h)
 
 */
 
-bool hashmap_has_key(const hashmap *hmap, const void *key)
+bool hashmap_contains(const hashmap *hmap, const void *key)
 {
 	return _find(hmap, key, _hash(hmap, key)).found;
 }
@@ -250,7 +250,8 @@ const void *hashmap_get(const hashmap *hmap, const void *key)
 	_find_res qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		return _value_at(hmap, qry.pos);
-	} else {
+	}
+	else {
 		return NULL;
 	}
 }
@@ -346,7 +347,7 @@ static void _check_resize(hashmap *hmap)
 
 
 
-void hashmap_set(hashmap *hmap, const void *key, const void *val)
+void hashmap_ins(hashmap *hmap, const void *key, const void *val)
 {
 	assert(key != NULL);
 	_check_resize(hmap);
@@ -354,7 +355,7 @@ void hashmap_set(hashmap *hmap, const void *key, const void *val)
 }
 
 
-void hashmap_unset(hashmap *hmap, const void *key)
+void hashmap_del(hashmap *hmap, const void *key)
 {
 	assert(key != NULL);
 	uint64_t h = _hash(hmap, key);
@@ -367,7 +368,8 @@ void hashmap_unset(hashmap *hmap, const void *key)
 }
 
 
-void hashmap_remove_entry(hashmap *hmap, const void *key, void *dest_key, void *dest_val)
+void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
+                          void *dest_val)
 {
 	assert(key != NULL);
 	_find_res qry = _find(hmap, key, _hash(hmap, key));
@@ -462,8 +464,8 @@ IMPL_TRAIT(hashmap_iter, iter);
 
 
 #define HASHMAP_SET_IMPL( TYPE )\
-	void hashmap_set_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
-		hashmap_set(hmap, key, &val);\
+	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
+		hashmap_ins(hmap, key, &val);\
 	}
 
 

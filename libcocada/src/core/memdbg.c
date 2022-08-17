@@ -108,7 +108,8 @@ static void memtable_check_and_resize(memtable *tally)
 	if (load < MIN_LOAD) {
 		newcap = tally->cap / GROW_BY;
 		newcap = (newcap > MIN_CAP) ? newcap : MIN_CAP;
-	} else if (load > MAX_LOAD) {
+	}
+	else if (load > MAX_LOAD) {
 		newcap = tally->cap * GROW_BY;
 	}
 	if (newcap != tally->cap) {

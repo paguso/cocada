@@ -61,7 +61,7 @@ size_t hashset_size(const hashset *set);
 
 
 /**
- * @brief Checks whether the @p set contains a given element @p elt.
+ * @brief Checks whether the @p set contains an element equal to @p elt.
  */
 bool hashset_contains(const hashset *set, const void *elt);
 
@@ -73,9 +73,23 @@ void hashset_add(hashset *set, const void *elt);
 
 
 /**
- * @brief Removes an element @p elt from the @p set.
+ * @brief Removes the element equal to @p elt from the @set, if any, 
+ * and returns it by copying into @p dest. If no such element is
+ * found, the operation has no effect.
  */
-void hashset_remove(hashset *set, const void *elt);
+void hashset_remv(hashset *set, const void *elt, void *dest);
+
+
+/**
+ * @brief Deletes an element equal to @p elt from the @p set, if any.
+ * If no such element is found, the operation has no effect.
+ * @warning If the deleted element contains external references to
+ * external objects, these might not be properly destroyed.
+ * @see hashset_remv
+ */
+void hashset_del(hashset *set, const void *elt);
+
+
 
 
 
@@ -87,14 +101,14 @@ void hashset_remove(hashset *set, const void *elt);
 	void hashset_add_##TYPE(hashset *set, TYPE elt );
 
 
-#define HASHSET_REMOVE_DECL( TYPE ) \
-	void hashset_remove_##TYPE(hashset *set, TYPE elt );
+#define HASHSET_DEL_DECL( TYPE ) \
+	void hashset_del_##TYPE(hashset *set, TYPE elt );
 
 
 #define HASHSET_ALL_DECL( TYPE, ... )\
 	HASHSET_CONTAINS_DECL(TYPE)\
 	HASHSET_ADD_DECL(TYPE)\
-	HASHSET_REMOVE_DECL(TYPE)
+	HASHSET_DEL_DECL(TYPE)
 
 XX_CORETYPES(HASHSET_ALL_DECL)
 

@@ -187,13 +187,15 @@ void quadtree_ins(quadtree *tree, point2d p, void *payload,
 		if (IS_EAST(pos)) {
 			rect.top_left.x = centre.x;
 			rect.width = SND_HALF(rect.width);
-		} else {
+		}
+		else {
 			rect.width = FST_HALF(rect.width);
 		}
 		if (IS_SOUTH(pos) ) {
 			rect.top_left.y = centre.y;
 			rect.height = SND_HALF(rect.height);
-		} else {
+		}
+		else {
 			rect.height = FST_HALF(rect.height);
 		}
 		centre.x = rect.top_left.x + FST_HALF(rect.width);
@@ -221,13 +223,15 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 			if (IS_EAST(pos)) {
 				rect.top_left.x = centre.x;
 				rect.width = SND_HALF(rect.width);
-			} else {
+			}
+			else {
 				rect.width = FST_HALF(rect.width);
 			}
 			if (IS_SOUTH(pos) ) {
 				rect.top_left.y = centre.y;
 				rect.height = SND_HALF(rect.height);
-			} else {
+			}
+			else {
 				rect.height = FST_HALF(rect.height);
 			}
 			centre.x = rect.top_left.x + FST_HALF(rect.width);
@@ -240,9 +244,11 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 		rectbounds[1].y = rect.top_left.x + rect.height;
 		if (bounds[i].x == rectbounds[0].x && bounds[i].y == rectbounds[0].y) {
 			bounds[i] = rectbounds[0];
-		} else if (bounds[i].x == rectbounds[1].x && bounds[i].y == rectbounds[1].y) {
+		}
+		else if (bounds[i].x == rectbounds[1].x && bounds[i].y == rectbounds[1].y) {
 			bounds[i] = rectbounds[1];
-		} else {
+		}
+		else {
 			switch (anchor) {
 			case SNAP_IN:
 				bounds[i] = rectbounds[1-i];
@@ -274,7 +280,8 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 		if (backtrack) {
 			return;
 		}
-	} else if (quadtree_node_is_leaf(tree, node)) {
+	}
+	else if (quadtree_node_is_leaf(tree, node)) {
 		return;
 	}
 

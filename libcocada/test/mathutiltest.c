@@ -44,28 +44,33 @@ void test_mult_floor(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			} else {
+			}
+			else {
 				expected = -INFINITY;
 			}
-		} else if (base<0) {
+		}
+		else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while (expected*base>value) {
 					expected+=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while ((expected-1)*base<value) {
 					expected-=1;
 				}
 			}
-		} else if (base>0) {
+		}
+		else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while (expected*base>value) {
 					expected-=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while ((expected+1)*base<value) {
 					expected+=1;
@@ -91,28 +96,33 @@ void test_mult_ceil(CuTest *tc)
 		if (base==0) {
 			if (value>=0) {
 				expected = 0;
-			} else {
+			}
+			else {
 				expected = INFINITY;
 			}
-		} else if (base<0) {
+		}
+		else if (base<0) {
 			if (value<0) {
 				expected = 0;
 				while ((expected+1)*base>=value) {
 					expected+=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected-=1;
 				}
 			}
-		} else if (base>0) {
+		}
+		else if (base>0) {
 			if (value<0) {
 				expected=0;
 				while ((expected-1)*base>=value) {
 					expected-=1;
 				}
-			} else if (value>=0) {
+			}
+			else if (value>=0) {
 				expected = 0;
 				while (expected*base<value) {
 					expected+=1;
@@ -126,19 +136,19 @@ void test_mult_ceil(CuTest *tc)
 
 
 
-void test_is_prime(CuTest *tc)
+void test_is_prime_mr(CuTest *tc)
 {
-	//bool a = is_prime(18023405708736723011);
-	//bool b = naive_is_prime(18023405708736723011);
+	//bool a = is_prime_mr(18023405708736723011);
+	//bool b = is_prime_naive(18023405708736723011);
 
 	uint64_t val = 1;
 	for (size_t p=0; p<63; p++) {
 		for (size_t n=0; n<1000; n++) {
-			bool ispr = is_prime(val);
+			bool ispr = is_prime_mr(val);
 			DEBUG("%zu is %s prime\n", val, ispr?"":"NOT");
-			if (ispr!=naive_is_prime(val)) {
-				ispr = is_prime(val);
-				CuAssert(tc, "primality test failed", ispr==naive_is_prime(val));
+			if (ispr!=is_prime_naive(val)) {
+				ispr = is_prime_mr(val);
+				CuAssert(tc, "primality test failed", ispr==is_prime_naive(val));
 			}
 			val++;
 		}
@@ -153,9 +163,9 @@ void test_prime_succ(CuTest *tc)
 		uint64_t psucc = prime_succ(n);
 		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n, psucc);
 		for (uint64_t s=n+1; s<psucc; s++) {
-			CuAssert(tc, "Prime successor not minimal", !is_prime(s));
+			CuAssert(tc, "Prime successor not minimal", !is_prime_mr(s));
 		}
-		CuAssert(tc, "Prime successor is NOT a prime", is_prime(psucc));
+		CuAssert(tc, "Prime successor is NOT a prime", is_prime_mr(psucc));
 	}
 }
 
@@ -165,7 +175,7 @@ CuSuite *mathutil_get_test_suite()
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_mult_floor);
 	SUITE_ADD_TEST(suite, test_mult_ceil);
-	//SUITE_ADD_TEST(suite, test_is_prime);
+	//SUITE_ADD_TEST(suite, test_is_prime_mr);
 	SUITE_ADD_TEST(suite, test_prime_succ);
 	return suite;
 }

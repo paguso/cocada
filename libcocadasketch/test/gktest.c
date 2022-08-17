@@ -47,7 +47,8 @@ void test_gk_upd(CuTest *tc)
 		double xval;
 		do {
 			xval = (rand_norm() + 1.0) / 7.0;
-		} while (xval < 0 || xval >= 1);
+		}
+		while (xval < 0 || xval >= 1);
 		int val = xval * univ;
 		//printf("Insert %d:\n", val);
 		gk_upd(sk, &val);

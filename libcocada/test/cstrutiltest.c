@@ -53,7 +53,7 @@ void test_sizet_to_cstr(CuTest *tc)
 }
 
 
-void test_cstr_join(CuTest *tc) 
+void test_cstr_join(CuTest *tc)
 {
 	memdbg_reset();
 	char *s1 = "sunday";
@@ -78,7 +78,9 @@ void test_cstr_join(CuTest *tc)
 	FREE(res);
 	res = cstr_join(sep, 7, s1, s2, s3, s4, s5, s6, s7);
 	DEBUG("Joined 7 = %s\n", res);
-	CuAssertStrEquals(tc, "sunday then monday then tuesday then wednesday then thursday then friday then saturday", res);
+	CuAssertStrEquals(tc,
+	                  "sunday then monday then tuesday then wednesday then thursday then friday then saturday",
+	                  res);
 	FREE(res);
 	ERROR_ASSERT(memdbg_is_empty(), "Memory leak.");
 }

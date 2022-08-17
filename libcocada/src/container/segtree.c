@@ -78,7 +78,8 @@ segtree *segtree_new(size_t range, size_t typesize, merge_func merge,
 
 void segtree_free(segtree *self)
 {
-	FREE(self->tree);
+	DESTROY_FLAT(self->tree, vec);
+	FREE(self->init_val);
 	FREE(self);
 }
 

@@ -164,9 +164,11 @@ static bool contains_addr(vec *chunks, size_t addr)
 		mem_chunk *chk = (mem_chunk *)vec_get(chunks, m);
 		if ( addr < chk->start) {
 			r = m;
-		} else if ( chk->start <= addr  && addr < chk->start + chk->size ) {
+		}
+		else if ( chk->start <= addr  && addr < chk->start + chk->size ) {
 			return true;
-		} else {
+		}
+		else {
 			l = m + 1;
 		}
 	}
@@ -180,17 +182,21 @@ static void add_chunk(vec *chunks, mem_chunk ck)
 	size_t addr = ck.start;
 	if (vec_len(chunks) == 0) {
 		pos = 0;
-	} else if (addr <= ((mem_chunk *)(vec_first(chunks)))->start) {
+	}
+	else if (addr <= ((mem_chunk *)(vec_first(chunks)))->start) {
 		pos = 0;
-	} else if (((mem_chunk *)(vec_last(chunks)))->start < addr) {
+	}
+	else if (((mem_chunk *)(vec_last(chunks)))->start < addr) {
 		pos =  vec_len(chunks);
-	} else {
+	}
+	else {
 		size_t l = 0, r = vec_len(chunks) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
 			if (((mem_chunk *)(vec_get(chunks, m)))->start < addr) {
 				l = m;
-			} else {
+			}
+			else {
 				r = m;
 			}
 		}
@@ -282,7 +288,7 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
 	mem_chunk chunk = {.start = addr, .size=model->size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 }
 
 
@@ -316,7 +322,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
 		}
 	}
 	size_t off = (size_t)addr - (size_t)base;
-	ERROR_ASSERT(hashmap_has_key(mem_map, &base),
+	ERROR_ASSERT(hashmap_contains(mem_map, &base),
 	             "Cannot map already read address %p.\n", base);
 	base = hashmap_get_rawptr(mem_map, &base);
 	return base + off;
@@ -340,7 +346,7 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 	mem_chunk chunk = {.start = addr, .size = size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 	if ( contains_addr(read, (size_t)(*dest)) ) {
 		*dest = map_addr(mem_map, read, *dest);
 		return;
@@ -353,7 +359,8 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 		void *new_obj = NULL;
 		if (pointee_model->type == som_arr || pointee_model->type == som_cstr) {
 			new_obj = ptr;
-		} else {
+		}
+		else {
 			new_obj = malloc(pointee_model->size);
 		}
 		*dest = new_obj;
@@ -394,7 +401,7 @@ void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read,
 	mem_chunk chunk = {.start = addr, .size = size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
-	hashmap_set(mem_map, &addr, &dest);
+	hashmap_ins(mem_map, &addr, &dest);
 	for (size_t i = 0; i < som_nchd(model); i++) {
 		sub_som field_som_chd = som_chd(model, i);
 		som *field_som = field_som_chd.chd;
@@ -489,7 +496,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	            "Incompatible array size for the element size.\n");
 	size_t len = size / elt_size;
 	void *arr = sa_arr_calloc(len, elt_size);
-	hashmap_set(mem_map, &addr, &arr);
+	hashmap_ins(mem_map, &addr, &arr);
 	*((rawptr *)ptr_addr) = arr;
 
 	switch (elt_som->type) {
@@ -530,7 +537,7 @@ void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	add_chunk(read, chunk);
 
 	void *str = cstr_new(size-1);
-	hashmap_set(mem_map, &addr, &str);
+	hashmap_ins(mem_map, &addr, &str);
 	*((rawptr *)ptr_addr) = str;
 	read_blob(str, size, stream);
 }
@@ -619,7 +626,7 @@ static void *bfs_read(som *model, FILE *stream)
 	hashmap *mem_map = hashmap_new( sizeof(size_t), sizeof(size_t),
 	                                ident_hash_size_t, eq_size_t );
 	void *nullptr = NULL;
-	hashmap_set(mem_map, &nullptr, &nullptr);
+	hashmap_ins(mem_map, &nullptr, &nullptr);
 	deque *dq = deque_new(sizeof(obj_model));
 
 	rawptr *ptr = NEW(rawptr);

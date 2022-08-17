@@ -229,7 +229,8 @@ void bitvec_push_n (bitvec *bv, size_t nbits, bool bit)
 		*(last_byte) |= ~(BYTE_MAX>>nleft);
 		bv->len += nbits;
 		//bv->count1 += nbits;
-	} else
+	}
+	else
 		bv->len += nbits;
 
 }

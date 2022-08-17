@@ -90,10 +90,10 @@ void minqueue_pop(minqueue *queue, void *dest);
 
 
 /**
- * @brief  Removes the element from the front of the queue.
+ * @brief  Deletes the element from the front of the queue.
  * @warning No check is performed on @p queue bounds.
  */
-void minqueue_remv(minqueue *queue);
+void minqueue_del(minqueue *queue);
 
 
 
@@ -137,7 +137,7 @@ minqueue_iter *minqueue_all_min(const minqueue *queue);
 /**
  * @brief  Destructor.
  */
-void minqueue_free(minqueue_iter *iter);
+void minqueue_iter_free(minqueue_iter *iter);
 
 
 /**

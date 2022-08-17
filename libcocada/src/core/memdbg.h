@@ -120,8 +120,6 @@ extern bool memdbg_is_empty();
 
 #ifdef MEM_DEBUG
 
-#define MEM_DEBUG_PRINT_ALL
-
 #ifndef MEM_DEBUG_OFF
 
 #define malloc(size) (memdbg_malloc(size, __FILE__ , __LINE__))

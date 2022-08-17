@@ -79,7 +79,7 @@ void test_hashset_indel(CuTest *tc)
 		CuAssertSizeTEquals(tc, n-i, hashset_size(set));
 		elt  = (uint)(10*i);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
-		hashset_remove(set, &elt);
+		hashset_del(set, &elt);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
 	}
 
@@ -87,7 +87,7 @@ void test_hashset_indel(CuTest *tc)
 	for (uint i=0; i<n/2; i++) {
 		elt = (uint)(10*i);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
-		hashset_remove(set, &elt);
+		hashset_del(set, &elt);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
 		CuAssertSizeTEquals(tc, n-(n/2), hashset_size(set));
 	}

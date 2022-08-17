@@ -98,31 +98,31 @@
  * or either *multiple* times. For example, the `gcc -I <include dir>`
  * option can be declared multiple times for specifying several
  * directories where to look for the header files.
- * 
+ *
  * ## Short-circuit (s/c) options
- * 
- * A short-circuit option is an option that, when found, causes the CLI 
- * parse to be interrupted and other options  and positional arguments to 
- * be ignored.  The archeypical example of such an option is the 
- * `--help (-h)` option, which ususally signals that the program should 
+ *
+ * A short-circuit option is an option that, when found, causes the CLI
+ * parse to be interrupted and other options  and positional arguments to
+ * be ignored.  The archeypical example of such an option is the
+ * `--help (-h)` option, which ususally signals that the program should
  * print the usage help message and exit.
- * The s/c help function is automatically added to every command. 
+ * The s/c help function is automatically added to every command.
  * Another very common example is  the `--version (-v)`.
- * A s/c option is meant to be used alone, is always optional and can 
+ * A s/c option is meant to be used alone, is always optional and can
  * be used at most once. It can however take values just like other options.
  * As soon as the first s/c option is  found in a program call, the parsing
- * is interrupted and further validations concerning other options and 
- * positional arguments are ignored, even though some of them might have 
+ * is interrupted and further validations concerning other options and
+ * positional arguments are ignored, even though some of them might have
  * already been performed.
- * 
+ *
  * ## Option combos
- * 
- * Sometimes there can be dependencies between options. For example, 
- * there can be a situation in which if an option is used, then a 
+ *
+ * Sometimes there can be dependencies between options. For example,
+ * there can be a situation in which if an option is used, then a
  * complementary option should also be used. COCADA lets such dependencies
  * be specified via "option combos" ::clioptcombotype.
  *
- *  
+ *
  * # Positional arguments
  *
  * The required inputs to a program are given as a list of positional
@@ -281,7 +281,7 @@ typedef struct _cliopt cliopt;
 
 
 /**
- * @brief Option combo type which specifies how groups of inderdependent 
+ * @brief Option combo type which specifies how groups of inderdependent
  * options should be used together.
  */
 typedef enum {
@@ -368,7 +368,7 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
  * - Optional (non-mandatory)
  * - Single usage (can appear at most once per program call)
  * - No associated value (boolean switch).
- * 
+ *
  * @param shortname (**no transfer**) The one-character distinct name
  * @param longname  (**no transfer**) The multi-character distinct name
  * @param help      (**no transfer**) A short description of the option
@@ -387,8 +387,8 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  * @see cliopt_new
  */
 cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
-                   cliargtype type, int min_val_no, int max_val_no,
-                   vec *choices, vec *defaults );
+                      cliargtype type, int min_val_no, int max_val_no,
+                      vec *choices, vec *defaults );
 
 
 /**
@@ -483,13 +483,14 @@ void cliparser_add_option(cliparser *cmd, cliopt *opt);
 
 
 /**
- * @brief Adds an option combo specification to the parser. A variable 
+ * @brief Adds an option combo specification to the parser. A variable
  * list of  @p n cliopt  references should be passed as arguments.
- * 
+ *
  * @warning The combo specifies the dependencies between the options only,
  * and they must be independently added via ::cliparser_add_option.
  */
-void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n, ...);
+void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n,
+                                ...);
 
 
 /**
@@ -536,15 +537,15 @@ typedef struct {
 } cliparse_error;
 
 
-DECL_RESULT_ERR(cliparse, cliparser*, cliparse_error)
+DECL_RESULT_ERR(cliparse, cliparser *, cliparse_error)
 
 /**
  * @brief Parses a program call.
- * 
+ *
  * If the call is sucessfully parsed, the @p cmd is populated with the
  * option and argument values, including default values for undeclared
  * non-required options, if available. If a parse error occurs, an error object
- * cliparser_error is returned containing an error message, unless the 
+ * cliparser_error is returned containing an error message, unless the
  * paramater @p exit_on_error is set to true, in which case the error message
  * is printed to stderr and the program exits.
  *
@@ -588,7 +589,8 @@ DECL_RESULT_ERR(cliparse, cliparser*, cliparse_error)
  * `3`, `4`, and `5`.
  *
  */
-cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv, bool exit_on_error);
+cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv,
+                             bool exit_on_error);
 
 
 //const char *cliparser_parse_status_msg(cliparser *cmd);
@@ -608,7 +610,7 @@ const cliparser *cliparser_active_subcommand(const cliparser *cmd);
  * After parsing a call, if an sc option was declared, returns the
  * corresponding (populated) cliopt, else returns NULL.
  */
-const cliopt* cliparser_active_sc_option(const cliparser *cmd);
+const cliopt *cliparser_active_sc_option(const cliparser *cmd);
 
 
 /**
@@ -633,7 +635,8 @@ const cliopt* cliparser_active_sc_option(const cliparser *cmd);
  * vector with with two child vectors, the first with three long ints
  * and the second with two long ints.
  */
-const vec *cliparser_opt_val_from_shortname(const cliparser *cmd, char shortname);
+const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
+        char shortname);
 
 
 /**
@@ -645,7 +648,8 @@ const vec *cliparser_opt_val_from_shortname(const cliparser *cmd, char shortname
  * @see cliparser_opt_val_from_shortname
  *
  */
-const vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname);
+const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
+        char *longname);
 
 
 /**

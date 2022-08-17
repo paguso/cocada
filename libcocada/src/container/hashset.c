@@ -49,20 +49,28 @@ size_t hashset_size(const hashset *set)
 
 bool hashset_contains(const hashset *set, const void *elt)
 {
-	return hashmap_has_key(set, elt);
+	return hashmap_contains(set, elt);
 }
 
-static int NOTHING = 0;
+static char __NOCHAR;
+#define __NOTHING ((void *)(&__NOCHAR))
+
 
 void hashset_add(hashset *set, const void *elt)
 {
-	hashmap_set(set, elt, (void *)&NOTHING);
+	hashmap_ins(set, elt, __NOTHING);
 }
 
 
-void hashset_remove(hashset *set, const void *elt)
+void hashset_remv(hashset *set, const void *elt, void *dest)
 {
-	hashmap_unset(set, elt);
+	hashmap_remv(set, elt, __NOTHING, dest);
+}
+
+
+void hashset_del(hashset *set, const void *elt)
+{
+	hashmap_del(set, elt);
 }
 
 #define HASHSET_CONTAINS_IMPL( TYPE ) \
@@ -77,16 +85,16 @@ void hashset_remove(hashset *set, const void *elt)
 	}
 
 
-#define HASHSET_REMOVE_IMPL( TYPE ) \
-	void hashset_remove_##TYPE(hashset *set, TYPE elt ) {\
-		hashset_remove(set, &elt);\
+#define HASHSET_DEL_IMPL( TYPE ) \
+	void hashset_del_##TYPE(hashset *set, TYPE elt ) {\
+		hashset_del(set, &elt);\
 	}
 
 
 #define HASHSET_ALL_IMPL( TYPE, ... )\
 	HASHSET_CONTAINS_IMPL(TYPE)\
 	HASHSET_ADD_IMPL(TYPE)\
-	HASHSET_REMOVE_IMPL(TYPE)
+	HASHSET_DEL_IMPL(TYPE)
 
 XX_CORETYPES(HASHSET_ALL_IMPL)
 

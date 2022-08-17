@@ -29,21 +29,25 @@
 #ifndef STRREADER_H
 #define STRREADER_H
 
+#include <stddef.h>
+
+#include "strread.h"
 #include "trait.h"
+
 
 typedef struct _strreader strreader;
 
 /**
  * @brief "Opens" the in-memory source string @p src of length @p len as a stream reader.
  */
-strreader *strreader_open(char *src, size_t len);
+strreader *strreader_new(char *src, size_t len);
 
 
 /**
- * @brief Closes the string reader.
+ * @brief Destructor.
  * @warning This *does not* deallocate de source string.
  */
-void strreader_close(strreader *rdr);
+void strreader_free(strreader *rdr);
 
 
 DECL_TRAIT(strreader, strread)

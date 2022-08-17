@@ -169,13 +169,13 @@ bool cstr_equals_ignore_case(const char *left, const char *right);
 
 
 /**
- * @brief Joins @p n strings into a single string, 
+ * @brief Joins @p n strings into a single string,
  * intercalating them with a given separator @p sep.
- * 
+ *
  * #Example
  * ```C
  * char *lifecicle = cstr_join("-", 3, "code", "test", "repeat");
- * printf("%s\n",lifecicle);// prints "code-test-repeat" 
+ * printf("%s\n",lifecicle);// prints "code-test-repeat"
  * ```
  */
 char *cstr_join(const char *sep, size_t n, ...);
