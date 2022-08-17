@@ -59,16 +59,16 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 
 uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m)
 {
-	uint64_t res = 0;
+	uint64_t ans = 0;
 	a = a % m;
 	while (b > 0) {
-		if ( b & 1 ) { // b is odd
-			res = mod_sum(res, a, m); // res = res + a mod m
+		if ( IS_ODD(b) ) {
+			ans = mod_sum(ans, a, m); // ans = ans + a mod m
 		}
 		a = mod_sum(a, a, m); // a = 2*a mod m
 		b /= 2;
 	}
-	return res % m;
+	return ans % m;
 }
 
 
@@ -76,18 +76,18 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m)
 {
 	b = b % m;
 	if (b == 0) return 0;
-	uint64_t res = 1;
+	uint64_t ans = 1;
 	while (e) {
-		if (e & 1)
-			res = mod_mult(res, b, m); // res = (res*b) % m;
+		if ( IS_ODD(e) )
+			ans = mod_mult(ans, b, m); // ans = (ans*b) % m;
 		e >>= 1;
 		b = mod_mult(b, b, m); // b = b^2 % m;
 	}
-	return res;
+	return ans;
 }
 
 
-bool naive_is_prime(uint64_t val)
+bool is_prime_naive(uint64_t val)
 {
 	if (val < 2) return false;
 	for (uint64_t q=2; q*q <=val; q++) {
@@ -99,10 +99,10 @@ bool naive_is_prime(uint64_t val)
 }
 
 
-bool is_prime(uint64_t n)
+bool is_prime_mr(uint64_t n)
 {
 	uint64_t a[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
-	uint64_t limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615};
+	uint64_t limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615ull};
 	size_t nwitness[] = {1, 2, 3, 4, 5, 6, 7, 9, 12};
 	if (n < 2) return false;
 	if (n == 2) return true;
@@ -150,7 +150,7 @@ uint64_t prime_succ(uint64_t n)
 		ret += 2;
 		pm = false;
 	}
-	while ( !is_prime(ret) ) {
+	while ( !is_prime_mr(ret) ) {
 		ret += (pm)?2:4;
 		pm = !pm;
 	}
@@ -158,20 +158,50 @@ uint64_t prime_succ(uint64_t n)
 }
 
 
-long double average_uint64_t(uint64_t *vals, size_t n)
+#define __uchar_max UCHAR_MAX
+#define __ushort_max USHRT_MAX
+#define __uint_max UINT_MAX
+#define __ulong_max ULONG_MAX
+#define __ullong_max ULLONG_MAX
+#define __size_t_max SIZE_MAX
+#define __uint8_t_max UINT8_MAX
+#define __uint16_t_max UINT16_MAX
+#define __uint32_t_max UINT32_MAX
+#define __uint64_t_max UINT32_MAX
+#define __byte_t_max BYTE_MAX
+
+#define AVG_IMPL(TYPE, ...)\
+double average_##TYPE(TYPE *vals, size_t n)\
+{\
+	double avg = 0;\
+	TYPE acc = 0;\
+	for (size_t i = 0; i < n; i++) {\
+		if ((__##TYPE##_max - acc) < vals[i]) {\
+			avg += (double) acc / (double) n;\
+			acc = 0;\
+		}\
+		acc += vals[i];\
+	}\
+	avg += (double) acc / (double) n;\
+	return avg;\
+}
+
+XX_UNSIGNED_INT(AVG_IMPL)
+
+/*double average_uint64_t(uint64_t *vals, size_t n)
 {
-	long double avg = 0;
+	double avg = 0;
 	uint64_t acc = 0;
 	for (size_t i = 0; i < n; i++) {
 		if ((UINT64_MAX - acc) < vals[i]) {
-			avg += (long double) acc / (long double) n;
+			avg += (double) acc / (double) n;
 			acc = 0;
 		}
 		acc += vals[i];
 	}
-	avg += (long double) acc / (long double) n;
+	avg += (double) acc / (double) n;
 	return avg;
-}
+}*/
 
 
 #define SWAP(X, Y, TMP) \

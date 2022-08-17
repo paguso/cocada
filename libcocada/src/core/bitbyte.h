@@ -71,11 +71,11 @@ typedef unsigned char byte_t;
 #define BYTESIZE CHAR_BIT
 
 /*
- * Most of the code herein is not dependent on a byte being an octet.
+ * Most of the code in this library is not dependent on a byte being an octet.
  * However it has only been tested on such conditions, so this is
  * included as a safeguard.
  * If this is removed to support larger bytes, at least the byte masks
- * below should probably be modified.
+ * below should be modified.
  */
 #if BYTESIZE!=8
 #error Error: this code requires an 8-bit byte_t type
@@ -88,7 +88,6 @@ typedef unsigned char byte_t;
 /*
  * 8-bit Byte masks:
  */
-
 static const byte_t _BITMASK[8] = { 0x80, 0x40, 0x20, 0x10,
                                     0x08, 0x04, 0x02, 0x01
                                   };
@@ -186,7 +185,7 @@ See release notes for porting issues."
 
 /**
  * @brief returns the minimal number of bytes required to represent @p nvalues
- * distinct values.
+ * distinct values, that is ceil(log2(nvalues)/8).
  */
 size_t nbytes(size_t nvalues);
 

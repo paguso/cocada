@@ -91,7 +91,6 @@
 #define IS_POW2(UNS_INT) (UNS_INT && !(UNS_INT & (UNS_INT - 1)))
 
 
-
 /**
  * @brief Computes the smallest power of 2 greater or equal to @p val
  */
@@ -126,13 +125,13 @@ uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m);
 /**
  * @brief Naive O(sqrt(n))-time primality testing.
  */
-bool naive_is_prime(uint64_t n);
+bool is_prime_naive(uint64_t n);
 
 
 /**
  * @brief Deterministic Miller-Rabin primality testing.
  */
-bool is_prime(uint64_t n);
+bool is_prime_mr(uint64_t n);
 
 
 /**
@@ -141,11 +140,19 @@ bool is_prime(uint64_t n);
 uint64_t prime_succ(uint64_t n);
 
 
-long double average_uint64_t(uint64_t *vals, size_t n);
+/**
+ * @brief Computes the average of an array of an unsigned int type.
+ * @warning This function is slow because it takes care of overflows.
+ */
+#define AVG_DECL(TYPE, ...)\
+double average_##TYPE(TYPE *vals, size_t n);
+
+XX_UNSIGNED_INT(AVG_DECL)
+
 
 /**
  * @brief Returns the @p kth element of the array @p v of length @p len.
- * @param dirty If true, the original array might be modified in the process.
+ * @param dirty If true, the original array may be reordered in the process.
  * Else, a copy is first created and @p v is left intact.
  */
 #define KTH_SMALLEST_DECL(TYPE, ...)\
@@ -154,6 +161,11 @@ long double average_uint64_t(uint64_t *vals, size_t n);
 XX_PRIMITIVES(KTH_SMALLEST_DECL)
 
 
+/**
+ * @brief Returns the median of the array @p v of length @p len.
+ * @param dirty If true, the original array may be reordered in the process.
+ * Else, a copy is first created and @p v is left intact.
+ */
 #define MEDIAN_DECL(TYPE, ...)\
 	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);
 
