@@ -29,6 +29,7 @@
 #include "bitbyte.h"
 #include "strbuf.h"
 #include "new.h"
+#include "format.h"
 
 /**
  * @file bitvec.h
@@ -97,6 +98,13 @@ size_t bitvec_len(const bitvec *bv);
 
 
 /**
+ * @brief Returns a pointer to the internar representation of the bitvector as a raw byte array.
+ * @warning The returned representation is not meant to be changed directly.
+ */
+const byte_t *bitvec_as_bytes(const bitvec *bv);
+
+
+/**
  * @brief Returns the bit value stored at a given position @p pos.
  */
 bool bitvec_get_bit (const bitvec *bv, size_t pos);
@@ -149,6 +157,10 @@ void bitvec_fit(bitvec *bv);
 byte_t *bitvec_detach (bitvec *bv);
 
 
+
+
+
+
 /**
  * @brief Writes a string representations of the bitvector to a string buffer
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
@@ -162,6 +174,26 @@ void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
  * @param bytes_per_row Number of bytes per row
  */
 void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row);
+
+
+
+typedef struct _bitvec_format bitvec_format;
+
+
+DECL_TRAIT(bitvec_format, format);
+
+
+/**
+ * @brief Returns a default formatter for printing the bitvector content.
+ * @see format.h
+ */
+bitvec_format *bitvec_get_format(bitvec *self, uint bytes_per_row);
+
+
+/**
+ * @brief Bitvector formatter destructor
+ */
+void bitvec_format_free(bitvec_format *self);
 
 
 #endif

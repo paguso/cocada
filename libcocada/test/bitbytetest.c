@@ -27,6 +27,7 @@
 #include "CuTest.h"
 
 #include "bitbyte.h"
+#include "errlog.h"
 #include "cstrutil.h"
 
 void test_byte_reverse(CuTest *tc)
@@ -69,6 +70,18 @@ void test_byte_to_str(CuTest *tc)
 	b = 0xef;
 	byte_to_str(b, str);
 	CuAssertStrEquals(tc, "11101111", str);
+
+	printf("start converting\n");
+	size_t n = 1ll<<8;
+	for (size_t i=0; i < n; i++) {
+		b = (byte_t) i;
+		byte_to_str(b, str);
+		DEBUG("%"PRIbB" = %s\n", BYTESTRB(b), str);
+		byte_to_strx(b, str);
+		DEBUG("%"PRIbX" = %s\n", BYTESTRX(b), str);
+	}
+
+	printf("Done converting %zu bytes\n",n);
 }
 
 
@@ -193,7 +206,7 @@ void test_byte_select(CuTest *tc)
 }
 
 
-CuSuite *bitsandbytes_get_test_suite()
+CuSuite *bitbyte_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_byte_reverse);

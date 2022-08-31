@@ -31,11 +31,13 @@
 #include "bitvec.h"
 #include "new.h"
 #include "mathutil.h"
+#include "memdbg.h"
 
 static size_t ba_size = 1000;
 
 void bitvec_test_append(CuTest *tc)
 {
+	memdbg_reset();
 	bitvec *bv = bitvec_new_with_capacity(0);
 	byte_t *array;
 	array = ARR_NEW(byte_t, ba_size);
@@ -53,10 +55,12 @@ void bitvec_test_append(CuTest *tc)
 	//printf(".");
 	bitvec_free(bv);
 	FREE(array);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 void bitvec_test_append_n(CuTest *tc)
 {
+	memdbg_reset();
 	bitvec *bv = bitvec_new_with_capacity(0);
 	byte_t *array;
 	array = ARR_NEW(byte_t, ba_size);
@@ -78,11 +82,13 @@ void bitvec_test_append_n(CuTest *tc)
 	}
 	bitvec_free(bv);
 	FREE(array);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void bitvec_test_count(CuTest *tc)
 {
+	memdbg_reset();
 	bitvec *bv = bitvec_new_with_capacity(0);
 	bool bit;
 	size_t counts[2] = {0,0};
@@ -99,6 +105,24 @@ void bitvec_test_count(CuTest *tc)
 	    CuAssertIntEquals(tc, counts[1], c1);
 	*/
 	bitvec_free(bv);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+void bitvec_test_format(CuTest *tc)
+{
+	memdbg_reset();
+	bitvec *bv = bitvec_new_with_capacity(0);
+	bool bit;
+	for (size_t i=0; i<ba_size; i++) {
+		bit = ((byte_t)rand()%2);
+		bitvec_push(bv, bit);
+	}
+	bitvec_format *fmt = bitvec_get_format(bv, 4);
+	format_fprint(bitvec_format_as_format(fmt), stdout);
+	bitvec_format_free(fmt);
+	bitvec_free(bv);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
@@ -108,5 +132,6 @@ CuSuite *bitvec_get_test_suite()
 	SUITE_ADD_TEST(suite, bitvec_test_append);
 	SUITE_ADD_TEST(suite, bitvec_test_append_n);
 	SUITE_ADD_TEST(suite, bitvec_test_count);
+	SUITE_ADD_TEST(suite, bitvec_test_format);
 	return suite;
 }

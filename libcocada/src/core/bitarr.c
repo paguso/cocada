@@ -27,6 +27,7 @@
 #include "bitarr.h"
 #include "bitbyte.h"
 #include "bytearr.h"
+#include "cstrutil.h"
 #include "new.h"
 #include "mathutil.h"
 
@@ -89,11 +90,11 @@ inline void bitarr_set_bit (byte_t *ba, size_t pos, const bool bit)
 
 
 void bitarr_print(FILE *stream, const byte_t *ba, size_t nbits,
-                  size_t bytes_per_line)
+                  uint bytes_per_line, uint indent)
 {
 	size_t i, c, line_label_width, bits_per_line;
 	byte_t b, onemask;
-	line_label_width = ceil(log10(nbits));
+	line_label_width = indent + ceil(log10(nbits));
 	bits_per_line = bytes_per_line * BYTESIZE;
 	onemask = 1<<(BYTESIZE-1);
 	i = 0;

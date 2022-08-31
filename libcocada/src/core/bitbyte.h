@@ -183,6 +183,22 @@ See release notes for porting issues."
 #endif
 
 
+
+#define PRIbB "c%c%c%c%c%c%c%c"
+
+#define BYTESTRB(byte)  \
+	(byte & 0x80 ? '1' : '0'), \
+	(byte & 0x40 ? '1' : '0'), \
+	(byte & 0x20 ? '1' : '0'), \
+	(byte & 0x10 ? '1' : '0'), \
+	(byte & 0x08 ? '1' : '0'), \
+	(byte & 0x04 ? '1' : '0'), \
+	(byte & 0x02 ? '1' : '0'), \
+	(byte & 0x01 ? '1' : '0')
+
+#define PRIbX "02x"
+#define BYTESTRX(byte) ((int)byte)
+
 /**
  * @brief returns the minimal number of bytes required to represent @p nvalues
  * distinct values, that is ceil(log2(nvalues)/8).
@@ -194,6 +210,12 @@ size_t nbytes(size_t nvalues);
  * @brief Converts a byte to a binary string.
  */
 void byte_to_str(byte_t b, char *dest);
+
+
+/**
+ * @brief Converts a byte to an hexadecimal string.
+ */
+void byte_to_strx(byte_t b, char *dest);
 
 
 /**
@@ -334,7 +356,11 @@ size_t byte_select(byte_t b, size_t rank, bool bit);
 int uint32_hibit(uint32_t v);
 
 
+/**
+ * @brief Returns the position of the lowest order 1 bit of @p v.
+ */
 int uint32_lobit(uint32_t v);
+
 
 /**
  * @brief Returns the position of the lowest order 1 bit of @p v.

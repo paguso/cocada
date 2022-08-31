@@ -35,28 +35,28 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 
 typedef struct _strbuf {
 	char *str;
-	size_t len;
+	size_t len; // string contents length, excluding the null-terminating char(s)
 	size_t capacity; // string capacity. physical capacity is 1 + this because of ending ('\0')
 }
 strbuf;
 
 
-static void _resize_to(strbuf *sb, size_t min_cap)
+static void _resize_to(strbuf *self, size_t min_cap)
 {
-	min_cap = MAX(min_cap, sb->len); // losing data not allowed
+	min_cap = MAX(min_cap, self->len); // losing data not allowed
 	size_t cap;
-	for (cap = MAX(DEFAULT_CAP, sb->capacity); cap < min_cap; cap *= GROW_BY);
-	sb->str = realloc(sb->str, (cap + 1) * sizeof(char));
-	cstr_fill(sb->str, sb->len, cap, '\0');
-	sb->capacity = cap;
+	for (cap = MAX(DEFAULT_CAP, self->capacity); cap < min_cap; cap *= GROW_BY);
+	self->str = realloc(self->str, (cap + 1) * sizeof(char));
+	cstr_fill(self->str, self->len, cap, '\0');
+	self->capacity = cap;
 }
 
 /*
-static void _double(strbuf *sb)
+static void _double(strbuf *self)
 {
-	sb->capacity = MAX(1, 2*sb->capacity);
-	sb->str = realloc(sb->str, (sb->capacity+1)*sizeof(char));
-	cstr_fill(sb->str, sb->len, sb->capacity, '\0');
+	self->capacity = MAX(1, 2*self->capacity);
+	self->str = realloc(self->str, (self->capacity+1)*sizeof(char));
+	cstr_fill(self->str, self->len, self->capacity, '\0');
 }
 */
 
@@ -77,13 +77,13 @@ strbuf *strbuf_new_with_capacity(size_t init_capacity)
 }
 
 
-strbuf *strbuf_new_from_str(const char *src, size_t len)
+strbuf *strbuf_new_from_str(const char *other, size_t len)
 {
 	strbuf *ret;
 	ret = NEW(strbuf);
 	ret->len = ret->capacity = len;
 	ret->str = cstr_new(ret->capacity);
-	strncpy(ret->str, src, len);
+	strncpy(ret->str, other, len);
 	return ret;
 }
 
@@ -94,144 +94,145 @@ void strbuf_finalise(void *ptr, const finaliser *fnr)
 }
 
 
-void strbuf_free(strbuf *sb)
+void strbuf_free(strbuf *self)
 {
-	FREE(sb->str);
-	FREE(sb);
+	FREE(self->str);
+	FREE(self);
 }
 
 
-size_t strbuf_len(strbuf *sb)
+size_t strbuf_len(strbuf *self)
 {
-	return sb->len;
+	return self->len;
 }
 
 
-size_t strbuf_capacity(strbuf *sb)
+size_t strbuf_capacity(strbuf *self)
 {
-	return sb->capacity;
+	return self->capacity;
 }
 
 
-char strbuf_get(strbuf *sb, size_t pos)
+char strbuf_get(strbuf *self, size_t pos)
 {
-	return sb->str[pos];
+	return self->str[pos];
 }
 
 
-void strbuf_clear(strbuf *sb)
+void strbuf_clear(strbuf *self)
 {
-	memset(sb->str, '\0', sb->capacity);
-	sb->len = 0;
+	memset(self->str, '\0', self->capacity);
+	self->len = 0;
 }
 
 
-void strbuf_set(strbuf *sb, size_t pos, char c)
+void strbuf_set(strbuf *self, size_t pos, char c)
 {
-	sb->str[pos] = c;
+	self->str[pos] = c;
 }
 
 
-void strbuf_nappend(strbuf *sb, const char *src, size_t len)
+void strbuf_nappend(strbuf *self, const char *other, size_t len)
 {
-	_resize_to(sb, sb->len + len);
-	strcpy(sb->str + sb->len, src);
-	sb->len += len;
-	sb->str[sb->len] = '\0';
+	_resize_to(self, self->len + len);
+	strcpy(self->str + self->len, other);
+	self->len += len;
+	self->str[self->len] = '\0';
 
 }
 
 
-void strbuf_append(strbuf *sb, const char *src)
+void strbuf_append(strbuf *self, const char *other)
 {
-	strbuf_nappend(sb, src, strlen(src));
+	strbuf_nappend(self, other, strlen(other));
 }
 
 
-void strbuf_ncat(strbuf *dest, const strbuf *src, size_t n)
+void strbuf_ncat(strbuf *dest, const strbuf *other, size_t n)
 {
-	strbuf_nappend(dest, (const char *)src->str, MIN(n, src->len));
+	strbuf_nappend(dest, (const char *)other->str, MIN(n, other->len));
 }
 
 
-void strbuf_cat(strbuf *dest, const strbuf *src)
+void strbuf_cat(strbuf *dest, const strbuf *other)
 {
-	strbuf_nappend(dest, (const char *)src->str, src->len);
+	strbuf_nappend(dest, (const char *)other->str, other->len);
 }
 
 
-void strbuf_append_char(strbuf *sb, char c)
+void strbuf_append_char(strbuf *self, char c)
 {
-	_resize_to(sb, sb->len + 1);
-	sb->str[sb->len] = c;
-	sb->len++;
-	sb->str[sb->len] = '\0';
+	_resize_to(self, self->len + 1);
+	self->str[self->len] = c;
+	self->len++;
+	self->str[self->len] = '\0';
 }
 
 
-void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep)
+void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep)
 {
 	size_t seplen = strlen(sep);
 	for (size_t i=0; i<n; i++) {
 		if (i) {
-			strbuf_nappend(sb, sep, seplen);
+			strbuf_nappend(self, sep, seplen);
 		}
-		strbuf_nappend(sb, arr[i], strlen(arr[i]));
+		strbuf_nappend(self, arr[i], strlen(arr[i]));
 	}
 }
 
 
-const char *strbuf_as_str(strbuf *sb)
+const char *strbuf_as_str(strbuf *self)
 {
-	return sb->str;
+	return self->str;
 }
 
 
-char *strbuf_detach(strbuf *sb)
+char *strbuf_detach(strbuf *self)
 {
-	char *str = sb->str;
-	str = realloc(str, (sb->len+1));
-	FREE(sb);
+	char *str = self->str;
+	str = realloc(str, (self->len+1));
+	FREE(self);
 	return str;
 }
 
 
-void strbuf_ins(strbuf *sb, size_t pos, const char *str, size_t len)
+void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len)
 {
-	assert(pos <= sb->len);
-	_resize_to(sb, sb->len + len);
-	memmove(sb->str + ((pos + len) * sizeof(char)), sb->str + (pos * sizeof(char)),
-	        (sb->len - pos) * sizeof(char));
-	memcpy(sb->str + (pos * sizeof(char)), str, len * sizeof(char));
-	sb->len += len;
+	assert(pos <= self->len);
+	_resize_to(self, self->len + len);
+	memmove(self->str + ((pos + len) * sizeof(char)),
+	        self->str + (pos * sizeof(char)),
+	        (self->len - pos) * sizeof(char));
+	memcpy(self->str + (pos * sizeof(char)), str, len * sizeof(char));
+	self->len += len;
 }
 
 
-void strbuf_cut(strbuf *sb, size_t from, size_t len, char *dest)
+void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest)
 {
-	assert(from + len <= sb->len);
+	assert(from + len <= self->len);
 	if (dest != NULL) {
-		strncpy(dest, sb->str + (from * sizeof(char)), len);
+		strncpy(dest, self->str + (from * sizeof(char)), len);
 		dest[len] = '\0';
 	}
-	memmove(sb->str + (from * sizeof(char)),
-	        sb->str + ((from + len) * sizeof(char)),
-	        (sb->len - (from + len)) * sizeof(char));
-	sb->len -= len;
-	memset(sb->str + (sb->len * sizeof(char)), '\0', len);
+	memmove(self->str + (from * sizeof(char)),
+	        self->str + ((from + len) * sizeof(char)),
+	        (self->len - (from + len)) * sizeof(char));
+	self->len -= len;
+	memset(self->str + (self->len * sizeof(char)), '\0', len);
 }
 
 
-void strbuf_paste(strbuf *sb, size_t from, const char *src, size_t len)
+void strbuf_paste(strbuf *self, size_t from, const char *other, size_t len)
 {
-	assert (from <= sb->len);
-	if (from + len <= sb->len) {
-		memcpy(sb->str + (from * sizeof(char)), src, len * sizeof(char));
+	assert (from <= self->len);
+	if (from + len <= self->len) {
+		memcpy(self->str + (from * sizeof(char)), other, len * sizeof(char));
 	}
 	else {
-		size_t hang = len - (sb->len - from);
-		memcpy(sb->str + (from * sizeof(char)), src, (len - hang) * sizeof(char));
-		strbuf_nappend(sb, src + (len - hang) * sizeof(char), hang);
+		size_t hang = len - (self->len - from);
+		memcpy(self->str + (from * sizeof(char)), other, (len - hang) * sizeof(char));
+		strbuf_nappend(self, other + (len - hang) * sizeof(char), hang);
 	}
 }
 
@@ -273,7 +274,7 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
-void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n)
+void strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n)
 {
 	size_t patlen = strlen(old);
 	size_t repllen = strlen(new);
@@ -284,8 +285,8 @@ void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n)
 		stack_push_size_t(occ, 0);
 		occ_count++;
 	}
-	for (size_t i = 0, state = 0; occ_count < n && i < sb->len; i++) {
-		state = matcher->delta[(size_t)sb->str[i]][state];
+	for (size_t i = 0, state = 0; occ_count < n && i < self->len; i++) {
+		state = matcher->delta[(size_t)self->str[i]][state];
 		if (state == patlen) {
 			assert (i + 1 >= patlen );
 			stack_push_size_t(occ, i + 1 - patlen );
@@ -295,15 +296,15 @@ void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n)
 	while (!stack_empty(occ)) {
 		size_t pos = stack_pop_size_t(occ);
 		if (repllen > patlen) {
-			strbuf_paste(sb, pos, new, patlen);
-			strbuf_ins(sb, pos + patlen, new + patlen, repllen - patlen);
+			strbuf_paste(self, pos, new, patlen);
+			strbuf_ins(self, pos + patlen, new + patlen, repllen - patlen);
 		}
 		else if (repllen < patlen) {
-			strbuf_cut(sb, pos, patlen - repllen, NULL);
-			strbuf_paste(sb, pos, new, repllen);
+			strbuf_cut(self, pos, patlen - repllen, NULL);
+			strbuf_paste(self, pos, new, repllen);
 		}
 		else {   // equals
-			strbuf_paste(sb, pos, new, patlen);
+			strbuf_paste(self, pos, new, patlen);
 		}
 	}
 	DESTROY_FLAT(occ, stack);
@@ -311,15 +312,40 @@ void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n)
 }
 
 
-void strbuf_replace(strbuf *sb, const char *old, const char *new)
+void strbuf_replace(strbuf *self, const char *old, const char *new)
 {
-	strbuf_replace_n(sb, old, new, 1);
+	strbuf_replace_n(self, old, new, 1);
 }
 
 
-void strbuf_replace_all(strbuf *sb, const char *old, const char *new)
+void strbuf_replace_all(strbuf *self, const char *old, const char *new)
 {
-	strbuf_replace_n(sb, old, new, SIZE_MAX);
+	strbuf_replace_n(self, old, new, SIZE_MAX);
 }
 
 
+int strbuf_printf(strbuf *self, const char *fmt, ...)
+{
+	size_t fmt_len = strlen(fmt);
+	size_t avail = self->capacity - self->len;
+	if (avail < fmt_len) {
+		_resize_to(self, self->len + (2 * fmt_len));
+	}
+	avail = self->capacity - self->len;
+	char *dest = self->str + self->len;
+	va_list valist;
+	va_start(valist, fmt);
+	int written = vsnprintf(dest, avail, fmt, valist);
+	va_end(valist);
+	if (written >= avail) {
+		_resize_to(self, self->len + written + 1);
+		dest = self->str + self->len;
+		avail = self->capacity - self->len;
+		va_start(valist, fmt);
+		written = vsnprintf(dest, avail, fmt, valist);
+		va_end(valist);
+		assert(written < avail);
+	}
+	self->len += written;
+	return written;
+}

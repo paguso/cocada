@@ -266,7 +266,7 @@ void vec_del(vec *v, size_t pos);
 
 /**
  * @brief Clips the vector to @p v[@p from..@p to-1].
- * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed. 
+ * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed.
  * The data outside the [from:to] boundaries are lost.
  */
 void vec_clip(vec *v, size_t from, size_t to);

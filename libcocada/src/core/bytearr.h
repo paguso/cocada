@@ -58,13 +58,23 @@ void bytearr_reverse(byte_t *ba, size_t size);
 
 
 /**
+ * @brief Byte print format
+ */
+typedef enum {
+	BIN = 0, /**< binaray */
+	HEX = 1  /**< Hexadecimal */
+}
+byte_format;
+
+
+/**
  * @brief Prints a string representations of a byte array do std output.
  * @param ba The array to print.
  * @param nbytes Array size in bytes.
  * @param bytes_per_line Number of bytes to be printed per line.
  * @param leftmargin Left margin string to be print at the start of each line.
  */
-void bytearr_print(const byte_t *ba, size_t nbytes,
+void bytearr_print(const byte_t *ba, size_t nbytes, byte_format fmt,
                    size_t bytes_per_line, const char *leftmargin);
 
 

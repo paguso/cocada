@@ -29,6 +29,7 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "cstrutil.h"
+#include "format.h"
 #include "mathutil.h"
 #include "memdbg.h"
 #include "new.h"
@@ -108,6 +109,12 @@ bitvec *bitvec_clone(const bitvec *src)
 size_t bitvec_len(const bitvec *bv)
 {
 	return bv->len;
+}
+
+
+const byte_t *bitvec_as_bytes(const bitvec *bv)
+{
+	return bv->bits;
 }
 
 
@@ -286,13 +293,55 @@ void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 }
 
 
+
 void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row)
 {
 	fprintf(stream, "bitvector@%p {\n", bv);
 	fprintf(stream, "  len     : %zu\n", bv->len);
 	fprintf(stream, "  capacity: %zu\n", bv->cap);
 	fprintf(stream, "  data:\n");
-	bitarr_print(stream, bv->bits, bv->cap, bytes_per_row);
+	bitarr_print(stream, bv->bits, bv->cap, bytes_per_row, 2);
 	fprintf(stream, "}\n");
 
 }
+
+
+struct _bitvec_format {
+	format _t_format;
+	bitvec *src;
+	uint bytes_per_row;
+};
+
+void bitvec_format_print(format *self, FILE *stream)
+{
+	bitvec_format bf = *((bitvec_format *)self->impltor);
+	fprintf(stream, "bitvector@%p {\n", bf.src);
+	fprintf(stream, "  len     : %zu\n", bf.src->len);
+	fprintf(stream, "  capacity: %zu\n", bf.src->cap);
+	fprintf(stream, "  data:\n");
+	bitarr_print(stream, bf.src->bits, bf.src->cap, bf.bytes_per_row, 2);
+	fprintf(stream, "}\n");
+
+}
+
+format_vt bitvec_format_vt = {.print = bitvec_format_print};
+
+
+bitvec_format *bitvec_get_format(bitvec *self, uint bytes_per_row)
+{
+	bitvec_format *ret = NEW(bitvec_format);
+	ret->_t_format = (format) {
+		.vt = bitvec_format_vt, .impltor = ret
+	};
+	ret->src = self;
+	ret->bytes_per_row = MAX(1, bytes_per_row);
+	return ret;
+}
+
+
+void bitvec_format_free(bitvec_format *self)
+{
+	FREE(self);
+}
+
+IMPL_TRAIT(bitvec_format, format);

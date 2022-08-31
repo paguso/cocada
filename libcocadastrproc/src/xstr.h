@@ -24,6 +24,7 @@
 
 #include "strbuf.h"
 #include "new.h"
+#include "write.h"
 #include "xchar.h"
 
 /**
@@ -160,6 +161,20 @@ size_t xstr_sizeof_char(const xstr *xs);
 
 
 /**
+ * @brief Returns the internal raw byte contents of the xstr.
+ * @warning The returned information is not meant to be directly modified.
+ */
+const byte_t *xstr_as_bytes(const xstr *self);
+
+
+/**
+ * @brief Returns the physical size (in bytes) of the internal raw byte representation
+ * xstr_len(self) * xstr_sizeof_char(self)
+ */
+size_t xstr_nbytes(const xstr *self);
+
+
+/**
  * @brief Returns the char at a specified position.
  * @warning  No out-of-bounds verification is assumed.
  */
@@ -248,15 +263,16 @@ int xstr_ncmp(const xstr *this, const xstr *other, size_t n);
 
 /**
  * @brief Lexicographically compares two strings.
- * @return -1 if this < other, 0 if this==other, +1 if this > other
+ * @return -1 if self < other, 0 if self==other, +1 if self > other
  */
-int xstr_cmp(const xstr *this, const xstr *other);
-
+int xstr_cmp(const xstr *self, const xstr *other);
 
 #define FOREACH_IN_XSTR(CHR, STR) \
 	for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
 		for (xchar_t CHR = 1; CHR ; CHR = 0) \
 			for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
 				for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
+
+
 
 #endif // !XSTRING_H

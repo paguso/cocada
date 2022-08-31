@@ -90,11 +90,11 @@ typedef struct {
 	double dval;
 } obj_t;
 
-void merge_obj(const void* left, const void *right, void *dest)
+void merge_obj(const void *left, const void *right, void *dest)
 {
-	obj_t *l = (obj_t*)left;
-	obj_t *r = (obj_t*)right;
-	obj_t *d = (obj_t*)dest;
+	obj_t *l = (obj_t *)left;
+	obj_t *r = (obj_t *)right;
+	obj_t *d = (obj_t *)dest;
 	d->val = l->val + r->val;
 	d->dval = l->dval + r->dval;
 }
@@ -107,7 +107,9 @@ void test_segtree_upd_obj(CuTest *tc)
 	size_t range = 10;
 	segtree *tree = segtree_new(range, sizeof(obj_t), merge_obj, &zero);
 	for (size_t i=0; i<range; i++) {
-		obj_t v  =(obj_t){.val=(int)i, .dval = (double)i * 2};
+		obj_t v  =(obj_t) {
+			.val=(int)i, .dval = (double)i * 2
+		};
 		segtree_upd(tree, i, &v);
 	}
 	for (size_t i=0; i<range; i++) {

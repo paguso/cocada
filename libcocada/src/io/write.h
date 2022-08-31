@@ -19,37 +19,38 @@
  *
  */
 
+#ifndef WRITE_H
+#define WRITE_H
 
 #include <stdio.h>
-#include <stdlib.h>
 
-#include "CuTest.h"
-
-
-CuSuite *alphabet_get_test_suite();
-CuSuite *xstr_get_test_suite();
+#include "trait.h"
 
 
-void run_all_tests(void)
-{
-	CuString *output = CuStringNew();
-	CuSuite *suite = CuSuiteNew();
+typedef struct _write write;
 
-	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	CuSuiteAddSuite(suite, xstr_get_test_suite());
-
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
-}
+/**
+ * @brief Writer virtual table
+ */
+typedef struct {
+	int (*write) (write *self, void *buf);
+	int (*write_n) (write *self, void *buf, size_t n);
+} write_vt;
 
 
-void print_count() ;
+/**
+ * @brief writer trait type
+ */
+struct _write {
+	write_vt *vt;
+	void *impltor;
+};
 
 
-int main(void)
-{
-	run_all_tests();
-	return 0;
-}
+int write_write (write *self, void *buf);
+
+int write_write_n (write *self, void *buf, size_t n);
+
+
+
+#endif

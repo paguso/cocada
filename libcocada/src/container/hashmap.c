@@ -369,7 +369,7 @@ void hashmap_del(hashmap *hmap, const void *key)
 
 
 void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
-                          void *dest_val)
+                  void *dest_val)
 {
 	assert(key != NULL);
 	_find_res qry = _find(hmap, key, _hash(hmap, key));

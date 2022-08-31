@@ -239,6 +239,52 @@ void test_strbuf_replace_all(CuTest *tc)
 }
 
 
+void test_strbuf_printf(CuTest *tc)
+{
+	memdbg_reset();
+	char buf[1<<12];
+	char *s = buf;
+	buf[0] = '\0';
+	strbuf *sbuf = strbuf_new();
+	int ws, wsbuf;
+
+	ws = sprintf(s, "");
+	s += ws;
+	wsbuf = strbuf_printf(sbuf, "");
+	CuAssertIntEquals(tc, ws, wsbuf);
+	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
+
+	ws = sprintf(s, "The");
+	s += ws;
+	wsbuf = strbuf_printf(sbuf, "The");
+	CuAssertIntEquals(tc, ws, wsbuf);
+	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
+
+
+	ws = sprintf(s, " quick brown fox jumped over the lazy dog.");
+	s += ws;
+	wsbuf = strbuf_printf(sbuf, " quick brown fox jumped over the lazy dog.");
+	CuAssertIntEquals(tc, ws, wsbuf);
+	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
+
+	int i = (1 << 30) + 1;
+	double d = 0.2 / 0.7;
+	char *string = "The quick brown fox jumped over the lazy dog. "
+	               "The quick brown fox jumped over the lazy dog."
+	               "The quick brown fox jumped over the lazy dog."
+	               "The quick brown fox jumped over the lazy dog.";
+
+	ws = sprintf(s, " int=%d double=%lf string=%s", i, d, string);
+	s += ws;
+	wsbuf = strbuf_printf(sbuf, " int=%d double=%lf string=%s", i, d, string);
+	CuAssertIntEquals(tc, ws, wsbuf);
+	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
+
+	strbuf_free(sbuf);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+
 void strbuf_test_teardown(CuTest *tc)
 {
 }
@@ -258,6 +304,7 @@ CuSuite *strbuf_get_test_suite()
 	SUITE_ADD_TEST(suite, test_strbuf_replace_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_all);
+	SUITE_ADD_TEST(suite, test_strbuf_printf);
 	SUITE_ADD_TEST(suite, strbuf_test_teardown);
 	return suite;
 }

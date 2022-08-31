@@ -175,7 +175,7 @@ void hashmap_del(hashmap *hmap, const void *key);
 
 /**
  * @brief Removes an association corresponding to a given @p key,
- * if it exists, and returns the previously stored key and value 
+ * if it exists, and returns the previously stored key and value
  * by copying them to @p dest_key and @p dest_val respectively.
  *
  * This is particularly useful when the key/value is an owned reference to
@@ -212,7 +212,7 @@ void hashmap_del(hashmap *hmap, const void *key);
  * @warning This does not destroy the key or its value.
  */
 void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
-                          void *dest_val);
+                  void *dest_val);
 
 
 /**

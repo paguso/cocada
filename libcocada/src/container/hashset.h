@@ -73,7 +73,7 @@ void hashset_add(hashset *set, const void *elt);
 
 
 /**
- * @brief Removes the element equal to @p elt from the @set, if any, 
+ * @brief Removes the element equal to @p elt from the @set, if any,
  * and returns it by copying into @p dest. If no such element is
  * found, the operation has no effect.
  */

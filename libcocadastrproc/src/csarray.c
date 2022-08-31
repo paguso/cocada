@@ -153,12 +153,14 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 			for (size_t i = 0 ; i < lvl_len; i++)
 				bitvec_push(even_suff, IS_EVEN(sarr[i]));
 			break;
-		} else {
+		}
+		else {
 			for (size_t i = 0, last = 0; i < lvl_len; i++) {
 				if (IS_EVEN(sarr[i])) {
 					bitvec_push(even_suff, 1);
 					sarr[last++] = sarr[i]/2;
-				} else
+				}
+				else
 					bitvec_push(even_suff, 0);
 			}
 		}
@@ -217,11 +219,11 @@ void csarray_print(FILE *stream, csarray *csa)
 		fprintf(stream, "\t--- LEVEL %zu ---\n", lvl);
 		fprintf(stream, "\teven_bv[%zu]:\n\t", lvl);
 		bitarr_print( stream,  csrsbitarr_data(csa->even_bv[lvl]),
-		              csrsbitarr_len(csa->even_bv[lvl]), 10 );
+		              csrsbitarr_len(csa->even_bv[lvl]), 10 , 0);
 		//csrsbitarr_print(csa->even_bv[lvl], 4);
 		fprintf(stream, "\tchar_stop_bv[%zu]:\n\t", lvl);
 		bitarr_print( stream,  csrsbitarr_data(csa->char_stop_bv[lvl]),
-		              csrsbitarr_len(csa->char_stop_bv[lvl]), 10 );
+		              csrsbitarr_len(csa->char_stop_bv[lvl]), 10 , 0);
 		//csrsbitarr_print(csa->char_stop_bv[lvl], 4);
 		//printf("\tphi_wt[%zu]: ", lvl);
 		//wavtree_print(csa->phi_wt[lvl]);
@@ -287,7 +289,8 @@ static size_t csa_get(csarray *csa, size_t lvl, size_t i)
 	if ( csrsbitarr_get(csa->even_bv[lvl], i) ) {
 		size_t epos = csrsbitarr_rank1(csa->even_bv[lvl], i);
 		return 2*csa_get( csa, lvl+1, epos );
-	} else {
+	}
+	else {
 		size_t phi = csa_phi(csa, lvl, i);
 		size_t sa_i_plus1 = csa_get( csa, lvl, phi );
 		return (sa_i_plus1 > 0) ? sa_i_plus1 - 1 : csa->lvl_len[lvl] - 1;
@@ -308,7 +311,8 @@ static size_t csa_get_inv(csarray *csa, size_t lvl, size_t i)
 	if ( IS_EVEN(i) ) {
 		size_t rec_inv = csa_get_inv(csa, lvl+1, i/2);
 		return csrsbitarr_select1(csa->even_bv[lvl], rec_inv);
-	} else {
+	}
+	else {
 		size_t inv_i_minus1 = csa_get_inv( csa, lvl, i-1 );
 		return csa_phi(csa, lvl, inv_i_minus1);
 	}

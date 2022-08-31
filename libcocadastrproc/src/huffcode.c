@@ -79,7 +79,8 @@ static void fill_code_table( huffcode *hcode, const hufftnode *node,
 	if (hufftnode_is_leaf(node)) {
 		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
 		//printf("code of %c = %s\n",ab_char(hcode->ab, node->chr_rank), code);
-	} else {
+	}
+	else {
 		bitarr_set_bit(code, code_len, 0);
 		fill_code_table(hcode, hufftnode_left(node), code_len+1, code);
 		bitarr_set_bit(code, code_len, 1);
@@ -217,7 +218,8 @@ static void _print_htree( FILE *stream, const huffcode *hc,
 		fprintf(stream,"%s[%p code=%s chr=%c(%d)]\n", space, node, code,
 		        ab_char(hc->ab, node->chr_rank), (int)(ab_char(hc->ab, node->chr_rank)));
 		//bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
-	} else {
+	}
+	else {
 		fprintf(stream, "%s[%p code=%s]\n", space, node, code);
 		//bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 		char *ccode = cstr_new(level+1);

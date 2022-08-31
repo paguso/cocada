@@ -65,7 +65,7 @@ strfilereader *strfilereader_new(FILE *stream);
 
 
 /**
- * @brief Creates a new reader attached to a character input stream from its @p path. 
+ * @brief Creates a new reader attached to a character input stream from its @p path.
  * A new input stream is created and opened for reading.
  * @returns NULL if the FILE at specified @p path cannot be open in "r" mode.
  */
@@ -74,7 +74,7 @@ strfilereader *strfilereader_new_from_path(const char *path);
 
 /**
  * @brief Destructor. If the reader was created with strfilereader_new(),
- * the underlying stream is not closed. If the reader was created with the 
+ * the underlying stream is not closed. If the reader was created with the
  * strfilereader_new_from_path() constructor, the stream is closed.
  */
 void strfilereader_free(strfilereader *self);

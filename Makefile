@@ -62,7 +62,7 @@ help:
 	@echo - sharedlib [\<libs\>]: build and install shared libraries 
 	@echo - fmt [\<libs\>]: format library source files \(non-recursive\) 
 	@echo - doc: generate API documentation for all libraries
-	@echo - doc_clean: wipeout API documentation for all libraries
+	@echo - clean_doc: wipeout API documentation for all libraries
 	@echo - help: prints this message
 	@echo
 	@echo "See README.md for more instructions"

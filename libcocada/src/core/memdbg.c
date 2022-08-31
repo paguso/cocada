@@ -180,6 +180,29 @@ static void memtable_unset(memtable *tally, void *addr)
 }
 
 
+static memdbg_query_t memtable_get(memtable *tally, void *addr)
+{
+#ifndef MEM_DEBUG
+	return;
+#endif
+	size_t pos = hash(addr, tally->cap);
+	while (tally->data[pos].flag != FREE) {
+		if (tally->data[pos].flag == ACTIVE &&
+		        tally->data[pos].addr == addr) {
+			return (memdbg_query_t) {
+				.active = true, .size=tally->data[pos].size
+			};
+		}
+		pos = (pos + 1) % tally->cap;
+	}
+	assert(tally->data[pos].flag == FREE);
+	return (memdbg_query_t) {
+		.active = false, .size=0
+	};
+}
+
+
+
 static const char *prefixes[7] = {"", "Kilo", "Mega", "Giga", "Tera", "Peta", "Exa"};
 
 typedef struct {
@@ -288,6 +311,12 @@ size_t memdbg_nchunks()
 bool memdbg_is_empty()
 {
 	return (tally.total == 0 && tally.nact == 0);
+}
+
+
+memdbg_query_t memdbg_query(const void *addr)
+{
+	return memtable_get(&tally, addr);
 }
 
 

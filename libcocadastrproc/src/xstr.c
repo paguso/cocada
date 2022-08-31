@@ -71,7 +71,9 @@ xstr *xstr_new(size_t sizeof_char)
 
 xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
 {
-	assert(sizeof_char<=XCHAR_BYTESIZE);
+	ERROR_ASSERT(sizeof_char <= XCHAR_BYTESIZE,
+	             "Invalid xstr char size %zu. This must be at most XCHAR_BYTESIZE=%d. See xchar documentation.\n",
+	             sizeof_char, XCHAR_BYTESIZE);
 	xstr *ret = NEW(xstr);
 	ret->sizeof_char = sizeof_char;
 	ret->len = 0;
@@ -129,6 +131,7 @@ void xstr_print(FILE *stream, const xstr *xs)
 }
 
 
+
 void xstr_to_string (const xstr *xs, strbuf *dest)
 {
 	for (size_t i=0, l=xstr_len(xs); i < l; i++) {
@@ -152,12 +155,16 @@ void xstr_to_string (const xstr *xs, strbuf *dest)
 xchar_t xstr_get(const xstr *xs, size_t pos)
 {
 	xchar_t ret = 0;
+	//xchar_t *ret = malloc(sizeof(xchar_t));
+	//*ret = 0;
 #if ENDIANNESS==LITTLE
 	memcpy(&ret, xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #elif ENDIANNESS==BIG
-	memcpy(&ret + (XCHAR_BYTESIZE - xs->sizeof_char),
+	memcpy(ret + (XCHAR_BYTESIZE - xs->sizeof_char),
 	       xs->buf + (pos * xs->sizeof_char), xs->sizeof_char);
 #endif
+	//xchar_t ans = *ret;
+	//free(ret);
 	return ret;
 }
 
@@ -194,6 +201,18 @@ inline size_t xstr_len(const xstr *xs)
 inline size_t xstr_sizeof_char(const xstr *xs)
 {
 	return xs->sizeof_char;
+}
+
+
+const byte_t *xstr_as_bytes(const xstr *self)
+{
+	return (const byte_t *)(self->buf);
+}
+
+
+size_t xstr_nbytes(const xstr *self)
+{
+	return self->len * self->sizeof_char;
 }
 
 

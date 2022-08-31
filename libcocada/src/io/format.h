@@ -20,36 +20,51 @@
  */
 
 
+#ifndef FORMAT_H
+#define FORMAT_H
+
 #include <stdio.h>
-#include <stdlib.h>
 
-#include "CuTest.h"
+#include "trait.h"
 
-
-CuSuite *alphabet_get_test_suite();
-CuSuite *xstr_get_test_suite();
-
-
-void run_all_tests(void)
-{
-	CuString *output = CuStringNew();
-	CuSuite *suite = CuSuiteNew();
-
-	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	CuSuiteAddSuite(suite, xstr_get_test_suite());
-
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
-}
+/**
+ * @file format.h
+ * @author Paulo Fonseca
+ * @brief Format trait
+ *
+ * Objects implementing this trait print formatted text to an output stream.
+ * They are usually wrappers that provide a common interface for printing
+ * other objects, relieving these from having to implement specific
+ * I/O operation themselves.
+ */
 
 
-void print_count() ;
+/**
+ * @brief format trait type
+ */
+typedef struct _format format;
+
+/**
+ * @brief format virtual table
+ */
+typedef struct {
+	void (*fprint)(format *, FILE *);
+} format_vt;
 
 
-int main(void)
-{
-	run_all_tests();
-	return 0;
-}
+struct _format {
+	format_vt vt;
+	void *impltor;
+};
+
+/**
+ * @brief Prints formatted text to the standard output.
+ */
+void format_print(format *self);
+
+/**
+ * @brief Prints formatted text to a given @p stream.
+ */
+void format_fprint(format *self, FILE *stream);
+
+#endif

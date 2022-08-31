@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "coretype.h"
+#include "write.h"
 #include "iter.h"
 #include "new.h"
 #include "order.h"
@@ -186,6 +187,16 @@ bool avl_remv(avl *self, void *key, void *dest);
 bool avl_del(avl *self, void *key);
 
 
+
+#define AVL_DECLARE_ALL(TYPE, ...)\
+	bool avl_contains_##TYPE(const avl *self, TYPE val);\
+	bool avl_ins_##TYPE(avl *self, TYPE val);\
+	bool avl_del_##TYPE(avl *self, TYPE val);
+
+
+XX_CORETYPES(AVL_DECLARE_ALL)
+
+
 /**
  * @brief Prints the AVL tree in the given output @p stream.
  *
@@ -208,19 +219,13 @@ bool avl_del(avl *self, void *key);
  *      fprintf(stream, "(key=%d value=%f)", (*((obj_t **)ptr))->key, (*((obj_t **)ptr))->value);
  * }
  * ```
+ *
+ * @deprecated Mixing IO with core functionality. Should move to an external formatter.
  */
+
 void avl_print( const avl *self, FILE *stream,
                 void (*prt_val)(FILE *, const void *));
 
-
-
-#define AVL_DECLARE_ALL(TYPE, ...)\
-	bool avl_contains_##TYPE(const avl *self, TYPE val);\
-	bool avl_ins_##TYPE(avl *self, TYPE val);\
-	bool avl_del_##TYPE(avl *self, TYPE val);
-
-
-XX_CORETYPES(AVL_DECLARE_ALL)
 
 
 /**
@@ -254,6 +259,7 @@ void avl_iter_free(avl_iter *self);
 
 
 DECL_TRAIT(avl_iter, iter);
+
 
 
 #endif

@@ -50,7 +50,7 @@
 
 /**
  * @brief Alphabet types returned by the ab_type() function.
- * @see ab_type
+ * @see ab_type()
  */
 typedef enum {
 	CHAR_TYPE = 0, /**< Character alphabet type */

@@ -145,7 +145,7 @@ uint64_t prime_succ(uint64_t n);
  * @warning This function is slow because it takes care of overflows.
  */
 #define AVG_DECL(TYPE, ...)\
-double average_##TYPE(TYPE *vals, size_t n);
+	double average_##TYPE(TYPE *vals, size_t n);
 
 XX_UNSIGNED_INT(AVG_DECL)
 

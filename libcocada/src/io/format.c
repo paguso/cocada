@@ -19,37 +19,18 @@
  *
  */
 
-
 #include <stdio.h>
-#include <stdlib.h>
 
-#include "CuTest.h"
-
-
-CuSuite *alphabet_get_test_suite();
-CuSuite *xstr_get_test_suite();
+#include "format.h"
 
 
-void run_all_tests(void)
+void format_fprint(format *self, FILE *stream)
 {
-	CuString *output = CuStringNew();
-	CuSuite *suite = CuSuiteNew();
-
-	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	CuSuiteAddSuite(suite, xstr_get_test_suite());
-
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
+	self->vt.fprint(self, stream);
 }
 
 
-void print_count() ;
-
-
-int main(void)
+void format_print(format *self)
 {
-	run_all_tests();
-	return 0;
+	self->vt.fprint(self, stdout);
 }
