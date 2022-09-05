@@ -776,7 +776,7 @@ void wavtree_print(wavtree *wt)
 	printf ("  tree:\n");
 	_wt_node_print(wt, 0, 0);
 	//printf ("  bitarray:\n");
-	//csrsbitarr_print(wt->bitarr, 4);
+	//csrsbitarr_fprint(wt->bitarr, 4);
 	if (ab_type(wt->ab)==CHAR_TYPE) {
 		printf ("  char codes:\n");
 		strbuf *codestr = strbuf_new_with_capacity(2);

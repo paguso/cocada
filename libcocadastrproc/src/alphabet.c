@@ -104,19 +104,6 @@ alphabet *alphabet_clone(const alphabet *src)
 }
 
 
-void ab_print(const alphabet *ab)
-{
-	printf("alphabet@%p\n",(void *)ab);
-	printf("  size = %zu\n", ab->size);
-	if (ab->type==CHAR_TYPE) {
-		printf("  letters = %s\n", ab->letters);
-	}
-	else if (ab->type==INT_TYPE) {
-		printf("  letters = 0..%zu\n",ab->size-1);
-	}
-}
-
-
 void alphabet_free(alphabet *ab)
 {
 	if (ab == NULL) return;

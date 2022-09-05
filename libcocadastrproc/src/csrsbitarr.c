@@ -291,12 +291,12 @@ size_t csrsbitarr_len(csrsbitarr *ba)
 }
 
 
-void csrsbitarr_print(FILE *stream, csrsbitarr *ba, size_t bytes_per_row)
+void csrsbitarr_fprint(FILE *stream, csrsbitarr *ba, size_t bytes_per_row)
 {
 	fprintf(stream, "csrsbitarr@%p {\n",(void *)ba);
 	fprintf(stream, "->size = %zu\n",ba->len);
 	fprintf(stream, "->data:\n");
-	bitarr_print(stream, ba->data, ba->len, 4);
+	bitarr_fprint(stream, ba->data, ba->len, 4, 4);
 	for (unsigned int b=0; b<=1; b++) {
 		fprintf(stream, "->total_bits_count[%u] = %zu\n",b,  ba->total_bit_count[b]);
 	}

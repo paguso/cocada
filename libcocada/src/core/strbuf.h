@@ -77,10 +77,28 @@ size_t strbuf_len(strbuf *self);
 
 
 /**
- * @brief Returns the capacity (i.e. the "physical" length)
- *        of a given dynamic string.
+ * @brief Returns the current capacity of this stringbuffer, 
+ * that is the number of characters of longest string that can 
+ * be represented in the currently allocated memory, excluding 
+ * the null terminating '\0'.
  */
 size_t strbuf_capacity(strbuf *self);
+
+
+/**
+ * @brief Adjusts the physical size of the string buffer to the least
+ * amount necessary its current content.
+ * 
+ * @warning The strbuf may have a minimum required size. 
+ */
+void strbuf_fit(strbuf *self);
+
+
+/**
+ * @brief Tests whether two string buffers have the same contents
+ * regardless of their capacity.
+ */
+bool strbuf_eq(strbuf *self, strbuf *other);
 
 
 /**
@@ -177,35 +195,50 @@ void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
 
 
 /**
+ * @brief Find the first @p n occurrences of the pattern @p pat in @p self starting from position @p from_pos. The positions of the matches are
+ * stored in @p dest.
+ * @return The number of matches of @p pat in @p self from left to right,
+ * starting at position @p from_pos up to a maximum number @p n.
+ * @warning The array @p dest should have enough space to store at least
+ * @p n size_t values.
+ * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
+ */
+size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos, size_t *dest);
+
+
+/**
  * @brief Replaces the first @p n  left-to-right non-overlapping occurrences
- * of the substring @p old in the string buffer @p self, with the substring @p new.
+ * of the substring @p old in the string buffer @p self, with the substring @p new
+ * starting from position @p from_pos.
  *
  * # Example
  * ```
- * strbuf *self = strbuf_new_from_str("macaca", 6);
+ * strbuf *self = strbuf_new_from_str("macaca", 6, 0);
  * strbuf_replace_n(self, "ca", "na", 2);
  * // yelds "manana"
- * strbuf_replace_n(self, "ma", "ba", 2);
+ * strbuf_replace_n(self, "ma", "ba", 2, 0);
  * // yelds "banana" . only 1 <= 2 occurrence found
- * strbuf_replace_n(self, "ana", "aca", 2);
+ * strbuf_replace_n(self, "ana", "aca", 2, 0);
  * // yelds "bacana" . only 1 <= 2 "non-overlapping" occurrence found
  * ```
+ * 
+ * @return Returns the number of substitutions actually performed.
  */
-void strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n);
+size_t strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n, size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(self, old, new, 1)`
+ * @brief Same as `strbuf_replace_n(self, old, new, 1, from)`
  * @see strbuf_replace_n
  */
-void strbuf_replace(strbuf *self, const char *old, const char *new);
+size_t strbuf_replace(strbuf *self, const char *old, const char *new, size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(self, old, new, strbuf_len(self) + 1)`
+ * @brief Same as `strbuf_replace_n(self, old, new, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-void strbuf_replace_all(strbuf *self, const char *old, const char *new);
+size_t strbuf_replace_all(strbuf *self, const char *old, const char *new, size_t from_pos);
 
 
 /**
@@ -218,8 +251,7 @@ void strbuf_replace_all(strbuf *self, const char *old, const char *new);
  * null-terminating char '\0').
  *
  */
-int strbuf_printf(strbuf *self, const char *fmt, ...);
-
+int sbprintf(strbuf *self, const char *fmt, ...);
 
 
 /**

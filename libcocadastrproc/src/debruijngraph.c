@@ -132,7 +132,7 @@ static void _init_cumul_char_count(dbgraph *graph, size_t *cumul_char_count)
 	for (size_t i=0; i<eabsize; i++)
 		bitarr_set_bit(bits, cumul_char_count[i+1]+i, 1);
 	graph->node_lbl_last_char = csrsbitarr_new(bits, l);
-	//csrsbitarr_print(graph->node_lbl_last_char, 4);
+	//csrsbitarr_fprint(graph->node_lbl_last_char, 4);
 }
 
 
@@ -503,7 +503,7 @@ static void node_cstr(xstr *node, alphabet *ab, char *dest)
 void dbg_print(dbgraph *g)
 {
 	printf("dbgraph@%p\n",g);
-	//csrsbitarr_print(g->node_lbl_last_char, 10);
+	//csrsbitarr_fprint(g->node_lbl_last_char, 10);
 	size_t ncols = 4;
 	char *headers[4] = {"nid", "real", "node", "edge"};
 	int *cols = ARR_NEW(int, ncols);

@@ -117,21 +117,6 @@ void xstr_free(xstr *xs)
 }
 
 
-void xstr_print(FILE *stream, const xstr *xs)
-{
-	fprintf(stream, "xstr@%p {\n", xs);
-	fprintf(stream, "  len : %zu\n", xs->len );
-	fprintf(stream, "  cap : %zu\n", xs->cap );
-	fprintf(stream, "  sizeof_char: %zu\n", xs->sizeof_char );
-	fprintf(stream, "  str: ");
-	for (size_t i=0, l=xs->len; i < l; i++) {
-		fprintf(stream, XCHAR_FMT"%s", xstr_get(xs, i), (i < l-1) ? "-" : "");
-	}
-	fprintf(stream, "}\n");
-}
-
-
-
 void xstr_to_string (const xstr *xs, strbuf *dest)
 {
 	for (size_t i=0, l=xstr_len(xs); i < l; i++) {

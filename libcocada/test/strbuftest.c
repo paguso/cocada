@@ -25,6 +25,7 @@
 
 #include "CuTest.h"
 
+#include "errlog.h"
 #include "memdbg.h"
 #include "strbuf.h"
 
@@ -174,15 +175,52 @@ void test_strbuf_paste(CuTest *tc)
 }
 
 
+void test_strbuf_find_n(CuTest *tc)
+{
+	memdbg_reset();
+	char *s = "0123012301230123012301230123012301230123"
+			  "0123012301230123012301230123012301230123"
+			  "0123012301230123012301230123012301230123";
+	char *pat = "123";
+	strbuf *sb = strbuf_new_from_str(s, strlen(s));
+	size_t matches[7];
+	size_t from_pos = 0;
+	size_t expected_pos = 1;
+	size_t n;
+	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
+		for (size_t i = 0; i < n; i++) {
+			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
+			from_pos = matches[i] + 1;
+			expected_pos += 4;
+		}
+	}
+	pat = "";
+	from_pos = 0;
+	expected_pos = 0;
+	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
+		for (size_t i = 0; i < n; i++) {
+			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
+			from_pos = matches[i] + 1;
+			expected_pos += 1;
+		}
+	}
+	strbuf_free(sb);
+	if (!memdbg_is_empty()) {
+		DEBUG_EXEC(memdbg_print_stats(stdout, true));
+	}
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+
 void test_strbuf_replace_n(CuTest *tc)
 {
 	memdbg_reset();
 	strbuf *sb = strbuf_new_from_str("macaca", 6);
-	strbuf_replace_n(sb, "ca", "na", 2);
+	strbuf_replace_n(sb, "ca", "na", 2, 0);
 	CuAssertStrEquals(tc, "manana", strbuf_as_str(sb));
-	strbuf_replace_n(sb, "ma", "ba", 2);
+	strbuf_replace_n(sb, "ma", "ba", 2, 0);
 	CuAssertStrEquals(tc, "banana", strbuf_as_str(sb));
-	strbuf_replace_n(sb, "ana", "aca", 2);
+	strbuf_replace_n(sb, "ana", "aca", 2, 0);
 	CuAssertStrEquals(tc, "bacana", strbuf_as_str(sb));
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
@@ -194,21 +232,21 @@ void test_strbuf_replace(CuTest *tc)
 	memdbg_reset();
 	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
 	                                 44);
-	strbuf_replace(sb, "black fox", "yellow arara"); // do nothing
+	strbuf_replace(sb, "black fox", "yellow arara", 0); // do nothing
 	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.",
 	                  strbuf_as_str(sb));
-	strbuf_replace(sb, "brown fox", "yellow arara");
+	strbuf_replace(sb, "brown fox", "yellow arara", 0);
 	CuAssertStrEquals(tc, "The quick yellow arara jumps over the lazy dog.",
 	                  strbuf_as_str(sb));
-	strbuf_replace(sb, "The quick", "My");
+	strbuf_replace(sb, "The quick", "My", 0);
 	CuAssertStrEquals(tc, "My yellow arara jumps over the lazy dog.",
 	                  strbuf_as_str(sb));
-	strbuf_replace(sb, "ara", "cob");
+	strbuf_replace(sb, "ara", "cob", 0);
 	CuAssertStrEquals(tc, "My yellow cobra jumps over the lazy dog.",
 	                  strbuf_as_str(sb));
-	strbuf_replace(sb, "yellow cobra jumps over the lazy ", "");
+	strbuf_replace(sb, "yellow cobra jumps over the lazy ", "", 0);
 	CuAssertStrEquals(tc, "My dog.", strbuf_as_str(sb));
-	strbuf_replace(sb, "", "-");
+	strbuf_replace(sb, "", "-", 0);
 	CuAssertStrEquals(tc, "-My dog.", strbuf_as_str(sb));
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
@@ -221,18 +259,18 @@ void test_strbuf_replace_all(CuTest *tc)
 	strbuf *sb =
 	    strbuf_new_from_str("The__quick__brown__arara__jumps__over__the__lazy__arara.",
 	                        56);
-	strbuf_replace_all(sb, "__", " ");
+	strbuf_replace_all(sb, "__", " ", 0);
 	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.",
 	                  strbuf_as_str(sb));
-	strbuf_replace_all(sb, "ara", "ara");
+	strbuf_replace_all(sb, "ara", "ara", 0);
 	CuAssertStrEquals(tc, "The quick brown arara jumps over the lazy arara.",
 	                  strbuf_as_str(sb));
-	strbuf_replace_all(sb, "ara", "cob");
+	strbuf_replace_all(sb, "ara", "cob", 0);
 	CuAssertStrEquals(tc, "The quick brown cobra jumps over the lazy cobra.",
 	                  strbuf_as_str(sb));
-	strbuf_replace_all(sb, "quick brown cobra jumps over the lazy ", "");
+	strbuf_replace_all(sb, "quick brown cobra jumps over the lazy ", "", 0);
 	CuAssertStrEquals(tc, "The cobra.", strbuf_as_str(sb));
-	strbuf_replace_all(sb, "", "-");
+	strbuf_replace_all(sb, "", "-", 0);
 	CuAssertStrEquals(tc, "-T-h-e- -c-o-b-r-a-.-", strbuf_as_str(sb));
 	DESTROY_FLAT(sb, strbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
@@ -250,20 +288,20 @@ void test_strbuf_printf(CuTest *tc)
 
 	ws = sprintf(s, "");
 	s += ws;
-	wsbuf = strbuf_printf(sbuf, "");
+	wsbuf = sbprintf(sbuf, "");
 	CuAssertIntEquals(tc, ws, wsbuf);
 	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
 
 	ws = sprintf(s, "The");
 	s += ws;
-	wsbuf = strbuf_printf(sbuf, "The");
+	wsbuf = sbprintf(sbuf, "The");
 	CuAssertIntEquals(tc, ws, wsbuf);
 	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
 
 
 	ws = sprintf(s, " quick brown fox jumped over the lazy dog.");
 	s += ws;
-	wsbuf = strbuf_printf(sbuf, " quick brown fox jumped over the lazy dog.");
+	wsbuf = sbprintf(sbuf, " quick brown fox jumped over the lazy dog.");
 	CuAssertIntEquals(tc, ws, wsbuf);
 	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
 
@@ -276,7 +314,7 @@ void test_strbuf_printf(CuTest *tc)
 
 	ws = sprintf(s, " int=%d double=%lf string=%s", i, d, string);
 	s += ws;
-	wsbuf = strbuf_printf(sbuf, " int=%d double=%lf string=%s", i, d, string);
+	wsbuf = sbprintf(sbuf, " int=%d double=%lf string=%s", i, d, string);
 	CuAssertIntEquals(tc, ws, wsbuf);
 	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
 
@@ -301,6 +339,7 @@ CuSuite *strbuf_get_test_suite()
 	SUITE_ADD_TEST(suite, test_strbuf_insert);
 	SUITE_ADD_TEST(suite, test_strbuf_cut);
 	SUITE_ADD_TEST(suite, test_strbuf_paste);
+	SUITE_ADD_TEST(suite, test_strbuf_find_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_all);

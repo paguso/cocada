@@ -33,28 +33,28 @@
  * @author Paulo Fonseca
  * @brief Extended string (xstr) formatter
  * @see format.h
- * 
+ *
  * This formatter implements the format trait to provide a interface
  * for printing an xstr.
  */
 
 /**
  * @brief Formatter type.
- * 
+ *
  */
 typedef struct _xstrformat xstrformat;
 
 
 /**
  * @brief Creates a formatter for @p src that formats individual
- * xchars according to the default format specification XCHAR_FMT 
+ * xchars according to the default format specification XCHAR_FMT
  * @see xchar.h
  */
 xstrformat *xstrformat_new(const xstr *src);
 
 
 /**
- * @brief Creates a formatter for @p src that formats individual xchars 
+ * @brief Creates a formatter for @p src that formats individual xchars
  * as the corresponding ASCII chars.
  * @warning Assumes xstr_sizeof_char(src) == sizeof(char)
  */

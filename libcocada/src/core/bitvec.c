@@ -300,7 +300,7 @@ void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row)
 	fprintf(stream, "  len     : %zu\n", bv->len);
 	fprintf(stream, "  capacity: %zu\n", bv->cap);
 	fprintf(stream, "  data:\n");
-	bitarr_print(stream, bv->bits, bv->cap, bytes_per_row, 2);
+	bitarr_fprint(stream, bv->bits, bv->cap, bytes_per_row, 2);
 	fprintf(stream, "}\n");
 
 }
@@ -312,19 +312,25 @@ struct _bitvec_format {
 	uint bytes_per_row;
 };
 
-void bitvec_format_print(format *self, FILE *stream)
-{
-	bitvec_format bf = *((bitvec_format *)self->impltor);
-	fprintf(stream, "bitvector@%p {\n", bf.src);
-	fprintf(stream, "  len     : %zu\n", bf.src->len);
-	fprintf(stream, "  capacity: %zu\n", bf.src->cap);
-	fprintf(stream, "  data:\n");
-	bitarr_print(stream, bf.src->bits, bf.src->cap, bf.bytes_per_row, 2);
-	fprintf(stream, "}\n");
+#define BITVEC_PRINT(TYPE)\
+	int ret = 0;\
+	bitvec_format bf = *((bitvec_format *)self->impltor);\
+	ret += TYPE##printf(out, "bitvector@%p {\n", bf.src);\
+	ret += TYPE##printf(out, "  len     : %zu\n", bf.src->len);\
+	ret += TYPE##printf(out, "  capacity: %zu\n", bf.src->cap);\
+	ret += TYPE##printf(out, "  data:\n");\
+	ret += bitarr_##TYPE##print(out, bf.src->bits, bf.src->cap, bf.bytes_per_row, 2);\
+	ret += TYPE##printf(out, "}\n");\
+	return ret;
 
-}
 
-format_vt bitvec_format_vt = {.print = bitvec_format_print};
+static int bitvec_format_fprint(format *self, FILE *out) {BITVEC_PRINT(f)}
+static int bitvec_format_sprint(format *self, char *out) {BITVEC_PRINT(s)}
+static int bitvec_format_sbprint(format *self, strbuf *out) {BITVEC_PRINT(sb)}
+
+format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
+.sprint = bitvec_format_sprint,
+.sbprint = bitvec_format_sbprint};
 
 
 bitvec_format *bitvec_get_format(bitvec *self, uint bytes_per_row)

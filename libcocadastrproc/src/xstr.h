@@ -135,20 +135,6 @@ void xstr_rot_left(xstr *xs, size_t npos);
 
 
 /**
- * @brief Prints a xstr to the given stream.
- */
-void xstr_print(FILE *stream, const xstr *xs);
-
-
-/**
- * @brief Appends a string representation of the xstr to a
- * string buffer @p dest
- * @warning This is not a conversion to @p xs to string.
- */
-void xstr_to_string (const xstr *xs, strbuf *dest);
-
-
-/**
  * @brief Returns the lenght of the xstr.
  */
 size_t xstr_len(const xstr *xs);

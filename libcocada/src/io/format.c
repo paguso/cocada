@@ -22,15 +22,30 @@
 #include <stdio.h>
 
 #include "format.h"
+#include "strbuf.h"
 
 
-void format_fprint(format *self, FILE *stream)
+int format_print(format *self)
 {
-	self->vt.fprint(self, stream);
+	return self->vt.fprint(self, stdout);
 }
 
 
-void format_print(format *self)
+int format_fprint(format *self, FILE *stream)
 {
-	self->vt.fprint(self, stdout);
+	return self->vt.fprint(self, stream);
 }
+
+
+int format_sprint(format *self, char *dest)
+{
+	return self->vt.sprint(self, dest);
+}
+
+
+int format_sbprint(format *self, strbuf *buf)
+{
+	return self->vt.sbprint(self, buf);
+}
+
+

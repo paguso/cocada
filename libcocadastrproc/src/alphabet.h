@@ -106,12 +106,6 @@ void alphabet_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
- * @brief Prints an alphabet representation to the standard output.
- */
-void ab_print(const alphabet *ab);
-
-
-/**
  * @brief Return the base char type of the alphabet
  */
 alphabet_type ab_type(const alphabet *ab);

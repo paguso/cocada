@@ -113,6 +113,19 @@ size_t strbuf_capacity(strbuf *self)
 }
 
 
+void strbuf_fit(strbuf *self)
+{
+	_resize_to(self, self->len);
+}
+
+
+bool strbuf_eq(strbuf *self, strbuf *other)
+{
+	return (strcmp(self->str, other->str) == 0);
+}
+
+
+
 char strbuf_get(strbuf *self, size_t pos)
 {
 	return self->str[pos];
@@ -274,18 +287,42 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
-void strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n)
+size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos, size_t *dest)
 {
+	size_t patlen = strlen(old);
+	if (n == 0 || from_pos + patlen > self->len) {
+		return 0;
+	}
+	fsm *matcher = build_fsm(old, patlen);
+	size_t ret = 0;
+	if (patlen == 0 && n > 0) {
+		dest[ret++] = from_pos;
+	}
+	for (size_t i = from_pos, state = 0; ret < n && i < self->len; i++) {
+		state = matcher->delta[(size_t)self->str[i]][state];
+		if (state == patlen) {
+			assert (i + 1 >= patlen );
+			dest[ret++] = i + 1 - patlen;
+		}
+	}
+	fsm_free(matcher);
+	return ret; 
+}
+
+
+size_t strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n, size_t from)
+{
+	if (from > self->len) return 0;
 	size_t patlen = strlen(old);
 	size_t repllen = strlen(new);
 	fsm *matcher = build_fsm(old, patlen);
 	stack *occ = stack_new(sizeof(size_t));
-	size_t occ_count = 0;
+	uint occ_count = 0;
 	if (patlen == 0 && occ_count < n ) {
 		stack_push_size_t(occ, 0);
 		occ_count++;
 	}
-	for (size_t i = 0, state = 0; occ_count < n && i < self->len; i++) {
+	for (size_t i = from, state = 0; occ_count < n && i < self->len; i++) {
 		state = matcher->delta[(size_t)self->str[i]][state];
 		if (state == patlen) {
 			assert (i + 1 >= patlen );
@@ -309,22 +346,23 @@ void strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n)
 	}
 	DESTROY_FLAT(occ, stack);
 	fsm_free(matcher);
+	return occ_count;
 }
 
 
-void strbuf_replace(strbuf *self, const char *old, const char *new)
+size_t strbuf_replace(strbuf *self, const char *old, const char *new, size_t from)
 {
-	strbuf_replace_n(self, old, new, 1);
+	return strbuf_replace_n(self, old, new, 1, from);
 }
 
 
-void strbuf_replace_all(strbuf *self, const char *old, const char *new)
+size_t strbuf_replace_all(strbuf *self, const char *old, const char *new, size_t from)
 {
-	strbuf_replace_n(self, old, new, SIZE_MAX);
+	return strbuf_replace_n(self, old, new, SIZE_MAX, from);
 }
 
 
-int strbuf_printf(strbuf *self, const char *fmt, ...)
+int sbprintf(strbuf *self, const char *fmt, ...)
 {
 	size_t fmt_len = strlen(fmt);
 	size_t avail = self->capacity - self->len;

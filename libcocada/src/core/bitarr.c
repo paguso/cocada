@@ -89,44 +89,69 @@ inline void bitarr_set_bit (byte_t *ba, size_t pos, const bool bit)
 }
 
 
-void bitarr_print(FILE *stream, const byte_t *ba, size_t nbits,
+#define BITARR_PRINT(TYPE)\
+	int ret = 0;\
+	size_t i, c, line_label_width, bits_per_line;\
+	byte_t b, onemask;\
+	line_label_width = indent + ceil(log10(nbits));\
+	bits_per_line = bytes_per_line * BYTESIZE;\
+	onemask = 1<<(BYTESIZE-1);\
+	i = 0;\
+	while (i < nbits) {\
+		if (i%bits_per_line == 0) {\
+			if (i) {\
+				ret += TYPE##printf(out, "\n");\
+			}\
+			ret += TYPE##printf(out, "%*zu:", (int)line_label_width, i);\
+		}\
+		ret += TYPE##printf(out, " ");\
+		b = ba[i/BYTESIZE];\
+		/*printf ("%x ",b);*/\
+		for (c=0; c<BYTESIZE; c++) {\
+			if (i+c < nbits) {\
+				if (b & onemask) {\
+					ret += TYPE##printf(out, "1");\
+				}\
+				else {\
+					ret += TYPE##printf(out, "0");\
+				}\
+			}\
+			else {\
+				ret += TYPE##printf(out, "*");\
+			}\
+			b <<= 1;\
+		}\
+		i += BYTESIZE;\
+	}\
+	ret += TYPE##printf(out, "\n");\
+	return ret;
+
+
+
+int bitarr_fprint(FILE *out, const byte_t *ba, size_t nbits,
                   uint bytes_per_line, uint indent)
 {
-	size_t i, c, line_label_width, bits_per_line;
-	byte_t b, onemask;
-	line_label_width = indent + ceil(log10(nbits));
-	bits_per_line = bytes_per_line * BYTESIZE;
-	onemask = 1<<(BYTESIZE-1);
-	i = 0;
-	while (i < nbits) {
-		if (i%bits_per_line == 0) {
-			if (i) fprintf(stream, "\n");
-			fprintf(stream, "%*zu:", (int)line_label_width, i);
-		}
-		fprintf(stream, " ");
-		b = ba[i/BYTESIZE];
-		//printf ("%x ",b);
-		for (c=0; c<BYTESIZE; c++) {
-			if (i+c < nbits) {
-				if (b & onemask) {
-					fprintf(stream, "1");
-				}
-				else {
-					fprintf(stream, "0");
-				}
-			}
-			else {
-				fprintf(stream, "*");
-			}
-			b <<= 1;
-		}
-		i += BYTESIZE;
-	}
-	fprintf(stream, "\n");
+	BITARR_PRINT(f);
+}
+
+int bitarr_sprint(char *out, const byte_t *ba, size_t nbits,
+                  uint bytes_per_line, uint indent)
+{
+	BITARR_PRINT(s);
+}
+
+int bitarr_sbprint(strbuf *out, const byte_t *ba, size_t nbits,
+                  uint bytes_per_line, uint indent)
+{
+	BITARR_PRINT(sb);
 }
 
 
-void bitarr_print_as_size_t(const byte_t *ba, size_t nbits,
+
+
+
+/*
+void bitarr_fprint_as_size_t(const byte_t *ba, size_t nbits,
                             size_t bits_per_entry)
 {
 	size_t i;
@@ -137,6 +162,7 @@ void bitarr_print_as_size_t(const byte_t *ba, size_t nbits,
 	}
 	printf ("]\n");
 }
+*/
 
 
 void bitarr_and(byte_t *ba, const byte_t *mask, size_t nbits)

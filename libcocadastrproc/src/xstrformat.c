@@ -24,6 +24,7 @@
 
 #include "errlog.h"
 #include "format.h"
+#include "strbuf.h"
 #include "xstr.h"
 #include "xstrformat.h"
 
@@ -37,40 +38,78 @@ struct _xstrformat {
 IMPL_TRAIT(xstrformat, format)
 
 
-static void fprint_ascii(format *self, FILE *stream)
+
+#define PRINT_ASCII(TYPE)\
+	int ret = 0;\
+	const xstr *xs = ((xstrformat *)(self->impltor))->src;\
+	WARN_ASSERT(xstr_sizeof_char(xs)==sizeof(char),\
+	            "Formatting xstr @%p with char size = %zubytes as ASCII.\n", xs,\
+	            xstr_sizeof_char(xs));\
+	ret += TYPE##printf(out, "xstr@%p {\n", xs);\
+	ret += TYPE##printf(out, "  len : %zu\n", xstr_len(xs) );\
+	ret += TYPE##printf(out, "  sizeof_char: %zu\n", xstr_sizeof_char(xs));\
+	ret += TYPE##printf(out, "  str: %s\n", (char *)xstr_as_bytes(xs));\
+	ret += TYPE##printf(out, "}\n");\
+	return ret;
+
+
+static int fprint_ascii(format *self, FILE *out)
 {
-	const xstr *xs = ((xstrformat *)(self->impltor))->src;
-	WARN_ASSERT(xstr_sizeof_char(xs)==sizeof(char),
-	            "Formatting xstr @%p with char size = %zubytes as ASCII.\n", xs,
-	            xstr_sizeof_char(xs));
-	fprintf(stream, "xstr@%p {\n", xs);
-	fprintf(stream, "  len : %zu\n", xstr_len(xs) );
-	fprintf(stream, "  sizeof_char: %zu\n", xstr_sizeof_char(xs));
-	fprintf(stream, "  str: %s\n", (char *)xstr_as_bytes(xs));
-	fprintf(stream, "}\n");
+	PRINT_ASCII(f)
 }
 
-static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii};
-
-
-static void fprint_xchar(format *self, FILE *stream)
+static int sprint_ascii(format *self, char *out)
 {
-	const xstr *xs = ((xstrformat *)(self->impltor))->src;
-	WARN_ASSERT(xstr_sizeof_char(xs)==XCHAR_BYTESIZE,
-	            "Formatting xstr @%p with char size = %zu bytes as a sequence of xchars, whereas XCHAR_BYTESIZE=%d\n",
-	            xs, xstr_sizeof_char(xs), XCHAR_BYTESIZE);
-	fprintf(stream, "xstr@%p {\n", xs);
-	fprintf(stream, "  len : %zu\n", xstr_len(xs) );
-	fprintf(stream, "  sizeof_char: %zu\n", xstr_sizeof_char(xs));
-	fprintf(stream, "  str:");
-	FOREACH_IN_XSTR(c, xs) {
-		fprintf(stream, "[%"XCHAR_FMT"]", c);
-	}
-	fprintf(stream, "\n");
-	fprintf(stream, "}\n");
+	PRINT_ASCII(s)
 }
 
-static format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar};
+
+static int sbprint_ascii(format *self, strbuf *out)
+{
+	PRINT_ASCII(sb)
+}
+
+
+static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint_ascii, .sbprint = sbprint_ascii};
+
+
+#define PRINT_XCHAR(TYPE)\
+	int ret = 0;\
+	const xstr *xs = ((xstrformat *)(self->impltor))->src;\
+	WARN_ASSERT(xstr_sizeof_char(xs)==XCHAR_BYTESIZE,\
+	            "Formatting xstr @%p with char size = %zu bytes as a sequence of xchars, whereas XCHAR_BYTESIZE=%d\n",\
+	            xs, xstr_sizeof_char(xs), XCHAR_BYTESIZE);\
+	ret += TYPE##printf(out, "xstr@%p {\n", xs);\
+	ret += TYPE##printf(out, "  len : %zu\n", xstr_len(xs) );\
+	ret += TYPE##printf(out, "  sizeof_char: %zu\n", xstr_sizeof_char(xs));\
+	ret += TYPE##printf(out, "  str:");\
+	FOREACH_IN_XSTR(c, xs) {\
+		ret += TYPE##printf(out, "[%"XCHAR_FMT"]", c);\
+	}\
+	ret += TYPE##printf(out, "\n");\
+	ret += TYPE##printf(out, "}\n");\
+	return ret;
+
+
+static int fprint_xchar(format *self, FILE *out)
+{
+	PRINT_XCHAR(f)
+}
+
+
+static int sprint_xchar(format *self, char *out)
+{
+	PRINT_XCHAR(s)
+}
+
+
+static int sbprint_xchar(format *self, strbuf *out)
+{
+	PRINT_XCHAR(sb)
+}
+
+
+static format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar, .sprint = sprint_xchar, .sbprint = sbprint_xchar};
 
 
 xstrformat *xstrformat_new(const xstr *src)

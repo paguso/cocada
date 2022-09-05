@@ -78,7 +78,7 @@ static void memtable_init(memtable *tally)
 }
 
 
-static size_t hash(void *addr, size_t capacity)
+static size_t hash(const void *addr, size_t capacity)
 {
 	size_t h = (size_t)(addr);
 	h *= 11400714819323198485llu;
@@ -180,7 +180,7 @@ static void memtable_unset(memtable *tally, void *addr)
 }
 
 
-static memdbg_query_t memtable_get(memtable *tally, void *addr)
+static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 {
 #ifndef MEM_DEBUG
 	return;
