@@ -22,6 +22,10 @@
 #ifndef SAIS_H
 #define SAIS_H
 
+#include <stddef.h>
+
+#include "alphabet.h"
+
 /**
  * @file sais.h
  * @author Paulo Fonseca
@@ -36,7 +40,7 @@
  * @brief Builds the plain suffix array for the string @p str over the
  *        alphabet @p ab.
  *
- * @warn  A sentinel character, lexicographically smaller than any char in
+ * @warning  A sentinel character, lexicographically smaller than any char in
  *        @p ab is virtually added to @str s.t. the returned suffix array SA
  *        will have size @p len+1 and SA[0]==len.
  */

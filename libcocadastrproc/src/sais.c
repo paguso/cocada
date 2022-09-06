@@ -32,8 +32,8 @@
 
 static const char SENTINEL='$';
 
-static const byte_t S = 0x0;
-static const byte_t L = 0x1;
+static const byte_t S = 0;
+static const byte_t L = 1;
 
 #define UNSET SIZE_MAX
 #define CHAR_AT(S,I) ((ab_type==CHAR_TYPE)?((char *)(S))[(I)]:((size_t *)(S))[(I)])
@@ -260,7 +260,7 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 
 	bitvec *ls   = bitvec_new_with_capacity(len+add_sentinel);
 	bitvec *lms  = bitvec_new_with_capacity(len+add_sentinel);
-	size_t    *bkts = calloc(ab_sz, sizeof(size_t)); //ARR_NEW(size_t, ab_sz);
+	size_t *bkts = calloc(ab_sz, sizeof(size_t)); //ARR_NEW(size_t, ab_sz);
 
 	init_LS(str, len, ab, ab_t, ls, lms, bkts, add_sentinel);
 

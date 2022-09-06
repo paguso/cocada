@@ -76,9 +76,9 @@ static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint
 #define PRINT_XCHAR(TYPE)\
 	int ret = 0;\
 	const xstr *xs = ((xstrformat *)(self->impltor))->src;\
-	WARN_ASSERT(xstr_sizeof_char(xs)==XCHAR_BYTESIZE,\
-	            "Formatting xstr @%p with char size = %zu bytes as a sequence of xchars, whereas XCHAR_BYTESIZE=%d\n",\
-	            xs, xstr_sizeof_char(xs), XCHAR_BYTESIZE);\
+	WARN_ASSERT(xstr_sizeof_char(xs)==XCHAR_BYTES,\
+	            "Formatting xstr @%p with char size = %zu bytes as a sequence of xchars, whereas XCHAR_BYTES=%d\n",\
+	            xs, xstr_sizeof_char(xs), XCHAR_BYTES);\
 	ret += TYPE##printf(out, "xstr@%p {\n", xs);\
 	ret += TYPE##printf(out, "  len : %zu\n", xstr_len(xs) );\
 	ret += TYPE##printf(out, "  sizeof_char: %zu\n", xstr_sizeof_char(xs));\
