@@ -76,7 +76,7 @@ typedef size_t (*char_rank_func)(xchar_t c);
  * @param size Number of letters.
  * @param letters (no transfer) String with letters in lexicographic order.
  */
-alphabet *alphabet_new(const size_t size, const char *letters);
+alphabet *alphabet_new(size_t size, const char *letters);
 
 
 /**
@@ -84,7 +84,7 @@ alphabet *alphabet_new(const size_t size, const char *letters);
  *        0 to @p size-1
  * @param size The alphabet size.
  */
-alphabet *int_alphabet_new(const size_t size);
+alphabet *int_alphabet_new(size_t size);
 
 
 /**

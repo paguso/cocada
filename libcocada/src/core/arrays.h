@@ -171,15 +171,11 @@ XX_CORETYPES(SA_ARR_DECL)
 		(DEST)[_fd+_i]=(SRC)[_fs+_i]
 
 
-/**
- * @brief Prints the array ARR from positio FROM to position TO-1
- *        using NAME as label, displaying ELTSPERLINE elements per line,
- *        and using the printf format string FORMAT.
- */
-#define ARR_PRINT( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
-	{ printf(#NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
+
+#define OLD_ARR_PRINT( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
+	{ printf("%s"#NAME"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
 		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
-			if(!((__i-FROM)%__el)) printf("\n%4zu: ",__i);\
+			if(!((__i-FROM)%__el)) printf("\n%s%4zu: ",LEFT_MARGIN, __i);\
 			printf(#FORMAT" " , ARR[__i]);}\
 		printf("\n");}
 
@@ -188,13 +184,24 @@ XX_CORETYPES(SA_ARR_DECL)
  * @brief Prints the array @p ARR from position @p FROM to position @p TO-1
  *        using @p NAME as label, displaying @pELTSPERLINE elements per line,
  *        and using the printf format string @p FORMAT.
+ *        LEFT_MARGIN is a string that is printed at the beginning of each line.
  */
-#define ARR_FPRINT(STREAM, ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE )\
-	{ fprintf(STREAM, #NAME"[%zu:%zu] =",((size_t)(FROM)), ((size_t)(TO)));\
+#define ARR_FPRINT(STREAM, ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
+	{ fprintf(STREAM, "%s"#NAME"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
 		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
-			if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%4zu: ",__i);\
+			if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%s%4zu: ",LEFT_MARGIN, __i);\
 			fprintf(STREAM, #FORMAT" " , ARR[__i]);}\
 		fprintf(STREAM, "\n");}
+
+
+/**
+ * @brief Prints the array ARR from positio FROM to position TO-1
+ *        using NAME as label, displaying ELTSPERLINE elements per line,
+ *        and using the printf format string FORMAT.
+ *        LEFT_MARGIN is a string that is printed at the beginning of each line.
+ */
+#define ARR_PRINT( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
+    ARR_FPRINT(stdout, ARR, NAME, FORMAT, FROM, TO, ELTSPERLINE, LEFT_MARGIN)
 
 
 #define NEW_MATRIX(ID, TYPE, ROWS, COLS)\

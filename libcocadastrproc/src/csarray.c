@@ -234,9 +234,9 @@ void csarray_print(FILE *stream, csarray *csa)
 		//strbuf_free(phi);
 	}
 	ARR_FPRINT(stream, csa->root_sa, root_sa, %zu, 0, csa->lvl_len[csa->nlevels-1],
-	           10);
+	           10, "");
 	ARR_FPRINT(stream, csa->root_sa_inv, root_sa_inv, %zu, 0,
-	           csa->lvl_len[csa->nlevels-1], 10);
+	           csa->lvl_len[csa->nlevels-1], 10, "");
 	fprintf (stream, "} #end of csarray@%p\n", csa);
 
 }

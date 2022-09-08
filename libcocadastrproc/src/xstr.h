@@ -253,6 +253,7 @@ int xstr_ncmp(const xstr *self, const xstr *other, size_t n);
  */
 int xstr_cmp(const xstr *self, const xstr *other);
 
+
 #define FOREACH_IN_XSTR(CHR, STR) \
 	for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
 		for (xchar_t CHR = 1; CHR ; CHR = 0) \

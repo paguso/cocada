@@ -32,9 +32,12 @@ void test_ab(CuTest *tc)
 {
 	memdbg_reset();
 	size_t size = 16;
-	char *letters = "0123456789ABCDEF";
+	char *letters = "\0""0C1C2312AA6604CCB752FFFF567840C9AB7313330C91D0D88BB8DD8EEEF"; // len=60
+	size_t lsize = 60;
+	CuAssertSizeTEquals(tc, 59, strlen(&letters[1]));
 	alphabet *ab;
-	ab = alphabet_new(size, letters);
+	ab = alphabet_new(lsize, letters);
+	CuAssertSizeTEquals(tc, 16, ab_size(ab));
 	for (size_t i = 0; i < size; i++) {
 		size_t rk = ab_rank(ab, letters[i]);
 		CuAssertSizeTEquals(tc, i, rk);

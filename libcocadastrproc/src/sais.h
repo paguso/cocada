@@ -25,6 +25,7 @@
 #include <stddef.h>
 
 #include "alphabet.h"
+#include "xstr.h"
 
 /**
  * @file sais.h
@@ -41,10 +42,19 @@
  *        alphabet @p ab.
  *
  * @warning  A sentinel character, lexicographically smaller than any char in
- *        @p ab is virtually added to @str s.t. the returned suffix array SA
+ *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
  *        will have size @p len+1 and SA[0]==len.
  */
 size_t *sais(char *str, size_t len, alphabet *ab);
 
+
+/**
+ * @brief 
+ * 
+ * @param str 
+ * @param ab 
+ * @return size_t* 
+ */
+size_t *sais_xstr(xstr *str, alphabet *ab);
 
 #endif

@@ -30,6 +30,7 @@
 #include "arrays.h"
 #include "arrays.h"
 #include "new.h"
+#include "order.h"
 #include "cstrutil.h"
 #include "hashmap.h"
 #include "mathutil.h"
@@ -54,19 +55,32 @@ struct _alphabet {
 };
 
 
-alphabet *alphabet_new(const size_t size, const char *letters)
+alphabet *alphabet_new(size_t size, const char *letters)
 {
 	alphabet *ret;
 	ret =  NEW(alphabet);
 	ret->type = CHAR_TYPE;
 	ret->rank_mode = ARRAY;
+	ret->letters = cstr_clone_len(letters, size);
+	qsort(ret->letters, size, sizeof(char), cmp_char);
+	// removing repeated letters
+	int l = size - 1, r = size - 1;
+	while (r >= 0) {
+		while (l >= 0 && ret->letters[l] == ret->letters[r]) {
+			l--;
+		}
+		if ( (r - l) > 1 ) {
+			ret->letters = cstr_cut(ret->letters, l + 1, r);
+			size -= (r - l - 1);
+		}
+		r = l;
+	}
+	ret->letters = cstr_crop_len(ret->letters, size);
 	ret->size = size;
-	ret->letters = cstr_new(size);
-	strncpy(ret->letters, letters, size);
 	ret->ranks.arr = ARR_NEW(size_t, UCHAR_MAX);
 	ARR_FILL(ret->ranks.arr, 0, UCHAR_MAX, size);
 	for (size_t i=0; i<size; i++)
-		ret->ranks.arr[(size_t)letters[i]]=i;
+		ret->ranks.arr[(size_t)letters[i]] = i;
 	return ret;
 }
 

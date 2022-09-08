@@ -96,14 +96,15 @@ char *cstr_substr(char *str, size_t from,  size_t to);
 
 
 /**
- * @brief 'Crops' the string @p str to @p str[@p from..@p to-1].
+ * @brief 'Crops' the string @p str to @p str[@p from: @p to].
  *        The cropped char array will end with a '\0'.
  *        The memory used by the parts of the string out of this interval
  *        will be freed. As part of the operation, the remaining 'cropped'
  *        portion may be relocated.
  * @return The address of the trimmed string.
  */
-char *cstr_crop(char *str, size_t from,  size_t to);
+char *cstr_crop(char *str, size_t from, size_t to);
+
 
 
 /**
@@ -129,12 +130,29 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
 /**
  * @brief resizes the string to a given length @p len.
  * If @p len is less than the current string length, this is equivalent
- * to `cstr_trim(str, 0, len)`. Else, the string is enlarged to
+ * to `cstr_crop(str, 0, len)`. Else, the string is enlarged to
  * have physical length @p len+1, i.e. with trailing positions
  * set to '\0'.
  * @warning The string may be relocated.
  */
 char *cstr_resize(char *str, size_t len);
+
+
+/**
+ * @brief Cuts away the substring @p str[@p from: @p to] from @p str.
+ * Example: 
+ * ```
+ * char *str = "banana";
+ * str = cstr_cut(str, 1, 3);
+ * printf("%s", str); // prints "bana"
+ * ```
+ * If @p from >= @p to This operation has no effect.
+ * The operation does not reallocate the string. To adjust the physiscal
+ * array size to the new string size, use cstr_resize()
+ * new size
+ * @warning No bound checks are performed.
+ */
+char *cstr_cut(char *str, size_t from, size_t to);
 
 
 /**
