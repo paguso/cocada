@@ -37,7 +37,6 @@ static const byte_t S = 0;
 static const byte_t L = 1;
 
 #define UNSET SIZE_MAX
-//#define CHAR_AT(S,I) ((ab_type==CHAR_TYPE)?((char *)(S))[(I)]:((size_t *)(S))[(I)])
 
 
 static inline ullong cstr_char_at(void *str, size_t i) {
@@ -55,9 +54,8 @@ static inline ullong size_t_char_at(void *str, size_t i) {
 typedef (*char_at_fn)(void *, size_t);
 
 
-
 void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
-                 bool add_sentinel, char_at_fn CHAR_AT );
+                 bool add_sentinel, char_at_fn char_at );
 
 
 static void get_bkt_start( size_t *bkts, size_t *dest, size_t l)
@@ -78,15 +76,15 @@ static void get_bkt_end( size_t *bkts, size_t *dest, size_t l)
 }
 
 
-static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
+static void init_LS( void *str, size_t len, alphabet *ab,
                      bitvec *lsvec, bitvec *lmsvec, size_t *bkts,
-                     bool add_sentinel , char_at_fn CHAR_AT)
+                     bool add_sentinel , char_at_fn char_at)
 {
 	size_t last = 0;
 	byte_t ls, lastls;
 	int cmp;
 	for (size_t i = 1; i < len; i++) {
-		cmp = ab_cmp(ab, CHAR_AT(str, i - 1), CHAR_AT(str, i));
+		cmp = ab_cmp(ab, char_at(str, i - 1), char_at(str, i));
 		if (cmp == 0) {
 			continue;
 		}
@@ -94,7 +92,7 @@ static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
 		bitvec_push_n(lsvec, i - last, ls);
 		bitvec_push(lmsvec, (last > 0 && ls == S && lastls == L));
 		bitvec_push_n(lmsvec, (i - last - 1), 0);
-		bkts[ab_rank(ab, CHAR_AT(str, i - 1)) + add_sentinel] += (i - last);
+		bkts[ab_rank(ab, char_at(str, i - 1)) + add_sentinel] += (i - last);
 		last = i;
 		lastls = ls;
 	}
@@ -103,7 +101,7 @@ static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
 		bitvec_push_n(lsvec, len - last, L);
 		bitvec_push(lmsvec, (last > 0 && ls == S && lastls == L));
 		bitvec_push_n(lmsvec, (len - last - 1), 0);
-		bkts[ab_rank(ab, CHAR_AT(str, len - 1)) + add_sentinel] += (len - last);
+		bkts[ab_rank(ab, char_at(str, len - 1)) + add_sentinel] += (len - last);
 	}
 	// last run must be the sentinel
 	bitvec_push(lsvec, S);
@@ -112,9 +110,9 @@ static void init_LS( void *str, size_t len, alphabet *ab, alphabet_type ab_type,
 }
 
 
-static void induce_L( void *str, alphabet *ab, alphabet_type ab_type,
+static void induce_L( void *str, alphabet *ab,
                       size_t *sarr, bitvec *ls,
-                      size_t *bkts, size_t *offsets , bool add_sentinel, char_at_fn CHAR_AT)
+                      size_t *bkts, size_t *offsets , bool add_sentinel, char_at_fn char_at)
 {
 	size_t l = ab_size(ab) + add_sentinel;
 	get_bkt_start(bkts, offsets, l);
@@ -123,15 +121,15 @@ static void induce_L( void *str, alphabet *ab, alphabet_type ab_type,
 		j = sarr[i];
 		if ( j != UNSET && j > 0 && bitvec_get_bit(ls, j - 1) == L ) {
 			j -= 1;
-			sarr[offsets[ab_rank(ab, CHAR_AT(str, j)) + add_sentinel]++] = j;
+			sarr[offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]++] = j;
 		}
 	}
 }
 
 
-static void induce_S( void *str, alphabet *ab, alphabet_type ab_type,
+static void induce_S( void *str, alphabet *ab,
                       size_t *sarr, bitvec *ls,
-                      size_t *bkts, size_t *offsets , bool add_sentinel, char_at_fn CHAR_AT)
+                      size_t *bkts, size_t *offsets , bool add_sentinel, char_at_fn char_at)
 {
 	size_t l = ab_size(ab) + add_sentinel;
 	get_bkt_end(bkts, offsets, l);
@@ -140,17 +138,17 @@ static void induce_S( void *str, alphabet *ab, alphabet_type ab_type,
 		j = sarr[i];
 		if ( j != UNSET && j > 0 && bitvec_get_bit(ls, j - 1) == S ) {
 			j -= 1;
-			sarr[--offsets[ab_rank(ab, CHAR_AT(str, j)) + add_sentinel]] = j;
+			sarr[--offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]] = j;
 		}
 	}
 }
 
 
-static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
+static void sort_LMS( void *str, alphabet *ab, 
                       size_t *sarr, bitvec *ls, bitvec *lms,
-                      size_t *bkts, size_t *offsets, bool add_sentinel , char_at_fn CHAR_AT)
+                      size_t *bkts, size_t *offsets, bool add_sentinel , char_at_fn char_at)
 {
-	//assert(CHAR_AT != size_t_char_at || add_sentinel == false);
+	//assert(char_at != size_t_char_at || add_sentinel == false);
 	size_t n = bitvec_len(ls);
 	size_t l = ab_size(ab) + add_sentinel;
 
@@ -160,14 +158,14 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
 	for (size_t i = 0; i < n - 1; i++) {
 		if (!bitvec_get_bit(lms, i))
 			continue;
-		sarr[--offsets[ab_rank(ab, CHAR_AT(str, i)) + add_sentinel]] = i;
+		sarr[--offsets[ab_rank(ab, char_at(str, i)) + add_sentinel]] = i;
 	}
 	//printf("1)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, n, 10, "");
-	induce_L(str, ab, ab_type, sarr, ls, bkts, offsets, add_sentinel, CHAR_AT);
+	induce_L(str, ab, sarr, ls, bkts, offsets, add_sentinel, char_at);
 	//printf("2)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, n, 10, "");
-	induce_S(str, ab, ab_type, sarr, ls, bkts, offsets, add_sentinel, CHAR_AT);
+	induce_S(str, ab, sarr, ls, bkts, offsets, add_sentinel, char_at);
 	//printf("3)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, n, 10, "");
 
@@ -199,7 +197,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
 			//printf("comparing positions prev_lms+k=%zu to cur_lms+k=%zu \n", prev_lms+k, cur_lms+k);
 			if (i == 0 || 
 					prev_lms + k + add_sentinel == n || cur_lms + k + add_sentinel == n ||
-					CHAR_AT(str, prev_lms + k) != CHAR_AT(str, cur_lms + k) ||
+					char_at(str, prev_lms + k) != char_at(str, cur_lms + k) ||
 			        bitvec_get_bit(ls, prev_lms + k) != bitvec_get_bit(ls, cur_lms + k)) {
 				diff = true;
 				//printf("break diff=true >\n");
@@ -280,7 +278,7 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
 	for (size_t i = nlms - 1, j; i > 0; i--) {
 		j = sarr[i];
 		sarr[i] = UNSET;
-		sarr[--offsets[ab_rank(ab, CHAR_AT(str,j)) + add_sentinel]] = j;
+		sarr[--offsets[ab_rank(ab, char_at(str,j)) + add_sentinel]] = j;
 	}
 	// Done. All LMS suffixes are sorted and correctly placed in the SA
 	//printf("10)\n");
@@ -294,23 +292,22 @@ static void sort_LMS( void *str, alphabet *ab, alphabet_type ab_type,
  * exactly once at the end of the string.
  */
 void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
-                 bool add_sentinel , char_at_fn CHAR_AT)
+                 bool add_sentinel , char_at_fn char_at)
 {
 	if (!add_sentinel) {
 		for (size_t i=0; i<len-1; i++) {
-			if (CHAR_AT(str, len-1) >= CHAR_AT(str, i)) {
-				assert(CHAR_AT(str, len-1) < CHAR_AT(str, i));
+			if (char_at(str, len-1) >= char_at(str, i)) {
+				assert(char_at(str, len-1) < char_at(str, i));
 			}
 		}
 	}
 	size_t ab_sz = ab_size(ab);
-	alphabet_type ab_t = ab_type(ab);
 
 	bitvec *ls   = bitvec_new_with_capacity(len + add_sentinel);
 	bitvec *lms  = bitvec_new_with_capacity(len + add_sentinel);
-	size_t *bkts = calloc(ab_sz + add_sentinel, sizeof(size_t)); //ARR_NEW(size_t, ab_sz);
+	size_t *bkts = ARR_OF_0_NEW(size_t, ab_sz + add_sentinel);
 
-	init_LS(str, len, ab, ab_t, ls, lms, bkts, add_sentinel, CHAR_AT);
+	init_LS(str, len, ab, ls, lms, bkts, add_sentinel, char_at);
 
 	// printf("-------------------------------------------------------------\n");
 	//printf("build_sarr\n");
@@ -321,15 +318,15 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 	//ARR_PRINT(bkts, bkts, %zu, 0, ab_sz + add_sentinel, 10, "");
 
 	ARR_FILL(sarr, 0, len+1, UNSET);
-	size_t *offsets = ARR_NEW(size_t, ab_sz);
+	size_t *offsets = ARR_NEW(size_t, ab_sz + add_sentinel);
 
-	sort_LMS(str, ab, ab_t, sarr, ls, lms, bkts, offsets, add_sentinel, CHAR_AT);
+	sort_LMS(str, ab, sarr, ls, lms, bkts, offsets, add_sentinel, char_at);
 	//printf("a)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, len+1, 10, "");
-	induce_L(str, ab, ab_t, sarr, ls, bkts, offsets, add_sentinel, CHAR_AT);
+	induce_L(str, ab, sarr, ls, bkts, offsets, add_sentinel, char_at);
 	//printf("b)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, len+1, 10, "");
-	induce_S(str, ab, ab_t, sarr, ls, bkts, offsets, add_sentinel, CHAR_AT);
+	induce_S(str, ab, sarr, ls, bkts, offsets, add_sentinel, char_at);
 	//printf("c)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, len+1, 10, "");
 

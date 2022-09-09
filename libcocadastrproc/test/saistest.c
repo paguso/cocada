@@ -81,7 +81,7 @@ void sais_test_xstr(CuTest *tc)
 {
     memdbg_reset();
     alphabet *ab = int_alphabet_new(10);
-    size_t max_len = 10000;
+    size_t max_len = 5000;
     xstr *str = xstr_new(nbytes(ab_size(ab)));
     xstrformat *xf = xstrformat_new(str);
     for (size_t len = 0; len < max_len; len++) {
