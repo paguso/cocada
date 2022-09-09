@@ -219,11 +219,11 @@ void csarray_print(FILE *stream, csarray *csa)
 		fprintf(stream, "\t--- LEVEL %zu ---\n", lvl);
 		fprintf(stream, "\teven_bv[%zu]:\n\t", lvl);
 		bitarr_fprint( stream,  csrsbitarr_data(csa->even_bv[lvl]),
-		              csrsbitarr_len(csa->even_bv[lvl]), 10, 0);
+		               csrsbitarr_len(csa->even_bv[lvl]), 10, 0);
 		//csrsbitarr_fprint(csa->even_bv[lvl], 4);
 		fprintf(stream, "\tchar_stop_bv[%zu]:\n\t", lvl);
 		bitarr_fprint( stream,  csrsbitarr_data(csa->char_stop_bv[lvl]),
-		              csrsbitarr_len(csa->char_stop_bv[lvl]), 10, 0);
+		               csrsbitarr_len(csa->char_stop_bv[lvl]), 10, 0);
 		//csrsbitarr_fprint(csa->char_stop_bv[lvl], 4);
 		//printf("\tphi_wt[%zu]: ", lvl);
 		//wavtree_print(csa->phi_wt[lvl]);

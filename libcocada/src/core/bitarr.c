@@ -141,7 +141,7 @@ int bitarr_sprint(char *out, const byte_t *ba, size_t nbits,
 }
 
 int bitarr_sbprint(strbuf *out, const byte_t *ba, size_t nbits,
-                  uint bytes_per_line, uint indent)
+                   uint bytes_per_line, uint indent)
 {
 	BITARR_PRINT(sb);
 }

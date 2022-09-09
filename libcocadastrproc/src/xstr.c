@@ -73,8 +73,8 @@ xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
 {
 	ERROR_ASSERT(sizeof_char <= XCHAR_BYTES,
 	             "Invalid xstr char size %zu. "
-				 "This must be at most XCHAR_BYTES=%d. "
-				 "See xchar documentation.\n",
+	             "This must be at most XCHAR_BYTES=%d. "
+	             "See xchar documentation.\n",
 	             sizeof_char, XCHAR_BYTES);
 	xstr *ret = NEW(xstr);
 	ret->sizeof_char = sizeof_char;

@@ -77,9 +77,9 @@ size_t strbuf_len(strbuf *self);
 
 
 /**
- * @brief Returns the current capacity of this stringbuffer, 
- * that is the number of characters of longest string that can 
- * be represented in the currently allocated memory, excluding 
+ * @brief Returns the current capacity of this stringbuffer,
+ * that is the number of characters of longest string that can
+ * be represented in the currently allocated memory, excluding
  * the null terminating '\0'.
  */
 size_t strbuf_capacity(strbuf *self);
@@ -88,8 +88,8 @@ size_t strbuf_capacity(strbuf *self);
 /**
  * @brief Adjusts the physical size of the string buffer to the least
  * amount necessary its current content.
- * 
- * @warning The strbuf may have a minimum required size. 
+ *
+ * @warning The strbuf may have a minimum required size.
  */
 void strbuf_fit(strbuf *self);
 
@@ -203,7 +203,8 @@ void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
  * @p n size_t values.
  * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
  */
-size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos, size_t *dest);
+size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
+                     size_t *dest);
 
 
 /**
@@ -221,24 +222,27 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos, s
  * strbuf_replace_n(self, "ana", "aca", 2, 0);
  * // yelds "bacana" . only 1 <= 2 "non-overlapping" occurrence found
  * ```
- * 
+ *
  * @return Returns the number of substitutions actually performed.
  */
-size_t strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n, size_t from_pos);
+size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
+                        size_t n, size_t from_pos);
 
 
 /**
  * @brief Same as `strbuf_replace_n(self, old, new, 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace(strbuf *self, const char *old, const char *new, size_t from_pos);
+size_t strbuf_replace(strbuf *self, const char *old, const char *new,
+                      size_t from_pos);
 
 
 /**
  * @brief Same as `strbuf_replace_n(self, old, new, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace_all(strbuf *self, const char *old, const char *new, size_t from_pos);
+size_t strbuf_replace_all(strbuf *self, const char *old, const char *new,
+                          size_t from_pos);
 
 
 /**

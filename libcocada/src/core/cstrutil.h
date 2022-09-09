@@ -140,7 +140,7 @@ char *cstr_resize(char *str, size_t len);
 
 /**
  * @brief Cuts away the substring @p str[@p from: @p to] from @p str.
- * Example: 
+ * Example:
  * ```
  * char *str = "banana";
  * str = cstr_cut(str, 1, 3);

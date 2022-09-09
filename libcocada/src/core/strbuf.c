@@ -287,7 +287,8 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
-size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos, size_t *dest)
+size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos,
+                     size_t *dest)
 {
 	size_t patlen = strlen(old);
 	if (n == 0 || from_pos + patlen > self->len) {
@@ -306,11 +307,12 @@ size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos, s
 		}
 	}
 	fsm_free(matcher);
-	return ret; 
+	return ret;
 }
 
 
-size_t strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n, size_t from)
+size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
+                        size_t n, size_t from)
 {
 	if (from > self->len) return 0;
 	size_t patlen = strlen(old);
@@ -350,13 +352,15 @@ size_t strbuf_replace_n(strbuf *self, const char *old, const char *new, size_t n
 }
 
 
-size_t strbuf_replace(strbuf *self, const char *old, const char *new, size_t from)
+size_t strbuf_replace(strbuf *self, const char *old, const char *new,
+                      size_t from)
 {
 	return strbuf_replace_n(self, old, new, 1, from);
 }
 
 
-size_t strbuf_replace_all(strbuf *self, const char *old, const char *new, size_t from)
+size_t strbuf_replace_all(strbuf *self, const char *old, const char *new,
+                          size_t from)
 {
 	return strbuf_replace_n(self, old, new, SIZE_MAX, from);
 }

@@ -324,13 +324,23 @@ struct _bitvec_format {
 	return ret;
 
 
-static int bitvec_format_fprint(format *self, FILE *out) {BITVEC_PRINT(f)}
-static int bitvec_format_sprint(format *self, char *out) {BITVEC_PRINT(s)}
-static int bitvec_format_sbprint(format *self, strbuf *out) {BITVEC_PRINT(sb)}
+static int bitvec_format_fprint(format *self, FILE *out)
+{
+	BITVEC_PRINT(f)
+}
+static int bitvec_format_sprint(format *self, char *out)
+{
+	BITVEC_PRINT(s)
+}
+static int bitvec_format_sbprint(format *self, strbuf *out)
+{
+	BITVEC_PRINT(sb)
+}
 
 format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
-.sprint = bitvec_format_sprint,
-.sbprint = bitvec_format_sbprint};
+                              .sprint = bitvec_format_sprint,
+                              .sbprint = bitvec_format_sbprint
+                             };
 
 
 bitvec_format *bitvec_get_format(bitvec *self, uint bytes_per_row)

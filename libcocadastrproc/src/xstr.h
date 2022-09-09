@@ -229,7 +229,8 @@ void xstr_cpy(xstr *self, const xstr *src);
  * @warning The destination must be large enough, or a buffer overrun will occur.
  *       No out-of-bounds verification is performed.
  */
-void xstr_ncpy( xstr *self, size_t from_self, const xstr *other, size_t from_other,
+void xstr_ncpy( xstr *self, size_t from_self, const xstr *other,
+                size_t from_other,
                 size_t n );
 
 

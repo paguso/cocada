@@ -32,7 +32,8 @@ void test_ab(CuTest *tc)
 {
 	memdbg_reset();
 	size_t size = 16;
-	char *letters = "\0""0C1C2312AA6604CCB752FFFF567840C9AB7313330C91D0D88BB8DD8EEEF"; // len=60
+	char *letters =
+	    "\0""0C1C2312AA6604CCB752FFFF567840C9AB7313330C91D0D88BB8DD8EEEF"; // len=60
 	size_t lsize = 60;
 	CuAssertSizeTEquals(tc, 59, strlen(&letters[1]));
 	alphabet *ab;

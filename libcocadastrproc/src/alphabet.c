@@ -166,7 +166,6 @@ bool ab_contains(const alphabet *ab, xchar_t c)
 }
 
 
-
 xchar_t ab_char(const alphabet *ab, size_t index)
 {
 	switch (ab->type) {

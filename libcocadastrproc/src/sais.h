@@ -49,11 +49,11 @@ size_t *sais(char *str, size_t len, alphabet *ab);
 
 
 /**
- * @brief 
- * 
- * @param str 
- * @param ab 
- * @return size_t* 
+ * @brief
+ *
+ * @param str
+ * @param ab
+ * @return size_t*
  */
 size_t *sais_xstr(xstr *str, alphabet *ab);
 
