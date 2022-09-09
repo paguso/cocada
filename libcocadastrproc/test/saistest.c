@@ -101,7 +101,7 @@ int xstr_suff_cmp(xstr *str, size_t i, size_t j)
 void sais_test_xstr(CuTest *tc)
 {
 	memdbg_reset();
-	alphabet *ab = int_alphabet_new(10);
+	alphabet *ab = int_alphabet_new(300);
 	size_t max_len = 5000;
 	xstr *str = xstr_new(nbytes(ab_size(ab)));
 	xstrformat *xf = xstrformat_new(str);

@@ -49,11 +49,12 @@ size_t *sais(char *str, size_t len, alphabet *ab);
 
 
 /**
- * @brief
+ * @brief Builds the plain suffix array for the xstring @p str over the
+ *        int alphabet @p ab.
  *
- * @param str
- * @param ab
- * @return size_t*
+ * @warning  A sentinel character, lexicographically smaller than any char in
+ *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
+ *        will have size xstr_len(str)+1 and SA[0]==xstr_len(str).
  */
 size_t *sais_xstr(xstr *str, alphabet *ab);
 
