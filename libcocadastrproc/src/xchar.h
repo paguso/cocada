@@ -22,8 +22,8 @@
 #ifndef XCHAR_H
 #define XCHAR_H
 
-#include <limits.h>
-#include <stddef.h>
+//#include <limits.h>
+//#include <stddef.h>
 #include <inttypes.h>
 #include <stdio.h>
 

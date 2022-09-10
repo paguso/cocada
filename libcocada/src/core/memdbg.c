@@ -323,11 +323,13 @@ memdbg_query_t memdbg_query(const void *addr)
 void *memdbg_malloc(size_t size, char *file, int line)
 {
 	void *ret = malloc(size);
-	size_t alloc_no = memtable_set(&tally, ret, size);
 #ifdef MEM_DEBUG_PRINT_ALL
+	size_t alloc_no = memtable_set(&tally, ret, size);
 	hr_t hrsize = human_readable(tally.total);
 	printf("malloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       alloc_no, file, line, size, ret, hrsize.size, hrsize.prefix);
+#else 
+	memtable_set(&tally, ret, size);
 #endif
 	return ret;
 }
@@ -336,11 +338,13 @@ void *memdbg_malloc(size_t size, char *file, int line)
 void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 {
 	void *ret = calloc(nmemb, size);
-	size_t alloc_no = memtable_set(&tally, ret, nmemb * size);
 #ifdef MEM_DEBUG_PRINT_ALL
+	size_t alloc_no = memtable_set(&tally, ret, nmemb * size);
 	hr_t hrsize = human_readable(tally.total);
 	printf("calloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       alloc_no, file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);
+#else 
+	memtable_set(&tally, ret, nmemb * size);
 #endif
 	return ret;
 }
@@ -352,11 +356,13 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 	if (ret != ptr) {
 		memtable_unset(&tally, ptr);
 	}
-	size_t alloc_no = memtable_set(&tally, ret, size);
 #ifdef MEM_DEBUG_PRINT_ALL
+	size_t alloc_no = memtable_set(&tally, ret, size);
 	hr_t hrsize = human_readable(tally.total);
 	printf("realloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       alloc_no, file, line, size, ret, hrsize.size, hrsize.prefix);
+#else
+	memtable_set(&tally, ret, size);
 #endif
 	return ret;
 }

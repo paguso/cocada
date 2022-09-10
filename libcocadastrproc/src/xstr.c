@@ -119,26 +119,6 @@ void xstr_free(xstr *self)
 }
 
 
-void xstr_to_string (const xstr *self, strbuf *dest)
-{
-	for (size_t i=0, l=xstr_len(self); i < l; i++) {
-		if (i) strbuf_append_char(dest, '-');
-		xchar_t c = xstr_get(self, i);
-		size_t  n = c;
-		size_t  ord = 1;
-		for (; n>=10; n/=10) ord*=10;
-		char d[2] = "\0\0";
-		n = c;
-		while (ord) {
-			d[0] = '0' + (n/ord);
-			n = n % ord;
-			ord /= 10;
-			strbuf_nappend(dest, d, strlen(d));
-		}
-	}
-}
-
-
 xchar_t xstr_get(const xstr *self, size_t pos)
 {
 	xchar_t ret = 0;

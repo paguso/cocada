@@ -23,11 +23,9 @@
 #ifndef NEW_H
 #define NEW_H
 
-#include <stdbool.h>
 #include <stdlib.h>
 
 #include "coretype.h"
-#include "memdbg.h"
 
 /**
  * @file new.h

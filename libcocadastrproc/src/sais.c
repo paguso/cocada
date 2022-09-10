@@ -40,22 +40,22 @@ static const byte_t L = 1;
 #define UNSET SIZE_MAX
 
 
-static inline ullong cstr_char_at(void *str, size_t i)
+static inline llong cstr_char_at(void *str, size_t i)
 {
-	return (ullong)(((char *)str)[i]);
+	return (llong)(((char *)str)[i]);
 }
 
-static inline ullong xstr_char_at(void *str, size_t i)
+static inline llong xstr_char_at(void *str, size_t i)
 {
-	return (ullong)xstr_get(str, i);
+	return (llong)xstr_get(str, i);
 }
 
-static inline ullong size_t_char_at(void *str, size_t i)
+static inline llong size_t_char_at(void *str, size_t i)
 {
-	return (ullong)(((size_t *)str)[i]);
+	return (llong)(((size_t *)str)[i]);
 }
 
-typedef (*char_at_fn)(void *, size_t);
+typedef llong (*char_at_fn)(void *, size_t);
 
 
 void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,

@@ -22,9 +22,7 @@
 #ifndef XSTR_H
 #define XSTR_H
 
-#include "strbuf.h"
 #include "new.h"
-#include "write.h"
 #include "xchar.h"
 
 /**

@@ -37,7 +37,7 @@
 
 static const float GROW_BY = 1.5f;
 static const size_t MIN_BYTE_SIZE = 2; // GROW_BY*MIN_BYTE_SIZE has to be >1
-static const byte_t BYTE_MSB = 0x80;
+//static const byte_t BYTE_MSB = 0x80;
 
 
 struct _bitvec {

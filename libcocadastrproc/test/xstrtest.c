@@ -49,17 +49,6 @@ void test_xstr_get_set(CuTest *tc)
 	}
 }
 
-void test_xstr_to_string(CuTest *tc)
-{
-	size_t l = 1000;
-	xstr *xs = xstr_new(2);
-	for (xchar_t i=0; i<l; i++) {
-		xstr_push(xs, i);
-	}
-	strbuf *ds = strbuf_new();
-	xstr_to_string(xs, ds);
-	printf("%s\n",strbuf_as_str(ds));
-}
 
 void print_int16(FILE *stream, xchar_t c)
 {
