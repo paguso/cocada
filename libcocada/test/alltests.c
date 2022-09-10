@@ -61,7 +61,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
-	CuSuiteAddSuite(suite, bitbyte_get_test_suite());
+	//CuSuiteAddSuite(suite, bitbyte_get_test_suite());
 	//CuSuiteAddSuite(suite, bitvec_get_test_suite());
 	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
 	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());

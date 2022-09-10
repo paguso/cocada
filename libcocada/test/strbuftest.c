@@ -48,6 +48,7 @@ void test_strbuf_new_from_str(CuTest *tc)
 	CuAssertStrEquals(tc, str, strbuf_as_str(dstr));
 	free(str);
 	DESTROY_FLAT(dstr, strbuf);
+	if (!memdbg_is_empty()) DEBUG_EXEC(memdbg_print_stats(stdout, true));
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }
 

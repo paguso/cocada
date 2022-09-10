@@ -236,14 +236,6 @@ debug: debug_lib_build debug_test_build
 	$(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
 
 
-
-#$(lib_include_dir):
-#	mkdir -p $@
-#
-#$(install_dir):
-#	mkdir -p $@
-
-
 #
 # Static library build and installation
 # 
@@ -254,8 +246,6 @@ static_cflags =  -O3
 static_cflags += -DDEBUG_LVL=1 
 static_cflags += -DXCHAR_BYTESIZE=4
 
-#$(static_build_dir):
-#	mkdir -p $@
 
 $(static_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(static_cflags) $(CFLAGS) $< -o $@
