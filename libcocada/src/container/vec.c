@@ -430,8 +430,8 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_NEW_IMPL( TYPE ) \
-	vec *vec_new_##TYPE()\
-	vecurn vec_new(sizeof(TYPE)); }
+	vec *vec_new_##TYPE() \
+	{ return vec_new(sizeof(TYPE)); }
 
 
 #define VEC_GET_IMPL( TYPE ) \
@@ -482,6 +482,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define TYPED_VEC_IMPL( TYPE , ...)\
+	VEC_NEW_IMPL(TYPE) \
 	VEC_GET_IMPL(TYPE)\
 	VEC_FIRST_IMPL(TYPE)\
 	VEC_LAST_IMPL(TYPE)\

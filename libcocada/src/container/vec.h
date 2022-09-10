@@ -390,7 +390,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_NEW_DECL( TYPE ) \
 	/** @brief Creates a new TYPE vector @see coretype.h */ \
-	TYPE vec_new_##TYPE();
+	vec *vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
 	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \

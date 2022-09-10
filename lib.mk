@@ -191,7 +191,7 @@ endef
 
 # Debug extra compiler flags
 
-debug_cflags = -Wall -g3
+debug_cflags = -Wall -g3 
 debug_cflags += -DDEBUG_LVL=3 
 debug_cflags += -DMEM_DEBUG   
 debug_cflags += -DXCHAR_BYTESIZE=4

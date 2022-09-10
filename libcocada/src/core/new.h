@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #include "coretype.h"
-#include "memdbg.h" // needs this for memory tracking and debugging
+#include "memdbg.h" 
 
 /**
  * @file new.h

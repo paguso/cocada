@@ -32,7 +32,7 @@
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
-
+#include "time.h"
 
 void test_vec_new(CuTest *tc)
 {
@@ -423,6 +423,47 @@ void test_vec_flat_free(CuTest *tc)
 
 }
 
+void test_vec_get_speed() {
+	size_t n = 1000000;
+	int *arr = ARR_NEW(int, n);
+	vec *v = vec_new_int();
+	for (size_t i=0; i<n; i++) {
+		int x = rand_range_int(0, INT_MAX);
+		arr[i] = x;
+		vec_push_int(v, x);
+	}
+	clock_t t = clock();
+	size_t nops = n;
+	for (size_t i = 0; i < nops; i++) {
+		int x = arr[i];
+	}
+	t = clock() - t;
+	DEBUG_EXEC(printf("sequential array time = %ld\n", t));
+	t = clock();
+	for (size_t i = 0; i < nops; i++) {
+		int x = vec_get_int(v, i);
+	}
+	t = clock() - t;
+	DEBUG_EXEC(printf("sequential vec time = %ld\n", t));
+	
+	nops = 10000000;
+	t = clock();
+	for (size_t i = 0; i < nops; i++) {
+		int x = arr[rand_range_size_t(0, n)];
+	}
+	t = clock() - t;
+	DEBUG_EXEC(printf("random array time = %ld\n", t));
+	t = clock();
+	for (size_t i = 0; i < nops; i++) {
+		int x = vec_get_int(v, rand_range_size_t(0, n));
+	}
+	t = clock() - t;
+	DEBUG_EXEC(printf("random vec time = %ld\n", t));
+	FREE(arr);
+	DESTROY_FLAT(v, vec);
+}
+
+
 CuSuite *vec_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
@@ -439,5 +480,6 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_qsort);
 	SUITE_ADD_TEST(suite, test_vec_free);
 	SUITE_ADD_TEST(suite, test_vec_flat_free);
+	//SUITE_ADD_TEST(suite, test_vec_get_speed);
 	return suite;
 }
