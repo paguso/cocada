@@ -29,6 +29,7 @@
 #include "cstrutil.h"
 #include "errlog.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "randutil.h"
 #include "new.h"
 #include "vec.h"
@@ -36,14 +37,17 @@
 
 void test_vec_new(CuTest *tc)
 {
+	memdbg_reset();
 	vec *v = vec_new_with_capacity(sizeof(int), 10);
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_app(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 100;
 	vec *v = vec_new(sizeof(short));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -62,11 +66,13 @@ void test_vec_app(CuTest *tc)
 	}
 
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_get_cpy(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 100;
 	vec *v = vec_new(sizeof(double));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -85,12 +91,14 @@ void test_vec_get_cpy(CuTest *tc)
 	}
 
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 
 void test_vec_set(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 100;
 	vec *v = vec_new(sizeof(int));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -113,11 +121,13 @@ void test_vec_set(CuTest *tc)
 	}
 
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_ins(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 110;
 	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -137,12 +147,14 @@ void test_vec_ins(CuTest *tc)
 		CuAssertDblEquals(tc, (double)i, *d, 0.2);
 	}
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 
 void test_vec_del(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 100;
 	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -164,11 +176,13 @@ void test_vec_del(CuTest *tc)
 		CuAssertDblEquals(tc, (double)(2*i)+1.0, *d, 0.2);
 	}
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_swap(CuTest *tc)
 {
+	memdbg_reset();
 	size_t len = 100;
 	vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
@@ -187,11 +201,13 @@ void test_vec_swap(CuTest *tc)
 		CuAssertDblEquals(tc, (double)(len-1-i), *d, 0.2);
 	}
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_iter(CuTest *tc)
 {
+	memdbg_reset();
 	vec *v = vec_new(sizeof(int));
 
 	vec_iter *it = vec_get_iter(v);
@@ -229,6 +245,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	FREE(it);
 	DESTROY(v, finaliser_cons(FNR(vec), finaliser_new_ptr()));
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
@@ -257,6 +274,7 @@ static int triple_cmp(const void *p1, const void *p2)
 
 void test_vec_radixsort(CuTest *tc)
 {
+	memdbg_reset();
 	size_t max_key = 3;
 	vec *v;
 	v = vec_new(sizeof(triple));
@@ -271,7 +289,6 @@ void test_vec_radixsort(CuTest *tc)
 			}
 		}
 	}
-
 	/*
 	printf("Before sort:\n");
 	for (size_t i=0; i<vec_len(v); i++)
@@ -295,11 +312,14 @@ void test_vec_radixsort(CuTest *tc)
 		triple *q = (triple *)vec_get(v, i+1);
 		CuAssertIntEquals(tc, -1, triple_cmp(p, q));
 	}
+	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 void test_vec_qsort(CuTest *tc)
 {
+	memdbg_reset();
 	size_t max_key = 10000;
 	triple *arr = ARR_NEW(triple, max_key);
 	for (size_t i=0; i<max_key; i++) {
@@ -315,40 +335,21 @@ void test_vec_qsort(CuTest *tc)
 		vec_push(v, &arr[i]);
 	}
 	FREE(arr);
-
-	/*
-	DEBUG("Before sort:\n");
-	for (size_t i=0; i<vec_len(v); i++)
-	{
-	    triple *t = (triple *)vec_get(v, i);
-	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
-	}
-	*/
-
 	vec_qsort(v, triple_cmp);
-
-	/*
-	DEBUG("After sort:\n");
-	for (size_t i=0; i<vec_len(v); i++)
-	{
-	    triple *t = (triple *)vec_get(v, i);
-	    DEBUG("v[%zu] = (%u, %u, %u)\n", i, t->values[0], t->values[1], t->values[2]);
-	}
-	*/
-
 	for (size_t i=0; i<vec_len(v)-1; i++) {
 		triple *p = (triple *)vec_get(v, i);
 		triple *q = (triple *)vec_get(v, i+1);
 		CuAssertIntEquals(tc, -1, triple_cmp(p, q));
 	}
-
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
 
 void test_vec_bsearch(CuTest *tc)
 {
+	memdbg_reset();
 	vec *v = vec_new(sizeof(int));
 	int maxval = 100;
 	CuAssertIntEquals(tc, 0, (int)vec_bsearch(v, &maxval, cmp_int));
@@ -362,7 +363,8 @@ void test_vec_bsearch(CuTest *tc)
 		size_t exp_pos = (i>0 && IS_EVEN(i)) ? ((i/2) * ((i/2)-1)) : vec_len(v);
 		CuAssertIntEquals(tc, exp_pos, pos);
 	}
-	FREE(v);
+	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
@@ -374,6 +376,7 @@ typedef struct _vecobj {
 
 void test_vec_free(CuTest *tc)
 {
+	memdbg_reset();
 	size_t n = 10;
 	vec *v = vec_new(sizeof(vec *));
 	for (size_t i=0; i<n; i++) {
@@ -391,10 +394,12 @@ void test_vec_free(CuTest *tc)
 	DESTROY(v,  finaliser_cons(FNR(vec), finaliser_cons (finaliser_new_ptr(),
 	                           finaliser_cons (FNR(vec),
 	                                   finaliser_new_ptr())))) ;
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 void test_vec_flat_free(CuTest *tc)
 {
+	memdbg_reset();
 	size_t n = 10;
 	vec *v = vec_new(vec_sizeof());
 	for (size_t i=0; i<n; i++) {
@@ -420,10 +425,43 @@ void test_vec_flat_free(CuTest *tc)
 
 	DESTROY(v,  finaliser_cons  ( FNR(vec),  finaliser_cons ( FNR(vec),
 	                              finaliser_new_empty()  ) ) ) ;
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 }
 
-void test_vec_get_speed() {
+void test_vec_cat(CuTest *tc) {
+	memdbg_reset();
+	vec *v1 = vec_new(sizeof(vobj));
+	for (size_t i=0; i<100; i++) {
+		vobj o = {.i = (int)i, .d = (double)i};
+		vec_push(v1, &o);
+	}
+	vec *v2 = vec_new(sizeof(vobj));
+	for (size_t i=100; i<200; i++) {
+		vobj o = {.i = (int)i, .d = (double)i};
+		vec_push(v2, &o);
+	}
+	vec_cat(v1, v2);
+	CuAssertSizeTEquals(tc, 200, vec_len(v1));
+	CuAssertSizeTEquals(tc, 100, vec_len(v2));
+	for (size_t i=100; i<200; i++) {
+		vobj *o = vec_get(v2, i - 100);
+		CuAssertIntEquals(tc, (int)i, o->i);
+		CuAssertDblEquals(tc, (double)i, o->d, 0.1);
+	}
+	DESTROY_FLAT(v2, vec);
+	for (size_t i=0; i<200; i++) {
+		vobj *o;
+		o = vec_get(v1, i);
+		CuAssertIntEquals(tc, (int)i, o->i);
+		CuAssertDblEquals(tc, (double)i, o->d, 0.1);
+	}
+	DESTROY_FLAT(v1, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+void test_vec_get_speed(CuTest *tc) {
+	memdbg_reset();
 	size_t n = 1000000;
 	int *arr = ARR_NEW(int, n);
 	vec *v = vec_new_int();
@@ -461,6 +499,7 @@ void test_vec_get_speed() {
 	DEBUG_EXEC(printf("random vec time = %ld\n", t));
 	FREE(arr);
 	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
@@ -470,6 +509,7 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_new);
 	SUITE_ADD_TEST(suite, test_vec_app);
 	SUITE_ADD_TEST(suite, test_vec_bsearch);
+	SUITE_ADD_TEST(suite, test_vec_cat);
 	SUITE_ADD_TEST(suite, test_vec_get_cpy);
 	SUITE_ADD_TEST(suite, test_vec_set);
 	SUITE_ADD_TEST(suite, test_vec_ins);
