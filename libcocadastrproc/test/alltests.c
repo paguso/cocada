@@ -27,6 +27,7 @@
 
 
 CuSuite *alphabet_get_test_suite();
+CuSuite *roaringbitvec_get_test_suite();
 CuSuite *sais_get_test_suite();
 CuSuite *xstr_get_test_suite();
 
@@ -37,7 +38,8 @@ void run_all_tests(void)
 	CuSuite *suite = CuSuiteNew();
 
 	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
-	CuSuiteAddSuite(suite, sais_get_test_suite());
+	CuSuiteAddSuite(suite, roaringbitvec_get_test_suite());
+	//CuSuiteAddSuite(suite, sais_get_test_suite());
 	//CuSuiteAddSuite(suite, xstr_get_test_suite());
 
 	CuSuiteRun(suite);
