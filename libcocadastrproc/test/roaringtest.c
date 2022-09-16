@@ -8,6 +8,7 @@
 #include "bitbyte.h"
 #include "errlog.h"
 #include "mathutil.h"
+#include "randutil.h"
 #include "memdbg.h"
 #include "new.h"
 #include "roaring.h"
@@ -21,7 +22,7 @@ static roaringbitvec *rbv_zeros, *rbv_ones, *rbv_odd, *rbv_even,
        *rbv_rand, *rbv_alt;
 static roaringbitvec **all_rbv;
 
-static size_t ba_size=70000;
+static size_t ba_size = (1 << 18) + 725;
 
 static void reset_arrays()
 {
@@ -59,7 +60,7 @@ void roaringbitvec_test_setup(CuTest *tc)
 	//bitarr_print(ba_odd, ba_size, 4);
 	//ba_print(ba_even, ba_size, 4);
 	//ba_print(ba_rand, ba_size, 4);
-	all_ba = malloc(nof_arrays*sizeof(byte_t *));
+	all_ba = malloc(nof_arrays * sizeof(byte_t *));
 	all_ba[0] = ba_zeros;
 	all_ba[1] = ba_ones;
 	all_ba[2] = ba_odd;
@@ -84,7 +85,7 @@ void roaringbitvec_test_setup(CuTest *tc)
 	//roaringbitvec_print(rbv_rand,  4);
 	//printf("------------ rbv_alt  -------------\n");
 	//roaringbitvec_print(rbv_alt,  4);
-	all_rbv = malloc(nof_arrays*sizeof(roaringbitvec *));
+	all_rbv = malloc(nof_arrays * sizeof(roaringbitvec *));
 	all_rbv[0] = rbv_zeros;
 	all_rbv[1] = rbv_ones;
 	all_rbv[2] = rbv_odd;
@@ -96,16 +97,23 @@ void roaringbitvec_test_setup(CuTest *tc)
 
 void roaringbitvec_test_teardown(CuTest *tc)
 {
+	for (size_t i = 0 ; i < nof_arrays; i++) {
+		roaringbitvec_free(all_rbv[i]);
+		free(all_ba[i]);
+	}
+	/*
 	roaringbitvec_free(rbv_zeros);
 	roaringbitvec_free(rbv_ones);
 	roaringbitvec_free(rbv_odd);
 	roaringbitvec_free(rbv_even);
 	roaringbitvec_free(rbv_rand);
+	roaringbitvec_free(rbv_alt);
 	free(ba_zeros);
 	free(ba_ones);
 	free(ba_odd);
 	free(ba_even);
 	free(ba_rand);
+	free(ba_alt);*/
 	free(all_ba);
 	free(all_rbv);
 }
@@ -119,11 +127,11 @@ void roaringbitvec_test_get(CuTest *tc) {
         for (size_t i=0; i < ba_size; i++) {
             bool a = bitarr_get_bit(ba,  i);
             bool b = roaringbitvec_get(rbv, i);
-            if (a!=b) {
+            if (a != b) {
                 DEBUG_EXEC(printf("i=%zu\n", i));
                 roaringbitvec_fprint(stdout, rbv);
             }
-            CuAssert(tc, "Wrong value", a==b);
+            CuAssert(tc, "Wrong value", a == b);
         }
     }
     roaringbitvec_test_teardown(tc);
@@ -131,6 +139,28 @@ void roaringbitvec_test_get(CuTest *tc) {
         DEBUG_EXEC(memdbg_print_stats(stdout, true));
     }
     CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+void roaringbitvec_test_memsize(CuTest *tc) 
+{
+	size_t n = 1 << 20;
+	for (float density = 0; density < 1; density += 0.1) {
+		memdbg_reset();
+		roaringbitvec *rbv = roaringbitvec_new(n);
+		for (size_t i = 0; i < n; i++) {
+			if (rand() < density * RAND_MAX) {
+				roaringbitvec_set(rbv, i, true);
+			}
+		}
+		size_t mem = memdbg_total();
+		CuAssertSizeTEquals(tc, mem, roaringbitvec_memsize(rbv));
+		DEBUG_IF(true, "N=%zu density=%f Roaring card=%zu memsize = %zu bytes (estimated = %zu)\n", 
+				n, density, roaringbitvec_card(rbv), mem, (size_t)(density * n));
+		roaringbitvec_free(rbv);
+    	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+	}
+
 }
 
 /*
@@ -357,6 +387,7 @@ CuSuite *roaringbitvec_get_test_suite()
 	SUITE_ADD_TEST(suite, roaringbitvec_test_empty);
 	SUITE_ADD_TEST(suite, roaringbitvec_test_teardown);
     */
+	SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
 	SUITE_ADD_TEST(suite, roaringbitvec_test_get);
 
 	return suite;

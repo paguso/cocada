@@ -51,7 +51,7 @@ help:
 	@echo
 	@echo - clean [\<libs\>]: wipeout all library builds \(non-recursive\)
 	@echo - clone [\<libs\>]: copy library sources
-	@echo - debug [\<libs\>]: build library and tests for debugging
+	@echo - debug [\<libs\>] [print_mem=true]: build library and tests for debugging
 	@echo - staticlib_build [\<libs\>]: build static libraries
 	@echo - staticlib_install [\<libs\>]: install built static libraries
 	@echo - staticlib_uninstall [\<libs\>]: uninstall static libraries

@@ -50,6 +50,13 @@ struct _vec {
 };
 
 
+size_t vec_memsize(vec *self)
+{
+	return sizeof(struct _vec) + (self->capacity * self->typesize);
+}
+
+
+
 vec *vec_new(size_t typesize)
 {
 	return vec_new_with_capacity(typesize, MIN_CAPACITY);

@@ -150,6 +150,11 @@ void bitvec_fit(bitvec *bv);
 
 
 /**
+ * @brief Returns the physical memory used by the bitvector in bytes
+ */
+size_t bitvec_memsize(bitvec *bv);
+
+/**
  * @brief Detaches and returns the internal raw byte array
  * and destroys the bitvector object
  * @param bv (full transfer) The bitvector to be dismantled.

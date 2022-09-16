@@ -48,6 +48,13 @@ struct _bitvec {
 };
 
 
+
+size_t bitvec_memsize(bitvec *bv)
+{
+	return sizeof(struct _bitvec) + bv->byte_cap;
+}
+
+
 bitvec *bitvec_new()
 {
 	return bitvec_new_with_capacity(1);

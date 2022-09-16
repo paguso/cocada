@@ -195,6 +195,9 @@ debug_cflags = -Wall -g3
 debug_cflags += -DDEBUG_LVL=3 
 debug_cflags += -DMEM_DEBUG   
 debug_cflags += -DXCHAR_BYTESIZE=4
+ifdef print_mem
+debug_cflags += -DMEM_DEBUG_PRINT_ALL
+endif
 
 #$(debug_build_dir):
 #	mkdir -p $@
