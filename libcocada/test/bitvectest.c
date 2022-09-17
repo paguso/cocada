@@ -33,12 +33,12 @@
 #include "mathutil.h"
 #include "memdbg.h"
 
-static size_t ba_size = 1000;
+static size_t ba_size = 1024;
 
-void bitvec_test_append(CuTest *tc)
+void bitvec_test_push(CuTest *tc)
 {
 	memdbg_reset();
-	bitvec *bv = bitvec_new_with_capacity(0);
+	bitvec *bv = bitvec_new_with_capacity(ba_size);
 	byte_t *array;
 	array = ARR_NEW(byte_t, ba_size);
 	bool bit;
@@ -58,7 +58,7 @@ void bitvec_test_append(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
-void bitvec_test_append_n(CuTest *tc)
+void bitvec_test_push_n(CuTest *tc)
 {
 	memdbg_reset();
 	bitvec *bv = bitvec_new_with_capacity(0);
@@ -129,8 +129,8 @@ void bitvec_test_format(CuTest *tc)
 CuSuite *bitvec_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, bitvec_test_append);
-	SUITE_ADD_TEST(suite, bitvec_test_append_n);
+	SUITE_ADD_TEST(suite, bitvec_test_push);
+	SUITE_ADD_TEST(suite, bitvec_test_push_n);
 	SUITE_ADD_TEST(suite, bitvec_test_count);
 	SUITE_ADD_TEST(suite, bitvec_test_format);
 	return suite;

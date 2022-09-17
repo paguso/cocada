@@ -9,6 +9,8 @@
 #include "order.h"
 #include "roaring.h"
 #include "vec.h"
+#include "segtree.h"
+
 
 #define MAX_ARRAY_SIZE 4096
 #define BITVEC_SIZE (1<<16)
@@ -39,6 +41,7 @@ struct _roaringbitvec
     size_t ncntrs;
     size_t last_ctnr_sz;
     ctnr_t *ctnrs;
+    segtree *count_st;
 };
 
 
@@ -101,7 +104,7 @@ bool arrctnr_get(ctnr_t *ctnr, uint16_t index)
 }
 
 
-void arrctnr_set(ctnr_t *ctnr, uint16_t index, bool val)
+int arrctnr_set(ctnr_t *ctnr, uint16_t index, bool val)
 {
     size_t pos = arrctnr_succ(ctnr, index);
     bool ins;
@@ -109,13 +112,22 @@ void arrctnr_set(ctnr_t *ctnr, uint16_t index, bool val)
         if (val) {
             vec_ins_uint16_t(ctnr->data, pos, index);
             ctnr->card++;
+            return +1;
         }
     } else { // ctnr->data[pos] == val
         if (!val) {
             vec_del(ctnr->data, pos);
             ctnr->card--;
+            return -1;
         }
     }
+    return 0;
+}
+
+
+uint16_t arrctnr_rank(ctnr_t *ctnr, uint16_t index) 
+{
+    return (uint16_t) arrctnr_succ(ctnr, index);
 }
 
 
@@ -160,14 +172,30 @@ bool bitvecctnr_get(ctnr_t *ctnr, uint16_t index)
 }
 
 
-void bitvecctnr_set(ctnr_t *ctnr, uint16_t index, bool val)
+int bitvecctnr_set(ctnr_t *ctnr, uint16_t index, bool val)
 {
-    if (bitvec_get_bit(ctnr->data, index) != val)
-    {
+    if (bitvec_get_bit(ctnr->data, index) != val) {
         bitvec_set_bit(ctnr->data, index, val);
         ctnr->card += ((val) ? 1 : -1);
+        return val ? +1 : -1;
     }
+    return 0;
 }
+
+
+uint16_t bitvecctnr_rank(ctnr_t *ctnr, uint16_t index) 
+{
+    return bitvec_count_range(ctnr->data, 1, 0, index);
+}
+
+
+
+static uint16_t ctnr_card(roaringbitvec *self,  size_t ctnr_index) {
+    return self->ctnrs[ctnr_index].card;
+}
+
+
+static const uint32_t ZERO32 = 0;
 
 roaringbitvec *roaringbitvec_new(size_t n)
 {
@@ -180,6 +208,7 @@ roaringbitvec *roaringbitvec_new(size_t n)
     {
         ret->ctnrs[i] = (ctnr_t){.type = EMPTY, .card = 0, .data = NULL};
     }
+    ret->count_st = segtree_new(ret->ncntrs, sizeof(uint32_t), segtree_merge_sum_uint32_t, &ZERO32);
     return ret;
 }
 
@@ -213,6 +242,7 @@ void roaringbitvec_free(roaringbitvec *self)
         }
     }
     FREE(self->ctnrs);
+    segtree_free(self->count_st);
     FREE(self);
 }
 
@@ -233,19 +263,21 @@ void roaringbitvec_set(roaringbitvec *self, uint32_t pos, bool val)
     uint16_t bucket = MSB(pos);
     uint16_t index = LSB(pos);
     ctnr_t *ctnr = self->ctnrs + bucket;
+    uint16_t old_card = ctnr_card(self, bucket);
+    int card_incr = 0;
     switch (ctnr->type) {
     case EMPTY:
         if (val) {
             arrctnr_init(ctnr);
         }
     case ARRAY_TYPE:
-        arrctnr_set(ctnr, index, val);
+        card_incr = arrctnr_set(ctnr, index, val);
         if (ctnr->card > MAX_ARRAY_SIZE) {
             convert_arr_to_bitvec_ctnr(ctnr);
         }
         break;
     case BITVEC_TYPE:
-        bitvecctnr_set(ctnr, index, val);
+        card_incr = bitvecctnr_set(ctnr, index, val);
         if (ctnr->card <= MAX_ARRAY_SIZE) {
             convert_bitvec_to_arr_ctnr(ctnr);
         }
@@ -253,7 +285,11 @@ void roaringbitvec_set(roaringbitvec *self, uint32_t pos, bool val)
     default:
         break;
     }
+    if (card_incr) {
+        segtree_upd_int32_t(self->count_st, bucket, old_card + card_incr);
+    }
 }
+
 
 bool roaringbitvec_get(roaringbitvec *self, uint32_t pos)
 {
@@ -280,8 +316,7 @@ void roaringbitvec_fit(roaringbitvec *self)
 {
     for (size_t i = 0; i < self->ncntrs; i++) {
         ctnr_t *ctnr = self->ctnrs + i;
-        switch (ctnr->type)
-        {
+        switch (ctnr->type){
         case EMPTY:
             break;
         case ARRAY_TYPE:
@@ -293,6 +328,31 @@ void roaringbitvec_fit(roaringbitvec *self)
         default:
             break;
         }
+    }
+}
+
+
+uint32_t roaringbitvec_rank(roaringbitvec *self, uint32_t pos) 
+{
+    pos = MIN(self->size, pos);
+    uint16_t bucket = MSB(pos);
+    uint16_t index = LSB(pos);
+    uint32_t ret = 0;
+    for (size_t i = 0; i < bucket; i++) {
+        ret += ctnr_card(self, i);
+    }
+    ctnr_t *ctnr = self->ctnrs + bucket;
+    switch (ctnr->type){
+    case EMPTY:
+        break;
+    case ARRAY_TYPE:
+        ret += arrctnr_rank(ctnr, index);
+        break; 
+    case BITVEC_TYPE:
+        ret += bitvecctnr_rank(ctnr, index);
+        break;
+    default:
+        break;
     }
 }
 

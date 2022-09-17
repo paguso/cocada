@@ -118,6 +118,7 @@ void roaringbitvec_test_teardown(CuTest *tc)
 	free(all_rbv);
 }
 
+
 void roaringbitvec_test_get(CuTest *tc) {
     memdbg_reset();
     roaringbitvec_test_setup(tc);
@@ -145,7 +146,7 @@ void roaringbitvec_test_get(CuTest *tc) {
 void roaringbitvec_test_memsize(CuTest *tc) 
 {
 	size_t n = 1 << 20;
-	for (float density = 0; density < 1; density += 0.1) {
+	for (float density = 0.005; density < 1; density *= 1.25) {
 		memdbg_reset();
 		roaringbitvec *rbv = roaringbitvec_new(n);
 		for (size_t i = 0; i < n; i++) {
@@ -154,7 +155,7 @@ void roaringbitvec_test_memsize(CuTest *tc)
 			}
 		}
 		size_t mem = memdbg_total();
-		CuAssertSizeTEquals(tc, mem, roaringbitvec_memsize(rbv));
+		//CuAssertSizeTEquals(tc, mem, roaringbitvec_memsize(rbv));
 		DEBUG_IF(true, "N=%zu density=%f Roaring card=%zu memsize = %zu bytes (estimated = %zu)\n", 
 				n, density, roaringbitvec_card(rbv), mem, (size_t)(density * n));
 		roaringbitvec_free(rbv);
@@ -200,24 +201,26 @@ void test_roaringbitvec_rank0(CuTest *tc)
 	}
 	free(bf_ranks);
 }
-
+*/
 
 
 void test_roaringbitvec_rank1(CuTest *tc)
 {
+	memdbg_reset();
+	roaringbitvec_test_setup(tc);
 	roaringbitvec *ba;
 	size_t b, i, count;
 	size_t *bf_ranks;
 	size_t max_rank;
 
 	bf_ranks = calloc(ba_size, sizeof(size_t));
-	for (b=0; b<nof_arrays; b++) {
+	for (b = 0; b < nof_arrays; b++) {
 		//printf("Testing rank1 with bitarray #%zu:\n", b);
 
 		ba = all_rbv[b];
 		//compute ranks by brute force
 		count = 0;
-		for (i=0; i<ba_size; i++) {
+		for (i = 0; i < ba_size; i++) {
 			bf_ranks[i] = count;
 			if (bitarr_get_bit(all_ba[b], i)) {
 				++count;
@@ -226,21 +229,23 @@ void test_roaringbitvec_rank1(CuTest *tc)
 		}
 		max_rank = count;
 		// then compare them with the function results
-		for (i=0; i<ba_size; i++) {
-			count = roaringbitvec_rank1(ba, i);
+		for (i = 0; i < ba_size; i++) {
+			count = roaringbitvec_rank(ba, i);
 			//printf("rank1 of %zu = %zu  (expected %zu)\n", i, count, bf_ranks[i]);
 			CuAssertSizeTEquals(tc, bf_ranks[i], count);
 		}
-		for (i=ba_size; i<ba_size+(3*BYTESIZE); i++) {
-			count = roaringbitvec_rank1(ba, i);
+		for (i = ba_size; i < ba_size + (3 * BYTESIZE); i++) {
+			count = roaringbitvec_rank(ba, i);
 			//printf("rank1 of %zu (>N) = %zu  (expected %zu)\n", i, count, max_rank);
 			CuAssertSizeTEquals(tc, max_rank, count);
 		}
-
 	}
 	free(bf_ranks);
+	roaringbitvec_test_teardown(tc);
+    CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
+/*
 void test_roaringbitvec_select0(CuTest *tc)
 {
 	roaringbitvec *ba;
@@ -379,7 +384,6 @@ CuSuite *roaringbitvec_get_test_suite()
     /*
 	SUITE_ADD_TEST(suite, roaringbitvec_test_setup);
 	SUITE_ADD_TEST(suite, test_roaringbitvec_rank0);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_rank1);
 	SUITE_ADD_TEST(suite, test_roaringbitvec_select0);
 	SUITE_ADD_TEST(suite, test_roaringbitvec_select1);
 	SUITE_ADD_TEST(suite, test_roaringbitvec_pred);
@@ -389,6 +393,7 @@ CuSuite *roaringbitvec_get_test_suite()
     */
 	SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
 	SUITE_ADD_TEST(suite, roaringbitvec_test_get);
+	SUITE_ADD_TEST(suite, test_roaringbitvec_rank1);
 
 	return suite;
 }

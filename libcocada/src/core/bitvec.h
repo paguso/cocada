@@ -123,6 +123,13 @@ size_t bitvec_count(const bitvec *bv, bool bit);
 
 
 /**
+ * @brief Returns the number of positions set to a given @p bit value
+ * in the subvector @p bv[@p from: @p to].
+ */
+size_t bitvec_count_range(const bitvec *bv, bool bit, size_t from, size_t to);
+
+
+/**
  * @brief Appends a new @p bit.
  */
 void bitvec_push (bitvec *bv, bool bit);
