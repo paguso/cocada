@@ -391,8 +391,8 @@ CuSuite *roaringbitvec_get_test_suite()
 	SUITE_ADD_TEST(suite, roaringbitvec_test_empty);
 	SUITE_ADD_TEST(suite, roaringbitvec_test_teardown);
     */
-	SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
-	SUITE_ADD_TEST(suite, roaringbitvec_test_get);
+	//SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
+	//SUITE_ADD_TEST(suite, roaringbitvec_test_get);
 	SUITE_ADD_TEST(suite, test_roaringbitvec_rank1);
 
 	return suite;

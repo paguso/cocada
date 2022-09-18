@@ -55,6 +55,13 @@ bitvec *bitvec_new_with_capacity(size_t capacity);
 
 
 /**
+ * @brief Creates a new array with a given @p len, with all
+ * positions set to zero.
+ */
+bitvec *bitvec_new_with_len(size_t len);
+
+
+/**
  * @brief Constructs a new bitvector from a source bitarray.
  *        Source bits are copied internally
  * @param src (no transfer) The source bit array

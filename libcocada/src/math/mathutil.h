@@ -98,7 +98,7 @@
 	TYPE pow2ceil_##TYPE( TYPE val );
 
 
-#define MEAN(A, B) ((A) + (B) / 2);
+#define MEAN(A, B) (((A) + (B)) / 2);
 
 XX_UNSIGNED_INT(POW2CEIL_DECL)
 

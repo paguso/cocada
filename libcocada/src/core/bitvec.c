@@ -61,6 +61,15 @@ bitvec *bitvec_new()
 }
 
 
+bitvec *bitvec_new_with_len(size_t len)
+{
+	bitvec *ret = bitvec_new_with_capacity(len);	
+	ret->len = len;
+	return ret;
+}
+
+
+
 bitvec *bitvec_new_with_capacity(size_t capacity)
 {
 	bitvec *bv = NEW(bitvec);
@@ -139,44 +148,54 @@ inline void bitvec_set_bit(bitvec *bv, size_t pos, bool bit)
 
 static inline size_t _bitvec_count1(const bitvec *bv, size_t from, size_t to)
 {
-	assert(from <= to && to <= bv->len);
-	size_t ret = 0;
-	//count bits from first byte 	
+	if (from >= to) return 0;
+	assert(from < to && to <= bv->len);
+
 	size_t byte_pos = from / BYTESIZE;
-	ret += byte_bitcount1( bv->bits[byte_pos] && LSBMASK(from % BYTESIZE));
+	size_t last_byte = to / BYTESIZE;
+
+	// if range is within one byte
+	if (byte_pos == last_byte) {
+		return byte_bitcount1( bv->bits[byte_pos] 
+				& LSBMASK(BYTESIZE - (from % BYTESIZE)) 
+				& MSBMASK(to % BYTESIZE) );
+	}
+
+	//count bits from first byte 	
+	size_t ret = 0;
+	ret += byte_bitcount1(bv->bits[byte_pos] & LSBMASK(BYTESIZE - (from % BYTESIZE)));
 	byte_pos++;
 
-	size_t to_byte = (size_t)DIVCEIL(to, BYTESIZE);
 #if BYTEWORDSIZE == 8
-	while (byte_pos + 8 < to_byte) {
+	while (byte_pos + 8 < last_byte) {
 		ret += uint64_bitcount1(*((uint64_t *)(bv->bits+byte_pos)));
 		byte_pos += 8;
 	}
-	while (byte_pos + 4 < to_byte) {
+	while (byte_pos + 4 < last_byte) {
 		ret += uint32_bitcount1(*((uint32_t *)(bv->bits+byte_pos)));
 		byte_pos += 4;
 	}
-	while (byte_pos + 2 < to_byte) {
+	while (byte_pos + 2 < last_byte) {
 		ret += uint16_bitcount1(*((uint16_t *)(bv->bits+byte_pos)));
 		byte_pos += 2;
 	}
 #elif BYTEWORDSIZE == 4 
-	while (byte_pos + 4 < to_byte) {
+	while (byte_pos + 4 < last_byte) {
 		ret += uint32_bitcount1(*((uint32_t *)(bv->bits+byte_pos)));
 		byte_pos += 4;
 	}
-	while (byte_pos + 2 < to_byte) {
+	while (byte_pos + 2 < last_byte) {
 		ret += uint16_bitcount1(*((uint16_t *)(bv->bits+byte_pos)));
 		byte_pos += 2;
 	}
 #endif
-	while (byte_pos < to_byte) {
+	while (byte_pos < last_byte) {
 		ret += byte_bitcount1(bv->bits[byte_pos]);
 		byte_pos++;
 	}
 
 	// last byte
-	ret += byte_bitcount1(bv->bits[to_byte] && LSBMASK(to % BYTESIZE));
+	ret += byte_bitcount1(bv->bits[last_byte] & MSBMASK(to % BYTESIZE));
 
 	return ret;
 }
