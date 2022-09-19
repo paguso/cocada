@@ -45,7 +45,6 @@ struct _bitvec {
 	byte_t *bits;
 	size_t  len;
 	size_t  cap;
-	//size_t  byte_cap;
 };
 
 
@@ -104,6 +103,12 @@ void bitvec_free(bitvec *bv)
 }
 
 
+bitvec *bitvec_clone(const bitvec *src)
+{
+	return bitvec_cropped_clone(src, src->len);
+}
+
+
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits)
 {
 	bitvec *bv = bitvec_new_with_capacity(nbits);
@@ -116,15 +121,11 @@ bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits)
 }
 
 
-bitvec *bitvec_clone(const bitvec *src)
+void bitvec_fit(bitvec *bv)
 {
-	return bitvec_cropped_clone(src, src->len);
-}
-
-
-size_t bitvec_len(const bitvec *bv)
-{
-	return bv->len;
+	size_t byte_cap = MAX(MIN_CAP / BYTESIZE, NBYTES(bv->len));
+	bv->cap = byte_cap * BYTESIZE;
+	bv->bits = realloc(bv->bits, byte_cap);
 }
 
 
@@ -134,15 +135,24 @@ const byte_t *bitvec_as_bytes(const bitvec *bv)
 }
 
 
-inline bool bitvec_get_bit(const bitvec *bv, size_t pos)
+byte_t *bitvec_detach(bitvec *bv)
 {
-	return bitarr_get_bit(bv->bits, pos);
+	byte_t *ret = (byte_t *)bv->bits;
+	//ret = realloc(ret, (size_t)DIVCEIL(bv->len, BYTESIZE));
+	FREE(bv);
+	return ret;
 }
 
 
-inline void bitvec_set_bit(bitvec *bv, size_t pos, bool bit)
+size_t bitvec_len(const bitvec *bv)
 {
-	bitarr_set_bit(bv->bits, pos, bit);
+	return bv->len;
+}
+
+
+inline bool bitvec_get_bit(const bitvec *bv, size_t pos)
+{
+	return bitarr_get_bit(bv->bits, pos);
 }
 
 
@@ -225,6 +235,12 @@ size_t bitvec_count_range(const bitvec *bv, bool bit, size_t from, size_t to)
 }
 
 
+inline void bitvec_set_bit(bitvec *bv, size_t pos, bool bit)
+{
+	bitarr_set_bit(bv->bits, pos, bit);
+}
+
+
 static void _growto_bits(bitvec *bv, size_t min_cap)
 {
 	size_t old_byte_cap = bv->cap / BYTESIZE;
@@ -288,23 +304,6 @@ void bitvec_cat (bitvec *bv, const bitvec *src)
 }
 
 
-void bitvec_fit(bitvec *bv)
-{
-	size_t byte_cap = MAX(MIN_CAP / BYTESIZE, NBYTES(bv->len));
-	bv->cap = byte_cap * BYTESIZE;
-	bv->bits = realloc(bv->bits, byte_cap);
-}
-
-
-byte_t *bitvec_detach(bitvec *bv)
-{
-	byte_t *ret = (byte_t *)bv->bits;
-	//ret = realloc(ret, (size_t)DIVCEIL(bv->len, BYTESIZE));
-	FREE(bv);
-	return ret;
-}
-
-
 void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 {
 	int line_label_width = (bv->len>1)?ceil(log10(bv->len)):1;
@@ -340,12 +339,14 @@ void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row)
 
 }
 
+/* ------------------------ bitvec_format trait  -------------------------- */
 
 struct _bitvec_format {
 	format _t_format;
 	bitvec *src;
 	uint bytes_per_row;
 };
+
 
 #define BITVEC_PRINT(TYPE)\
 	int ret = 0;\
@@ -363,14 +364,19 @@ static int bitvec_format_fprint(format *self, FILE *out)
 {
 	BITVEC_PRINT(f)
 }
+
+
 static int bitvec_format_sprint(format *self, char *out)
 {
 	BITVEC_PRINT(s)
 }
+
+
 static int bitvec_format_sbprint(format *self, strbuf *out)
 {
 	BITVEC_PRINT(sb)
 }
+
 
 format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
                               .sprint = bitvec_format_sprint,
@@ -394,5 +400,6 @@ void bitvec_format_free(bitvec_format *self)
 {
 	FREE(self);
 }
+
 
 IMPL_TRAIT(bitvec_format, format);

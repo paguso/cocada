@@ -48,17 +48,16 @@ bitvec *bitvec_new();
 
 
 /**
- * @brief Constructor
- * @param capacity The initial bit capacity.
+ * @brief Creates a new empty (length = 0) bitvector with a given @p capacity.
  */
 bitvec *bitvec_new_with_capacity(size_t capacity);
 
 
 /**
- * @brief Creates a new array with a given @p len, with all
+ * @brief Creates a new array with a given @p length, with all
  * positions set to zero.
  */
-bitvec *bitvec_new_with_len(size_t len);
+bitvec *bitvec_new_with_len(size_t length);
 
 
 /**
@@ -68,6 +67,19 @@ bitvec *bitvec_new_with_len(size_t len);
  * @param len Number of bits to be copied
  */
 bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len);
+
+
+/**
+ * @brief Finaliser
+ * @see new.h
+ */
+void bitvec_finalise(void *ptr, const finaliser *fnr);
+
+
+/**
+ * @brief Destructor
+ */
+void bitvec_free(bitvec *bv);
 
 
 /**
@@ -85,17 +97,35 @@ bitvec *bitvec_clone(const bitvec *src);
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
 
 
+
 /**
- * @brief Finaliser
- * @see new.h
+ * @brief Fits the bitvector internal buffer to its actual size, i.e.
+ * deallocates unused memory.
  */
-void bitvec_finalise(void *ptr, const finaliser *fnr);
+void bitvec_fit(bitvec *bv);
 
 
 /**
- * @brief Destructor
+ * @brief Returns the physical memory used by the bitvector in bytes
  */
-void bitvec_free(bitvec *bv);
+size_t bitvec_memsize(bitvec *bv);
+
+
+/**
+ * @brief Returns a pointer to the internar representation of the 
+ * bitvector as a raw byte array.
+ * @warning The returned representation is not meant to be 
+ * modified directly.
+ */
+const byte_t *bitvec_as_bytes(const bitvec *bv);
+
+
+/**
+ * @brief Detaches and returns the internal raw byte array
+ * and destroys the bitvector object
+ * @param bv (full transfer) The bitvector to be dismantled.
+ */
+byte_t *bitvec_detach (bitvec *bv);
 
 
 /**
@@ -105,22 +135,9 @@ size_t bitvec_len(const bitvec *bv);
 
 
 /**
- * @brief Returns a pointer to the internar representation of the bitvector as a raw byte array.
- * @warning The returned representation is not meant to be changed directly.
- */
-const byte_t *bitvec_as_bytes(const bitvec *bv);
-
-
-/**
  * @brief Returns the bit value stored at a given position @p pos.
  */
 bool bitvec_get_bit (const bitvec *bv, size_t pos);
-
-
-/**
- * @brief Sets the bit at a given position.
- */
-void bitvec_set_bit (bitvec *bv, size_t pos, bool bit);
 
 
 /**
@@ -134,6 +151,12 @@ size_t bitvec_count(const bitvec *bv, bool bit);
  * in the subvector @p bv[@p from: @p to].
  */
 size_t bitvec_count_range(const bitvec *bv, bool bit, size_t from, size_t to);
+
+
+/**
+ * @brief Sets the bit at a given position.
+ */
+void bitvec_set_bit (bitvec *bv, size_t pos, bool bit);
 
 
 /**
@@ -156,34 +179,13 @@ void bitvec_push_n (bitvec *bv, size_t n, bool bit);
 void bitvec_cat (bitvec *bv, const bitvec *src);
 
 
-/**
- * @brief Fits the bitvector internal buffer to its actual size, i.e.
- * deallocates unused memory.
- */
-void bitvec_fit(bitvec *bv);
-
-
-/**
- * @brief Returns the physical memory used by the bitvector in bytes
- */
-size_t bitvec_memsize(bitvec *bv);
-
-/**
- * @brief Detaches and returns the internal raw byte array
- * and destroys the bitvector object
- * @param bv (full transfer) The bitvector to be dismantled.
- */
-byte_t *bitvec_detach (bitvec *bv);
-
-
-
-
-
 
 /**
  * @brief Writes a string representations of the bitvector to a string buffer
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
  *        as a single line.
+ * @deprecated Use the bitvec_format interface 
+ * @see bitvec_get_format()
  */
 void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
 
@@ -191,9 +193,10 @@ void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
 /**
  * @brief Prints the bitvector do std output.
  * @param bytes_per_row Number of bytes per row
+ * @deprecated Use the bitvec_format interface 
+ * @see bitvec_get_format()
  */
 void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row);
-
 
 
 typedef struct _bitvec_format bitvec_format;

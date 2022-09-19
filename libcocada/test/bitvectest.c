@@ -29,11 +29,45 @@
 #include "arrays.h"
 #include "bitbyte.h"
 #include "bitvec.h"
+#include "bitarr.h"
 #include "new.h"
 #include "mathutil.h"
 #include "memdbg.h"
 
 static size_t ba_size = 1024;
+
+
+void bitvec_test_new_with_len(CuTest *tc)
+{
+	memdbg_reset();
+	for (size_t len = 0; len < ba_size; len++) {
+		bitvec *bv = bitvec_new_with_len(len);
+		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
+		for (int i = 0; i < len ; i++) {
+			CuAssert(tc, "Wrong bit", 0==bitvec_get_bit(bv, i));
+		}
+		bitvec_free(bv);
+	}
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+void bitvec_test_get_set(CuTest *tc)
+{
+	memdbg_reset();
+	for (size_t len = 0; len < ba_size; len++) {
+		bitvec *bv = bitvec_new_with_len(len);
+		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
+		for (int i = 0; i < len ; i++) {
+			bool bit = rand() % 2;
+			bitvec_set_bit(bv, i, bit);
+			CuAssert(tc, "Wrong bit", bit == bitvec_get_bit(bv, i));
+		}
+		bitvec_free(bv);
+	}
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
 
 void bitvec_test_push(CuTest *tc)
 {
@@ -47,12 +81,10 @@ void bitvec_test_push(CuTest *tc)
 		bitvec_push(bv, bit);
 		array[i] = bit;
 	}
-	//bitvec_print(bv, 8);
 	for (int i=0; i<ba_size; i++) {
 		bit = bitvec_get_bit(bv, i);
 		CuAssertIntEquals(tc, array[i], bit);
 	}
-	//printf(".");
 	bitvec_free(bv);
 	FREE(array);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
@@ -91,19 +123,27 @@ void bitvec_test_count(CuTest *tc)
 	memdbg_reset();
 	bitvec *bv = bitvec_new_with_capacity(0);
 	bool bit;
-	size_t counts[2] = {0,0};
+	byte_t *ba = bitarr_new(ba_size);
+	size_t count1 = 0;
 	for (size_t i=0; i<ba_size; i++) {
 		bit = ((byte_t)rand()%2);
+		bitarr_set_bit(ba, i, bit);
 		bitvec_push(bv, bit);
-		counts[bit]++;
+		count1 += bit;
 	}
-	/*
-	    size_t c0 = bitvec_count(bv, 0);
-	    CuAssertIntEquals(tc, counts[0], c0);
-
-	    size_t c1 = bitvec_count(bv, 1);
-	    CuAssertIntEquals(tc, counts[1], c1);
-	*/
+	CuAssertSizeTEquals(tc, count1, bitvec_count(bv, 1));
+	CuAssertSizeTEquals(tc, ba_size - count1, bitvec_count(bv, 0));
+	for (size_t i=0; i<ba_size; i++) {
+		for (size_t j=i; j<ba_size; j++) {
+			count1 = 0;
+			for (size_t k=i; k<j; k++) {
+				count1 += bitarr_get_bit(ba, k);
+			}
+			CuAssertSizeTEquals(tc, count1, bitvec_count_range(bv, 1, i, j));
+			CuAssertSizeTEquals(tc, (j - i) - count1, bitvec_count_range(bv, 0, i, j));
+		}
+	}
+	FREE(ba);
 	bitvec_free(bv);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
@@ -129,6 +169,8 @@ void bitvec_test_format(CuTest *tc)
 CuSuite *bitvec_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, bitvec_test_new_with_len);
+	SUITE_ADD_TEST(suite, bitvec_test_get_set);
 	SUITE_ADD_TEST(suite, bitvec_test_push);
 	SUITE_ADD_TEST(suite, bitvec_test_push_n);
 	SUITE_ADD_TEST(suite, bitvec_test_count);
