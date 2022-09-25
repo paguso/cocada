@@ -153,6 +153,10 @@ size_t bitvec_count(const bitvec *bv, bool bit);
 size_t bitvec_count_range(const bitvec *bv, bool bit, size_t from, size_t to);
 
 
+
+size_t bitvec_select(const bitvec *bv, bool bit, size_t rank);
+
+
 /**
  * @brief Sets the bit at a given position.
  */

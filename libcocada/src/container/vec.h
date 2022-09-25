@@ -116,6 +116,12 @@ void vec_finalise(void *v, const finaliser *fnr);
 
 
 /**
+ * @brief Returns the physical memory size (in bytes) taken by the vector.
+ */
+size_t vec_memsize(vec *self);
+
+
+/**
  * @brief Returns the # of elements logically stored.
  */
 size_t vec_len(const vec *v);

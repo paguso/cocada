@@ -55,7 +55,8 @@ typedef struct _dbgraph dbgraph;
  *        this string after padding.
  * @param k A stictly positive order.
  */
-dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multigraph);
+dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k,
+                                  bool multigraph);
 
 
 /**
@@ -63,7 +64,7 @@ dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multig
  * @see bossbossdbg_new_from_string
  */
 dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
-                              bool multigraph );
+                                      bool multigraph );
 
 
 /**

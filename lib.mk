@@ -48,6 +48,7 @@ VPATH += $(test_src_dirs)
 
 build_dir = ./build
 debug_build_dir = $(build_dir)/debug
+test_build_dir = $(build_dir)/test
 static_build_dir = $(build_dir)/static
 shared_build_dir = $(build_dir)/shared
 
@@ -61,7 +62,7 @@ install_dir = /usr/local/lib/
 
 # Make directory targets
 
-$(build_dir) $(debug_build_dir) $(static_build_dir) $(shared_build_dir)\
+$(build_dir) $(debug_build_dir) $(test_build_dir) $(static_build_dir) $(shared_build_dir)\
 $(include_dir) $(lib_include_dir) $(install_dir):
 	mkdir -p $@ 
 
@@ -194,7 +195,7 @@ endef
 debug_cflags = -Wall -g3 
 debug_cflags += -DDEBUG_LVL=3 
 debug_cflags += -DMEM_DEBUG   
-debug_cflags += -DXCHAR_BYTESIZE=4
+debug_cflags += -DXCHAR_BYTES=4
 ifdef print_mem
 debug_cflags += -DMEM_DEBUG_PRINT_ALL
 endif
@@ -239,6 +240,57 @@ debug: debug_lib_build debug_test_build
 	$(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
 
 
+
+#
+# Test build
+#
+
+# Test extra compiler flags
+
+test_cflags = -O3 
+test_cflags += -DDEBUG_LVL=1
+test_cflags += -DXCHAR_BYTES=4
+
+#$(test_build_dir):
+#	mkdir -p $@
+
+$(test_build_dir)/%.o: %.c
+	$(CC) -c $(INCLUDE_CFLAGS) $(test_cflags) $(CFLAGS) $< -o $@
+
+# Recursively build library and its prerequisite libraries for testing
+
+$(eval $(call deps_tgt_templ,test_lib_build,lib_deps))
+
+test_lib_objs = $(patsubst %.c,$(test_build_dir)/%.o,$(lib_srcs))
+
+$(test_lib_objs): | $(test_build_dir)
+
+.PHONY: test_lib_build
+
+test_lib_build: deps $(test_lib_build_deps) $(test_lib_objs) ;
+
+
+# Add tests to the test build
+
+test_test_objs = $(patsubst %.c,$(test_build_dir)/%.o,$(test_srcs))
+
+$(test_test_objs): | $(test_build_dir)
+
+.PHONY: test_test_build 
+test_test_build: deps $(test_test_objs) ;
+
+# Wrap test build as libraries + tests
+
+test_strict_deps_objs = $(foreach lib, $(strict_deps), \
+	$(patsubst %.c, ../lib$(lib)/$(test_build_dir)/%.o,\
+		$(notdir $(shell find ../lib$(lib)/$(src_dir) -name '*.c'))))
+
+.PHONY: test  
+test: test_lib_build test_test_build 
+	$(CC) $(INCLUDE_CFLAGS) $(test_cflags) $(CFLAGS) $(test_strict_deps_objs) \
+	$(test_build_dir)/*.o -lm -o $(test_build_dir)/test
+
+
 #
 # Static library build and installation
 # 
@@ -247,7 +299,7 @@ debug: debug_lib_build debug_test_build
 
 static_cflags =  -O3
 static_cflags += -DDEBUG_LVL=1 
-static_cflags += -DXCHAR_BYTESIZE=4
+static_cflags += -DXCHAR_BYTES=4
 
 
 $(static_build_dir)/%.o: %.c
@@ -308,7 +360,7 @@ staticlib_uninstall: $(staticlib_uninstall_deps)
 
 shared_cflags =  -O3
 shared_cflags += -DDEBUG_LVL=1 
-shared_cflags += -DXCHAR_BYTESIZE=4
+shared_cflags += -DXCHAR_BYTES=4
 shared_cflags += -fpic
 
 #$(shared_build_dir):

@@ -304,7 +304,8 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 }
 
 
-dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multigraph)
+dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k,
+                                  bool multigraph)
 {
 	strstream *sst = strstream_open_str(txt, strlen(txt));
 	dbgraph *dbg = _dbg_init(ab, sst, k, multigraph);
@@ -314,7 +315,7 @@ dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multig
 
 
 dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
-                              bool multigraph )
+                                      bool multigraph )
 {
 	return _dbg_init(ab, sst, k, multigraph);
 }

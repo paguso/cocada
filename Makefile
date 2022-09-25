@@ -17,7 +17,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
  
-all_valid_targets := clean clone debug staticlib_build staticlib_install staticlib_uninstall staticlib sharedlib_build sharedlib_install sharedlib_uninstall sharedlib doc clean_doc fmt help
+all_valid_targets := clean clone debug test staticlib_build staticlib_install staticlib_uninstall staticlib sharedlib_build sharedlib_install sharedlib_uninstall sharedlib doc clean_doc fmt help
 all_libs := cocada cocadaapp cocadastrproc cocadabio cocadasketch
 all_valid_args := $(all_valid_targets) $(all_libs) all
 invalid_args := $(filter-out $(all_valid_args), $(MAKECMDGOALS))
@@ -52,6 +52,7 @@ help:
 	@echo - clean [\<libs\>]: wipeout all library builds \(non-recursive\)
 	@echo - clone [\<libs\>]: copy library sources
 	@echo - debug [\<libs\>] [print_mem=true]: build library and tests for debugging
+	@echo - test [\<libs\>]: build library and tests for testing 
 	@echo - staticlib_build [\<libs\>]: build static libraries
 	@echo - staticlib_install [\<libs\>]: install built static libraries
 	@echo - staticlib_uninstall [\<libs\>]: uninstall static libraries

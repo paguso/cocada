@@ -183,7 +183,9 @@ static void memtable_unset(memtable *tally, void *addr)
 static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 {
 #ifndef MEM_DEBUG
-	return;
+	return (memdbg_query_t) {
+		.active = false, .size=0
+	};
 #endif
 	size_t pos = hash(addr, tally->cap);
 	while (tally->data[pos].flag != FREE) {

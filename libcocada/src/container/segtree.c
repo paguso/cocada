@@ -107,10 +107,12 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 	memcpy(dest, self->init_val, self->typesize);
 	for (left += self->range, right += self->range; left < right;
 	        left /= 2, right /= 2) {
-		if (IS_ODD(left)) self->merge(vec_get(self->tree, left++), (const void *)dest,
-			                              dest);
-		if (IS_ODD(right)) self->merge((const void *)dest, vec_get(self->tree, --right),
-			                               dest);
+		if (IS_ODD(left)) {
+			self->merge(vec_get(self->tree, left++), (const void *)dest, dest);
+		}
+		if (IS_ODD(right)) {
+			self->merge((const void *)dest, vec_get(self->tree, --right), dest);
+		}
 	}
 }
 

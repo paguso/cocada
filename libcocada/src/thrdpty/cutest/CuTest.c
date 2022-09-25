@@ -146,6 +146,7 @@ void CuTestDelete(CuTest *t)
 
 void CuTestRun(CuTest *tc)
 {
+	printf("Running test %s...\n", (tc->name)?tc->name:"Undefined");
 	jmp_buf buf;
 	tc->jumpBuf = &buf;
 	if (setjmp(buf) == 0) {
@@ -153,6 +154,7 @@ void CuTestRun(CuTest *tc)
 		(tc->function)(tc);
 	}
 	tc->jumpBuf = 0;
+	printf("Done running %s.\n\n", (tc->name)?tc->name:"Undefined");
 }
 
 static void CuFailInternal(CuTest *tc, const char *file, int line,

@@ -235,6 +235,117 @@ size_t bitvec_count_range(const bitvec *bv, bool bit, size_t from, size_t to)
 }
 
 
+size_t _bitvec_select1(const bitvec *bv, size_t rank) {
+	byte_t *cur_byte = bv->bits;
+	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+	size_t count=0, partial_count=0;
+#if BYTEWORDSIZE == 8
+	uint64_t *arr64 = (uint64_t*)(bv->bits); 
+	while ( (byte_t *)(arr64 + 1) <= last_byte && 
+		    count + (partial_count = uint64_bitcount1(*arr64)) <= rank ) {
+		count += partial_count;
+		arr64++;
+	}
+	uint32_t *arr32 = (uint32_t*)arr64;
+	while ( (byte_t *)(arr32 + 1) <= last_byte && 
+		    count + (partial_count = uint32_bitcount1(*arr32)) <= rank ) {
+		count += partial_count;
+		arr32++;
+	}
+	uint16_t *arr16 = (uint16_t*)arr32;
+	while ( (byte_t *)(arr16 + 1) <= last_byte && 
+		    count + (partial_count = uint16_bitcount1(*arr16)) <= rank ) {
+		count += partial_count;
+		arr16++;
+	}
+	cur_byte = (byte_t*)arr16;
+#elif BYTEWORDSIZE == 4 
+	uint32_t *arr32 = (uint32_t*)arr64;
+	while ( (byte_t *)(arr32 + 1) <= last_byte && 
+		    count + (partial_count = uint32_bitcount1(*arr32)) <= rank ) {
+		count += partial_count;
+		arr32++;
+	}
+	uint16_t *arr16 = (uint16_t*)arr32;
+	while ( (byte_t *)(arr16 + 1) <= last_byte && 
+		    count + (partial_count = uint16_bitcount1(*arr16)) <= rank ) {
+		count += partial_count;
+		arr16++;
+	}
+	cur_byte = (byte_t*)arr16;
+#endif
+	while ( (cur_byte + 1) <= last_byte && 
+		    count + (partial_count = byte_bitcount1(*cur_byte)) <= rank ) {
+		count += partial_count;
+		cur_byte++;
+	}
+	// cur_byte is the rightmost byte with rank < desired rank
+	// selected position has to be within cur_byte if it exists 
+	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) + 
+		byte_select1(*cur_byte, MIN(BYTESIZE, rank - count));
+
+	return MIN(bv->len, ret);
+}
+
+
+size_t _bitvec_select0(const bitvec *bv, size_t rank) {
+	byte_t *cur_byte = bv->bits;
+	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+	size_t count=0, partial_count=0;
+#if BYTEWORDSIZE == 8
+	uint64_t *arr64 = (uint64_t*)(bv->bits); 
+	while ( (byte_t *)(arr64 + 1) <= last_byte && 
+		    count + (partial_count = uint64_bitcount0(*arr64)) <= rank ) {
+		count += partial_count;
+		arr64++;
+	}
+	uint32_t *arr32 = (uint32_t*)arr64;
+	while ( (byte_t *)(arr32 + 1) <= last_byte && 
+		    count + (partial_count = uint32_bitcount0(*arr32)) <= rank ) {
+		count += partial_count;
+		arr32++;
+	}
+	uint16_t *arr16 = (uint16_t*)arr32;
+	while ( (byte_t *)(arr16 + 1) <= last_byte && 
+		    count + (partial_count = uint16_bitcount0(*arr16)) <= rank ) {
+		count += partial_count;
+		arr16++;
+	}
+	cur_byte = (byte_t*)arr16;
+#elif BYTEWORDSIZE == 4 
+	uint32_t *arr32 = (uint32_t*)arr64;
+	while ( (byte_t *)(arr32 + 1) <= last_byte && 
+		    count + (partial_count = uint32_bitcount0(*arr32)) <= rank ) {
+		count += partial_count;
+		arr32++;
+	}
+	uint16_t *arr16 = (uint16_t*)arr32;
+	while ( (byte_t *)(arr16 + 1) <= last_byte && 
+		    count + (partial_count = uint16_bitcount0(*arr16)) <= rank ) {
+		count += partial_count;
+		arr16++;
+	}
+	cur_byte = (byte_t*)arr16;
+#endif
+	while ( (cur_byte + 1) <= last_byte && 
+		    count + (partial_count = byte_bitcount0(*cur_byte)) <= rank ) {
+		count += partial_count;
+		cur_byte++;
+	}
+	// cur_byte is the rightmost byte with rank < desired rank
+	// selected position has to be within cur_byte if it exists 
+	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) + 
+		byte_select0(*cur_byte, MIN(BYTESIZE, rank - count));
+
+	return MIN(bv->len, ret);
+}
+
+size_t bitvec_select(const bitvec *bv, bool bit, size_t rank)
+{
+	return bit?_bitvec_select1(bv, rank):_bitvec_select0(bv, rank);
+}
+
+
 inline void bitvec_set_bit(bitvec *bv, size_t pos, bool bit)
 {
 	bitarr_set_bit(bv->bits, pos, bit);
