@@ -176,47 +176,39 @@ void roaringbitvec_test_memsize(CuTest *tc)
 }
 
 
-void test_roaringbitvec_rank1(CuTest *tc)
+void roaringbitvec_test_rank(CuTest *tc)
 {
+	byte_t bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
 	memdbg_reset();
-	roaringbitvec_test_setup(tc);
-	roaringbitvec *ba;
-	size_t b, i, count;
-	size_t *bf_ranks;
-	size_t max_rank;
-
-	bf_ranks = calloc(ba_size, sizeof(size_t));
-	for (b = 0; b < nof_arrays; b++) {
-		//printf("Testing rank1 with bitarray #%zu:\n", b);
-
-		ba = all_rbv[b];
-		//compute ranks by brute force
-		count = 0;
-		for (i = 0; i < ba_size; i++) {
-			bf_ranks[i] = count;
-			if (bitarr_get_bit(all_ba[b], i)) {
-				++count;
+	for (int intbit=0; intbit<2; intbit++) {
+		bool bit = (bool)intbit;
+		for (int j=-1; j <= 18; j++) {
+			size_t len = (j < 0) ? 0 : (1 << j) + ((j % 2) * 25);
+			for (int pat = 0; pat < 6; pat++) {	
+				printf("sel pat=%d len=%zu bit=%d\n",pat ,len, (int)bit);
+				byte_t *ba = bitarr_new(len);
+				memset(ba, bit_patterns[pat], DIVCEIL(len, BYTESIZE));
+				roaringbitvec *bv = roaringbitvec_new_from_bitarr(ba, len);
+				uint32_t expec_rank = 0;
+				for (size_t i = 0; i < len; i++) {
+					uint32_t rank = roaringbitvec_rank(bv, bit, i);
+					if (rank != expec_rank) 
+					CuAssertULlongEquals(tc, expec_rank, rank);
+					expec_rank += (roaringbitvec_get(bv, i) == bit);
+				}
+				CuAssertULongEquals(tc, roaringbitvec_count(bv, bit), expec_rank);
+				for (size_t i = len; i < len + 20; i++) {
+					uint32_t rank = roaringbitvec_rank(bv, bit, i);
+					if (rank != expec_rank)
+					CuAssertULlongEquals(tc, expec_rank, rank);
+				}
+				FREE(ba);
+				roaringbitvec_free(bv);
 			}
-			//printf("rank1[%zu]=%zu\n", i, count);
-		}
-		max_rank = count;
-		// then compare them with the function results
-		for (i = 0; i < ba_size; i++) {
-			count = roaringbitvec_rank1(ba, i);
-			//printf("rank1 of %zu = %zu  (expected %zu)\n", i, count, bf_ranks[i]);
-			CuAssertSizeTEquals(tc, bf_ranks[i], count);
-		}
-		for (i = ba_size; i < ba_size + (3 * BYTESIZE); i++) {
-			count = roaringbitvec_rank1(ba, i);
-			//printf("rank1 of %zu (>N) = %zu  (expected %zu)\n", i, count, max_rank);
-			CuAssertSizeTEquals(tc, max_rank, count);
 		}
 	}
-	free(bf_ranks);
-	roaringbitvec_test_teardown(tc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
-
 
 
 void roaringbitvec_test_select(CuTest *tc)
@@ -225,9 +217,10 @@ void roaringbitvec_test_select(CuTest *tc)
 	memdbg_reset();
 	for (int intbit=0; intbit<2; intbit++) {
 		bool bit = (bool)intbit;
-		for (int j=/*-1*/18; j <= 18; j++) {
+		for (int j=-1; j <= 18; j++) {
 			size_t len = (j < 0) ? 0 : (1 << j) + ((j % 2) * 25);
-			for (int i = 1; i < 6; i++) {	
+			for (int i = 0; i < 6; i++) {	
+				printf("sel i=%d len=%zu bit=%d\n",i,len, (int)bit);
 				byte_t *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
 				roaringbitvec *bv = roaringbitvec_new_from_bitarr(ba, len);
@@ -241,7 +234,6 @@ void roaringbitvec_test_select(CuTest *tc)
 					while (pos < len && roaringbitvec_get(bv, pos) != bit) {
 						pos++;
 					}
-					printf("sel i=%d len=%zu r=%zu bit=%d\n",i,len,r,(int)bit);
 					size_t sel = roaringbitvec_select(bv, bit, r);
 					if (pos != sel) 
 					CuAssertSizeTEquals(tc, pos, sel);
@@ -299,19 +291,9 @@ CuSuite *roaringbitvec_get_test_suite()
 {
 	CuSuite *suite;
 	suite = CuSuiteNew();
-	/*
-	SUITE_ADD_TEST(suite, roaringbitvec_test_setup);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_rank0);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_select0);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_select1);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_pred);
-	SUITE_ADD_TEST(suite, test_roaringbitvec_succ);
-	SUITE_ADD_TEST(suite, roaringbitvec_test_empty);
-	SUITE_ADD_TEST(suite, roaringbitvec_test_teardown);
-	*/
-	//SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
-	//SUITE_ADD_TEST(suite, roaringbitvec_test_get);
-	//SUITE_ADD_TEST(suite, test_roaringbitvec_rank1);
+	SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
+	SUITE_ADD_TEST(suite, roaringbitvec_test_get);
+	SUITE_ADD_TEST(suite, roaringbitvec_test_rank);
 	//SUITE_ADD_TEST(suite, test_roaringbitvec_speed_rank);
 	SUITE_ADD_TEST(suite, roaringbitvec_test_select);
 

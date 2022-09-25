@@ -43,6 +43,8 @@ void roaringbitvec_free(roaringbitvec *self);
 
 uint32_t roaringbitvec_card(roaringbitvec *self);
 
+uint32_t roaringbitvec_count(roaringbitvec *self, bool bit);
+
 size_t roaringbitvec_memsize(roaringbitvec *self);
 
 void roaringbitvec_fit(roaringbitvec *self);
@@ -54,6 +56,12 @@ bool roaringbitvec_get(roaringbitvec *self, uint32_t pos);
 uint32_t roaringbitvec_rank0(roaringbitvec *self, uint32_t pos);
 
 uint32_t roaringbitvec_rank1(roaringbitvec *self, uint32_t pos);
+
+uint32_t roaringbitvec_rank(roaringbitvec *self, bool bit, uint32_t pos);
+
+uint32_t roaringbitvec_select0(roaringbitvec *self, uint32_t rank);
+
+uint32_t roaringbitvec_select1(roaringbitvec *self, uint32_t rank);
 
 uint32_t roaringbitvec_select(roaringbitvec *self, bool bit, uint32_t rank);
 

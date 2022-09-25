@@ -426,8 +426,15 @@ uint32_t roaringbitvec_rank1(roaringbitvec *self, uint32_t pos)
 
 uint32_t roaringbitvec_rank0(roaringbitvec *self, uint32_t pos)
 {
-    return pos - roaringbitvec_rank1(self, pos);
+    return MIN(self->size, pos) - roaringbitvec_rank1(self, pos);
 }
+
+
+uint32_t roaringbitvec_rank(roaringbitvec *self, bool bit, uint32_t pos)
+{
+	return bit ? roaringbitvec_rank1(self, pos) : roaringbitvec_rank0(self, pos);
+}
+
 
 
 #define BKTRANK0(b) MIN(self->size, (b) * CTNR_SIZE) - segtree_range_qry_uint32_t(self->count_st, 0, b)
@@ -474,7 +481,16 @@ uint32_t roaringbitvec_select(roaringbitvec *self, bool bit, uint32_t rank)
 }
 
 
+uint32_t roaringbitvec_select0(roaringbitvec *self, uint32_t rank)
+{
+	return roaringbitvec_select(self, 0, rank);
+}
 
+
+uint32_t roaringbitvec_select1(roaringbitvec *self, uint32_t rank)
+{
+	return roaringbitvec_select(self, 1, rank);
+}
 
 void roaringbitvec_fprint(FILE *stream, roaringbitvec *self)
 {
