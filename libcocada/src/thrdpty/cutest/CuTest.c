@@ -236,6 +236,63 @@ void CuAssertIntEquals_LineMsg(CuTest *tc, const char *file, int line,
 	CuFail_Line(tc, file, line, message, buf);
 }
 
+
+void CuAssertUIntEquals_LineMsg(CuTest *tc, const char *file,  int line,
+                               const char *message,
+                               unsigned int expected, unsigned int actual)
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%u> but was <%u>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
+
+
+void CuAssertLongEquals_LineMsg(CuTest *tc, const char *file,  int line,
+                               const char *message,
+                               long expected, long actual)
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%ld> but was <%ld>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
+
+void CuAssertULongEquals_LineMsg(CuTest *tc, const char *file,  int line,
+                               const char *message,
+                               unsigned long expected, unsigned long actual)
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%lu> but was <%lu>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
+
+void CuAssertLlongEquals_LineMsg(CuTest *tc, const char *file,  int line,
+                               const char *message,
+                               long long expected, long long actual)
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%lld> but was <%lld>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
+
+void CuAssertULlongEquals_LineMsg(CuTest *tc, const char *file, int line,
+                               const char *message,
+                               unsigned long long expected, unsigned long long actual)
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%llu> but was <%llu>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
+
 void CuAssertSizeTEquals_LineMsg(CuTest *tc, const char *file, int line,
                                  const char *message,
                                  size_t expected, size_t actual)

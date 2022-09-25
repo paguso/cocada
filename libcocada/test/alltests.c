@@ -74,7 +74,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
 	//CuSuiteAddSuite(suite, randutil_get_test_suite());
 	//CuSuiteAddSuite(suite, serialise_get_test_suite());
-	//CuSuiteAddSuite(suite, segtree_get_test_suite());
+	CuSuiteAddSuite(suite, segtree_get_test_suite());
 	//CuSuiteAddSuite(suite, stack_get_test_suite());
 	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	//CuSuiteAddSuite(suite, strfileread_get_test_suite());
