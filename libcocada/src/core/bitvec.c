@@ -138,7 +138,6 @@ const byte_t *bitvec_as_bytes(const bitvec *bv)
 byte_t *bitvec_detach(bitvec *bv)
 {
 	byte_t *ret = (byte_t *)bv->bits;
-	//ret = realloc(ret, (size_t)DIVCEIL(bv->len, BYTESIZE));
 	FREE(bv);
 	return ret;
 }
@@ -176,29 +175,22 @@ static inline size_t _bitvec_count1(const bitvec *bv, size_t from, size_t to)
 	ret += byte_bitcount1(bv->bits[byte_pos] & LSBMASK(BYTESIZE - (from % BYTESIZE)));
 	byte_pos++;
 
-#if BYTEWORDSIZE == 8
-	while (byte_pos + 8 < last_byte) {
-		ret += uint64_bitcount1(*((uint64_t *)(bv->bits+byte_pos)));
-		byte_pos += 8;
+	while (byte_pos + ULLONG_BYTES < last_byte) {
+		ret += ullong_bitcount1(*((ullong *)(bv->bits+byte_pos)));
+		byte_pos += ULLONG_BYTES;
 	}
-	while (byte_pos + 4 < last_byte) {
-		ret += uint32_bitcount1(*((uint32_t *)(bv->bits+byte_pos)));
-		byte_pos += 4;
+	while (byte_pos + ULONG_BYTES < last_byte) {
+		ret += ulong_bitcount1(*((ulong *)(bv->bits+byte_pos)));
+		byte_pos += ULONG_BYTES;
 	}
-	while (byte_pos + 2 < last_byte) {
-		ret += uint16_bitcount1(*((uint16_t *)(bv->bits+byte_pos)));
-		byte_pos += 2;
+	while (byte_pos + UINT_BYTES < last_byte) {
+		ret += uint_bitcount1(*((uint *)(bv->bits+byte_pos)));
+		byte_pos += UINT_BYTES;
 	}
-#elif BYTEWORDSIZE == 4 
-	while (byte_pos + 4 < last_byte) {
-		ret += uint32_bitcount1(*((uint32_t *)(bv->bits+byte_pos)));
-		byte_pos += 4;
+	while (byte_pos + USHRT_BYTES < last_byte) {
+		ret += ushort_bitcount1(*((ushort *)(bv->bits+byte_pos)));
+		byte_pos += USHRT_BYTES;
 	}
-	while (byte_pos + 2 < last_byte) {
-		ret += uint16_bitcount1(*((uint16_t *)(bv->bits+byte_pos)));
-		byte_pos += 2;
-	}
-#endif
 	while (byte_pos < last_byte) {
 		ret += byte_bitcount1(bv->bits[byte_pos]);
 		byte_pos++;
@@ -239,41 +231,33 @@ size_t _bitvec_select1(const bitvec *bv, size_t rank) {
 	byte_t *cur_byte = bv->bits;
 	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
 	size_t count=0, partial_count=0;
-#if BYTEWORDSIZE == 8
-	uint64_t *arr64 = (uint64_t*)(bv->bits); 
-	while ( (byte_t *)(arr64 + 1) <= last_byte && 
-		    count + (partial_count = uint64_bitcount1(*arr64)) <= rank ) {
+
+	ullong *llarr = (ullong*)(bv->bits); 
+	while ( (byte_t *)(llarr + 1) <= last_byte && 
+		    count + (partial_count = ullong_bitcount1(*llarr)) <= rank ) {
 		count += partial_count;
-		arr64++;
+		llarr++;
 	}
-	uint32_t *arr32 = (uint32_t*)arr64;
-	while ( (byte_t *)(arr32 + 1) <= last_byte && 
-		    count + (partial_count = uint32_bitcount1(*arr32)) <= rank ) {
+	ulong *larr = (ulong*)llarr;
+	while ( (byte_t *)(larr + 1) <= last_byte && 
+		    count + (partial_count = ulong_bitcount1(*larr)) <= rank ) {
 		count += partial_count;
-		arr32++;
+		larr++;
 	}
-	uint16_t *arr16 = (uint16_t*)arr32;
-	while ( (byte_t *)(arr16 + 1) <= last_byte && 
-		    count + (partial_count = uint16_bitcount1(*arr16)) <= rank ) {
+	uint *intarr = (uint*)larr;
+	while ( (byte_t *)(intarr + 1) <= last_byte && 
+		    count + (partial_count = uint_bitcount1(*intarr)) <= rank ) {
 		count += partial_count;
-		arr16++;
+		intarr++;
 	}
-	cur_byte = (byte_t*)arr16;
-#elif BYTEWORDSIZE == 4 
-	uint32_t *arr32 = (uint32_t*)arr64;
-	while ( (byte_t *)(arr32 + 1) <= last_byte && 
-		    count + (partial_count = uint32_bitcount1(*arr32)) <= rank ) {
+	ushort *shrtarr = (ushort*)intarr;
+	while ( (byte_t *)(shrtarr + 1) <= last_byte && 
+		    count + (partial_count = ushort_bitcount1(*shrtarr)) <= rank ) {
 		count += partial_count;
-		arr32++;
+		shrtarr++;
 	}
-	uint16_t *arr16 = (uint16_t*)arr32;
-	while ( (byte_t *)(arr16 + 1) <= last_byte && 
-		    count + (partial_count = uint16_bitcount1(*arr16)) <= rank ) {
-		count += partial_count;
-		arr16++;
-	}
-	cur_byte = (byte_t*)arr16;
-#endif
+	cur_byte = (byte_t*)shrtarr;
+
 	while ( (cur_byte + 1) <= last_byte && 
 		    count + (partial_count = byte_bitcount1(*cur_byte)) <= rank ) {
 		count += partial_count;
@@ -292,41 +276,33 @@ size_t _bitvec_select0(const bitvec *bv, size_t rank) {
 	byte_t *cur_byte = bv->bits;
 	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
 	size_t count=0, partial_count=0;
-#if BYTEWORDSIZE == 8
-	uint64_t *arr64 = (uint64_t*)(bv->bits); 
-	while ( (byte_t *)(arr64 + 1) <= last_byte && 
-		    count + (partial_count = uint64_bitcount0(*arr64)) <= rank ) {
+	
+	ullong *llarr = (ullong*)(bv->bits); 
+	while ( (byte_t *)(llarr + 1) <= last_byte && 
+		    count + (partial_count = ullong_bitcount0(*llarr)) <= rank ) {
 		count += partial_count;
-		arr64++;
+		llarr++;
 	}
-	uint32_t *arr32 = (uint32_t*)arr64;
-	while ( (byte_t *)(arr32 + 1) <= last_byte && 
-		    count + (partial_count = uint32_bitcount0(*arr32)) <= rank ) {
+	ulong *larr = (ulong*)llarr;
+	while ( (byte_t *)(larr + 1) <= last_byte && 
+		    count + (partial_count = ulong_bitcount0(*larr)) <= rank ) {
 		count += partial_count;
-		arr32++;
+		larr++;
 	}
-	uint16_t *arr16 = (uint16_t*)arr32;
-	while ( (byte_t *)(arr16 + 1) <= last_byte && 
-		    count + (partial_count = uint16_bitcount0(*arr16)) <= rank ) {
+	uint *intarr = (uint*)larr;
+	while ( (byte_t *)(intarr + 1) <= last_byte && 
+		    count + (partial_count = uint_bitcount0(*intarr)) <= rank ) {
 		count += partial_count;
-		arr16++;
+		intarr++;
 	}
-	cur_byte = (byte_t*)arr16;
-#elif BYTEWORDSIZE == 4 
-	uint32_t *arr32 = (uint32_t*)arr64;
-	while ( (byte_t *)(arr32 + 1) <= last_byte && 
-		    count + (partial_count = uint32_bitcount0(*arr32)) <= rank ) {
+	ushort *shrtarr = (ushort*)intarr;
+	while ( (byte_t *)(shrtarr + 1) <= last_byte && 
+		    count + (partial_count = ushort_bitcount0(*shrtarr)) <= rank ) {
 		count += partial_count;
-		arr32++;
+		shrtarr++;
 	}
-	uint16_t *arr16 = (uint16_t*)arr32;
-	while ( (byte_t *)(arr16 + 1) <= last_byte && 
-		    count + (partial_count = uint16_bitcount0(*arr16)) <= rank ) {
-		count += partial_count;
-		arr16++;
-	}
-	cur_byte = (byte_t*)arr16;
-#endif
+	cur_byte = (byte_t*)shrtarr;
+
 	while ( (cur_byte + 1) <= last_byte && 
 		    count + (partial_count = byte_bitcount0(*cur_byte)) <= rank ) {
 		count += partial_count;

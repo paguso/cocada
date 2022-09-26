@@ -131,6 +131,7 @@ void bitvec_test_count(CuTest *tc)
 		bitvec_push(bv, bit);
 		count1 += bit;
 	}
+	if (count1 != bitvec_count(bv, 1))
 	CuAssertSizeTEquals(tc, count1, bitvec_count(bv, 1));
 	CuAssertSizeTEquals(tc, ba_size - count1, bitvec_count(bv, 0));
 	for (size_t i=0; i<ba_size; i++) {

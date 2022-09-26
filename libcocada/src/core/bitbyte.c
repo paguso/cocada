@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "bitbyte.h"
+#include "coretype.h"
 //#include "new.h"
 #include "mathutil.h"
 
@@ -168,7 +169,7 @@ static const uint64_t byte_as_uint64_str[256] = {
 	0x3131313131313030,0x3131313131313031,0x3131313131313130,0x3131313131313131
 };
 #else
-#error "Little or Bit endianness required"
+#error "Little or Big endianness required"
 #endif
 
 void byte_to_str(byte_t b, char *dest)
@@ -177,17 +178,6 @@ void byte_to_str(byte_t b, char *dest)
 	dest[8]='\0';
 }
 
-/*
-void byte_to_str_loop(byte_t b, char *dest)
-{
-	int i;
-	for (i=0; i<BYTESIZE; i++) {
-		dest[BYTESIZE-i-1] = '0'+ (b%2) ;
-		b >>= 1;
-	}
-	dest[i]='\0';
-}
-*/
 
 void byte_to_strx(byte_t b, char *dest)
 {
@@ -212,10 +202,14 @@ size_t byte_bitcount0(byte_t b)
 
 size_t byte_bitcount1(byte_t b)
 {
+#if GCC_BUILTINS
+	return uint_bitcount1(b);
+#else
 	b = ((b>>1) & 0x55)+(b & 0x55);
 	b = ((b>>2) & 0x33)+(b & 0x33);
 	b = ((b>>4) & 0x0F)+(b & 0x0F);
 	return (size_t)b;
+#endif
 }
 
 
@@ -302,6 +296,118 @@ size_t uint64_bitcount(uint64_t n, bool bit)
 	else
 		return uint64_bitcount0(n);
 }
+
+
+int ushort_bitcount1(unsigned short x)
+{
+	return uint_bitcount1(x);
+}
+
+int ushort_bitcount0(unsigned short x)
+{
+	return USHRT_BITS - ushort_bitcount1(x);
+}
+
+int ushort_bitcount(unsigned short x, bool bit)
+{
+	return bit ?
+		ushort_bitcount1(x) :
+		USHRT_BITS - ushort_bitcount1(x);
+}
+
+
+
+int uint_bitcount1(unsigned int n) 
+{
+#if GCC_BUILTINS
+	return __builtin_popcount(n);
+#elif UINT_BITS==8
+	return byte_bitcount1(n);
+#elif UINT_BITS==16
+	return uint16_bitcount1(n);
+#elif UINT_BITS==32
+	return uint32_bitcount1(n);
+#elif UINT_BITS==64
+	return uint64_bitcount1(n);
+#else 
+#error "Unknown uint size"
+#endif
+}
+
+
+int uint_bitcount0(unsigned int x) {
+	return UINT_BITS - uint_bitcount1(x);
+}
+
+int uint_bitcount(unsigned int x, bool bit)
+{
+	return bit ?
+		uint_bitcount1(x) :
+		UINT_BITS - uint_bitcount1(x);
+}
+
+
+int ulong_bitcount1(unsigned long x) 
+{
+#if GCC_BUILTINS
+	return __builtin_popcountl(x);
+#elif ULONG_BITS==8
+	return byte_bitcount1(x);
+#elif ULONG_BITS==16
+	return uint16_bitcount1(x);
+#elif ULONG_BITS==32
+	return uint32_bitcount1(x);
+#elif ULONG_BITS==64
+	return uint64_bitcount1(x);
+#else 
+#error "Unknown uint size"
+#endif
+}
+
+
+int ulong_bitcount0(unsigned long x) {
+	return ULONG_BITS - ulong_bitcount1(x);
+}
+
+
+int ulong_bitcount(unsigned long x, bool bit)
+{
+	return bit ?
+		ulong_bitcount1(x) :
+		ULONG_BITS - ulong_bitcount1(x);
+}
+
+
+int ullong_bitcount1(unsigned long long x) 
+{
+#if GCC_BUILTINS
+	return __builtin_popcountll(x);
+#elif ULLONG_BITS==8
+	return byte_bitcount1(x);
+#elif ULLONG_BITS==16
+	return uint16_bitcount1(x);
+#elif ULLONG_BITS==32
+	return uint32_bitcount1(x);
+#elif ULLONG_BITS==64
+	return uint64_bitcount1(x);
+#else 
+#error "Unknown uint size"
+#endif
+}
+
+
+int ullong_bitcount0(unsigned long long x) {
+	return ULLONG_BITS - ullong_bitcount1(x);
+}
+
+
+int ullong_bitcount(unsigned long long x, bool bit)
+{
+	return bit ?
+		ullong_bitcount1(x) :
+		ULLONG_BITS - ullong_bitcount1(x);
+}
+
 
 
 size_t byte_rank0(byte_t b, size_t pos)

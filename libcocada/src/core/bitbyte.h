@@ -22,11 +22,14 @@
 #ifndef BITBYTE_H
 #define BITBYTE_H
 
+
 #include <endian.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "coretype.h"
 
 /**
  * @file bitbyte.h
@@ -39,51 +42,6 @@
  *       'porting' instructions and issues.
  */
 
-
-#ifndef BYTE_T
-#define BYTE_T
-
-/**
- * @brief A required unsigned byte type.
- *
- * The C11 standard  IEC 9899:2011 defines a "byte" as an addressable unit
- * of data storage large enough to hold any member of the basic character
- * set of the execution environment.
- *
- * It also defines a char as "single-byte" character and so sizeof(char)
- * should always return 1.
- *
- * Moreover, the standard library <limits.h> defines CHAR_BIT to be the
- * number of bits for smallest object that is not a bit-field ("byte")
- * and specifies a minimum size of 8 (eight).
- *
- * Although a byte may be composed of more that eight bits,
- * ISO Norm IEC 80000-13:2008 (item 13.9 c) suggests that the word "byte"
- * be defined as a synonymm of octet, i.e. a sequence of eight bits.
- *
- * A byte_t type is therefore defined as an alias for unsigned char.
- * A BYTESIZE constant is defined as a CHAR_BIT synonym, and
- * accordingly a maximum value constant BYTE_MAX is defined as
- * UCHAR_MAX synonym.
- */
-typedef unsigned char byte_t;
-
-#define BYTESIZE CHAR_BIT
-
-/*
- * Most of the code in this library is not dependent on a byte being an octet.
- * However it has only been tested on such conditions, so this is
- * included as a safeguard.
- * If this is removed to support larger bytes, at least the byte masks
- * below should be modified.
- */
-#if BYTESIZE!=8
-#error Error: this code requires an 8-bit byte_t type
-#endif
-
-#define BYTE_MAX UCHAR_MAX
-
-#endif // BYTE_T
 
 /*
  * 8-bit Byte masks:
@@ -182,6 +140,8 @@ This code requires BIG or LITTLE byte endianess.\n\
 See release notes for porting issues."
 #endif
 
+
+#define GCC_BUILTINS (defined(__GNUC__) && !defined(__clang__))
 
 
 #define PRIbB "c%c%c%c%c%c%c%c"
@@ -302,6 +262,23 @@ size_t uint64_bitcount1(uint64_t n);
  * @brief Returns the number of bits with value==@p bit of a given 64-bit uint.
  */
 size_t uint64_bitcount(uint64_t n, bool bit);
+
+
+int ushort_bitcount1(unsigned short x);
+int ushort_bitcount0(unsigned short x);
+int ushort_bitcount(unsigned short x, bool bit);
+
+int uint_bitcount1(unsigned int x);
+int uint_bitcount0(unsigned int x);
+int uint_bitcount(unsigned int x, bool bit);
+
+int ulong_bitcount1(unsigned long x);
+int ulong_bitcount0(unsigned long x);
+int ulong_bitcount(unsigned long x, bool bit);
+
+int ullong_bitcount1(unsigned long long x);
+int ullong_bitcount0(unsigned long long x);
+int ullong_bitcount(unsigned long long x, bool bit);
 
 
 /**

@@ -185,7 +185,7 @@ void roaringbitvec_test_rank(CuTest *tc)
 		for (int j=-1; j <= 18; j++) {
 			size_t len = (j < 0) ? 0 : (1 << j) + ((j % 2) * 25);
 			for (int pat = 0; pat < 6; pat++) {	
-				printf("sel pat=%d len=%zu bit=%d\n",pat ,len, (int)bit);
+				printf("rank pat=%d len=%zu bit=%d\n",pat ,len, (int)bit);
 				byte_t *ba = bitarr_new(len);
 				memset(ba, bit_patterns[pat], DIVCEIL(len, BYTESIZE));
 				roaringbitvec *bv = roaringbitvec_new_from_bitarr(ba, len);
