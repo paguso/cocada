@@ -143,9 +143,22 @@ See release notes for porting issues."
 
 #define GCC_BUILTINS (defined(__GNUC__) && !defined(__clang__))
 
-
+/**
+ * @brief Binary print format specifier for the byte_t type to be used 
+ * in conjunction with BYTESTRB conversion macro.
+ * @see BYTESTRB
+ */
 #define PRIbB "c%c%c%c%c%c%c%c"
 
+/**
+ * @brief Converts a byte to a binary string for printing. To be used with the PRIbB format.
+ * Example
+ * ```C
+ * byte_t b = 0xaa;
+ * printf("byte=%"PRIbB"\n", BYTESTRB(b)); // prints "byte=10101010"
+ * ```
+ * @see PRIbB
+ */
 #define BYTESTRB(byte)  \
 	(byte & 0x80 ? '1' : '0'), \
 	(byte & 0x40 ? '1' : '0'), \
@@ -156,8 +169,26 @@ See release notes for porting issues."
 	(byte & 0x02 ? '1' : '0'), \
 	(byte & 0x01 ? '1' : '0')
 
+/**
+ * @brief Hexadecimal print format specifier for the byte_t type to be used 
+ * in conjunction with BYTESTRX conversion macro.
+ * @see BYTESTRX
+ */
 #define PRIbX "02x"
+
+
+/**
+ * @brief Converts a byte to an hexadecimal string for printing. 
+ * To be used with the PRIbB format.
+ * Example
+ * ```C
+ * byte_t b = 0xaa;
+ * printf("byte=%"PRIbX"\n", BYTESTRX(b)); // prints "byte=0xaa"
+ * ```
+ * @see PRIbB
+ */
 #define BYTESTRX(byte) ((int)byte)
+
 
 /**
  * @brief returns the minimal number of bytes required to represent @p nvalues
@@ -185,100 +216,163 @@ void byte_reverse(byte_t *b);
 
 
 /**
- * @brief Same as byte_bitcount(n, 0)
+ * @brief Same as byte_bitcount(x, 0)
  * @see byte_bitcount
  */
-size_t byte_bitcount0(byte_t n);
+uint byte_bitcount0(byte_t x);
 
 
 /**
- * @brief Same as byte_bitcount(n, 1)
+ * @brief Same as byte_bitcount(x, 1)
  * @see byte_bitcount
  */
-size_t byte_bitcount1(byte_t n);
+uint byte_bitcount1(byte_t x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given byte.
  */
-size_t byte_bitcount(byte_t n, bool bit);
+uint byte_bitcount(byte_t x, bool bit);
 
 
 /**
  * @brief Same as uint16_bitcount(n, 0)
  * @see uint16_bitcount
  */
-size_t uint16_bitcount0(uint16_t n);
+uint uint16_bitcount0(uint16_t x);
 
 
 /**
  * @brief Same as uint16_bitcount(n, 1)
  * @see uint16_bitcount
  */
-size_t uint16_bitcount1(uint16_t n);
+uint uint16_bitcount1(uint16_t x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 16-bit uint.
  */
-size_t uint16_bitcount(uint16_t n, bool bit);
+uint uint16_bitcount(uint16_t x, bool bit);
 
 
 /**
- * @brief Same as uint32_bitcount(n, 0)
+ * @brief Same as uint32_bitcount(x, 0)
  * @see uint32_bitcount
  */
-size_t uint32_bitcount0(uint32_t n);
+uint uint32_bitcount0(uint32_t x);
 
 
 /**
- * @brief Same as uint32_bitcount(n, 1)
+ * @brief Same as uint32_bitcount(x, 1)
  * @see uint32_bitcount
  */
-size_t uint32_bitcount1(uint32_t n);
+uint uint32_bitcount1(uint32_t x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 32-bit uint.
  */
-size_t uint32_bitcount(uint32_t n, bool bit);
+uint uint32_bitcount(uint32_t x, bool bit);
 
 
 /**
- * @brief Same as uint64_bitcount(n, 0)
+ * @brief Same as uint64_bitcount(x, 0)
  * @see uint64_bitcount
  */
-size_t uint64_bitcount0(uint64_t n);
+uint uint64_bitcount0(uint64_t x);
 
 
 /**
  * @brief Same as uint64_bitcount(n, 1)
  * @see uint64_bitcount
  */
-size_t uint64_bitcount1(uint64_t n);
+uint uint64_bitcount1(uint64_t x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 64-bit uint.
  */
-size_t uint64_bitcount(uint64_t n, bool bit);
+uint uint64_bitcount(uint64_t x, bool bit);
 
 
-int ushort_bitcount1(unsigned short x);
-int ushort_bitcount0(unsigned short x);
-int ushort_bitcount(unsigned short x, bool bit);
+/**
+ * @brief Same as ushort_bitcount(x, 1)
+ * @see ushort_bitcount()
+ */
+uint ushort_bitcount1(unsigned short x);
 
-int uint_bitcount1(unsigned int x);
-int uint_bitcount0(unsigned int x);
-int uint_bitcount(unsigned int x, bool bit);
 
-int ulong_bitcount1(unsigned long x);
-int ulong_bitcount0(unsigned long x);
-int ulong_bitcount(unsigned long x, bool bit);
+/**
+ * @brief Same as ushort_bitcount(x, 0)
+ * @see ushort_bitcount()
+ */
+uint ushort_bitcount0(unsigned short x);
 
-int ullong_bitcount1(unsigned long long x);
-int ullong_bitcount0(unsigned long long x);
-int ullong_bitcount(unsigned long long x, bool bit);
+
+/**
+ * @brief Returns the number of bits with value ==@p bit of a given ushort value.
+ */
+uint ushort_bitcount(unsigned short x, bool bit);
+
+
+/**
+ * @brief Same as uint_bitcount(x, 1)
+ * @see uint_bitcount()
+ */
+uint uint_bitcount1(unsigned int x);
+
+
+/**
+ * @brief Same as uint_bitcount(x, 0)
+ * @see uint_bitcount()
+ */
+uint uint_bitcount0(unsigned int x);
+
+
+/**
+ * @brief Returns the number of bits with value==@p bit of a given uint value.
+ */
+uint uint_bitcount(unsigned int x, bool bit);
+
+
+/**
+ * @brief Same as ulong_bitcount(x, 1)
+ * @see ulong_bitcount()
+ */
+uint ulong_bitcount1(unsigned long x);
+
+
+/**
+ * @brief Same as ulong_bitcount(x, 0)
+ * @see ulong_bitcount()
+ */
+uint ulong_bitcount0(unsigned long x);
+
+
+/**
+ * @brief Returns the number of bits with value==@p bit of a given ulong value.
+ */
+uint ulong_bitcount(unsigned long x, bool bit);
+
+
+/**
+ * @brief Same as ullong_bitcount(x, 1)
+ * @see ushort_bitcount()
+ */
+uint ullong_bitcount1(unsigned long long x);
+
+
+/**
+ * @brief Same as ullong_bitcount(x, 0)
+ * @see ullong_bitcount()
+ */
+uint ullong_bitcount0(unsigned long long x);
+
+
+/**
+ * @brief Returns the number of bits with value ==@p bit of a given ullong value.
+ */
+uint ullong_bitcount(unsigned long long x, bool bit);
 
 
 /**

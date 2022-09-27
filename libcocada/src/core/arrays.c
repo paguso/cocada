@@ -19,6 +19,7 @@
  *
  */
 
+#include <stddef.h>
 #include <stdlib.h>
 
 #include "arrays.h"

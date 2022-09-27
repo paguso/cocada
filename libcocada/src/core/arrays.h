@@ -22,11 +22,8 @@
 #ifndef ARRAYUTIL_H
 #define ARRAYUTIL_H
 
-#include <stdlib.h>
-#include <string.h>
-
+#include <stddef.h>
 #include "coretype.h"
-#include "memdbg.h"
 
 /**
  * @file arrays.h

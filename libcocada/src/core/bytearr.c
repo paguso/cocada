@@ -154,7 +154,7 @@ int bytearr_read_int(const byte_t *src, size_t from_byte,
 	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
-#    elif ENDIANESS==LITTLE
+#elif ENDIANESS==LITTLE
 	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
 		ret = ~ret;
 	}

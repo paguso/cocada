@@ -194,13 +194,13 @@ void byte_reverse(byte_t *b)
 }
 
 
-size_t byte_bitcount0(byte_t b)
+uint byte_bitcount0(byte_t b)
 {
 	return byte_bitcount1(~b);
 }
 
 
-size_t byte_bitcount1(byte_t b)
+uint byte_bitcount1(byte_t b)
 {
 #if GCC_BUILTINS
 	return uint_bitcount1(b);
@@ -208,107 +208,108 @@ size_t byte_bitcount1(byte_t b)
 	b = ((b>>1) & 0x55)+(b & 0x55);
 	b = ((b>>2) & 0x33)+(b & 0x33);
 	b = ((b>>4) & 0x0F)+(b & 0x0F);
-	return (size_t)b;
+	return (uint)b;
 #endif
 }
 
 
-size_t byte_bitcount(byte_t b, bool bit)
+uint byte_bitcount(byte_t b, bool bit)
 {
-	if (bit) return byte_bitcount1(b);
-	else return byte_bitcount0(b);
+	return bit?
+		byte_bitcount1(b):
+		byte_bitcount0(b);
 }
 
 
-size_t uint16_bitcount0(uint16_t n)
+uint uint16_bitcount0(uint16_t x)
 {
-	return uint16_bitcount1(~n);
+	return uint16_bitcount1(~x);
 }
 
 
-size_t uint16_bitcount1(uint16_t n)
+uint uint16_bitcount1(uint16_t x)
 {
-	n = ((n>>1) & 0x5555)+(n & 0x5555);
-	n = ((n>>2) & 0x3333)+(n & 0x3333);
-	n = ((n>>4) & 0x0F0F)+(n & 0x0F0F);
-	n = ((n>>8) & 0x00FF)+(n & 0x00FF);
-	return (size_t)n;
+	x = ((x>>1) & 0x5555)+(x & 0x5555);
+	x = ((x>>2) & 0x3333)+(x & 0x3333);
+	x = ((x>>4) & 0x0F0F)+(x & 0x0F0F);
+	x = ((x>>8) & 0x00FF)+(x & 0x00FF);
+	return (uint)x;
 }
 
 
-size_t uint16_bitcount(uint16_t n, bool bit)
+uint uint16_bitcount(uint16_t x, bool bit)
 {
-	if (bit)
-		return uint16_bitcount1(n);
-	else
-		return uint16_bitcount0(n);
+	return bit ?
+		uint16_bitcount1(x) :
+		uint16_bitcount0(x);
 }
 
 
-size_t uint32_bitcount0(uint32_t n)
+uint uint32_bitcount0(uint32_t x)
 {
-	return uint32_bitcount1(~n);
+	return uint32_bitcount1(~x);
 }
 
 
-size_t uint32_bitcount1(uint32_t n)
+uint uint32_bitcount1(uint32_t x)
 {
-	n = ((n>>1) & 0x55555555)+(n & 0x55555555);
-	n = ((n>>2) & 0x33333333)+(n & 0x33333333);
-	n = ((n>>4) & 0x0F0F0F0F)+(n & 0x0F0F0F0F);
-	n = ((n>>8) & 0x00FF00FF)+(n & 0x00FF00FF);
-	n = ((n>>16) & 0x0000FFFF)+(n & 0x0000FFFF);
-	return (size_t)n;
+	x = ((x>>1) & 0x55555555)+(x & 0x55555555);
+	x = ((x>>2) & 0x33333333)+(x & 0x33333333);
+	x = ((x>>4) & 0x0F0F0F0F)+(x & 0x0F0F0F0F);
+	x = ((x>>8) & 0x00FF00FF)+(x & 0x00FF00FF);
+	x = ((x>>16) & 0x0000FFFF)+(x & 0x0000FFFF);
+	return (uint)x;
 }
 
 
-size_t uint32_bitcount(uint32_t n, bool bit)
-{
-	if (bit)
-		return uint32_bitcount1(n);
-	else
-		return uint32_bitcount0(n);
-}
-
-
-size_t uint64_bitcount0(uint64_t n)
-{
-	return uint64_bitcount1(~n);
-}
-
-
-size_t uint64_bitcount1(uint64_t n)
-{
-	n = ((n>>1) & 0x5555555555555555)+(n & 0x5555555555555555);
-	n = ((n>>2) & 0x3333333333333333)+(n & 0x3333333333333333);
-	n = ((n>>4) & 0x0F0F0F0F0F0F0F0F)+(n & 0x0F0F0F0F0F0F0F0F);
-	n = ((n>>8) & 0x00FF00FF00FF00FF)+(n & 0x00FF00FF00FF00FF);
-	n = ((n>>16) & 0x0000FFFF0000FFFF)+(n & 0x0000FFFF0000FFFF);
-	n = ((n>>32) & 0x00000000FFFFFFFF)+(n & 0x00000000FFFFFFFF);
-	return (size_t)n;
-}
-
-
-size_t uint64_bitcount(uint64_t n, bool bit)
+uint uint32_bitcount(uint32_t x, bool bit)
 {
 	if (bit)
-		return uint64_bitcount1(n);
+		return uint32_bitcount1(x);
 	else
-		return uint64_bitcount0(n);
+		return uint32_bitcount0(x);
 }
 
 
-int ushort_bitcount1(unsigned short x)
+uint uint64_bitcount0(uint64_t x)
+{
+	return uint64_bitcount1(~x);
+}
+
+
+uint uint64_bitcount1(uint64_t x)
+{
+	x = ((x>>1) & 0x5555555555555555)+(x & 0x5555555555555555);
+	x = ((x>>2) & 0x3333333333333333)+(x & 0x3333333333333333);
+	x = ((x>>4) & 0x0F0F0F0F0F0F0F0F)+(x & 0x0F0F0F0F0F0F0F0F);
+	x = ((x>>8) & 0x00FF00FF00FF00FF)+(x & 0x00FF00FF00FF00FF);
+	x = ((x>>16) & 0x0000FFFF0000FFFF)+(x & 0x0000FFFF0000FFFF);
+	x = ((x>>32) & 0x00000000FFFFFFFF)+(x & 0x00000000FFFFFFFF);
+	return (size_t)x;
+}
+
+
+uint uint64_bitcount(uint64_t x, bool bit)
+{
+	return bit ?
+		uint64_bitcount1(x):
+		uint64_bitcount0(x);
+}
+
+
+uint ushort_bitcount1(unsigned short x)
 {
 	return uint_bitcount1(x);
 }
 
-int ushort_bitcount0(unsigned short x)
+
+uint ushort_bitcount0(unsigned short x)
 {
 	return USHRT_BITS - ushort_bitcount1(x);
 }
 
-int ushort_bitcount(unsigned short x, bool bit)
+
+uint ushort_bitcount(unsigned short x, bool bit)
 {
 	return bit ?
 		ushort_bitcount1(x) :
@@ -316,8 +317,7 @@ int ushort_bitcount(unsigned short x, bool bit)
 }
 
 
-
-int uint_bitcount1(unsigned int n) 
+uint uint_bitcount1(unsigned int n) 
 {
 #if GCC_BUILTINS
 	return __builtin_popcount(n);
@@ -335,11 +335,12 @@ int uint_bitcount1(unsigned int n)
 }
 
 
-int uint_bitcount0(unsigned int x) {
+uint uint_bitcount0(unsigned int x) {
 	return UINT_BITS - uint_bitcount1(x);
 }
 
-int uint_bitcount(unsigned int x, bool bit)
+
+uint uint_bitcount(unsigned int x, bool bit)
 {
 	return bit ?
 		uint_bitcount1(x) :
@@ -347,7 +348,7 @@ int uint_bitcount(unsigned int x, bool bit)
 }
 
 
-int ulong_bitcount1(unsigned long x) 
+uint ulong_bitcount1(unsigned long x) 
 {
 #if GCC_BUILTINS
 	return __builtin_popcountl(x);
@@ -365,12 +366,12 @@ int ulong_bitcount1(unsigned long x)
 }
 
 
-int ulong_bitcount0(unsigned long x) {
+uint ulong_bitcount0(unsigned long x) {
 	return ULONG_BITS - ulong_bitcount1(x);
 }
 
 
-int ulong_bitcount(unsigned long x, bool bit)
+uint ulong_bitcount(unsigned long x, bool bit)
 {
 	return bit ?
 		ulong_bitcount1(x) :
@@ -378,7 +379,7 @@ int ulong_bitcount(unsigned long x, bool bit)
 }
 
 
-int ullong_bitcount1(unsigned long long x) 
+uint ullong_bitcount1(unsigned long long x) 
 {
 #if GCC_BUILTINS
 	return __builtin_popcountll(x);
@@ -396,12 +397,12 @@ int ullong_bitcount1(unsigned long long x)
 }
 
 
-int ullong_bitcount0(unsigned long long x) {
+uint ullong_bitcount0(unsigned long long x) {
 	return ULLONG_BITS - ullong_bitcount1(x);
 }
 
 
-int ullong_bitcount(unsigned long long x, bool bit)
+uint ullong_bitcount(unsigned long long x, bool bit)
 {
 	return bit ?
 		ullong_bitcount1(x) :
