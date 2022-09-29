@@ -423,7 +423,7 @@ uint ullong_bitcount(unsigned long long x, bool bit);
 
 /**
  * @brief Returns the position of the highest order 1 bit of the 32-bit uint @p x
- * or, equivalently, the number of leading zeroes in the bynary representation of @p x.
+ * or, equivalently, the number of leading zeroes in the binary form of @p x.
  * If @p x==0, returns 32.
  */
 uint uint32_hibit(uint32_t x);
@@ -431,22 +431,24 @@ uint uint32_hibit(uint32_t x);
 
 /**
  * @brief Returns the position of the lowest order 1 bit of the 32-bit uint @p x
- * or, equivalently, the number of trailing zeroes in the bynary representation of @p x.
+ * or, equivalently, the number of trailing zeroes in the binary form of @p x.
  * If @p x==0 returns 32.
  */
 uint uint32_lobit(uint32_t x);
 
 
 /**
- * @brief Returns the position of the highest order 1 bit of the 64-bit uint @p x.
- * If x==0 returns 64.
+ * @brief Returns the position of the lowest order 1 bit of the 64-bit uint @p x
+ * or, equivalently, the number of leading zeroes in the binary form of @p x.
+ * If @p x==0 returns 64.
  */
 uint uint64_hibit(uint64_t x);
 
 
 /**
- * @brief Returns the position of the lowest order 1 bit of the 64-bit uint @p x.
- * If x==0 returns 64.
+ * @brief Returns the position of the lowest order 1 bit of the 64-bit uint @p x
+ * or, equivalently, the number of trailing zeroes in the binary form of @p x.
+ * If @p x==0 returns 64.
  */
 uint uint64_lobit(uint64_t x);
 
