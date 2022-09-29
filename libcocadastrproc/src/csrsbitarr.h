@@ -24,6 +24,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+
+#include "coretype.h"
 
 /**
  * @file csrsbitarr.h
