@@ -236,6 +236,52 @@ uint byte_bitcount(byte_t x, bool bit);
 
 
 /**
+ * @brief Same as byte_rank(@p b, @p pos, 0)
+ * @see byte_rank
+ */
+uint byte_rank0(byte_t b, uint pos);
+
+
+/**
+ * @brief Same as byte_rank(@p b, @p pos, 1)
+ * @see byte_rank
+ */
+uint byte_rank1(byte_t b, uint pos);
+
+
+/**
+ * @brief Computes rank_@p bit(@p b, @p pos) = # positions j<@p pos
+ * s.t. @p b[j]==@p bit,
+ * where @p b[j] denotes the jth bit of byte @p b from the left.
+ * If i>=BYTESIZE, returns the total number of positions with value == @p bit.
+ */
+uint byte_rank(byte_t b, uint pos, bool bit);
+
+
+/**
+ * @brief Same as byte_select(@p b, @p rank, 0)
+ * @see byte_select
+ */
+uint byte_select0(byte_t b, uint rank);
+
+
+/**
+ * @brief Same as byte_select(@p b, @p rank, 1)
+ * @see byte_select
+ */
+uint byte_select1(byte_t b, uint rank);
+
+
+/**
+ * @brief Computes select_@p bit(@p b, @p rank) = j s.t.
+ * @p b[j]==@p bit and rank_@p bit(@p b, j)=@p rank,
+ * where @p b[j] denotes the jth bit of byte @p b from the left.
+ * If no such position exists, returns BYTESIZE.
+ */
+uint byte_select(byte_t b, uint rank, bool bit);
+
+
+/**
  * @brief Same as uint16_bitcount(n, 0)
  * @see uint16_bitcount
  */
@@ -376,66 +422,32 @@ uint ullong_bitcount(unsigned long long x, bool bit);
 
 
 /**
- * @brief Same as byte_rank(@p b, @p pos, 0)
- * @see byte_rank
+ * @brief Returns the position of the highest order 1 bit of the 32-bit uint @p x.
+ * If x==0 returns 32.
  */
-size_t byte_rank0(byte_t b, size_t pos);
+uint uint32_hibit(uint32_t x);
 
 
 /**
- * @brief Same as byte_rank(@p b, @p pos, 1)
- * @see byte_rank
+ * @brief Returns the position of the lowest order 1 bit of the 32-bit uint @p x.
+ * If x==0 returns 32.
  */
-size_t byte_rank1(byte_t b, size_t pos);
+uint uint32_lobit(uint32_t x);
 
 
 /**
- * @brief Computes rank_@p bit(@p b, @p pos) = # positions j<@p pos
- * s.t. @p b[j]==@p bit,
- * where @p b[j] denotes the jth bit of byte @p b from the left.
- * If i>=BYTESIZE, returns the total number of positions with value == @p bit.
+ * @brief Returns the position of the highest order 1 bit of the 64-bit uint @p x.
+ * If x==0 returns 64.
  */
-size_t byte_rank(byte_t b, size_t pos, bool bit);
+uint uint64_hibit(uint64_t x);
 
 
 /**
- * @brief Same as byte_select(@p b, @p rank, 0)
- * @see byte_select
+ * @brief Returns the position of the lowest order 1 bit of the 64-bit uint @p x.
+ * If x==0 returns 64.
  */
-size_t byte_select0(byte_t b, size_t rank);
+uint uint64_lobit(uint64_t x);
 
 
-/**
- * @brief Same as byte_select(@p b, @p rank, 1)
- * @see byte_select
- */
-size_t byte_select1(byte_t b, size_t rank);
-
-
-/**
- * @brief Computes select_@p bit(@p b, @p rank) = j s.t.
- * @p b[j]==@p bit and rank_@p bit(@p b, j)=@p rank,
- * where @p b[j] denotes the jth bit of byte @p b from the left.
- * If no such position exists, returns BYTESIZE.
- */
-size_t byte_select(byte_t b, size_t rank, bool bit);
-
-
-/**
- * @brief Returns the position of the highest order 1 bit of @p v.
- */
-int uint32_hibit(uint32_t v);
-
-
-/**
- * @brief Returns the position of the lowest order 1 bit of @p v.
- */
-int uint32_lobit(uint32_t v);
-
-
-/**
- * @brief Returns the position of the lowest order 1 bit of @p v.
- */
-byte_t uint64_lobit(uint64_t v);
 
 #endif

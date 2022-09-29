@@ -75,9 +75,6 @@
  */
 
 
-#ifndef BYTE_T
-#define BYTE_T
-
 /**
  * @brief A required unsigned byte type.
  *
@@ -104,83 +101,15 @@
 typedef unsigned char byte_t;
 
 #define BYTESIZE CHAR_BIT
-
 /*
- * Most of the code in this library is not dependent on a byte being an octet.
- * However it has only been tested on such conditions, so this is
- * included as a safeguard.
- * If this is removed to support larger bytes, at least the byte masks
- * below should be modified.
+ * This library is not strictly dependent on a byte being an octet.
+ * However it has only been tested on such conditions, hence this safeguard.
  */
 #if BYTESIZE!=8
 #error Error: this code requires an 8-bit byte_t type
 #endif
-
 #define BYTE_MAX UCHAR_MAX
 
-#endif // BYTE_T
-
-
-#if SHRT_MAX==0x7fff
-#define SHRT_BYTES 2
-#define SHRT_BITS 16
-#elif SHRT_MAX==0x7fffffff
-#define SHRT_BYTES 4
-#define SHRT_BITS 32 
-#elif SHRT_MAX==0x7fffffffffffffff
-#define SHRT_BYTES 8
-#define SHRT_BITS 64
-#else
-#error "Unknown short size" 
-#endif
-#define USHRT_BYTES SHRT_BYTES
-#define USHRT_BITS SHRT_BITS
-
-#if INT_MAX==0x7fff
-#define INT_BYTES 2
-#define INT_BITS 16
-#elif INT_MAX==0x7fffffff
-#define INT_BYTES 4
-#define INT_BITS 32 
-#elif INT_MAX==0x7fffffffffffffff
-#define INT_BYTES 8
-#define INT_BITS 64
-#else
-#error "Unknown int size" 
-#endif
-#define UINT_BYTES INT_BYTES
-#define UINT_BITS INT_BITS
-
-#if LONG_MAX==0x7fff
-#define LONG_BYTES 2
-#define LONG_BITS 16
-#elif LONG_MAX==0x7fffffff
-#define LONG_BYTES 4
-#define LONG_BITS 32 
-#elif LONG_MAX==0x7fffffffffffffff
-#define LONG_BYTES 8
-#define LONG_BITS 64
-#else
-#error "Unknown long size" 
-#endif
-#define ULONG_BYTES LONG_BYTES
-#define ULONG_BITS LONG_BITS
-
-
-#if LLONG_MAX==0x7fff
-#define LLONG_BYTES 2
-#define LLONG_BITS 16
-#elif LLONG_MAX==0x7fffffff
-#define LLONG_BYTES 4
-#define LLONG_BITS 32 
-#elif LLONG_MAX==0x7fffffffffffffff
-#define LLONG_BYTES 8
-#define LLONG_BITS 64
-#else
-#error "Unknown long long size" 
-#endif
-#define ULLONG_BYTES LLONG_BYTES
-#define ULLONG_BITS LLONG_BITS
 
 
 #ifndef uchar
@@ -226,6 +155,61 @@ typedef void               *rawptr;
 #ifndef cstr
 typedef char               *cstr;
 #endif
+
+
+/* Int types widths */
+
+#if SHRT_MAX==0x7fff
+#define SHRT_BYTES 2
+#define SHRT_BITS 16
+#elif SHRT_MAX==0x7fffffff
+#define SHRT_BYTES 4
+#define SHRT_BITS 32 
+#elif SHRT_MAX==0x7fffffffffffffff
+#define SHRT_BYTES 8
+#define SHRT_BITS 64
+#else
+#error "Unknown/invalid short size" 
+#endif
+#define USHRT_BYTES SHRT_BYTES
+#define USHRT_BITS SHRT_BITS
+
+#if INT_MAX==0x7fff
+#define INT_BYTES 2
+#define INT_BITS 16
+#elif INT_MAX==0x7fffffff
+#define INT_BYTES 4
+#define INT_BITS 32 
+#elif INT_MAX==0x7fffffffffffffff
+#define INT_BYTES 8
+#define INT_BITS 64
+#else
+#error "Unknown/invalid int size" 
+#endif
+#define UINT_BYTES INT_BYTES
+#define UINT_BITS INT_BITS
+
+#if LONG_MAX==0x7fffffff
+#define LONG_BYTES 4
+#define LONG_BITS 32 
+#elif LONG_MAX==0x7fffffffffffffff
+#define LONG_BYTES 8
+#define LONG_BITS 64
+#else
+#error "Unknown/invalid long size" 
+#endif
+#define ULONG_BYTES LONG_BYTES
+#define ULONG_BITS LONG_BITS
+
+
+#if LLONG_MAX==0x7fffffffffffffff
+#define LLONG_BYTES 8
+#define LLONG_BITS 64
+#else
+#error "Unknown/invalid long long size" 
+#endif
+#define ULLONG_BYTES LLONG_BYTES
+#define ULLONG_BITS LLONG_BITS
 
 
 #define XX_UNSIGNED_INT(XX, ...) \
