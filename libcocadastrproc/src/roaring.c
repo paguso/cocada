@@ -58,7 +58,7 @@ typedef struct {
 
 
 struct _roaringbitvec {
-	size_t size;
+	size_t len;
 	size_t ncntrs;
 	ctnr_t *ctnrs;
 	segtree *count_st;
@@ -256,10 +256,10 @@ static size_t ctnr_card(roaringbitvec *self,  size_t ctnr_index)
 
 static const uint32_t ZERO32 = 0;
 
-roaringbitvec *roaringbitvec_new(size_t n)
+roaringbitvec *roaringbitvec_new(uint32_t n)
 {
 	roaringbitvec *ret = NEW(roaringbitvec);
-	ret->size = n;
+	ret->len = n;
 	ret->ncntrs = (size_t)DIVCEIL(n, BITVEC_SIZE);
 	ret->ctnrs = calloc(ret->ncntrs, sizeof(ctnr_t));
 	for (size_t i = 0; i < ret->ncntrs; i++) {
@@ -273,9 +273,8 @@ roaringbitvec *roaringbitvec_new(size_t n)
 }
 
 
-roaringbitvec *roaringbitvec_new_from_bitarr(byte_t *b, size_t n)
+roaringbitvec *roaringbitvec_new_from_bitarr(byte_t *b, uint32_t n)
 {
-	setbuf(stdout, NULL);
 	roaringbitvec *ret = roaringbitvec_new(n);
 	for (size_t i = 0; i < n; i++) {
 		if (bitarr_get_bit(b, i)) {
@@ -306,21 +305,27 @@ void roaringbitvec_free(roaringbitvec *self)
 }
 
 
+size_t roaringbitvec_len(roaringbitvec *self)
+{
+	return self->len;
+}
+
+
 size_t roaringbitvec_card(roaringbitvec *self)
 {
-	return self->size ? segtree_range_qry_uint32_t(self->count_st, 0, self->ncntrs) : 0;
+	return self->len ? segtree_range_qry_uint32_t(self->count_st, 0, self->ncntrs) : 0;
 }
 
 
 size_t roaringbitvec_count(roaringbitvec *self, bool bit)
 {
-	return bit ? roaringbitvec_card(self) : self->size - roaringbitvec_card(self);
+	return bit ? roaringbitvec_card(self) : self->len - roaringbitvec_card(self);
 }
 
 
 void roaringbitvec_set(roaringbitvec *self, size_t pos, bool val)
 {
-	assert(pos < self->size);
+	assert(pos < self->len);
 	size_t bucket = MSB(pos);
 	size_t index = LSB(pos);
 	ctnr_t *ctnr = self->ctnrs + bucket;
@@ -357,7 +362,7 @@ void roaringbitvec_set(roaringbitvec *self, size_t pos, bool val)
 
 bool roaringbitvec_get(roaringbitvec *self, size_t pos)
 {
-	assert(pos < self->size);
+	assert(pos < self->len);
 	size_t bucket = MSB(pos);
 	size_t index = LSB(pos);
 	ctnr_t *ctnr = self->ctnrs + bucket;
@@ -401,7 +406,7 @@ void roaringbitvec_fit(roaringbitvec *self)
 
 size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos)
 {
-	pos = MIN(self->size, pos);
+	pos = MIN(self->len, pos);
 	size_t bucket = MSB(pos);
 	size_t index = LSB(pos);
 	size_t ret = 0;
@@ -425,7 +430,7 @@ size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos)
 
 size_t roaringbitvec_rank0(roaringbitvec *self, size_t pos)
 {
-    return MIN(self->size, pos) - roaringbitvec_rank1(self, pos);
+    return MIN(self->len, pos) - roaringbitvec_rank1(self, pos);
 }
 
 
@@ -435,7 +440,7 @@ size_t roaringbitvec_rank(roaringbitvec *self, bool bit, size_t pos)
 }
 
 
-#define BKTRANK0(b) MIN(self->size, (b) * CTNR_SIZE) - segtree_range_qry_uint32_t(self->count_st, 0, b)
+#define BKTRANK0(b) MIN(self->len, (b) * CTNR_SIZE) - segtree_range_qry_uint32_t(self->count_st, 0, b)
 #define BKTRANK1(b) segtree_range_qry_uint32_t(self->count_st, 0, (b))
 #define BKTRANK(bkt, bit) ((bit) ? BKTRANK1((bkt)) : BKTRANK0((bkt)))
 
@@ -443,7 +448,7 @@ size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank)
 {
 	
 	if (rank >= roaringbitvec_count(self, bit)) { // self->size || rank > BKTRANK(self->ncntrs - 1, bit)) {
-		return self->size;
+		return self->len;
 	}
 	// find the bucket on which to look for the right bit
 	size_t l = 0, r = self->ncntrs, bkt_rank = 0; 
@@ -472,7 +477,7 @@ size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank)
 		break;
 	default:
 		ERROR("Invalid container type\n");
-		return self->size;
+		return self->len;
 		break;
 	}
 	return ret;
@@ -495,7 +500,7 @@ void roaringbitvec_fprint(FILE *stream, roaringbitvec *self)
 {
 	char *types[3] = {"EMPTY", "ARRAY", "BITVEC"};
 	fprintf(stream, "roaringbitvec@%p {\n", self);
-	fprintf(stream, "   size=%zu\n", self->size);
+	fprintf(stream, "   size=%zu\n", self->len);
 	for (size_t b = 0; b < self->ncntrs; b++) {
 		fprintf(stream, "   [%zu] type=%s card=%"PRIu32"\n", b, 
                 types[self->ctnrs[b].type],
