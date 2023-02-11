@@ -164,12 +164,12 @@ typedef char               *cstr;
 #define SHRT_BITS 16
 #elif SHRT_MAX==0x7fffffff
 #define SHRT_BYTES 4
-#define SHRT_BITS 32 
+#define SHRT_BITS 32
 #elif SHRT_MAX==0x7fffffffffffffff
 #define SHRT_BYTES 8
 #define SHRT_BITS 64
 #else
-#error "Unknown/invalid short size" 
+#error "Unknown/invalid short size"
 #endif
 #define USHRT_BYTES SHRT_BYTES
 #define USHRT_BITS SHRT_BITS
@@ -179,24 +179,24 @@ typedef char               *cstr;
 #define INT_BITS 16
 #elif INT_MAX==0x7fffffff
 #define INT_BYTES 4
-#define INT_BITS 32 
+#define INT_BITS 32
 #elif INT_MAX==0x7fffffffffffffff
 #define INT_BYTES 8
 #define INT_BITS 64
 #else
-#error "Unknown/invalid int size" 
+#error "Unknown/invalid int size"
 #endif
 #define UINT_BYTES INT_BYTES
 #define UINT_BITS INT_BITS
 
 #if LONG_MAX==0x7fffffff
 #define LONG_BYTES 4
-#define LONG_BITS 32 
+#define LONG_BITS 32
 #elif LONG_MAX==0x7fffffffffffffff
 #define LONG_BYTES 8
 #define LONG_BITS 64
 #else
-#error "Unknown/invalid long size" 
+#error "Unknown/invalid long size"
 #endif
 #define ULONG_BYTES LONG_BYTES
 #define ULONG_BITS LONG_BITS
@@ -206,7 +206,7 @@ typedef char               *cstr;
 #define LLONG_BYTES 8
 #define LLONG_BITS 64
 #else
-#error "Unknown/invalid long long size" 
+#error "Unknown/invalid long long size"
 #endif
 #define ULLONG_BYTES LLONG_BYTES
 #define ULLONG_BITS LLONG_BITS

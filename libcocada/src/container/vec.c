@@ -76,7 +76,8 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 	ret->typesize = typesize;
 	ret->capacity = MAX(MIN_CAPACITY, init_capacity);
 	ret->len = 0;
-	ret->data = malloc((ret->capacity + 1)* ret->typesize); // +1 position used for swap
+	ret->data = malloc((ret->capacity + 1)*
+	                   ret->typesize); // +1 position used for swap
 	return ret;
 }
 

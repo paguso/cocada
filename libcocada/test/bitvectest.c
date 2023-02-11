@@ -132,7 +132,7 @@ void bitvec_test_count(CuTest *tc)
 		count1 += bit;
 	}
 	if (count1 != bitvec_count(bv, 1))
-	CuAssertSizeTEquals(tc, count1, bitvec_count(bv, 1));
+		CuAssertSizeTEquals(tc, count1, bitvec_count(bv, 1));
 	CuAssertSizeTEquals(tc, ba_size - count1, bitvec_count(bv, 0));
 	for (size_t i=0; i<ba_size; i++) {
 		for (size_t j=i; j<ba_size; j++) {
@@ -157,7 +157,7 @@ void bitvec_test_select(CuTest *tc)
 	for (int intbit=0; intbit<2; intbit++) {
 		bool bit = (bool)intbit;
 		for (size_t len=0; len < ba_size; len++) {
-			for (int i = 0; i < 6; i++) {	
+			for (int i = 0; i < 6; i++) {
 				byte_t *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
 				bitvec *bv = bitvec_new_from_bitarr(ba, len);
@@ -165,7 +165,7 @@ void bitvec_test_select(CuTest *tc)
 				size_t rank = 0;
 				size_t pos = 0;
 				for (size_t r = 0; r < bitcount; r++) {
-					while(pos < len && rank < r) {
+					while (pos < len && rank < r) {
 						rank += (bitvec_get_bit(bv, pos++) == bit);
 					}
 					while (pos < len && bitvec_get_bit(bv, pos) != bit) {
