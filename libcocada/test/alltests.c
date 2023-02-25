@@ -46,6 +46,8 @@ CuSuite *queue_get_test_suite();
 CuSuite *randutil_get_test_suite();
 CuSuite *segtree_get_test_suite();
 CuSuite *serialise_get_test_suite();
+CuSuite *skiplist_get_test_suite();
+CuSuite *slordmap_get_test_suite();
 CuSuite *stack_get_test_suite();
 CuSuite *strfileread_get_test_suite();
 CuSuite *vec_get_test_suite();
@@ -72,6 +74,7 @@ void run_all_tests(void)
 	// CuSuiteAddSuite(suite, serialise_get_test_suite());
 	// CuSuiteAddSuite(suite, segtree_get_test_suite());
 	CuSuiteAddSuite(suite, skiplist_get_test_suite());
+	CuSuiteAddSuite(suite, slordmap_get_test_suite());
 	// CuSuiteAddSuite(suite, stack_get_test_suite());
 	// CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	// CuSuiteAddSuite(suite, strfileread_get_test_suite());

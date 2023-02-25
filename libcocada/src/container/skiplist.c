@@ -130,7 +130,28 @@ static void skiplist_get_precursors(skiplist *self, const void *key)
 }
 
 
-size_t random_height(skiplist *self)
+const void *skiplist_search(skiplist *self, const void *key)
+{
+	skiplist_get_precursors(self, key);
+	skiplist_node *lvl0_node = (skiplist_node *) vec_first_rawptr(self->precursors);
+	if (lvl0_node->next == NULL || self->key_cmp(lvl0_node->next->key, key) != 0) {
+		// not found
+		return NULL;
+	}
+	return (const void *)(lvl0_node->next->key);
+}
+
+
+#define SKIPLIST_CONTAINS_IMPL(TYPE,...)\
+	bool skiplist_contains_##TYPE (const skiplist *self, TYPE key)\
+	{\
+		return skiplist_search(self, &key) != NULL;\
+	}
+
+XX_CORETYPES(SKIPLIST_CONTAINS_IMPL)
+
+
+static size_t random_height(skiplist *self)
 {
 	size_t ret = 1;
 	while (rand_unif() < self->p && ret <= self->height) {
@@ -181,6 +202,17 @@ bool skiplist_ins(skiplist *self, const void *src)
 XX_CORETYPES(SKIPLIST_INS_IMPL)
 
 
+bool skiplist_upd(skiplist *self, const void *src)
+{
+    void *key = (void *) skiplist_search(self, src);
+    if (key) {
+        memcpy(key, src, self->sizeof_key);
+        return true;
+    }
+    return false;
+}
+
+
 bool skiplist_remv(skiplist *self, const void *key, void *dest)
 {
 	skiplist_get_precursors(self, key);
@@ -221,26 +253,6 @@ bool skiplist_del(skiplist *self, const void *key)
 
 XX_CORETYPES(SKIPLIST_DEL_IMPL)
 
-
-const void *skiplist_get(skiplist *self, const void *key)
-{
-	skiplist_get_precursors(self, key);
-	skiplist_node *lvl0_node = (skiplist_node *) vec_first_rawptr(self->precursors);
-	if (lvl0_node->next == NULL || self->key_cmp(lvl0_node->next->key, key) != 0) {
-		// not found
-		return NULL;
-	}
-	return (const void *)(lvl0_node->next->key);
-}
-
-
-#define SKIPLIST_CONTAINS_IMPL(TYPE,...)\
-	bool skiplist_contains_##TYPE (const skiplist *self, TYPE key)\
-	{\
-		return skiplist_get(self, &key) != NULL;\
-	}
-
-XX_CORETYPES(SKIPLIST_CONTAINS_IMPL)
 
 
 
@@ -288,3 +300,4 @@ skiplist_iter *skiplist_get_iter(const skiplist *self)
 	ret->cur = (skiplist_node *) vec_get(ret->src->levels, 0);
 	return ret;
 }
+

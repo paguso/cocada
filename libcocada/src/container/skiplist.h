@@ -56,6 +56,15 @@ size_t skiplist_len(skiplist *self);
 
 
 /**
+ * @brief Searches for an element matching a given @p key
+ * (according to the SL comparison function) , if any, and
+ * returns a pointer to the data stored therein.
+ * In no such node is found, returns NULL.
+ */
+const void *skiplist_search(skiplist *self, const void *key);
+
+
+/**
  * @brief Inserts a copy of the element pointed to by @p src
  * if it doesn't already contain an element matching this
  * value (according to the comparison function). Otherwise
@@ -86,12 +95,12 @@ bool skiplist_del(skiplist *self, const void *key);
 
 
 /**
- * @brief Searches for an element matching a given @p key
- * (according to the SL comparison function) , if any, and
- * returns a pointer to the data stored therein.
- * In no such node is found, returns NULL.
+ * @brief Updates the element matching @p src currently stored
+ * in the SkipList, if it exists, otherwise do nothing.
+ * @return true if the update ocurred, or false if no element
+ * matching @p src is found.
  */
-const void *skiplist_get(skiplist *self, const void *key);
+bool skiplist_upd(skiplist *self, const void *src);
 
 
 #define SKIPLIST_DECLARE_ALL(TYPE, ...)\
@@ -111,5 +120,6 @@ DECL_TRAIT(skiplist_iter, iter);
  * @brief Returns an iterator over the sorted SkipList elements.
  */
 skiplist_iter *skiplist_get_iter(const skiplist *self);
+
 
 #endif
