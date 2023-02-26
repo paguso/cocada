@@ -231,6 +231,17 @@ bool avl_ins(avl *self, void *val)
 	return ret.ok;
 }
 
+bool avl_upd(avl *self, void *val)
+{
+	void *oldval = (void *) avl_get(self, val);
+	if (oldval) {
+		memcpy(oldval, val, self->typesize);
+		return true;
+	} else {
+		return false;
+	}
+	
+}
 
 #define AVL_INS_IMPL(TYPE, ...)\
 	bool avl_ins_##TYPE(avl *self, TYPE val)\

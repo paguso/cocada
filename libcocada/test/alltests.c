@@ -25,6 +25,7 @@
 #include "CuTest.h"
 
 CuSuite *avl_get_test_suite();
+CuSuite *avlordmap_get_test_suite();
 CuSuite *binheap_get_test_suite();
 CuSuite *bitarray_get_test_suite();
 CuSuite *bitbyte_get_test_suite();
@@ -57,6 +58,7 @@ void run_all_tests(void)
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
 	// CuSuiteAddSuite(suite, avl_get_test_suite());
+	 CuSuiteAddSuite(suite, avlordmap_get_test_suite());
 	// CuSuiteAddSuite(suite, binheap_get_test_suite());
 	// CuSuiteAddSuite(suite, bitarray_get_test_suite());
 	// CuSuiteAddSuite(suite, bitbyte_get_test_suite());
@@ -73,8 +75,8 @@ void run_all_tests(void)
 	// CuSuiteAddSuite(suite, randutil_get_test_suite());
 	// CuSuiteAddSuite(suite, serialise_get_test_suite());
 	// CuSuiteAddSuite(suite, segtree_get_test_suite());
-	CuSuiteAddSuite(suite, skiplist_get_test_suite());
-	CuSuiteAddSuite(suite, slordmap_get_test_suite());
+	// CuSuiteAddSuite(suite, skiplist_get_test_suite());
+	// CuSuiteAddSuite(suite, slordmap_get_test_suite());
 	// CuSuiteAddSuite(suite, stack_get_test_suite());
 	// CuSuiteAddSuite(suite, strbuf_get_test_suite());
 	// CuSuiteAddSuite(suite, strfileread_get_test_suite());

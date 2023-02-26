@@ -18,7 +18,7 @@ bool slordmap_contains(slordmap *self, const void *key);
 
 const void *slordmap_get(slordmap *self, const void *key);
 
-bool slordmap_set(slordmap *self, const void *key, const void *val);
+void slordmap_set(slordmap *self, const void *key, const void *val);
 
 skiplist_iter *slordmap_get_iter(slordmap *self);
 

@@ -64,15 +64,15 @@ const void *slordmap_get(slordmap *self, const void *key)
 }
 
 
-bool slordmap_set(slordmap *self, const void *key, const void *val)
+void slordmap_set(slordmap *self, const void *key, const void *val)
 {
     memcpy(self->sandbox, key, self->sizeof_key);
     memcpy(self->sandbox + self->sizeof_key, val, self->sizeof_val);
     if (skiplist_search(self->list, key)) {
-        return skiplist_upd(self->list, self->sandbox);
+        skiplist_upd(self->list, self->sandbox);
     }
     else {
-        return skiplist_ins(self->list, self->sandbox);
+        skiplist_ins(self->list, self->sandbox);
     }
 }
 

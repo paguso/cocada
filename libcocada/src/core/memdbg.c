@@ -139,7 +139,7 @@ static size_t memtable_set(memtable *tally, void *addr, size_t size)
 	while (tally->data[pos].flag != FREE) {
 		if (tally->data[pos].flag == ACTIVE &&
 		        tally->data[pos].addr == addr) {
-			tally->total += (size - tally->data[pos].size);
+			tally->total += ((long long)size - tally->data[pos].size);
 			tally->data[pos].size = size;
 			return tally->data[pos].alloc_no;
 		}

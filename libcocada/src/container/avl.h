@@ -167,6 +167,15 @@ bool avl_ins(avl *self, void *val);
 
 
 /**
+ * @brief Updates a node matching @p val (according to the
+ * comparison function), if it exists. Otherwise this operation 
+ * has no effect.
+ * @return true if the update ocurred, and false otherwise.
+ */
+bool avl_upd(avl *self, void *val);
+
+
+/**
  * @brief Removes the node matching a given @p key
  * (according to the AVL comparison function) , if any,
  * and copies the value to @p dest.

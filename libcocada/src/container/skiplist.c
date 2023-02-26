@@ -62,7 +62,6 @@ static void skiplist_add_level(skiplist *self)
 		new_top_head->down = former_top_head;
 	}
 	vec_push_rawptr(self->precursors, NULL);
-	DEBUG("SkipList adding new level (new height=%zu)\n", self->height);
 }
 
 
@@ -166,15 +165,15 @@ bool skiplist_ins(skiplist *self, const void *src)
 	skiplist_node *lvl0_node = (skiplist_node *) vec_first_rawptr(self->precursors);
 	if (lvl0_node->next && !self->key_cmp(lvl0_node->next->key, src)) {
 		// duplicate (do nothing)
-		DEBUG("Trying to insert a duplicate value in SkipList. Do nothing!\n");
 		return false;
 	}
 	size_t h = random_height(self);
-	while ( self->height < h ) {
-		skiplist_add_level(self);
+	if (self->height < h) {
+		while ( self->height < h ) {
+			skiplist_add_level(self);
+		}
+		skiplist_get_precursors(self, src); // (!) must recompute
 	}
-	skiplist_get_precursors(self, src); // (!) must recompute
-	DEBUG("SkipList adding new node of height %zu\n", h);
 	void *new_node_data = malloc(self->sizeof_key);
 	memcpy(new_node_data, src, self->sizeof_key);
 	skiplist_node *down_node = NULL;
