@@ -97,7 +97,9 @@ void test_deque_push_pop_refs(CuTest *tc)
 
 	for (int i=0; i<n; i++) {
 		dequeobj *o = NEW(dequeobj);
-		*o = (dequeobj){.i=i, .f=(double)i, .c=(char)i};
+		*o = (dequeobj) {
+			.i=i, .f=(double)i, .c=(char)i
+		};
 		deque_push_back_rawptr(q, o);
 	}
 	CuAssertSizeTEquals(tc, n, deque_len(q));

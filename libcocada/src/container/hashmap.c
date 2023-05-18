@@ -274,7 +274,7 @@ void *hashmap_get_mut(const hashmap *hmap, const void *key)
 	return (void *)hashmap_get(hmap, key);
 }
 
-
+/*
 static void _print(const hashmap *hmap)
 {
 	printf("Hashmap at %p\n", hmap);
@@ -285,7 +285,7 @@ static void _print(const hashmap *hmap)
 	}
 	FREE(c);
 }
-
+*/
 
 static inline void _set(hashmap *hmap, const void *key, const void *val)
 {
@@ -369,7 +369,7 @@ void hashmap_del(hashmap *hmap, const void *key)
 
 
 void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
-                          void *dest_val)
+                  void *dest_val)
 {
 	assert(key != NULL);
 	_find_res qry = _find(hmap, key, _hash(hmap, key));

@@ -50,7 +50,7 @@
 
 /**
  * @brief Alphabet types returned by the ab_type() function.
- * @see ab_type
+ * @see ab_type()
  */
 typedef enum {
 	CHAR_TYPE = 0, /**< Character alphabet type */
@@ -76,7 +76,7 @@ typedef size_t (*char_rank_func)(xchar_t c);
  * @param size Number of letters.
  * @param letters (no transfer) String with letters in lexicographic order.
  */
-alphabet *alphabet_new(const size_t size, const char *letters);
+alphabet *alphabet_new(size_t size, const char *letters);
 
 
 /**
@@ -84,7 +84,7 @@ alphabet *alphabet_new(const size_t size, const char *letters);
  *        0 to @p size-1
  * @param size The alphabet size.
  */
-alphabet *int_alphabet_new(const size_t size);
+alphabet *int_alphabet_new(size_t size);
 
 
 /**
@@ -103,12 +103,6 @@ void alphabet_free(alphabet *ab);
  * @brief Destructor
  */
 void alphabet_finalise(void *ptr, const finaliser *fnr);
-
-
-/**
- * @brief Prints an alphabet representation to the standard output.
- */
-void ab_print(const alphabet *ab);
 
 
 /**

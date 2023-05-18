@@ -27,6 +27,7 @@
 #include "CuTest.h"
 
 #include "bitbyte.h"
+#include "errlog.h"
 #include "cstrutil.h"
 
 void test_byte_reverse(CuTest *tc)
@@ -69,6 +70,18 @@ void test_byte_to_str(CuTest *tc)
 	b = 0xef;
 	byte_to_str(b, str);
 	CuAssertStrEquals(tc, "11101111", str);
+
+	printf("start converting\n");
+	size_t n = 1ll<<8;
+	for (size_t i=0; i < n; i++) {
+		b = (byte_t) i;
+		byte_to_str(b, str);
+		DEBUG("%"PRIbB" = %s\n", BYTESTRB(b), str);
+		byte_to_strx(b, str);
+		DEBUG("%"PRIbX" = %s\n", BYTESTRX(b), str);
+	}
+
+	printf("Done converting %zu bytes\n",n);
 }
 
 
@@ -193,7 +206,52 @@ void test_byte_select(CuTest *tc)
 }
 
 
-CuSuite *bitsandbytes_get_test_suite()
+void test_uint32_lohibit(CuTest *tc) {
+	uint32_t x = 0;
+	int hbbf = 0, hb, lbbf=0, lb;
+	for (byte_t *b = (byte_t *)&x, *end = (byte_t*)(&x + 1); b < end; b++) {
+		for (int v = 0; v < 256; v++) {
+			x = 0;
+			*b = (byte_t)v;
+			lb = uint32_lobit(x);
+			for(lbbf = 0; lbbf < 32 && (~x & (uint32_t)1) ; x >>= 1, lbbf++);
+			lbbf = lbbf >= 0 ? lbbf : 32;
+			CuAssertUIntEquals(tc, lbbf, lb);
+			x = 0;
+			*b = (byte_t)v;
+			hb = uint32_hibit(x);
+			for(hbbf = -1; x ; x >>= 1, hbbf++);
+			hbbf = hbbf >= 0 ? hbbf : 32;
+			CuAssertUIntEquals(tc, hbbf, hb);
+		}
+	}
+}
+
+
+void test_uint64_lohibit(CuTest *tc) {
+	uint64_t x = 0;
+	int hbbf = 0, hb, lbbf=0, lb;
+	for (byte_t *b = (byte_t *)&x, *end = (byte_t*)(&x + 1); b < end; b++) {
+		for (int v = 0; v < 256; v++) {
+			x = 0;
+			*b = (byte_t)v;
+			lb = uint64_lobit(x);
+			for(lbbf = 0; lbbf < 64 && (~x & (uint64_t)1) ; x >>= 1, lbbf++);
+			lbbf = lbbf >= 0 ? lbbf : 64;
+			CuAssertUIntEquals(tc, lbbf, lb);
+			x = 0;
+			*b = (byte_t)v;
+			hb = uint64_hibit(x);
+			for(hbbf = -1; x ; x >>= 1, hbbf++);
+			hbbf = hbbf >= 0 ? hbbf : 64;
+			CuAssertUIntEquals(tc, hbbf, hb);
+		}
+	}
+}
+
+
+
+CuSuite *bitbyte_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_byte_reverse);
@@ -204,5 +262,7 @@ CuSuite *bitsandbytes_get_test_suite()
 	SUITE_ADD_TEST(suite, test_uint64_bitcount);
 	SUITE_ADD_TEST(suite, test_byte_rank);
 	SUITE_ADD_TEST(suite, test_byte_select);
+	SUITE_ADD_TEST(suite, test_uint32_lohibit);
+	SUITE_ADD_TEST(suite, test_uint64_lohibit);
 	return suite;
 }

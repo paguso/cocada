@@ -22,8 +22,8 @@
 #ifndef XCHAR_H
 #define XCHAR_H
 
-#include <limits.h>
-#include <stddef.h>
+//#include <limits.h>
+//#include <stddef.h>
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -45,9 +45,9 @@
  * particular character set or encoding is required or implied, neither
  * the size is related to the current locale.**
  *
- * The XCHAR_BYTESIZE constant macro defines the size of the xchar_t type
+ * The XCHAR_BYTES constant macro defines the size of the xchar_t type
  * in bytes. Allowed values are 1, 2, 4, and 8. When not defined, the
- * default value of 4 (32 bits) is assumed. When XCHAR_BYTESIZE is set
+ * default value of 4 (32 bits) is assumed. When XCHAR_BYTES is set
  * to $N$, the  xchar_t is a typedef renaming of the standard int`N`_t
  * type. In addition to that, two more constants are defined. XCHAR_MAX
  * defines the maximum numerical value of xchar_t, and XCHAR_FMT is a
@@ -56,38 +56,37 @@
  */
 
 
-#ifndef XCHAR_BYTESIZE
+#ifndef XCHAR_BYTES
 
-
-#warning "Undefined XCHAR_BYTESIZE. Setting to default = 4 (32 bits)"
-#define XCHAR_BYTESIZE 4
+#warning "Undefined XCHAR_BYTES. Setting to default = 4 (32 bits)"
+#define XCHAR_BYTES 4
 typedef int32_t   xchar_t;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
 typedef int32_t   xchar_wt; // xchar wrapper type
 
-#elif XCHAR_BYTESIZE == 1
+#elif XCHAR_BYTES == 1
 
 typedef int8_t   xchar_t;
 #define XCHAR_MAX INT8_MAX
 #define XCHAR_FMT PRId8
 typedef int32_t   xchar_wt; // xchar wrapper type
 
-#elif XCHAR_BYTESIZE == 2
+#elif XCHAR_BYTES == 2
 
 typedef int16_t  xchar_t;
 #define XCHAR_MAX INT16_MAX
 #define XCHAR_FMT PRId16
 typedef int32_t   xchar_wt; // xchar wrapper type
 
-#elif XCHAR_BYTESIZE == 4
+#elif XCHAR_BYTES == 4
 
 typedef int32_t  xchar_t;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
 typedef int32_t   xchar_wt; // xchar wrapper type
 
-#elif XCHAR_BYTESIZE == 8
+#elif XCHAR_BYTES == 8
 
 typedef int64_t  xchar_t;
 #define XCHAR_MAX INT64_MAX
@@ -96,9 +95,9 @@ typedef int64_t   xchar_wt; // xchar wrapper type
 
 #else
 
-#warning "Invalid XCHAR_BYTESIZE. Allowed values are 1,2,4, and 8. Setting to default = 4 (32 bits)"
-#undef XCHAR_BYTESIZE
-#define XCHAR_BYTESIZE 4
+#warning "Invalid XCHAR_BYTES. Allowed values are 1,2,4, and 8. Setting to default = 4 (32 bits)"
+#undef XCHAR_BYTES
+#define XCHAR_BYTES 4
 
 typedef int32_t  xchar_t;
 #define XCHAR_MAX INT32_MAX
@@ -113,4 +112,4 @@ typedef int32_t  xchar_t;
 #define XEOF ((xchar_wt)EOF)
 
 
-#endif // XCHAR_BYTESIZE
+#endif // XCHAR_BYTES

@@ -115,7 +115,7 @@ strfilereader *strfilereader_new(FILE *stream)
 
 void strfilereader_free(strfilereader *self)
 {
-	if(self->own_stream) {
+	if (self->own_stream) {
 		fclose(self->src);
 	}
 	FREE(self);

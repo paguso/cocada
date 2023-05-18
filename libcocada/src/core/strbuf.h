@@ -59,7 +59,7 @@ void strbuf_finalise(void *ptr, const finaliser *fnr);
 /**
  * @brief Destructor.
  */
-void strbuf_free(strbuf *sb);
+void strbuf_free(strbuf *self);
 
 
 /**
@@ -73,139 +73,189 @@ strbuf *strbuf_new_from_str(const char *src, size_t len);
 /**
  * @brief Returns the "logical" length of a given dynamic string.
  */
-size_t strbuf_len(strbuf *sb);
+size_t strbuf_len(strbuf *self);
 
 
 /**
- * @brief Returns the capacity (i.e. the "physical" length)
- *        of a given dynamic string.
+ * @brief Returns the current capacity of this stringbuffer,
+ * that is the number of characters of longest string that can
+ * be represented in the currently allocated memory, excluding
+ * the null terminating '\0'.
  */
-size_t strbuf_capacity(strbuf *sb);
+size_t strbuf_capacity(strbuf *self);
+
+
+/**
+ * @brief Adjusts the physical size of the string buffer to the least
+ * amount necessary its current content.
+ *
+ * @warning The strbuf may have a minimum required size.
+ */
+void strbuf_fit(strbuf *self);
+
+
+/**
+ * @brief Tests whether two string buffers have the same contents
+ * regardless of their capacity.
+ */
+bool strbuf_eq(strbuf *self, strbuf *other);
 
 
 /**
  * @brief Returns the character at a given position.
  */
-char strbuf_get(strbuf *sb, size_t pos);
+char strbuf_get(strbuf *self, size_t pos);
 
 
 /**
  * @brief Sets all positions to '\0'.
  */
-void strbuf_clear(strbuf *sb);
+void strbuf_clear(strbuf *self);
 
 
 /**
  * @brief Sets (overwrites) the character of a given position @p pos to @p c.
  */
-void strbuf_set(strbuf *sb, size_t pos, char c);
+void strbuf_set(strbuf *self, size_t pos, char c);
 
 
 /**
  * @brief Appends a character @p c.
  */
-void strbuf_append_char(strbuf *sb, char c);
+void strbuf_append_char(strbuf *self, char c);
 
 
 /**
  * @brief Appends a copy of the first @p len chars of a static string @p str.
  * @warning No bounds checks performed.
  */
-void strbuf_nappend(strbuf *sb, const char *src, size_t len);
+void strbuf_nappend(strbuf *self, const char *src, size_t len);
 
 
 /**
- * @brief Same as `strbuf_nappend(sb, src, strlen(src))`.
+ * @brief Same as `strbuf_nappend(self, src, strlen(src))`.
  */
-void strbuf_append(strbuf *sb, const char *src);
+void strbuf_append(strbuf *self, const char *src);
 
 
 /**
  * @brief Inserts a string @p str of length @p len at position @p pos.
  * @warning No bound checks performed.
  */
-void strbuf_ins(strbuf *sb, size_t pos, const char *str, size_t len);
+void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len);
 
 
 /**
- * @brief Cuts the substring @p sb[@p from:@pfrom + @p len] from the buffer.
+ * @brief Cuts the substring @p self[@p from:@pfrom + @p len] from the buffer.
  * If @p dest is not NULL, the removed substring is copied there.
  * @warning No bound checks performed.
  * @warning If @p dest is non-null, it should have space for at least @p len + 1
  * chars, since a '\0' is added right after the copied substring such that
  * @p dest is a prorperly null-terminated C string.
  */
-void strbuf_cut(strbuf *sb, size_t from, size_t len, char *dest);
+void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest);
 
 
 /**
  * @brief Pastes the string @p src of length @p len over the contents
- * of the string buffer @p sb, starting from position @p from.
+ * of the string buffer @p self, starting from position @p from.
  * The string buffer will be extended if the pasted over string goes
  * past the end of the buffer.
  *
  * @warning No bound checks performed.
  */
-void strbuf_paste(strbuf *sb, size_t from, const char *src, size_t len);
+void strbuf_paste(strbuf *self, size_t from, const char *src, size_t len);
 
 
 /**
- * @brief Appends copies of @p n strings in an array @p arr to @p sb,
+ * @brief Appends copies of @p n strings in an array @p arr to @p self,
  *        separating each of these strings by @p sep
  * # Example
  * ```C
- * strbuf *sb = str_buf_new_from_str("Four seasons: ");
+ * strbuf *self = str_buf_new_from_str("Four seasons: ");
  * char *seasons[4] = {"Spring", "Summer", "Autumn", "Winter"};
- * strbuf_join(sb, 4, seasons, " and ");
- * printf("%s", strbuf_as_str(sb)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
+ * strbuf_join(self, 4, seasons, " and ");
+ * printf("%s", strbuf_as_str(self)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
  * ```
  */
-void strbuf_join(strbuf *sb, size_t n, const char **arr, const char *sep);
+void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep);
 
 
 /**
- * @brief Concatenates two stringbuffers.
+ * @brief Appends a copy of the contents of @p other to  @p self.
  */
-void strbuf_cat(strbuf *dest, const strbuf *src);
+void strbuf_cat(strbuf *self, const strbuf *other);
 
 
 /**
- * @brief Concatenates the @p n-prefix of @p src (or all @p src if its
- * length is <= @p n ) to @p dest.
+ * @brief Appends the @p n-prefix of @p other (or all @p other if its
+ * length is <= @p n ) to @p self.
  */
-void strbuf_ncat(strbuf *dest, const strbuf *src, size_t n);
+void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
+
+
+/**
+ * @brief Find the first @p n occurrences of the pattern @p pat in @p self starting from position @p from_pos. The positions of the matches are
+ * stored in @p dest.
+ * @return The number of matches of @p pat in @p self from left to right,
+ * starting at position @p from_pos up to a maximum number @p n.
+ * @warning The array @p dest should have enough space to store at least
+ * @p n size_t values.
+ * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
+ */
+size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
+                     size_t *dest);
 
 
 /**
  * @brief Replaces the first @p n  left-to-right non-overlapping occurrences
- * of the substring @p old in the string buffer @p sb, with the substring @p new.
+ * of the substring @p old in the string buffer @p self, with the substring @p new
+ * starting from position @p from_pos.
  *
  * # Example
  * ```
- * strbuf *sb = strbuf_new_from_str("macaca", 6);
- * strbuf_replace_n(sb, "ca", "na", 2);
+ * strbuf *self = strbuf_new_from_str("macaca", 6, 0);
+ * strbuf_replace_n(self, "ca", "na", 2);
  * // yelds "manana"
- * strbuf_replace_n(sb, "ma", "ba", 2);
+ * strbuf_replace_n(self, "ma", "ba", 2, 0);
  * // yelds "banana" . only 1 <= 2 occurrence found
- * strbuf_replace_n(sb, "ana", "aca", 2);
+ * strbuf_replace_n(self, "ana", "aca", 2, 0);
  * // yelds "bacana" . only 1 <= 2 "non-overlapping" occurrence found
  * ```
+ *
+ * @return Returns the number of substitutions actually performed.
  */
-void strbuf_replace_n(strbuf *sb, const char *old, const char *new, size_t n);
+size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
+                        size_t n, size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(sb, old, new, 1)`
+ * @brief Same as `strbuf_replace_n(self, old, new, 1, from)`
  * @see strbuf_replace_n
  */
-void strbuf_replace(strbuf *sb, const char *old, const char *new);
+size_t strbuf_replace(strbuf *self, const char *old, const char *new,
+                      size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(sb, old, new, strbuf_len(sb) + 1)`
+ * @brief Same as `strbuf_replace_n(self, old, new, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-void strbuf_replace_all(strbuf *sb, const char *old, const char *new);
+size_t strbuf_replace_all(strbuf *self, const char *old, const char *new,
+                          size_t from_pos);
+
+
+/**
+ * @brief Writes formatted output to a string buffer. This function is analogous
+ * to sprintf(), except that the output is *appended* to @p self.
+ * The format string @p fmt and variable list of arguments follow the printf()
+ * family rules.
+ *
+ * @return Upon success, returns the number of written chars (excluding the
+ * null-terminating char '\0').
+ *
+ */
+int sbprintf(strbuf *self, const char *fmt, ...);
 
 
 /**
@@ -214,7 +264,7 @@ void strbuf_replace_all(strbuf *sb, const char *old, const char *new);
  * @warning The internal string can change between calls and the returned
  *          reference can become NULL or invalid.
  */
-const char *strbuf_as_str(strbuf *sb);
+const char *strbuf_as_str(strbuf *self);
 
 
 /**
@@ -222,8 +272,10 @@ const char *strbuf_as_str(strbuf *sb);
  *        trimming (removal of trailing unused positions).
  *
  * @see cstr_trim
- * @warning After this operation, the dynamic string @p sb is destroyed.
+ * @warning After this operation, the dynamic string @p self is destroyed.
  */
-char *strbuf_detach(strbuf *sb);
+char *strbuf_detach(strbuf *self);
+
+
 
 #endif

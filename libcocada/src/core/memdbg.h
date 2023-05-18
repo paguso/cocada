@@ -117,6 +117,13 @@ extern size_t memdbg_nchunks();
 extern bool memdbg_is_empty();
 
 
+typedef struct {
+	bool active;
+	size_t size;
+} memdbg_query_t;
+
+extern memdbg_query_t memdbg_query(const void *addr);
+
 
 #ifdef MEM_DEBUG
 

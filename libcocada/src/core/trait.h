@@ -105,8 +105,7 @@
  * ```
  *
  * Let's also have a look at the implementation of the `circle` type that
- * implements the `shape` trait, and explain how it all comes together in
- * what follows.
+ * implements the `shape` trait, and explain how it all comes together.
  *
  * ```C
  * // FIle circle.c

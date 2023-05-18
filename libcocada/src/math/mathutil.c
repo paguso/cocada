@@ -171,20 +171,20 @@ uint64_t prime_succ(uint64_t n)
 #define __byte_t_max BYTE_MAX
 
 #define AVG_IMPL(TYPE, ...)\
-double average_##TYPE(TYPE *vals, size_t n)\
-{\
-	double avg = 0;\
-	TYPE acc = 0;\
-	for (size_t i = 0; i < n; i++) {\
-		if ((__##TYPE##_max - acc) < vals[i]) {\
-			avg += (double) acc / (double) n;\
-			acc = 0;\
+	double average_##TYPE(TYPE *vals, size_t n)\
+	{\
+		double avg = 0;\
+		TYPE acc = 0;\
+		for (size_t i = 0; i < n; i++) {\
+			if ((__##TYPE##_max - acc) < vals[i]) {\
+				avg += (double) acc / (double) n;\
+				acc = 0;\
+			}\
+			acc += vals[i];\
 		}\
-		acc += vals[i];\
-	}\
-	avg += (double) acc / (double) n;\
-	return avg;\
-}
+		avg += (double) acc / (double) n;\
+		return avg;\
+	}
 
 XX_UNSIGNED_INT(AVG_IMPL)
 

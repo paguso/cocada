@@ -27,7 +27,7 @@
 #include "xchar.h"
 
 /**
- * @file debruijngraph.h
+ * @file bossdbg.h
  * @author Paulo Fonseca
  *
  * @brief String de Bruijn Graph (dBG) ADT.
@@ -55,65 +55,66 @@ typedef struct _dbgraph dbgraph;
  *        this string after padding.
  * @param k A stictly positive order.
  */
-dbgraph *dbg_new_from_str(alphabet *ab, char *txt, size_t k, bool multigraph);
+dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k,
+                                  bool multigraph);
 
 
 /**
  * @brief Creates a dBG from a source stream.
- * @see dbg_new_from_string
+ * @see bossbossdbg_new_from_string
  */
-dbgraph *dbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
-                              bool multigraph );
+dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
+                                      bool multigraph );
 
 
 /**
  * @brief Destructor.
  */
-void dbg_free(dbgraph *g);
+void bossdbg_free(dbgraph *g);
 
 
 /**
  * @brief Returns the sentinel character of a given deBruijn graph.
  */
-char dbg_sentinel(dbgraph *g);
+char bossdbg_sentinel(dbgraph *g);
 
 
 /**
  * @brief Returns the input alphabet
  */
-alphabet *dbg_ab(dbgraph *g);
+alphabet *bossdbg_ab(dbgraph *g);
 
 
 /**
  * @brief Returns the extended alphabet, including the sentinel
  * character of a given de Bruijn graph.
  */
-alphabet *dbg_ext_ab(dbgraph *g);
+alphabet *bossdbg_ext_ab(dbgraph *g);
 
 
 /**
  * @brief Returns the number of distinct nodes of the dBG.
  */
-size_t dbg_nnodes(dbgraph *g);
+size_t bossdbg_nnodes(dbgraph *g);
 
 
 /**
  * @brief Returns the number of distinct edges of the dBG.
  */
-size_t dbg_nedges(dbgraph *g);
+size_t bossdbg_nedges(dbgraph *g);
 
 
 /**
  * @brief Returns the order of the dBG.
  */
-size_t dbg_k(dbgraph *g);
+size_t bossdbg_k(dbgraph *g);
 
 
 /**
  * @brief Returns whether the a node may have multiple outgoing edges with the
  *        same label.
  */
-bool dbg_is_multigraph(dbgraph *g);
+bool bossdbg_is_multigraph(dbgraph *g);
 
 
 /**
@@ -122,9 +123,9 @@ bool dbg_is_multigraph(dbgraph *g);
  *        This function returns the id of a node given its (also unique)
  *        rank in the range 0..nnodes-1.
  * @param nrk The node rank. If nrk>=nnodes, the result is undefined.
- * @see dbg_node_rank
+ * @see bossdbg_node_rank
  */
-size_t dbg_node_id(dbgraph *g, size_t nrk);
+size_t bossdbg_node_id(dbgraph *g, size_t nrk);
 
 
 /**
@@ -133,9 +134,9 @@ size_t dbg_node_id(dbgraph *g, size_t nrk);
  *        This function returns the rank of a node given its id.
  * @param nid The node id. If a nonexistant id is given, the result is
  *            undefined.
- * @see dbg_node_rank
+ * @see bossdbg_node_rank
  */
-size_t dbg_node_rank(dbgraph *g, size_t nid);
+size_t bossdbg_node_rank(dbgraph *g, size_t nid);
 
 
 /**
@@ -143,14 +144,14 @@ size_t dbg_node_rank(dbgraph *g, size_t nid);
  * @param nid The node id. If a nonexistant id is given, the result is
  *            the empty string.
  */
-void dbg_node_lbl(dbgraph *g, size_t nid, xstr *dest);
+void bossdbg_node_lbl(dbgraph *g, size_t nid, xstr *dest);
 
 
 /**
  * @brief Returns the outdegree of a node given its id.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t dbg_outdeg(dbgraph *g, size_t nid);
+size_t bossdbg_outdeg(dbgraph *g, size_t nid);
 
 
 /**
@@ -158,7 +159,7 @@ size_t dbg_outdeg(dbgraph *g, size_t nid);
  *        edge label @p c.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t dbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c);
+size_t bossdbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c);
 
 
 /**
@@ -170,7 +171,7 @@ size_t dbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c);
  * @param nid The id of the parent node.
  * @param c The outgoing edge label.
  */
-size_t dbg_child(dbgraph *g, size_t nid, xchar_t c);
+size_t bossdbg_child(dbgraph *g, size_t nid, xchar_t c);
 
 
 /**
@@ -179,12 +180,12 @@ size_t dbg_child(dbgraph *g, size_t nid, xchar_t c);
  * @param nid The node id of the child node. If a nonexistant id is given,
  *        the result is undefined.
  */
-size_t dbg_parent(dbgraph *g, size_t nid);
+size_t bossdbg_parent(dbgraph *g, size_t nid);
 
 
 /**
  * @brief Prints the dBG @p g to std output.
  */
-void  dbg_print(dbgraph *g);
+void  bossdbg_print(dbgraph *g);
 
 #endif

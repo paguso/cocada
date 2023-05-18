@@ -29,6 +29,7 @@
 #include <stdint.h>
 
 #include "bitbyte.h"
+#include "strbuf.h"
 
 /**
  * @file bitarr.h
@@ -78,12 +79,27 @@ void bitarr_set_bit(byte_t *ba, size_t pos, bool bit_val);
 
 
 /**
- * @brief Prints a representation of a bitarray to stdout.
- * @param nbits The total number of bits.
- * @param bytes_per_line The number of bytes per line.
+ * @brief Prints a representation of a bitarray as text to an output FILE.
+ * @return Upon success returns the number of chars printed
  */
-void bitarr_print( FILE *stream, const byte_t *ba, size_t nbits,
-                   size_t bytes_per_line );
+int bitarr_fprint( FILE *stream, const byte_t *ba, size_t nbits,
+                   uint bytes_per_line, uint indent);
+
+
+/**
+ * @brief Prints a representation of a bitarray as text to a string.
+ * @return Upon success returns the number of chars printed
+ */
+int bitarr_sprint( char *str, const byte_t *ba, size_t nbits,
+                   uint bytes_per_line, uint indent);
+
+
+/**
+ * @brief Prints a representation of a bitarray as text to a string buffer.
+ * @return Upon success returns the number of chars printed
+ */
+int bitarr_sbprint(strbuf *buf, const byte_t *ba, size_t nbits,
+                   uint bytes_per_line, uint indent);
 
 
 /**

@@ -19,18 +19,18 @@
  *
  */
 
-#include <byteswap.h>
-#include <stdint.h>
+#include <stdio.h>
 
-#include "xchar.h"
+#include "write.h"
 
-void xchar_flip_bytes(xchar_t *c)
+int write_write (write *self, void *buf)
 {
-#if XCHAR_BYTES==2
-	*c = bswap_16(*c);
-#elif XCHAR_BYTES==4
-	*c = bswap_32(*c);
-#elif XCHAR_BYTES==8
-	*c = bswap_64(*c);
-#endif
+	return self->vt->write(self, buf);
 }
+
+
+int write_write_n (write *self, void *buf, size_t n)
+{
+	return self->vt->write_n(self, buf, n);
+}
+

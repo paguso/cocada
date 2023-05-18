@@ -28,46 +28,64 @@
 
 #include "bitbyte.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "xstr.h"
+#include "xstrformat.h"
 
 
 
 void test_xstr_get_set(CuTest *tc)
 {
 	for (size_t len=0; len<1000; len++) {
-		xstr *xs = xstr_new_with_capacity(nbytes(len), len);
-
+		size_t sizeof_char = nbytes(len);
+		xstr *xs = xstr_new_with_capacity(sizeof_char, len);
 		for (size_t i=0; i<len; i++) {
 			xstr_push(xs, i);
 		}
-
-		//xstr_print(xs);
-
 		for (size_t i=0; i<len; i++) {
-			//printf("xstr[%zu]=%zu\n", i, xstr_get(xs,i));
 			CuAssert(tc, "assertion failed", i==xstr_get(xs, i));
 		}
-
 		xstr_free(xs);
 	}
 }
 
-void test_xstr_to_string(CuTest *tc)
+
+void print_int16(FILE *stream, xchar_t c)
 {
-	size_t l = 1000;
-	xstr *xs = xstr_new(2);
-	for (xchar_t i=0; i<l; i++) {
+	fprintf(stream, "{%d}", c);
+}
+
+
+void test_xstr_format(CuTest *tc)
+{
+	memdbg_reset();
+	size_t l = 26;
+	xstr *xs = xstr_new(1);
+	for (xchar_t i=65; i<65+l; i++) {
 		xstr_push(xs, i);
 	}
-	strbuf *ds = strbuf_new();
-	xstr_to_string(xs, ds);
-	printf("%s\n",strbuf_as_str(ds));
+	xstrformat *fmt = xstrformat_new_ascii(xs);
+	format_fprint(xstrformat_as_format(fmt), stdout);
+	xstrformat_free(fmt);
+	xstr_free(xs);
+
+	xs = xstr_new(2);
+	for (xchar_t i=65; i<65+l; i++) {
+		xstr_push(xs, i);
+	}
+	fmt = xstrformat_new(xs);
+	format_fprint(xstrformat_as_format(fmt), stdout);
+	xstrformat_free(fmt);
+	xstr_free(xs);
+	CuAssert(tc, "memory leak.", memdbg_is_empty());
+	memdbg_print_stats(stdout, true);
 }
+
 
 CuSuite *xstr_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_xstr_get_set);
-	//SUITE_ADD_TEST(suite, test_xstr_to_string);
+	SUITE_ADD_TEST(suite, test_xstr_format);
 	return suite;
 }

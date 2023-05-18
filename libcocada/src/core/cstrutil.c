@@ -55,7 +55,7 @@ char *cstr_clone(const char *src)
 char *cstr_clone_len(const char *src, size_t len)
 {
 	char *ret = cstr_new(len);
-	strncpy(ret, src, len);
+	memcpy(ret, src, len * sizeof(char));
 	return ret;
 }
 
@@ -139,6 +139,14 @@ char *cstr_resize(char *str, size_t len)
 	return str;
 }
 
+
+
+char *cstr_cut(char *str, size_t from, size_t to)
+{
+	if (from >= to) return str;
+	strcpy(&(str[from]), &(str[to]));
+	return str;
+}
 
 
 

@@ -22,6 +22,11 @@
 #ifndef SAIS_H
 #define SAIS_H
 
+#include <stddef.h>
+
+#include "alphabet.h"
+#include "xstr.h"
+
 /**
  * @file sais.h
  * @author Paulo Fonseca
@@ -36,11 +41,21 @@
  * @brief Builds the plain suffix array for the string @p str over the
  *        alphabet @p ab.
  *
- * @warn  A sentinel character, lexicographically smaller than any char in
- *        @p ab is virtually added to @str s.t. the returned suffix array SA
+ * @warning  A sentinel character, lexicographically smaller than any char in
+ *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
  *        will have size @p len+1 and SA[0]==len.
  */
 size_t *sais(char *str, size_t len, alphabet *ab);
 
+
+/**
+ * @brief Builds the plain suffix array for the xstring @p str over the
+ *        int alphabet @p ab.
+ *
+ * @warning  A sentinel character, lexicographically smaller than any char in
+ *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
+ *        will have size xstr_len(str)+1 and SA[0]==xstr_len(str).
+ */
+size_t *sais_xstr(xstr *str, alphabet *ab);
 
 #endif

@@ -19,18 +19,33 @@
  *
  */
 
-#include <byteswap.h>
-#include <stdint.h>
+#include <stdio.h>
 
-#include "xchar.h"
+#include "format.h"
+#include "strbuf.h"
 
-void xchar_flip_bytes(xchar_t *c)
+
+int format_print(format *self)
 {
-#if XCHAR_BYTES==2
-	*c = bswap_16(*c);
-#elif XCHAR_BYTES==4
-	*c = bswap_32(*c);
-#elif XCHAR_BYTES==8
-	*c = bswap_64(*c);
-#endif
+	return self->vt.fprint(self, stdout);
 }
+
+
+int format_fprint(format *self, FILE *stream)
+{
+	return self->vt.fprint(self, stream);
+}
+
+
+int format_sprint(format *self, char *dest)
+{
+	return self->vt.sprint(self, dest);
+}
+
+
+int format_sbprint(format *self, strbuf *buf)
+{
+	return self->vt.sbprint(self, buf);
+}
+
+

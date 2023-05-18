@@ -21,6 +21,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "coretype.h"
 
@@ -98,6 +99,8 @@
 	TYPE pow2ceil_##TYPE( TYPE val );
 
 
+#define MEAN(A, B) (((A) + (B)) / 2);
+
 XX_UNSIGNED_INT(POW2CEIL_DECL)
 
 
@@ -145,7 +148,7 @@ uint64_t prime_succ(uint64_t n);
  * @warning This function is slow because it takes care of overflows.
  */
 #define AVG_DECL(TYPE, ...)\
-double average_##TYPE(TYPE *vals, size_t n);
+	double average_##TYPE(TYPE *vals, size_t n);
 
 XX_UNSIGNED_INT(AVG_DECL)
 

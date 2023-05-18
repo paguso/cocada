@@ -22,7 +22,6 @@
 #ifndef XSTR_H
 #define XSTR_H
 
-#include "strbuf.h"
 #include "new.h"
 #include "xchar.h"
 
@@ -39,7 +38,7 @@
  * Characters are read from/written to the string via methods that
  * return/receive xchar_t values. Thus xstr characters must fit
  * into the xchar_t value, that is, they must require at most
- * XCHAR_BYTESIZE bytes.
+ * XCHAR_BYTES bytes.
  *
  * @see xchar.h
  */
@@ -104,66 +103,66 @@ xstr *xstr_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char);
 /**
  * @brief Destructor.
  */
-void xstr_free(xstr *xs);
+void xstr_free(xstr *self);
 
 
 /**
  * @brief Fits the xstr to its actual size, i.e. deallocates
  *        unused internal memory.
  */
-void xstr_fit(xstr *xs);
+void xstr_fit(xstr *self);
 
 
 /**
  * @brief Clips the xstr
  */
-void xstr_clip(xstr *xs, size_t from, size_t to);
+void xstr_clip(xstr *self, size_t from, size_t to);
 
 
 /**
  * @brief Clears the xstr
  */
-void xstr_clear(xstr *xs);
+void xstr_clear(xstr *self);
 
 
 /**
  * @brief Rotates the xstr @p npos positions to the left.
  * Example: `xstr_rotate_left(s="abcdefg",3) -> s="defgabc"`
  */
-void xstr_rot_left(xstr *xs, size_t npos);
-
-
-/**
- * @brief Prints a xstr to the given stream.
- */
-void xstr_print(FILE *stream, const xstr *xs);
-
-
-/**
- * @brief Appends a string representation of the xstr to a
- * string buffer @p dest
- * @warning This is not a conversion to @p xs to string.
- */
-void xstr_to_string (const xstr *xs, strbuf *dest);
+void xstr_rot_left(xstr *self, size_t npos);
 
 
 /**
  * @brief Returns the lenght of the xstr.
  */
-size_t xstr_len(const xstr *xs);
+size_t xstr_len(const xstr *self);
 
 
 /**
  * @brief Returns the size of each character position in bytes.
  */
-size_t xstr_sizeof_char(const xstr *xs);
+size_t xstr_sizeof_char(const xstr *self);
+
+
+/**
+ * @brief Returns the internal raw byte contents of the xstr.
+ * @warning The returned information is not meant to be directly modified.
+ */
+const byte_t *xstr_as_bytes(const xstr *self);
+
+
+/**
+ * @brief Returns the physical size (in bytes) of the internal raw byte representation
+ * xstr_len(self) * xstr_sizeof_char(self)
+ */
+size_t xstr_nbytes(const xstr *self);
 
 
 /**
  * @brief Returns the char at a specified position.
  * @warning  No out-of-bounds verification is assumed.
  */
-xchar_t xstr_get(const xstr *xs, size_t pos);
+xchar_t xstr_get(const xstr *self, size_t pos);
 
 
 /**
@@ -172,7 +171,7 @@ xchar_t xstr_get(const xstr *xs, size_t pos);
  * @warn  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
-void xstr_set(xstr *xs, size_t pos, xchar_t val);
+void xstr_set(xstr *self, size_t pos, xchar_t val);
 
 
 /**
@@ -181,7 +180,7 @@ void xstr_set(xstr *xs, size_t pos, xchar_t val);
  * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
-void xstr_nset(xstr *xs, size_t n, xchar_t val);
+void xstr_nset(xstr *self, size_t n, xchar_t val);
 
 
 /**
@@ -189,7 +188,7 @@ void xstr_nset(xstr *xs, size_t n, xchar_t val);
  * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
-void xstr_push(xstr *xs, xchar_t c);
+void xstr_push(xstr *self, xchar_t c);
 
 
 /**
@@ -197,30 +196,30 @@ void xstr_push(xstr *xs, xchar_t c);
  * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
-void xstr_push_n(xstr *xs, xchar_t c, size_t n);
+void xstr_push_n(xstr *self, xchar_t c, size_t n);
 
 
 /**
- * @brief Concatenates (copies) the contents of @p src at the end of @p dest.
+ * @brief Concatenates (copies) the contents of @p src at the end of @p self.
  * @warning  Requires that both xstrs have the same character byte size.
  */
-void xstr_cat(xstr *dest, const xstr *src);
+void xstr_cat(xstr *self, const xstr *src);
 
 
 /**
- * @brief Same as <code>xstr_ncpy(dest, 0, src, 0, xstr_len(dest))</code>.
+ * @brief Same as <code>xstr_ncpy(self, 0, src, 0, xstr_len(self))</code>.
  * @see xstr_ncpy
  * @see xstr_len
  */
-void xstr_cpy(xstr *dest, const xstr *src);
+void xstr_cpy(xstr *self, const xstr *src);
 
 
 /**
- * @brief Copies @p n characters from position @p from_src of the source
- *        xstr @p src into the destination xstr @p dest, starting at
- *        position @p from_dest. That is, copies and pastes
- *        @p src[@p from_src : @p from_src + @p nxchars] over
- *        @p dest[@p from_dest : @p from_dest + @p nxchars].
+ * @brief Copies @p n characters from position @p from_other of the source
+ *        xstr @p other into the destination xstr @p self, starting at
+ *        position @p from_self. That is, copies and pastes
+ *        @p other[@p from_other : @p from_other + @p n] over
+ *        @p self[@p from_self : @p from_self + @p n].
  *        Source and destination may not overlap.
  *
  * @warning Assumes without verification that both xstrs have the same internal
@@ -228,7 +227,8 @@ void xstr_cpy(xstr *dest, const xstr *src);
  * @warning The destination must be large enough, or a buffer overrun will occur.
  *       No out-of-bounds verification is performed.
  */
-void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src, size_t from_src,
+void xstr_ncpy( xstr *self, size_t from_self, const xstr *other,
+                size_t from_other,
                 size_t n );
 
 
@@ -236,21 +236,21 @@ void xstr_ncpy( xstr *dest, size_t from_dest, const xstr *src, size_t from_src,
  * @brief Returns the representation of the xstr as a byte array and
           destroys the xstr.
  */
-void *xstr_detach(xstr *xs);
+void *xstr_detach(xstr *self);
 
 
 /**
  * @brief Lexicographically compares the first @p n xchars  of two strings.
- * @return -1 if this < other, 0 if this==other, +1 if this > other
+ * @return -1 if self < other, 0 if self==other, +1 if this > other
  */
-int xstr_ncmp(const xstr *this, const xstr *other, size_t n);
+int xstr_ncmp(const xstr *self, const xstr *other, size_t n);
 
 
 /**
  * @brief Lexicographically compares two strings.
- * @return -1 if this < other, 0 if this==other, +1 if this > other
+ * @return -1 if self < other, 0 if self==other, +1 if self > other
  */
-int xstr_cmp(const xstr *this, const xstr *other);
+int xstr_cmp(const xstr *self, const xstr *other);
 
 
 #define FOREACH_IN_XSTR(CHR, STR) \
@@ -258,5 +258,7 @@ int xstr_cmp(const xstr *this, const xstr *other);
 		for (xchar_t CHR = 1; CHR ; CHR = 0) \
 			for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
 				for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
+
+
 
 #endif // !XSTRING_H

@@ -390,6 +390,7 @@ bool avl_del(avl *self, void *key)
 XX_CORETYPES(AVL_DEL_IMPL)
 
 
+
 static void __avl_print(avlnode *root, size_t level, FILE *stream,
                         void (*prt_val)(FILE *, const void *))
 {
@@ -414,6 +415,7 @@ void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *,
 }
 
 
+/* Iterator implementation */
 
 
 struct _avl_iter {

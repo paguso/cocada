@@ -88,7 +88,7 @@ void segtree_upd(segtree *self, size_t pos, const void *val)
 {
 	pos += self->range;
 	vec_set(self->tree, pos, val);
-	for (pos /= 2 ; pos > 1; pos /= 2) {
+	for (pos /= 2 ; pos > 0; pos /= 2) {
 		self->merge( vec_get(self->tree, 2 * pos),
 		             vec_get(self->tree, 2 * pos + 1),
 		             vec_get_mut(self->tree, pos) );
@@ -107,10 +107,12 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 	memcpy(dest, self->init_val, self->typesize);
 	for (left += self->range, right += self->range; left < right;
 	        left /= 2, right /= 2) {
-		if (IS_ODD(left)) self->merge(vec_get(self->tree, left++), (const void *)dest,
-			                              dest);
-		if (IS_ODD(right)) self->merge((const void *)dest, vec_get(self->tree, --right),
-			                               dest);
+		if (IS_ODD(left)) {
+			self->merge(vec_get(self->tree, left++), (const void *)dest, dest);
+		}
+		if (IS_ODD(right)) {
+			self->merge((const void *)dest, vec_get(self->tree, --right), dest);
+		}
 	}
 }
 

@@ -19,18 +19,38 @@
  *
  */
 
-#include <byteswap.h>
-#include <stdint.h>
+#ifndef WRITE_H
+#define WRITE_H
 
-#include "xchar.h"
+#include <stdio.h>
 
-void xchar_flip_bytes(xchar_t *c)
-{
-#if XCHAR_BYTES==2
-	*c = bswap_16(*c);
-#elif XCHAR_BYTES==4
-	*c = bswap_32(*c);
-#elif XCHAR_BYTES==8
-	*c = bswap_64(*c);
+#include "trait.h"
+
+
+typedef struct _write write;
+
+/**
+ * @brief Writer virtual table
+ */
+typedef struct {
+	int (*write) (write *self, void *buf);
+	int (*write_n) (write *self, void *buf, size_t n);
+} write_vt;
+
+
+/**
+ * @brief writer trait type
+ */
+struct _write {
+	write_vt *vt;
+	void *impltor;
+};
+
+
+int write_write (write *self, void *buf);
+
+int write_write_n (write *self, void *buf, size_t n);
+
+
+
 #endif
-}

@@ -116,6 +116,12 @@ void vec_finalise(void *v, const finaliser *fnr);
 
 
 /**
+ * @brief Returns the physical memory size (in bytes) taken by the vector.
+ */
+size_t vec_memsize(vec *self);
+
+
+/**
  * @brief Returns the # of elements logically stored.
  */
 size_t vec_len(const vec *v);
@@ -266,7 +272,7 @@ void vec_del(vec *v, size_t pos);
 
 /**
  * @brief Clips the vector to @p v[@p from..@p to-1].
- * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed. 
+ * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed.
  * The data outside the [from:to] boundaries are lost.
  */
 void vec_clip(vec *v, size_t from, size_t to);
@@ -390,7 +396,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_NEW_DECL( TYPE ) \
 	/** @brief Creates a new TYPE vector @see coretype.h */ \
-	TYPE vec_new_##TYPE();
+	vec *vec_new_##TYPE();
 
 #define VEC_GET_DECL( TYPE ) \
 	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \

@@ -60,7 +60,7 @@ void bytearr_reverse(byte_t *src, size_t size)
 }
 
 
-void bytearr_print (const byte_t *ba, size_t nbytes,
+void bytearr_print (const byte_t *ba, size_t nbytes, byte_format fmt,
                     size_t bytes_per_line, const char *left_margin)
 {
 	size_t i, line_label_width;
@@ -154,7 +154,7 @@ int bytearr_read_int(const byte_t *src, size_t from_byte,
 	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
-#    elif ENDIANESS==LITTLE
+#elif ENDIANESS==LITTLE
 	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
 		ret = ~ret;
 	}

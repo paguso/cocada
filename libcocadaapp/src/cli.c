@@ -561,7 +561,7 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 	assert(cmd!=subcmd);	// avoid cycles
 	assert(subcmd->par==NULL); // a subcommand gets added at most once
 	assert(!hashmap_contains(cmd->subcommands,
-	                        &subcmd->name)); // all subcommand names are unique
+	                         &subcmd->name)); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
 	hashmap_iter *it = hashmap_get_iter(subcmd->options);
 	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_iter(it)) {
