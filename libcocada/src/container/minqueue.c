@@ -71,6 +71,7 @@ void minqueue_finalise(void *ptr, const finaliser *fnr )
 {
 	minqueue *mq = (minqueue *)ptr;
 	deque_finalise(mq->elts, fnr);
+	FREE(mq->elts);
 	DESTROY_FLAT(mq->mins, deque);
 }
 
@@ -114,6 +115,18 @@ void minqueue_del(minqueue *queue)
 }
 
 
+const void *minqueue_front(const minqueue *queue)
+{
+	return deque_front(queue->elts);
+}
+
+
+const void *minqueue_back(const minqueue *queue)
+{
+	return deque_back(queue->elts);
+}
+
+
 const void *minqueue_min(const minqueue *queue)
 {
 	return deque_get(queue->elts, deque_front_size_t(queue->mins) - queue->dels );
@@ -136,11 +149,20 @@ void minqueue_min_cpy(const minqueue *queue, void *dest)
 
 #define MINQUEUE_POP_IMPL( TYPE )\
 	TYPE minqueue_pop_##TYPE(minqueue *queue) {\
-		TYPE *ret;\
+		TYPE ret;\
 		minqueue_pop(queue, &ret);\
-		return *ret;\
+		return ret;\
 	}
 
+#define MINQUEUE_FRONT_IMPL( TYPE )\
+	TYPE minqueue_front_##TYPE(const minqueue *queue) {\
+		return deque_front_##TYPE(queue->elts);\
+	}
+
+#define MINQUEUE_BACK_IMPL( TYPE )\
+	TYPE minqueue_back_##TYPE(const minqueue *queue) {\
+		return deque_back_##TYPE(queue->elts);\
+	}
 
 #define MINQUEUE_MIN_IMPL( TYPE )\
 	TYPE minqueue_min_##TYPE(const minqueue *queue){\
@@ -148,9 +170,13 @@ void minqueue_min_cpy(const minqueue *queue, void *dest)
 	}
 
 
+
+
 #define MINQUEUE_ALL_IMPL( TYPE , ... )\
 	MINQUEUE_PUSH_IMPL(TYPE)\
 	MINQUEUE_POP_IMPL(TYPE)\
+	MINQUEUE_FRONT_IMPL(TYPE)\	
+	MINQUEUE_BACK_IMPL(TYPE)\	
 	MINQUEUE_MIN_IMPL(TYPE)
 
 XX_CORETYPES(MINQUEUE_ALL_IMPL)

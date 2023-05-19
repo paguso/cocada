@@ -78,10 +78,6 @@ size_t minqueue_len(const minqueue *queue);
 void minqueue_push(minqueue *queue, const void *elt);
 
 
-#define MINQUEUE_PUSH_DECL( TYPE )\
-	void minqueue_push_##TYPE(minqueue *queue, TYPE val);
-
-
 /**
  * @brief Pops the element from the front of the queue and copies it into @p dest.
  * @warning No check is performed on @p queue bounds, or @p dest.
@@ -96,9 +92,19 @@ void minqueue_pop(minqueue *queue, void *dest);
 void minqueue_del(minqueue *queue);
 
 
+/**
+ * @brief Returns a pointer to the element at the front of the queue
+ * (least recently added element)
+ * @warning Do not change this value directly.
+ */
+const void *minqueue_front(const minqueue *queue);
 
-#define MINQUEUE_POP_DECL( TYPE )\
-	TYPE minqueue_pop_##TYPE(minqueue *queue);
+/**
+ * @brief Returns a pointer to the element at the back of the queue
+ * (most recently added element).
+ * @warning Do not change this value directly.
+ */
+const void *minqueue_back(const minqueue *queue);
 
 
 /**
@@ -115,14 +121,12 @@ const void *minqueue_min(const minqueue *queue);
 void minqueue_min_cpy(const minqueue *queue, void *dest);
 
 
-#define MINQUEUE_MIN_DECL( TYPE )\
-	TYPE minqueue_min_##TYPE(const minqueue *queue);
-
-
 #define MINQUEUE_ALL_DECL( TYPE , ...)\
-	MINQUEUE_PUSH_DECL(TYPE)\
-	MINQUEUE_POP_DECL(TYPE)\
-	MINQUEUE_MIN_DECL(TYPE)
+	void minqueue_push_##TYPE(minqueue *queue, TYPE val);\
+	TYPE minqueue_pop_##TYPE(minqueue *queue);\
+	TYPE minqueue_front_##TYPE(const minqueue *queue);\
+	TYPE minqueue_back_##TYPE(const minqueue *queue);\
+	TYPE minqueue_min_##TYPE(const minqueue *queue);
 
 XX_CORETYPES(MINQUEUE_ALL_DECL)
 
