@@ -30,6 +30,7 @@
 #include "minqueue.h"
 #include "deque.h"
 #include "randutil.h"
+#include "memdbg.h"
 
 typedef struct _minqobj {
 	int i;
@@ -53,6 +54,7 @@ int minqobj_cmp(const void *first, const void *second)
 
 void test_minqueue_push_pop(CuTest *tc)
 {
+	memdbg_reset();
 	minqueue *q = minqueue_new(sizeof(minqobj), minqobj_cmp);
 	deque *v = deque_new(sizeof(minqobj));
 
@@ -113,6 +115,50 @@ void test_minqueue_push_pop(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, 0, nmin);
 	minqueue_iter_free(iter);
+	
+	DESTROY_FLAT(q, minqueue);
+	DESTROY_FLAT(v, deque);
+	memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak!", memdbg_is_empty());
+
+}
+
+
+void test_minqueue_front_back(CuTest *tc)
+{
+	memdbg_reset();
+	minqueue *q = minqueue_new(sizeof(int), cmp_int);
+	deque *v = deque_new(sizeof(int));
+
+	size_t n = 1000;
+	for (int i=0; i<n; i++) {
+		int r = rand_range_int(0, n);
+		minqueue_push_int(q, r);
+		deque_push_back_int(v, r);
+		CuAssert(tc, "Wrong back value", r == minqueue_back_int(q));
+	}
+	CuAssertSizeTEquals(tc, minqueue_len(q), n);
+	CuAssertSizeTEquals(tc, deque_len(v), n);
+
+	int imin;
+	for (int i=0; i<n/2; i++) {
+		imin = minqueue_min_int(q);
+		for (int j=0; j<deque_len(v); j++) {
+			CuAssert(tc, "Min is not minimmal", imin <= deque_get_int(v, j));
+		}
+		int fq = minqueue_front_int(q);
+		int fv = deque_front_int(v);
+		CuAssert(tc, "Wrong front value", fq == fv);
+		fq = minqueue_pop_int(q);
+		CuAssert(tc, "Wrong front value", fq == fv);
+		deque_del_front(v);
+	}
+	CuAssertSizeTEquals(tc, minqueue_len(q), n-(n/2));
+	
+	DESTROY_FLAT(q, minqueue);
+	DESTROY_FLAT(v, deque);
+	//memdbg_print_stats(stdout, true);
+	CuAssert(tc, "Memory leak!", memdbg_is_empty());
 
 }
 
@@ -121,5 +167,6 @@ CuSuite *minqueue_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_minqueue_push_pop);
+	SUITE_ADD_TEST(suite, test_minqueue_front_back);
 	return suite;
 }

@@ -153,7 +153,7 @@ void test_avl_ins(CuTest *tc)
 
 void test_avl_get(CuTest *tc)
 {
-	DEBUG("AVL Get")
+	DEBUG("AVL Get");
 	memdbg_reset();
 	int half_univ = 100;
 	// typed primitive values
@@ -235,7 +235,7 @@ void test_avl_get(CuTest *tc)
 
 void test_avl_remv(CuTest *tc)
 {
-	DEBUG("AVL remove")
+	DEBUG("AVL remove");
 	memdbg_reset();
 	int half_univ = 10;
 	// typed primitive values
