@@ -279,4 +279,5 @@ void fasta_close(fasta *self)
 	FREE(self->cur_rec.descr);
 	FREE(self->cur_rec.seq);
 	FREE(self->cur_rec_rd.descr);
+	FREE(self);
 }
