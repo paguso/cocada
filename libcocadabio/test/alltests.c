@@ -34,14 +34,12 @@ void run_all_tests(void)
 	CuSuite *suite = CuSuiteNew();
 
 	CuSuiteAddSuite(suite, fasta_get_test_suite());
-
+	
+	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);
 	CuSuiteDetails(suite, output);
 	printf("%s\n", output->buffer);
 }
-
-
-void print_count() ;
 
 
 int main(void)

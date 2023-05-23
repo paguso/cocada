@@ -25,6 +25,7 @@
 
 #include "CuTest.h"
 #include "fasta.h"
+#include "memdbg.h"
 
 static char *filename = "test_fasta.fa";
 static size_t nseq = 4;
@@ -88,6 +89,7 @@ static void test_teardown()
 
 void test_fasta_next(CuTest *tc)
 {
+	memdbg_reset();
 	test_setup();
 
 	fasta *f = fasta_open(filename);
@@ -108,13 +110,19 @@ void test_fasta_next(CuTest *tc)
 		CuAssert(tc, "fasta read error: premature end of sequence", k==seq_i_len);
 	}
 	CuAssertSizeTEquals(tc, nseq, i);
+	fasta_close(f);
 
 	test_teardown();
+	if (!memdbg_is_empty()) {
+		memdbg_print_stats(stdout, true);
+	}
+	CuAssert(tc, "Memory leak!", memdbg_is_empty());
 }
 
 
 void test_fasta_next_read(CuTest *tc)
 {
+	memdbg_reset();
 	test_setup();
 
 	fasta *f = fasta_open(filename);
@@ -136,8 +144,13 @@ void test_fasta_next_read(CuTest *tc)
 		CuAssert(tc, "fasta read error: premature end of sequence", k==l);
 	}
 	CuAssertSizeTEquals(tc, nseq, i);
+	fasta_close(f);
 
 	test_teardown();
+	if (!memdbg_is_empty()) {
+		memdbg_print_stats(stdout, true);
+	}
+	CuAssert(tc, "Memory leak!", memdbg_is_empty());
 }
 
 
@@ -148,5 +161,4 @@ CuSuite *fasta_get_test_suite()
 	SUITE_ADD_TEST(suite, test_fasta_next);
 	SUITE_ADD_TEST(suite, test_fasta_next_read);
 	return suite;
-
 }
