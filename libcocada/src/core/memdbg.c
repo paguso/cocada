@@ -330,7 +330,7 @@ void *memdbg_malloc(size_t size, char *file, int line)
 	hr_t hrsize = human_readable(tally.total);
 	printf("malloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       alloc_no, file, line, size, ret, hrsize.size, hrsize.prefix);
-#else 
+#else
 	memtable_set(&tally, ret, size);
 #endif
 	return ret;
@@ -345,7 +345,7 @@ void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line)
 	hr_t hrsize = human_readable(tally.total);
 	printf("calloc #%zu [%s:%d]  %zu bytes @%p (total: %.3lf %sbytes)\n",
 	       alloc_no, file, line, nmemb * size, ret, hrsize.size, hrsize.prefix);
-#else 
+#else
 	memtable_set(&tally, ret, nmemb * size);
 #endif
 	return ret;

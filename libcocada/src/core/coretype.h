@@ -145,6 +145,55 @@ typedef void               *rawptr;
 #endif
 
 
+#define SIGNED_char char
+#define SIGNED_uchar char
+#define SIGNED_short short
+#define SIGNED_ushort short
+#define SIGNED_int int
+#define SIGNED_uint int
+#define SIGNED_long long
+#define SIGNED_ulong long
+#define SIGNED_llong llong
+#define SIGNED_ullong llong
+#define SIGNED_int8_t int8_t
+#define SIGNED_uint8_t int8_t
+#define SIGNED_int16_t int16_t
+#define SIGNED_uint16_t int16_t
+#define SIGNED_int32_t int32_t
+#define SIGNED_uint32_t int32_t
+#define SIGNED_int64_t int64_t
+#define SIGNED_uint64_t int64_t
+#define SIGNED_bool int8_t
+#define SIGNED__Bool int8_t
+#define SIGNED_byte_t int8_t
+#define SIGNED_size_t llong
+#define UNSIGNED_char uchar
+#define UNSIGNED_uchar uchar
+#define UNSIGNED_short ushort
+#define UNSIGNED_ushort ushort
+#define UNSIGNED_int uint
+#define UNSIGNED_uint uint
+#define UNSIGNED_long ulong
+#define UNSIGNED_ulong ulong
+#define UNSIGNED_llong ullong
+#define UNSIGNED_ullong ullong
+#define UNSIGNED_int8_t uint8_t
+#define UNSIGNED_uint8_t uint8_t
+#define UNSIGNED_int16_t uint16_t
+#define UNSIGNED_uint16_t uint16_t
+#define UNSIGNED_int32_t uint32_t
+#define UNSIGNED_uint32_t uint32_t
+#define UNSIGNED_int64_t uint64_t
+#define UNSIGNED_uint64_t uint64_t
+#define UNSIGNED_bool uint8_t
+#define UNSIGNED__Bool uint8_t
+#define UNSIGNED_byte_t uint8_t
+#define UNSIGNED_size_t size_t
+
+#define SIGNED(TYPE) SIGNED_##TYPE
+#define UNSIGNED(TYPE) UNSIGNED_##TYPE
+
+
 /**
  * NULL pointer constant.
  */
@@ -164,12 +213,12 @@ typedef char               *cstr;
 #define SHRT_BITS 16
 #elif SHRT_MAX==0x7fffffff
 #define SHRT_BYTES 4
-#define SHRT_BITS 32 
+#define SHRT_BITS 32
 #elif SHRT_MAX==0x7fffffffffffffff
 #define SHRT_BYTES 8
 #define SHRT_BITS 64
 #else
-#error "Unknown/invalid short size" 
+#error "Unknown/invalid short size"
 #endif
 #define USHRT_BYTES SHRT_BYTES
 #define USHRT_BITS SHRT_BITS
@@ -179,24 +228,24 @@ typedef char               *cstr;
 #define INT_BITS 16
 #elif INT_MAX==0x7fffffff
 #define INT_BYTES 4
-#define INT_BITS 32 
+#define INT_BITS 32
 #elif INT_MAX==0x7fffffffffffffff
 #define INT_BYTES 8
 #define INT_BITS 64
 #else
-#error "Unknown/invalid int size" 
+#error "Unknown/invalid int size"
 #endif
 #define UINT_BYTES INT_BYTES
 #define UINT_BITS INT_BITS
 
 #if LONG_MAX==0x7fffffff
 #define LONG_BYTES 4
-#define LONG_BITS 32 
+#define LONG_BITS 32
 #elif LONG_MAX==0x7fffffffffffffff
 #define LONG_BYTES 8
 #define LONG_BITS 64
 #else
-#error "Unknown/invalid long size" 
+#error "Unknown/invalid long size"
 #endif
 #define ULONG_BYTES LONG_BYTES
 #define ULONG_BITS LONG_BITS
@@ -206,7 +255,7 @@ typedef char               *cstr;
 #define LLONG_BYTES 8
 #define LLONG_BITS 64
 #else
-#error "Unknown/invalid long long size" 
+#error "Unknown/invalid long long size"
 #endif
 #define ULLONG_BYTES LLONG_BYTES
 #define ULLONG_BITS LLONG_BITS

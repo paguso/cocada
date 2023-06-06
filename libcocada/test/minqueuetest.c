@@ -115,7 +115,7 @@ void test_minqueue_push_pop(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, 0, nmin);
 	minqueue_iter_free(iter);
-	
+
 	DESTROY_FLAT(q, minqueue);
 	DESTROY_FLAT(v, deque);
 	memdbg_print_stats(stdout, true);
@@ -154,7 +154,7 @@ void test_minqueue_front_back(CuTest *tc)
 		deque_del_front(v);
 	}
 	CuAssertSizeTEquals(tc, minqueue_len(q), n-(n/2));
-	
+
 	DESTROY_FLAT(q, minqueue);
 	DESTROY_FLAT(v, deque);
 	//memdbg_print_stats(stdout, true);

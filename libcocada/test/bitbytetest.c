@@ -206,21 +206,22 @@ void test_byte_select(CuTest *tc)
 }
 
 
-void test_uint32_lohibit(CuTest *tc) {
+void test_uint32_lohibit(CuTest *tc)
+{
 	uint32_t x = 0;
 	int hbbf = 0, hb, lbbf=0, lb;
-	for (byte_t *b = (byte_t *)&x, *end = (byte_t*)(&x + 1); b < end; b++) {
+	for (byte_t *b = (byte_t *)&x, *end = (byte_t *)(&x + 1); b < end; b++) {
 		for (int v = 0; v < 256; v++) {
 			x = 0;
 			*b = (byte_t)v;
 			lb = uint32_lobit(x);
-			for(lbbf = 0; lbbf < 32 && (~x & (uint32_t)1) ; x >>= 1, lbbf++);
+			for (lbbf = 0; lbbf < 32 && (~x & (uint32_t)1) ; x >>= 1, lbbf++);
 			lbbf = lbbf >= 0 ? lbbf : 32;
 			CuAssertUIntEquals(tc, lbbf, lb);
 			x = 0;
 			*b = (byte_t)v;
 			hb = uint32_hibit(x);
-			for(hbbf = -1; x ; x >>= 1, hbbf++);
+			for (hbbf = -1; x ; x >>= 1, hbbf++);
 			hbbf = hbbf >= 0 ? hbbf : 32;
 			CuAssertUIntEquals(tc, hbbf, hb);
 		}
@@ -228,21 +229,22 @@ void test_uint32_lohibit(CuTest *tc) {
 }
 
 
-void test_uint64_lohibit(CuTest *tc) {
+void test_uint64_lohibit(CuTest *tc)
+{
 	uint64_t x = 0;
 	int hbbf = 0, hb, lbbf=0, lb;
-	for (byte_t *b = (byte_t *)&x, *end = (byte_t*)(&x + 1); b < end; b++) {
+	for (byte_t *b = (byte_t *)&x, *end = (byte_t *)(&x + 1); b < end; b++) {
 		for (int v = 0; v < 256; v++) {
 			x = 0;
 			*b = (byte_t)v;
 			lb = uint64_lobit(x);
-			for(lbbf = 0; lbbf < 64 && (~x & (uint64_t)1) ; x >>= 1, lbbf++);
+			for (lbbf = 0; lbbf < 64 && (~x & (uint64_t)1) ; x >>= 1, lbbf++);
 			lbbf = lbbf >= 0 ? lbbf : 64;
 			CuAssertUIntEquals(tc, lbbf, lb);
 			x = 0;
 			*b = (byte_t)v;
 			hb = uint64_hibit(x);
-			for(hbbf = -1; x ; x >>= 1, hbbf++);
+			for (hbbf = -1; x ; x >>= 1, hbbf++);
 			hbbf = hbbf >= 0 ? hbbf : 64;
 			CuAssertUIntEquals(tc, hbbf, hb);
 		}
