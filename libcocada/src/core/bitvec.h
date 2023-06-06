@@ -112,9 +112,9 @@ size_t bitvec_memsize(bitvec *bv);
 
 
 /**
- * @brief Returns a pointer to the internar representation of the 
+ * @brief Returns a pointer to the internar representation of the
  * bitvector as a raw byte array.
- * @warning The returned representation is not meant to be 
+ * @warning The returned representation is not meant to be
  * modified directly.
  */
 const byte_t *bitvec_as_bytes(const bitvec *bv);
@@ -188,7 +188,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src);
  * @brief Writes a string representations of the bitvector to a string buffer
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
  *        as a single line.
- * @deprecated Use the bitvec_format interface 
+ * @deprecated Use the bitvec_format interface
  * @see bitvec_get_format()
  */
 void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
@@ -197,7 +197,7 @@ void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
 /**
  * @brief Prints the bitvector do std output.
  * @param bytes_per_row Number of bytes per row
- * @deprecated Use the bitvec_format interface 
+ * @deprecated Use the bitvec_format interface
  * @see bitvec_get_format()
  */
 void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row);

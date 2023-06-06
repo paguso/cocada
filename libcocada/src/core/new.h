@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #include "coretype.h"
-#include "memdbg.h" 
+#include "memdbg.h"
 
 /**
  * @file new.h

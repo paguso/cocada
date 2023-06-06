@@ -144,7 +144,7 @@ See release notes for porting issues."
 #define GCC_BUILTINS (defined(__GNUC__) && !defined(__clang__))
 
 /**
- * @brief Binary print format specifier for the byte_t type to be used 
+ * @brief Binary print format specifier for the byte_t type to be used
  * in conjunction with BYTESTRB conversion macro.
  * @see BYTESTRB
  */
@@ -170,7 +170,7 @@ See release notes for porting issues."
 	(byte & 0x01 ? '1' : '0')
 
 /**
- * @brief Hexadecimal print format specifier for the byte_t type to be used 
+ * @brief Hexadecimal print format specifier for the byte_t type to be used
  * in conjunction with BYTESTRX conversion macro.
  * @see BYTESTRX
  */
@@ -178,7 +178,7 @@ See release notes for porting issues."
 
 
 /**
- * @brief Converts a byte to an hexadecimal string for printing. 
+ * @brief Converts a byte to an hexadecimal string for printing.
  * To be used with the PRIbB format.
  * Example
  * ```C

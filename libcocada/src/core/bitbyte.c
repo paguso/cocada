@@ -216,8 +216,8 @@ uint byte_bitcount1(byte_t b)
 uint byte_bitcount(byte_t b, bool bit)
 {
 	return bit?
-		byte_bitcount1(b):
-		byte_bitcount0(b);
+	       byte_bitcount1(b):
+	       byte_bitcount0(b);
 }
 
 
@@ -236,8 +236,8 @@ uint byte_rank0(byte_t b, uint pos)
 uint byte_rank(byte_t b, uint pos, bool bit)
 {
 	return bit?
-		byte_rank1(b, pos):
-		byte_rank0(b, pos);
+	       byte_rank1(b, pos):
+	       byte_rank0(b, pos);
 }
 
 
@@ -276,8 +276,8 @@ uint byte_select1(byte_t b, uint rank)
 uint byte_select(byte_t b, uint rank, bool bit)
 {
 	return bit?
-		byte_select1(b, rank):
-		byte_select0(b, rank);
+	       byte_select1(b, rank):
+	       byte_select0(b, rank);
 }
 
 
@@ -292,7 +292,7 @@ uint uint16_bitcount1(uint16_t x)
 #if GCC_BUILTINS
 	// In C11 uint is at least 16 bits
 	return __builtin_popcount(x);
-#else 
+#else
 	x = ((x>>1) & 0x5555)+(x & 0x5555);
 	x = ((x>>2) & 0x3333)+(x & 0x3333);
 	x = ((x>>4) & 0x0F0F)+(x & 0x0F0F);
@@ -305,8 +305,8 @@ uint uint16_bitcount1(uint16_t x)
 uint uint16_bitcount(uint16_t x, bool bit)
 {
 	return bit ?
-		uint16_bitcount1(x) :
-		uint16_bitcount0(x);
+	       uint16_bitcount1(x) :
+	       uint16_bitcount0(x);
 }
 
 
@@ -365,8 +365,8 @@ uint uint64_bitcount1(uint64_t x)
 uint uint64_bitcount(uint64_t x, bool bit)
 {
 	return bit ?
-		uint64_bitcount1(x):
-		uint64_bitcount0(x);
+	       uint64_bitcount1(x):
+	       uint64_bitcount0(x);
 }
 
 
@@ -385,12 +385,12 @@ uint ushort_bitcount0(unsigned short x)
 uint ushort_bitcount(unsigned short x, bool bit)
 {
 	return bit ?
-		ushort_bitcount1(x) :
-		USHRT_BITS - ushort_bitcount1(x);
+	       ushort_bitcount1(x) :
+	       USHRT_BITS - ushort_bitcount1(x);
 }
 
 
-uint uint_bitcount1(unsigned int n) 
+uint uint_bitcount1(unsigned int n)
 {
 #if GCC_BUILTINS
 	return __builtin_popcount(n);
@@ -402,13 +402,14 @@ uint uint_bitcount1(unsigned int n)
 	return uint32_bitcount1(n);
 #elif UINT_BITS==64
 	return uint64_bitcount1(n);
-#else 
+#else
 #error "Unknown uint size"
 #endif
 }
 
 
-uint uint_bitcount0(unsigned int x) {
+uint uint_bitcount0(unsigned int x)
+{
 	return UINT_BITS - uint_bitcount1(x);
 }
 
@@ -416,12 +417,12 @@ uint uint_bitcount0(unsigned int x) {
 uint uint_bitcount(unsigned int x, bool bit)
 {
 	return bit ?
-		uint_bitcount1(x) :
-		UINT_BITS - uint_bitcount1(x);
+	       uint_bitcount1(x) :
+	       UINT_BITS - uint_bitcount1(x);
 }
 
 
-uint ulong_bitcount1(unsigned long x) 
+uint ulong_bitcount1(unsigned long x)
 {
 #if GCC_BUILTINS
 	return __builtin_popcountl(x);
@@ -433,13 +434,14 @@ uint ulong_bitcount1(unsigned long x)
 	return uint32_bitcount1(x);
 #elif ULONG_BITS==64
 	return uint64_bitcount1(x);
-#else 
+#else
 #error "Unknown uint size"
 #endif
 }
 
 
-uint ulong_bitcount0(unsigned long x) {
+uint ulong_bitcount0(unsigned long x)
+{
 	return ULONG_BITS - ulong_bitcount1(x);
 }
 
@@ -447,12 +449,12 @@ uint ulong_bitcount0(unsigned long x) {
 uint ulong_bitcount(unsigned long x, bool bit)
 {
 	return bit ?
-		ulong_bitcount1(x) :
-		ULONG_BITS - ulong_bitcount1(x);
+	       ulong_bitcount1(x) :
+	       ULONG_BITS - ulong_bitcount1(x);
 }
 
 
-uint ullong_bitcount1(unsigned long long x) 
+uint ullong_bitcount1(unsigned long long x)
 {
 #if GCC_BUILTINS
 	return __builtin_popcountll(x);
@@ -464,13 +466,14 @@ uint ullong_bitcount1(unsigned long long x)
 	return uint32_bitcount1(x);
 #elif ULLONG_BITS==64
 	return uint64_bitcount1(x);
-#else 
+#else
 #error "Unknown uint size"
 #endif
 }
 
 
-uint ullong_bitcount0(unsigned long long x) {
+uint ullong_bitcount0(unsigned long long x)
+{
 	return ULLONG_BITS - ullong_bitcount1(x);
 }
 
@@ -478,17 +481,18 @@ uint ullong_bitcount0(unsigned long long x) {
 uint ullong_bitcount(unsigned long long x, bool bit)
 {
 	return bit ?
-		ullong_bitcount1(x) :
-		ULLONG_BITS - ullong_bitcount1(x);
+	       ullong_bitcount1(x) :
+	       ULLONG_BITS - ullong_bitcount1(x);
 }
 
 
 
 static const byte_t _uint32_hibit_tbl[37] = {
-32, 0, 25, 1, 22, 26, 31, 2, 15, 23, 
-29, 27, 10, 32, 12, 3, 6, 16, 32, 24, 
-21, 30, 14, 28, 9, 11, 5, 32, 20, 13, 
-8, 4, 19, 7, 18, 17, 32};
+	32, 0, 25, 1, 22, 26, 31, 2, 15, 23,
+	29, 27, 10, 32, 12, 3, 6, 16, 32, 24,
+	21, 30, 14, 28, 9, 11, 5, 32, 20, 13,
+	8, 4, 19, 7, 18, 17, 32
+};
 
 uint uint32_hibit(uint32_t x)
 {
@@ -502,10 +506,11 @@ uint uint32_hibit(uint32_t x)
 
 
 static const byte_t _uint32_lobit_tbl[37] = {
-32, 0, 1, 26, 2, 23, 27, 32, 3, 16, 
-24, 30, 28, 11, 32, 13, 4, 7, 17, 32, 
-25, 22, 31, 15, 29, 10, 12, 6, 32, 21, 
-14, 9, 5, 20, 8, 19, 18};
+	32, 0, 1, 26, 2, 23, 27, 32, 3, 16,
+	24, 30, 28, 11, 32, 13, 4, 7, 17, 32,
+	25, 22, 31, 15, 29, 10, 12, 6, 32, 21,
+	14, 9, 5, 20, 8, 19, 18
+};
 
 
 uint uint32_lobit(uint32_t x)
@@ -515,12 +520,12 @@ uint uint32_lobit(uint32_t x)
 
 
 static const byte_t _uint64_lobit_tbl[67] = {
-	64, 0, 1, 39, 2, 15, 40, 23, 3, 12, 
-	16, 59, 41, 19, 24, 54, 4, 128, 13, 10, 
-	17, 62, 60, 28, 42, 30, 20, 51, 25, 44, 
-	55, 47, 5, 32, 128, 38, 14, 22, 11, 58, 
-	18, 53, 63, 9, 61, 27, 29, 50, 43, 46, 
-	31, 37, 21, 57, 52, 8, 26, 49, 45, 36, 
+	64, 0, 1, 39, 2, 15, 40, 23, 3, 12,
+	16, 59, 41, 19, 24, 54, 4, 128, 13, 10,
+	17, 62, 60, 28, 42, 30, 20, 51, 25, 44,
+	55, 47, 5, 32, 128, 38, 14, 22, 11, 58,
+	18, 53, 63, 9, 61, 27, 29, 50, 43, 46,
+	31, 37, 21, 57, 52, 8, 26, 49, 45, 36,
 	56, 7, 48, 35, 6, 34, 33
 };
 
@@ -541,13 +546,14 @@ uint uint64_lobit(uint64_t v)
 
 
 static const byte_t _uint64_hibit_tbl[67] =  {
-	64, 0, 1, 39, 2, 15, 40, 23, 3, 12, 
-	16, 59, 41, 19, 24, 54, 4, 64, 13, 10, 
-	17, 62, 60, 28, 42, 30, 20, 51, 25, 44, 
-	55, 47, 5, 32, 64, 38, 14, 22, 11, 58, 
-	18, 53, 63, 9, 61, 27, 29, 50, 43, 46, 
-	31, 37, 21, 57, 52, 8, 26, 49, 45, 36, 
-	56, 7, 48, 35, 6, 34, 33};
+	64, 0, 1, 39, 2, 15, 40, 23, 3, 12,
+	16, 59, 41, 19, 24, 54, 4, 64, 13, 10,
+	17, 62, 60, 28, 42, 30, 20, 51, 25, 44,
+	55, 47, 5, 32, 64, 38, 14, 22, 11, 58,
+	18, 53, 63, 9, 61, 27, 29, 50, 43, 46,
+	31, 37, 21, 57, 52, 8, 26, 49, 45, 36,
+	56, 7, 48, 35, 6, 34, 33
+};
 
 
 uint uint64_hibit(uint64_t x)

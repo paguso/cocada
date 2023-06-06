@@ -429,7 +429,8 @@ void test_vec_flat_free(CuTest *tc)
 
 }
 
-void test_vec_cat(CuTest *tc) {
+void test_vec_cat(CuTest *tc)
+{
 	memdbg_reset();
 	vec *v1 = vec_new(sizeof(vobj));
 	for (size_t i=0; i<100; i++) {
@@ -460,7 +461,8 @@ void test_vec_cat(CuTest *tc) {
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
-void test_vec_get_speed(CuTest *tc) {
+void test_vec_get_speed(CuTest *tc)
+{
 	memdbg_reset();
 	size_t n = 1000000;
 	int *arr = ARR_NEW(int, n);
@@ -483,7 +485,7 @@ void test_vec_get_speed(CuTest *tc) {
 	}
 	t = clock() - t;
 	DEBUG_EXEC(printf("sequential vec time = %ld\n", t));
-	
+
 	nops = 10000000;
 	t = clock();
 	for (size_t i = 0; i < nops; i++) {
