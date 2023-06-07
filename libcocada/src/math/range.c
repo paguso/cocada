@@ -26,87 +26,45 @@
 #include "range.h"
 
 
-#define RANGE_ARR_NEW_IMPL(TYPE, ...)\
-	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step) \
+#define RANGE_ARR_IMPL(TYPE, ...)\
+	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\ 
 	{\
 		if (from == to) {\
-			return (range_##TYPE) {.n = 0, .arr = (TYPE*)malloc(0)};\
+			return 0;\
 		} else if (from < to) {\
 			ERROR_ASSERT(step!=0, "Range with step=0 has infinite size.\n");\
 			if (step < 0) {\
-				return (range_##TYPE) {.n = 0, .arr = (TYPE*)malloc(0)};\
+				return 0;\
 			}\
 			size_t n = (to - from);\
 			n = (n / step) + ((n % step) ? 1 : 0);\
-			TYPE *arr = (TYPE *)malloc(n * sizeof(TYPE));\
-			TYPE value = from;\
-			for (size_t i = 0; i < n; i++, value += step) {\
-				arr[i] = value;\
-			}\
-			return (range_##TYPE){.n = n, .arr = arr};\
+			return n;\
 		} else {\
 			ERROR_ASSERT(step!=0, "Range with step=0 has infinite size.\n");\
 			if (step > 0) {\
-				return (range_##TYPE) {.n = 0, .arr = (TYPE*)malloc(0)};\
+				return 0;\
 			}\
 			size_t n = (from - to);\
 			n = (n / (-step)) + ((n % (-step)) ? 1 : 0);\
-			TYPE *arr = (TYPE *)malloc(n * sizeof(TYPE));\
-			TYPE value = from;\
-			for (size_t i = 0; i < n; i++, value += step) {\
-				arr[i] = value;\
-			}\
-			return (range_##TYPE){.n = n, .arr = arr};\
+			return n;\
 		}\
-	}
+	}\
+	\ 
+	size_t range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step)\
+	{\
+		size_t n = range_arr_len_##TYPE(from, to, step);\
+		for (size_t i = 0; i < n; i++, from += step) {\
+			dest[i] = from;\
+		}\
+		return n;\
+	}\
+	\
+	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step) \
+	{\
+		size_t n = range_arr_len_##TYPE(from, to, step);\
+		TYPE *arr = (TYPE *)malloc(n * sizeof(TYPE));\
+		range_arr_fill_##TYPE(arr, from, to, step);\
+		return (range_##TYPE){.n = n, .arr = arr};\
+	}\
 
-
-
-range_int xrange_arr_new_int(int from, int to, SIGNED(int) step)
-{
-	if (from == to) {
-		return (range_int) {
-			.n = 0, .arr = (int *)malloc(0)
-		};
-	}
-	else if (from < to) {
-		ERROR_ASSERT(step!=0, "Range with step=0 has infinite size.\n");
-		if (step < 0) {
-			return (range_int) {
-				.n = 0, .arr = (int *)malloc(0)
-			};
-		}
-		size_t n = (to - from);
-		n = (n / step) + ((n % step) ? 1 : 0);
-		int *arr = (int *)malloc(n * sizeof(int));
-		int value = from;
-		for (size_t i = 0; i < n; i++, value += step) {
-			arr[i] = value;
-		}
-		return (range_int) {
-			.n = n, .arr = arr
-		};
-	}
-	else {   // from > to
-		ERROR_ASSERT(step!=0, "Range with step=0 has infinite size.\n");
-		if (step > 0) {
-			return (range_int) {
-				.n = 0, .arr = (int *)malloc(0)
-			};
-		}
-		size_t n = (from - to);
-		n = (n / (-step)) + ((n%(-step)) ? 1 : 0);
-		int *arr = (int *)malloc(n * sizeof(int));
-		int value = from;
-		for (size_t i = 0; i < n; i++, value += step) {
-			arr[i] = value;
-		}
-		return (range_int) {
-			.n = n, .arr = arr
-		};
-	}
-}
-
-
-
-XX_INTS(RANGE_ARR_NEW_IMPL)
+XX_INTS(RANGE_ARR_IMPL)
