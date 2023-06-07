@@ -24,17 +24,17 @@
 
 #include "coretype.h"
 
-#define RANGE_TYPE_DECL(TYPE,...)\
+#define RANGE_ARR_DECL(TYPE,...)\
 	typedef struct {\
 		size_t n;\
-		TYPE *arr;\
-	} range_##TYPE;
-
-XX_INTS(RANGE_TYPE_DECL)
-
-#define RANGE_ARR_NEW_DECL(TYPE, ...)\
+		const TYPE *arr;\
+	} range_##TYPE;\
+	\
+	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);\
+	size_t range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step);\
 	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);
+	
 
-XX_INTS(RANGE_ARR_NEW_DECL)
+XX_INTS(RANGE_ARR_DECL)
 
 #endif
