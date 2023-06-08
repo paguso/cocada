@@ -19,6 +19,9 @@
  *
  */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "arrays.h"
 #include "coretype.h"
 #include "mathutil.h"

@@ -27,7 +27,7 @@
 
 
 #define RANGE_ARR_IMPL(TYPE, ...)\
-	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\ 
+	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\
 	{\
 		if (from == to) {\
 			return 0;\
@@ -49,7 +49,7 @@
 			return n;\
 		}\
 	}\
-	\ 
+	\
 	size_t range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step)\
 	{\
 		size_t n = range_arr_len_##TYPE(from, to, step);\

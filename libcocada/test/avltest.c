@@ -180,7 +180,7 @@ void test_avl_get(CuTest *tc)
 		obj.key = key;
 		obj.value = (double)key;
 		DEBUG("\n\nGet flat obj %d\n", key);
-		obj_t *ans = avl_get(tree, &obj);
+		const obj_t *ans = avl_get(tree, &obj);
 		CuAssert(tc, "AVL Get Fail", ans == NULL);
 		CuAssert(tc, "Failed AVL push", avl_ins(tree, &obj));
 		ans = avl_get(tree, &obj);
@@ -199,7 +199,7 @@ void test_avl_get(CuTest *tc)
 		int key = half_univ + ((i % 2) ? i : -i);
 		obj_t obj = {.key = key, .value = (double)key};
 		vec_push(buf, &obj);
-		obj_t *obj_ref = vec_get(buf, i);
+		obj_t *obj_ref = (obj_t *)vec_get(buf, i);
 		DEBUG("\n\nInsert non-owned obj %d\n", key);
 		CuAssert(tc, "AVL Get error", avl_get(tree, &obj_ref) == NULL);
 		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, obj_ref));
