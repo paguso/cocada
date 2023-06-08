@@ -319,7 +319,7 @@ void print_trace(FILE *);
  * @see FDEBUG_ASSERT
  */
 #define DEBUG_ASSERT(ASSERTION, FORMAT, ...) \
-	FDEBUG_ASSERT(ASSERTION, stederr, FORMAT, ##__VA_ARGS__)
+	FDEBUG_ASSERT(ASSERTION, stderr, FORMAT, ##__VA_ARGS__)
 
 
 /**
