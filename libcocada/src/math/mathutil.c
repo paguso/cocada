@@ -23,6 +23,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "arrays.h"
 #include "coretype.h"

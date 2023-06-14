@@ -446,14 +446,13 @@ void test_vec_cat(CuTest *tc)
 	CuAssertSizeTEquals(tc, 200, vec_len(v1));
 	CuAssertSizeTEquals(tc, 100, vec_len(v2));
 	for (size_t i=100; i<200; i++) {
-		vobj *o = vec_get(v2, i - 100);
+		const vobj *o = vec_get(v2, i - 100);
 		CuAssertIntEquals(tc, (int)i, o->i);
 		CuAssertDblEquals(tc, (double)i, o->d, 0.1);
 	}
 	DESTROY_FLAT(v2, vec);
 	for (size_t i=0; i<200; i++) {
-		vobj *o;
-		o = vec_get(v1, i);
+		const vobj *o = vec_get(v1, i);
 		CuAssertIntEquals(tc, (int)i, o->i);
 		CuAssertDblEquals(tc, (double)i, o->d, 0.1);
 	}
@@ -474,28 +473,36 @@ void test_vec_get_speed(CuTest *tc)
 	}
 	clock_t t = clock();
 	size_t nops = n;
+	int sum = 0;
 	for (size_t i = 0; i < nops; i++) {
 		int x = arr[i];
+		sum += x;
 	}
 	t = clock() - t;
 	DEBUG_EXEC(printf("sequential array time = %ld\n", t));
 	t = clock();
+	sum = 0;
 	for (size_t i = 0; i < nops; i++) {
 		int x = vec_get_int(v, i);
+		sum += x;
 	}
 	t = clock() - t;
 	DEBUG_EXEC(printf("sequential vec time = %ld\n", t));
 
 	nops = 10000000;
 	t = clock();
+	sum = 0;
 	for (size_t i = 0; i < nops; i++) {
 		int x = arr[rand_range_size_t(0, n)];
+		sum += x;
 	}
 	t = clock() - t;
 	DEBUG_EXEC(printf("random array time = %ld\n", t));
 	t = clock();
+	sum = 0;
 	for (size_t i = 0; i < nops; i++) {
 		int x = vec_get_int(v, rand_range_size_t(0, n));
+		sum += x;
 	}
 	t = clock() - t;
 	DEBUG_EXEC(printf("random vec time = %ld\n", t));
