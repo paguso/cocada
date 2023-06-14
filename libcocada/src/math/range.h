@@ -27,7 +27,7 @@
 #define RANGE_ARR_DECL(TYPE,...)\
 	typedef struct {\
 		size_t n;\
-		const TYPE *arr;\
+		TYPE *arr;\
 	} range_##TYPE;\
 	\
 	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);\
