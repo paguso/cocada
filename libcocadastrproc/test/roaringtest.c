@@ -30,6 +30,7 @@
 #include "bitbyte.h"
 #include "errlog.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "randutil.h"
 #include "memdbg.h"
 #include "new.h"

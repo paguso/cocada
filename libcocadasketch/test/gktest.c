@@ -28,6 +28,7 @@
 #include "order.h"
 #include "gk.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "randutil.h"
 
 static void print_int(FILE *stream, const void *val)

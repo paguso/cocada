@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "new.h"
+#include "memdbg.h"
 
 
 struct _finaliser {

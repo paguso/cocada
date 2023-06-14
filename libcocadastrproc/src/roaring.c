@@ -27,6 +27,7 @@
 #include "bitvec.h"
 #include "errlog.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "order.h"
 #include "roaring.h"

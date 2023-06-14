@@ -28,6 +28,7 @@
 #include "strbuf.h"
 #include "stack.h"
 #include "mathutil.h"
+#include "memdbg.h"
 
 
 const static size_t DEFAULT_CAP = 4;

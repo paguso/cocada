@@ -27,6 +27,7 @@
 #include "CuTest.h"
 #include "mathutil.h"
 #include "randutil.h"
+#include "memdbg.h"
 
 
 void test_rand_unif(CuTest *tc)

@@ -23,7 +23,9 @@
 
 #include "coretype.h"
 #include "errlog.h"
+#include "memdbg.h"
 #include "range.h"
+
 
 
 #define RANGE_ARR_IMPL(TYPE, ...)\

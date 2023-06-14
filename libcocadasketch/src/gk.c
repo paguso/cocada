@@ -25,7 +25,7 @@
 
 #include "errlog.h"
 #include "gk.h"
-//#include "memdbg.h"
+#include "memdbg.h"
 #include "new.h"
 #include "strbuf.h"
 #include "vec.h"

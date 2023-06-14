@@ -27,7 +27,6 @@
 
 #include "new.h"
 
-
 typedef struct _strbuf strbuf;
 
 /**

@@ -35,6 +35,7 @@
 #include "strbuf.h"
 #include "math.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "sais.h"
 #include "strstream.h"
 #include "wavtree.h"

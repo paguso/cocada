@@ -126,7 +126,7 @@ uint64_t fmalg_query(fmalg *fm)
 	for (size_t i = 0; i < fm->m; i++) {
 		fm->avgs[i] = pow_avg(fm->maxlsb[i], fm->n);
 	}
-	ARR_PRINT(fm->avgs, "FM estimates ", "%Lf", 0, fm->m, fm->m );
+	ARR_PRINT(fm->avgs, "FM estimates ", "%Lf", 0, fm->m, fm->m , "");
 	long double med =  median_ldouble(fm->avgs, fm->m, true);
 	//ARR_PRINT(fm->avgs, "FM estimates after ", "%Lf", 0, fm->m, fm->m );
 	return med;
