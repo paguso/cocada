@@ -25,6 +25,7 @@
 
 #include "trait.h"
 #include "xstr.h"
+#include "xstrread.h"
 
 typedef struct _xstrreader xstrreader;
 

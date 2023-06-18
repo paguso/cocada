@@ -63,7 +63,10 @@ size_t  _xstr_read(xstrread *t, xstr *dest, size_t n)
 	xstrreader *rdr = (xstrreader *) t->impltor;
 	xstr *src = (xstr *) rdr->src;
 	size_t r = MIN(n, xstr_len(src) - rdr->index);
-	xstr_ncpy(dest, 0, src, rdr->index, r);
+	if (dest != NULL) {
+		xstr_ncpy(dest, 0, src, rdr->index, r);
+	}
+	rdr->index += r;
 	return r;
 }
 
@@ -75,7 +78,9 @@ size_t  _xstr_read_until(xstrread *t, xstr *dest, xchar_t delim)
 	size_t i;
 	for (i = rdr->index; i < xstr_len(src) && xstr_get(src, i) != delim; i++);
 	size_t r = i - rdr->index;
-	xstr_ncpy(src, 0, dest, rdr->index, r);
+	if (dest != NULL) {
+		xstr_ncpy(src, 0, dest, rdr->index, r);
+	}
 	rdr->index = i;
 	return r;
 }

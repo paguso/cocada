@@ -62,7 +62,9 @@ xchar_wt xstrread_getc(xstrread *trait);
 /**
  * @brief Attempts to read the next @p n chars into the xstring *dest.
  *        Less than @p n characters can be read if the stream reaches its end.
- * @returns The number of chars actually read.
+ * @param dest The destination xstring. If @p dest is NULL, the data are read from the reader and then ignored.
+ * @param n The number of chars to attempt reading.
+ * @returns The number of chars actually read (and possibly discarded if @p dest is NULL).
  */
 size_t xstrread_read(xstrread *trait, xstr *dest, size_t n);
 
@@ -71,6 +73,8 @@ size_t xstrread_read(xstrread *trait, xstr *dest, size_t n);
  * @brief Reads characters from the reader into the xstring @p dest until a
  *        delimiter xchar_t @p delim is found. This delimiter xchar is not
  *        consumed.
+ * @param dest The destination xstring. If @p dest is NULL, the data are read from the reader and then ignored.
+ * @param n The number of chars to attempt reading.
  * @returns The number of chars actually read (excluding the delimiter).
  */
 size_t xstrread_read_until(xstrread *trait, xstr *dest, xchar_t delim);
