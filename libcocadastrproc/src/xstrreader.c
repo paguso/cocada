@@ -22,9 +22,9 @@
 #include <stddef.h>
 #include <string.h>
 
-
 #include "mathutil.h"
 #include "new.h"
+#include "strread.h"
 #include "trait.h"
 #include "xchar.h"
 #include "xstr.h"
@@ -93,6 +93,18 @@ static xstrread_vt _xstr_vt = { .reset = _xstr_reset,
                               };
 
 
+xstrreader *xstrreader_open(xstr *src)
+{
+	xstrreader *ret = NEW(xstrreader);
+	ret->_t_xstrread.impltor = ret;
+	ret->_t_xstrread.vt = &_xstr_vt;
+	ret->src = src;
+	ret->index = 0;
+	return ret;
+}
+
+
+
 
 
 static xchar_wt _str_getc(xstrread *t)
@@ -149,16 +161,6 @@ static xstrread_vt _str_vt = { .reset = _xstr_reset,
                              };
 
 
-xstrreader *xstrreader_open(xstr *src)
-{
-	xstrreader *ret = NEW(xstrreader);
-	ret->_t_xstrread.impltor = ret;
-	ret->_t_xstrread.vt = &_xstr_vt;
-	ret->src = src;
-	ret->index = 0;
-	return ret;
-}
-
 
 xstrreader *xstrreader_open_str(char *src, size_t len)
 {
@@ -168,6 +170,98 @@ xstrreader *xstrreader_open_str(char *src, size_t len)
 	ret->src = src;
 	ret->len = strlen(src);
 	ret->index = 0;
+	return ret;
+}
+
+
+static void _strread_reset(xstrread *t)
+{
+	xstrreader *rdr = (xstrreader *) t->impltor;
+	strread *sr = (strread *) rdr->src;
+	strread_reset(sr);
+}
+
+static xchar_wt _strread_getc(xstrread *t)
+{
+	xstrreader *rdr = (xstrreader *) t->impltor;
+	strread *sr = (strread *) rdr->src;
+	return strread_getc(sr);
+}
+
+
+size_t  _strread_read(xstrread *t, xstr *dest, size_t n)
+{
+	xstrreader *rdr = (xstrreader *) t->impltor;
+	strread *sr = (strread *) rdr->src;
+	size_t r = 0;
+	if (dest != NULL) {
+		int c = strread_getc(sr); 
+		while(c != EOF && r < n && r < xstr_len(dest)) {
+			xstr_set(dest, r, c);
+			r++;
+			c = strread_getc(sr);
+		}
+		while(c != EOF && r < n) {
+			xstr_push(dest, c);
+			r++;
+			c = strread_getc(sr);
+		}
+	} else {
+		int c = strread_getc(sr); 
+		while(c != EOF && r < n) {
+			r++;
+			c = strread_getc(sr);
+		}
+	}
+	return r;
+}
+
+size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
+{
+	xstrreader *rdr = (xstrreader *) t->impltor;
+	strread *sr = (strread *) rdr->src;
+	size_t r = 0;
+	if (dest != NULL) {
+		int c = strread_getc(sr); 
+		while(c != EOF && c != delim && r < xstr_len(dest)) {
+			xstr_set(dest, r, c);
+			r++;
+			c = strread_getc(sr);
+		}
+		while(c != EOF && c != delim) {
+			xstr_push(dest, c);
+			r++;
+			c = strread_getc(sr);
+		}
+		if (c == delim) {
+			strread_ungetc(sr, c);
+		}
+	} else {	
+		int c = strread_getc(sr); 
+		while(c != EOF && c != delim) {
+			r++;
+			c = strread_getc(sr);
+		}
+	}
+	return r;
+}
+
+
+static xstrread_vt _strread_vt = { .reset = _strread_reset,
+                               .getch = _strread_getc,
+                               .read = _strread_read,
+                               .read_until = _strread_read_until
+                             };
+
+
+xstrreader *xstrreader_open_strread(strread *src)
+{
+	xstrreader *ret = NEW(xstrreader);
+	ret->_t_xstrread.impltor = ret;
+	ret->_t_xstrread.vt = &_strread_vt;
+	ret->src = src;
+	ret->index = 0;
+	ret->len = 0;
 	return ret;
 }
 
