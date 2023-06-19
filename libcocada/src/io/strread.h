@@ -46,6 +46,7 @@ typedef struct _strread strread;
 typedef struct {
 	void    (*reset) (strread *self);
 	int		(*getc) (strread *self);
+	int		(*ungetc) (strread *self);
 	size_t  (*read_str) (strread *self, char *dest, size_t n);
 	size_t  (*read_str_until) (strread *self, char *dest, char delim);
 }  strread_vt;
@@ -64,7 +65,7 @@ strread_vt strread_vt_new();
  * @brief Resets the reader, that is moves cursor to initial position,
  * if supported by the underlying stream.
  */
-void strread_reset(strread *trait);
+void strread_reset(strread *self);
 
 
 /**
@@ -73,7 +74,22 @@ void strread_reset(strread *trait);
  *          reached its end.
  *
  */
-int strread_getc(strread *trait);
+int strread_getc(strread *self);
+
+
+/**
+ * @brief Attempts to put back the last char read into the stream to
+ * be read by subsequent read operations.
+ * If the base stream implementing the trait does not support this operation 
+ * or if no char has been read from the stream, the function returns 0.
+ * Otherwise, it returns 1
+ * 
+ * @returns int 0 if the operation is not supported or no char has been read,
+ * 		   1 otherwise. 
+ * @warning Only one char can be put back into the stream. Once a char is put back,
+ * a subsequent call to this function will return 0.
+ */
+int strread_ungetc(strread *self);
 
 
 /**
@@ -81,7 +97,7 @@ int strread_getc(strread *trait);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strread_read_str(strread *trait, char *dest, size_t n);
+size_t strread_read_str(strread *self, char *dest, size_t n);
 
 
 /**
@@ -90,7 +106,7 @@ size_t strread_read_str(strread *trait, char *dest, size_t n);
  * 		  or the end of the stream is reached.
  * @returns The number of chars actually read.
  */
-size_t strread_read_str_until(strread *trait, char *dest, char delim);
+size_t strread_read_str_until(strread *self, char *dest, char delim);
 
 
 

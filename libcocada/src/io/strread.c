@@ -36,27 +36,33 @@ strread_vt strread_vt_new()
 }
 
 
-void strread_reset(strread *trait)
+void strread_reset(strread *self)
 {
-	trait->vt->reset(trait);
+	self->vt->reset(self);
 }
 
 
-int strread_getc(strread *trait)
+int strread_getc(strread *self)
 {
-	return trait->vt->getc(trait);
+	return self->vt->getc(self);
 }
 
 
-size_t strread_read_str(strread *trait, char *dest, size_t n)
+int strread_ungetc(strread *self)
 {
-	return trait->vt->read_str(trait, dest, n);
+	return self->vt->ungetc(self);
 }
 
 
-size_t strread_read_str_until(strread *trait, char *dest, char delim)
+size_t strread_read_str(strread *self, char *dest, size_t n)
 {
-	return trait->vt->read_str_until(trait, dest, delim);
+	return self->vt->read_str(self, dest, n);
+}
+
+
+size_t strread_read_str_until(strread *self, char *dest, char delim)
+{
+	return self->vt->read_str_until(self, dest, delim);
 }
 
 
