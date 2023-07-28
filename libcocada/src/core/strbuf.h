@@ -65,6 +65,7 @@ void strbuf_free(strbuf *self);
  * @brief Creates a new string buffer from a source static string @src.
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
+ * @param src The source string **NO TRANSFER OF OWNERSHIP**.
  */
 strbuf *strbuf_new_from_str(const char *src, size_t len);
 
@@ -165,6 +166,11 @@ void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest);
  */
 void strbuf_paste(strbuf *self, size_t from, const char *src, size_t len);
 
+
+/**
+ * @brief Clips the contents of the stringbuffer.
+ */
+void strbuf_clip(strbuf *self, size_t from, size_t to);
 
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p self,

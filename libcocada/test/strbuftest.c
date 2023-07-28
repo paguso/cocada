@@ -176,6 +176,24 @@ void test_strbuf_paste(CuTest *tc)
 }
 
 
+void test_strbuf_clip(CuTest *tc)
+{
+	memdbg_reset();
+	char *str = "The quick brown fox jumps over the lazy dog.";
+	strbuf *sb = strbuf_new_from_str(str, 44);
+	strbuf_clip(sb, 0, strbuf_len(sb));
+	CuAssertSizeTEquals(tc, 44, strbuf_len(sb));
+	CuAssertStrEquals(tc, strbuf_as_str(sb), str);
+	strbuf_clip(sb, 4, strbuf_len(sb));
+	CuAssertSizeTEquals(tc, 40, strbuf_len(sb));
+	CuAssertStrEquals(tc, strbuf_as_str(sb), str+4);
+	strbuf_clip(sb, 6, 15);
+	CuAssertSizeTEquals(tc, 9, strbuf_len(sb));
+	CuAssertStrEquals(tc, "brown fox", strbuf_as_str(sb));
+	DESTROY_FLAT(sb, strbuf);
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
 void test_strbuf_find_n(CuTest *tc)
 {
 	memdbg_reset();
@@ -340,6 +358,7 @@ CuSuite *strbuf_get_test_suite()
 	SUITE_ADD_TEST(suite, test_strbuf_insert);
 	SUITE_ADD_TEST(suite, test_strbuf_cut);
 	SUITE_ADD_TEST(suite, test_strbuf_paste);
+	SUITE_ADD_TEST(suite, test_strbuf_clip);
 	SUITE_ADD_TEST(suite, test_strbuf_find_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace);
