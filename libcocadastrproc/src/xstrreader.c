@@ -22,6 +22,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "cstrutil.h"
 #include "mathutil.h"
 #include "new.h"
 #include "strread.h"
@@ -105,8 +106,6 @@ xstrreader *xstrreader_open(xstr *src)
 
 
 
-
-
 static xchar_wt _str_getc(xstrread *t)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
@@ -185,7 +184,7 @@ static xchar_wt _strread_getc(xstrread *t)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
 	strread *sr = (strread *) rdr->src;
-	return strread_getc(sr);
+	return (xchar_wt) strread_getc(sr);
 }
 
 
@@ -193,26 +192,13 @@ size_t  _strread_read(xstrread *t, xstr *dest, size_t n)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
 	strread *sr = (strread *) rdr->src;
-	size_t r = 0;
+	char *s = cstr_new(n);
+	size_t r = strread_read_str(sr, s, n);
+	xstr *xs = xstr_new_from_arr(s, r, sizeof(char));
 	if (dest != NULL) {
-		int c = strread_getc(sr); 
-		while(c != EOF && r < n && r < xstr_len(dest)) {
-			xstr_set(dest, r, c);
-			r++;
-			c = strread_getc(sr);
-		}
-		while(c != EOF && r < n) {
-			xstr_push(dest, c);
-			r++;
-			c = strread_getc(sr);
-		}
-	} else {
-		int c = strread_getc(sr); 
-		while(c != EOF && r < n) {
-			r++;
-			c = strread_getc(sr);
-		}
+		xstr_ncpy(dest, 0, xs, 0, r);
 	}
+	xstr_free(xs);
 	return r;
 }
 
@@ -234,7 +220,7 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 			c = strread_getc(sr);
 		}
 		if (c == delim) {
-			strread_ungetc(sr, c);
+			strread_ungetc(sr);
 		}
 	} else {	
 		int c = strread_getc(sr); 
