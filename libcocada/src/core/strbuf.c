@@ -256,7 +256,7 @@ void strbuf_clip(strbuf *self, size_t from, size_t to)
 	assert(from <= to && to <= self->len);
 	memmove(self->str, self->str + from, to - from);
 	self->len = to - from;
-	self->str[self->len] = '\0';	
+	self->str[self->len] = '\0';
 }
 
 

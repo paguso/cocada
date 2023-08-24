@@ -80,12 +80,12 @@ int strread_getc(strread *self);
 /**
  * @brief Attempts to put back the last char read into the stream to
  * be read by subsequent read operations.
- * If the base stream implementing the trait does not support this operation 
+ * If the base stream implementing the trait does not support this operation
  * or if no char has been read from the stream, the function returns 0.
  * Otherwise, it returns 1
- * 
+ *
  * @returns int 0 if the operation is not supported or no char has been read,
- * 		   1 otherwise. 
+ * 		   1 otherwise.
  * @warning Only one char can be put back into the stream. Once a char is put back,
  * a subsequent call to this function will return 0.
  */

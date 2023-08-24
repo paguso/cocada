@@ -374,8 +374,9 @@ void *memdbg_realloc(void *ptr, size_t size, char *file, int line)
 void memdbg_free(void *ptr, char *file, int line)
 {
 	memdbg_query_t q = memtable_get(&tally, ptr);
-	ERROR_ASSERT(q.active == true, "ERROR: invalid or double free detected @%p [%s:%d]\n",
-		        ptr, file, line);
+	ERROR_ASSERT(q.active == true,
+	             "ERROR: invalid or double free detected @%p [%s:%d]\n",
+	             ptr, file, line);
 	free(ptr);
 #ifdef MEM_DEBUG_PRINT_ALL
 	hr_t hrsize = human_readable(tally.total);

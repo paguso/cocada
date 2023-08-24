@@ -33,7 +33,7 @@
 	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);\
 	size_t range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step);\
 	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);
-	
+
 
 XX_INTS(RANGE_ARR_DECL)
 
