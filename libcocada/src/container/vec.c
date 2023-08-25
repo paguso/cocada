@@ -311,6 +311,15 @@ void vec_clip(vec *v, size_t from, size_t to)
 }
 
 
+void vec_reverse(vec *v) 
+{
+	size_t l = 0, r = v->len - 1;
+	while (l < r) {
+		vec_swap(v, l++, r--);
+	}
+}
+
+
 void vec_rotate_left(vec *v, size_t npos)
 {
 	if (v->len == 0 || npos % v->len == 0) return;

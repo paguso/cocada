@@ -96,7 +96,7 @@ void print_trace(FILE *);
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define FERROR(STREAM, FORMAT, ...)\
-	fprintf(STREAM,  "Error: "FORMAT, ##__VA_ARGS__ ); \
+	fprintf(STREAM,  "Error: " FORMAT, ##__VA_ARGS__ ); \
 	exit(EXIT_FAILURE);
 
 
@@ -202,7 +202,7 @@ void print_trace(FILE *);
  */
 #define FWARN_IF(CONDITION, STREAM, FORMAT, ...) \
 	if ( CONDITION ) { \
-		fprintf(STREAM,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
+		fprintf(STREAM,  "Warning: " FORMAT, ##__VA_ARGS__ ); \
 	}
 
 
@@ -227,7 +227,7 @@ void print_trace(FILE *);
  */
 #define FWARN_ASSERT(ASSERTION, STREAM, FORMAT, ...) \
 	if ( !(ASSERTION) ) { \
-		fprintf(STREAM,  "Warning: "FORMAT, ##__VA_ARGS__ ); \
+		fprintf(STREAM,  "Warning: " FORMAT, ##__VA_ARGS__ ); \
 	}
 
 
@@ -262,7 +262,7 @@ void print_trace(FILE *);
  * by the variable list of arguments as in `printf`-like functions.
  */
 #define FDEBUG(STREAM, FORMAT, ...) \
-	fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );
+	fprintf(STREAM,  "Debug: " FORMAT, ##__VA_ARGS__ );
 
 
 /**
@@ -285,7 +285,7 @@ void print_trace(FILE *);
  */
 #define FDEBUG_IF(CONDITION, STREAM, FORMAT, ...) \
 	if ( CONDITION ) { \
-		fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+		fprintf(STREAM,  "Debug: " FORMAT, ##__VA_ARGS__ );\
 	}
 
 
@@ -310,7 +310,7 @@ void print_trace(FILE *);
  */
 #define FDEBUG_ASSERT(ASSERTION, STREAM, FORMAT, ...) \
 	if ( !(ASSERTION) ) { \
-		fprintf(STREAM,  "Debug: "FORMAT, ##__VA_ARGS__ );\
+		fprintf(STREAM,  "Debug: " FORMAT, ##__VA_ARGS__ );\
 	}
 
 

@@ -279,6 +279,12 @@ void vec_clip(vec *v, size_t from, size_t to);
 
 
 /**
+ * @brief Reverses the array contents in place.
+ */
+void vec_reverse(vec *v);
+
+
+/**
  * @brief Rotates the vector contents @p npos positions to the left.
  *        If @p v has length `n`, then @p v[@p npos + i % n] becomes @p v[i],
  *        for i=0..n-1. If @p npos > `n`, this is the same as rotating
@@ -293,7 +299,6 @@ void vec_rotate_left(vec *v, size_t npos);
  * @see vec_rotate_left
  */
 void vec_rotate_right(vec *v, size_t npos);
-
 
 
 /**
@@ -315,6 +320,7 @@ size_t vec_find(const vec *v, const void *val, eq_func eq);
  * to the @p cmp order.
  */
 size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp);
+
 
 /**
  * @brief Returns the position of the minimum element according to

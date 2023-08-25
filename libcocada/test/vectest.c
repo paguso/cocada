@@ -205,6 +205,32 @@ void test_vec_swap(CuTest *tc)
 }
 
 
+void test_vec_reverse(CuTest *tc)
+{
+	memdbg_reset();
+	size_t len = 100;
+	vec *v = vec_new(sizeof(double *));
+	CuAssertSizeTEquals(tc, 0, vec_len(v));
+
+	for (size_t i=0; i<len; i++) {
+		double d = i;
+		vec_push(v, &d);
+	}
+	vec_reverse(v);
+
+	for (size_t i =0; i<vec_len(v); i++) {
+		const double *d;
+		d = vec_get(v, i);
+		//printf("get da[%zu]=%f\n",i,*d);
+		CuAssertDblEquals(tc, (double)(len-1-i), *d, 0.2);
+	}
+
+	DESTROY_FLAT(v, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+
 void test_vec_iter(CuTest *tc)
 {
 	memdbg_reset();
@@ -524,6 +550,7 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_ins);
 	SUITE_ADD_TEST(suite, test_vec_del);
 	SUITE_ADD_TEST(suite, test_vec_swap);
+	SUITE_ADD_TEST(suite, test_vec_reverse);
 	SUITE_ADD_TEST(suite, test_vec_iter);
 	SUITE_ADD_TEST(suite, test_vec_radixsort);
 	SUITE_ADD_TEST(suite, test_vec_qsort);
