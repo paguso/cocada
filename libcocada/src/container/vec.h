@@ -21,6 +21,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include "arrays.h"
 #include "coretype.h"
 #include "iter.h"
 #include "new.h"
@@ -461,6 +462,5 @@ vec_iter *vec_get_iter(const vec *self);
 
 
 DECL_TRAIT(vec_iter, iter)
-
 
 #endif

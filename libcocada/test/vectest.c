@@ -538,6 +538,21 @@ void test_vec_get_speed(CuTest *tc)
 }
 
 
+void test_vec_arr_of_from_vec(CuTest *tc) {
+	memdbg_reset();
+	size_t n = 100;
+	vec *v = vec_new_int();
+	for (size_t i=0; i<n; i++) {
+		vec_push_int(v, i);
+	}
+	arr_of_int A = ARR_OF_FROM_ARR(int, vec_len(v), vec_detach(v));
+	for (size_t i=0; i<n; i++) {
+		CuAssertIntEquals(tc, (int)i, A.arr[i]);
+	}
+	FREE(A.arr);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
 CuSuite *vec_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
@@ -556,6 +571,7 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_qsort);
 	SUITE_ADD_TEST(suite, test_vec_free);
 	SUITE_ADD_TEST(suite, test_vec_flat_free);
+	SUITE_ADD_TEST(suite, test_vec_arr_of_from_vec);
 	//SUITE_ADD_TEST(suite, test_vec_get_speed);
 	return suite;
 }

@@ -168,15 +168,6 @@ XX_CORETYPES(SA_ARR_DECL)
 		(DEST)[_fd+_i]=(SRC)[_fs+_i]
 
 
-
-#define OLD_ARR_PRINT( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
-	{ printf("%s"#NAME"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
-		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
-			if(!((__i-FROM)%__el)) printf("\n%s%4zu: ",LEFT_MARGIN, __i);\
-			printf(#FORMAT" " , ARR[__i]);}\
-		printf("\n");}
-
-
 /**
  * @brief Prints the array @p ARR from position @p FROM to position @p TO-1
  *        using @p NAME as label, displaying @pELTSPERLINE elements per line,
@@ -192,7 +183,7 @@ XX_CORETYPES(SA_ARR_DECL)
 
 
 /**
- * @brief Prints the array ARR from positio FROM to position TO-1
+ * @brief Prints the array ARR from position FROM to position TO-1
  *        using NAME as label, displaying ELTSPERLINE elements per line,
  *        and using the printf format string FORMAT.
  *        LEFT_MARGIN is a string that is printed at the beginning of each line.
@@ -223,5 +214,28 @@ XX_CORETYPES(SA_ARR_DECL)
 			ID[__i][__j] = (EXPR);\
 
 
+/**
+ * @brief Declares a typed array with elements of a given TYPE 
+ * called arr_of_TYPE (e.g. arr_of_int, arr_of_size_t, etc). 
+ * Typed arrays encapsulate the array and its length in a struct. 
+ * This is convenient because we can pass and receive the array and 
+ * its length to and from functions as a single argument. Differently
+ * from vectors and other generic arrays, the type of the elements
+ * makes it more convenient to use the array directly, without the 
+ * need for casts and other type conversions.
+ */
+#define DECL_ARR_OF(TYPE, ...)\
+typedef struct {\
+	TYPE *arr;\
+	size_t len;\
+}arr_of_##TYPE;\
+
+XX_CORETYPES(DECL_ARR_OF)
+
+#define ARR_OF_NEW(TYPE, LEN) ((arr_of_##TYPE){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
+
+#define ARR_OF_FROM_ARR(TYPE, LEN, SRC) ((arr_of_##TYPE){.len=(LEN), .arr=(SRC)})
+
+#define FREE_ARR_OF(ARR) free((ARR).arr)
 
 #endif
