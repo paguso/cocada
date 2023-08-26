@@ -73,7 +73,7 @@ size_t part(byte_t *arr, size_t typesize, cmp_func cmp, size_t l, size_t r)
 	return (j - arr)/typesize;
 }
 
-static void qs(void *arr, size_t typesize, cmp_func *cmp, size_t l, size_t r)
+static void qs(void *arr, size_t typesize, cmp_func cmp, size_t l, size_t r)
 {
 	if (r <= l + 1)
 		return;
@@ -82,7 +82,7 @@ static void qs(void *arr, size_t typesize, cmp_func *cmp, size_t l, size_t r)
 	qs(arr, typesize, cmp, p + 1, r);
 }
 
-void quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp)
+void quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp)
 {
 	qs(arr, typesize, cmp, 0, n);
 }
@@ -130,7 +130,7 @@ size_t idx_part(size_t *idx, byte_t *arr, size_t arr_tsz, cmp_func cmp,
 	return j;
 }
 
-void idx_qs(size_t *idx, byte_t *arr, size_t arr_tsz, cmp_func *cmp, size_t l,
+void idx_qs(size_t *idx, byte_t *arr, size_t arr_tsz, cmp_func cmp, size_t l,
             size_t r)
 {
 	if (r <= l + 1)
@@ -140,7 +140,8 @@ void idx_qs(size_t *idx, byte_t *arr, size_t arr_tsz, cmp_func *cmp, size_t l,
 	idx_qs(idx, arr, arr_tsz, cmp, p + 1, r);
 }
 
-size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp)
+
+size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp)
 {
 	size_t *idx = range_arr_new_size_t(0, n, 1).arr;
 	idx_qs(idx, arr, typesize, cmp, 0, n);

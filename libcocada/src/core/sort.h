@@ -33,7 +33,7 @@
  * @param typesize The size of each element in the array.
  * @param cmp The comparison function.
  */
-void quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp);
+void quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp);
 
 
 /**
@@ -45,7 +45,7 @@ void quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp);
  * @param cmp The comparison function.
  * @return The array `I=(I[0]...I[n-1])` of sorted indexes of the original array s.t. for all `0 <= q < n`, `arr[I[q]] <= arr[I[q+1]]` according to @p cmp.
  */
-size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp);
+size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp);
 
 
 /**
