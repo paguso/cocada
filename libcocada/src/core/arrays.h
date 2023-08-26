@@ -215,20 +215,20 @@ XX_CORETYPES(SA_ARR_DECL)
 
 
 /**
- * @brief Declares a typed array with elements of a given TYPE 
- * called arr_of_TYPE (e.g. arr_of_int, arr_of_size_t, etc). 
- * Typed arrays encapsulate the array and its length in a struct. 
- * This is convenient because we can pass and receive the array and 
+ * @brief Declares a typed array with elements of a given TYPE
+ * called arr_of_TYPE (e.g. arr_of_int, arr_of_size_t, etc).
+ * Typed arrays encapsulate the array and its length in a struct.
+ * This is convenient because we can pass and receive the array and
  * its length to and from functions as a single argument. Differently
  * from vectors and other generic arrays, the type of the elements
- * makes it more convenient to use the array directly, without the 
+ * makes it more convenient to use the array directly, without the
  * need for casts and other type conversions.
  */
 #define DECL_ARR_OF(TYPE, ...)\
-typedef struct {\
-	TYPE *arr;\
-	size_t len;\
-}arr_of_##TYPE;\
+	typedef struct {\
+		TYPE *arr;\
+		size_t len;\
+	}arr_of_##TYPE;\
 
 XX_CORETYPES(DECL_ARR_OF)
 

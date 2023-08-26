@@ -538,7 +538,8 @@ void test_vec_get_speed(CuTest *tc)
 }
 
 
-void test_vec_arr_of_from_vec(CuTest *tc) {
+void test_vec_arr_of_from_vec(CuTest *tc)
+{
 	memdbg_reset();
 	size_t n = 100;
 	vec *v = vec_new_int();

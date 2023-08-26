@@ -148,92 +148,108 @@ size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp)
 }
 
 
-size_t succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val)
+size_t succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+            void *val)
 {
-    if (cmp(ELT(sorted_arr, n - 1, typesize), val) < 0) {
-        return n;
-    } else if (cmp(ELT(sorted_arr, 0, typesize), val) >= 0) {
-        return 0;
-    } else {
-        size_t l = 0;
-        size_t r = n - 1;
-        size_t m;
-        while ( r - l > 1) { // sucessor in (l,r]
-            m = (l + r) / 2;
-            if (cmp(ELT(sorted_arr, m, typesize), val) >= 0) {
-                r = m;
-            } else {
-                l = m;
-            }
-        }
-        return r;
-    }
+	if (cmp(ELT(sorted_arr, n - 1, typesize), val) < 0) {
+		return n;
+	}
+	else if (cmp(ELT(sorted_arr, 0, typesize), val) >= 0) {
+		return 0;
+	}
+	else {
+		size_t l = 0;
+		size_t r = n - 1;
+		size_t m;
+		while ( r - l > 1) { // sucessor in (l,r]
+			m = (l + r) / 2;
+			if (cmp(ELT(sorted_arr, m, typesize), val) >= 0) {
+				r = m;
+			}
+			else {
+				l = m;
+			}
+		}
+		return r;
+	}
 }
 
-size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val)
+size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+                   void *val)
 {
-    if (cmp(ELT(sorted_arr, n - 1, typesize), val) <= 0) {
-        return n;
-    } else if (cmp(ELT(sorted_arr, 0, typesize), val) > 0) {
-        return 0;
-    } else {
-        size_t l = 0;
-        size_t r = n - 1;
-        size_t m;
-        while ( r - l > 1) { // sucessor in (l,r]
-            m = (l + r) / 2;
-            if (cmp(ELT(sorted_arr, m, typesize), val) > 0) {
-                r = m;
-            } else {
-                l = m;
-            }
-        }
-        return r;
-    }
-}
-
-
-size_t pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val)
-{
-    if (cmp(ELT(sorted_arr, n - 1, typesize), val) <= 0) {
-        return n - 1;
-    } else if (cmp(ELT(sorted_arr, 0, typesize), val) > 0) {
-        return n;
-    } else {
-        size_t l = 0;
-        size_t r = n - 1;
-        size_t m;
-        while ( r - l > 1) { // predecessor in [l, r)
-            m = (l + r) / 2;
-            if (cmp(ELT(sorted_arr, m, typesize), val) > 0) {
-                r = m;
-            } else {
-                l = m;
-            }
-        }
-        return l;
-    }
+	if (cmp(ELT(sorted_arr, n - 1, typesize), val) <= 0) {
+		return n;
+	}
+	else if (cmp(ELT(sorted_arr, 0, typesize), val) > 0) {
+		return 0;
+	}
+	else {
+		size_t l = 0;
+		size_t r = n - 1;
+		size_t m;
+		while ( r - l > 1) { // sucessor in (l,r]
+			m = (l + r) / 2;
+			if (cmp(ELT(sorted_arr, m, typesize), val) > 0) {
+				r = m;
+			}
+			else {
+				l = m;
+			}
+		}
+		return r;
+	}
 }
 
 
-size_t strict_pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val)
+size_t pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+            void *val)
 {
-    if (cmp(ELT(sorted_arr, n - 1, typesize), val) < 0) {
-        return n - 1;
-    } else if (cmp(ELT(sorted_arr, 0, typesize), val) >= 0) {
-        return n;
-    } else {
-        size_t l = 0;
-        size_t r = n - 1;
-        size_t m;
-        while ( r - l > 1) { // predecessor in [l, r)
-            m = (l + r) / 2;
-            if (cmp(ELT(sorted_arr, m, typesize), val) >= 0) {
-                r = m;
-            } else {
-                l = m;
-            }
-        }
-        return l;
-    }
+	if (cmp(ELT(sorted_arr, n - 1, typesize), val) <= 0) {
+		return n - 1;
+	}
+	else if (cmp(ELT(sorted_arr, 0, typesize), val) > 0) {
+		return n;
+	}
+	else {
+		size_t l = 0;
+		size_t r = n - 1;
+		size_t m;
+		while ( r - l > 1) { // predecessor in [l, r)
+			m = (l + r) / 2;
+			if (cmp(ELT(sorted_arr, m, typesize), val) > 0) {
+				r = m;
+			}
+			else {
+				l = m;
+			}
+		}
+		return l;
+	}
+}
+
+
+size_t strict_pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+                   void *val)
+{
+	if (cmp(ELT(sorted_arr, n - 1, typesize), val) < 0) {
+		return n - 1;
+	}
+	else if (cmp(ELT(sorted_arr, 0, typesize), val) >= 0) {
+		return n;
+	}
+	else {
+		size_t l = 0;
+		size_t r = n - 1;
+		size_t m;
+		while ( r - l > 1) { // predecessor in [l, r)
+			m = (l + r) / 2;
+			if (cmp(ELT(sorted_arr, m, typesize), val) >= 0) {
+				r = m;
+			}
+			else {
+				l = m;
+			}
+		}
+		return l;
+	}
 }

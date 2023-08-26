@@ -27,7 +27,7 @@
 
 /**
  * @brief Sort an array in place using Quicksort.
- * 
+ *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.
  * @param typesize The size of each element in the array.
@@ -38,7 +38,7 @@ void quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp);
 
 /**
  * @brief Sort the indexes of an array via Quicksort.
- * 
+ *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.
  * @param typesize The size of each element in the array.
@@ -50,33 +50,35 @@ size_t *index_quicksort(void *arr, size_t n, size_t typesize, cmp_func *cmp);
 
 /**
  * @brief Finds the index of the first element in a sorted array that is greater or equal to a given value.
- * 
+ *
  * @param sorted_arr The sorted array
  * @param n The number of elements in the array
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the first element in the array that is greater or equal to @p val. 
+ * @return size_t The index of the first element in the array that is greater or equal to @p val.
  */
-size_t succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val);
+size_t succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+            void *val);
 
 
 /**
  * @brief Finds the index of the first element in a sorted array that is strictly greater than a given value.
- * 
+ *
  * @param sorted_arr The sorted array
  * @param n The number of elements in the array
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the first element in the array that is strictly greater than @p val. 
+ * @return size_t The index of the first element in the array that is strictly greater than @p val.
  */
-size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val);
+size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+                   void *val);
 
 
 /**
  * @brief Finds the index of the last element in a sorted array that is strictly smaller than a given value.
- * 
+ *
  * @param sorted_arr The sorted array
  * @param n The number of elements in the array
  * @param typesize The size of each element in the array in bytes
@@ -84,6 +86,7 @@ size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, vo
  * @param val The value to be compared
  * @return size_t The index of the last element in the array that is strictly smaller than @p val.
  */
-size_t strict_pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val);
+size_t strict_pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+                   void *val);
 
 #endif

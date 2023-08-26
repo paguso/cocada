@@ -311,7 +311,7 @@ void vec_clip(vec *v, size_t from, size_t to)
 }
 
 
-void vec_reverse(vec *v) 
+void vec_reverse(vec *v)
 {
 	size_t l = 0, r = v->len - 1;
 	while (l < r) {
