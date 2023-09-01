@@ -228,13 +228,13 @@ XX_CORETYPES(SA_ARR_DECL)
 typedef struct {\
 	TYPE *arr;\
 	size_t len;\
-}arr_of_##TYPE;\
+} arr_of_##TYPE;
 
 XX_CORETYPES(DECL_ARR_OF)
 
 #define ARR_OF_NEW(TYPE, LEN) ((arr_of_##TYPE){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
 
-#define ARR_OF_FROM_ARR(TYPE, LEN, SRC) ((arr_of_##TYPE){.len=(LEN), .arr=(SRC)})
+#define ARR_OF_FROM_ARR(TYPE, LEN, SRC) ((arr_of_##TYPE){.len=(LEN), .arr=((TYPE*)(SRC))})
 
 #define FREE_ARR_OF(ARR) free((ARR).arr)
 
