@@ -25,6 +25,7 @@
 #include "CuTest.h"
 
 
+CuSuite *align_get_test_suite();
 CuSuite *fasta_get_test_suite();
 
 
@@ -33,7 +34,8 @@ void run_all_tests(void)
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
 
-	CuSuiteAddSuite(suite, fasta_get_test_suite());
+	CuSuiteAddSuite(suite, align_get_test_suite());
+	//CuSuiteAddSuite(suite, fasta_get_test_suite());
 	
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);

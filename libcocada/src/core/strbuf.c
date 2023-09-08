@@ -323,13 +323,13 @@ size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos,
 }
 
 
-size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
                         size_t n, size_t from)
 {
 	if (from > self->len) return 0;
-	size_t patlen = strlen(old);
-	size_t repllen = strlen(new);
-	fsm *matcher = build_fsm(old, patlen);
+	size_t patlen = strlen(old_str);
+	size_t repllen = strlen(new_str);
+	fsm *matcher = build_fsm(old_str, patlen);
 	stack *occ = stack_new(sizeof(size_t));
 	uint occ_count = 0;
 	if (patlen == 0 && occ_count < n ) {
@@ -347,15 +347,15 @@ size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
 	while (!stack_empty(occ)) {
 		size_t pos = stack_pop_size_t(occ);
 		if (repllen > patlen) {
-			strbuf_paste(self, pos, new, patlen);
-			strbuf_ins(self, pos + patlen, new + patlen, repllen - patlen);
+			strbuf_paste(self, pos, new_str, patlen);
+			strbuf_ins(self, pos + patlen, new_str + patlen, repllen - patlen);
 		}
 		else if (repllen < patlen) {
 			strbuf_cut(self, pos, patlen - repllen, NULL);
-			strbuf_paste(self, pos, new, repllen);
+			strbuf_paste(self, pos, new_str, repllen);
 		}
 		else {   // equals
-			strbuf_paste(self, pos, new, patlen);
+			strbuf_paste(self, pos, new_str, patlen);
 		}
 	}
 	DESTROY_FLAT(occ, stack);
@@ -364,17 +364,27 @@ size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
 }
 
 
-size_t strbuf_replace(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
                       size_t from)
 {
-	return strbuf_replace_n(self, old, new, 1, from);
+	return strbuf_replace_n(self, old_str, new_str, 1, from);
 }
 
 
-size_t strbuf_replace_all(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace_all(strbuf *self, const char *old_str, const char *new_str,
                           size_t from)
 {
-	return strbuf_replace_n(self, old, new, SIZE_MAX, from);
+	return strbuf_replace_n(self, old_str, new_str, SIZE_MAX, from);
+}
+
+
+void strbuf_reverse(strbuf *self)
+{
+	for (size_t i = 0, j = self->len - 1; i < j; i++, j--) {
+		char tmp = self->str[i];
+		self->str[i] = self->str[j];
+		self->str[j] = tmp;
+	}
 }
 
 

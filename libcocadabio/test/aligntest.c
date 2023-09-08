@@ -78,9 +78,27 @@ void test_simple_global_align(CuTest *tc)
 }
 
 
+void test_gotoh(CuTest *tc) {
+    memdbg_reset();
+
+    char *qry = "aaabbbcccddd";
+    char *tgt = "aabbbxxcccyyddd";
+    strbuf *cigar = strbuf_new();
+    int simple_cost = simple_global_align(qry, strlen(qry), tgt, strlen(tgt), cigar);
+    int cost = gotoh(qry, strlen(qry), tgt, strlen(tgt), 0, 1, subst_uniform_cost, cigar);
+    CuAssertIntEquals(tc, simple_cost, cost);
+
+   
+    strbuf_free(cigar);
+
+    CuAssert(tc, "Memory leak detected", memdbg_is_empty());
+}
+
+
 CuSuite *align_get_test_suite(void)
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_simple_global_align);
+    SUITE_ADD_TEST(suite, test_gotoh);
 	return suite;
 }

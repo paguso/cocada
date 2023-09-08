@@ -7,9 +7,9 @@ void test_matrix(CuTest *tc) {
     memdbg_reset();
 
     for (int m = 0; m < 100; m++) {
-        printf("m = %d\n", m);
+        //printf("m = %d\n", m);
         for (int n = 0; n < 100; n++) {
-            printf("n = %d\n", n);
+            //printf("n = %d\n", n);
             NEW_MATRIX(mat, int, m, n);
                     
             for (int i = 0; i < m; i++) {

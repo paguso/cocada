@@ -23,6 +23,8 @@
 #define ARRAYUTIL_H
 
 #include <stddef.h>
+#include <string.h>
+
 #include "coretype.h"
 
 /**
@@ -194,18 +196,26 @@ XX_CORETYPES(SA_ARR_DECL)
 
 #define NEW_MATRIX(ID, TYPE, ROWS, COLS)\
 	TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
-	TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
-	for (size_t __i=0; __i < (ROWS); __i++)\
-		ID[__i] = __ptr##ID + (__i * COLS);
+	TYPE* __ptr##ID =(TYPE *) (ID + (ROWS));\
+	for (size_t __i=0; __i < (ROWS); __i++){\
+		ID[__i] = __ptr##ID;\
+		__ptr##ID += (COLS);\
+	}
 
 
 #define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
 	size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
 	TYPE** ID = (TYPE**) malloc(__len##ID);\
 	memset(ID, 0x0, __len##ID);\
-	TYPE* __ptr##ID = (TYPE*) (ID + ROWS);\
-	for (size_t __i=0; __i < (ROWS); __i++)\
-		ID[__i] = __ptr##ID + (__i * COLS);
+	TYPE* __ptr##ID = (TYPE *) (ID + (ROWS));\
+	for (size_t __i=0; __i < (ROWS); __i++){\
+		ID[__i] = __ptr##ID;\
+		__ptr##ID += (COLS);\
+	}
+
+
+#define FREE_MATRIX(ID) free(ID)
+
 
 
 #define FILL_MATRIX(ID, ROWS, COLS, EXPR)\
