@@ -142,7 +142,7 @@ XX_CORETYPES(SA_ARR_DECL)
 /**
  * @brief Allocates a new array of N elements of a given TYPE.
  */
-#define ARR_NEW( TYPE, N ) ((N>0)?((TYPE*)(malloc((N)*sizeof(TYPE)))):NULL)
+#define ARR_NEW( TYPE, N ) (((N) > 0) ? ((TYPE*)(malloc((N)*sizeof(TYPE)))) : NULL)
 
 
 /**

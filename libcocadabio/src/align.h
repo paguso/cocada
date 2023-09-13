@@ -48,11 +48,15 @@ int subst_uniform_cost(char a, char b);
  * 
  * @return int The cost of the alignment.
  */
-int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
-                        size_t tgt_len, strbuf *cigar);
+int simple_global_align(const char *qry, size_t qry_len, const char *tgt, size_t tgt_len, strbuf *cigar);
 
 
 int gotoh(char *qry, size_t qry_len, char *tgt, size_t tgt_len, 
           int gap_open, int gap_ext, subst_cost_fn subst, strbuf *cigar);
+
+
+int align(char *qry, size_t qry_len, char *tgt, size_t tgt_len, 
+    int gap_open, int gap_ext, subst_cost_fn subst, strbuf *cigar);
+
 
 #endif // ALIGN_H

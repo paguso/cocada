@@ -149,7 +149,7 @@ void strbuf_set(strbuf *self, size_t pos, char c)
 void strbuf_nappend(strbuf *self, const char *other, size_t len)
 {
 	_resize_to(self, self->len + len);
-	strcpy(self->str + self->len, other);
+	strncpy(self->str + self->len, other, len);
 	self->len += len;
 	self->str[self->len] = '\0';
 

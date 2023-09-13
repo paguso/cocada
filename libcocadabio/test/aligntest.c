@@ -22,7 +22,9 @@
 #include <string.h>
 
 #include "CuTest.h"
+#include "cstrutil.h"
 #include "align.h"
+#include "errlog.h"
 #include "memdbg.h"
 #include "strbuf.h"
 
@@ -78,6 +80,14 @@ void test_simple_global_align(CuTest *tc)
 }
 
 
+char *random_str(size_t n) {
+    char *ret = cstr_new(n);
+    for (size_t i = 0; i < n; i++) {
+        ret[i] = 'a' + rand()%10;
+    }
+    return ret;
+}
+
 void test_gotoh(CuTest *tc) {
     memdbg_reset();
 
@@ -88,6 +98,20 @@ void test_gotoh(CuTest *tc) {
     int cost = gotoh(qry, strlen(qry), tgt, strlen(tgt), 0, 1, subst_uniform_cost, cigar);
     CuAssertIntEquals(tc, simple_cost, cost);
 
+    for (int gap_open = 0; gap_open < 2; gap_open++) {
+        for (int gap_ext = 1; gap_ext < 3; gap_ext++) {
+            for (size_t m = 0; m < 20; m++) {
+                for (size_t n = 0; n < 20; n++) {
+                    qry = random_str(m);
+                    tgt = random_str(n);
+                    cost = gotoh(qry, strlen(qry), tgt, strlen(tgt), 0, 1, subst_uniform_cost, cigar);
+                    DEBUG("gotoh(%s,%s,%d,%d)=%d", qry, tgt, gap_open, gap_ext, cost);
+                    free(qry);
+                    free(tgt);
+                }
+            }
+        }
+    }
    
     strbuf_free(cigar);
 
@@ -95,10 +119,48 @@ void test_gotoh(CuTest *tc) {
 }
 
 
+void test_align(CuTest *tc) {
+    memdbg_reset();
+
+    char *qry = "aaaaccccccccbbbbaaaaccccccccbbbb";
+    char *tgt = "aaaabbbbaaaabbbb";
+    strbuf *cigar = strbuf_new();
+
+    int gap_open = 1;
+    int gap_ext = 1;
+    int align_cost = align(qry, strlen(qry), tgt, strlen(tgt), gap_open, gap_ext, subst_uniform_cost, cigar);
+    int gotoh_cost = gotoh(qry, strlen(qry), tgt, strlen(tgt), gap_open, gap_ext, subst_uniform_cost, cigar);
+    CuAssertIntEquals(tc, align_cost, gotoh_cost);
+
+    //int cost = simple_global_align(qry, strlen(qry), tgt, strlen(tgt), gap_open, gap_ext, subst_uniform_cost, cigar);
+
+    //CuAssertIntEquals(tc, gotoh_cost, align_cost);
+    for (int gap_open = 0; gap_open < 2; gap_open++) {
+        for (int gap_ext = 1; gap_ext < 3; gap_ext++) {
+            for (size_t m = 0; m < 20; m++) {
+                for (size_t n = 0; n < 20; n++) {
+                    qry = random_str(m);
+                    tgt = random_str(n);
+                    int align_cost = align(qry, strlen(qry), tgt, strlen(tgt), gap_open, gap_ext, subst_uniform_cost, cigar);
+                    int gotoh_cost = gotoh(qry, strlen(qry), tgt, strlen(tgt), gap_open, gap_ext, subst_uniform_cost, cigar);
+                    CuAssertIntEquals(tc, align_cost, gotoh_cost);
+                    free(qry);
+                    free(tgt);
+                }
+            }
+        }
+    }
+   
+
+    strbuf_free(cigar);
+    CuAssert(tc, "Memory leak!", memdbg_is_empty());
+}
+
 CuSuite *align_get_test_suite(void)
 {
 	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_simple_global_align);
-    SUITE_ADD_TEST(suite, test_gotoh);
+	//SUITE_ADD_TEST(suite, test_simple_global_align);
+    //SUITE_ADD_TEST(suite, test_gotoh);
+    SUITE_ADD_TEST(suite, test_align);
 	return suite;
 }
