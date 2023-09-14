@@ -81,7 +81,7 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt, size_t
  * @param subst The substitution cost function
  * @param cigar The string buffer on which to append the CIGAR string of the alignment
  * @return int The cost of the alignment.
- * @cite "E.W. Myers, W. Miller, Optimal Alignments in Linear Space, Bioinformatics, Volume 4,
+ * @see "E.W. Myers, W. Miller, Optimal Alignments in Linear Space, Bioinformatics, Volume 4,
  * Issue 1, March 1988, Pages 11–17, https://doi.org/10.1093/bioinformatics/4.1.11"
  */
 int affine_global_align(const char *qry, size_t qry_len, const char *tgt, size_t tgt_len, 

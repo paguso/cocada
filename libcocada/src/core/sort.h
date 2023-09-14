@@ -22,11 +22,17 @@
 #ifndef SORT_H
 #define SORT_H
 
+/**
+ * @file sort.h
+ * @author Paulo Fonseca
+ * @brief Sorting algorithms.
+ */
+
 #include "coretype.h"
 #include "order.h"
 
 /**
- * @brief Sort an array in place using Quicksort.
+ * @brief Sort an array in place using Quicksort using the median of three pivot choice heuristic.
  *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.
@@ -37,7 +43,7 @@ void quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp);
 
 
 /**
- * @brief Sort the indexes of an array via Quicksort.
+ * @brief Sort the indexes of an array via Quicksort using the median of three pivot choice heuristic.
  *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.

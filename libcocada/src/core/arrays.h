@@ -225,27 +225,83 @@ XX_CORETYPES(SA_ARR_DECL)
 
 
 /**
- * @brief Declares a typed array with elements of a given TYPE
- * called arr_of_TYPE (e.g. arr_of_int, arr_of_size_t, etc).
- * Typed arrays encapsulate the array and its length in a struct.
- * This is convenient because we can pass and receive the array and
- * its length to and from functions as a single argument. Differently
- * from vectors and other generic arrays, the type of the elements
- * makes it more convenient to use the array directly, without the
- * need for casts and other type conversions.
+ * @brief Expands into a type name for an array with elements of a 
+ * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
+ * A TYPE_array encapsulates an ordinary C array of TYPE and its 
+ * length in a struct. This is convenient because we can pass and 
+ * receive the array and its length to and from functions as a single 
+ * argument. Differently from vectors and other generic arrays, the type 
+ * of the elements makes its use more convenient, without the need for 
+ * casts and other type conversions.
+ * 
+ * Prior to being used, a TYPE_array must be declared with the macro
+ * ::DECL_ARRAY. By importing this file you get the declaration of
+ * TYPE_array for all the core types defined in coretype.h.
+ * 
+ * A TYPE_array object is primarily meant to be created on the stack,
+ * although the encapsulated array will typically be allocated on 
+ * the heap. Thus we can pass and receive a TYPE_array by value. 
+ * 
+ * Example:
+ * ```
+ * void print_int_array(ARRAY(int) a){
+ * 	for (size_t i=0; i<a.len; i++){
+ * 		printf("%d ", a.arr[i]);
+ * 	}
+ * }
+ * 
+ * int main() {
+ * 	ARRAY(int) a = ARRAY_NEW(int, 10);
+ * 	for (size_t i=0; i<a.len; i++){
+ * 		a.arr[i] = i;
+ * 	}
+ * 	print_int_array(a);
+ * 	ARRAY_FREE(a);
+ * }
+ * ```
  */
-#define DECL_ARR_OF(TYPE, ...)\
+#define ARRAY(TYPE) TYPE##_array
+
+/**
+ * @brief Declares a type name for an array with elements of a
+ * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
+ * By importing this file you get the declaration of
+ * TYPE_array for all the core types defined in coretype.h.
+ * @see ARRAY
+ */
+#define DECL_ARRAY(TYPE, ...)\
 	typedef struct {\
 		TYPE *arr;\
 		size_t len;\
-	} arr_of_##TYPE;
+	} ARRAY(TYPE);
 
-XX_CORETYPES(DECL_ARR_OF)
+XX_CORETYPES(DECL_ARRAY)
 
-#define ARR_OF_NEW(TYPE, LEN) ((arr_of_##TYPE){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
+/**
+ * @brief Creates a new TYPE_array object with a given length
+ * on the stack.
+ * The encapsulated array is allocated on the heap and is left 
+ * uninitialized.
+ * This array can be freed with ::ARRAY_FREE.
+ * @see See example in ::ARRAY
+ */
+#define ARRAY_NEW(TYPE, LEN) ((ARRAY(TYPE)){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
 
-#define ARR_OF_FROM_ARR(TYPE, LEN, SRC) ((arr_of_##TYPE){.len=(LEN), .arr=((TYPE*)(SRC))})
+/**
+ * @brief Encapsulates an existing array of a given TYPE with a given length
+ * in a TYPE_array object on the stack.
+ * 
+ * Example
+ * ```
+ * int *src = calloc(5, sizeof(int));
+ * ARRAY(int) a = ARRAY_NEW_FROM_ARR(int, 5, src);
+ * ```
+ */
+#define ARRAY_NEW_FROM_ARR(TYPE, LEN, SRC) ((ARRAY(TYPE)){.len=(LEN), .arr=((TYPE*)(SRC))})
 
-#define FREE_ARR_OF(ARR) free((ARR).arr)
+/**
+ * @brief Frees the encapsulated array of a TYPE_array object.
+ */
+#define ARRAY_FREE(A) free((A).arr)
 
 #endif

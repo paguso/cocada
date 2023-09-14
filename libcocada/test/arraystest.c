@@ -52,10 +52,25 @@ void test_matrix(CuTest *tc)
 }
 
 
+void test_array(CuTest *tc) {
+	memdbg_reset();
+
+	ARRAY(int) a = ARRAY_NEW(int, 10);
+	for (int i = 0; i < 10; i++) {
+		a.arr[i] = i;
+	}
+
+	ARRAY_FREE(a);
+
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+
 
 CuSuite *arrays_get_test_suite(void)
 {
 	CuSuite *suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, test_array);
 	SUITE_ADD_TEST(suite, test_matrix);
 	return suite;
 }
