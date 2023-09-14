@@ -246,7 +246,8 @@ size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
  * @brief Same as `strbuf_replace_n(self, old_str, new_str, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace_all(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace_all(strbuf *self, const char *old_str,
+                          const char *new_str,
                           size_t from_pos);
 
 

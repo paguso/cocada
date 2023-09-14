@@ -371,7 +371,8 @@ size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
 }
 
 
-size_t strbuf_replace_all(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace_all(strbuf *self, const char *old_str,
+                          const char *new_str,
                           size_t from)
 {
 	return strbuf_replace_n(self, old_str, new_str, SIZE_MAX, from);

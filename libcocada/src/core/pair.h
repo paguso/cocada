@@ -40,7 +40,7 @@ XX_CORETYPES(DECL_PAIRS)
 #define MAKE_PAIR(type1, type2, first, second) \
 	(PAIR(type1, type2)) { \
 		.first = first, \
-		.second = second \
+		         .second = second \
 	}
 
 
