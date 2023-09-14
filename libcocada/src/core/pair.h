@@ -22,26 +22,47 @@
 #ifndef PAIR_H
 #define PAIR_H
 
+/**
+ * @file pair.h
+ * @author Paulo Fonseca
+ * @brief Pair type
+ */
+
 #include "coretype.h"
 
+/**
+ * @brief Declares a pair of given types.
+ * By importing this file "pair.h", homogenous pairs are declared for all core types, 
+ * ex. pair_int_int, pair_double_double, etc.
+ * @see coretype.h
+ */
 #define DECL_PAIR(type1, type2, ...) \
 	typedef struct pair_##type1##_##type2 { \
 		type1 first; \
 		type2 second; \
 	} pair_##type1##_##type2;
 
+
+/**
+ * @brief To be used as type name for a pair of given types.
+ * For example 
+ * ``` 
+ * DECL_PAIR(int, char);
+ * 
+ * int main() {
+ * 		PAIR(int, char) p = {1, 'a'};
+ * 		PAIR(int, char) q = {2, 'b'};
+ * 		...
+ * }
+ * 
+ * ```
+ */
+#define PAIR(type1, type2) pair_##type1##_##type2
+
+
 #define DECL_PAIRS(TYPE,...) \
 	DECL_PAIR(TYPE, TYPE)
 
 XX_CORETYPES(DECL_PAIRS)
-
-#define PAIR(type1, type2) pair_##type1##_##type2
-
-#define MAKE_PAIR(type1, type2, first, second) \
-	(PAIR(type1, type2)) { \
-		.first = first, \
-		.second = second \
-	}
-
 
 #endif // PAIR_H

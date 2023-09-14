@@ -214,7 +214,7 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
 
 /**
  * @brief Replaces the first @p n  left-to-right non-overlapping occurrences
- * of the substring @p old in the string buffer @p self, with the substring @p new
+ * of the substring @p old_str in the string buffer @p self, with the substring @p new_str
  * starting from position @p from_pos.
  *
  * # Example
@@ -230,24 +230,31 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
  *
  * @return Returns the number of substitutions actually performed.
  */
-size_t strbuf_replace_n(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
                         size_t n, size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(self, old, new, 1, from)`
+ * @brief Same as `strbuf_replace_n(self, old_str, new_str, 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
                       size_t from_pos);
 
 
 /**
- * @brief Same as `strbuf_replace_n(self, old, new, strbuf_len(self) + 1, from)`
+ * @brief Same as `strbuf_replace_n(self, old_str, new_str, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace_all(strbuf *self, const char *old, const char *new,
+size_t strbuf_replace_all(strbuf *self, const char *old_str,
+                          const char *new_str,
                           size_t from_pos);
+
+
+/**
+ * @brief Reverses the contents of the string buffer.
+ */
+void strbuf_reverse(strbuf *self);
 
 
 /**

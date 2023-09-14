@@ -22,11 +22,17 @@
 #ifndef SORT_H
 #define SORT_H
 
+/**
+ * @file sort.h
+ * @author Paulo Fonseca
+ * @brief Sorting algorithms.
+ */
+
 #include "coretype.h"
 #include "order.h"
 
 /**
- * @brief Sort an array in place using Quicksort.
+ * @brief Sort an array in place using Quicksort using the median of three pivot choice heuristic.
  *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.
@@ -37,7 +43,7 @@ void quicksort(void *arr, size_t n, size_t typesize, cmp_func cmp);
 
 
 /**
- * @brief Sort the indexes of an array via Quicksort.
+ * @brief Sort the indexes of an array via Quicksort using the median of three pivot choice heuristic.
  *
  * @param arr The array to be sorted.
  * @param n The number of elements in the array.
@@ -78,7 +84,7 @@ size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
 
 /**
  * @brief Finds the index of the last element in a sorted array that is smaller or equal to a given value.
- * 
+ *
  * @param sorted_arr The sorted array
  * @param n The number of elements in the array
  * @param typesize The size of each element in the array in bytes
@@ -86,7 +92,8 @@ size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
  * @param val The value to be compared
  * @return size_t The index of the last element in the array that is smaller or equal to @p val.
  */
-size_t pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp, void *val);
+size_t pred(void *sorted_arr, size_t n, size_t typesize, cmp_func cmp,
+            void *val);
 
 
 /**
