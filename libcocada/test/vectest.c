@@ -546,7 +546,7 @@ void test_vec_arr_of_from_vec(CuTest *tc)
 	for (size_t i=0; i<n; i++) {
 		vec_push_int(v, i);
 	}
-	arr_of_int A = ARR_OF_FROM_ARR(int, vec_len(v), vec_detach(v));
+	ARRAY(int) A = ARRAY_NEW_FROM_ARR(int, vec_len(v), vec_detach(v));
 	for (size_t i=0; i<n; i++) {
 		CuAssertIntEquals(tc, (int)i, A.arr[i]);
 	}
