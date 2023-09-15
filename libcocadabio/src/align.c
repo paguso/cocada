@@ -131,7 +131,7 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
 }
 
 
-static int gotoh_affine_cost(char *qry, size_t qry_len, char *tgt, size_t tgt_len, int gap_open, int gap_ext, subst_cost_fn subst)
+static int gotoh_affine_cost(const char *qry, size_t qry_len, const char *tgt, size_t tgt_len, int gap_open, int gap_ext, subst_cost_fn subst)
 {
 	size_t m = qry_len + 1;
 	size_t n = tgt_len + 1;
@@ -200,7 +200,7 @@ typedef enum {
 	BW = -1
 } dir_t;
 
-static int aff_slice_cost(char *qry, size_t qry_len, char *tgt, size_t tgt_len, dir_t dir, int gap_open, int initial_del_gap_open, int gap_ext, subst_cost_fn subst, int *C, int *D)
+static int aff_slice_cost(const char *qry, size_t qry_len, const char *tgt, size_t tgt_len, dir_t dir, int gap_open, int initial_del_gap_open, int gap_ext, subst_cost_fn subst, int *C, int *D)
 {
 	/*strbuf *_q = strbuf_new();
 	strbuf_nappend(_q, qry, qry_len);
@@ -268,7 +268,7 @@ static inline int gap(size_t len, int gap_open, int gap_ext)
 	return (len) ? (gap_open + (len * gap_ext)) : 0;
 }
 
-static int aff_slice_aln(char *qry, size_t from_qry, size_t to_qry, char *tgt, size_t from_tgt, size_t to_tgt, int gap_open, int gap_open_begin, int gap_open_end, int gap_ext, subst_cost_fn subst, strbuf *cigar, int *C1, int *D1, int *C2, int *D2) { 
+static int aff_slice_aln(const char *qry, size_t from_qry, size_t to_qry, const char *tgt, size_t from_tgt, size_t to_tgt, int gap_open, int gap_open_begin, int gap_open_end, int gap_ext, subst_cost_fn subst, strbuf *cigar, int *C1, int *D1, int *C2, int *D2) { 
 	size_t m = to_qry - from_qry;
 	size_t n = to_tgt - from_tgt;
 

@@ -301,6 +301,10 @@ XX_CORETYPES(DECL_ARRAY)
 
 /**
  * @brief Frees the encapsulated array of a TYPE_array object.
+ * @warning This is a shallow free. It does not free the contents of the 
+ * encapsulated array if it contains pointers to other objects. For
+ * the proper disposal of structured object collections, use vectors 
+ * defined in vec.h and the destructor infrastructure defined in new.h.*
  */
 #define ARRAY_FREE(A) free((A).arr)
 
