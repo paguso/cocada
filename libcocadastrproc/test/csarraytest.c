@@ -199,7 +199,7 @@ void csarray_test_get(CuTest *tc)
 			//printf("csa[%zu].get(%zu) = %zu (bf = %zu)\n", i, j, s, sa[j]);
 			if (sa[j]!=s) {
 				csarray_print(stdout, csa);
-				ARR_PRINT(sa, sa, %zu, 0, sa_len, 10, "");
+				ARR_PRINT(sa, 0, sa_len, 10, "sa", "%zu", " ", "");
 			}
 			CuAssertSizeTEquals(tc, sa[j], s);
 		}
