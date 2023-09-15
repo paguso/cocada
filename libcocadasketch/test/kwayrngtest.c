@@ -35,7 +35,7 @@ void test_kwayrng(CuTest *tc)
 	for (size_t k=0; k<10; k++) {
 		kwayrng *rng = kwayrng_new(k, nbits);
 		const uint64_t *coef = kwayrng_coefs(rng);
-		ARR_FPRINT(stderr, coef, coef, %zu, 0, k, 10, "");
+		ARR_FPRINT(stderr, coef, 0, k, 10, "coef", "%zu", " ", "");
 		DEBUG("%zu-way independent sequence:\n", k);
 		for (size_t i=0; i<kwayrng_maxval(rng); i++) {
 			DEBUG("X[%zu] = %"PRIu64"\n", i,  kwayrng_next(rng));
@@ -64,8 +64,7 @@ void test_uniform(CuTest *tc)
 			}
 		}
 	}
-	ARR_PRINT(counts, counts, %zu, 0, 32, 32, "");
-
+	ARR_PRINT(counts, 0, 32, 32, "counts", "%zu", " ", "");
 }
 
 

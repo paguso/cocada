@@ -172,28 +172,28 @@ XX_CORETYPES(SA_ARR_DECL)
 
 /**
  * @brief Prints the array @p ARR from position @p FROM to position @p TO-1
- *        using @p NAME as label, displaying @pELTSPERLINE elements per line,
- *        and using the printf format string @p FORMAT.
- *        LEFT_MARGIN is a string that is printed at the beginning of each line.
+ *        using @p LABEL as label, displaying @p ELTSPERLINE elements per line,
+ *        separated by @p SEPARATOR and using the printf format string @p FORMAT.
+ *        @p LEFT_MARGIN is a string that is printed at the beginning of each line.
  */
-#define ARR_FPRINT(STREAM, ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
-	{ fprintf(STREAM, "%s"#NAME"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
+#define ARR_FPRINT(STREAM, ARR, FROM, TO, ELTSPERLINE, LABEL, FORMAT, SEPARATOR, LEFT_MARGIN)\
+	{ fprintf(STREAM, "%s"LABEL"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
 		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
 			if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%s%4zu: ",LEFT_MARGIN, __i);\
-			fprintf(STREAM, #FORMAT" " , ARR[__i]);}\
+			fprintf(STREAM, FORMAT"%s" , ARR[__i], (__i<(TO-1))?SEPARATOR:"");}\
 		fprintf(STREAM, "\n");}
 
 
 /**
- * @brief Prints the array ARR from position FROM to position TO-1
- *        using NAME as label, displaying ELTSPERLINE elements per line,
- *        and using the printf format string FORMAT.
- *        LEFT_MARGIN is a string that is printed at the beginning of each line.
+ * @brief Same as `ARR_FPRINT(stdout, ARR, FROM, TO, ELTSPERLINE, LABEL, FORMAT, SEPARATOR, LEFT_MARGIN)`
  */
-#define ARR_PRINT( ARR, NAME, FORMAT, FROM, TO , ELTSPERLINE, LEFT_MARGIN )\
-	ARR_FPRINT(stdout, ARR, NAME, FORMAT, FROM, TO, ELTSPERLINE, LEFT_MARGIN)
+#define ARR_PRINT(ARR, FROM, TO, ELTSPERLINE, LABEL, FORMAT, SEPARATOR, LEFT_MARGIN)\
+	ARR_FPRINT(stdout, ARR, FROM, TO, ELTSPERLINE, LABEL, FORMAT, SEPARATOR, LEFT_MARGIN)
 
 
+/**
+ * @brief Creates a new matrix of a given TYPE with @p ROWS rows and @p COLS columns.
+ */
 #define NEW_MATRIX(ID, TYPE, ROWS, COLS)\
 	TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
 	TYPE* __ptr##ID =(TYPE *) (ID + (ROWS));\
@@ -202,7 +202,10 @@ XX_CORETYPES(SA_ARR_DECL)
 		__ptr##ID += (COLS);\
 	}
 
-
+/**
+ * @brief Creates a new matrix of a given TYPE with @p ROWS rows and @p COLS columns 
+ * and initializes it to 0.
+ */
 #define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
 	size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
 	TYPE** ID = (TYPE**) malloc(__len##ID);\
@@ -213,11 +216,15 @@ XX_CORETYPES(SA_ARR_DECL)
 		__ptr##ID += (COLS);\
 	}
 
-
+/**
+ * @brief Frees a matrix created with ::NEW_MATRIX or ::NEW_MATRIX_0.
+ */
 #define FREE_MATRIX(ID) free(ID)
 
-
-
+/**
+ * @brief Fills a matrix with a given expression.
+ * @warning The expression @p EXPR is evaluated for every element to be set.
+ */
 #define FILL_MATRIX(ID, ROWS, COLS, EXPR)\
 	for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
 		for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
