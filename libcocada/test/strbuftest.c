@@ -337,6 +337,12 @@ void test_strbuf_printf(CuTest *tc)
 	CuAssertIntEquals(tc, ws, wsbuf);
 	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
 
+	ws = sprintf(s, "%*s", 10, string);
+	s += ws;
+	wsbuf = sbprintf(sbuf, "%*s", 10, string);
+	CuAssertIntEquals(tc, ws, wsbuf);
+	CuAssertStrEquals(tc, buf, strbuf_as_str(sbuf));
+
 	strbuf_free(sbuf);
 	CuAssert(tc, "Memory leak", memdbg_is_empty());
 }

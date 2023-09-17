@@ -87,5 +87,20 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt, size_t
 int affine_global_align(const char *qry, size_t qry_len, const char *tgt, size_t tgt_len, 
     int gap_open, int gap_ext, subst_cost_fn subst, strbuf *cigar);
 
+/**
+ * @brief Prints the alignment of two strings to the given file stream.
+ * 
+ * @param out Output file stream
+ * @param qry The query string
+ * @param qry_from The start position of the query string
+ * @param qry_to The end position of the query string
+ * @param tgt The target string
+ * @param tgt_from The start position of the target string
+ * @param tgt_to The end position of the target string
+ * @param cigar The CIGAR string of the alignment
+ * @param cigar_len The length of the CIGAR string
+ */
+void fprintf_alignment(FILE *out, const char *qry, size_t qry_from, size_t qry_to, const char *tgt, size_t tgt_from, size_t tgt_to, const char *cigar, size_t cigar_len);
+
 
 #endif // ALIGN_H
