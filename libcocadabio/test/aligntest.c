@@ -157,8 +157,8 @@ void test_affine_global_align(CuTest *tc)
 {
     memdbg_reset();
 
-    char *qry = "a";
-    char *tgt = "gegcfigcieh";
+    char *qry = "afjcgi"; //"ejj";
+    char *tgt = "fcidgh";// "aijdbeijghhdhbccbf";
     // char *qry = "a";
     // char *tgt = "b";
     strbuf *cigar = strbuf_new();
@@ -202,10 +202,18 @@ void test_affine_global_align(CuTest *tc)
     CuAssert(tc, "Memory leak!", memdbg_is_empty());
 }
 
+void test_fprintf_alignment(CuTest *tc) {
+    char *tgt = "aaaaaaaaaaaaaaaaabbbxxxxxaabbcyyyyyyyyyyaaabbccc";
+    char *qry = "aaaaabbbbbxxxxxaaaaabbbbbcccccyyyyyyyyyyaaaaabbbbbccccc";
+    char *cigar = "5M2D3M5M3D2M3D2M4D1M10M2D3M3D2M3D2M";
+    fprintf_alignment(stdout, qry, 0, strlen(qry), tgt, 12, 47, cigar, strlen(cigar));
+}
+
 CuSuite *align_get_test_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_simple_global_align);
     SUITE_ADD_TEST(suite, test_affine_global_align);
+    SUITE_ADD_TEST(suite, test_fprintf_alignment);
     return suite;
 }

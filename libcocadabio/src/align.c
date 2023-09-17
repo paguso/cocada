@@ -35,32 +35,33 @@ int unit_subst(char a, char b)
 }
 
 
-static int read_number_(strbuf *cigar, size_t pos, int *nb) 
+static int read_number_(char *cigar, size_t pos, int *nb) 
 {
-	const char *s = strbuf_as_str(cigar);
-	s = &s[pos];
+	//const char *s = strbuf_as_str(cigar);
+	//s = &s[pos];
 	*nb = 0;
-	int p = 0;
-	while ('0' <= s[p] && s[p] <= '9') {
+	int p = pos;
+	while ('0' <= cigar[p] && cigar[p] <= '9') {
 		*nb = (*nb) * 10;
-		*nb = (*nb) + (s[p] - '0');
+		*nb = (*nb) + (cigar[p] - '0');
 	  	p++;
 	}
-	return p;	
+	return p-pos;	
 }
 
 
 static void compress_cigar(strbuf *cigar)
 {
 	size_t n = strbuf_len(cigar);
+	//char *cigar_ = strbuf_as_str(cigar);
 	if (n == 0) return;
 	size_t i = 0;
 	int count;
-	i += read_number_(cigar, i, &count);
+	i += read_number_(strbuf_as_str(cigar), i, &count);
 	char last_c = strbuf_get(cigar, i++);
 	int run_len = count;
 	while (i < n) {
-		i += read_number_(cigar, i, &count);
+		i += read_number_(strbuf_as_str(cigar), i, &count);
 		char c = strbuf_get(cigar, i++);
 		if (c == last_c) {
 			run_len += count;
@@ -388,4 +389,81 @@ int affine_global_align(const char *qry, size_t qry_len, const char *tgt, size_t
 	} else {
 		return gotoh_affine_cost(qry, qry_len, tgt, tgt_len, gap_open, gap_ext, subst);
 	}
+}
+
+void fprintf_alignment(FILE *out, const char *qry, size_t qry_from, size_t qry_to, const char *tgt, size_t tgt_from, size_t tgt_to, const char *cigar, size_t cigar_len)
+{
+	size_t qry_len = qry_to - qry_from;
+	size_t tgt_len = tgt_to - tgt_from;
+	qry = &qry[qry_from];
+	tgt = &tgt[tgt_from];
+	strbuf *qry_line = strbuf_new();
+	strbuf *tgt_line = strbuf_new();
+	strbuf *cig_line = strbuf_new();
+	size_t tpos = 0, qpos = 0, cpos = 0, prev_cpos = 0;
+	int pos_len = (int)log10(MAX(qry_from, tgt_from)) + 1;
+	sbprintf(tgt_line, "T[%*d] ", pos_len, tgt_from);
+	sbprintf(qry_line, "Q[%*d] ", pos_len, qry_from);
+	sbprintf(cig_line, "%*s", pos_len+4, "");
+	while (cpos < cigar_len) { 
+		int count;
+		cpos += read_number_(cigar, cpos, &count);
+		char op = cigar[cpos++];
+		int clen = cpos - prev_cpos;
+		int print_len = 1 + MAX(clen, count); // width of the aligned fragment
+
+		switch (op) {
+			case 'M':
+			case 'S':
+				sbprintf(tgt_line, "%.*s", count, &tgt[tpos]);
+				sbprintf(tgt_line, "%*s", (print_len - count), " ");
+				tpos += count;
+				sbprintf(qry_line, "%.*s", count, &qry[qpos]);
+				sbprintf(qry_line, "%*s", (print_len - count), " ");
+				qpos += count;
+				sbprintf(cig_line, "%.*s", clen, &cigar[prev_cpos]);
+				sbprintf(cig_line, "%*s", (print_len - clen), " ");
+				prev_cpos = cpos;
+				break;
+			case 'I':
+				sbprintf(tgt_line, "%.*s", count, &tgt[tpos]);
+				sbprintf(tgt_line, "%*s", (print_len - count), " ");
+				tpos += count;
+				for (int i=0; i < count; i++) {
+					sbprintf(qry_line, "-");
+				}
+				//sbprintf(qry_line, "%.*s", count, &qry[qpos]);
+				sbprintf(qry_line, "%*s", (print_len - count), " ");
+				//qpos += count;
+				sbprintf(cig_line, "%.*s", clen, &cigar[prev_cpos]);
+				sbprintf(cig_line, "%*s", (print_len - clen), " ");
+				prev_cpos = cpos;
+				break;
+			case 'D':
+				for (int i=0; i < count; i++) {
+					sbprintf(tgt_line, "-");
+				}
+				//sbprintf(tgt_line, "%.*s", count, &tgt[tpos]);
+				sbprintf(tgt_line, "%*s", (print_len - count), " ");
+				//tpos += count;
+				sbprintf(qry_line, "%.*s", count, &qry[qpos]);
+				sbprintf(qry_line, "%*s", (print_len - count), " ");
+				qpos += count;
+				sbprintf(cig_line, "%.*s", clen, &cigar[prev_cpos]);
+				sbprintf(cig_line, "%*s", (print_len - clen), " ");
+				prev_cpos = cpos;
+				break;
+			default:
+				assert(false);
+		}
+	}
+	assert (tpos == tgt_len && qpos == qry_len);
+	pos_len = (int)log10(MAX(qry_to, tgt_to)) + 1;
+	sbprintf(tgt_line, "[%*d]", pos_len, tgt_to);
+	sbprintf(qry_line, "[%*d]", pos_len, qry_to);
+	sbprintf(cig_line, "%*s", pos_len+2, "");
+	fprintf(out, "%s\n%s\n%s\n", strbuf_as_str(tgt_line),  strbuf_as_str(qry_line),  strbuf_as_str(cig_line));
+	strbuf_free(tgt_line);
+	strbuf_free(qry_line);
+	strbuf_free(cig_line);
 }
