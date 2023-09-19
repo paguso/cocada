@@ -1093,12 +1093,12 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				}
 				cur_opt = hashmap_get_rawptr(cur_parse->options, &shortname);
 				// help option used
-				/*if (cur_opt->shortname == 'h') {
+				if (cur_opt->shortname == 'h') {
 					cliparser_print_help(cur_parse);
 					result.ok = true;
 					result.res.ok = clip;
 					goto cleanup;
-				}*/
+				}
 				if ( cur_opt->multi!=OPT_MULTIPLE && vec_len(cur_opt->values)>0 ) {
 					result.ok = false;
 					result.res.err.code = INVALID_MULT_OPTION;
