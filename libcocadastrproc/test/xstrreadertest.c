@@ -59,7 +59,7 @@ void test_xstrreader_from_strread(CuTest *tc)
     CuAssertSizeTEquals(tc, 9, xstr_len(dest));
     xstr_free(dest);
     xstrreader_close(xrdr);
-    xstr_free(s);
+    strreader_free(srdr);
     if (!memdbg_is_empty()) {
         memdbg_print_stats(stderr, true);
     }

@@ -92,7 +92,9 @@ void test_fasta_next(CuTest *tc)
 	memdbg_reset();
 	test_setup();
 
-	fasta *f = fasta_open(filename);
+	fasta_res result = fasta_open(filename);
+	CuAssert(tc, "Error opening fasta", result.ok);
+	fasta *f = result.val.ok;
 	size_t i=0;
 	for (i=0; fasta_has_next(f); i++) {
 		const fasta_rec *rr = fasta_next(f);
@@ -125,7 +127,9 @@ void test_fasta_next_read(CuTest *tc)
 	memdbg_reset();
 	test_setup();
 
-	fasta *f = fasta_open(filename);
+	fasta_res result = fasta_open(filename);
+	CuAssert(tc, "Error opening fasta", result.ok);
+	fasta *f = result.val.ok;
 	size_t i=0;
 	for (i=0; fasta_has_next(f); i++) {
 		const fasta_rec_rdr *rr = fasta_next_reader(f);

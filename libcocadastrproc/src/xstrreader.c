@@ -148,6 +148,9 @@ size_t  _str_read_until(xstrread *t, xstr *dest, xchar_t delim)
 	for (; i < rdr->len && (xchar_t) src[i] != delim; i++, j++) {
 		xstr_push(dest, src[i]);
 	}
+	while (i < l && src[i] == delim) {
+		i--;
+	}
 	rdr->index = i;
 	return j;
 }
@@ -227,6 +230,9 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 		while(c != EOF && c != delim) {
 			r++;
 			c = strread_getc(sr);
+		}
+		if (c == delim) {
+			strread_ungetc(sr);
 		}
 	}
 	return r;

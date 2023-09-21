@@ -31,7 +31,7 @@ void test_semver_from_str(CuTest *tc)
 	char *src = "1.0.0-beta+exp.sha.5114f85";
 	semver_res result = semver_new_from_str(src);
 	CuAssert(tc, "Semver parse error", result.ok);
-	semver *ver = result.res;
+	semver *ver = result.val;
 	CuAssertIntEquals(tc, 1, ver->major);
 	CuAssertIntEquals(tc, 0, ver->minor);
 	CuAssertIntEquals(tc, 0, ver->patch);

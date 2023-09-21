@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -123,12 +124,12 @@ static strread_vt _strread_vt  = {
 };
 
 
-static void _fastaread_init(fastaread *ret, FILE *src)
+static void _fastaread_init(fastaread *fr, FILE *src)
 {
 
-	ret->src = src;
-	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vt = &_strread_vt;
+	fr->src = src;
+	fr->_t_strread.impltor = fr;
+	fr->_t_strread.vt = &_strread_vt;
 }
 
 
@@ -144,19 +145,33 @@ struct _fasta {
 };
 
 
-fasta *fasta_open(char *filename)
+fasta_res fasta_open(char *filename)
 {
-	fasta *ret = NEW(fasta);
-	ret->src = fopen(filename, "r");
-	ret->src_path = cstr_clone(filename);
-	_fastaread_init(&(ret->rd), ret->src);
-	ret->cur_rec_len[0] = ret->cur_rec_len[1] = 100;
-	ret->cur_rec_rd_len[0] = ret->cur_rec_rd_len[1] = 100;
-	ret->cur_rec.descr = cstr_new(ret->cur_rec_len[0]);
-	ret->cur_rec.seq = cstr_new(ret->cur_rec_len[1]);
-	ret->cur_rec_rd.descr = cstr_new(ret->cur_rec_rd_len[0]);
-	ret->cur_rec_rd.seqrdr = fastaread_as_strread(&(ret->rd));
-	return ret;
+	fasta_res result = {.ok = true};
+	fasta *f = NEW(fasta);
+	f->src = fopen(filename, "r");
+	if (errno) {
+		result.ok = false;
+		result.val.err = (fasta_err){.code = errno};
+		cstr_ncpy(result.val.err.msg, strerror(errno), ERR_MSG_BUF_SIZE);
+		goto ERROR;
+	}
+	f->src_path = cstr_clone(filename);
+	_fastaread_init(&(f->rd), f->src);
+	f->cur_rec_len[0] = f->cur_rec_len[1] = 100;
+	f->cur_rec_rd_len[0] = f->cur_rec_rd_len[1] = 100;
+	f->cur_rec.descr = cstr_new(f->cur_rec_len[0]);
+	f->cur_rec.seq = cstr_new(f->cur_rec_len[1]);
+	f->cur_rec_rd.descr = cstr_new(f->cur_rec_rd_len[0]);
+	f->cur_rec_rd.seqrdr = fastaread_as_strread(&(f->rd));
+	goto SUCCESS;
+ERROR:
+	FREE(f);
+	f = NULL;
+SUCCESS:
+	result.ok = true;
+	result.val.ok = f;
+	return result; 
 }
 
 

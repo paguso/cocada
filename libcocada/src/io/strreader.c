@@ -53,11 +53,25 @@ static int _strreader_getc(strread *t)
 	}
 }
 
+
+static void _strreader_ungetc(strread *t)
+{
+	strreader *rdr = (strreader *) t->impltor;
+	if (0 < rdr->index && rdr->index <= rdr->len) {
+		rdr->index--;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
 size_t  _strreader_read_str(strread *t, char *dest, size_t n)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	size_t r = MIN(n, rdr->len - rdr->index);
 	strncpy(dest, rdr->src + rdr->index, r);
+	rdr->index += r;
 	return r;
 }
 
@@ -77,6 +91,7 @@ size_t  _strreader_read_str_until(strread *t, char *dest, char delim)
 
 static strread_vt _strreader_vt = { .reset = _strreader_reset,
                                     .getc = _strreader_getc,
+									.ungetc = _strreader_ungetc,
                                     .read_str = _strreader_read_str,
                                     .read_str_until = _strreader_read_str_until
                                   };

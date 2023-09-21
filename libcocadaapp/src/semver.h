@@ -33,7 +33,7 @@ typedef struct {
 } semver;
 
 
-DECL_RESULT(semver, semver *);
+DECL_RESULT_OK(semver, semver *);
 
 semver_res semver_new_from_str(const char *src);
 

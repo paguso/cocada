@@ -96,6 +96,13 @@ char *cstr_substr(char *str, size_t from,  size_t to);
 
 
 /**
+ * @brief Copies at most n chars from @p src to @p dest and then adds 
+ * a NULL-terminating char '\0' to @p dest.
+ * @return a pointer to the destination string @p dest.
+ */
+char *cstr_ncpy(char *dest, char *src, size_t n);
+
+/**
  * @brief 'Crops' the string @p str to @p str[@p from: @p to].
  *        The cropped char array will end with a '\0'.
  *        The memory used by the parts of the string out of this interval
