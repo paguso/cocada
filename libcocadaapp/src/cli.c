@@ -32,6 +32,7 @@
 
 #include "arrays.h"
 #include "cli.h"
+#include "errlog.h"
 #include "cstrutil.h"
 #include "hash.h"
 #include "hashmap.h"
@@ -286,48 +287,62 @@ static bool _validate_defaults(vec *defaults, cliargtype type, vec *choices)
 	case ARG_NONE:
 		break;
 	case ARG_CHAR:
-		assert(vec_typesize(defaults)==sizeof(char));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(char), 
+			"Default values for ARG_CHAR arguments must be of char type.");
 		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
 			char c = vec_get_char(defaults, i);
-			assert(isprint(c));
+			ERROR_ASSERT(isprint(c), 
+				"Default values for ARG_CHAR arguments must be printable chars");
 		}
 		break;
 	case ARG_BOOL:
-		assert(vec_typesize(defaults)==sizeof(bool));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(bool),
+			"Default values for ARG_BOOL arguments must be of bool type.");
 		break;
 	case ARG_INT:
-		assert(vec_typesize(defaults)==sizeof(long));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(long),
+			"Default values for ARG_INT arguments must be of long type.");
 		break;
 	case ARG_FLOAT:
-		assert(vec_typesize(defaults)==sizeof(double));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(double),
+			"Default values for ARG_FLOAT arguments must be of double type.");
 		break;
 	case ARG_STR:
-		assert(vec_typesize(defaults)==sizeof(char *));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(char *),
+			"Default values for ARG_STR arguments must be of char* type.");
 		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
 			char *c = vec_get_cstr(defaults, i);
-			assert(strlen(c)==0 || c[0]!='-');
+			ERROR_ASSERT(strlen(c)==0 || c[0]!='-', 
+				"Default values for ARG_STR arguments must not begin with '-'.");
 		}
 		break;
 	case ARG_FILE:
-		assert(vec_typesize(defaults)==sizeof(char *));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(char *),
+			"Default values for ARG_FILE arguments must be of char* type.");
 		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
 			char *c = vec_get_cstr(defaults, i);
-			assert(strlen(c)==0 || c[0]!='-');
+			ERROR_ASSERT(strlen(c)==0 || c[0]!='-', 
+				"Default values for ARG_FILE arguments must not begin with '-'.");
 		}
 		break;
 	case ARG_DIR:
-		assert(vec_typesize(defaults)==sizeof(char *));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(char *),
+		"Default values for ARG_DIR arguments must be of char* type.");
 		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
 			char *c = vec_get_cstr(defaults, i);
-			assert(strlen(c)==0 || c[0]!='-');
+			ERROR_ASSERT(strlen(c)==0 || c[0]!='-', 
+				"Default values for ARG_DIR arguments must not begin with '-'.");
 		}
 		break;
 	case ARG_CHOICE:
-		assert(vec_typesize(defaults)==sizeof(char *));
+		ERROR_ASSERT(vec_typesize(defaults)==sizeof(char *),
+		"Default values for ARG_CHOICE arguments must be of char* type.");
 		for (size_t i=0, l=vec_len(defaults); i<l; i++) {
 			char *c = vec_get_cstr(defaults, i);
-			assert(strlen(c)==0 || c[0]!='-');
-			assert(vec_find(choices, &c, _str_eq) < vec_len(choices));
+			ERROR_ASSERT(strlen(c)==0 || c[0]!='-', 
+				"Default values for ARG_CHOICE arguments must not begin with '-'.");
+			ERROR_ASSERT(vec_find(choices, &c, _str_eq) < vec_len(choices),
+				"Invalid default values for ARG_CHOICE argument (%s)",c);
 		}
 		break;
 	}
@@ -340,19 +355,27 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
                    cliargtype type, int min_val_no, int max_val_no,
                    vec *choices, vec *defaults )
 {
-	assert( _isletter(shortname) );
-	assert( _isid(longname) );
-	assert( need==OPT_OPTIONAL || max_val_no!=0 );
-	assert( multiplicity==OPT_SINGLE || max_val_no!=0 );
-	assert( max_val_no!=0 || type==ARG_NONE);
-	assert( type!=ARG_NONE || max_val_no==0);
-	assert( type!=ARG_NONE || defaults==NULL);
-	assert( 0<=min_val_no && min_val_no <= max_val_no );
-	assert( type!=ARG_CHOICE ||_arechoices(choices) );
-	assert( defaults==NULL ||
+	ERROR_ASSERT( _isletter(shortname) , "Option shortname must be a letter.");
+	ERROR_ASSERT( _isid(longname), "Invalid option long name %s.", longname );
+	ERROR_ASSERT( need==OPT_OPTIONAL || max_val_no!=0 , 
+		"Required option -%c must have a non-zero max number of values.", shortname);
+	ERROR_ASSERT( multiplicity==OPT_SINGLE || max_val_no!=0 , 
+		"Multiple option -%c must have a non-zero maximum number of values.", shortname);
+	ERROR_ASSERT( max_val_no!=0 || type==ARG_NONE, 
+		"Option -%c has zero maximum number of values so it should be of type ARG_NONE.", shortname);
+	ERROR_ASSERT( type!=ARG_NONE || max_val_no==0,
+		"Option -%c has non-zero maximum number of values so it cannot be of type ARG_NONE.", shortname);
+	ERROR_ASSERT( type!=ARG_NONE || defaults==NULL, 
+		"Option -%c is of type ARG_NONE and so should have no default value.", shortname);
+	ERROR_ASSERT( 0<=min_val_no && min_val_no <= max_val_no,
+		"Option -%c: invalid range for the number of values min=%d max=%d.", shortname, min_val_no, max_val_no);
+	ERROR_ASSERT( type!=ARG_CHOICE ||_arechoices(choices),
+		"Option -%c: invalid choice values.", shortname);
+	ERROR_ASSERT( defaults==NULL ||
 	        (  min_val_no <= vec_len(defaults)
 	           && vec_len(defaults) <= max_val_no
-	           && _validate_defaults(defaults, type, choices) ) );
+	           && _validate_defaults(defaults, type, choices) ),
+		"Option -%c: invalid default values.", shortname);
 	cliopt *ret = NEW(cliopt);
 	ret->shortname = shortname;
 	ret->longname = (longname) ? cstr_clone(longname) : NULL;
@@ -449,7 +472,7 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type)
 
 cliarg *cliarg_new_choice(char *name, char *help, vec *choices)
 {
-	assert( _arechoices(choices) );
+	ERROR_ASSERT( _arechoices(choices) , "Invalid choices for argument %s.", name);
 	cliarg *ret = cliarg_new(name, help, ARG_CHOICE);
 	ret->choices = choices;
 	return ret;
@@ -483,7 +506,7 @@ static uint64_t _hash_str(const void *ptr)
 
 cliparser *cliparser_new(char *name, char *help)
 {
-	assert(_isid(name));
+	ERROR_ASSERT(_isid(name), "Invalid parser ID '%s'.", name);
 	cliparser *ret = NEW(cliparser);
 	ret->par = NULL;
 	ret->name = cstr_clone(name);
@@ -557,11 +580,17 @@ static bool _not_a_subcmd_name(char *id, cliparser *cmd)
 
 void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 {
-	assert(cmd->par==NULL); // subcommand cannot have subcommands
-	assert(cmd!=subcmd);	// avoid cycles
-	assert(subcmd->par==NULL); // a subcommand gets added at most once
-	assert(!hashmap_contains(cmd->subcommands,
-	                         &subcmd->name)); // all subcommand names are unique
+	ERROR_ASSERT(cmd->par==NULL, 
+		"%s is already a subcommand of %s. No nested subcommands allowed.", 
+		cmd->name, cmd->par->name); // subcommand cannot have subcommands
+	ERROR_ASSERT(cmd!=subcmd, 
+		"Cannot add a command as a subcommand of itself.");	// avoid cycles
+	ERROR_ASSERT(subcmd->par==NULL, 
+		"Command %s is already a subcommand of %s. Cannot be added to %s.", 
+		subcmd->name, subcmd->par->name, cmd->name); // a subcommand gets added at most once
+	ERROR_ASSERT(!hashmap_contains(cmd->subcommands, &subcmd->name),
+		"Subcommand name %s already in use. Use a unique name.", 
+		subcmd->name); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
 	hashmap_iter *it = hashmap_get_iter(subcmd->options);
 	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_iter(it)) {
@@ -569,14 +598,18 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 		if (opt->type == ARG_CHOICE) {
 			for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
 				char *ch = vec_get_cstr(opt->choices, i);
-				assert(_not_a_subcmd_name(ch, cmd));
+				ERROR_ASSERT(_not_a_subcmd_name(ch, cmd),
+					"Subcommand choice option '%s' is a subcommand name of %s.",
+					ch, cmd->name);
 			}
 		}
 		if (opt->defaults!=NULL && ( opt->type==ARG_STR || opt->type==ARG_FILE
 		                             || opt->type==ARG_DIR || opt->type==ARG_CHOICE ) ) {
 			for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 				char *val = vec_get_cstr(opt->defaults, i);
-				assert(_not_a_subcmd_name(val, cmd));
+				ERROR_ASSERT(_not_a_subcmd_name(val, cmd),
+					"Value '%s' of option of -%c of %s is a subcommand name of %s.",
+					val, opt->shortname, subcmd->name, cmd->name);
 			}
 		}
 	}
@@ -589,20 +622,26 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 
 void cliparser_add_option(cliparser *cmd, cliopt *opt)
 {
-	assert( !hashmap_contains(cmd->options, &(opt->shortname)) );
-	assert( opt->longname==NULL
-	        || !hashmap_contains(cmd->long_to_short, &(opt->longname)) );
+	ERROR_ASSERT( !hashmap_contains(cmd->options, &(opt->shortname)),
+		"Duplicate option shortname -%c.", opt->shortname );
+	ERROR_ASSERT( opt->longname==NULL
+	        || !hashmap_contains(cmd->long_to_short, &(opt->longname)),
+		"Duplicate option longname --%s.", opt->longname );
 	if (opt->type == ARG_CHOICE) {
 		for (size_t i=0, l=vec_len(opt->choices); i<l; i++) {
 			char *ch = vec_get_cstr(opt->choices, i);
-			assert(_not_a_subcmd_name(ch, cmd));
+			ERROR_ASSERT(_not_a_subcmd_name(ch, cmd),
+		    	"Value '%s' for option -%c is not allowed because it is a (sub)command name.\n", 
+				ch, opt->shortname);
 		}
 	}
 	if (opt->defaults!=NULL && ( opt->type==ARG_STR || opt->type==ARG_FILE
 	                             || opt->type==ARG_DIR || opt->type==ARG_CHOICE ) ) {
 		for (size_t i=0, l=vec_len(opt->defaults); i<l; i++) {
 			char *val = vec_get_cstr(opt->defaults, i);
-			assert(_not_a_subcmd_name(val, cmd));
+			ERROR_ASSERT(_not_a_subcmd_name(val, cmd),
+		    	"Default value '%s' for option -%c is not allowed because it is a (sub)command name.\n", 
+				val, opt->shortname);
 		}
 	}
 	hashmap_ins(cmd->options, &(opt->shortname), &opt);
@@ -632,9 +671,11 @@ void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n,
 
 void cliparser_add_pos_arg(cliparser *cmd, cliarg *arg)
 {
-	assert( arg->single_val ||
-	        vec_len(cmd->args) == 0 ||
-	        ((cliarg *)vec_last_rawptr(cmd->args))->single_val );
+	ERROR_ASSERT( arg->single_val ||
+	    vec_len(cmd->args) == 0 ||
+	    ((cliarg *)vec_last_rawptr(cmd->args))->single_val,
+		"Error adding multi-valued argument %s. "
+		"There can be at most one multi-valued argument and it must be the last.", arg->name );
 	vec_push_rawptr(cmd->args, arg);
 }
 
@@ -784,7 +825,7 @@ void cliparser_print_help(const cliparser *cmd)
  */
 static cliparse_res _check_missing_options(cliparser *cmd)
 {
-	cliparse_res result = {.ok = true, .res.ok = cmd};
+	cliparse_res result = {.ok = true, .val.ok = cmd};
 
 	strbuf *longname = strbuf_new_with_capacity(16);
 	hashmap_iter *opt_it = hashmap_get_iter(cmd->options);
@@ -798,8 +839,8 @@ static cliparse_res _check_missing_options(cliparser *cmd)
 		if ( opt->need == OPT_REQUIRED && (opt->values == NULL
 		                                   || vec_len(opt->values) == 0 ) ) {
 			result.ok = false;
-			result.res.err.code = MISSING_REQ_OPT;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = MISSING_REQ_OPT;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Undefined required option -%c%s.", opt->shortname, strbuf_as_str(longname));
 			goto cleanup;
 		}
@@ -860,7 +901,7 @@ static cliparse_res _check_missing_options(cliparser *cmd)
 		}
 	}
 	result.ok = true;
-	result.res.ok = cmd;
+	result.val.ok = cmd;
 cleanup:
 	FREE(opt_it);
 	strbuf_free(longname);
@@ -870,7 +911,7 @@ cleanup:
 
 static cliparse_res _check_option_combos(cliparser *cmd)
 {
-	cliparse_res result = {.ok = true, .res.ok = cmd};
+	cliparse_res result = {.ok = true, .val.ok = cmd};
 
 	for (size_t i = 0, l = vec_len(cmd->optcombos); i < l; i++) {
 		optcombo *c = (optcombo *) vec_get(cmd->optcombos, i);
@@ -883,32 +924,32 @@ static cliparse_res _check_option_combos(cliparser *cmd)
 		}
 		if (c->type == ALL_OF && nused != c->size) {
 			result.ok = false;
-			result.res.err.code = INVALID_OPT_COMBO;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = INVALID_OPT_COMBO;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Invalid option usage: all of '%s' must be declared.",
 			         c->shortnames);
 			break;
 		}
 		else if (c->type == ONE_OF && nused != 1) {
 			result.ok = false;
-			result.res.err.code = INVALID_OPT_COMBO;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = INVALID_OPT_COMBO;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Invalid option usage: only one of '%s' must be declared.",
 			         c->shortnames);
 			break;
 		}
 		else if (c->type == ALL_IF_ANY && nused != 0  && nused != c->size) {
 			result.ok = false;
-			result.res.err.code = INVALID_OPT_COMBO;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = INVALID_OPT_COMBO;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Invalid option usage: all or none of '%s' must be declared.",
 			         c->shortnames);
 			break;
 		}
 		else if (c->type == ONE_IF_ANY && nused != 0  && nused != 1) {
 			result.ok = false;
-			result.res.err.code = INVALID_OPT_COMBO;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = INVALID_OPT_COMBO;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Invalid option usage: at most one of '%s' must be declared.",
 			         c->shortnames);
 			break;
@@ -923,7 +964,7 @@ static cliparse_res _check_option_combos(cliparser *cmd)
  * If type=ARGV_CHOICE, a non-null choices vector must be informed.
  * Returns whether parsing went OK.
  */
-static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
+static bool _parse_and_add_value(vec *vals, char *tok, cliargtype type, vec *choices,
                          cliparser *cmd)
 {
 	switch (type) {
@@ -995,7 +1036,8 @@ static bool _parse_value(vec *vals, char *tok, cliargtype type, vec *choices,
 		vec_push(vals, &pval);
 		break;
 	case ARG_CHOICE:
-		assert(choices);
+		ERROR_ASSERT(choices,
+		"Error parsing a token '%s' as a choice item, but no choices given", tok);
 		if (vec_find(choices, &tok, _str_eq) == vec_len(choices)) {
 			return false;
 		}
@@ -1015,7 +1057,7 @@ typedef enum {
 cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
                              bool exit_on_error)
 {
-	//cliparse_res result = {.ok = true, .res.ok = clip};
+	//cliparse_res result = {.ok = true, .val.ok = clip};
 	cliparse_res result = {0};
 
 	WARN_IF( clip->parsed, "This CLI has already been processed!"
@@ -1043,8 +1085,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				char shortname = '\0';
 				if (toklen <= 1) {
 					result.ok = false;
-					result.res.err.code = INVALID_OPTION;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_OPTION;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Invalid empty option name - at position %d.", t);
 					goto cleanup;
 				}
@@ -1052,15 +1094,15 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 					char *longname = &tok[2];
 					if (!_isid(longname)) {
 						result.ok = false;
-						result.res.err.code = INVALID_OPTION;
-						snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+						result.val.err.code = INVALID_OPTION;
+						snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 						         "Invalid option name %s at position %d.", tok, t);
 						goto cleanup;
 					}
 					if (!hashmap_contains(cur_parse->long_to_short, &longname)) {
 						result.ok = false;
-						result.res.err.code = INVALID_OPTION;
-						snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+						result.val.err.code = INVALID_OPTION;
+						snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 						         "Unknown option %s at position %d.", tok, t);
 						goto cleanup;
 					}
@@ -1069,15 +1111,15 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				else { // short option
 					if (toklen != 2) {
 						result.ok = false;
-						result.res.err.code = INVALID_OPTION;
-						snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+						result.val.err.code = INVALID_OPTION;
+						snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 						         "Invalid option short name %s at position %d.", tok, t);
 						goto cleanup;
 					}
 					if (!_isletter(tok[1])) {
 						result.ok = false;
-						result.res.err.code = INVALID_OPTION;
-						snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+						result.val.err.code = INVALID_OPTION;
+						snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 						         "Invalid option name %s at position %d.", tok, t);
 						goto cleanup;
 					}
@@ -1085,41 +1127,41 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				}
 				if (!hashmap_contains(cur_parse->options, &shortname)) {
 					result.ok = false;
-					result.res.err.code = INVALID_OPTION;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_OPTION;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Unknown option %s of (sub)command %s at position %d.", tok, cur_parse->name,
 					         t);
 					goto cleanup;
 				}
 				cur_opt = hashmap_get_rawptr(cur_parse->options, &shortname);
 				// help option used
-				/*if (cur_opt->shortname == 'h') {
+				if (cur_opt->shortname == 'h') {
 					cliparser_print_help(cur_parse);
 					result.ok = true;
-					result.res.ok = clip;
+					result.val.ok = clip;
 					goto cleanup;
-				}*/
+				}
 				if ( cur_opt->multi!=OPT_MULTIPLE && vec_len(cur_opt->values)>0 ) {
 					result.ok = false;
-					result.res.err.code = INVALID_MULT_OPTION;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_MULT_OPTION;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Invalid multiple declaration of option %s at position %d.", tok, t);
 					goto cleanup;
 				}
 				// valid option found
-				if (cur_opt->max_val_no > 0) {
+				if (cur_opt->min_val_no > 0) {
 					if (t + 1 >= argc) {
 						result.ok = false;
-						result.res.err.code = INVALID_OPT_VAL_NO;
-						snprintf( result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+						result.val.err.code = INVALID_OPT_VAL_NO;
+						snprintf( result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 						          "Option %s at positon %d requires %s%d value%s of type <%s>, but none given.",
 						          argv[t], t, (cur_opt->min_val_no==cur_opt->max_val_no)?"":"at least ",
 						          cur_opt->min_val_no, (cur_opt->min_val_no==1)?"":"s", type_lbl[cur_opt->type] );
 						goto cleanup;
 					}
-					cur_vals = _vals_vec_new(OPT_SINGLE, cur_opt->type);
+					cur_vals = _vals_vec_new(cur_opt->multi, cur_opt->type);
 					state = PS_VAL;
-				}
+				} 
 				else {   // no values, boolean assumed
 					if (vec_len(cur_opt->values)) {
 						vec_set__Bool(cur_opt->values, 0, true);
@@ -1140,8 +1182,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				        ( cur_arg_no != 0
 				          || vec_len(((cliarg *)vec_first_rawptr(cur_parse->args))->values) > 0) ) {
 					result.ok = false;
-					result.res.err.code = INVALID_SUBCMD;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_SUBCMD;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Subcommand %s at position %d cannot be called after arguments to the root command have been given.",
 					         tok, t );
 					goto cleanup;
@@ -1156,18 +1198,18 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				// see if it is a correct positional argument
 				if ( cur_arg_no >= vec_len(cur_parse->args) ) {
 					result.ok = false;
-					result.res.err.code = UNEXPECTED_TK;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = UNEXPECTED_TK;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Unexpected token '%s' at position %d.", tok, t);
 					goto cleanup;
 				}
 				cliarg *cur_arg = (cliarg *)vec_get_rawptr(cur_parse->args, cur_arg_no);
-				bool is_arg = _parse_value(cur_arg->values, tok, cur_arg->type,
+				bool is_arg = _parse_and_add_value(cur_arg->values, tok, cur_arg->type,
 				                           cur_arg->choices, cur_parse);
 				if (!is_arg) {
 					result.ok = false;
-					result.res.err.code = INVALID_ARG_VAL;
-					snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_ARG_VAL;
+					snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					         "Wrong value '%s' for argument #%d of type <%s> at position %d.",
 					         tok, cur_arg_no, type_lbl[cur_arg->type], t );
 					goto cleanup;
@@ -1178,7 +1220,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 		}
 		else if (state == PS_VAL) {
 			// can only be here if expecting values for a valued option
-			bool val_ok = _parse_value(cur_vals, tok, cur_opt->type, cur_opt->choices,
+			bool val_ok = _parse_and_add_value(cur_vals, tok, cur_opt->type, cur_opt->choices,
 			                           cur_parse);
 			bool max_val_no_reached =  val_ok
 			                           && ( vec_len(cur_vals) == cur_opt->max_val_no );
@@ -1186,8 +1228,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 			if (!val_ok || max_val_no_reached || eof_argv) {
 				if ( cur_opt->min_val_no > vec_len(cur_vals) ) {
 					result.ok = false;
-					result.res.err.code = INVALID_OPT_VAL_NO;
-					snprintf( result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_OPT_VAL_NO;
+					snprintf( result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					          "Too few values for option %s at positon %d. %s%d value%s of type <%s> required, but %zu given.",
 					          argv[cur_opt_pos], cur_opt_pos,
 					          (cur_opt->min_val_no==cur_opt->max_val_no)?"":"At least ",
@@ -1197,8 +1239,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				}
 				if ( vec_len(cur_vals) > cur_opt->max_val_no ) {
 					result.ok = false;
-					result.res.err.code = INVALID_OPT_VAL_NO;
-					snprintf( result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+					result.val.err.code = INVALID_OPT_VAL_NO;
+					snprintf( result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 					          "Too many values for option %s at positon %d. %s%d value%s of type <%s> allowed, but %zu given.",
 					          argv[cur_opt_pos], cur_opt_pos,
 					          (cur_opt->min_val_no==cur_opt->max_val_no)?"":"At most ",
@@ -1231,8 +1273,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 		}
 		else {
 			result.ok = false;
-			result.res.err.code = UNDEF_ERR;
-			snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+			result.val.err.code = UNDEF_ERR;
+			snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 			         "Uh-oh: undefined error parsing command arguments at position %d (WRONG STATE).",
 			         t);
 			goto cleanup;
@@ -1243,8 +1285,8 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 	        ( vec_len(cur_parse->args) == 0 || cur_arg_no != vec_len(cur_parse->args)-1
 	          || vec_len(((cliarg *)vec_last_rawptr(cur_parse->args))->values) == 0 ) ) {
 		result.ok = false;
-		result.res.err.code = INVALID_ARG_VAL_NO;
-		snprintf(result.res.err.msg, CLIPARSE_ERROR_BUFSZ,
+		result.val.err.code = INVALID_ARG_VAL_NO;
+		snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,
 		         "Missing value for argument #%d (%s) of type <%s>.",
 		         cur_arg_no, ((cliarg *)vec_get_rawptr(cur_parse->args, cur_arg_no))->help,
 		         type_lbl[((cliarg *)vec_get_rawptr(cur_parse->args, cur_arg_no))->type]);
@@ -1272,10 +1314,10 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 	}
 success:
 	result.ok = true;
-	result.res.ok = clip;
+	result.val.ok = clip;
 cleanup:
 	if (exit_on_error && !result.ok) {
-		ERROR("%s (code=%d)\n", result.res.err.msg, result.res.err.code);
+		ERROR("%s (code=%d)\n", result.val.err.msg, result.val.err.code);
 		exit(1);
 	}
 	return result;

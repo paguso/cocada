@@ -28,6 +28,7 @@
 #include <ctype.h>
 
 #include "cstrutil.h"
+#include "mathutil.h"
 #include "memdbg.h"
 #include "new.h"
 
@@ -89,6 +90,15 @@ char *cstr_substr(char *str, size_t from,  size_t to)
 	char *ret = cstr_new(to-from);
 	memcpy(ret, str+from, to-from);
 	return ret;
+}
+
+
+char *cstr_ncpy(char *dest, char *src, size_t n)
+{
+	size_t m = strlen(src);
+	m = MIN(m, n);
+	dest[m] = '\0';
+	return strncpy(dest, src, m);
 }
 
 

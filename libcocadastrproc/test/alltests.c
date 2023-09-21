@@ -41,7 +41,7 @@ void run_all_tests(void)
 	//CuSuiteAddSuite(suite, alphabet_get_test_suite());
 	//CuSuiteAddSuite(suite, roaringbitvec_get_test_suite());
 	//CuSuiteAddSuite(suite, sais_get_test_suite());
-	//CuSuiteAddSuite(suite, xstr_get_test_suite());
+	CuSuiteAddSuite(suite, xstr_get_test_suite());
 	CuSuiteAddSuite(suite, xstrreader_get_test_suite());
 
 	CuSuiteRun(suite);

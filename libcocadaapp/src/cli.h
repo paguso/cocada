@@ -537,7 +537,7 @@ typedef struct {
 } cliparse_error;
 
 
-DECL_RESULT_ERR(cliparse, cliparser *, cliparse_error)
+DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
 
 /**
  * @brief Parses a program call.

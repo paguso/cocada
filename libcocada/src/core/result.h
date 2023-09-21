@@ -51,11 +51,11 @@
  * } E;
  * ```
  *
- * By using the macro `DECL_RESULT(R, T*, E*)` a type named `R_res` which could
+ * By using the macro `DECL_RESULT_OK_ERR(R, T*, E*) a type named `R_res` which could
  * be used as follows.
  *
  * ```C
- * DECL_RESULT(R, T*, E*);
+ * DECL_RESULT_OK(R, T*, E*);
  *
  * R_res read_T_from_file(char *path) {
  *  R_res result;
@@ -67,9 +67,8 @@
  *  goto SUCCESS;
  * FAIL:
  *  result.ok = false;
- *  result.res.err = NEW(E);
- *  result.res.err->code = //set error code;
- *  result.res.err->msg  = //set error message;
+ *  result.val.err.code = //set error code;
+ *  result.val.err.msg  = //set error message;
  * SUCCESS:
  *  // free resources
  *  return result;
@@ -82,23 +81,27 @@
 
 #include "coretype.h"
 
-
-#define DECL_RESULT(N, T) \
+/**
+ * @brief Declares a @p NAME_res result type with success value only.
+ */
+#define DECL_RESULT_OK(NAME, OK_RES_TYPE) \
 	typedef struct {\
 		bool ok;\
-		T res;\
-	} N##_res;\
+		OK_RES_TYPE val;\
+	} NAME##_res;
 
-#define DECL_RESULT_ERR(N, T, E) \
-	typedef T N##_ok_t;\
-	typedef E N##_err_t;\
+
+/**
+ * @brief Declares a @p NAME_res result type with success and error values.
+ */
+#define DECL_RESULT_OK_ERR(NAME, OK_RES_TYPE, ERR_RES_TYPE) \
 	typedef struct {\
 		bool ok;\
 		union {\
-			T ok;\
-			E err;\
-		} res;\
-	} N##_res;\
+			OK_RES_TYPE ok;\
+			ERR_RES_TYPE err;\
+		} val;\
+	} NAME##_res;
 
 
 
