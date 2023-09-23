@@ -99,6 +99,12 @@ bool fasta_goto(fasta *self, size_t *descr_offset);
 
 
 /**
+ * @brief Sets the position of the stream to the beginning of the file.
+ */
+void fasta_rewind(fasta *self);
+
+
+/**
  * @brief Advances the cursor to the next sequence record, and loads
  * it as a stream.
  * The returned strread reader is a virtual stream that points to the

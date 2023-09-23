@@ -210,6 +210,12 @@ bool fasta_goto(fasta *self, size_t *descr_offset)
 }
 
 
+void fasta_rewind(fasta *self)
+{
+	rewind(self->src);
+}
+
+
 const fasta_rec *fasta_next(fasta *self)
 {
 	if (!_goto_next(self)) {
