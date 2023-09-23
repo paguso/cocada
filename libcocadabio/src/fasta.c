@@ -151,6 +151,7 @@ fasta_res fasta_open(char *filename)
 	fasta *f = NEW(fasta);
 	f->src = fopen(filename, "r");
 	if (errno) {
+		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
 		result.ok = false;
 		result.val.err = (fasta_err){.code = errno};
 		cstr_ncpy(result.val.err.msg, strerror(errno), ERR_MSG_BUF_SIZE);
