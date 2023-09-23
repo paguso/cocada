@@ -52,6 +52,12 @@ void fastaidx_finalise(void *ptr, const finaliser *fnr)
 }
 
 
+void fastaidx_free(fastaidx *self)
+{
+	DESTROY_FLAT(self, fastaidx);
+}
+
+
 size_t fastaidx_size(fastaidx *self)
 {
 	return vec_len(self->dscs);
