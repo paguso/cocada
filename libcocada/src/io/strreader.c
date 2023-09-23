@@ -54,7 +54,7 @@ static int _strreader_getc(strread *t)
 }
 
 
-static void _strreader_ungetc(strread *t)
+static int _strreader_ungetc(strread *t)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	if (0 < rdr->index && rdr->index <= rdr->len) {
@@ -66,7 +66,7 @@ static void _strreader_ungetc(strread *t)
 }
 
 
-size_t  _strreader_read_str(strread *t, char *dest, size_t n)
+static size_t _strreader_read_str(strread *t, char *dest, size_t n)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	size_t r = MIN(n, rdr->len - rdr->index);
@@ -76,7 +76,7 @@ size_t  _strreader_read_str(strread *t, char *dest, size_t n)
 }
 
 
-size_t  _strreader_read_str_until(strread *t, char *dest, char delim)
+static size_t _strreader_read_str_until(strread *t, char *dest, char delim)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	size_t i, j;

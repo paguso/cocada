@@ -203,6 +203,13 @@ bool fasta_has_next(fasta *self)
 }
 
 
+bool fasta_goto(fasta *self, size_t *descr_offset)
+{
+	return ((fseek(self->src, descr_offset, SEEK_SET)==0) &&
+			 _goto_next(self));
+}
+
+
 const fasta_rec *fasta_next(fasta *self)
 {
 	if (!_goto_next(self)) {

@@ -105,4 +105,15 @@
 
 
 
+typedef struct {
+	int code;
+	char *msg;
+} code_msg_err;
+
+#define DECL_OK(TYPE, ...) DECL_RESULT_OK(TYPE##_ok, TYPE)
+#define DECL_OK_ERR(TYPE, ...) DECL_RESULT_OK_ERR(TYPE##_ok_err, TYPE, code_msg_err)
+
+XX_CORETYPES(DECL_OK)
+XX_CORETYPES(DECL_OK_ERR)
+
 #endif
