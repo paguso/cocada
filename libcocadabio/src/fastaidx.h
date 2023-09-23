@@ -51,6 +51,12 @@ void fastaidx_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
+ * @brief Destructor
+ */
+void fastaidx_free(fastaidx *self);
+
+
+/**
  * @brief
  */
 size_t fastaidx_size(fastaidx *self);
