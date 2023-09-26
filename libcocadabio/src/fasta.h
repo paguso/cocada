@@ -73,6 +73,7 @@ typedef struct {
 
 /**
  * @brief Opens a FASTA file and places the cursor at its beginning.
+ * @param filename The path to the file (**NO TRANSFER OF OWNERSHIP**)
  */
 rawptr_ok_err_res fasta_open(char *filename);
 

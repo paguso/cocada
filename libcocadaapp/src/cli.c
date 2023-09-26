@@ -1134,12 +1134,14 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 					goto cleanup;
 				}
 				cur_opt = hashmap_get_rawptr(cur_parse->options, &shortname);
-				// help option used
-				if (cur_opt->shortname == 'h') {
-					cliparser_print_help(cur_parse);
-					result.ok = true;
-					result.val.ok = clip;
-					goto cleanup;
+				// stop after parsing first sc option
+				if (cur_opt->sc) {
+					cur_parse->active_sc_opt = cur_opt;
+					// help option used
+					if (cur_opt->shortname == 'h') {
+						cliparser_print_help(cur_parse);
+					}
+					goto success;
 				}
 				if ( cur_opt->multi!=OPT_MULTIPLE && vec_len(cur_opt->values)>0 ) {
 					result.ok = false;
@@ -1168,11 +1170,6 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 					}
 					else {
 						vec_push__Bool(cur_opt->values, true);
-					}
-					// stop after parsing first sc option
-					if (cur_opt->sc) {
-						cur_parse->active_sc_opt = cur_opt;
-						goto success;
 					}
 				}
 				t++;
