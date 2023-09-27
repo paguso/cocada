@@ -1188,6 +1188,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 				cliparser *subcmd = hashmap_get_rawptr(cur_parse->subcommands, &tok);
 				cur_parse->active_subcmd = subcmd;
 				cur_parse = subcmd;
+				cur_parse->parsed = true;
 				cur_arg_no = 0;
 				t++;
 			}
