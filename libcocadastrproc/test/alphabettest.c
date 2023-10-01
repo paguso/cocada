@@ -33,13 +33,11 @@ void test_ab(CuTest *tc)
 	memdbg_reset();
 	size_t size = 16;
 	char *letters =
-	    "\0""0C1C2312AA6604CCB752FFFF567840C9AB7313330C91D0D88BB8DD8EEEF"; // len=60
-	size_t lsize = 60;
-	CuAssertSizeTEquals(tc, 59, strlen(&letters[1]));
+	    "0123456789ABCDEF0123456789ABCDEF"; // len=60
 	alphabet *ab;
-	ab = alphabet_new(lsize, letters);
+	ab = alphabet_new(strlen(letters), letters);
 	CuAssertSizeTEquals(tc, 16, ab_size(ab));
-	for (size_t i = 0; i < size; i++) {
+	for (size_t i = 0; i < ab_size(ab); i++) {
 		size_t rk = ab_rank(ab, letters[i]);
 		CuAssertSizeTEquals(tc, i, rk);
 		xchar_t c = ab_char(ab, i);
@@ -70,10 +68,36 @@ void test_int_ab(CuTest *tc)
 }
 
 
+void test_ab_with_equivs(CuTest *tc) 
+{
+	char *letters[4] = {"aA@0", "bB1", "cCç2", "dD3"};
+	memdbg_reset();
+	alphabet *ab = alphabet_new_with_equivs(4, letters);
+
+	CuAssertSizeTEquals(tc, 4, ab_size(ab));
+
+	for (size_t r = 0; r < 4; r++) {
+		for (size_t j = 0, l = strlen(letters[r]); j < l; j++) {
+			CuAssertSizeTEquals(tc, r, ab_rank(ab, letters[r][j]));
+		}
+	}
+
+	for (char c = 0; c < CHAR_MAX; c++) {
+		CuAssert(tc, "rank error", !ab_contains(ab, c) || ab_rank(ab, c) < 4);
+	}
+
+	alphabet_free(ab);
+	if (!memdbg_is_empty()) {
+		memdbg_print_stats(stdout, true);
+	}
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
 CuSuite *alphabet_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_ab);
 	SUITE_ADD_TEST(suite, test_int_ab);
+	SUITE_ADD_TEST(suite, test_ab_with_equivs);
 	return suite;
 }

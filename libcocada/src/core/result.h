@@ -92,6 +92,16 @@
 
 
 /**
+ * @brief Declares a @p NAME_res result type with error value only.
+ */
+#define DECL_RESULT_ERR(NAME, ERR_RES_TYPE) \
+	typedef struct {\
+		bool ok;\
+		ERR_RES_TYPE err;\
+	} NAME##_res;
+
+
+/**
  * @brief Declares a @p NAME_res result type with success and error values.
  */
 #define DECL_RESULT_OK_ERR(NAME, OK_RES_TYPE, ERR_RES_TYPE) \
@@ -103,6 +113,18 @@
 		} val;\
 	} NAME##_res;
 
+typedef struct {
+	int code;
+	char *msg;
+} code_msg_err;
 
+
+DECL_RESULT_ERR(code_msg_err, code_msg_err)
+
+#define DECL_OK(TYPE, ...) DECL_RESULT_OK(TYPE##_ok, TYPE)
+#define DECL_OK_ERR(TYPE, ...) DECL_RESULT_OK_ERR(TYPE##_ok_err, TYPE, code_msg_err)
+
+XX_CORETYPES(DECL_OK)
+XX_CORETYPES(DECL_OK_ERR)
 
 #endif

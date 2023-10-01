@@ -70,19 +70,12 @@ typedef struct {
 } fasta_rec_rdr;
 
 
-#define ERR_MSG_BUF_SIZE 127
-
-typedef struct {
-	int code;
-	char msg[ERR_MSG_BUF_SIZE+1];
-} fasta_err; 
-
-DECL_RESULT_OK_ERR(fasta, fasta*, fasta_err);
 
 /**
  * @brief Opens a FASTA file and places the cursor at its beginning.
+ * @param filename The path to the file (**NO TRANSFER OF OWNERSHIP**)
  */
-fasta_res fasta_open(char *filename);
+rawptr_ok_err_res fasta_open(const char *filename);
 
 
 /**
@@ -95,6 +88,21 @@ const char *fasta_path(fasta *self);
  * cursor position
  */
 bool fasta_has_next(fasta *self);
+
+
+/**
+ * @brief Moves the stream to the sequence at the given description offset
+ * @p descr_offset.
+ * 
+ * @return true on success, false on fail.
+ */
+bool fasta_goto(fasta *self, size_t descr_offset);
+
+
+/**
+ * @brief Sets the position of the stream to the beginning of the file.
+ */
+void fasta_rewind(fasta *self);
 
 
 /**

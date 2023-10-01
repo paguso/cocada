@@ -31,11 +31,14 @@
 #include "arrays.h"
 #include "new.h"
 #include "order.h"
+#include "coretype.h"
+#include "errlog.h"
 #include "cstrutil.h"
 #include "hashmap.h"
 #include "mathutil.h"
 
 
+#define UCHAR_RANGE (UCHAR_MAX+1)
 
 typedef enum {
 	ARRAY = 0,
@@ -61,26 +64,60 @@ alphabet *alphabet_new(size_t size, const char *letters)
 	ret =  NEW(alphabet);
 	ret->type = CHAR_TYPE;
 	ret->rank_mode = ARRAY;
-	ret->letters = cstr_clone_len(letters, size);
-	qsort(ret->letters, size, sizeof(char), cmp_char);
-	// removing repeated letters
-	int l = size - 1, r = size - 1;
-	while (r >= 0) {
-		while (l >= 0 && ret->letters[l] == ret->letters[r]) {
-			l--;
+	ret->letters = ARR_NEW(char, size);
+	ret->ranks.arr = ARR_NEW(size_t, UCHAR_RANGE);
+	ARR_FILL(ret->ranks.arr, 0, UCHAR_RANGE, size);
+	ret->size = 0;
+	for (size_t i = 0; i < size; i++) {
+		uchar c = letters[i];
+		if (ret->ranks.arr[c] == size) {
+			ret->ranks.arr[c] = ret->size;
+			ret->letters[ret->size] = c;
+			ret->size++;
+		} else {
+			WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c, ret->ranks.arr[c]);
 		}
-		if ( (r - l) > 1 ) {
-			ret->letters = cstr_cut(ret->letters, l + 1, r);
-			size -= (r - l - 1);
-		}
-		r = l;
 	}
-	ret->letters = cstr_crop_len(ret->letters, size);
-	ret->size = size;
-	ret->ranks.arr = ARR_NEW(size_t, UCHAR_MAX);
-	ARR_FILL(ret->ranks.arr, 0, UCHAR_MAX, size);
-	for (size_t i=0; i<size; i++)
-		ret->ranks.arr[(size_t)letters[i]] = i;
+	for (size_t i = 0; i < UCHAR_RANGE; i++) {
+		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
+	}
+	ret->letters = cstr_crop_len(ret->letters, ret->size);
+	return ret;
+}
+
+
+alphabet *alphabet_new_with_equivs(size_t size, char **letters)
+{
+	alphabet *ret = NEW(alphabet);
+	ret->type = CHAR_TYPE;
+	ret->letters = cstr_new(size);
+	ret->size = 0;
+	ret->ranks.arr = ARR_NEW(size_t, UCHAR_RANGE);
+	ret->rank_mode = ARRAY;
+	ARR_FILL(ret->ranks.arr, 0, UCHAR_RANGE, size);
+	
+	for (size_t i = 0; i < size; i++) {
+		bool i_used = false;
+		for (size_t j = 0, l = strlen(letters[i]); j < l; j++) {
+			uchar c = letters[i][j];
+			if (ret->ranks.arr[c] == size) {
+				ret->ranks.arr[c] = ret->size;
+				if (!i_used) {
+					ret->letters[ret->size] = c;
+				}
+				i_used = true;
+			} else {
+				WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c, ret->ranks.arr[c]);
+			}
+		}
+		if (i_used) {
+			ret->size++;
+		}
+	}
+	for (size_t i = 0; i < UCHAR_RANGE; i++) {
+		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
+	}
+	ret->letters = cstr_crop_len(ret->letters, ret->size);
 	return ret;
 }
 
@@ -135,7 +172,7 @@ void alphabet_free(alphabet *ab)
 
 void alphabet_finalise(void *ptr, const finaliser *fnr)
 {
-	alphabet *ab = (alphabet *)ab;
+	alphabet *ab = (alphabet *)ptr;
 	if (ab == NULL) return;
 	switch (ab->rank_mode) {
 	case ARRAY:

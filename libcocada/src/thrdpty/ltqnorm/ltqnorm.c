@@ -21,7 +21,7 @@
 #include <math.h>
 #include <errno.h>
 
-#include "ltqnorn.h"
+#include "ltqnorm.h"
 
 /* Coefficients in rational approximations. */
 static const double a[] = {

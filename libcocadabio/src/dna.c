@@ -22,7 +22,9 @@
 #include "alphabet.h"
 #include "dna.h"
 
+static char *letters[4] = {"Aa", "Cc", "Gg", "Tt"};
+
 alphabet *dna_ab_new()
 {
-	return alphabet_new(4, "acgt");
+	return alphabet_new_with_equivs(4, letters);
 }

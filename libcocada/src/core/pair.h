@@ -43,6 +43,8 @@
 	} pair_##type1##_##type2;
 
 
+#define DECL_PAIR2(TYPE, ...) DECL_PAIR(TYPE, TYPE) 
+
 /**
  * @brief To be used as type name for a pair of given types.
  * For example 
@@ -57,12 +59,13 @@
  * 
  * ```
  */
-#define PAIR(type1, type2) pair_##type1##_##type2
+#define PAIR(TYPE1, TYPE2) pair_##TYPE1##_##TYPE2
 
+#define PAIR2(TYPE) pair_##TYPE##_##TYPE
 
-#define DECL_PAIRS(TYPE,...) \
-	DECL_PAIR(TYPE, TYPE)
+#define DECL_PAIRS2(TYPE,...) \
+	DECL_PAIR2(TYPE)
 
-XX_CORETYPES(DECL_PAIRS)
+XX_CORETYPES(DECL_PAIRS2)
 
 #endif // PAIR_H

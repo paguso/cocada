@@ -145,15 +145,15 @@ struct _fasta {
 };
 
 
-fasta_res fasta_open(char *filename)
+rawptr_ok_err_res fasta_open(const char *filename)
 {
-	fasta_res result = {.ok = true};
+	rawptr_ok_err_res result = {.ok = true};
 	fasta *f = NEW(fasta);
 	f->src = fopen(filename, "r");
 	if (errno) {
+		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
 		result.ok = false;
-		result.val.err = (fasta_err){.code = errno};
-		cstr_ncpy(result.val.err.msg, strerror(errno), ERR_MSG_BUF_SIZE);
+		result.val.err = (code_msg_err){.code = errno, .msg = strerror(errno)};
 		goto ERROR;
 	}
 	f->src_path = cstr_clone(filename);
@@ -200,6 +200,19 @@ bool fasta_has_next(fasta *self)
 	bool ret = _goto_next(self);
 	fseek(self->src, cur, SEEK_SET);
 	return ret;
+}
+
+
+bool fasta_goto(fasta *self, size_t descr_offset)
+{
+	return ((fseek(self->src, descr_offset, SEEK_SET)==0) &&
+			 _goto_next(self));
+}
+
+
+void fasta_rewind(fasta *self)
+{
+	rewind(self->src);
 }
 
 

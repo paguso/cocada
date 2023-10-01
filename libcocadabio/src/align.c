@@ -50,7 +50,7 @@ static int read_number_(char *cigar, size_t pos, int *nb)
 }
 
 
-static void compress_cigar(strbuf *cigar)
+void compress_cigar(strbuf *cigar)
 {
 	size_t n = strbuf_len(cigar);
 	//char *cigar_ = strbuf_as_str(cigar);
@@ -401,7 +401,7 @@ void fprintf_alignment(FILE *out, const char *qry, size_t qry_from, size_t qry_t
 	strbuf *tgt_line = strbuf_new();
 	strbuf *cig_line = strbuf_new();
 	size_t tpos = 0, qpos = 0, cpos = 0, prev_cpos = 0;
-	int pos_len = (int)log10(MAX(qry_from, tgt_from)) + 1;
+	int pos_len = (qry_from || tgt_from) ? (int)log10(MAX(qry_from, tgt_from)) + 1 : 1;
 	sbprintf(tgt_line, "T[%*d] ", pos_len, tgt_from);
 	sbprintf(qry_line, "Q[%*d] ", pos_len, qry_from);
 	sbprintf(cig_line, "%*s", pos_len+4, "");
@@ -458,7 +458,7 @@ void fprintf_alignment(FILE *out, const char *qry, size_t qry_from, size_t qry_t
 		}
 	}
 	assert (tpos == tgt_len && qpos == qry_len);
-	pos_len = (int)log10(MAX(qry_to, tgt_to)) + 1;
+	pos_len =  (qry_to || tgt_to) ? (int)log10(MAX(qry_to, tgt_to)) + 1 : 1;
 	sbprintf(tgt_line, "[%*d]", pos_len, tgt_to);
 	sbprintf(qry_line, "[%*d]", pos_len, qry_to);
 	sbprintf(cig_line, "%*s", pos_len+2, "");

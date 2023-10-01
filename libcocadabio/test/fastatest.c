@@ -86,13 +86,42 @@ static void test_teardown()
 	remove(filename);
 }
 
+void test_fasta_goto(CuTest *tc) 
+{
+	memdbg_reset();
+	test_setup();
+
+	rawptr_ok_err_res result = fasta_open(filename);
+	CuAssert(tc, "Error opening fasta", result.ok);
+	fasta *f = result.val.ok;
+	for (size_t i = 0; i < nseq; i++) {
+		CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
+		CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
+	}
+	
+	CuAssert(tc, "should not have found a record\n", fasta_goto(f, desc_offsets[nseq-1]+1)==false);
+	
+	for (int i = nseq-1; i >= 0; i--) {
+		CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
+		CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
+	}
+
+	fasta_close(f);
+
+
+	test_teardown();
+	if (!memdbg_is_empty()) {
+		CuAssert(tc, "Memory leak!", memdbg_is_empty());
+	}
+}
+
 
 void test_fasta_next(CuTest *tc)
 {
 	memdbg_reset();
 	test_setup();
 
-	fasta_res result = fasta_open(filename);
+	rawptr_ok_err_res result = fasta_open(filename);
 	CuAssert(tc, "Error opening fasta", result.ok);
 	fasta *f = result.val.ok;
 	size_t i=0;
@@ -103,7 +132,7 @@ void test_fasta_next(CuTest *tc)
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
 		size_t k = 0;
-		for (size_t j=0, rl=strlen(rr->seq); j < rl; j++) {
+			for (size_t j=0, rl=strlen(rr->seq); j < rl; j++) {
 			while ( k<seq_i_len && seq[i][k]=='\n') k++;
 			CuAssert(tc, "fasta read error: read too many chars", k<seq_i_len);
 			CuAssert(tc, "fasta read error: char mismatch", seq[i][k]==rr->seq[j]);
@@ -127,7 +156,7 @@ void test_fasta_next_read(CuTest *tc)
 	memdbg_reset();
 	test_setup();
 
-	fasta_res result = fasta_open(filename);
+	rawptr_ok_err_res result = fasta_open(filename);
 	CuAssert(tc, "Error opening fasta", result.ok);
 	fasta *f = result.val.ok;
 	size_t i=0;
@@ -164,5 +193,6 @@ CuSuite *fasta_get_test_suite()
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_fasta_next);
 	SUITE_ADD_TEST(suite, test_fasta_next_read);
+	SUITE_ADD_TEST(suite, test_fasta_goto);
 	return suite;
 }
