@@ -145,7 +145,7 @@ struct _fasta {
 };
 
 
-rawptr_ok_err_res fasta_open(char *filename)
+rawptr_ok_err_res fasta_open(const char *filename)
 {
 	rawptr_ok_err_res result = {.ok = true};
 	fasta *f = NEW(fasta);
@@ -203,7 +203,7 @@ bool fasta_has_next(fasta *self)
 }
 
 
-bool fasta_goto(fasta *self, size_t *descr_offset)
+bool fasta_goto(fasta *self, size_t descr_offset)
 {
 	return ((fseek(self->src, descr_offset, SEEK_SET)==0) &&
 			 _goto_next(self));

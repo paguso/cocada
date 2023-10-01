@@ -75,7 +75,7 @@ typedef struct {
  * @brief Opens a FASTA file and places the cursor at its beginning.
  * @param filename The path to the file (**NO TRANSFER OF OWNERSHIP**)
  */
-rawptr_ok_err_res fasta_open(char *filename);
+rawptr_ok_err_res fasta_open(const char *filename);
 
 
 /**
@@ -96,7 +96,7 @@ bool fasta_has_next(fasta *self);
  * 
  * @return true on success, false on fail.
  */
-bool fasta_goto(fasta *self, size_t *descr_offset);
+bool fasta_goto(fasta *self, size_t descr_offset);
 
 
 /**

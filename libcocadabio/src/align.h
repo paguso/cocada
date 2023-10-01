@@ -103,4 +103,11 @@ int affine_global_align(const char *qry, size_t qry_len, const char *tgt, size_t
 void fprintf_alignment(FILE *out, const char *qry, size_t qry_from, size_t qry_to, const char *tgt, size_t tgt_from, size_t tgt_to, const char *cigar, size_t cigar_len);
 
 
+/**
+ * @brief Simplifies a CIGAR strbuf in place by merging adjacent 
+ * sequences of the same operation.
+ */
+void compress_cigar(strbuf *cigar);
+
+
 #endif // ALIGN_H

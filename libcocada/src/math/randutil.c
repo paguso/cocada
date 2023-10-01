@@ -31,7 +31,7 @@
 #include "bitbyte.h"
 #include "randutil.h"
 
-#include "ltqnorn.h"
+#include "ltqnorm.h"
 
 
 static sfmt_t _rng;
