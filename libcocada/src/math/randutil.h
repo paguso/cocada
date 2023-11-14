@@ -35,6 +35,12 @@
 
 
 /**
+ * Resets the RNG to with a given seed
+ */
+void rand_reset(uint32_t seed);
+
+
+/**
  * Returns a randomly generated 64-bit unsigned integer
  */
 uint64_t rand_next ();
