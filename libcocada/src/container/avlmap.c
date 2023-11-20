@@ -107,7 +107,12 @@ void avlmap_ins(avlmap *self, const void *key, const void *val)
 	memcpy(entry, key, self->sizeofkey);
 	void *valptr = ENTRY_VAL(entry);
 	memcpy(valptr, val, self->sizeofval);
-	self->size += avl_ins(self->tree, entry);
+    bool inserted = avl_ins(self->tree, entry);
+    self->size += inserted;
+    if (!inserted) {
+        void *cur_val = avlmap_get_mut(self, key);
+        memcpy(cur_val, val, self->sizeofval);
+    }
 	free(entry);
 }
 

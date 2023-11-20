@@ -125,7 +125,7 @@ void hashmap_fit(hashmap *hmap);
 
 
 /**
- * @brief Checks whether the @p map already contains a given @p key.
+ * @brief Checks whether the map @p hmap already contains a given @p key.
  */
 bool hashmap_contains(const hashmap *hmap, const void *key);
 
