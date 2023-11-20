@@ -203,7 +203,7 @@ XX_CORETYPES(SA_ARR_DECL)
 	}
 
 /**
- * @brief Creates a new matrix of a given TYPE with @p ROWS rows and @p COLS columns 
+ * @brief Creates a new matrix of a given TYPE with @p ROWS rows and @p COLS columns
  * and initializes it to 0.
  */
 #define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
@@ -232,23 +232,23 @@ XX_CORETYPES(SA_ARR_DECL)
 
 
 /**
- * @brief Expands into a type name for an array with elements of a 
+ * @brief Expands into a type name for an array with elements of a
  * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
- * A TYPE_array encapsulates an ordinary C array of TYPE and its 
- * length in a struct. This is convenient because we can pass and 
- * receive the array and its length to and from functions as a single 
- * argument. Differently from vectors and other generic arrays, the type 
- * of the elements makes its use more convenient, without the need for 
+ * A TYPE_array encapsulates an ordinary C array of TYPE and its
+ * length in a struct. This is convenient because we can pass and
+ * receive the array and its length to and from functions as a single
+ * argument. Differently from vectors and other generic arrays, the type
+ * of the elements makes its use more convenient, without the need for
  * casts and other type conversions.
- * 
+ *
  * Prior to being used, a TYPE_array must be declared with the macro
  * ::DECL_ARRAY. By importing this file you get the declaration of
  * TYPE_array for all the core types defined in coretype.h.
- * 
+ *
  * A TYPE_array object is primarily meant to be created on the stack,
- * although the encapsulated array will typically be allocated on 
- * the heap. Thus we can pass and receive a TYPE_array by value. 
- * 
+ * although the encapsulated array will typically be allocated on
+ * the heap. Thus we can pass and receive a TYPE_array by value.
+ *
  * Example:
  * ```
  * void print_int_array(ARRAY(int) a){
@@ -256,7 +256,7 @@ XX_CORETYPES(SA_ARR_DECL)
  * 		printf("%d ", a.arr[i]);
  * 	}
  * }
- * 
+ *
  * int main() {
  * 	ARRAY(int) a = ARRAY_NEW(int, 10);
  * 	for (size_t i=0; i<a.len; i++){
@@ -287,7 +287,7 @@ XX_CORETYPES(DECL_ARRAY)
 /**
  * @brief Creates a new TYPE_array object with a given length
  * on the stack.
- * The encapsulated array is allocated on the heap and is left 
+ * The encapsulated array is allocated on the heap and is left
  * uninitialized.
  * This array can be freed with ::ARRAY_FREE.
  * @see See example in ::ARRAY
@@ -297,7 +297,7 @@ XX_CORETYPES(DECL_ARRAY)
 /**
  * @brief Encapsulates an existing array of a given TYPE with a given length
  * in a TYPE_array object on the stack.
- * 
+ *
  * Example
  * ```
  * int *src = calloc(5, sizeof(int));
@@ -308,9 +308,9 @@ XX_CORETYPES(DECL_ARRAY)
 
 /**
  * @brief Frees the encapsulated array of a TYPE_array object.
- * @warning This is a shallow free. It does not free the contents of the 
+ * @warning This is a shallow free. It does not free the contents of the
  * encapsulated array if it contains pointers to other objects. For
- * the proper disposal of structured object collections, use vectors 
+ * the proper disposal of structured object collections, use vectors
  * defined in vec.h and the destructor infrastructure defined in new.h.*
  */
 #define ARRAY_FREE(A) free((A).arr)

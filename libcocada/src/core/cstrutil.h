@@ -96,7 +96,7 @@ char *cstr_substr(char *str, size_t from,  size_t to);
 
 
 /**
- * @brief Copies at most n chars from @p src to @p dest and then adds 
+ * @brief Copies at most n chars from @p src to @p dest and then adds
  * a NULL-terminating char '\0' to @p dest.
  * @return a pointer to the destination string @p dest.
  */

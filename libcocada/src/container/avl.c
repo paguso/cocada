@@ -98,6 +98,13 @@ void avl_finalise(void *ptr, const finaliser *fnr)
 	}
 }
 
+
+bool avl_contains(const avl *self, const void *key)
+{
+	return avl_get(self, key) != NULL;
+}
+
+
 const void *avl_get(const avl *self, const void *key)
 {
 	avlnode *cur = self->root;

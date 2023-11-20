@@ -92,7 +92,7 @@
  * ```
  *
  * Also, in case the user wants to treat external references as owned,
- * she or he should care to provide the appropriate destructor when
+ * they should care to provide the appropriate destructor when
  * freeing the tree,
  * for instance
  * ```C
@@ -146,6 +146,12 @@ avl *avl_new(size_t typesize, cmp_func cmp);
  * @see new.h
  */
 void avl_finalise(void *ptr, const finaliser *fnr);
+
+
+/**
+ * @brief Checks whether the @p key is contained in the tree.
+ */
+bool avl_contains(const avl *self, const void *key);
 
 
 /**

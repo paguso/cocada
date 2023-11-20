@@ -60,7 +60,8 @@ static int _strreader_ungetc(strread *t)
 	if (0 < rdr->index && rdr->index <= rdr->len) {
 		rdr->index--;
 		return 1;
-	} else {
+	}
+	else {
 		return 0;
 	}
 }
@@ -91,7 +92,7 @@ static size_t _strreader_read_str_until(strread *t, char *dest, char delim)
 
 static strread_vt _strreader_vt = { .reset = _strreader_reset,
                                     .getc = _strreader_getc,
-									.ungetc = _strreader_ungetc,
+                                    .ungetc = _strreader_ungetc,
                                     .read_str = _strreader_read_str,
                                     .read_str_until = _strreader_read_str_until
                                   };

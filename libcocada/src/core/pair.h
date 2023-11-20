@@ -32,7 +32,7 @@
 
 /**
  * @brief Declares a pair of given types.
- * By importing this file "pair.h", homogenous pairs are declared for all core types, 
+ * By importing this file "pair.h", homogenous pairs are declared for all core types,
  * ex. pair_int_int, pair_double_double, etc.
  * @see coretype.h
  */
@@ -43,20 +43,20 @@
 	} pair_##type1##_##type2;
 
 
-#define DECL_PAIR2(TYPE, ...) DECL_PAIR(TYPE, TYPE) 
+#define DECL_PAIR2(TYPE, ...) DECL_PAIR(TYPE, TYPE)
 
 /**
  * @brief To be used as type name for a pair of given types.
- * For example 
- * ``` 
+ * For example
+ * ```
  * DECL_PAIR(int, char);
- * 
+ *
  * int main() {
  * 		PAIR(int, char) p = {1, 'a'};
  * 		PAIR(int, char) q = {2, 'b'};
  * 		...
  * }
- * 
+ *
  * ```
  */
 #define PAIR(TYPE1, TYPE2) pair_##TYPE1##_##TYPE2

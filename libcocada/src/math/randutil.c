@@ -55,7 +55,7 @@ static inline uint64_t _rand_next_unchecked()
 
 
 
-void rand_reset(uint32_t seed) 
+void rand_reset(uint32_t seed)
 {
 	sfmt_init_gen_rand(&_rng, seed);
 	__randinit = true;

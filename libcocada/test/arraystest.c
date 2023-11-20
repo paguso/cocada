@@ -52,7 +52,8 @@ void test_matrix(CuTest *tc)
 }
 
 
-void test_array(CuTest *tc) {
+void test_array(CuTest *tc)
+{
 	memdbg_reset();
 
 	ARRAY(int) a = ARRAY_NEW(int, 10);
