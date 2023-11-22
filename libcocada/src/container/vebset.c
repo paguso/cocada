@@ -23,7 +23,7 @@
 
 #include "coretype.h"
 #include "errlog.h"
-#include "hashmap.h"
+#include "avlmap.h"
 #include "hash.h"
 #include "mathutil.h"
 #include "new.h"
@@ -40,14 +40,14 @@
 
 #define INDEX(h, l,  nbits) ( (h * SQRTUNIV(nbits)) + l)
 
-#define CLUSTER(index) (*((vebtree**)hashmap_get(self->clusters, &index)))
+#define CLUSTER(index) (*((vebtree**)avlmap_get(self->clusters, &index)))
 
 
 typedef struct _vebtree {
 	int64_t min;
 	int64_t max;
 	struct _vebtree *summary;
-	hashmap *clusters;
+	avlmap *clusters;
 } vebtree;
 
 
@@ -80,7 +80,7 @@ void vebtree_finalise(void *self, const finaliser *fnr)
 	if (vset->clusters) {
 		DESTROY(vset->clusters,
 		        finaliser_cons(
-		            finaliser_cons(FNR(hashmap),
+		            finaliser_cons(FNR(avlmap),
 		                           finaliser_new_empty()),
 		            finaliser_new_ptr_to_obj(FNR(vebtree))));
 	}
@@ -120,7 +120,7 @@ bool vebtree_contains(vebtree *self, uint32_t x, uint nbits)
 		return true;
 	}
 	uint32_t high = HIGH(x, nbits);
-	if (hashmap_contains(self->clusters, &high)) {
+	if (avlmap_contains(self->clusters, &high)) {
 		vebtree *cluster = CLUSTER(high);
 		uint32_t low = LOW(x, nbits);
 		return vebtree_contains(cluster, low, nbits/2);
@@ -167,18 +167,16 @@ bool vebtree_add(vebtree *self, uint32_t x, uint nbits)
 	// will insert x recursively. summary and cluster needed
 	if (!self->summary) {
 		self->summary = vebtree_new_sized(nbits/2);
-		self->clusters = hashmap_new(sizeof(uint32_t), sizeof(vebtree *),
-		                             ident_hash_uint32_t, eq_uint32_t);
-		//self->clusters = avlmap_new(sizeof(uint32_t), sizeof(vebtree *),
-		//                            eq_uint32_t);
+		//self->clusters = avlmap_new(sizeof(uint32_t), sizeof(vebtree *), ident_hash_uint32_t, eq_uint32_t);
+		self->clusters = avlmap_new(sizeof(uint32_t), sizeof(vebtree *), cmp_uint32_t);
 	}
 	uint32_t high = HIGH(x, nbits);
 	uint32_t low = LOW(x, nbits);
 	vebtree *cluster = NULL;
-	if (!hashmap_contains(self->clusters, &high)) {
+	if (!avlmap_contains(self->clusters, &high)) {
 		cluster = vebtree_new_sized(nbits/2);
 		//DEBUG("Creating new cluster #%u @%p at level %u bits (parent=%p).\n", high, cluster, self->nbits, self);
-		hashmap_ins_rawptr(self->clusters, &high, cluster);
+		avlmap_ins_rawptr(self->clusters, &high, cluster);
 	}
 	else {
 		cluster = CLUSTER(high);
@@ -232,7 +230,7 @@ bool vebtree_del(vebtree *self, uint32_t x, uint nbits)
 	}
 	uint32_t high = HIGH(x, nbits);
 	uint32_t low = LOW(x, nbits);
-	if (!hashmap_contains(self->clusters, &high)) {
+	if (!avlmap_contains(self->clusters, &high)) {
 		return false;
 	}
 	vebtree *cluster = CLUSTER(high);
@@ -282,7 +280,7 @@ int64_t vebtree_succ(vebtree *self, uint32_t x, uint nbits)
 	uint32_t low = LOW(x, nbits);
 
 	vebtree *cluster = NULL;
-	if (hashmap_contains(self->clusters, &high)) {
+	if (avlmap_contains(self->clusters, &high)) {
 		cluster = CLUSTER(high);
 	}
 	if (cluster && low < vebtree_max(cluster)) {
@@ -293,7 +291,7 @@ int64_t vebtree_succ(vebtree *self, uint32_t x, uint nbits)
 		// sucessor not in the same cluster as x
 		high = vebtree_succ(self->summary, high, nbits/2);
 		if (high < UNIV(nbits/2)) {
-			assert(hashmap_contains(self->clusters, &high));
+			assert(avlmap_contains(self->clusters, &high));
 			cluster = CLUSTER(high);
 			low = vebtree_min(cluster);
 		}
@@ -335,7 +333,7 @@ int64_t vebtree_pred(vebtree *self, uint32_t x, uint nbits)
 	int64_t low = LOW(x, nbits);
 
 	vebtree *cluster = NULL;
-	if (hashmap_contains(self->clusters, &high)) {
+	if (avlmap_contains(self->clusters, &high)) {
 		cluster = CLUSTER(high);
 	}
 	if (cluster &&  vebtree_min(cluster) < low) {
@@ -352,7 +350,7 @@ int64_t vebtree_pred(vebtree *self, uint32_t x, uint nbits)
 		high = vebtree_pred(self->summary, high, nbits/2);
 		//DEBUG("summary indicated pred is in cluster #%ld\n", high);
 		if (high >= 0) {
-			assert(hashmap_contains(self->clusters, &high));
+			assert(avlmap_contains(self->clusters, &high));
 			cluster = CLUSTER(high);
 			low = vebtree_max(cluster);
 			assert (low >= 0);
