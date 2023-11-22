@@ -112,6 +112,10 @@ $(foreach tgt,$(filter-out help doc clean_doc fmt,$(all_valid_targets)), $(eval 
 
 # code formatting 
 
+head_license_cmd := sh headlicense.sh
+fmt_cmd := astyle
+fmt_options := --style=kr --indent=tab -n #--recursive
+
 all_src_files = $(foreach l,$(informed_libs),$(shell find lib$(l)/src -name '*.[c|h]'))
 all_src_files += $(foreach l,$(informed_libs),$(shell find lib$(l)/test -name '*.[c|h]'))
 thrdpty_files = $(foreach l,$(informed_libs),$(shell find lib$(l)/src/thrdpty -name '*.[c|h]'))
@@ -140,8 +144,4 @@ doc: $(doc_dir)
 
 clean_doc:
 	$(RM) -r $(doc_dir)	
-
-head_license_cmd := sh headlicense.sh
-fmt_cmd := astyle
-fmt_options := --style=kr --indent=tab -n #--recursive
 

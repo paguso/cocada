@@ -382,6 +382,41 @@ void test_avl_get_iter(CuTest *tc)
 }
 
 
+void test_avl_del(CuTest *tc) {
+	memdbg_reset();
+
+	// FLAT MAP
+
+	avl *tree = avl_new(sizeof(int), cmp_int);
+	size_t n = 20;
+
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		int key = i;
+		CuAssert(tc, "Should not contain key.", !avl_contains(tree, &key));
+		avl_ins(tree, &key);
+		CuAssert(tc, "Should contain key.", avl_contains(tree, &key));
+		int *v = avl_get(tree, &key);
+		CuAssertIntEquals(tc, key, *v);
+		
+	}
+	
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		int key = i;
+		DEBUG("\nDeleting %d\n\n", key);
+		CuAssert(tc, "Should contain key.", avl_contains(tree, &key));
+		avl_del(tree, &key);
+		CuAssert(tc, "Should not contain key.", !avl_contains(tree, &key));
+	}
+	
+	DESTROY_FLAT(tree, avl);
+
+	if (!memdbg_is_empty()) {
+		memdbg_print_stats(stdout, true);
+		CuAssert(tc, "Memory leak!", memdbg_is_empty());
+	}
+
+}
+
 
 CuSuite *avl_get_test_suite()
 {
@@ -390,5 +425,6 @@ CuSuite *avl_get_test_suite()
 	SUITE_ADD_TEST(suite, test_avl_get);
 	SUITE_ADD_TEST(suite, test_avl_remv);
 	SUITE_ADD_TEST(suite, test_avl_get_iter);
+	SUITE_ADD_TEST(suite, test_avl_del);
 	return suite;
 }

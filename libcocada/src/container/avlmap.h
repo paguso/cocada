@@ -78,7 +78,6 @@ bool avlmap_contains(const avlmap *self, const void *key);
  */
 const void *avlmap_get(const avlmap *self, const void *key);
 
-
 /**
  * @brief Gets an internal non-const pointer to the value associated to 
  * the given @p key, if any. Else returns NULL.
@@ -121,6 +120,14 @@ void avlmap_del(avlmap *self, void *key);
  */
 void avlmap_remv(avlmap *self, void *key, void *dest_key,
                  void *dest_val);
+
+
+#define AVLMAP_DECL(TYPE, ...)\
+TYPE avlmap_get_##TYPE(avlmap *self, const void *key);\
+TYPE avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val);\
+
+XX_CORETYPES(AVLMAP_DECL)
+
 
 
 /**

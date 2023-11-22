@@ -22,7 +22,7 @@
 #ifndef vebset_H
 #define vebset_H
 
-#include <coretype.h>
+#include "coretype.h"
 
 typedef struct _vebset vebset;
 

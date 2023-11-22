@@ -65,17 +65,9 @@ void avlmap_test_ins(CuTest *tc)
 		CuAssertDblEquals(tc, val.val, v->val, 0.1);
 	}
 
-	avlmap_iter *amit = avlmap_get_iter(map, IN_ORDER);
-	FOREACH_IN_ITER(entry, avlmap_entry, avlmap_iter_as_iter(amit)) {
-		testkey_t *k = (testkey_t *)entry->key;
-		testval_t *v = (testval_t *)entry->val;
-		DEBUG("Key={%d} val={%lf}\n", k->key, v->val);
-	}
-	avlmap_iter_free(amit);
-
 	DESTROY_FLAT(map, avlmap);
 
-	// TWO-LEVEL MAP
+	// store pointers to objects 
 
 	map = avlmap_new(sizeof(testkey_t *), sizeof(testval_t *), cmp_testkey_ptr_t);
 
@@ -91,13 +83,84 @@ void avlmap_test_ins(CuTest *tc)
 		CuAssertDblEquals(tc, val->val, (*v)->val, 0.1);
 	}
 
-	amit = avlmap_get_iter(map, IN_ORDER);
-	FOREACH_IN_ITER(entry, avlmap_entry, avlmap_iter_as_iter(amit)) {
-		testkey_t **k = entry->key;
-		testval_t **v = entry->val;
-		DEBUG("Key={%d} val={%lf}\n", (*k)->key, (*v)->val);
+	DESTROY(map, finaliser_cons(finaliser_cons(FNR(avlmap), finaliser_new_ptr()),
+	                            finaliser_new_ptr()));
+
+
+	if (!memdbg_is_empty()) {
+		memdbg_print_stats(stdout, true);
+		CuAssert(tc, "Memory leak!", memdbg_is_empty());
 	}
-	avlmap_iter_free(amit);
+
+}
+
+
+void prt_map_entry(FILE *stream, void *entry) {
+	int **k = entry;
+	double **v = entry + sizeof(int*);
+	fprintf(stream, "[KEY=%d VAL=%lf]", **k, **v);
+}
+
+void avlmap_test_del(CuTest *tc)
+{
+	memdbg_reset();
+
+	// FLAT MAP
+
+	avlmap *map = avlmap_new(sizeof(testkey_t), sizeof(testval_t), cmp_testkey_t);
+	size_t n = 100;
+
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		testkey_t key = {.key = i};
+		testval_t val = {.val = (double)i};
+		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &key));
+		avlmap_ins(map, &key, &val);
+		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
+		testval_t *v = avlmap_get(map, &key);
+		CuAssertDblEquals(tc, val.val, v->val, 0.1);
+	}
+	
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		testkey_t key = {.key = i};
+		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
+		avlmap_del(map, &key);
+		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &key));
+	}
+	CuAssertSizeTEquals(tc, 0, avlmap_size(map));
+
+	DESTROY_FLAT(map, avlmap);
+
+	// store pointers to objects 
+
+	map = avlmap_new(sizeof(testkey_t *), sizeof(testval_t *), cmp_testkey_ptr_t);
+
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		testkey_t *key = NEW(testkey_t);
+		key->key = i;
+		testval_t *val = NEW(testval_t);
+		val->val = (double)i;
+		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &key));
+		avlmap_ins(map, &key, &val);
+		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
+		testval_t **v = (testval_t **)avlmap_get(map, &key);
+		CuAssertDblEquals(tc, val->val, (*v)->val, 0.1);
+	}
+	
+	testkey_t *probekey = NEW(testkey_t);
+	for (int i = 0, step = 10; i < step * n; i += step) {
+		probekey->key = i;
+		CuAssert(tc, "Should contain key.", avlmap_contains(map, &probekey));
+		testkey_t *key;
+		testval_t *val;
+		avlmap_remv(map, &probekey, &key, &val);
+		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &probekey));
+		CuAssertDblEquals(tc, (double)(key->key), val->val, 0.1);
+		free(key);
+		free(val);
+	}
+	CuAssertSizeTEquals(tc, 0, avlmap_size(map));
+	free(probekey);
+
 
 	DESTROY(map, finaliser_cons(finaliser_cons(FNR(avlmap), finaliser_new_ptr()),
 	                            finaliser_new_ptr()));
@@ -116,6 +179,7 @@ CuSuite *avlmap_get_test_suite()
 	CuSuite *suite = CuSuiteNew();
 
 	SUITE_ADD_TEST(suite, avlmap_test_ins);
+	SUITE_ADD_TEST(suite, avlmap_test_del);
 
 	return suite;
 }

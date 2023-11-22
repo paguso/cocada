@@ -136,6 +136,21 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
 	free(entry);
 }
 
+
+#define AVLMAP_IMPL(TYPE, ...)\
+TYPE avlmap_get_##TYPE(avlmap *self, const void *key)\
+{\
+	const void *v = avlmap_get(self, key);\
+	return v ? ((TYPE *)v)[0] : (TYPE)0;\
+}\
+\
+TYPE avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val)\
+{\
+	avlmap_ins(self, key, &val);\
+}\
+
+XX_CORETYPES(AVLMAP_IMPL)
+
 struct _avlmap_iter {
 	iter _t_iter;
 	avlmap *src;

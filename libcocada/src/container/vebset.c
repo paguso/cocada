@@ -40,8 +40,7 @@
 
 #define INDEX(h, l,  nbits) ( (h * SQRTUNIV(nbits)) + l)
 
-#define CLUSTER(index) ((vebtree*) hashmap_get_rawptr(self->clusters, &index))
-
+#define CLUSTER(index) (*((vebtree**)hashmap_get(self->clusters, &index)))
 
 
 typedef struct _vebtree {
@@ -63,15 +62,8 @@ vebtree *vebtree_new_sized(uint nbits)
 	vebtree *ret = NEW(vebtree);
 	ret->min = UNIV(nbits);
 	ret->max = -1;
-	if (nbits == 1) {
-		ret->summary = NULL;
-		ret->clusters = NULL;
-	}
-	else {
-		ret->summary = NULL;// vebtree_new_sized(nbits / 2);
-		ret->clusters =
-		    NULL;//hashmap_new(sizeof(size_t), sizeof(vebtree *), ident_hash_size_t, eq_size_t);
-	}
+	ret->summary = NULL; // initialize summary and clusters on demand
+	ret->clusters = NULL;
 	return ret;
 }
 
@@ -129,7 +121,7 @@ bool vebtree_contains(vebtree *self, uint32_t x, uint nbits)
 	}
 	uint32_t high = HIGH(x, nbits);
 	if (hashmap_contains(self->clusters, &high)) {
-		vebtree *cluster = (vebtree *)hashmap_get_rawptr(self->clusters, &high);
+		vebtree *cluster = CLUSTER(high);
 		uint32_t low = LOW(x, nbits);
 		return vebtree_contains(cluster, low, nbits/2);
 	}
@@ -177,6 +169,8 @@ bool vebtree_add(vebtree *self, uint32_t x, uint nbits)
 		self->summary = vebtree_new_sized(nbits/2);
 		self->clusters = hashmap_new(sizeof(uint32_t), sizeof(vebtree *),
 		                             ident_hash_uint32_t, eq_uint32_t);
+		//self->clusters = avlmap_new(sizeof(uint32_t), sizeof(vebtree *),
+		//                            eq_uint32_t);
 	}
 	uint32_t high = HIGH(x, nbits);
 	uint32_t low = LOW(x, nbits);
@@ -187,7 +181,7 @@ bool vebtree_add(vebtree *self, uint32_t x, uint nbits)
 		hashmap_ins_rawptr(self->clusters, &high, cluster);
 	}
 	else {
-		cluster = (vebtree *) hashmap_get_rawptr(self->clusters, &high);
+		cluster = CLUSTER(high);
 		//DEBUG("Retrieving cluster #%u @%p at level %u bits (parent = %p).\n", high, cluster, self->nbits, self);
 	}
 	if (vebtree_empty(cluster)) {
@@ -289,7 +283,7 @@ int64_t vebtree_succ(vebtree *self, uint32_t x, uint nbits)
 
 	vebtree *cluster = NULL;
 	if (hashmap_contains(self->clusters, &high)) {
-		cluster = (vebtree *) hashmap_get_rawptr(self->clusters, &high);
+		cluster = CLUSTER(high);
 	}
 	if (cluster && low < vebtree_max(cluster)) {
 		// sucessor in the same cluster as x
@@ -300,7 +294,7 @@ int64_t vebtree_succ(vebtree *self, uint32_t x, uint nbits)
 		high = vebtree_succ(self->summary, high, nbits/2);
 		if (high < UNIV(nbits/2)) {
 			assert(hashmap_contains(self->clusters, &high));
-			cluster = (vebtree *) hashmap_get_rawptr(self->clusters, &high);
+			cluster = CLUSTER(high);
 			low = vebtree_min(cluster);
 		}
 		else {
@@ -342,7 +336,7 @@ int64_t vebtree_pred(vebtree *self, uint32_t x, uint nbits)
 
 	vebtree *cluster = NULL;
 	if (hashmap_contains(self->clusters, &high)) {
-		cluster = (vebtree *) hashmap_get_rawptr(self->clusters, &high);
+		cluster = CLUSTER(high);
 	}
 	if (cluster &&  vebtree_min(cluster) < low) {
 		assert(vebtree_min(cluster) < UNIV(nbits));
@@ -359,7 +353,7 @@ int64_t vebtree_pred(vebtree *self, uint32_t x, uint nbits)
 		//DEBUG("summary indicated pred is in cluster #%ld\n", high);
 		if (high >= 0) {
 			assert(hashmap_contains(self->clusters, &high));
-			cluster = (vebtree *) hashmap_get_rawptr(self->clusters, &high);
+			cluster = CLUSTER(high);
 			low = vebtree_max(cluster);
 			assert (low >= 0);
 		}
