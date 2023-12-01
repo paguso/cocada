@@ -66,7 +66,7 @@ void vebset_test_add(CuTest *tc)
 	DESTROY_FLAT(vec_vals, vec);
 	vebset_free(vset);
 	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
+		//memdbg_print_stats(stdout, true);
 		CuAssert(tc, "Memory leak!", memdbg_is_empty());
 	}
 }
@@ -114,7 +114,7 @@ void vebset_test_del(CuTest *tc)
 	DESTROY_FLAT(vec_vals, vec);
 	vebset_free(vset);
 	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
+		//memdbg_print_stats(stdout, true);
 		CuAssert(tc, "Memory leak!", memdbg_is_empty());
 	}
 }
@@ -207,7 +207,7 @@ void vebset_test_pred(CuTest *tc)
 	DESTROY_FLAT(vec_vals, vec);
 	vebset_free(vset);
 	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
+		//memdbg_print_stats(stdout, true);
 		CuAssert(tc, "Memory leak!", memdbg_is_empty());
 	}
 }
@@ -219,7 +219,7 @@ void vebset_test_memory(CuTest *tc)
 	rand_reset(123);
 	setbuf(stdout, NULL);
 
-	uint n = 10000;
+	uint n = 40000;
 	vebset *vset = vebset_new();
 	size_t size = 0;
 	for (uint i = 0; i < n; i++) {
@@ -232,7 +232,7 @@ void vebset_test_memory(CuTest *tc)
 
 	vebset_free(vset);
 	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
+		//memdbg_print_stats(stdout, true);
 		CuAssert(tc, "Memory leak!", memdbg_is_empty());
 	}
 }

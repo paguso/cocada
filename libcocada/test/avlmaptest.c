@@ -61,7 +61,7 @@ void avlmap_test_ins(CuTest *tc)
 		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &key));
 		avlmap_ins(map, &key, &val);
 		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
-		testval_t *v = avlmap_get(map, &key);
+		const testval_t *v = avlmap_get(map, &key);
 		CuAssertDblEquals(tc, val.val, v->val, 0.1);
 	}
 
@@ -116,7 +116,7 @@ void avlmap_test_del(CuTest *tc)
 		CuAssert(tc, "Should not contain key.", !avlmap_contains(map, &key));
 		avlmap_ins(map, &key, &val);
 		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
-		testval_t *v = avlmap_get(map, &key);
+		const testval_t *v = avlmap_get(map, &key);
 		CuAssertDblEquals(tc, val.val, v->val, 0.1);
 	}
 	

@@ -486,6 +486,32 @@ uint ullong_bitcount(unsigned long long x, bool bit)
 }
 
 
+static const byte_t _uint16_hibit_tbl[19] = { 
+	16, 0, 12, 1, 15, 13, 5, 2, 7, 16, 11, 
+	14, 4, 6, 10, 3, 9, 8, 16 };
+
+
+uint uint16_hibit(uint16_t x)
+{
+	x |= x >> 1; // first round down to one less than a power of 2
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	return (uint)_uint16_hibit_tbl[(uint16_t)(x % 19)];
+}
+
+
+static const byte_t _uint16_lobit_tbl[19] = {
+	16, 0, 1, 13, 2, 16, 14, 6, 3, 8, 16, 
+	12, 15, 5, 7, 11, 4, 10, 9 };
+
+
+uint uint16_lobit(uint16_t x)
+{
+	return (uint)_uint16_lobit_tbl[(uint16_t)((x & -x) % 19)];
+}
+
+
 
 static const byte_t _uint32_hibit_tbl[37] = {
 	32, 0, 25, 1, 22, 26, 31, 2, 15, 23,

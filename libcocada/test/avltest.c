@@ -395,7 +395,7 @@ void test_avl_del(CuTest *tc) {
 		CuAssert(tc, "Should not contain key.", !avl_contains(tree, &key));
 		avl_ins(tree, &key);
 		CuAssert(tc, "Should contain key.", avl_contains(tree, &key));
-		int *v = avl_get(tree, &key);
+		const int *v = avl_get(tree, &key);
 		CuAssertIntEquals(tc, key, *v);
 		
 	}

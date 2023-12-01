@@ -421,6 +421,23 @@ uint ullong_bitcount0(unsigned long long x);
 uint ullong_bitcount(unsigned long long x, bool bit);
 
 
+
+/**
+ * @brief Returns the position of the highest order 1 bit of the 16-bit uint @p x
+ * or, equivalently, the number of leading zeroes in the binary form of @p x.
+ * If @p x==0, returns 16.
+ */
+uint uint16_hibit(uint16_t x);
+
+
+/**
+ * @brief Returns the position of the lowest order 1 bit of the 16-bit uint @p x
+ * or, equivalently, the number of trailing zeroes in the binary form of @p x.
+ * If @p x==0 returns 16.
+ */
+uint uint16_lobit(uint16_t x);
+
+
 /**
  * @brief Returns the position of the highest order 1 bit of the 32-bit uint @p x
  * or, equivalently, the number of leading zeroes in the binary form of @p x.

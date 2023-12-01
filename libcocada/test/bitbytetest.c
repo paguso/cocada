@@ -206,22 +206,52 @@ void test_byte_select(CuTest *tc)
 }
 
 
+void test_uint16_lohibit(CuTest *tc)
+{
+	for (uint16_t x = 0 ; x < UINT16_MAX; x++) {
+		uint lb = uint16_lobit(x);
+		uint hb = uint16_hibit(x);
+		int lbbf = -1;
+		uint16_t y = x;
+		while ((y > 0)) {
+			lbbf++;
+			if (y % 2 == 1) {
+				break;
+			} 
+			y >>= 1;
+		}
+		lbbf = (lbbf >= 0) ? lbbf : 16;
+		CuAssertUIntEquals(tc, lbbf, lb);
+		y = x;
+		int hbbf = -1;
+		while (y) {
+			hbbf++;
+			y >>= 1;
+		}
+		hbbf = (hbbf >= 0) ? hbbf : 16;
+		CuAssertUIntEquals(tc, hbbf, hb);
+	}
+}
+
+
 void test_uint32_lohibit(CuTest *tc)
 {
-	uint32_t x = 0;
+	uint32_t y, x = 0;
 	int hbbf = 0, hb, lbbf=0, lb;
 	for (byte_t *b = (byte_t *)&x, *end = (byte_t *)(&x + 1); b < end; b++) {
 		for (int v = 0; v < 256; v++) {
 			x = 0;
 			*b = (byte_t)v;
 			lb = uint32_lobit(x);
-			for (lbbf = 0; lbbf < 32 && (~x & (uint32_t)1) ; x >>= 1, lbbf++);
+			y = x;
+			for (lbbf = 0; lbbf < 32 && (~y & (uint32_t)1) ; y >>= 1, lbbf++);
 			lbbf = lbbf >= 0 ? lbbf : 32;
 			CuAssertUIntEquals(tc, lbbf, lb);
 			x = 0;
 			*b = (byte_t)v;
 			hb = uint32_hibit(x);
-			for (hbbf = -1; x ; x >>= 1, hbbf++);
+			y = x;
+			for (hbbf = -1; y ; y >>= 1, hbbf++);
 			hbbf = hbbf >= 0 ? hbbf : 32;
 			CuAssertUIntEquals(tc, hbbf, hb);
 		}
@@ -264,6 +294,7 @@ CuSuite *bitbyte_get_test_suite()
 	SUITE_ADD_TEST(suite, test_uint64_bitcount);
 	SUITE_ADD_TEST(suite, test_byte_rank);
 	SUITE_ADD_TEST(suite, test_byte_select);
+	SUITE_ADD_TEST(suite, test_uint16_lohibit);
 	SUITE_ADD_TEST(suite, test_uint32_lohibit);
 	SUITE_ADD_TEST(suite, test_uint64_lohibit);
 	return suite;

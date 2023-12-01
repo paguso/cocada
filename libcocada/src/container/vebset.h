@@ -23,28 +23,94 @@
 #define vebset_H
 
 #include "coretype.h"
+#include "new.h"
 
+/**
+ * @file vebset.h
+ * @brief van Emde Boas (vEB) set of integers.
+ * @author Paulo Fonseca
+ */
+
+
+/**
+ * @brief vEB set type
+ */
 typedef struct _vebset vebset;
 
+
+/**
+ * @brief Constructor
+ */
 vebset *vebset_new();
 
+
+/**
+ * Destructor. Equivalent to DESTROY_FLAT(self, vebset).
+ * @see DESTROY_FLAT
+ */
 void vebset_free(vebset *self);
 
+
+/**
+ * @brief Finaliser. Should be called with an empty finaliser.
+ */
+void vebset_finalise(void *ptr, const finaliser *fnr);
+
+
+/**
+ * @brief Returns the cardinality of the set.
+*/
 size_t vebset_size(vebset *self);
 
+
+/**
+ * @brief Tests whether the set contains a value @p x.
+*/
 bool vebset_contains(vebset *self, uint32_t x);
 
+
+/**
+ * @brief Adds value @p x to the set.
+ * @return true if @p x was added. false if @p x was already in the 
+ * set or is an invalid value.
+*/
 bool vebset_add(vebset *self, uint32_t x);
 
+
+/**
+ * @brief Deletes value @p x from the set.
+ * @return true if @p x was deleted. false if @p x was not in the 
+ * set or is an invalid value.
+*/
+bool vebset_del(vebset *self, uint32_t x);
+
+
+/**
+ * @brief Returns the smallest value in the set strictly greater than 
+ * @p x if it exists. Otherwise, returns 2^32.
+*/
 int64_t vebset_succ(vebset *self, uint32_t x);
 
+
+/**
+ * @brief Returns the greatest value in the set strictly smaller than 
+ * @p x if it exists. Otherwise, returns -1.
+ */
 int64_t vebset_pred(vebset *self, uint32_t x);
 
+
+/**
+ * @brief Returns the minimum of the set, if the set is not empty,
+ * or 2^32 otherwise.
+*/
 int64_t vebset_min(vebset *self);
 
-int64_t vebset_max(vebset *self);
 
-bool vebset_del(vebset *self, uint32_t x);
+/**
+ * @brief Returns the maximum of the set, if the set is not empty,
+ * or -1 otherwise.
+*/
+int64_t vebset_max(vebset *self);
 
 
 #endif
