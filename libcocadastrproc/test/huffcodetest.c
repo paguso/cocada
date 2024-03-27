@@ -47,7 +47,7 @@ void test_huffcode_new(CuTest *tc)
 
 static void _random_str(char *dest, alphabet *ab, size_t len)
 {
-	for (size_t i=0; i<len;
+	for (size_t i = 0; i < len;
 	        dest[i++] = ab_char(ab, rand_range_size_t(0, ab_size(ab))));
 }
 
@@ -56,7 +56,7 @@ void test_huffcode_codec(CuTest *tc)
 {
 	size_t max_len = 1024;
 	char *letters = "abcdefghijklmnopqrstuvwxyz";
-	for (size_t len=2; len<max_len; len++) {
+	for (size_t len = 2; len < max_len; len++) {
 		alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
 		char *str = cstr_new(len);
 		_random_str(str, ab, len);

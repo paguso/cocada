@@ -34,30 +34,30 @@ void test_range_new(CuTest *tc)
 	FREE(rng0.arr);
 
 	range_int rng1 = range_arr_new_int(0, 10, 1);
-	int arr1[10] = {0,1,2,3,4,5,6,7,8,9};
+	int arr1[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	CuAssertSizeTEquals(tc, 10, rng1.n);
-	for (int i=0; i<10; i++)
+	for (int i = 0; i < 10; i++)
 		CuAssertIntEquals(tc, arr1[i], rng1.arr[i]);
 	FREE(rng1.arr);
 
 	range_int rng2 = range_arr_new_int(0, 10, 2);
-	int arr2[5] = {0,2,4,6,8};
+	int arr2[5] = {0, 2, 4, 6, 8};
 	CuAssertSizeTEquals(tc, 5, rng2.n);
-	for (int i=0; i<5; i++)
+	for (int i = 0; i < 5; i++)
 		CuAssertIntEquals(tc, arr2[i], rng2.arr[i]);
 	FREE(rng2.arr);
 
 	range_int rng3 = range_arr_new_int(0, 10, 3);
-	int arr3[4] = {0,3,6,9};
+	int arr3[4] = {0, 3, 6, 9};
 	CuAssertSizeTEquals(tc, 4, rng3.n);
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 		CuAssertIntEquals(tc, arr3[i], rng3.arr[i]);
 	FREE(rng3.arr);
 
 	range_int rng4 = range_arr_new_int(0, 10, 10);
 	int arr4[1] = {0};
 	CuAssertSizeTEquals(tc, 1, rng4.n);
-	for (int i=0; i<1; i++)
+	for (int i = 0; i < 1; i++)
 		CuAssertIntEquals(tc, arr4[i], rng4.arr[i]);
 	FREE(rng4.arr);
 
@@ -70,30 +70,30 @@ void test_range_new(CuTest *tc)
 	FREE(drng0.arr);
 
 	range_int drng1 = range_arr_new_int(0, -10, -1);
-	int darr1[10] = {0,-1,-2,-3,-4,-5,-6,-7,-8,-9};
+	int darr1[10] = {0, -1, -2, -3, -4, -5, -6, -7, -8, -9};
 	CuAssertSizeTEquals(tc, 10, drng1.n);
-	for (int i=0; i<10; i++)
+	for (int i = 0; i < 10; i++)
 		CuAssertIntEquals(tc, darr1[i], drng1.arr[i]);
 	FREE(drng1.arr);
 
 	range_int drng2 = range_arr_new_int(0, -10, -2);
-	int darr2[5] = {0,-2,-4,-6,-8};
+	int darr2[5] = {0, -2, -4, -6, -8};
 	CuAssertSizeTEquals(tc, 5, drng2.n);
-	for (int i=0; i<5; i++)
+	for (int i = 0; i < 5; i++)
 		CuAssertIntEquals(tc, darr2[i], drng2.arr[i]);
 	FREE(drng2.arr);
 
 	range_int drng3 = range_arr_new_int(0, -10, -3);
-	int darr3[4] = {0,-3,-6,-9};
+	int darr3[4] = {0, -3, -6, -9};
 	CuAssertSizeTEquals(tc, 4, drng3.n);
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 		CuAssertIntEquals(tc, darr3[i], drng3.arr[i]);
 	FREE(drng3.arr);
 
 	range_int drng4 = range_arr_new_int(0, -10, -10);
 	int darr4[1] = {0};
 	CuAssertSizeTEquals(tc, 1, drng4.n);
-	for (int i=0; i<1; i++)
+	for (int i = 0; i < 1; i++)
 		CuAssertIntEquals(tc, darr4[i], drng4.arr[i]);
 	FREE(drng4.arr);
 

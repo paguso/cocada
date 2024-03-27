@@ -42,7 +42,7 @@ void stack_finalise(void *ptr, const finaliser *fnr)
 
 bool stack_empty(const stack *s)
 {
-	return (vec_len(s)==0);
+	return (vec_len(s) == 0);
 }
 
 
@@ -54,13 +54,13 @@ void stack_push(stack *s, const void *elt)
 
 void stack_pop(stack *s, void *dest)
 {
-	return vec_pop(s, vec_len(s)-1, dest);
+	return vec_pop(s, vec_len(s) - 1, dest);
 }
 
 
 void stack_peek(stack *s, void *dest)
 {
-	return vec_get_cpy(s, vec_len(s)-1, dest);
+	return vec_get_cpy(s, vec_len(s) - 1, dest);
 }
 
 

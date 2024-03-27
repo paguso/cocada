@@ -55,23 +55,23 @@ void test_binheap_ins_remv(CuTest *tc)
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
-	for (size_t i=0; i<len; ++i) rv[i]=(double)i;
+	for (size_t i = 0; i < len; ++i) rv[i] = (double)i;
 	shuffle_arr(rv, len, sizeof(double));
 
 
-	for (size_t i =0; i<len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		double *d = &rv[i];
 		binheap_ins(maxheap, &d);
-		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
+		CuAssertSizeTEquals(tc, i + 1, binheap_size(maxheap));
 	}
 
 
-	for (size_t i =0; i<len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		double *d;
 		binheap_remv(maxheap, &d);
 		//printf("maxheap #%zu = %f\n",i,d);
-		CuAssertSizeTEquals(tc, len-i-1, binheap_size(maxheap));
-		CuAssertDblEquals(tc, (double)(len-i-1), *d, 0.1);
+		CuAssertSizeTEquals(tc, len - i - 1, binheap_size(maxheap));
+		CuAssertDblEquals(tc, (double)(len - i - 1), *d, 0.1);
 	}
 
 	DESTROY(maxheap, FNR(binheap));
@@ -85,21 +85,21 @@ void test_binheap_ins_remv_int(CuTest *tc)
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	int rv[len];
-	for (size_t i=0; i<len; i++) rv[i]=i;
+	for (size_t i = 0; i < len; i++) rv[i] = i;
 	shuffle_arr(rv, len, sizeof(int));
 
-	for (size_t i =0; i<len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		binheap_ins_int(maxheap, rv[i]);
-		CuAssertSizeTEquals(tc, i+1, binheap_size(maxheap));
+		CuAssertSizeTEquals(tc, i + 1, binheap_size(maxheap));
 	}
 
 
-	for (size_t i =0; i<len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		int d;
 		d = binheap_remv_int(maxheap);
 		//printf("maxheap #%zu = %d\n",i,d);
-		CuAssertSizeTEquals(tc, len-i-1, binheap_size(maxheap));
-		CuAssertIntEquals(tc, (int)(len-i-1), d);
+		CuAssertSizeTEquals(tc, len - i - 1, binheap_size(maxheap));
+		CuAssertIntEquals(tc, (int)(len - i - 1), d);
 	}
 
 	DESTROY(maxheap, FNR(binheap));

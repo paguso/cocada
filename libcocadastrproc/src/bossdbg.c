@@ -66,7 +66,7 @@ static inline xchar_t inp2ext (alphabet *input_ab, xchar_t c)
 // extended to input char conversion
 static inline xchar_t ext2inp (alphabet *input_ab, xchar_t c)
 {
-	if (c==SENTINEL || c>ab_size(input_ab)) return XEOF;
+	if (c == SENTINEL || c > ab_size(input_ab)) return XEOF;
 	return ab_char(input_ab, c - 1);
 }
 
@@ -129,8 +129,8 @@ static void _init_cumul_char_count(dbgraph *graph, size_t *cumul_char_count)
 	//ARR_PRINT(cumul_char_count, cumul_char_count, %zu, 0, eabsize, eabsize);
 	size_t l = eabsize + graph->nedges;
 	byte_t *bits = bitarr_new(l);
-	for (size_t i=0; i<eabsize; i++)
-		bitarr_set_bit(bits, cumul_char_count[i+1]+i, 1);
+	for (size_t i = 0; i < eabsize; i++)
+		bitarr_set_bit(bits, cumul_char_count[i + 1] + i, 1);
 	graph->node_lbl_last_char = csrsbitarr_new(bits, l);
 	//csrsbitarr_fprint(graph->node_lbl_last_char, 4);
 }
@@ -146,9 +146,9 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
 	// build padded string with k sentinels at the beginning an one at the end
 	xstr *padstr = xstr_new(sizeof_ext_char);
-	for (size_t i=0; i<k; i++)
+	for (size_t i = 0; i < k; i++)
 		xstr_push(padstr, SENTINEL);
-	for (xchar_t c; (c=strstream_getc(sst))!=XEOF; )
+	for (xchar_t c; (c = strstream_getc(sst)) != XEOF; )
 		xstr_push(padstr, (xchar_t)(ab_rank(ab, c) + 1));
 	xstr_push(padstr, SENTINEL);
 	xstr_fit(padstr);
@@ -156,8 +156,9 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
 	// build list of k+1mers
 	vec *kp1mers = vec_new(sizeof(kmer_t *));
-	for (size_t i=0, padslen=xstr_len(padstr), l=padslen-(k+1); i<=l; i++) {
-		kmer_t *kmer = kmer_new(padstr, i, k+1);
+	for (size_t i = 0, padslen = xstr_len(padstr), l = padslen - (k + 1); i <= l;
+	        i++) {
+		kmer_t *kmer = kmer_new(padstr, i, k + 1);
 		vec_push(kp1mers, &kmer);
 	}
 
@@ -175,7 +176,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	//strbuf_free(kmdstr);
 
 	// sort the k+1-mers
-	vec_radixsort(kp1mers, &kmer_key_fn, k+1, ab_size(ext_ab));
+	vec_radixsort(kp1mers, &kmer_key_fn, k + 1, ab_size(ext_ab));
 
 	//printf("kmers after sort:\n");
 	//kmstr = xstr_new(sizeof_ext_char);
@@ -192,37 +193,37 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 
 	xstr *edge_labels  = xstr_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
 	byte_t *last_node   = bitarr_new(vec_len(kp1mers));
-	size_t *char_count = ARR_NEW(size_t, ab_size(ext_ab)+1);
-	ARR_FILL(char_count, 0, ab_size(ext_ab)+1, 0);
+	size_t *char_count = ARR_NEW(size_t, ab_size(ext_ab) + 1);
+	ARR_FILL(char_count, 0, ab_size(ext_ab) + 1, 0);
 
 	size_t nnodes = 0; // # of *distinct* nodes (k-mers)
 	size_t nedges = 0; // # of *distinct* edges (k+1-mers)
 
 	byte_t *km1mers_chars = bitarr_new(sizeof_ext_char);
 	xstr *lastkp1mers[2];
-	lastkp1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k+1);
-	lastkp1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k+1);
+	lastkp1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k + 1);
+	lastkp1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k + 1);
 	xstr *lastkm1mers[2];
-	lastkm1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k-1);
-	lastkm1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k-1);
+	lastkm1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k - 1);
+	lastkm1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k - 1);
 	size_t this_line, last_line;
 	kmer_t *kp1mer;
 	bool new_edge = false;
 	xchar_t edge_chr;
 
 	// scan sorted k+1-mers to identify nodes and edges
-	for (size_t i=0, nkp1mers = vec_len(kp1mers); i<nkp1mers; i++) {
-		this_line = i%2;
-		last_line = (i+1)%2;
+	for (size_t i = 0, nkp1mers = vec_len(kp1mers); i < nkp1mers; i++) {
+		this_line = i % 2;
+		last_line = (i + 1) % 2;
 		kp1mer = *(kmer_t **)vec_get(kp1mers, i);
-		xstr_ncpy(lastkp1mers[this_line], 0, kp1mer->txt, kp1mer->pos, k+1);
+		xstr_ncpy(lastkp1mers[this_line], 0, kp1mer->txt, kp1mer->pos, k + 1);
 
 		// compare this k+1-mer with the previous
 		// if the first k chars are different from previous line,
 		//              then it's a new node (and also necessarily a new edge)
 		if (xstr_ncmp(lastkp1mers[this_line], lastkp1mers[last_line], k)) {
 			if (nedges > 0)
-				bitarr_set_bit(last_node, nedges-1, 1);
+				bitarr_set_bit(last_node, nedges - 1, 1);
 			nnodes++;
 			new_edge = true;
 		}
@@ -243,7 +244,7 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 		// now, check the (k-1)-mers (suffix of the node label).
 		// if the last node label suffix is different from previous
 		// we clear edge labels marks and start afresh
-		xstr_ncpy(lastkm1mers[this_line], 0, kp1mer->txt, kp1mer->pos+1, k-1);
+		xstr_ncpy(lastkm1mers[this_line], 0, kp1mer->txt, kp1mer->pos + 1, k - 1);
 		if (xstr_cmp(lastkm1mers[this_line], lastkm1mers[last_line])) {
 			ARR_FILL(km1mers_chars, 0, sizeof_ext_char, 0x0);
 		}
@@ -263,13 +264,13 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 			// whatever the case, set the new edge label char
 			xstr_push(edge_labels, edge_chr);
 			// and update the count of the last node label char
-			char_count[ab_rank(ext_ab, xstr_get(lastkp1mers[this_line], k-1)) + 1]++;
+			char_count[ab_rank(ext_ab, xstr_get(lastkp1mers[this_line], k - 1)) + 1]++;
 		}
 	}
 	xstr_fit(edge_labels);
 	//xstr_print(edge_labels);
 	nedges = xstr_len(edge_labels);
-	bitarr_set_bit(last_node, nedges-1, 1);
+	bitarr_set_bit(last_node, nedges - 1, 1);
 
 	dbgraph *graph = NEW(dbgraph);
 	graph->input_ab = ab;
@@ -282,8 +283,8 @@ static dbgraph *_dbg_init( alphabet *ab, strstream *sst, size_t k,
 	graph->edge_lbl_wt = wavtree_new_from_xstr( ext_ab, edge_labels,
 	                     WT_HUFFMAN );
 	graph->true_node = csrsbitarr_new(last_node, nedges);
-	for (size_t i=1, l=ab_size(ext_ab)+1; i<l; i++) {
-		char_count[i] += char_count[i-1];
+	for (size_t i = 1, l = ab_size(ext_ab) + 1; i < l; i++) {
+		char_count[i] += char_count[i - 1];
 	}
 	_init_cumul_char_count(graph, char_count);
 
@@ -323,7 +324,7 @@ dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
 
 void bossdbg_free(dbgraph *g)
 {
-	if (g==NULL) return;
+	if (g == NULL) return;
 	alphabet_free(g->ext_ab);
 	wavtree_free(g->edge_lbl_wt);
 	csrsbitarr_free(g->true_node, true);
@@ -375,7 +376,7 @@ bool bossdbg_is_multigraph(dbgraph *g)
 
 static size_t _true_node(dbgraph *g, size_t nid)
 {
-	if (csrsbitarr_get(g->true_node, nid)==1)
+	if (csrsbitarr_get(g->true_node, nid) == 1)
 		return nid;
 	else
 		return csrsbitarr_succ1(g->true_node, nid);
@@ -406,14 +407,14 @@ static size_t _last_node_char_rank(dbgraph *g, size_t nid)
 void bossdbg_node_lbl(dbgraph *g, size_t nid, xstr *dest)
 {
 	if (nid >= g->nedges) return;
-	size_t l=0;
-	for (size_t i=0; i<g->k; i++) {
+	size_t l = 0;
+	for (size_t i = 0; i < g->k; i++) {
 		xstr_set(dest, i, SENTINEL);
 	}
-	for (size_t cur=nid; l<g->k && 0<cur && cur<g->nedges; l++) {
+	for (size_t cur = nid; l < g->k && 0 < cur && cur < g->nedges; l++) {
 		size_t crk = _last_node_char_rank(g, cur);
 		xchar_t c = ab_char(g->ext_ab, crk);
-		xstr_set(dest, g->k-1-l, c);
+		xstr_set(dest, g->k - 1 - l, c);
 		cur = bossdbg_parent(g, cur);
 	}
 	xstr_clip(dest, 0, g->k);
@@ -422,9 +423,9 @@ void bossdbg_node_lbl(dbgraph *g, size_t nid, xstr *dest)
 
 size_t bossdbg_outdeg(dbgraph *g, size_t nid)
 {
-	if (nid==0)
+	if (nid == 0)
 		return MIN(1, g->nnodes);
-	return nid-csrsbitarr_pred1(g->true_node, nid);
+	return nid - csrsbitarr_pred1(g->true_node, nid);
 }
 
 
@@ -434,12 +435,12 @@ size_t bossdbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c)
 	xchar_t cp = inp2ext(g->input_ab, c);
 	xchar_t cn = neg_char(g->input_ab, cp);
 	size_t ret = 0;
-	ret = wavtree_rank(g->edge_lbl_wt, nid+1, cp)
-	      + wavtree_rank(g->edge_lbl_wt, nid+1, cn);
-	if (nid!=0) {
+	ret = wavtree_rank(g->edge_lbl_wt, nid + 1, cp)
+	      + wavtree_rank(g->edge_lbl_wt, nid + 1, cn);
+	if (nid != 0) {
 		size_t prev = csrsbitarr_pred1(g->true_node, nid);
-		ret -= ( wavtree_rank(g->edge_lbl_wt, prev+1, cp)
-		         + wavtree_rank(g->edge_lbl_wt, prev+1, cn) );
+		ret -= ( wavtree_rank(g->edge_lbl_wt, prev + 1, cp)
+		         + wavtree_rank(g->edge_lbl_wt, prev + 1, cn) );
 	}
 	return ret;
 }
@@ -447,30 +448,30 @@ size_t bossdbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c)
 
 size_t bossdbg_child(dbgraph *g, size_t nid, xchar_t c)
 {
-	size_t l = (nid==0)?0:csrsbitarr_pred1(g->true_node, nid)+1;
-	size_t r = nid+1;
+	size_t l = (nid == 0) ? 0 : csrsbitarr_pred1(g->true_node, nid) + 1;
+	size_t r = nid + 1;
 	// nodes of the same label are in the range [l,r)
 	// get the position p of edge label == c within this range
 	size_t p = wavtree_pred(g->edge_lbl_wt, r, c);
-	if ( l<=p && p<r ) {
+	if ( l <= p && p < r ) {
 		size_t crk = ab_rank(g->ext_ab, c);
 		size_t elrk = wavtree_rank_pos(g->edge_lbl_wt, p);
-		size_t past1 = (crk==0)?0:csrsbitarr_rank1(g->true_node,
+		size_t past1 = (crk == 0) ? 0 : csrsbitarr_rank1(g->true_node,
 		               g->char_cumul_count[crk]);
-		size_t chd = csrsbitarr_select1(g->true_node, past1+elrk);
+		size_t chd = csrsbitarr_select1(g->true_node, past1 + elrk);
 		return chd;
 	}
 	// if c not found in [l,r), try the extendedversion
 	p = wavtree_pred(g->edge_lbl_wt, r, neg_char(g->input_ab, c));
-	if ( l<=p && p<r ) {
+	if ( l <= p && p < r ) {
 		// if found, then by construction there is a preceding node
 		// with same suffix that has an outgoing edge labeled c
 		p = wavtree_pred(g->edge_lbl_wt, p, c);
 		size_t crk = ab_rank(g->ext_ab, c);
 		size_t elrk = wavtree_rank_pos(g->edge_lbl_wt, p);
-		size_t past1 = (crk==0)?0:csrsbitarr_rank1( g->true_node,
+		size_t past1 = (crk == 0) ? 0 : csrsbitarr_rank1( g->true_node,
 		               g->char_cumul_count[crk]);
-		size_t chd = csrsbitarr_select1(g->true_node, past1+elrk);
+		size_t chd = csrsbitarr_select1(g->true_node, past1 + elrk);
 		return chd;
 	}
 	// if the extended version also not found, then return a null id
@@ -480,7 +481,7 @@ size_t bossdbg_child(dbgraph *g, size_t nid, xchar_t c)
 
 size_t bossdbg_parent(dbgraph *g, size_t nid)
 {
-	if (nid==0)
+	if (nid == 0)
 		return g->nedges;
 	size_t  crk = _last_node_char_rank(g, nid);
 	xchar_t c   = ab_char(g->ext_ab, crk);
@@ -494,23 +495,23 @@ size_t bossdbg_parent(dbgraph *g, size_t nid)
 
 static void node_cstr(xstr *node, alphabet *ab, char *dest)
 {
-	for (size_t i=0, l=xstr_len(node); i<l; i++ ) {
+	for (size_t i = 0, l = xstr_len(node); i < l; i++ ) {
 		xchar_t c = xstr_get(node, i);
-		dest[i] = (c==SENTINEL) ? '$' : ext2inp(ab, c);
+		dest[i] = (c == SENTINEL) ? '$' : ext2inp(ab, c);
 	}
 	dest[xstr_len(node)] = '\0';
 }
 
 void bossdbg_print(dbgraph *g)
 {
-	printf("dbgraph@%p\n",g);
+	printf("dbgraph@%p\n", g);
 	//csrsbitarr_fprint(g->node_lbl_last_char, 10);
 	size_t ncols = 4;
 	char *headers[4] = {"nid", "real", "node", "edge"};
 	int *cols = ARR_NEW(int, ncols);
-	for (size_t c=0; c<ncols; c++)
+	for (size_t c = 0; c < ncols; c++)
 		cols[c] = strlen(headers[c]);
-	cols[0] = MAX(cols[0], (int)ceil(log(g->nedges))+1);
+	cols[0] = MAX(cols[0], (int)ceil(log(g->nedges)) + 1);
 	cols[2] = MAX(cols[2], g->k);
 
 	char *edge, *node;
@@ -524,7 +525,7 @@ void bossdbg_print(dbgraph *g)
 	       cols[1], headers[1],
 	       cols[2], headers[2],
 	       cols[3], headers[3]);
-	for (size_t i=0; i<g->nedges; i++) {
+	for (size_t i = 0; i < g->nedges; i++) {
 		bossdbg_node_lbl(g, _true_node(g, i), xnode);
 		node_cstr(xnode, g->input_ab, node);
 		char e = wavtree_char(g->edge_lbl_wt, i);
@@ -534,15 +535,15 @@ void bossdbg_print(dbgraph *g)
 		}
 		else {
 			edge[0] = ' ';
-			edge[1] = e==0 ? '$' : ab_char(g->input_ab, e-1);
+			edge[1] = e == 0 ? '$' : ab_char(g->input_ab, e - 1);
 		}
 		printf("%*zu %*c %*s %*s\n",
 		       cols[0], i,
-		       cols[1], csrsbitarr_get(g->true_node, i)?'1':'0',
+		       cols[1], csrsbitarr_get(g->true_node, i) ? '1' : '0',
 		       cols[2], node,
 		       cols[3], edge);
 	}
-	for (size_t i=0, l=ab_size(g->input_ab)+1; i<l; i++) {
+	for (size_t i = 0, l = ab_size(g->input_ab) + 1; i < l; i++) {
 		printf( "cumul_count[%c]=%zu\n", (char)ab_char(g->ext_ab, i),
 		        g->char_cumul_count[i] );
 	}

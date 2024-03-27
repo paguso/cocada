@@ -61,12 +61,12 @@ size_t binheap_size(const binheap *heap)
 
 static size_t _bubble_up(binheap *heap)
 {
-	size_t i=binheap_size(heap)-1;
-	while ( i>0 &&
+	size_t i = binheap_size(heap) - 1;
+	while ( i > 0 &&
 	        heap->cmp( vec_get(heap->data, i),
-	                   vec_get(heap->data, (i-1)/2) ) > 0 )  {
-		vec_swap(heap->data, i, (i-1)/2);
-		i = (i-1)/2;
+	                   vec_get(heap->data, (i - 1) / 2) ) > 0 )  {
+		vec_swap(heap->data, i, (i - 1) / 2);
+		i = (i - 1) / 2;
 	}
 	return i;
 }
@@ -79,8 +79,8 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 	i = pos;
 	while (true) {
 		m = i;
-		l = (2*i)+1;
-		r = (2*i)+2;
+		l = (2 * i) + 1;
+		r = (2 * i) + 2;
 		if ( l < n &&
 		        heap->cmp( vec_get(heap->data, l),
 		                   vec_get(heap->data, m) ) > 0 ) {
@@ -112,9 +112,9 @@ void binheap_ins(binheap *heap, const void *elt)
 
 void binheap_remv(binheap *heap, void *dest)
 {
-	if (vec_len(heap->data)==0) return;
-	vec_swap(heap->data, 0, vec_len(heap->data)-1);
-	vec_pop(heap->data, vec_len(heap->data)-1, dest);
+	if (vec_len(heap->data) == 0) return;
+	vec_swap(heap->data, 0, vec_len(heap->data) - 1);
+	vec_pop(heap->data, vec_len(heap->data) - 1, dest);
 	if (vec_len(heap->data) > 0)
 		_bubble_down(heap, 0);
 }

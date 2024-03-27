@@ -160,12 +160,12 @@ static size_t arrctnr_select(ctnr_t *ctnr, bool bit, size_t rank)
 {
 	if (bit) {
 		return vec_get_uint16_t(ctnr->data, rank);
-	} 
+	}
 	else {
 		size_t c0 = NZEROSUPTO(0);
 		if ( rank < c0 ) {
 			return rank;
-		} 
+		}
 		size_t l = 0, m;
 		size_t r = vec_len(ctnr->data);
 		while ((r - l) > 1) {
@@ -173,7 +173,8 @@ static size_t arrctnr_select(ctnr_t *ctnr, bool bit, size_t rank)
 			c0 = NZEROSUPTO(m);
 			if ( rank < c0 ) {
 				r = m;
-			} else {
+			}
+			else {
 				l = m;
 			}
 		}
@@ -314,7 +315,8 @@ size_t roaringbitvec_len(roaringbitvec *self)
 
 size_t roaringbitvec_card(roaringbitvec *self)
 {
-	return self->len ? segtree_range_qry_uint32_t(self->count_st, 0, self->ncntrs) : 0;
+	return self->len ? segtree_range_qry_uint32_t(self->count_st, 0,
+	        self->ncntrs) : 0;
 }
 
 
@@ -431,7 +433,7 @@ size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos)
 
 size_t roaringbitvec_rank0(roaringbitvec *self, size_t pos)
 {
-    return MIN(self->len, pos) - roaringbitvec_rank1(self, pos);
+	return MIN(self->len, pos) - roaringbitvec_rank1(self, pos);
 }
 
 
@@ -447,18 +449,20 @@ size_t roaringbitvec_rank(roaringbitvec *self, bool bit, size_t pos)
 
 size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank)
 {
-	
-	if (rank >= roaringbitvec_count(self, bit)) { // self->size || rank > BKTRANK(self->ncntrs - 1, bit)) {
+
+	if (rank >= roaringbitvec_count(self,
+	                                bit)) { // self->size || rank > BKTRANK(self->ncntrs - 1, bit)) {
 		return self->len;
 	}
 	// find the bucket on which to look for the right bit
-	size_t l = 0, r = self->ncntrs, bkt_rank = 0; 
+	size_t l = 0, r = self->ncntrs, bkt_rank = 0;
 	while ( (r - l) > 1) { // bucket in [l, r)
 		size_t m = MEAN(l, r);
 		bkt_rank = BKTRANK(m, bit);
 		if (rank < bkt_rank) {
 			r =  m;
-		} else {
+		}
+		else {
 			l = m;
 		}
 	}
@@ -503,8 +507,8 @@ void roaringbitvec_fprint(FILE *stream, roaringbitvec *self)
 	fprintf(stream, "roaringbitvec@%p {\n", self);
 	fprintf(stream, "   size=%zu\n", self->len);
 	for (size_t b = 0; b < self->ncntrs; b++) {
-		fprintf(stream, "   [%zu] type=%s card=%"PRIu32"\n", b, 
-                types[self->ctnrs[b].type],
+		fprintf(stream, "   [%zu] type=%s card=%"PRIu32"\n", b,
+		        types[self->ctnrs[b].type],
 		        self->ctnrs[b].card);
 	}
 	fprintf(stream, "}\n");

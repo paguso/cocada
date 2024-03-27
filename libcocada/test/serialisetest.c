@@ -53,7 +53,7 @@ void test_serialise_arr(CuTest *tc)
 {
 	int n = 10;
 	short *arr = sa_arr_short_calloc(10);
-	for (int i=0; i < n; i++) {
+	for (int i = 0; i < n; i++) {
 		arr[i] = i;
 	}
 	FILE *stream = fopen("serialised_arr.obj", "wb");
@@ -138,7 +138,7 @@ som *get_test_struct_som()
 
 void test_serialise_struct(CuTest *tc)
 {
-	test_struct str = {.i = 1, .s = {.b = true, .c='a'}, .f = 3.14};
+	test_struct str = {.i = 1, .s = {.b = true, .c = 'a'}, .f = 3.14};
 
 	FILE *stream = fopen("serialised_str.obj", "wb");
 	serialise(&str, get_test_struct_som(), stream);
@@ -171,7 +171,7 @@ static som *node_som = NULL;
 
 som *get_node_som ()
 {
-	if (node_som==NULL) {
+	if (node_som == NULL) {
 		node_som = som_struct_new(sizeof(node), get_node_som);
 		som_cons(node_som, STR_OFFSET(node, val), get_som_int());
 		som_cons(node_som, STR_OFFSET(node, str),
@@ -194,11 +194,11 @@ void test_serialise_list(CuTest *tc)
 	int n = 3;
 	node **cur = &head;
 	node *tail;
-	for (int i=1; i<=n; i++) {
+	for (int i = 1; i <= n; i++) {
 		tail = NEW(node);
 		tail->val = i;
 		tail->str = cstr_new(i);
-		for (int j = 0; j < i; tail->str[j++] = '0'+i);
+		for (int j = 0; j < i; tail->str[j++] = '0' + i);
 		tail->arr = sa_arr_int_calloc(i);
 		ARR_FILL(tail->arr, 0, i, i);
 		tail->next = NULL;
@@ -217,7 +217,7 @@ void test_serialise_list(CuTest *tc)
 	remove("serialised_node.out");
 
 	for ( node *cur = head, *cur_cpy = head_cpy; cur != NULL && cur_cpy;
-	        cur=cur->next, cur_cpy=cur_cpy->next ) {
+	        cur = cur->next, cur_cpy = cur_cpy->next ) {
 		CuAssertIntEquals(tc, cur->val, cur_cpy->val);
 		CuAssertStrEquals(tc, cur->str, cur_cpy->str);
 		CuAssertSizeTEquals(tc, sa_arr_int_len(cur->arr), sa_arr_int_len(cur_cpy->arr));

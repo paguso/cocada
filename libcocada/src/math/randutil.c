@@ -83,8 +83,8 @@ void shuffle_arr(void *arr, size_t n, size_t typesize)
 	_randinit();
 	byte_t tmp[typesize];
 	if (n > 1) {
-		for (size_t j, i = n-1; i > 0; i--) {
-			j = (size_t)_rand_next_unchecked() % (i+1);
+		for (size_t j, i = n - 1; i > 0; i--) {
+			j = (size_t)_rand_next_unchecked() % (i + 1);
 			memcpy(tmp, arr + (j * typesize), typesize);
 			memcpy(arr + (j * typesize), arr + (i * typesize), typesize);
 			memcpy(arr + (i * typesize), tmp, typesize);

@@ -43,14 +43,14 @@ byte_t *bytearr_new(size_t len)
 
 void bytearr_fill(byte_t *ba, size_t from, size_t to, byte_t val)
 {
-	memset(ba+from, val, to-from);
+	memset(ba + from, val, to - from);
 }
 
 
 void bytearr_reverse(byte_t *src, size_t size)
 {
-	size_t i=0, j=size-1;
-	while (i<j) {
+	size_t i = 0, j = size - 1;
+	while (i < j) {
 		src[i] = src[i] ^ src[j];
 		src[j] = src[i] ^ src[j];
 		src[i] = src[i] ^ src[j];
@@ -67,8 +67,8 @@ void bytearr_print (const byte_t *ba, size_t nbytes, byte_format fmt,
 	char *bytestr;
 	line_label_width = ceil(log10(nbytes));
 	bytestr = cstr_new(BYTESIZE);
-	for (i=0; i<nbytes; i++) {
-		if (i%bytes_per_line == 0) {
+	for (i = 0; i < nbytes; i++) {
+		if (i % bytes_per_line == 0) {
 			if (i) printf("\n");
 			printf("%s%*zu:", left_margin, (int)line_label_width, i);
 		}
@@ -83,13 +83,13 @@ void bytearr_print (const byte_t *ba, size_t nbytes, byte_format fmt,
 char bytearr_read_char(const byte_t *src, size_t from_byte,
                        size_t nbytes)
 {
-	char ret=0;
+	char ret = 0;
 #if ENDIANNESS==BIG
-	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #elif ENDIANESS==LITTLE
-	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte + nbytes - 1]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #endif
@@ -104,7 +104,7 @@ char bytearr_read_char(const byte_t *src, size_t from_byte,
 unsigned char bytearr_read_uchar(const byte_t *src, size_t from_byte,
                                  size_t nbytes)
 {
-	unsigned char ret=0;
+	unsigned char ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(unsigned char));
@@ -116,13 +116,13 @@ unsigned char bytearr_read_uchar(const byte_t *src, size_t from_byte,
 short bytearr_read_short(const byte_t *src, size_t from_byte,
                          size_t nbytes)
 {
-	short ret=0;
+	short ret = 0;
 #if ENDIANNESS==BIG
-	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #elif ENDIANESS==LITTLE
-	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte + nbytes - 1]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #endif
@@ -137,7 +137,7 @@ short bytearr_read_short(const byte_t *src, size_t from_byte,
 unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
                                    size_t nbytes)
 {
-	unsigned short ret=0;
+	unsigned short ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(unsigned short));
@@ -149,13 +149,13 @@ unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
 int bytearr_read_int(const byte_t *src, size_t from_byte,
                      size_t nbytes)
 {
-	int ret=0;
+	int ret = 0;
 #if ENDIANNESS==BIG
-	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #elif ENDIANESS==LITTLE
-	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte + nbytes - 1]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #endif
@@ -170,7 +170,7 @@ int bytearr_read_int(const byte_t *src, size_t from_byte,
 unsigned int bytearr_read_uint(const byte_t *src, size_t from_byte,
                                size_t nbytes)
 {
-	unsigned int ret=0;
+	unsigned int ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(unsigned int));
@@ -182,13 +182,13 @@ unsigned int bytearr_read_uint(const byte_t *src, size_t from_byte,
 long bytearr_read_long(const byte_t *src, size_t from_byte,
                        size_t nbytes)
 {
-	long ret=0;
+	long ret = 0;
 #if ENDIANNESS==BIG
-	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #    elif ENDIANESS==LITTLE
-	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte + nbytes - 1]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #endif
@@ -203,7 +203,7 @@ long bytearr_read_long(const byte_t *src, size_t from_byte,
 unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
                                  size_t nbytes)
 {
-	unsigned long ret=0;
+	unsigned long ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(unsigned long));
@@ -215,13 +215,13 @@ unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
 long long bytearr_read_llong(const byte_t *src, size_t from_byte,
                              size_t nbytes)
 {
-	long long ret=0;
+	long long ret = 0;
 #if ENDIANNESS==BIG
-	if (nbytes>0 && src[from_byte]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #elif ENDIANESS==LITTLE
-	if (nbytes>0 && src[from_byte+nbytes-1]&MSBMASK(1)) {
+	if (nbytes > 0 && src[from_byte + nbytes - 1]&MSBMASK(1)) {
 		ret = ~ret;
 	}
 #endif
@@ -236,7 +236,7 @@ long long bytearr_read_llong(const byte_t *src, size_t from_byte,
 unsigned long long bytearr_read_ullong(const byte_t *src,
                                        size_t from_byte, size_t nbytes)
 {
-	unsigned long long ret=0;
+	unsigned long long ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(unsigned long long));
@@ -248,7 +248,7 @@ unsigned long long bytearr_read_ullong(const byte_t *src,
 size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
                            size_t nbytes)
 {
-	size_t ret=0;
+	size_t ret = 0;
 	bytearr_write((byte_t *)&ret, 0, src, from_byte, nbytes);
 #if ENDIANNESS==BIG
 	bytearr_reverse((byte_t *)&ret, sizeof(size_t));
@@ -260,7 +260,7 @@ size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
 void bytearr_write(byte_t *dest, size_t from_byte_dest, const byte_t *src,
                    size_t from_byte_src, size_t nbytes)
 {
-	memcpy(dest+from_byte_dest, src+from_byte_src, nbytes);
+	memcpy(dest + from_byte_dest, src + from_byte_src, nbytes);
 }
 
 

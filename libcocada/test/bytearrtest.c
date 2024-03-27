@@ -36,14 +36,14 @@ static size_t ba_size;
 static void reset_arrays()
 {
 	size_t i, j;
-	for (i=0; i<ba_size; i++) {
+	for (i = 0; i < ba_size; i++) {
 		ba_zeros[i] = 0x0;
 		ba_ones[i] = ~(0x0);
 		ba_odd[i] = 0x0;
 		ba_even[i] = 0x0;
-		for (j=0; j<BYTESIZE; j+=2) {
-			ba_odd[i] |= ((0x1)<<j);
-			ba_even[i] |= ((0x2)<<j);
+		for (j = 0; j < BYTESIZE; j += 2) {
+			ba_odd[i] |= ((0x1) << j);
+			ba_even[i] |= ((0x2) << j);
 		}
 		ba_rand[i] = (byte_t)rand();
 	}
@@ -89,9 +89,9 @@ void test_revert_bytes(CuTest *tc)
 	ainv = a;
 	ainvp = (byte_t *) &ainv;
 	bytearr_reverse((byte_t *)&ainv, sizeof(uint32_t));
-	for (i=0; i<sizeof(uint32_t); i++) {
+	for (i = 0; i < sizeof(uint32_t); i++) {
 		//printf("a[%zu]=%x ainv[%zu]=%x\n", i, ap[i], sizeof(uint32_t)-i-1, ainvp[sizeof(uint32_t)-i-1]);
-		CuAssertTrue(tc, ap[i]==ainvp[sizeof(uint32_t)-i-1] );
+		CuAssertTrue(tc, ap[i] == ainvp[sizeof(uint32_t) - i - 1] );
 	}
 	//printf("inverting bytes of %x gives %x", a, ainv);
 }
@@ -101,26 +101,27 @@ void test_bytearr_write_int(CuTest *tc)
 	size_t ntests, from_byte, i, bytecrop;
 	int written, read;
 	ntests = 10000;
-	for (i=0; i<ntests; i++) {
-		from_byte = rand()%(ba_size-sizeof(unsigned int));
+	for (i = 0; i < ntests; i++) {
+		from_byte = rand() % (ba_size - sizeof(unsigned int));
 		written = (int)(rand());
-		bytecrop = i%(sizeof(unsigned int)+1);
+		bytecrop = i % (sizeof(unsigned int) +1);
 		bytearr_write_int(ba_zeros, from_byte, written, bytecrop);
 		read = bytearr_read_int(ba_zeros, from_byte, bytecrop);
 		if (bytecrop < sizeof(unsigned int)) {
-			written &= (int)((((int)0x1)<<(bytecrop*BYTESIZE)) - 1);
-			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
-			if (written<0) {
-				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
+			written &= (int)((((int)0x1) << (bytecrop * BYTESIZE)) - 1);
+			written <<= (BYTESIZE * sizeof(unsigned int) - (bytecrop * BYTESIZE));
+			if (written < 0) {
+				written = ~0 & written >> ((BYTESIZE * sizeof(unsigned int)) -
+				                           (bytecrop * BYTESIZE));
 			}
 			else {
-				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
+				written >>= ((BYTESIZE * sizeof(unsigned int)) - (bytecrop * BYTESIZE));
 			}
 		}
 		//printf(">> written = %x. read = %x\n", written, read);
 		//printf(">> written = %d. read = %d\n", written, read);
 		//bytearr_print(ba_zeros, ba_size, 4);
-		CuAssertIntEquals(tc,written, read);
+		CuAssertIntEquals(tc, written, read);
 	}
 }
 
@@ -130,25 +131,26 @@ void test_bytearr_write_uint(CuTest *tc)
 	size_t ntests, from_byte, i, bytecrop;
 	unsigned int written, read;
 	ntests = 1000;
-	for (i=0; i<ntests; i++) {
-		from_byte = rand()%(ba_size-sizeof(unsigned int));
+	for (i = 0; i < ntests; i++) {
+		from_byte = rand() % (ba_size - sizeof(unsigned int));
 		written = (unsigned int)(rand());
-		bytecrop = i%(sizeof(unsigned int)+1);
+		bytecrop = i % (sizeof(unsigned int) +1);
 		bytearr_write_uint(ba_zeros, from_byte, written, bytecrop);
 		read = bytearr_read_uint(ba_zeros, from_byte, bytecrop);
 		if (bytecrop < sizeof(unsigned int)) {
-			written &= (size_t)((((unsigned int)0x1)<<(bytecrop*BYTESIZE)) - 1);
-			written <<= (BYTESIZE*sizeof(unsigned int)-(bytecrop*BYTESIZE));
-			if (written<0) {
-				written = ~0 & written>>((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
+			written &= (size_t)((((unsigned int)0x1) << (bytecrop * BYTESIZE)) - 1);
+			written <<= (BYTESIZE * sizeof(unsigned int) - (bytecrop * BYTESIZE));
+			if (written < 0) {
+				written = ~0 & written >> ((BYTESIZE * sizeof(unsigned int)) -
+				                           (bytecrop * BYTESIZE));
 			}
 			else {
-				written >>= ((BYTESIZE*sizeof(unsigned int))-(bytecrop*BYTESIZE));
+				written >>= ((BYTESIZE * sizeof(unsigned int)) - (bytecrop * BYTESIZE));
 			}
 		}
 		//printf(">> written = %x. read = %x\n", written, read);
 		//bytearr_print(ba_zeros, ba_size, 4);
-		CuAssertIntEquals(tc,written, read);
+		CuAssertIntEquals(tc, written, read);
 	}
 }
 
@@ -158,25 +160,25 @@ void test_bytearr_write_size_t(CuTest *tc)
 	size_t ntests, from_byte, i, bytecrop;
 	size_t written, read;
 	ntests = 1000;
-	for (i=0; i<ntests; i++) {
-		from_byte = rand()%(ba_size-sizeof(size_t));
+	for (i = 0; i < ntests; i++) {
+		from_byte = rand() % (ba_size - sizeof(size_t));
 		written = (size_t)(rand());
-		bytecrop = i%(sizeof(size_t)+1);
+		bytecrop = i % (sizeof(size_t) +1);
 		bytearr_write_size_t(ba_zeros, from_byte, written, bytecrop);
 		read = bytearr_read_size_t(ba_zeros, from_byte, bytecrop);
 		if (bytecrop < sizeof(size_t)) {
-			written &= (size_t)((((size_t)0x1)<<(bytecrop*BYTESIZE)) - 1);
-			written <<= (BYTESIZE*sizeof(size_t)-(bytecrop*BYTESIZE));
-			if (written<0) {
-				written = ~0 & written>>((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
+			written &= (size_t)((((size_t)0x1) << (bytecrop * BYTESIZE)) - 1);
+			written <<= (BYTESIZE * sizeof(size_t) - (bytecrop * BYTESIZE));
+			if (written < 0) {
+				written = ~0 & written >> ((BYTESIZE * sizeof(size_t)) - (bytecrop * BYTESIZE));
 			}
 			else {
-				written >>= ((BYTESIZE*sizeof(size_t))-(bytecrop*BYTESIZE));
+				written >>= ((BYTESIZE * sizeof(size_t)) - (bytecrop * BYTESIZE));
 			}
 		}
 		//printf(">> written = %x. read = %x\n", written, read);
 		//bytearr_print(ba_zeros, ba_size, 4);
-		CuAssertIntEquals(tc,written, read);
+		CuAssertIntEquals(tc, written, read);
 	}
 }
 

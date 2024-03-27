@@ -140,7 +140,7 @@
  *     ...             |   A         |
  *     B *b;           |             |     ,....> +---------+
  *     ...             |   +----+    |    .       |    B    |
- * }                   |   | b..|........´        |         |
+ * }                   |   | b..|......../        |         |
  *                     |   +----+    |            +---------+
  *                     |             |
  *                     +-------------+
@@ -179,7 +179,7 @@
  *     size_t size;    |            |
  *     size_t cap;     | b +----+   |     ,...> +------+-------+-   -+----------+
  *     B *b.           |   |    |   |    .      | b[0] | b[1]  | ... | b[cap-1] |
- * }                   |   | ...........´       |      |       |     |          |
+ * }                   |   | .........../       |      |       |     |          |
  *                     |   +----+   |           +------+-------+-   -+----------+
  *                     |            |
  *                     +------------+
@@ -205,7 +205,7 @@
  *     size_t size;    |            |               .
  *     size_t cap;     | b +----+   |     ,...> +---.--+------+-   -+----------+
  *     B **b.          |   |    |   |    .      | b[0] | b[1] | ... | b[cap-1] |
- * }                   |   | ...........´       +------+--.---+-   -+----------+
+ * }                   |   | .........../       +------+--.---+-   -+----------+
  *                     |   +----+   |                     .
  *                     |            |                     .
  *                     +------------+                     .
@@ -226,7 +226,7 @@
  *
  * # Object destruction
  *
- * As mentioned above, destroying an object requires, first, `finalising´ it
+ * As mentioned above, destroying an object requires, first, `finalising' it
  * (Step 4), that is cleaning its internal state and releasing the resources
  * (memory, file handlers, network connexions, etc) held by the object in reverse
  * order of allocation, and then freeing the memory used by the struct (Step 5).
@@ -263,7 +263,7 @@
  * |  C  |<>----|  B  |<>----|  A  |
  * +-----+      +-----+      +-----+
  * ```
- * For now let us suppose these are flat containers (we´ll come back to that later).
+ * For now let us suppose these are flat containers (we'll come back to that later).
  *
  * The finalisation of `C` would go roughly as follows.  First, the finalise function
  *
@@ -307,7 +307,7 @@
  * above, as container of pointers, each pointer being itself a special case
  * container of just one element (like in CASE II above).
  * Hence, if `C` and `B` were reference containers in our running example
- * we´d have that
+ * we'd have that
  *
  * <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
  *

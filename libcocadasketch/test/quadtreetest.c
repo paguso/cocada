@@ -144,7 +144,7 @@ void quadtree_ins_test(CuTest *tc)
 	uint npts = 500;
 	memdbg_reset();
 	quadtree *tree = quadtree_new(width, height, depth);
-	for (uint i=0; i<npts; i++) {
+	for (uint i = 0; i < npts; i++) {
 		point2d pt = {.x = rand_range_uint(0, width), .y = rand_range_uint(0, height) };
 		quadtree_ins(tree, pt, &pt, upd_node_ins_pt);
 	}

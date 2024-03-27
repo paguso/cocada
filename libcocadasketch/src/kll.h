@@ -46,7 +46,7 @@
  *
  * Each buffer `B[l]` has a limited capacity `C[l] = k * c^(h-l)` for constants
  * `k` and `c`, s.t. `0.5 < c < 1`. The constant `k` depends on the desired
- * error level `err`, as we´ll see later. For now it suffices to note that
+ * error level `err`, as we'll see later. For now it suffices to note that
  * `k = C[h]`, that is, the capacity of the last (lowest resolution) buffer.
  * Because `c` liew between `1/2` and `1`, the capacities decay "smoothly" from
  * `k` to 2 (the minimum buffer capacity for technical reasons) from the

@@ -65,7 +65,7 @@ typedef struct {
 
 static int nodefreq_cmp(const void *p1, const void *p2)
 {
-	return (*((size_t *)p2) - *((size_t *)p1));
+	return (*((size_t *)p2) - * ((size_t *)p1));
 }
 
 static void fill_code_table(huffcode *hcode, const hufftnode *node,

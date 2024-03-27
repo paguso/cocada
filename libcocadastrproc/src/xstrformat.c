@@ -116,7 +116,7 @@ xstrformat *xstrformat_new(const xstr *src)
 {
 	xstrformat *ret = NEW(xstrformat);
 	ret->_t_format = (format) {
-		.impltor=ret, .vt=xstrformat_xchar_vt
+		.impltor = ret, .vt = xstrformat_xchar_vt
 	};
 	ret->src = src;
 	return ret;
@@ -127,7 +127,7 @@ xstrformat *xstrformat_new_ascii(const xstr *src)
 {
 	xstrformat *ret = NEW(xstrformat);
 	ret->_t_format = (format) {
-		.impltor=ret, .vt=xstrformat_ascii_vt
+		.impltor = ret, .vt = xstrformat_ascii_vt
 	};
 	ret->src = src;
 	return ret;

@@ -213,7 +213,7 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 	bounds[0] = rect.top_left;
 	bounds[1].x = rect.top_left.x + rect.width;
 	bounds[1].y = rect.top_left.y + rect.height;
-	for (uint i=0; i<2; i++) {
+	for (uint i = 0; i < 2; i++) {
 		rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
 		point2d centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
 		uint cur_depth = 0;
@@ -251,7 +251,7 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 		else {
 			switch (anchor) {
 			case SNAP_IN:
-				bounds[i] = rectbounds[1-i];
+				bounds[i] = rectbounds[1 - i];
 				break;
 			case SNAP_OUT:
 				bounds[i] = rectbounds[i];

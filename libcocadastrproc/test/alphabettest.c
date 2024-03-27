@@ -68,9 +68,9 @@ void test_int_ab(CuTest *tc)
 }
 
 
-void test_ab_with_equivs(CuTest *tc) 
+void test_ab_with_equivs(CuTest *tc)
 {
-	char *letters[4] = {"aA@0", "bB1", "cCç2", "dD3"};
+	char *letters[4] = {"aA@0", "bB1", "cCc2", "dD3"};
 	memdbg_reset();
 	alphabet *ab = alphabet_new_with_equivs(4, letters);
 

@@ -36,7 +36,7 @@ void run_all_tests(void)
 
 	CuSuiteAddSuite(suite, fasta_get_test_suite());
 	CuSuiteAddSuite(suite, align_get_test_suite());
-	
+
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);
 	CuSuiteDetails(suite, output);

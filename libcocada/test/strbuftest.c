@@ -39,9 +39,9 @@ void strbuf_test_setup(CuTest *tc)
 void test_strbuf_new_from_str(CuTest *tc)
 {
 	memdbg_reset();
-	char *str = (char *)malloc(11*sizeof(char));
+	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
-	str[10]='\0';
+	str[10] = '\0';
 	strbuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
 	CuAssertSizeTEquals(tc, 10, strbuf_len(dstr));
@@ -56,13 +56,13 @@ void test_strbuf_new_from_str(CuTest *tc)
 void test_strbuf_get(CuTest *tc)
 {
 	memdbg_reset();
-	char *str = (char *)malloc(11*sizeof(char));
+	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
-	str[10]='\0';
+	str[10] = '\0';
 	strbuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
-	for (size_t i=0; i<strbuf_len(dstr); i++) {
-		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0'+(i%10));
+	for (size_t i = 0; i < strbuf_len(dstr); i++) {
+		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0' + (i % 10));
 	}
 	free(str);
 	strbuf_free(dstr);
@@ -73,16 +73,16 @@ void test_strbuf_get(CuTest *tc)
 void test_strbuf_append_char(CuTest *tc)
 {
 	memdbg_reset();
-	char *str = (char *)malloc(11*sizeof(char));
+	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
-	str[10]='\0';
+	str[10] = '\0';
 	strbuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
-	for (size_t i=0; i<1000; i++) {
-		strbuf_append_char(dstr, '0'+(i%10));
+	for (size_t i = 0; i < 1000; i++) {
+		strbuf_append_char(dstr, '0' + (i % 10));
 	}
-	for (size_t i=0; i<strbuf_len(dstr); i++) {
-		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0'+(i%10));
+	for (size_t i = 0; i < strbuf_len(dstr); i++) {
+		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0' + (i % 10));
 	}
 	//printf("final strbuf = %s\ncapacity=%zu\n", strbuf_as_str(dstr), strbuf_capacity(dstr));
 	free(str);
@@ -186,7 +186,7 @@ void test_strbuf_clip(CuTest *tc)
 	CuAssertStrEquals(tc, strbuf_as_str(sb), str);
 	strbuf_clip(sb, 4, strbuf_len(sb));
 	CuAssertSizeTEquals(tc, 40, strbuf_len(sb));
-	CuAssertStrEquals(tc, strbuf_as_str(sb), str+4);
+	CuAssertStrEquals(tc, strbuf_as_str(sb), str + 4);
 	strbuf_clip(sb, 6, 15);
 	CuAssertSizeTEquals(tc, 9, strbuf_len(sb));
 	CuAssertStrEquals(tc, "brown fox", strbuf_as_str(sb));
@@ -299,7 +299,7 @@ void test_strbuf_replace_all(CuTest *tc)
 void test_strbuf_printf(CuTest *tc)
 {
 	memdbg_reset();
-	char buf[1<<12];
+	char buf[1 << 12];
 	char *s = buf;
 	buf[0] = '\0';
 	strbuf *sbuf = strbuf_new();

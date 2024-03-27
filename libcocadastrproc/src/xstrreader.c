@@ -211,13 +211,13 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 	strread *sr = (strread *) rdr->src;
 	size_t r = 0;
 	if (dest != NULL) {
-		int c = strread_getc(sr); 
-		while(c != EOF && c != delim && r < xstr_len(dest)) {
+		int c = strread_getc(sr);
+		while (c != EOF && c != delim && r < xstr_len(dest)) {
 			xstr_set(dest, r, c);
 			r++;
 			c = strread_getc(sr);
 		}
-		while(c != EOF && c != delim) {
+		while (c != EOF && c != delim) {
 			xstr_push(dest, c);
 			r++;
 			c = strread_getc(sr);
@@ -225,9 +225,10 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 		if (c == delim) {
 			strread_ungetc(sr);
 		}
-	} else {	
-		int c = strread_getc(sr); 
-		while(c != EOF && c != delim) {
+	}
+	else {
+		int c = strread_getc(sr);
+		while (c != EOF && c != delim) {
 			r++;
 			c = strread_getc(sr);
 		}
@@ -240,10 +241,10 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 
 
 static xstrread_vt _strread_vt = { .reset = _strread_reset,
-                               .getch = _strread_getc,
-                               .read = _strread_read,
-                               .read_until = _strread_read_until
-                             };
+                                   .getch = _strread_getc,
+                                   .read = _strread_read,
+                                   .read_until = _strread_read_until
+                                 };
 
 
 xstrreader *xstrreader_open_strread(strread *src)

@@ -45,7 +45,7 @@
 #define MIN_NLEVELS 1
 #define MAX_PLAIN_SA_LEN 3
 
-static const char SENTINEL='$';
+static const char SENTINEL = '$';
 
 
 struct _csarray {
@@ -63,7 +63,7 @@ struct _csarray {
 
 static void sarr_invert(size_t *src, size_t len, size_t *dest)
 {
-	for (size_t i=0; i<len; i++)
+	for (size_t i = 0; i < len; i++)
 		dest[src[i]] = i;
 }
 
@@ -73,8 +73,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	csarray *csa = NEW(csarray);
 
 	csa->nlevels = 1;  // # of levels, including root level
-	for ( size_t lvl_len = len+1; lvl_len > MAX_PLAIN_SA_LEN;
-	        lvl_len = (size_t) ceil(lvl_len/2.0f) )
+	for ( size_t lvl_len = len + 1; lvl_len > MAX_PLAIN_SA_LEN;
+	        lvl_len = (size_t) ceil(lvl_len / 2.0f) )
 		csa->nlevels++;
 
 	csa->lvl_len = ARR_NEW(size_t, csa->nlevels);
@@ -85,10 +85,10 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 	// build plain sarray and its inverse
 	size_t *sarr = sais(str, len, ab);
-	size_t *sarr_inv = ARR_NEW(size_t, len+1);
-	sarr_invert(sarr, len+1, sarr_inv);
+	size_t *sarr_inv = ARR_NEW(size_t, len + 1);
+	sarr_invert(sarr, len + 1, sarr_inv);
 
-	size_t lvl_len = len+1;  // sentinel added by sais
+	size_t lvl_len = len + 1; // sentinel added by sais
 	csa->lvl_len[0] = lvl_len;
 	bitvec *xchar_stops = bitvec_new_with_capacity(lvl_len);
 	bitvec_push_n(xchar_stops, lvl_len, 0);
@@ -96,11 +96,11 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	size_t ndiff_xchars = 1;            // has at least the SENTINEL
 	strbuf_append_char(supp_ab_str, SENTINEL);
 	bitvec_set_bit(xchar_stops, 0, 1);
-	bitvec_set_bit(xchar_stops, lvl_len-1, 1);
+	bitvec_set_bit(xchar_stops, lvl_len - 1, 1);
 	//ndiff_xchars++;
-	for (size_t i=1; i<lvl_len; i++) {
-		if (str[sarr[i]] != str[sarr[i-1]]) {
-			bitvec_set_bit(xchar_stops, i-1, 1);
+	for (size_t i = 1; i < lvl_len; i++) {
+		if (str[sarr[i]] != str[sarr[i - 1]]) {
+			bitvec_set_bit(xchar_stops, i - 1, 1);
 			strbuf_append_char(supp_ab_str, str[sarr[i]]);
 			ndiff_xchars++;
 		}
@@ -112,7 +112,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	xstr *cur_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 	xstr_push_n(cur_xstr, 0, lvl_len);
 	xchar_t cur_xchar = 0;
-	for (size_t i=0; i<lvl_len; i++) {
+	for (size_t i = 0; i < lvl_len; i++) {
 		xstr_set(cur_xstr, sarr[i], cur_xchar);
 		if ( bitvec_get_bit(xchar_stops, i) )
 			cur_xchar++;
@@ -138,8 +138,8 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 		xstr *phi_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 		xstr_push_n(phi_xstr, 0, lvl_len);
-		for (size_t i=0; i<lvl_len; i++)
-			xstr_set( phi_xstr, sarr_inv[(sarr[i]+1)%lvl_len],
+		for (size_t i = 0; i < lvl_len; i++)
+			xstr_set( phi_xstr, sarr_inv[(sarr[i] + 1) % lvl_len],
 			          xstr_get(cur_xstr, sarr[i]) );
 		csa->phi_wt[lvl] = wavtree_new_from_xstr( int_alphabet_new(ndiff_xchars),
 		                   phi_xstr,  WT_BALANCED );
@@ -159,7 +159,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 			for (size_t i = 0, last = 0; i < lvl_len; i++) {
 				if (IS_EVEN(sarr[i])) {
 					bitvec_push(even_suff, 1);
-					sarr[last++] = sarr[i]/2;
+					sarr[last++] = sarr[i] / 2;
 				}
 				else
 					bitvec_push(even_suff, 0);
@@ -168,26 +168,26 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		csa->even_bv[lvl] = csrsbitarr_new(bitvec_detach(even_suff), lvl_len);
 
 		// prepare next level base string and sarr
-		size_t nxt_lvl_len = (size_t) ceil(lvl_len/2.0f);
+		size_t nxt_lvl_len = (size_t) ceil(lvl_len / 2.0f);
 		sarr_invert(sarr, nxt_lvl_len, sarr_inv);
 		xchar_stops = bitvec_new_with_capacity(nxt_lvl_len);
 		bitvec_push_n(xchar_stops, nxt_lvl_len, 0);
 		ndiff_xchars = 1;
 		xchar_t ai, bi, aiminus1, biminus1;
-		ai = xstr_get(cur_xstr, 2*sarr[0]);
-		bi = (2*sarr[0]+1 < lvl_len) ? xstr_get(cur_xstr, 2*sarr[0]+1) : 0;
-		for (size_t i=1; i<nxt_lvl_len; i++) {
+		ai = xstr_get(cur_xstr, 2 * sarr[0]);
+		bi = (2 * sarr[0] + 1 < lvl_len) ? xstr_get(cur_xstr, 2 * sarr[0] + 1) : 0;
+		for (size_t i = 1; i < nxt_lvl_len; i++) {
 			aiminus1 = ai;
 			biminus1 = bi;
-			ai = xstr_get(cur_xstr, 2*sarr[i]);
-			bi= (2*sarr[i]+1 < lvl_len) ? xstr_get(cur_xstr, 2*sarr[i]+1) : 0;
-			if (ai!=aiminus1 || bi!=biminus1) {
-				bitvec_set_bit(xchar_stops, i-1, 1);
+			ai = xstr_get(cur_xstr, 2 * sarr[i]);
+			bi = (2 * sarr[i] + 1 < lvl_len) ? xstr_get(cur_xstr, 2 * sarr[i] + 1) : 0;
+			if (ai != aiminus1 || bi != biminus1) {
+				bitvec_set_bit(xchar_stops, i - 1, 1);
 				ndiff_xchars++;
 			}
 		}
 		assert(ndiff_xchars < XCHAR_MAX);
-		bitvec_set_bit(xchar_stops, nxt_lvl_len-1, 1);
+		bitvec_set_bit(xchar_stops, nxt_lvl_len - 1, 1);
 		xstr_free(cur_xstr);
 		cur_xstr = xstr_new_with_capacity( nbytes(ndiff_xchars), nxt_lvl_len );
 		xstr_push_n(cur_xstr, 0, nxt_lvl_len);
@@ -202,9 +202,9 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	}
 	xstr_free(cur_xstr);
 
-	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
+	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels - 1] * sizeof(size_t));
 	csa->root_sa_inv = realloc(sarr_inv,
-	                           csa->lvl_len[csa->nlevels-1]*sizeof(size_t));
+	                           csa->lvl_len[csa->nlevels - 1] * sizeof(size_t));
 	return csa;
 }
 
@@ -212,11 +212,11 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 void csarray_print(FILE *stream, csarray *csa)
 {
-	if (csa==NULL) return;
+	if (csa == NULL) return;
 	fprintf (stream, "csarray@%p {\n", csa);
 	fprintf (stream, "\tlen:%zu\n", csa->lvl_len[0]);
 	fprintf (stream, "\tlevels:%zu\n", csa->nlevels);
-	for (size_t lvl=0; lvl<csa->nlevels-1; lvl++) {
+	for (size_t lvl = 0; lvl < csa->nlevels - 1; lvl++) {
 		fprintf(stream, "\t--- LEVEL %zu ---\n", lvl);
 		fprintf(stream, "\teven_bv[%zu]:\n\t", lvl);
 		bitarr_fprint( stream,  csrsbitarr_data(csa->even_bv[lvl]),
@@ -234,8 +234,10 @@ void csarray_print(FILE *stream, csarray *csa)
 		//printf("%s\n", strbuf_as_str(phi));
 		//strbuf_free(phi);
 	}
-	ARR_FPRINT(stream, csa->root_sa, 0, csa->lvl_len[csa->nlevels-1], 10, "root_sa", "%zu", " ", "");
-	ARR_FPRINT(stream, csa->root_sa_inv, 0, csa->lvl_len[csa->nlevels-1], 10, "root_sa_inv", "%zu", " ", "");
+	ARR_FPRINT(stream, csa->root_sa, 0, csa->lvl_len[csa->nlevels - 1], 10,
+	           "root_sa", "%zu", " ", "");
+	ARR_FPRINT(stream, csa->root_sa_inv, 0, csa->lvl_len[csa->nlevels - 1], 10,
+	           "root_sa_inv", "%zu", " ", "");
 
 	fprintf (stream, "} #end of csarray@%p\n", csa);
 
@@ -244,8 +246,8 @@ void csarray_print(FILE *stream, csarray *csa)
 
 void csarray_free(csarray *csa)
 {
-	if (csa==NULL) return;
-	for (size_t l=0; l<csa->nlevels-1; l++) {
+	if (csa == NULL) return;
+	for (size_t l = 0; l < csa->nlevels - 1; l++) {
 		csrsbitarr_free(csa->even_bv[l], true);
 		csrsbitarr_free(csa->char_stop_bv[l], true);
 		wavtree_free(csa->phi_wt[l]);
@@ -271,7 +273,7 @@ static size_t csa_phi(csarray *csa, size_t lvl, size_t i)
 {
 	xchar_t c = csrsbitarr_rank1(csa->char_stop_bv[lvl], i);
 	size_t  r = csrsbitarr_pred1(csa->char_stop_bv[lvl], i);
-	r = ( r < csa->lvl_len[lvl] ) ? i-r-1 : i ;
+	r = ( r < csa->lvl_len[lvl] ) ? i - r - 1 : i ;
 	return wavtree_select(csa->phi_wt[lvl], c, r);
 }
 
@@ -284,11 +286,11 @@ size_t csarray_phi(csarray *csa, size_t i)
 
 static size_t csa_get(csarray *csa, size_t lvl, size_t i)
 {
-	if ( lvl == csa->nlevels-1 )
+	if ( lvl == csa->nlevels - 1 )
 		return csa->root_sa[i];
 	if ( csrsbitarr_get(csa->even_bv[lvl], i) ) {
 		size_t epos = csrsbitarr_rank1(csa->even_bv[lvl], i);
-		return 2*csa_get( csa, lvl+1, epos );
+		return 2 * csa_get( csa, lvl + 1, epos );
 	}
 	else {
 		size_t phi = csa_phi(csa, lvl, i);
@@ -309,11 +311,11 @@ static size_t csa_get_inv(csarray *csa, size_t lvl, size_t i)
 	if (lvl == csa->nlevels - 1)
 		return csa->root_sa_inv[i];
 	if ( IS_EVEN(i) ) {
-		size_t rec_inv = csa_get_inv(csa, lvl+1, i/2);
+		size_t rec_inv = csa_get_inv(csa, lvl + 1, i / 2);
 		return csrsbitarr_select1(csa->even_bv[lvl], rec_inv);
 	}
 	else {
-		size_t inv_i_minus1 = csa_get_inv( csa, lvl, i-1 );
+		size_t inv_i_minus1 = csa_get_inv( csa, lvl, i - 1 );
 		return csa_phi(csa, lvl, inv_i_minus1);
 	}
 }

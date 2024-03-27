@@ -102,7 +102,7 @@ uint64_t bjkst_qry(bjkst *counter)
 {
 	size_t min_nonempty_zeros = counter->min_zeros;
 	while (min_nonempty_zeros < counter->nbits
-	        && hashset_size(counter->buf[min_nonempty_zeros])==0 ) {
+	        && hashset_size(counter->buf[min_nonempty_zeros]) == 0 ) {
 		min_nonempty_zeros++;
 	}
 	uint64_t ret = (1 << min_nonempty_zeros);

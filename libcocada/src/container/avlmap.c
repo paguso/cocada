@@ -56,9 +56,9 @@ void avlmap_finalise(void *ptr, const finaliser *fnr)
 {
 	avlmap *self = (avlmap *)ptr;
 	avlmap_iter *it = avlmap_get_iter(self, POST_ORDER);
-	const finaliser *key_fnr = (finaliser_nchd(fnr)>0) ? finaliser_chd(fnr,
+	const finaliser *key_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
 	                           0) : NULL;
-	const finaliser *val_fnr = (finaliser_nchd(fnr)>1) ? finaliser_chd(fnr,
+	const finaliser *val_fnr = (finaliser_nchd(fnr) > 1) ? finaliser_chd(fnr,
 	                           1) : NULL;
 	if (key_fnr != NULL || val_fnr != NULL) {
 		FOREACH_IN_ITER(entry, avlmap_entry, avlmap_iter_as_iter(it)) {
@@ -107,12 +107,12 @@ void avlmap_ins(avlmap *self, const void *key, const void *val)
 	memcpy(entry, key, self->sizeofkey);
 	void *valptr = ENTRY_VAL(entry);
 	memcpy(valptr, val, self->sizeofval);
-    bool inserted = avl_ins(self->tree, entry);
-    self->size += inserted;
-    if (!inserted) {
-        void *cur_val = avlmap_get_mut(self, key);
-        memcpy(cur_val, val, self->sizeofval);
-    }
+	bool inserted = avl_ins(self->tree, entry);
+	self->size += inserted;
+	if (!inserted) {
+		void *cur_val = avlmap_get_mut(self, key);
+		memcpy(cur_val, val, self->sizeofval);
+	}
 	free(entry);
 }
 
@@ -138,14 +138,14 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
 
 
 #define AVLMAP_IMPL(TYPE, ...)\
-TYPE avlmap_get_##TYPE(avlmap *self, const void *key){\
-	const void *v = avlmap_get(self, key);\
-	return v ? ((TYPE *)v)[0] : (TYPE)0;\
-}\
-\
-void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val){\
-	avlmap_ins(self, key, &val);\
-}\
+	TYPE avlmap_get_##TYPE(avlmap *self, const void *key){\
+		const void *v = avlmap_get(self, key);\
+		return v ? ((TYPE *)v)[0] : (TYPE)0;\
+	}\
+	\
+	void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val){\
+		avlmap_ins(self, key, &val);\
+	}\
 
 XX_CORETYPES(AVLMAP_IMPL)
 

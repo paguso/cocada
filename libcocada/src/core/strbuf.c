@@ -186,7 +186,7 @@ void strbuf_append_char(strbuf *self, char c)
 void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep)
 {
 	size_t seplen = strlen(sep);
-	for (size_t i=0; i<n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		if (i) {
 			strbuf_nappend(self, sep, seplen);
 		}
@@ -204,7 +204,7 @@ const char *strbuf_as_str(strbuf *self)
 char *strbuf_detach(strbuf *self)
 {
 	char *str = self->str;
-	str = realloc(str, (self->len+1));
+	str = realloc(str, (self->len + 1));
 	FREE(self);
 	return str;
 }

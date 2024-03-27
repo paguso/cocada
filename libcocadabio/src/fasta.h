@@ -93,7 +93,7 @@ bool fasta_has_next(fasta *self);
 /**
  * @brief Moves the stream to the sequence at the given description offset
  * @p descr_offset.
- * 
+ *
  * @return true on success, false on fail.
  */
 bool fasta_goto(fasta *self, size_t descr_offset);

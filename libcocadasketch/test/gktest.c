@@ -44,7 +44,7 @@ void test_gk_upd(CuTest *tc)
 	size_t nupd = 4 * univ;
 	gksumm *sk = gk_new(sizeof(int), cmp_int, 0.05);
 	size_t max_count = 0;
-	for (size_t i=0; i<nupd; i++) {
+	for (size_t i = 0; i < nupd; i++) {
 		double xval;
 		do {
 			xval = (rand_norm() + 1.0) / 7.0;
@@ -64,16 +64,16 @@ void test_gk_upd(CuTest *tc)
 
 
 	size_t nbins = 50;
-	double resol = 100.0 / (max_count * (univ/nbins));
+	double resol = 100.0 / (max_count * (univ / nbins));
 	printf("\n\nGK Values distribution (each * for approx %f units)",
-	       (max_count * ((double)univ/(double)nbins))/100.0 );
+	       (max_count * ((double)univ / (double)nbins)) / 100.0 );
 	for (size_t i = 0, bin = 0; bin < nbins; bin++) {
 		size_t bin_count = 0;
 		while ( i < ((bin + 1) * univ) / nbins ) {
 			bin_count += bfcount[i++];
 		}
-		printf("\n%10zu|",(bin*univ)/nbins);
-		for (size_t j=0; j < resol * bin_count; j++) {
+		printf("\n%10zu|", (bin * univ) / nbins);
+		for (size_t j = 0; j < resol * bin_count; j++) {
 			printf("*");
 		}
 	}

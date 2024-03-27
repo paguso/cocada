@@ -74,8 +74,10 @@ alphabet *alphabet_new(size_t size, const char *letters)
 			ret->ranks.arr[c] = ret->size;
 			ret->letters[ret->size] = c;
 			ret->size++;
-		} else {
-			WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c, ret->ranks.arr[c]);
+		}
+		else {
+			WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c,
+			     ret->ranks.arr[c]);
 		}
 	}
 	for (size_t i = 0; i < UCHAR_RANGE; i++) {
@@ -95,7 +97,7 @@ alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 	ret->ranks.arr = ARR_NEW(size_t, UCHAR_RANGE);
 	ret->rank_mode = ARRAY;
 	ARR_FILL(ret->ranks.arr, 0, UCHAR_RANGE, size);
-	
+
 	for (size_t i = 0; i < size; i++) {
 		bool i_used = false;
 		for (size_t j = 0, l = strlen(letters[i]); j < l; j++) {
@@ -106,8 +108,10 @@ alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 					ret->letters[ret->size] = c;
 				}
 				i_used = true;
-			} else {
-				WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c, ret->ranks.arr[c]);
+			}
+			else {
+				WARN("Character '%c' has already been assigned rank %zu. Ignoring.\n", (char)c,
+				     ret->ranks.arr[c]);
 			}
 		}
 		if (i_used) {
@@ -235,7 +239,7 @@ int ab_cmp(const alphabet *ab, xchar_t a, xchar_t b)
 {
 	size_t ra = ab_rank(ab, a);
 	size_t rb = ab_rank(ab, b);
-	if (ra==rb) return 0;
-	else if (ra<rb) return -1;
+	if (ra == rb) return 0;
+	else if (ra < rb) return -1;
 	else return +1;
 }

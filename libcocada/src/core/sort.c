@@ -35,16 +35,16 @@
 size_t part(byte_t *arr, size_t typesize, cmp_func cmp, size_t l, size_t r)
 {
 	byte_t *left = arr + (l * typesize);
-	byte_t *right = arr + ((r-1) * typesize);
+	byte_t *right = arr + ((r - 1) * typesize);
 	byte_t *swp = (byte_t *)malloc(sizeof(typesize));
 
 	byte_t *p = left;
 	if (r >= l + 3) {
 		byte_t *mid = arr + (typesize * ((l + r) / 2));
-		if ((cmp(left, mid)>0) ^ (cmp(left,right)>0)) {
+		if ((cmp(left, mid) > 0) ^ (cmp(left, right) > 0)) {
 			p = left;
 		}
-		else if ((cmp(mid, left)<0) ^ (cmp(mid, right)<0)) {
+		else if ((cmp(mid, left) < 0) ^ (cmp(mid, right) < 0)) {
 			p = mid;
 		}
 		else {
@@ -70,7 +70,7 @@ size_t part(byte_t *arr, size_t typesize, cmp_func cmp, size_t l, size_t r)
 	}
 	SWP(left, j, swp, typesize);
 	free(swp);
-	return (j - arr)/typesize;
+	return (j - arr) / typesize;
 }
 
 static void qs(void *arr, size_t typesize, cmp_func cmp, size_t l, size_t r)
@@ -99,11 +99,11 @@ size_t idx_part(size_t *idx, byte_t *arr, size_t arr_tsz, cmp_func cmp,
 	if (r >= l + 3) {
 		size_t m = (l + r) / 2;
 		if ((cmp(ELT(arr, idx[l], arr_tsz), ELT(arr, idx[m], arr_tsz)) > 0) ^
-		        (cmp(ELT(arr, idx[l], arr_tsz), ELT(arr, idx[r-1], arr_tsz)) > 0)) {
+		        (cmp(ELT(arr, idx[l], arr_tsz), ELT(arr, idx[r - 1], arr_tsz)) > 0)) {
 			p = l;
 		}
 		else if ((cmp(ELT(arr, idx[m], arr_tsz), ELT(arr, idx[l], arr_tsz)) < 0) ^
-		         (cmp(ELT(arr, idx[m], arr_tsz), ELT(arr, idx[r-1], arr_tsz)) < 0)) {
+		         (cmp(ELT(arr, idx[m], arr_tsz), ELT(arr, idx[r - 1], arr_tsz)) < 0)) {
 			p = m;
 		}
 		else {

@@ -68,7 +68,7 @@ void deque_finalise(void *ptr, const finaliser *fnr)
 	deque *dq = (deque *)ptr;
 	if (finaliser_nchd(fnr)) {
 		const finaliser *chd_fr = finaliser_chd(fnr, 0);
-		for (size_t i=0, l=deque_len(dq); i<l; i++) {
+		for (size_t i = 0, l = deque_len(dq); i < l; i++) {
 			void *chd = (void *)deque_get(dq, i);
 			FINALISE(chd, chd_fr);
 		}
@@ -112,7 +112,7 @@ const void *deque_front(const deque *q)
 
 const void *deque_back(const deque *q)
 {
-	return deque_get(q, q->len-1);
+	return deque_get(q, q->len - 1);
 }
 
 
@@ -122,7 +122,7 @@ static void check_and_resize(deque *q)
 		size_t offset = q->cap;
 		q->cap = MAX(GROW_BY * q->cap, MIN_CAPACITY);
 		q->data = realloc(q->data, q->cap * q->typesize);
-		if (q->start==0) return;
+		if (q->start == 0) return;
 		offset = q->cap - offset;
 		memmove( q->data + (q->start + offset) * q->typesize,
 		         q->data + (q->start * q->typesize),
@@ -158,7 +158,7 @@ void deque_push_back(deque *q, const void *elt)
 void deque_push_front(deque *q, const void *elt)
 {
 	check_and_resize(q);
-	q->start = (q->start + (q->cap-1)) % q->cap;
+	q->start = (q->start + (q->cap - 1)) % q->cap;
 	memcpy(q->data + (q->start * q->typesize), elt, q->typesize);
 	q->len++;
 }
@@ -187,7 +187,7 @@ void deque_pop_front(deque *q, void *dest)
 	assert(q->len > 0);
 	memcpy(dest, q->data + (q->start * q->typesize), q->typesize);
 	q->len--;
-	q->start = (q->start+1)%q->cap;
+	q->start = (q->start + 1) % q->cap;
 	check_and_resize(q);
 }
 
@@ -196,7 +196,7 @@ void deque_del_front(deque *q)
 {
 	assert(q->len > 0);
 	q->len--;
-	q->start = (q->start+1)%q->cap;
+	q->start = (q->start + 1) % q->cap;
 	check_and_resize(q);
 }
 

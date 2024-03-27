@@ -40,7 +40,8 @@ static void test_setup()
 	cmd = cliparser_new("test", "A Test Program");
 	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
 	vec *choices = vec_new(sizeof(char *));
-	for (size_t i=0; i<3; vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
+	for (size_t i = 0; i < 3;
+	        vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
 	cliparser_add_option(cmd,
 	                     cliopt_new_defaults(
 	                         'a',
@@ -57,9 +58,9 @@ static void test_setup()
 	                     )
 	                    );
 	vec *def = vec_new(sizeof(long));
-	vec_push_long(def,1234);
-	vec_push_long(def,4321);
-	vec_push_long(def,2143);
+	vec_push_long(def, 1234);
+	vec_push_long(def, 4321);
+	vec_push_long(def, 2143);
 	cliparser_add_option(cmd,
 	                     cliopt_new(
 	                         'c',
@@ -176,7 +177,7 @@ static char **make_argv(char *call, int *argc)
 	int i;
 	saveptr = call;
 	vec *ret = vec_new(sizeof(char *));
-	for (i=0, str=call; ; i++, str=NULL) {
+	for (i = 0, str = call; ; i++, str = NULL) {
 		char *tok = strtok_r(str, " ", &saveptr);
 		if (!tok) break;
 		tok = cstr_clone(tok);
@@ -184,7 +185,7 @@ static char **make_argv(char *call, int *argc)
 	}
 	*argc = i;
 	char **argv = ARR_NEW(char *, *argc);
-	for (i=0; i<*argc; i++) {
+	for (i = 0; i < *argc; i++) {
 		argv[i] = (char *)vec_get_rawptr(ret, i);
 	}
 	DESTROY_FLAT(ret, vec);
@@ -194,7 +195,7 @@ static char **make_argv(char *call, int *argc)
 
 void freeargv(int argc, char **argv)
 {
-	for (int i=0; i<argc; i++)
+	for (int i = 0; i < argc; i++)
 		FREE(argv[i]);
 	FREE(argv);
 }

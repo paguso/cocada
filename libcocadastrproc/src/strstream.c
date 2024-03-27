@@ -54,7 +54,7 @@ struct _strstream {
 static xchar_t _getchar_from_str(void *str)
 {
 	strstream *sst = (strstream *)str;
-	if (sst->pos>=sst->slen)
+	if (sst->pos >= sst->slen)
 		return (xchar_t)EOF;
 	else
 		return (xchar_t)sst->src.str[sst->pos++];
@@ -159,7 +159,7 @@ xchar_t strstream_getc(strstream *sst)
 {
 	switch (sst->type) {
 	case SSTR_STR:
-		if (sst->pos>=sst->slen)
+		if (sst->pos >= sst->slen)
 			return (xchar_t)EOF;
 		else
 			return (xchar_t)sst->src.str[sst->pos++];
@@ -168,7 +168,7 @@ xchar_t strstream_getc(strstream *sst)
 		return fgetc(sst->src.file);
 		break;
 	case SSTR_XSTR:
-		if (sst->pos>=xstr_len(sst->src.xstr))
+		if (sst->pos >= xstr_len(sst->src.xstr))
 			return XEOF;
 		else
 			return xstr_get(sst->src.xstr, sst->pos++);
@@ -190,7 +190,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n)
 	switch (sst->type) {
 	case SSTR_STR:
 		nread = MIN(n, (sst->pos < sst->slen) ? (sst->slen - sst->pos) : 0);
-		strncpy(dest, sst->src.str+sst->pos, nread);
+		strncpy(dest, sst->src.str + sst->pos, nread);
 		sst->pos += nread;
 		//dest[nread] = '\0';
 		return nread;
@@ -210,7 +210,7 @@ size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 	size_t nread;
 	switch (sst->type) {
 	case SSTR_XSTR:
-		nread = MIN(n, (sst->pos<sst->slen)?(sst->slen-sst->pos):0);
+		nread = MIN(n, (sst->pos < sst->slen) ? (sst->slen - sst->pos) : 0);
 		xstr_ncpy(dest, 0, sst->src.xstr, sst->pos, nread);
 		sst->pos += nread;
 		return nread;
@@ -219,8 +219,8 @@ size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 		;
 		xchar_t c;
 		size_t bpc = xstr_sizeof_char(dest);
-		size_t nread=0;
-		while (nread<n) {
+		size_t nread = 0;
+		while (nread < n) {
 			if (fread(&c, bpc, 1, sst->src.file) == bpc)
 				xstr_set(dest, nread++, c);
 			else
@@ -236,7 +236,7 @@ size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 
 void strstream_close(strstream *sst)
 {
-	if (sst==NULL) return;
+	if (sst == NULL) return;
 	switch (sst->type) {
 	case SSTR_STR:
 		break;

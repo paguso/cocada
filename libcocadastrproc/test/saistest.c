@@ -37,7 +37,7 @@
 
 void random_str(alphabet *ab, size_t len, char *dest)
 {
-	for (size_t i=0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		dest[i] = (char)ab_char(ab, rand_range_size_t(0, ab_size(ab)));
 	}
 	dest[len] = '\0';

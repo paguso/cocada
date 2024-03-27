@@ -63,7 +63,7 @@ static const byte_t _LSBMASK[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f,
  * Most significant bits masks _MSBMASK[j]=1^j0^(8-j)
  */
 static const byte_t _MSBMASK[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
-                                    0xf8,0xfc, 0xfe, 0xff
+                                    0xf8, 0xfc, 0xfe, 0xff
                                   };
 #define MSBMASK(N)  (_MSBMASK[N])
 

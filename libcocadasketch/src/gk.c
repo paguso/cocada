@@ -55,7 +55,7 @@ gksumm *gk_new(size_t typesize, cmp_func cmp, double err)
 	memset(inf, ~0, typesize);
 	vec_push(ret->vals, inf);
 	FREE(inf);
-	gk_qty inf_qty = {.qty=1, .delta=0};
+	gk_qty inf_qty = {.qty = 1, .delta = 0};
 	vec_push(ret->qtys, &inf_qty);
 	ret->err = err;
 	ret->cmp = cmp;
@@ -103,7 +103,7 @@ void gk_upd(gksumm *self, const void *val)
 
 		gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, 0);
 		gk_qty *iplus1th_qty;
-		for (size_t i=0, l=vec_len(self->vals); i < l - 1; i++ ) {
+		for (size_t i = 0, l = vec_len(self->vals); i < l - 1; i++ ) {
 			iplus1th_qty = (gk_qty *) vec_get(self->qtys, i + 1);
 			if (ith_qty->qty + iplus1th_qty->qty + iplus1th_qty->delta < qty_thres) {
 				iplus1th_qty->qty += ith_qty->qty;
@@ -121,9 +121,9 @@ void gk_merge(gksumm *self, const gksumm *other)
 {
 	ERROR_ASSERT( self->cmp == other->cmp
 	              && self->err == other->err
-	              && vec_typesize(self->vals)== vec_typesize(other->vals),
+	              && vec_typesize(self->vals) == vec_typesize(other->vals),
 	              "Incompatible GK sketches." );
-	size_t i=0, j=0;
+	size_t i = 0, j = 0;
 	gk_qty *i_qty = (gk_qty *) vec_get(self->qtys, i);
 	gk_qty *j_qty = (gk_qty *) vec_get(other->qtys, j);
 	while (i < ( vec_len(self->vals) - 1 ) && j < ( vec_len(other->vals) - 1 ) ) {
@@ -175,7 +175,7 @@ size_t gk_rank(gksumm *self, const void *val)
 	size_t succ_pos = succ(self->vals, self->cmp, val);
 	gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
 	size_t ret = 0;
-	for (size_t i=0; i<succ_pos; i++) {
+	for (size_t i = 0; i < succ_pos; i++) {
 		ret += ((gk_qty *)vec_get(self->qtys, i))->qty;
 	}
 	return ret - 1 + (succ_qty->qty + succ_qty->delta) / 2;
@@ -186,13 +186,13 @@ void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *,
               const void *))
 {
 	size_t l = vec_len(self->vals);
-	for (size_t i=0; i < l-1; i++) {
+	for (size_t i = 0; i < l - 1; i++) {
 		fprintf(stream, "(");
 		print_val(stream, vec_get(self->vals, i));
 		fprintf(stream, ", ");
 		gk_qty *q = (gk_qty *) vec_get(self->qtys, i);
 		fprintf(stream, "%zu, %zu) ", q->qty, q->delta);
 	}
-	gk_qty *q = (gk_qty *) vec_get(self->qtys, l-1);
+	gk_qty *q = (gk_qty *) vec_get(self->qtys, l - 1);
 	fprintf(stream, "(INF, %zu, %zu)", q->qty, q->delta);
 }

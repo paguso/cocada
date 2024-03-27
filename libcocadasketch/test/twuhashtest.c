@@ -45,10 +45,10 @@ void twuhash_test_hash(CuTest *tc)
 	}
 	uint64_t mask_i = 1;
 	for (size_t i = 0; i < out_bits; i++) {
-		uint64_t mask_j = (1 << (i+1));
-		for (size_t j = i+1; j < out_bits; j++) {
-			size_t counts[4] = {0,0,0,0};
-			for (size_t k=0; k<samplesize; k++) {
+		uint64_t mask_j = (1 << (i + 1));
+		for (size_t j = i + 1; j < out_bits; j++) {
+			size_t counts[4] = {0, 0, 0, 0};
+			for (size_t k = 0; k < samplesize; k++) {
 				unsigned char pair = ((mask_i & sample[k]) > 0);
 				pair <<= 1;
 				pair |= ((mask_j & sample[k]) > 0);

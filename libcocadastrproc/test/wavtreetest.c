@@ -105,36 +105,37 @@ static char *random_str(alphabet *ab, size_t len)
 void wavtree_test_setup(CuTest *tc)
 {
 	char *ascii = cstr_new(128);
-	for (int c=0; c<128; c++)
+	for (int c = 0; c < 128; c++)
 		ascii[(size_t)c] = (char)c;
 	nwt = 2 * 3 * 3; // shape * ab * len
 
 	alphabets = ARR_NEW(alphabet *, nwt);
-	for (int i=0; i<nwt; i++) {
-		if (((i/3)%3) == 0)
+	for (int i = 0; i < nwt; i++) {
+		if (((i / 3) % 3) == 0)
 			alphabets[i] = alphabet_new(1, "a");
-		if (((i/3)%3) == 1)
-			alphabets[i] = alphabet_new('k'-'a', cstr_substr(ascii, 'a', 'k'));
-		if (((i/3)%3) == 2)
-			alphabets[i] = alphabet_new('~'-' ', cstr_substr(ascii, ' ', '~'));
+		if (((i / 3) % 3) == 1)
+			alphabets[i] = alphabet_new('k' - 'a', cstr_substr(ascii, 'a', 'k'));
+		if (((i / 3) % 3) == 2)
+			alphabets[i] = alphabet_new('~' - ' ', cstr_substr(ascii, ' ', '~'));
 	}
 
 	strings = ARR_NEW(char *, nwt);
 	slens = ARR_NEW(size_t, nwt);
 	size_t max_len_mult = 10;
-	for (int i=0; i<nwt; i+=3) {
-		strings[i+0] = random_str(alphabets[i+0], 0);
-		strings[i+1] = random_str(alphabets[i+1], 1);
-		strings[i+2] = random_str(alphabets[i+2], max_len_mult*ab_size(alphabets[i+2]));
-		slens[i+0] = 0;
-		slens[i+1] = 1;
-		slens[i+2] = max_len_mult*ab_size(alphabets[i+2]);
+	for (int i = 0; i < nwt; i += 3) {
+		strings[i + 0] = random_str(alphabets[i + 0], 0);
+		strings[i + 1] = random_str(alphabets[i + 1], 1);
+		strings[i + 2] = random_str(alphabets[i + 2],
+		                            max_len_mult * ab_size(alphabets[i + 2]));
+		slens[i + 0] = 0;
+		slens[i + 1] = 1;
+		slens[i + 2] = max_len_mult * ab_size(alphabets[i + 2]);
 	}
 
 	wtshape shp[2] = {WT_BALANCED, WT_HUFFMAN};
 	wts = ARR_NEW(wavtree *, nwt);
-	for (int i=0; i<nwt; i++) {
-		wts[i] = wavtree_new(alphabets[i], strings[i], slens[i], shp[i/9]);
+	for (int i = 0; i < nwt; i++) {
+		wts[i] = wavtree_new(alphabets[i], strings[i], slens[i], shp[i / 9]);
 	}
 }
 
@@ -305,26 +306,26 @@ void xwavtree_test_setup(CuTest *tc)
 {
 	nwt = 2 * 3 * 3; // shape * ab * len
 	alphabets = ARR_NEW(alphabet *, nwt);
-	for (int i=0; i<nwt; i++) {
-		if (((i/3)%3) == 0)
+	for (int i = 0; i < nwt; i++) {
+		if (((i / 3) % 3) == 0)
 			alphabets[i] = int_alphabet_new(1);
-		if (((i/3)%3) == 1)
+		if (((i / 3) % 3) == 1)
 			alphabets[i] = int_alphabet_new(10);
-		if (((i/3)%3) == 2)
+		if (((i / 3) % 3) == 2)
 			alphabets[i] = int_alphabet_new(300);
 	}
 
 	xstrs = ARR_NEW(xstr *, nwt);
-	for (int i=0; i<nwt; i+=3) {
-		xstrs[i+0] = random_xstr(alphabets[i+0], 0);
-		xstrs[i+1] = random_xstr(alphabets[i+1], 1);
-		xstrs[i+2] = random_xstr(alphabets[i+2], 5*ab_size(alphabets[i+2]));
+	for (int i = 0; i < nwt; i += 3) {
+		xstrs[i + 0] = random_xstr(alphabets[i + 0], 0);
+		xstrs[i + 1] = random_xstr(alphabets[i + 1], 1);
+		xstrs[i + 2] = random_xstr(alphabets[i + 2], 5 * ab_size(alphabets[i + 2]));
 	}
 
 	wtshape shp[2] = {WT_BALANCED, WT_HUFFMAN};
 	wts = ARR_NEW(wavtree *, nwt);
-	for (int i=0; i<nwt; i++) {
-		wts[i] = wavtree_new_from_xstr(alphabets[i], xstrs[i], shp[i/9]);
+	for (int i = 0; i < nwt; i++) {
+		wts[i] = wavtree_new_from_xstr(alphabets[i], xstrs[i], shp[i / 9]);
 	}
 }
 
@@ -362,7 +363,7 @@ void test_xwavtree_rank(CuTest *tc)
 		for (size_t j = 0; j < ab_size(alphabets[k]); j++) {
 			xchar_t c = ab_char(alphabets[k], j);
 			xstr *str = xstrs[k];
-			for (size_t i = 0, l=xstr_len(str); i < l + 5; i++) {
+			for (size_t i = 0, l = xstr_len(str); i < l + 5; i++) {
 				size_t rank = wavtree_rank(wt, i, c);
 				size_t rankbf = xrank_bf(str, i, c);
 				//printf("Rank[%zu, %zu] = %zu, bf = %zu\n", i, c, rank, rankbf);
@@ -396,7 +397,7 @@ void test_xwavtree_rank_pos(CuTest *tc)
 		wavtree *wt = wts[k];
 		//printf("wavelet tree\n");
 		//wavtree_print(wt);
-		for (size_t i = 0, l=xstr_len(str); i < l; i++) {
+		for (size_t i = 0, l = xstr_len(str); i < l; i++) {
 			size_t rank = wavtree_rank_pos(wt, i);
 			//printf("Rank[%zu] = %zu\n",i, rank);
 			CuAssertSizeTEquals(tc, xrank_pos_bf(str, i), rank);
@@ -443,7 +444,7 @@ void test_xwavtree_char(CuTest *tc)
 		wavtree *wt = wts[k];
 		//printf("wavelet tree\n");
 		//wavtree_print(wt);
-		for (size_t i = 0, l=xstr_len(str); i < l; i++) {
+		for (size_t i = 0, l = xstr_len(str); i < l; i++) {
 			xchar_t c = wavtree_char(wt, i);
 			//printf("Char[%zu, %zu] = %c\n", k, i, c);
 			CuAssertIntEquals(tc, (int)xstr_get(str, i), (int)c);
@@ -456,14 +457,14 @@ void test_xwavtree_char(CuTest *tc)
 size_t __xpred_bf(xstr *str, size_t pos, xchar_t c)
 {
 	size_t slen = xstr_len(str);
-	for (pos = MIN(pos, slen); pos > 0 && xstr_get(str, pos-1)!=c; pos--);
+	for (pos = MIN(pos, slen); pos > 0 && xstr_get(str, pos - 1) != c; pos--);
 	return pos > 0 ? pos - 1 : slen;
 }
 
 size_t __xsucc_bf(xstr *str, size_t pos, xchar_t c)
 {
 	size_t slen = xstr_len(str);
-	for (pos = MIN(pos, slen); pos<slen && xstr_get(str, pos+1)!=c; pos++);
+	for (pos = MIN(pos, slen); pos < slen && xstr_get(str, pos + 1) != c; pos++);
 	return pos < slen ? pos + 1 : slen;
 }
 
@@ -478,12 +479,12 @@ void test_xwavtree_pred(CuTest *tc)
 		//wavtree_print(wt);
 		for (size_t l = 0; l < ab_size(alphabets[k]); l++) {
 			xchar_t c = ab_char(alphabets[k], l);
-			for (size_t i = 0, l=xstr_len(str); i < l; i++) {
+			for (size_t i = 0, l = xstr_len(str); i < l; i++) {
 				size_t pred = wavtree_pred(wt, i, c);
 				//printf("Pred[%c, %zu] = %zu\n",c, i, pred);
 				CuAssertSizeTEquals(tc, __xpred_bf(str, i, c), pred);
 			}
-			for (size_t i=xstr_len(str), l=xstr_len(str); i < l + 5; i++) {
+			for (size_t i = xstr_len(str), l = xstr_len(str); i < l + 5; i++) {
 				size_t pred = wavtree_pred(wt, i, c);
 				//printf("Nonex Pred[%c, %zu] = %zu\n",c, i, pred);
 				CuAssertSizeTEquals(tc, __xpred_bf(str, i, c), pred);
@@ -503,7 +504,7 @@ void test_xwavtree_succ(CuTest *tc)
 		//printf("-------------- wavelet tree -------------------\n");
 		//printf("#=%zu ab_size=%zu str=%s online=%s\n",k, ab_size(ab[k]), strings[k], online?"true":"false");
 		//wavtree_print(wt);
-		for (size_t i = 0, sl=xstr_len(str); i < sl;  i++) {
+		for (size_t i = 0, sl = xstr_len(str); i < sl;  i++) {
 			for (size_t l = 0; l < ab_size(alphabets[k]); l++) {
 				xchar_t c = ab_char(alphabets[k], l);
 				size_t succ = wavtree_succ(wt, i, c);

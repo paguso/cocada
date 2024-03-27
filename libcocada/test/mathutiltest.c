@@ -35,50 +35,50 @@ void test_mult_floor(CuTest *tc)
 	size_t i, ntests = 1000000;
 	double value, base, expected, actual;
 
-	for (i=0; i<ntests; i++) {
+	for (i = 0; i < ntests; i++) {
 		value = rand();
 		base = rand();
-		if (((unsigned int)rand())%2) value = -value;
-		if (((unsigned int)rand())%2) base = -base;
+		if (((unsigned int)rand()) % 2) value = -value;
+		if (((unsigned int)rand()) % 2) base = -base;
 		actual = DIVFLOOR(value, base);
-		if (base==0) {
-			if (value>=0) {
+		if (base == 0) {
+			if (value >= 0) {
 				expected = 0;
 			}
 			else {
 				expected = -INFINITY;
 			}
 		}
-		else if (base<0) {
-			if (value<0) {
+		else if (base < 0) {
+			if (value < 0) {
 				expected = 0;
-				while (expected*base>value) {
-					expected+=1;
+				while (expected * base > value) {
+					expected += 1;
 				}
 			}
-			else if (value>=0) {
+			else if (value >= 0) {
 				expected = 0;
-				while ((expected-1)*base<value) {
-					expected-=1;
+				while ((expected - 1)*base < value) {
+					expected -= 1;
 				}
 			}
 		}
-		else if (base>0) {
-			if (value<0) {
-				expected=0;
-				while (expected*base>value) {
-					expected-=1;
+		else if (base > 0) {
+			if (value < 0) {
+				expected = 0;
+				while (expected * base > value) {
+					expected -= 1;
 				}
 			}
-			else if (value>=0) {
+			else if (value >= 0) {
 				expected = 0;
-				while ((expected+1)*base<value) {
-					expected+=1;
+				while ((expected + 1)*base < value) {
+					expected += 1;
 				}
 			}
 		}
 		//printf("mult_floor(%f, %f) = %f   exp=%f\n", value, base, actual, expected);
-		CuAssertDblEquals(tc, expected, actual,0);
+		CuAssertDblEquals(tc, expected, actual, 0);
 	}
 }
 
@@ -87,50 +87,50 @@ void test_mult_ceil(CuTest *tc)
 	size_t i, ntests = 1000000;
 	double value, base, expected, actual;
 
-	for (i=0; i<ntests; i++) {
+	for (i = 0; i < ntests; i++) {
 		value = rand();
 		base = rand();
-		if (((unsigned int)rand())%2) value = -value;
-		if (((unsigned int)rand())%2) base = -base;
+		if (((unsigned int)rand()) % 2) value = -value;
+		if (((unsigned int)rand()) % 2) base = -base;
 		actual = DIVCEIL(value, base);
-		if (base==0) {
-			if (value>=0) {
+		if (base == 0) {
+			if (value >= 0) {
 				expected = 0;
 			}
 			else {
 				expected = INFINITY;
 			}
 		}
-		else if (base<0) {
-			if (value<0) {
+		else if (base < 0) {
+			if (value < 0) {
 				expected = 0;
-				while ((expected+1)*base>=value) {
-					expected+=1;
+				while ((expected + 1)*base >= value) {
+					expected += 1;
 				}
 			}
-			else if (value>=0) {
+			else if (value >= 0) {
 				expected = 0;
-				while (expected*base<value) {
-					expected-=1;
+				while (expected * base < value) {
+					expected -= 1;
 				}
 			}
 		}
-		else if (base>0) {
-			if (value<0) {
-				expected=0;
-				while ((expected-1)*base>=value) {
-					expected-=1;
+		else if (base > 0) {
+			if (value < 0) {
+				expected = 0;
+				while ((expected - 1)*base >= value) {
+					expected -= 1;
 				}
 			}
-			else if (value>=0) {
+			else if (value >= 0) {
 				expected = 0;
-				while (expected*base<value) {
-					expected+=1;
+				while (expected * base < value) {
+					expected += 1;
 				}
 			}
 		}
 		//printf("mult_ceil(%f, %f) = %f   exp=%f\n", value, base, actual, expected);
-		CuAssertDblEquals(tc, expected, actual,0);
+		CuAssertDblEquals(tc, expected, actual, 0);
 	}
 }
 
@@ -142,13 +142,13 @@ void test_is_prime_mr(CuTest *tc)
 	//bool b = is_prime_naive(18023405708736723011);
 
 	uint64_t val = 1;
-	for (size_t p=0; p<63; p++) {
-		for (size_t n=0; n<1000; n++) {
+	for (size_t p = 0; p < 63; p++) {
+		for (size_t n = 0; n < 1000; n++) {
 			bool ispr = is_prime_mr(val);
-			DEBUG("%zu is %s prime\n", val, ispr?"":"NOT");
-			if (ispr!=is_prime_naive(val)) {
+			DEBUG("%zu is %s prime\n", val, ispr ? "" : "NOT");
+			if (ispr != is_prime_naive(val)) {
 				ispr = is_prime_mr(val);
-				CuAssert(tc, "primality test failed", ispr==is_prime_naive(val));
+				CuAssert(tc, "primality test failed", ispr == is_prime_naive(val));
 			}
 			val++;
 		}
@@ -159,10 +159,10 @@ void test_is_prime_mr(CuTest *tc)
 
 void test_prime_succ(CuTest *tc)
 {
-	for (uint64_t n=0; n<100000; n++) {
+	for (uint64_t n = 0; n < 100000; n++) {
 		uint64_t psucc = prime_succ(n);
 		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n, psucc);
-		for (uint64_t s=n+1; s<psucc; s++) {
+		for (uint64_t s = n + 1; s < psucc; s++) {
 			CuAssert(tc, "Prime successor not minimal", !is_prime_mr(s));
 		}
 		CuAssert(tc, "Prime successor is NOT a prime", is_prime_mr(psucc));

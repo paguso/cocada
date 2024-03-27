@@ -40,7 +40,7 @@
 
 static  bool is_digits(const char *str, size_t len )
 {
-	if (len==0) return false;
+	if (len == 0) return false;
 	for (char *c = (char *)str; c != str + len; c++) {
 		if ( !is_digit(*c) ) return false;
 	}
@@ -100,20 +100,22 @@ semver_res semver_new_from_str(const char *src)
 	bool parse_err = false;
 	errno = 0;
 	major = (int) strtol(start, &stop, 10);
-	if (errno || stop == NULL || *stop != '.' || !is_num_id(start, (stop-start))) {
+	if (errno || stop == NULL || *stop != '.'
+	        || !is_num_id(start, (stop - start))) {
 		parse_err = true;
 		goto cleanup;
 	}
 	start = stop + 1;
 	errno = 0;
 	minor = (int) strtol(start, &stop, 10);
-	if (errno || stop == NULL || *stop != '.' || !is_num_id(start, (stop-start))) {
+	if (errno || stop == NULL || *stop != '.'
+	        || !is_num_id(start, (stop - start))) {
 		parse_err = true;
 		goto cleanup;
 	}
 	start = stop + 1;
 	patch = (int) strtol(start, &stop, 10);
-	if (errno || stop == NULL || !is_num_id(start, (stop-start))) {
+	if (errno || stop == NULL || !is_num_id(start, (stop - start))) {
 		parse_err = true;
 		goto cleanup;
 	}

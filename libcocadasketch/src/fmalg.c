@@ -89,7 +89,7 @@ void fmalg_reset(fmalg *fm)
 void fmalg_process(fmalg *fm, uint64_t val)
 {
 	WARN_ASSERT(val < fm->maxval, "Ignoring invalid FM value %"PRIu64\
-	            ". Max allowed value is %"PRIu64"", val, fm->maxval-1);
+	            ". Max allowed value is %"PRIu64"", val, fm->maxval - 1);
 	uint64_t hashval;
 	byte_t lsb;
 	for (size_t i = 0; i < fm->m; i++) {

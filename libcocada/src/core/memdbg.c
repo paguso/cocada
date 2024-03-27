@@ -185,7 +185,7 @@ static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 {
 #ifndef MEM_DEBUG
 	return (memdbg_query_t) {
-		.active = false, .size=0
+		.active = false, .size = 0
 	};
 #endif
 	size_t pos = hash(addr, tally->cap);
@@ -193,14 +193,14 @@ static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 		if (tally->data[pos].flag == ACTIVE &&
 		        tally->data[pos].addr == addr) {
 			return (memdbg_query_t) {
-				.active = true, .size=tally->data[pos].size
+				.active = true, .size = tally->data[pos].size
 			};
 		}
 		pos = (pos + 1) % tally->cap;
 	}
 	assert(tally->data[pos].flag == FREE);
 	return (memdbg_query_t) {
-		.active = false, .size=0
+		.active = false, .size = 0
 	};
 }
 
@@ -250,18 +250,18 @@ static void memtable_print_stats(FILE *stream, memtable *tally,
 		fprintf(stream,
 		        "--------------------------------------------------------------------------------\n");
 		fprintf(stream, "Chunks in chronological order of allocation\n\n");
-		size_t n = tally->nact, k=0;
+		size_t n = tally->nact, k = 0;
 		pair *pairs = (pair *)malloc(n * sizeof(pair));
-		for (size_t i=0; i < tally->cap; i++) {
+		for (size_t i = 0; i < tally->cap; i++) {
 			if (tally->data[i].flag == ACTIVE) {
 				pairs[k].no = tally->data[i].alloc_no;
 				pairs[k].pos = i;
 				k++;
 			}
 		}
-		assert(k==n);
+		assert(k == n);
 		qsort(pairs, n, sizeof(pair), cmp_pair);
-		for (size_t i=0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			size_t pos = pairs[i].pos;
 			fprintf(stream, "#%zu:  %zu bytes @%p\n",
 			        pairs[i].no, tally->data[pos].size, tally->data[pos].addr);

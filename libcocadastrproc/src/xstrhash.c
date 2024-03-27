@@ -41,14 +41,14 @@ static void _initpow(xstrhash *self)
 	uint64_t base = ab_size(self->ab);
 	size_t e = 0;
 	uint64_t p = 1;
-	while ( (uint64_t)(base*p) > p ) {
+	while ( (uint64_t)(base * p) > p ) {
 		e++;
 		p *= base;
 	}
 	self->max_exp = e;
 	self->pow = ARR_NEW(uint64_t, e);
 	p = 1;
-	for (size_t i=0; i<e; i++) {
+	for (size_t i = 0; i < e; i++) {
 		self->pow[i] = p;
 		p *= base;
 	}
@@ -91,7 +91,7 @@ uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from,
                           size_t to)
 {
 	uint64_t hash = 0;
-	for (size_t i=from; i < to; i++) {
+	for (size_t i = from; i < to; i++) {
 		hash *= ab_size(self->ab);
 		hash += ab_rank(self->ab, xstr_get(s, i));
 	}
@@ -102,7 +102,7 @@ uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from,
 uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash,
                            xchar_t c)
 {
-	hash -= _pow(self, xstr_len(s)-1) * ab_rank(self->ab, xstr_get(s, 0));
+	hash -= _pow(self, xstr_len(s) - 1) * ab_rank(self->ab, xstr_get(s, 0));
 	hash += ab_rank(self->ab, c);
 	return hash;
 }

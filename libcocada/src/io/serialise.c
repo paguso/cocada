@@ -124,7 +124,7 @@ som *som_cons(som *par, size_t off,  som *chd)
 	if (IS_POW2(par->nchd)) {
 		par->chd = (sub_som *) realloc(par->chd, ( 2 * par->nchd) * sizeof(sub_som));
 	}
-	sub_som ss = {.off = off, .chd=chd};
+	sub_som ss = {.off = off, .chd = chd};
 	par->chd[par->nchd++] = ss;
 	return par;
 }
@@ -285,7 +285,7 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
 	            "SOM (in-memory) type size is %zu; serialised type size is %zu bytes.\n",
 	            model->size, size);
 	fread(dest, model->size, 1, stream);
-	mem_chunk chunk = {.start = addr, .size=model->size};
+	mem_chunk chunk = {.start = addr, .size = model->size};
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
 	hashmap_ins(mem_map, &addr, &dest);
@@ -298,7 +298,7 @@ void write_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *written)
 	write_addr(ptr, stream);
 	write_size(sizeof(rawptr), stream);
 	fwrite(ptr, sizeof(rawptr), 1, stream);
-	mem_chunk chunk = {.start = (size_t) ptr, .size=sizeof(rawptr)};
+	mem_chunk chunk = {.start = (size_t) ptr, .size = sizeof(rawptr)};
 	//vec_push(written, &chunk);
 	add_chunk(written, chunk);
 	if (som_nchd(model) > 0) {
@@ -313,7 +313,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
 {
 	if (addr == NULL) return NULL;
 	void *base = NULL;
-	for (size_t i=0, l=vec_len(read); i<l; i++) {
+	for (size_t i = 0, l = vec_len(read); i < l; i++) {
 		mem_chunk *chk = (mem_chunk *)vec_get(read, i);
 		if ( (size_t)chk->start <= (size_t)addr  &&
 		        (size_t)addr < (size_t)chk->start + (size_t)chk->size ) {
@@ -536,7 +536,7 @@ void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 	//vec_push(read, &chunk);
 	add_chunk(read, chunk);
 
-	void *str = cstr_new(size-1);
+	void *str = cstr_new(size - 1);
 	hashmap_ins(mem_map, &addr, &str);
 	*((rawptr *)ptr_addr) = str;
 	read_blob(str, size, stream);
@@ -601,12 +601,12 @@ static void read_obj(som *model, void *dest, FILE *stream, deque *dq, vec *read,
 
 static void bfs_write(som *model, void *obj, FILE *stream)
 {
-	mem_chunk nullchunk = {.start=(size_t)NULL, .size=1};
+	mem_chunk nullchunk = {.start = (size_t)NULL, .size = 1};
 	vec *written = vec_new(sizeof(mem_chunk));
 	//vec_push(written, &nullchunk);
 	add_chunk(written, nullchunk);
 	deque *dq = deque_new(sizeof(obj_model));
-	obj_model om = {.obj=obj, .model=model};
+	obj_model om = {.obj = obj, .model = model};
 	deque_push_back(dq, &om);
 	while (!deque_empty(dq)) {
 		deque_pop_front(dq, &om);
@@ -619,7 +619,7 @@ static void bfs_write(som *model, void *obj, FILE *stream)
 
 static void *bfs_read(som *model, FILE *stream)
 {
-	mem_chunk nullchunk = {.start=(size_t)NULL, .size=1};
+	mem_chunk nullchunk = {.start = (size_t)NULL, .size = 1};
 	vec *read = vec_new(sizeof(mem_chunk));
 	//vec_push(read, &nullchunk);
 	add_chunk(read, nullchunk);

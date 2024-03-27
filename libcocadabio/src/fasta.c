@@ -56,12 +56,12 @@ static int _getc(strread *self)
 	int c;
 	while (true) {
 		c = fgetc(fr->src);
-		if (c=='>') {
+		if (c == '>') {
 			ungetc(c, fr->src);
 			c = EOF;
 			break;
 		}
-		else if (c=='\n'|| c=='\r') {
+		else if (c == '\n' || c == '\r') {
 			continue;
 		}
 		else {
@@ -76,22 +76,22 @@ static size_t _read_str(strread *self, char *dest, size_t n)
 {
 	FILE *src = ((fastaread *)self->impltor)->src;
 	char *origdest = dest;
-	memset(dest, '\0', n+1);
+	memset(dest, '\0', n + 1);
 	while ( !feof(src) && n > 0 ) {
-		fgets(dest, n+1, src);
+		fgets(dest, n + 1, src);
 		size_t l = strlen(dest);
 		if (dest[0] == '>') {
 			memset(dest, '\0', l );
 			break;
 		}
-		while (l > 0 && ( dest[l-1]=='\n' || dest[l-1]=='\r' )) {
-			dest[l-1] = '\0';
+		while (l > 0 && ( dest[l - 1] == '\n' || dest[l - 1] == '\r' )) {
+			dest[l - 1] = '\0';
 			l--;
 		}
 		dest += l;
 		n -= l;
 	}
-	return dest-origdest;
+	return dest - origdest;
 }
 
 
@@ -106,7 +106,7 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 			ungetc(c, src);
 			break;
 		}
-		else if ( c == '\n' || c=='\r' ) {
+		else if ( c == '\n' || c == '\r' ) {
 			continue;
 		}
 		dest[nread++] = c;
@@ -153,7 +153,9 @@ rawptr_ok_err_res fasta_open(const char *filename)
 	if (errno) {
 		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
 		result.ok = false;
-		result.val.err = (code_msg_err){.code = errno, .msg = strerror(errno)};
+		result.val.err = (code_msg_err) {
+			.code = errno, .msg = strerror(errno)
+		};
 		goto ERROR;
 	}
 	f->src_path = cstr_clone(filename);
@@ -171,7 +173,7 @@ ERROR:
 SUCCESS:
 	result.ok = true;
 	result.val.ok = f;
-	return result; 
+	return result;
 }
 
 
@@ -185,7 +187,7 @@ static bool _goto_next(fasta *self)
 {
 	int c;
 	while (!feof(self->src)) {
-		if ((c=fgetc(self->src)) == '>') {
+		if ((c = fgetc(self->src)) == '>') {
 			ungetc(c, self->src);
 			return true;
 		}
@@ -205,8 +207,8 @@ bool fasta_has_next(fasta *self)
 
 bool fasta_goto(fasta *self, size_t descr_offset)
 {
-	return ((fseek(self->src, descr_offset, SEEK_SET)==0) &&
-			 _goto_next(self));
+	return ((fseek(self->src, descr_offset, SEEK_SET) == 0) &&
+	        _goto_next(self));
 }
 
 
@@ -236,7 +238,8 @@ const fasta_rec *fasta_next(fasta *self)
 		}
 		fgets(self->cur_rec.descr + l, self->cur_rec_len[0] - l + 1, self->src);
 		l = strlen(self->cur_rec.descr);
-		while (self->cur_rec.descr[l-1]=='\n' || self->cur_rec.descr[l-1]=='\r') {
+		while (self->cur_rec.descr[l - 1] == '\n'
+		        || self->cur_rec.descr[l - 1] == '\r') {
 			self->cur_rec.descr[--l] = '\0';
 			eol = true;
 		}
@@ -258,7 +261,7 @@ const fasta_rec *fasta_next(fasta *self)
 			break;
 		}
 		l = strlen(self->cur_rec.seq);
-		while (self->cur_rec.seq[l-1]=='\n' || self->cur_rec.seq[l-1]=='\r') {
+		while (self->cur_rec.seq[l - 1] == '\n' || self->cur_rec.seq[l - 1] == '\r') {
 			self->cur_rec.seq[--l] = '\0';
 		}
 	}
@@ -288,7 +291,8 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 		}
 		fgets(self->cur_rec_rd.descr + l, self->cur_rec_rd_len[0] - l + 1, self->src);
 		l = strlen(self->cur_rec_rd.descr);
-		while (self->cur_rec_rd.descr[l-1]=='\n' || self->cur_rec_rd.descr[l-1]=='\r') {
+		while (self->cur_rec_rd.descr[l - 1] == '\n'
+		        || self->cur_rec_rd.descr[l - 1] == '\r') {
 			self->cur_rec_rd.descr[--l] = '\0';
 			eol = true;
 		}

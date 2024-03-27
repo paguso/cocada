@@ -113,7 +113,7 @@ xstr *xstr_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
 
 void xstr_free(xstr *self)
 {
-	if (self==NULL) return;
+	if (self == NULL) return;
 	FREE(self->buf);
 	FREE(self);
 }
@@ -146,11 +146,11 @@ void xstr_set(xstr *self, size_t pos, xchar_t val)
 void xstr_nset(xstr *self, size_t n, xchar_t val)
 {
 	size_t l = MIN(xstr_len(self), n);
-	for (size_t i=0; i<l; i++) {
+	for (size_t i = 0; i < l; i++) {
 		xstr_set(self, i, val);
 	}
 	if (n > l) {
-		xstr_push_n(self, val, n-l);
+		xstr_push_n(self, val, n - l);
 	}
 }
 
@@ -189,7 +189,7 @@ void xstr_push_n(xstr *self, xchar_t c, size_t n)
 {
 	check_and_resize_by(self, n);
 	void *last = self->buf + (self->len * self->sizeof_char);
-	for (size_t i=0; i<n; i++, last += self->sizeof_char) {
+	for (size_t i = 0; i < n; i++, last += self->sizeof_char) {
 #if ENDIANNESS==LITTLE
 		memcpy(last, &c, self->sizeof_char);
 #elif ENDIANNESS==BIG
@@ -218,11 +218,11 @@ void xstr_cpy(xstr *self, const xstr *src)
 void xstr_ncpy( xstr *self, size_t from_dest, const xstr *src,
                 size_t from_src, size_t n )
 {
-	size_t l = MIN(n, xstr_len(self)-from_dest);
-	for (size_t i=0; i < l; i++ ) {
+	size_t l = MIN(n, xstr_len(self) - from_dest);
+	for (size_t i = 0; i < l; i++ ) {
 		xstr_set(self, from_dest + i, xstr_get(src, from_src + i));
 	}
-	for (size_t i=l; i<n; i++) {
+	for (size_t i = l; i < n; i++) {
 		xstr_push(self, xstr_get(src, from_src + i));
 	}
 }
@@ -281,9 +281,9 @@ int xstr_ncmp(const xstr *self, const xstr *other, size_t n)
 	size_t lo = xstr_len(other);
 	size_t m = MIN3(n, lt, lo);
 	intmax_t cmp;
-	for (size_t i=0; i<m;  i++) {
+	for (size_t i = 0; i < m;  i++) {
 		cmp = (intmax_t)xstr_get(self, i) - (intmax_t)xstr_get(other, i);
-		if (cmp) return cmp/abs(cmp);
+		if (cmp) return cmp / abs(cmp);
 	}
 	if (n <= MIN(lt, lo)) return 0;
 	else {

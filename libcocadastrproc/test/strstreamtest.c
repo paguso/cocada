@@ -62,19 +62,19 @@ void test_strstream_getc(CuTest *tc)
 	ssst = strstream_open_str(str, slen);
 	fsst = strstream_open_file(filename);
 
-	for (size_t k=0; k<5; k++) {
-		i=0;
-		for (i=0; (c=strstream_getc(ssst)) != EOF; i++) {
+	for (size_t k = 0; k < 5; k++) {
+		i = 0;
+		for (i = 0; (c = strstream_getc(ssst)) != EOF; i++) {
 			//printf ("s i=%zu c=%c\n", i, (char)c);
-			CuAssertTrue(tc, str[i]==(char)c);
+			CuAssertTrue(tc, str[i] == (char)c);
 		}
 		CuAssertSizeTEquals(tc, slen, i);
 		strstream_reset(ssst);
 
-		i=0;
-		for (i=0; (c=strstream_getc(fsst)) != EOF; i++) {
+		i = 0;
+		for (i = 0; (c = strstream_getc(fsst)) != EOF; i++) {
 			//printf ("f i=%zu c=%c\n", i, (char)c);
-			CuAssertTrue(tc, str[i]==(char)c);
+			CuAssertTrue(tc, str[i] == (char)c);
 		}
 		CuAssertSizeTEquals(tc, slen, i);
 		strstream_reset(fsst);
@@ -94,22 +94,22 @@ void test_strstream_reads(CuTest *tc)
 	size_t dlen = 7;
 	char *dest = cstr_new(slen);
 	char *exp = cstr_new(slen);
-	size_t i,n;
+	size_t i, n;
 
 	ssst = strstream_open_str(str, slen);
 	fsst = strstream_open_file(filename);
 
-	for (size_t k=0; k<5; k++) {
-		for (i=0; (n=strstream_reads(ssst, dest, dlen)); i+=n) {
-			exp = strncpy(dest, str+i, n);
+	for (size_t k = 0; k < 5; k++) {
+		for (i = 0; (n = strstream_reads(ssst, dest, dlen)); i += n) {
+			exp = strncpy(dest, str + i, n);
 			//printf ("s read=%s exp=%s\n", dest, exp);
 			CuAssertStrEquals(tc, exp, dest);
 		}
 		CuAssertSizeTEquals(tc, slen, i);
 		strstream_reset(ssst);
 
-		for (i=0; (n=strstream_reads(fsst, dest, dlen)); i+=n) {
-			exp = strncpy(dest, str+i, n);
+		for (i = 0; (n = strstream_reads(fsst, dest, dlen)); i += n) {
+			exp = strncpy(dest, str + i, n);
 			//printf ("f read=%s exp=%s\n", dest, exp);
 			CuAssertStrEquals(tc, exp, dest);
 		}

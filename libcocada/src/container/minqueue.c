@@ -84,7 +84,7 @@ size_t minqueue_len(const minqueue *queue)
 
 void minqueue_push(minqueue *queue, const void *elt)
 {
-	while ( deque_len(queue->mins)>0 &&
+	while ( deque_len(queue->mins) > 0 &&
 	        queue->cmp( elt, deque_get(queue->elts,
 	                                   deque_back_size_t(queue->mins) - queue->dels) ) < 0 ) {
 		deque_pop_back_size_t(queue->mins);
@@ -207,8 +207,8 @@ static void _minqueue_iter_goto_next(minqueue_iter *iter)
 minqueue_iter *minqueue_all_min(const minqueue *queue)
 {
 	minqueue_iter *iter = NEW(minqueue_iter);
-	iter->src=queue;
-	iter->index=0;
+	iter->src = queue;
+	iter->index = 0;
 	_minqueue_iter_goto_next(iter);
 	return iter;
 }
@@ -231,7 +231,7 @@ const void *minqueue_iter_next(minqueue_iter *iter)
 	const void *ret;
 	ret = deque_get(iter->src->elts, deque_get_size_t(iter->src->mins,
 	                iter->index) - iter->src->dels );
-	iter->index +=1;
+	iter->index += 1;
 	_minqueue_iter_goto_next(iter);
 	return ret;
 }

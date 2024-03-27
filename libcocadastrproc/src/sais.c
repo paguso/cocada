@@ -292,7 +292,7 @@ static void sort_LMS( void *str, alphabet *ab,
 	for (size_t i = nlms - 1, j; i > 0; i--) {
 		j = sarr[i];
 		sarr[i] = UNSET;
-		sarr[--offsets[ab_rank(ab, char_at(str,j)) + add_sentinel]] = j;
+		sarr[--offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]] = j;
 	}
 	// Done. All LMS suffixes are sorted and correctly placed in the SA
 	//printf("10)\n");
@@ -324,7 +324,7 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 	//bitvec_print(stdout, lms, 4);
 	//ARR_PRINT(bkts, bkts, %zu, 0, ab_sz + add_sentinel, 10, "");
 
-	ARR_FILL(sarr, 0, len+1, UNSET);
+	ARR_FILL(sarr, 0, len + 1, UNSET);
 	size_t *offsets = ARR_NEW(size_t, ab_sz + add_sentinel);
 
 	sort_LMS(str, ab, sarr, ls, lms, bkts, offsets, add_sentinel, char_at);
@@ -349,7 +349,7 @@ size_t *sais(char *str, size_t len, alphabet *ab)
 {
 	ERROR_ASSERT(ab_type(ab) == CHAR_TYPE,
 	             "Incompatible alphabet type for SA-IS");
-	if (len<2) {
+	if (len < 2) {
 		size_t *sarr = ARR_NEW(size_t, len + 1);
 		for (size_t i = 0; i <= len; i++) {
 			sarr[i] = len - i;

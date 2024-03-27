@@ -29,7 +29,7 @@
 #include "strread.h"
 #include "strfilereader.h"
 
-static char *filename="test_strfileread.txt";
+static char *filename = "test_strfileread.txt";
 
 static char *file_content = "acgtacgtacgtacgtacgtacgtacgtacgtacgtacgt";
 
@@ -52,7 +52,7 @@ void test_getc(CuTest *tc)
 	strfilereader *sfr = strfilereader_new_from_path(filename);
 	size_t n = strlen(file_content);
 	char c;
-	for (size_t i=0; i<n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		c = strread_getc(strfilereader_as_strread(sfr));
 		CuAssertCharEquals(tc, file_content[i], c);
 	}

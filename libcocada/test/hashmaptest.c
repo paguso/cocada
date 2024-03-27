@@ -40,19 +40,19 @@ void test_hashmap_int(CuTest *tc)
 	                            ident_hash_uint32_t, eq_uint32_t);
 
 	size_t n = 1000000;
-	for (int i=0; i<n; i++) {
+	for (int i = 0; i < n; i++) {
 		//printf("Adding [%d,%d] to hashmap\n", i, i);
 		hashmap_ins(hmap, &i, &i);
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (int i=0; i<n; i++) {
+	for (int i = 0; i < n; i++) {
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &i));
 		CuAssertIntEquals(tc, i, *((int *)hashmap_get(hmap, &i)));
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (int i=0; i<n; i+=7) {
+	for (int i = 0; i < n; i += 7) {
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &i));
 		hashmap_del(hmap, &i);
 		CuAssert(tc, "map should NOT contain key", !hashmap_contains(hmap, &i));
@@ -85,8 +85,8 @@ uint64_t hash_bin_str(const void *key)
 	size_t n = strlen(s);
 	uint64_t h = 0;
 	uint64_t pow = 2;
-	for (size_t i=0; i<n; i++) {
-		h = (pow * h) +  (s[i]-'0');
+	for (size_t i = 0; i < n; i++) {
+		h = (pow * h) +  (s[i] - '0');
 	}
 	return h;
 }
@@ -95,7 +95,7 @@ bool bin_str_eq(const void *a, const void *b)
 {
 	char *sa = ((char **)a)[0];
 	char *sb = ((char **)b)[0];
-	return strcmp(sa, sb)==0;
+	return strcmp(sa, sb) == 0;
 }
 
 void test_hashmap_obj(CuTest *tc)
@@ -108,28 +108,28 @@ void test_hashmap_obj(CuTest *tc)
 	uint64_t mink = 1;
 	mink <<= 32;
 	uint64_t maxk = mink + n;
-	for (uint64_t i=mink; i<maxk; i++) {
+	for (uint64_t i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		//printf("%zu => adding %s to hashmap\n", i-mink, k);
-		object v = {i, i+1, k};
+		object v = {i, i + 1, k};
 		hashmap_ins(hmap, &k, &v);
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (uint64_t i=mink; i<maxk; i++) {
+	for (uint64_t i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &k));
 		object *v = (object *)hashmap_get(hmap, &k);
 		CuAssert(tc, "wrong k1 value", i == v->k1);
-		CuAssert(tc, "wrong k2 value", i+1 == v->k2);
-		CuAssert(tc, "wrong k3 value", strcmp(k, v->k3)==0);
+		CuAssert(tc, "wrong k2 value", i + 1 == v->k2);
+		CuAssert(tc, "wrong k3 value", strcmp(k, v->k3) == 0);
 		FREE(k);
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (uint64_t i=mink; i<maxk; i+=2) {
+	for (uint64_t i = mink; i < maxk; i += 2) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &k));
@@ -144,19 +144,19 @@ void test_hashmap_obj(CuTest *tc)
 
 	hashmap_fit(hmap);
 
-	for (uint64_t i=mink; i<maxk; i++) {
+	for (uint64_t i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
-		if (i%2) {
+		if (i % 2) {
 			object *v = (object *)hashmap_get(hmap, &k);
 			CuAssert(tc, "map should contain key", hashmap_contains(hmap, &k));
 			CuAssert(tc, "wrong k1 value", i == v->k1);
-			CuAssert(tc, "wrong k2 value", i+1 == v->k2);
-			CuAssert(tc, "wrong k3 value", strcmp(k, v->k3)==0);
+			CuAssert(tc, "wrong k2 value", i + 1 == v->k2);
+			CuAssert(tc, "wrong k3 value", strcmp(k, v->k3) == 0);
 		}
 		else {
 			object *v = (object *)hashmap_get(hmap, &k);
-			CuAssert(tc, "should be null", v==NULL);
+			CuAssert(tc, "should be null", v == NULL);
 		}
 		FREE(k);
 	}

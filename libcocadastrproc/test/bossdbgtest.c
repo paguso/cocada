@@ -46,8 +46,8 @@ static dbgraph **mg;
 
 static void random_seq(alphabet *ab, char *dest, size_t n)
 {
-	for (size_t i=0; i<n; i++) {
-		dest[i] = ab_char(ab, abs(rand())%ab_size(ab));
+	for (size_t i = 0; i < n; i++) {
+		dest[i] = ab_char(ab, abs(rand()) % ab_size(ab));
 	}
 	dest[n] = '\0';
 }
@@ -63,14 +63,14 @@ void dbgraph_test_setup(CuTest *tc)
 	dbg_order    = ARR_NEW(size_t, n);
 	g    = ARR_NEW(dbgraph *, n);
 	mg   = ARR_NEW(dbgraph *, n);
-	for (size_t i=0; i<n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		ab[i] = alphabet_new(4, "acgt");
 
 
-		slen[i] = 10*i;
+		slen[i] = 10 * i;
 		str[i] = cstr_new(slen[i]);
 		random_seq(ab[i], str[i], slen[i]);
-		dbg_order[i] = 3 + rand()%((i+2)/2);
+		dbg_order[i] = 3 + rand() % ((i + 2) / 2);
 
 
 
@@ -90,19 +90,19 @@ void dbgraph_test_setup(CuTest *tc)
 		mg[i] = bossbossdbg_new_from_str(ab[i], str[i], dbg_order[i], true);
 		//dbg_print(mg[i]);
 
-		padslen[i] = slen[i]+dbg_order[i]+1;
+		padslen[i] = slen[i] + dbg_order[i] + 1;
 		padstr[i] = cstr_new(padslen[i]);
-		for (size_t j=0; j<dbg_order[i]; j++)
+		for (size_t j = 0; j < dbg_order[i]; j++)
 			padstr[i][j] = '$';
-		strcpy(padstr[i]+dbg_order[i], str[i]);
-		padstr[i][slen[i]+dbg_order[i]] = bossdbg_sentinel(g[i]);
+		strcpy(padstr[i] + dbg_order[i], str[i]);
+		padstr[i][slen[i] + dbg_order[i]] = bossdbg_sentinel(g[i]);
 	}
 }
 
 
 void dbgraph_test_teardown(CuTest *tc)
 {
-	for (size_t i=0; i<n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		alphabet_free(ab[i]);
 		FREE(str[i]);
 		bossdbg_free(g[i]);
@@ -141,9 +141,9 @@ static inline xchar_t plain_chr(alphabet *base_ab,  xchar_t c)
 
 static void node_cstr(xstr *node, alphabet *ab, char *dest)
 {
-	for (size_t i=0, l=xstr_len(node); i<l; i++ ) {
+	for (size_t i = 0, l = xstr_len(node); i < l; i++ ) {
 		xchar_t c = xstr_get(node, i);
-		dest[i] = (c==0) ? '$' : plain_chr(ab, c);
+		dest[i] = (c == 0) ? '$' : plain_chr(ab, c);
 	}
 	dest[xstr_len(node)] = '\0';
 }
@@ -157,12 +157,12 @@ size_t _outdeg_bf(size_t cs, char *node, bool multigraph)
 	bool *outletters = ARR_NEW(bool, ab_size(abt));
 	ARR_FILL(outletters, 0, ab_size(abt), false);
 	size_t ret = 0;
-	for (size_t i=0, l=slen-k; i<l; i++) {
+	for (size_t i = 0, l = slen - k; i < l; i++) {
 		size_t j = 0;
-		while (j<k && str[i+j]==node[j])
+		while (j < k && str[i + j] == node[j])
 			j++;
-		if (j==k) {
-			size_t ocrk = ab_rank(abt, str[i+k]);
+		if (j == k) {
+			size_t ocrk = ab_rank(abt, str[i + k]);
 			if (multigraph || !outletters[ocrk])
 				ret++;
 			outletters[ocrk] = true;
@@ -177,7 +177,7 @@ void test_dbgraph_outdeg(CuTest *tc)
 {
 	dbgraph_test_setup(tc);
 
-	for (size_t i=0; i<n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		dbgraph *dbg = g[i];
 		//printf("T:%s\n",padstr[i]);
 		//dbg_print(dbg);
@@ -185,14 +185,14 @@ void test_dbgraph_outdeg(CuTest *tc)
 		                                      bossdbg_k(dbg) );
 		char *node = cstr_new(bossdbg_k(dbg));
 
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			size_t deg = bossdbg_outdeg(dbg, nid);
 			bossdbg_node_lbl(dbg, nid, xnode);
 			node_cstr(xnode, ab[i], node);
 			size_t deg_bf = _outdeg_bf(i, node, bossdbg_is_multigraph(dbg));
-			if (deg_bf!=deg) {
-				printf("T=%s\n",padstr[i]);
+			if (deg_bf != deg) {
+				printf("T=%s\n", padstr[i]);
 				bossdbg_print(dbg);
 				printf ("Node %s rk=%zu id=%zu deg=%zu\n", node, nrk, nid, deg);
 
@@ -203,7 +203,7 @@ void test_dbgraph_outdeg(CuTest *tc)
 		dbg = mg[i];
 		//dbg_print(dbg);
 
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			size_t deg = bossdbg_outdeg(dbg, nid);
 			bossdbg_node_lbl(dbg, nid, xnode);
@@ -224,14 +224,14 @@ size_t _lbl_outdeg_bf(size_t cs, char *node, char c, bool multigraph)
 	size_t slen = padslen[cs];
 	size_t k = dbg_order[cs];
 	size_t ret = 0;
-	for (size_t i=0, l=slen-k; i<l; i++) {
+	for (size_t i = 0, l = slen - k; i < l; i++) {
 		size_t j = 0;
-		while (j<k && str[i+j]==node[j])
+		while (j < k && str[i + j] == node[j])
 			j++;
-		if (j==k && str[i+j]==c)
+		if (j == k && str[i + j] == c)
 			ret++;
 	}
-	return multigraph ? ret : MIN(1,ret);
+	return multigraph ? ret : MIN(1, ret);
 }
 
 
@@ -239,17 +239,17 @@ void test_bossdbg_lbl_outdeg(CuTest *tc)
 {
 	dbgraph_test_setup(tc);
 
-	for (size_t i=0; i<n; i++)  {
+	for (size_t i = 0; i < n; i++)  {
 		dbgraph *dbg = g[i];
 		alphabet *abt = ab[i];
 		xstr *xnode = xstr_new_with_capacity( nbytes(ab_size(bossdbg_ext_ab(dbg))),
 		                                      bossdbg_k(dbg) );
 		char *node = cstr_new(bossdbg_k(dbg));
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			bossdbg_node_lbl(dbg, nid, xnode);
 			node_cstr(xnode, abt, node);
-			for (size_t cr=0, abs=ab_size(abt); cr<abs; cr++) {
+			for (size_t cr = 0, abs = ab_size(abt); cr < abs; cr++) {
 				char c = ab_char(abt, cr);
 				size_t deg = bossdbg_lbl_outdeg(dbg, nid, c);
 				//printf("outdeg(%zu=%s, %c) = %zu\n", nid, node, c, deg);
@@ -260,11 +260,11 @@ void test_bossdbg_lbl_outdeg(CuTest *tc)
 
 		dbg = mg[i];
 		abt = ab[i];
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			bossdbg_node_lbl(dbg, nid, xnode);
 			node_cstr(xnode, abt, node);
-			for (size_t cr=0, abs=ab_size(abt); cr<abs; cr++) {
+			for (size_t cr = 0, abs = ab_size(abt); cr < abs; cr++) {
 				char c = ab_char(abt, cr);
 				size_t deg = bossdbg_lbl_outdeg(dbg, nid, c);
 				//printf("multi outdeg(%zu=%s, %c) = %zu\n", nid, node, c, deg);
@@ -284,13 +284,13 @@ void _child_bf(size_t cs, char *node, char c, bool multigraph, char *dest)
 	size_t slen = padslen[cs];
 	size_t k = dbg_order[cs];
 	cstr_fill(dest, 0, dbg_order[cs], '\0');
-	for (size_t i=0, l=slen-k; i<l; i++) {
+	for (size_t i = 0, l = slen - k; i < l; i++) {
 		size_t j = 0;
-		while (j<k && str[i+j]==node[j])
+		while (j < k && str[i + j] == node[j])
 			j++;
-		if (j==k && str[i+j]==c) {
-			strncpy(dest, str+i+1, k-1);
-			dest[k-1]=c;
+		if (j == k && str[i + j] == c) {
+			strncpy(dest, str + i + 1, k - 1);
+			dest[k - 1] = c;
 			return;
 		}
 	}
@@ -302,7 +302,7 @@ void test_dbgraph_child(CuTest *tc)
 {
 	dbgraph_test_setup(tc);
 
-	for (size_t i=0; i<n; i++)  {
+	for (size_t i = 0; i < n; i++)  {
 		dbgraph *dbg = g[i];
 		alphabet *abt = ab[i];
 		char *par_lbl, *chd_lbl, *chd_lbl_bf;
@@ -317,10 +317,10 @@ void test_dbgraph_child(CuTest *tc)
 		xchd_lbl_bf = xstr_new_with_capacity(nbytes(ab_size(bossdbg_ext_ab(dbg))),
 		                                     bossdbg_k(dbg));
 
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			bossdbg_node_lbl(dbg, nid, xpar_lbl);
-			for (size_t cr=0, abs=ab_size(abt); cr<abs; cr++) {
+			for (size_t cr = 0, abs = ab_size(abt); cr < abs; cr++) {
 				xchar_t c = ab_char(abt, cr);
 				size_t chd = bossdbg_child(dbg, nid, c);
 				bossdbg_node_lbl(dbg, chd, xchd_lbl);
@@ -340,10 +340,10 @@ void test_dbgraph_child(CuTest *tc)
 		par_lbl = cstr_new(bossdbg_k(dbg));
 		chd_lbl = cstr_new(bossdbg_k(dbg));
 		chd_lbl_bf = cstr_new(bossdbg_k(dbg));
-		for (size_t nrk=0, V=bossdbg_nnodes(dbg); nrk<V; nrk++) {
+		for (size_t nrk = 0, V = bossdbg_nnodes(dbg); nrk < V; nrk++) {
 			size_t nid = bossdbg_node_id(dbg, nrk);
 			bossdbg_node_lbl(dbg, nid, xpar_lbl);
-			for (size_t cr=0, abs=ab_size(abt); cr<abs; cr++) {
+			for (size_t cr = 0, abs = ab_size(abt); cr < abs; cr++) {
 				char c = ab_char(abt, cr);
 				size_t chd = bossdbg_child(dbg, nid, c);
 				bossdbg_node_lbl(dbg, chd, chd_lbl);

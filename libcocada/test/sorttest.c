@@ -76,11 +76,11 @@ void test_succ(CuTest *tc)
 			CuAssertTrue(tc, i <= r.arr[0]);
 		}
 		else if (0 < idx && idx < r.n) {
-			CuAssertTrue(tc, r.arr[idx-1] < i);
+			CuAssertTrue(tc, r.arr[idx - 1] < i);
 			CuAssertTrue(tc, i <= r.arr[idx]);
 		}
 		else { // no successor
-			CuAssertTrue(tc, r.arr[r.n-1] < i);
+			CuAssertTrue(tc, r.arr[r.n - 1] < i);
 		}
 	}
 	free(r.arr);
@@ -97,11 +97,11 @@ void test_strict_succ(CuTest *tc)
 			CuAssertTrue(tc, i < r.arr[0]);
 		}
 		else if (0 < idx && idx < r.n) {
-			CuAssertTrue(tc, r.arr[idx-1] <= i);
+			CuAssertTrue(tc, r.arr[idx - 1] <= i);
 			CuAssertTrue(tc, i < r.arr[idx]);
 		}
 		else { // no successor
-			CuAssertTrue(tc, r.arr[r.n-1] <= i);
+			CuAssertTrue(tc, r.arr[r.n - 1] <= i);
 		}
 	}
 	free(r.arr);
@@ -115,12 +115,12 @@ void test_pred(CuTest *tc)
 	range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
 		size_t idx = pred(r.arr, r.n, sizeof(int), cmp_int, &i);
-		if (0 <= idx && idx < r.n-1) {
+		if (0 <= idx && idx < r.n - 1) {
 			CuAssertTrue(tc, r.arr[idx] <= i);
-			CuAssertTrue(tc, i < r.arr[idx+1]);
+			CuAssertTrue(tc, i < r.arr[idx + 1]);
 		}
-		else if (idx == r.n-1) {
-			CuAssertTrue(tc, r.arr[r.n-1] <= i);
+		else if (idx == r.n - 1) {
+			CuAssertTrue(tc, r.arr[r.n - 1] <= i);
 		}
 		else { // no predecessor
 			CuAssertTrue(tc, i < r.arr[0]);
@@ -136,12 +136,12 @@ void test_strict_pred(CuTest *tc)
 	range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
 		size_t idx = strict_pred(r.arr, r.n, sizeof(int), cmp_int, &i);
-		if (0 <= idx && idx < r.n-1) {
+		if (0 <= idx && idx < r.n - 1) {
 			CuAssertTrue(tc, r.arr[idx] < i);
-			CuAssertTrue(tc, i <= r.arr[idx+1]);
+			CuAssertTrue(tc, i <= r.arr[idx + 1]);
 		}
-		else if (idx == r.n-1) {
-			CuAssertTrue(tc, r.arr[r.n-1] < i);
+		else if (idx == r.n - 1) {
+			CuAssertTrue(tc, r.arr[r.n - 1] < i);
 		}
 		else { // no predecessor
 			CuAssertTrue(tc, i <= r.arr[0]);

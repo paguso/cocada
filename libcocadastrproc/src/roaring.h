@@ -40,14 +40,14 @@
 typedef struct _roaringbitvec roaringbitvec;
 
 /**
- * @brief Constructs a new roaring bitvector with a given @p length, 
+ * @brief Constructs a new roaring bitvector with a given @p length,
  * with all bits initially set to 0.
  */
 roaringbitvec *roaringbitvec_new(uint32_t length);
 
 
 /**
- * @brief Constructs a new roaring bitvector from a raw bitarray 
+ * @brief Constructs a new roaring bitvector from a raw bitarray
  * @p src, with given @p length.
  */
 roaringbitvec *roaringbitvec_new_from_bitarr(byte_t *src, uint32_t length);
@@ -134,10 +134,10 @@ size_t roaringbitvec_select1(roaringbitvec *self, size_t rank);
 
 
 /**
- * @brief Returns the position `j` with a given @p bit value and 
+ * @brief Returns the position `j` with a given @p bit value and
  * @p rank if it exists.
- * Such position `j` has value @p bit and there are exactly @p rank 
- * positions with that same  @p bit value to the left of `j`. 
+ * Such position `j` has value @p bit and there are exactly @p rank
+ * positions with that same  @p bit value to the left of `j`.
  * If no such position exists, the length of the bitvector is returned.
  */
 size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank);
@@ -145,7 +145,7 @@ size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank);
 
 /**
  * @brief Prints a text representation of the bitvector to
- * the output @p stream. 
+ * the output @p stream.
  */
 void roaringbitvec_fprint(FILE *stream, roaringbitvec *self);
 

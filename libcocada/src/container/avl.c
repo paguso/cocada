@@ -73,7 +73,7 @@ avl *avl_new(size_t typesize, cmp_func cmp)
 
 static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 {
-	if (root==NULL) {
+	if (root == NULL) {
 		return;
 	}
 	else {
@@ -297,7 +297,7 @@ remv_min_result __avl_remv_min(avlnode *root)
 
 indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 {
-	if (root==NULL) {
+	if (root == NULL) {
 		indel_result ret = {.ok = false, .height_chgd = 0, .new_root = NULL};
 		return ret;
 	}
@@ -407,14 +407,14 @@ static void __avl_print(avlnode *root, size_t level, FILE *stream,
 	if (root == NULL) {
 		return;
 	}
-	__avl_print(root->left, level+1, stream, prt_val);
-	for (size_t i=0; i<level; i++) {
+	__avl_print(root->left, level + 1, stream, prt_val);
+	for (size_t i = 0; i < level; i++) {
 		fprintf(stream, "    ");
 	}
 	fprintf(stream, "[val=");
 	prt_val(stream, NODE_DATA(root));
 	fprintf(stream, "  bf=%d]\n", (int)(root->bf));
-	__avl_print(root->right, level+1, stream, prt_val);
+	__avl_print(root->right, level + 1, stream, prt_val);
 }
 
 

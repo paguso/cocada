@@ -53,7 +53,7 @@ avlmap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp);
 
 /**
  * @brief Finaliser.
- * If the given finaliser @p fnr has one child, it is assumed to be the 
+ * If the given finaliser @p fnr has one child, it is assumed to be the
  * finaliser for the keys. If it has two childre, the second is assumed
  * to be the finaliser for the values.
  */
@@ -79,7 +79,7 @@ bool avlmap_contains(const avlmap *self, const void *key);
 const void *avlmap_get(const avlmap *self, const void *key);
 
 /**
- * @brief Gets an internal non-const pointer to the value associated to 
+ * @brief Gets an internal non-const pointer to the value associated to
  * the given @p key, if any. Else returns NULL.
  */
 void *avlmap_get_mut(const avlmap *self, const void *key);
@@ -114,7 +114,7 @@ void avlmap_del(avlmap *self, void *key);
  * The copies returned via @p dest_key and
  * @p dest_val can be used by the caller to explicitly destroy those objects
  * after removal from the map.
- * 
+ *
  * @warning If the map does not contain the provided @p key, this operation has no effect.
  * @warning This does not destroy the key or its value.
  */
@@ -123,8 +123,8 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key,
 
 
 #define AVLMAP_DECL(TYPE, ...)\
-TYPE avlmap_get_##TYPE(avlmap *self, const void *key);\
-void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val);\
+	TYPE avlmap_get_##TYPE(avlmap *self, const void *key);\
+	void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val);\
 
 XX_CORETYPES(AVLMAP_DECL)
 

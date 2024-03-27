@@ -81,25 +81,25 @@ alphabet *alphabet_new(size_t size, const char *letters);
 /**
  * @brief Creates a char alphabet with the possibility of multiple
  * chars being equivalente, e.g. lowercase/uppercase.
- * 
- * For example, a DNA alphabet with equivalent lowercase/uppercase 
+ *
+ * For example, a DNA alphabet with equivalent lowercase/uppercase
  * could be defined as
- * 
+ *
  * ```C
  * char *nucl[4] = {"Aa", "Cc", "Gg", "Tt"};
  * alphabet *dna = alphabet_new_with_equivs(4, nucl);
  * ```
- * 
+ *
  * The parameter @p size indicates the size of the alphabet, i.e. the
  * number of distinct ranks, from 0 to @p size-1.
  * The parameter @p letters gives combinations of equivalent letter per rank
  * s.t. `letters[i]` contains a string with the equivalent letters
- * to be assigned rank `i`. Once a char in @p letters[i] is assigned a rank, 
+ * to be assigned rank `i`. Once a char in @p letters[i] is assigned a rank,
  * further appearences of the same char in @p letters[j] with `j>i` will be
  * ignored. If multiple equivalent chars are assigned to rank `r`,
  * calling ::ab_char(ab, `r`) will return the first of them.
- * 
- * 
+ *
+ *
  * @param size The size of the alphabet
  * @param letters The combinations of equivalent letters per rank
  * s.t. `letters[i]` contains a string with the equivalent letters

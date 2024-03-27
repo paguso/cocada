@@ -48,34 +48,34 @@ void test_segtree_upd(CuTest *tc)
 	size_t max_range = 100;
 	for (size_t range = 0; range < max_range; range++) {
 		segtree *tree = segtree_new(range, sizeof(int), segtree_merge_sum_int, &zero);
-		for (size_t i=0; i<range; i++) {
+		for (size_t i = 0; i < range; i++) {
 			int v = (int)i;
 			segtree_upd(tree, i, &v);
 		}
-		for (size_t i=0; i<range; i++) {
+		for (size_t i = 0; i < range; i++) {
 			int v = *((int *)segtree_qry(tree, i));
 			CuAssertIntEquals(tc, i, v);
 		}
-		for (size_t l=0; l<range; l++) {
-			for (size_t r=l; r<range; r++) {
-				int v, ex=0;
-				for (size_t i=l; i<r; ex+=(i++));
+		for (size_t l = 0; l < range; l++) {
+			for (size_t r = l; r < range; r++) {
+				int v, ex = 0;
+				for (size_t i = l; i < r; ex += (i++));
 				segtree_range_qry(tree, l, r, &v);
 				CuAssertIntEquals(tc, ex, v);
 			}
 		}
-		for (size_t i=0; i<range; i++) {
+		for (size_t i = 0; i < range; i++) {
 			int v = 2 * (int)i;
 			segtree_upd(tree, i, &v);
 		}
-		for (size_t i=0; i<range; i++) {
+		for (size_t i = 0; i < range; i++) {
 			int v = *((int *)segtree_qry(tree, i));
-			CuAssertIntEquals(tc, 2*i, v);
+			CuAssertIntEquals(tc, 2 * i, v);
 		}
-		for (size_t l=0; l<range; l++) {
-			for (size_t r=l; r<range; r++) {
-				int v, ex=0;
-				for (size_t i=l; i<r; ex+=(i++));
+		for (size_t l = 0; l < range; l++) {
+			for (size_t r = l; r < range; r++) {
+				int v, ex = 0;
+				for (size_t i = l; i < r; ex += (i++));
 				ex *= 2;
 				segtree_range_qry(tree, l, r, &v);
 				CuAssertIntEquals(tc, ex, v);
@@ -107,24 +107,24 @@ void test_segtree_upd_obj(CuTest *tc)
 	memdbg_reset();
 	obj_t zero =  {.val = 0, .dval = 0};
 	size_t max_range = 100;
-	for (size_t range=0; range<max_range; range++) {
+	for (size_t range = 0; range < max_range; range++) {
 		size_t range = 10;
 		segtree *tree = segtree_new(range, sizeof(obj_t), merge_obj, &zero);
-		for (size_t i=0; i<range; i++) {
-			obj_t v  =(obj_t) {
-				.val=(int)i, .dval = (double)i * 2
+		for (size_t i = 0; i < range; i++) {
+			obj_t v  = (obj_t) {
+				.val = (int)i, .dval = (double)i * 2
 			};
 			segtree_upd(tree, i, &v);
 		}
-		for (size_t i=0; i<range; i++) {
+		for (size_t i = 0; i < range; i++) {
 			int v = (*((obj_t *)segtree_qry(tree, i))).val;
 			CuAssertIntEquals(tc, i, v);
 		}
 		obj_t v;
-		for (size_t l=0; l<range; l++) {
-			for (size_t r=l; r<range; r++) {
-				int ex=0;
-				for (size_t i=l; i<r; ex+=(i++));
+		for (size_t l = 0; l < range; l++) {
+			for (size_t r = l; r < range; r++) {
+				int ex = 0;
+				for (size_t i = l; i < r; ex += (i++));
 				segtree_range_qry(tree, l, r, &v);
 				CuAssertIntEquals(tc, ex, v.val);
 			}
@@ -144,8 +144,8 @@ void test_segtree_range_qry(CuTest *tc)
 	for (size_t range = 0; range < max_range; range++) {
 		segtree *st = segtree_new(range, sizeof(uint32_t), segtree_merge_sum_uint32_t,
 		                          &ZERO32);
-		uint32_t val = UINT32_MAX / MAX(1,range);
-		for (size_t i=0; i<range; i++) {
+		uint32_t val = UINT32_MAX / MAX(1, range);
+		for (size_t i = 0; i < range; i++) {
 			segtree_upd_uint32_t(st, i, val);
 		}
 		for (size_t l = 0; l <= range; l++) {

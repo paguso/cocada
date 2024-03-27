@@ -67,7 +67,7 @@ void avlmap_test_ins(CuTest *tc)
 
 	DESTROY_FLAT(map, avlmap);
 
-	// store pointers to objects 
+	// store pointers to objects
 
 	map = avlmap_new(sizeof(testkey_t *), sizeof(testval_t *), cmp_testkey_ptr_t);
 
@@ -95,9 +95,10 @@ void avlmap_test_ins(CuTest *tc)
 }
 
 
-void prt_map_entry(FILE *stream, void *entry) {
+void prt_map_entry(FILE *stream, void *entry)
+{
 	int **k = entry;
-	double **v = entry + sizeof(int*);
+	double **v = entry + sizeof(int *);
 	fprintf(stream, "[KEY=%d VAL=%lf]", **k, **v);
 }
 
@@ -119,7 +120,7 @@ void avlmap_test_del(CuTest *tc)
 		const testval_t *v = avlmap_get(map, &key);
 		CuAssertDblEquals(tc, val.val, v->val, 0.1);
 	}
-	
+
 	for (int i = 0, step = 10; i < step * n; i += step) {
 		testkey_t key = {.key = i};
 		CuAssert(tc, "Should contain key.", avlmap_contains(map, &key));
@@ -130,7 +131,7 @@ void avlmap_test_del(CuTest *tc)
 
 	DESTROY_FLAT(map, avlmap);
 
-	// store pointers to objects 
+	// store pointers to objects
 
 	map = avlmap_new(sizeof(testkey_t *), sizeof(testval_t *), cmp_testkey_ptr_t);
 
@@ -145,7 +146,7 @@ void avlmap_test_del(CuTest *tc)
 		testval_t **v = (testval_t **)avlmap_get(map, &key);
 		CuAssertDblEquals(tc, val->val, (*v)->val, 0.1);
 	}
-	
+
 	testkey_t *probekey = NEW(testkey_t);
 	for (int i = 0, step = 10; i < step * n; i += step) {
 		probekey->key = i;

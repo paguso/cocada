@@ -54,8 +54,9 @@ void vebset_test_add(CuTest *tc)
 		vebset_add(vset, x);
 		CuAssert(tc, "vset does not contain added element", vebset_contains(vset, x));
 		if (i > 0) {
-			uint32_t prev_x = vec_get_uint32_t(vec_vals, i-1);
-			for (uint32_t y = prev_x + 1; y < x - ((x-prev_x)/2); y+=((x-prev_x)/2)) {
+			uint32_t prev_x = vec_get_uint32_t(vec_vals, i - 1);
+			for (uint32_t y = prev_x + 1; y < x - ((x - prev_x) / 2);
+			        y += ((x - prev_x) / 2)) {
 				if (vebset_contains(vset, y)) {
 					CuAssert(tc, "vset contains non-added element", !vebset_contains(vset, y));
 				}
@@ -98,7 +99,7 @@ void vebset_test_del(CuTest *tc)
 		uint32_t x = vec_get_uint32_t(vec_vals, i);
 		bool has = vebset_contains(vset, x);
 		bool del = vebset_del(vset, x);
-		CuAssert(tc, "Wrong deletion result", has==del);
+		CuAssert(tc, "Wrong deletion result", has == del);
 		size -= del;
 	}
 	CuAssertSizeTEquals(tc, 0, size);

@@ -302,7 +302,7 @@ void quadtree_fit(quadtree *tree);
  *  + - - - + - - - + - ^ - + - - - +
  *                      |
  *                      |
- *    insert here -----´
+ *    insert here ------+
  *
  *
  *  Nodes visited are indicated by an asterisk *:

@@ -50,7 +50,7 @@ uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize)
 	        *end = ((byte_t *)obj) + objsize;
 	        bp < end; bp++ ) {
 		//xor the bottom with the current octet
-		hval ^= (uint64_t)*bp;
+		hval ^= (uint64_t) * bp;
 		// multiply by the 64 bit FNV magic prime mod 2^64
 #ifdef NO_FNV_GCC_OPTIMIZATION
 		hval *= ((uint64_t)0x100000001b3ULL);

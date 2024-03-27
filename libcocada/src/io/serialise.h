@@ -186,14 +186,14 @@
  *
  * 1. The struct type declaration itself
  * 2. The STR_SOM_INFO is a required preparation for being able to use the STR_OFFSET macro
- * for composing the struct SOM with its fields´ SOMs.
+ * for composing the struct SOM with its fields' SOMs.
  * 3. The struct SOM singleton object. This should not be accessed directly but rather via
  * the get_som_func function defined for this struct on step 4
  * 4. The definition of the get_som_func that returns the struct SOM singleton
  * after initialisation, if needed.
  *
  * Notice that when composing the struct SOM with the SOMs of its fields via calls
- * to som_cons, we have to inform the relative offset of the field´s memory location
+ * to som_cons, we have to inform the relative offset of the field's memory location
  * w.r.t. the struct's start location. This information is required in particular for
  * deserialisation, and can be obtained via the STR_OFFSET macro.
  *

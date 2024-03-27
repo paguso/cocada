@@ -250,7 +250,7 @@ void test_avl_remv(CuTest *tc)
 	DEBUG("\n\n\n");
 	// remove non-existent value
 	CuAssert(tc, "Attempt to delete non-existent element should return false",
-	         ! avl_del_int(tree, 2*half_univ));
+	         ! avl_del_int(tree, 2 * half_univ));
 	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 	// remove leaf node
@@ -291,7 +291,7 @@ void test_avl_remv(CuTest *tc)
 	// remove non-existent value
 	obj_t obj;
 	obj_t *probe = &obj, *dest;
-	obj.key = 2*half_univ;
+	obj.key = 2 * half_univ;
 	CuAssert(tc, "Attempt to delete non-existent element should return false",
 	         ! avl_remv(tree, &probe, &dest));
 	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t_ref));
@@ -356,25 +356,25 @@ void test_avl_get_iter(CuTest *tc)
 	DEBUG("\n\n\n");
 
 	avl_iter *it = avl_get_iter(tree, PRE_ORDER);
-	for (int k=0; iter_has_next(avl_iter_as_iter(it)); k++) {
+	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
 		int val = *((int *)iter_next(avl_iter_as_iter(it)));
-		DEBUG("Pre-order[%d] = %d\n",k, val);
+		DEBUG("Pre-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
 
 	DEBUG("\n\n");
 	it = avl_get_iter(tree, IN_ORDER);
-	for (int k=0; iter_has_next(avl_iter_as_iter(it)); k++) {
+	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
 		int val = *((int *)iter_next(avl_iter_as_iter(it)));
-		DEBUG("In-order[%d] = %d\n",k, val);
+		DEBUG("In-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
 
 	DEBUG("\n\n");
 	it = avl_get_iter(tree, POST_ORDER);
-	for (int k=0; iter_has_next(avl_iter_as_iter(it)); k++) {
+	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
 		int val = *((int *)iter_next(avl_iter_as_iter(it)));
-		DEBUG("Post-order[%d] = %d\n",k, val);
+		DEBUG("Post-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
 	DESTROY_FLAT(tree, avl);
@@ -382,7 +382,8 @@ void test_avl_get_iter(CuTest *tc)
 }
 
 
-void test_avl_del(CuTest *tc) {
+void test_avl_del(CuTest *tc)
+{
 	memdbg_reset();
 
 	// FLAT MAP
@@ -397,9 +398,9 @@ void test_avl_del(CuTest *tc) {
 		CuAssert(tc, "Should contain key.", avl_contains(tree, &key));
 		const int *v = avl_get(tree, &key);
 		CuAssertIntEquals(tc, key, *v);
-		
+
 	}
-	
+
 	for (int i = 0, step = 10; i < step * n; i += step) {
 		int key = i;
 		DEBUG("\nDeleting %d\n\n", key);
@@ -407,7 +408,7 @@ void test_avl_del(CuTest *tc) {
 		avl_del(tree, &key);
 		CuAssert(tc, "Should not contain key.", !avl_contains(tree, &key));
 	}
-	
+
 	DESTROY_FLAT(tree, avl);
 
 	if (!memdbg_is_empty()) {

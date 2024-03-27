@@ -32,21 +32,21 @@
 
 void test_fmalg(CuTest *tc)
 {
-	uint64_t maxval = (uint64_t)1<<32;
+	uint64_t maxval = (uint64_t)1 << 32;
 	bitvec *ticks = bitvec_new_with_capacity(maxval);
 	fmalg *fm  = fmalg_init(maxval, 5, 7);
-	uint64_t val=0, true_count=0;
+	uint64_t val = 0, true_count = 0;
 	double error;
-	for (size_t i=0; i<100000; i++) {
+	for (size_t i = 0; i < 100000; i++) {
 		val = rand_range_uint64_t(0, maxval);
 		if ( bitvec_get_bit(ticks, val) == 0 ) {
 			true_count++;
 			bitvec_set_bit(ticks, val, 1);
 		}
 		fmalg_process(fm, val);
-		if (i%10 == 0) {
+		if (i % 10 == 0) {
 			uint64_t f0 = fmalg_query(fm);
-			error = abs((double)f0-(double)true_count)/(double)true_count;
+			error = abs((double)f0 - (double)true_count) / (double)true_count;
 			DEBUG("FM estimate = %"PRIu64" true count = %"PRIu64" error = %f\n", f0,
 			      true_count, error);
 		}

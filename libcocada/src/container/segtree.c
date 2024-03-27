@@ -73,7 +73,7 @@ segtree *segtree_new(size_t range, size_t typesize, merge_func merge,
 	ret->merge = merge;
 	ret->init_val = malloc(sizeof(typesize));
 	memcpy(ret->init_val, init_val, typesize);
-	ret->tree = vec_new_with_capacity(typesize, 2*range);
+	ret->tree = vec_new_with_capacity(typesize, 2 * range);
 	segtree_reset(ret);
 	return ret;
 }
@@ -101,7 +101,7 @@ void segtree_upd(segtree *self, size_t pos, const void *val)
 
 const void *segtree_qry(segtree *self, size_t pos)
 {
-	return vec_get(self->tree, pos+self->range);
+	return vec_get(self->tree, pos + self->range);
 }
 
 

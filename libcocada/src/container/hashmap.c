@@ -35,7 +35,7 @@
 
 
 static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
-static float GROW_BY = 2.0F; // DON´T TOUCH
+static float GROW_BY = 2.0F; // DO NOT TOUCH
 static float MAX_LOAD = 0.75;
 
 static byte_t  ST_EMPTY = 0x80; // empty slot ctrl code   0b10000000
@@ -112,9 +112,9 @@ void hashmap_finalise(void *ptr, const finaliser *dst)
 	hashmap *hmap = (hashmap *)ptr;
 	if (dst != NULL) {
 		bool free_keys = (finaliser_nchd(dst) > 0);
-		const finaliser *keys_dst = (free_keys)?finaliser_chd(dst, 0):NULL;
+		const finaliser *keys_dst = (free_keys) ? finaliser_chd(dst, 0) : NULL;
 		bool free_vals = (finaliser_nchd(dst) > 1);
-		const finaliser *vals_dst = (free_vals)?finaliser_chd(dst, 1):NULL;
+		const finaliser *vals_dst = (free_vals) ? finaliser_chd(dst, 1) : NULL;
 		if (free_keys || free_vals) {
 			hashmap_iter *it = hashmap_get_iter(hmap);
 			FOREACH_IN_ITER(keyval, hashmap_entry, hashmap_iter_as_iter(it)) {
@@ -177,7 +177,7 @@ static _find_res _find(const hashmap *hmap, const void *key, uint64_t h)
 {
 	uint64_t h1 = _h1(h);
 	uint64_t h2 = _h2(h);
-	_find_res ret = {.found=false, .pos=h1 % hmap->cap};
+	_find_res ret = {.found = false, .pos = h1 % hmap->cap};
 	//printf("starting probe at pos %zu\n", ret.pos );
 	while (true) {
 		//printf("   probing pos %zu\n", ret.pos );

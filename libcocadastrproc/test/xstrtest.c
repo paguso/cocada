@@ -36,14 +36,14 @@
 
 void test_xstr_get_set(CuTest *tc)
 {
-	for (size_t len=0; len<1000; len++) {
+	for (size_t len = 0; len < 1000; len++) {
 		size_t sizeof_char = nbytes(len);
 		xstr *xs = xstr_new_with_capacity(sizeof_char, len);
-		for (size_t i=0; i<len; i++) {
+		for (size_t i = 0; i < len; i++) {
 			xstr_push(xs, i);
 		}
-		for (size_t i=0; i<len; i++) {
-			CuAssert(tc, "assertion failed", i==xstr_get(xs, i));
+		for (size_t i = 0; i < len; i++) {
+			CuAssert(tc, "assertion failed", i == xstr_get(xs, i));
 		}
 		xstr_free(xs);
 	}
@@ -61,7 +61,7 @@ void test_xstr_format(CuTest *tc)
 	memdbg_reset();
 	size_t l = 26;
 	xstr *xs = xstr_new(1);
-	for (xchar_t i=65; i<65+l; i++) {
+	for (xchar_t i = 65; i < 65 + l; i++) {
 		xstr_push(xs, i);
 	}
 	xstrformat *fmt = xstrformat_new_ascii(xs);
@@ -70,7 +70,7 @@ void test_xstr_format(CuTest *tc)
 	xstr_free(xs);
 
 	xs = xstr_new(2);
-	for (xchar_t i=65; i<65+l; i++) {
+	for (xchar_t i = 65; i < 65 + l; i++) {
 		xstr_push(xs, i);
 	}
 	fmt = xstrformat_new(xs);

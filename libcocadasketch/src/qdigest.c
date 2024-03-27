@@ -80,16 +80,16 @@ typedef struct qdigest {
 } size_pair;
 
 
-static const size_pair zeropair = {.fst=0, .snd=0};
+static const size_pair zeropair = {.fst = 0, .snd = 0};
 
 
 static size_pair tree_size (qdnode *root)
 {
-	if (root==NULL) {
+	if (root == NULL) {
 		return zeropair;
 	}
 	else {
-		size_pair ret = {.fst=0, .snd=0};
+		size_pair ret = {.fst = 0, .snd = 0};
 		size_pair l = tree_size(root->chd[LEFT]);
 		size_pair r = tree_size(root->chd[RIGHT]);
 		ret.fst = 1 + l.fst + r.fst;
@@ -238,17 +238,17 @@ size_t qdigest_rank(qdigest *self, size_t val)
 static void _print(FILE *stream, qdnode *root, size_t l, size_t r, size_t level)
 {
 	if (root == NULL ) return;
-	for (int i=0; i<level; i++)  {
+	for (int i = 0; i < level; i++)  {
 		fprintf(stream, "   ");
 	}
-	if (r-l==1) {
+	if (r - l == 1) {
 		fprintf(stream, "[val=%zu qty=%zu]\n", l, root->qty);
 	}
 	else {
 		fprintf(stream, "[l=%zu r=%zu qty=%zu]\n", l, r, root->qty);
 	}
-	_print(stream, root->chd[LEFT], l, (l+r)/2, level+1);
-	_print(stream, root->chd[RIGHT], (l+r)/2, r, level+1);
+	_print(stream, root->chd[LEFT], l, (l + r) / 2, level + 1);
+	_print(stream, root->chd[RIGHT], (l + r) / 2, r, level + 1);
 }
 
 

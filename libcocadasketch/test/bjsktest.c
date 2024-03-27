@@ -40,7 +40,7 @@ void bjkst_test(CuTest *tc)
 	double delta = 0.1;
 	bjkst *counter = bjkst_init(nbits, eps, delta);
 
-	for (int i=0; i<n; i++) {
+	for (int i = 0; i < n; i++) {
 		uint64_t val = rand_range_uint64_t(0, ndistinct) * step;
 		bjkst_process(counter, val);
 	}

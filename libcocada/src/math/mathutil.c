@@ -91,7 +91,7 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m)
 bool is_prime_naive(uint64_t val)
 {
 	if (val < 2) return false;
-	for (uint64_t q=2; q*q <=val; q++) {
+	for (uint64_t q = 2; q * q <= val; q++) {
 		if (val % q == 0) {
 			return false;
 		}
@@ -112,7 +112,7 @@ bool is_prime_mr(uint64_t n)
 	size_t nwit = 1;
 	for (size_t j = 0; j < 9 && n >= limits[j]; nwit = nwitness[++j]);
 
-	uint64_t d = n-1;
+	uint64_t d = n - 1;
 	uint64_t r = 0;
 	while (IS_EVEN(d)) {
 		d >>= 1;
@@ -123,13 +123,13 @@ bool is_prime_mr(uint64_t n)
 	for (size_t i = 0; prime && i < nwit; i++) {
 		prime = false;
 		uint64_t x = mod_pow(a[i], d, n); // (a[i]^d) mod n
-		if ( x == 1 || x == (n-1) ) {
+		if ( x == 1 || x == (n - 1) ) {
 			prime = true;
 			continue;
 		}
-		for (size_t _j=0; _j < r-1; _j++) {
+		for (size_t _j = 0; _j < r - 1; _j++) {
 			x = mod_mult(x, x, n); // (x*x) % n;
-			if ( x == n-1 ) {
+			if ( x == n - 1 ) {
 				prime = true;
 				break;
 			}
@@ -141,10 +141,10 @@ bool is_prime_mr(uint64_t n)
 
 uint64_t prime_succ(uint64_t n)
 {
-	uint64_t firstfew[] = {2,2,2,3,5,5,7};
-	if (n<=6) return firstfew[n];
+	uint64_t firstfew[] = {2, 2, 2, 3, 5, 5, 7};
+	if (n <= 6) return firstfew[n];
 	uint64_t k = (uint64_t) DIVCEIL(n, 6);
-	assert (n <= k*6);
+	assert (n <= k * 6);
 	uint64_t ret = 6 * k - 1;
 	bool pm = true;
 	if (ret < n) {
@@ -152,7 +152,7 @@ uint64_t prime_succ(uint64_t n)
 		pm = false;
 	}
 	while ( !is_prime_mr(ret) ) {
-		ret += (pm)?2:4;
+		ret += (pm) ? 2 : 4;
 		pm = !pm;
 	}
 	return ret;

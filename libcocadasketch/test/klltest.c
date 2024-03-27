@@ -57,19 +57,19 @@ void test_kll_upd(CuTest *tc)
 	DEBUG_EXEC(kll_print(summ, stderr, print_int));
 	double epsN = err * n;
 	int nerr = 0;
-	for (int sum=0, nxtsum=0, i=0; i<univ; i++) {
+	for (int sum = 0, nxtsum = 0, i = 0; i < univ; i++) {
 		nxtsum += ranks[i];
 		ranks[i] = sum;
 		size_t kllrk =  kll_rank(summ, &i);
 		DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk,
-		      abs(((double)kllrk - (double)ranks[i]))/(double)n);
+		      abs(((double)kllrk - (double)ranks[i])) / (double)n);
 		if ( abs((double)kllrk - (double)ranks[i]) > epsN) {
 			nerr++;
 		}
 		sum = nxtsum;
 	}
 	DEBUG("# wrong ranks = %d\n", nerr);
-	DEBUG("Observed P[Err>eN] = %f  (Predicted = %f)", (double)nerr/n, err);
+	DEBUG("Observed P[Err>eN] = %f  (Predicted = %f)", (double)nerr / n, err);
 
 }
 
@@ -96,7 +96,7 @@ void test_kll_upd_obj (CuTest *tc)
 	int univ = 300;
 	double err = 0.1;
 	kllsumm *summ = kll_new(sizeof(kllsumm *), cmp_kll_obj, err);
-	for (int i=0; i<n; i++) {
+	for (int i = 0; i < n; i++) {
 		int k = rand_range_int(0, univ);
 		kll_obj *obj = NEW(kll_obj);
 		obj->key = k;
@@ -104,7 +104,7 @@ void test_kll_upd_obj (CuTest *tc)
 		kll_upd(summ, &obj);
 	}
 	kll_obj *val = NEW(kll_obj);
-	for (int i=0; i<univ; i++) {
+	for (int i = 0; i < univ; i++) {
 		val->key = i;
 		size_t r = kll_rank(summ, &val);
 		DEBUG("KLL Obj rank (key=%d) = %zu\n", i, r);

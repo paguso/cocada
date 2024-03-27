@@ -75,7 +75,7 @@
  * This function allocates an array of `S = nmemb * nmemb_size` bytes **plus**
  * the size of a size_t value **immediately before** the useful area
  * of the array. The size `S` is stored at this location as a size_t value,
- * the useful area is initialised with 0´s, and a pointer to the start
+ * the useful area is initialised with 0's, and a pointer to the start
  * location of the useful area of the array  is returned, as illustrated in
  * the diagram below. This makes the array size readily available via
  * the ::sa_arr_sizeof function, without having to store this information separately.

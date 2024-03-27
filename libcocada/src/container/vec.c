@@ -76,7 +76,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 	ret->typesize = typesize;
 	ret->capacity = MAX(MIN_CAPACITY, init_capacity);
 	ret->len = 0;
-	ret->data = malloc((ret->capacity + 1)*
+	ret->data = malloc((ret->capacity + 1) *
 	                   ret->typesize); // +1 position used for swap
 	return ret;
 }
@@ -124,7 +124,7 @@ static void _resize_to(vec *v, size_t cap)
 
 static void _check_and_resize(vec *v)
 {
-	if (v->len==v->capacity) {
+	if (v->len == v->capacity) {
 		_resize_to(v, GROW_BY * v->capacity);
 	}
 	else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD * v->capacity) {
@@ -138,7 +138,7 @@ void vec_finalise(void *ptr, const finaliser *fnr )
 	vec *v = (vec *)ptr;
 	if (finaliser_nchd(fnr)) {
 		const finaliser *chd_fr = finaliser_chd(fnr, 0);
-		for (size_t i=0, l = vec_len(v); i < l; i++) {
+		for (size_t i = 0, l = vec_len(v); i < l; i++) {
 			void *chd =  vec_get_mut(v, i);
 			FINALISE(chd, chd_fr);
 		}
@@ -212,7 +212,7 @@ void *vec_first_mut(const vec *v)
 
 void *vec_last_mut(const vec *v)
 {
-	return (v->len) ? vec_get_mut(v, v->len-1) : NULL;
+	return (v->len) ? vec_get_mut(v, v->len - 1) : NULL;
 }
 
 
@@ -232,7 +232,7 @@ void vec_set(vec *v, size_t pos, const void *src)
 void vec_swap(vec *v, size_t i, size_t j)
 {
 	void *swp = v->data + (v->capacity * v->typesize);
-	if (i==j) return;
+	if (i == j) return;
 	memcpy(swp, v->data + (i * v->typesize), v->typesize);
 	memcpy(v->data + (i * v->typesize), v->data + (j * v->typesize), v->typesize);
 	memcpy(v->data + (j * v->typesize), swp, v->typesize);
@@ -398,7 +398,7 @@ void vec_qsort(vec *v, cmp_func cmp)
 size_t vec_min(const vec *v, cmp_func cmp)
 {
 	size_t m = 0;
-	for (size_t i=1, l=vec_len(v); i<l; ++i) {
+	for (size_t i = 1, l = vec_len(v); i < l; ++i) {
 		m = ( cmp(vec_get(v, i), vec_get(v, m)) < 0 ) ? i : m;
 	}
 	return m;
@@ -408,7 +408,7 @@ size_t vec_min(const vec *v, cmp_func cmp)
 size_t vec_max(const vec *v, cmp_func cmp)
 {
 	size_t m = 0;
-	for (size_t i=1, l=vec_len(v); i<l; ++i) {
+	for (size_t i = 1, l = vec_len(v); i < l; ++i) {
 		m = ( cmp(vec_get(v, i), vec_get(v, m)) > 0 ) ? i : m;
 	}
 	return m;
@@ -419,23 +419,23 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
                    size_t key_size, size_t max_key)
 {
 	size_t n = vec_len(v);
-	void *vcpy = malloc(n*(v->typesize));
+	void *vcpy = malloc(n * (v->typesize));
 	size_t *count = ARR_NEW(size_t, max_key);
 	size_t i, k;
-	for (size_t d=0; d<key_size; d++) {
-		memset(count, 0, max_key*sizeof(size_t));
-		for (i=0; i<n; i++) {
+	for (size_t d = 0; d < key_size; d++) {
+		memset(count, 0, max_key * sizeof(size_t));
+		for (i = 0; i < n; i++) {
 			k = key_fn(vec_get(v, i), d);
 			count[k]++;
 		}
-		for (k=1; k<max_key; k++)
-			count[k] += count[k-1];
-		for (i=n; i>0; i--) {
-			k = key_fn(vec_get(v, i-1), d);
+		for (k = 1; k < max_key; k++)
+			count[k] += count[k - 1];
+		for (i = n; i > 0; i--) {
+			k = key_fn(vec_get(v, i - 1), d);
 			count[k]--;
-			vec_get_cpy(v, i-1, vcpy+(count[k]*v->typesize));
+			vec_get_cpy(v, i - 1, vcpy + (count[k]*v->typesize));
 		}
-		memcpy(v->data, vcpy, n*(v->typesize));
+		memcpy(v->data, vcpy, n * (v->typesize));
 	}
 	FREE(vcpy);
 	FREE(count);

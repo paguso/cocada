@@ -65,8 +65,8 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 	FILE *src = ((strfilereader *)self->impltor)->src;
 	size_t nread;
 	char c;
-	for (nread=0; !feof(src); nread++) {
-		if ( (c=fgetc(src)) == delim ) {
+	for (nread = 0; !feof(src); nread++) {
+		if ( (c = fgetc(src)) == delim ) {
 			fseek(src, -1, SEEK_CUR);
 			break;
 		}

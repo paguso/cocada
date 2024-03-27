@@ -38,17 +38,17 @@ static size_t _key_fn(const void *elt)
 
 static bool _equals_fn(const void *elt1, const void *elt2)
 {
-	return ((size_t)(*((uint *)elt1))==(size_t)(*((uint *)elt2)));
+	return ((size_t)(*((uint *)elt1)) == (size_t)(*((uint *)elt2)));
 }
 
 static int _uint_cmp_fn(const void *elt1, const void *elt2)
 {
-	return ((*((uint *)elt1))-(*((uint *)elt2)));
+	return ((*((uint *)elt1)) - (*((uint *)elt2)));
 }
 
 void test_hashset_indel(CuTest *tc)
 {
-	size_t n=105;
+	size_t n = 105;
 	hashset *set;
 	uint elt, *elts;
 	set = hashset_new(sizeof(uint), &_key_fn, &_equals_fn);
@@ -57,17 +57,17 @@ void test_hashset_indel(CuTest *tc)
 	//CuAssertTrue(tc, !hashset_contains(set, NULL));
 
 	// insert originals
-	for (uint i=0; i<n; i++) {
+	for (uint i = 0; i < n; i++) {
 		CuAssertSizeTEquals(tc, i, hashset_size(set));
-		elt = (uint)(10*i);
+		elt = (uint)(10 * i);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
 		hashset_add(set, &elt);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
 	}
 
 	// insert duplicates
-	for (uint i=0; i<n; i++) {
-		elt = (uint)(10*i);
+	for (uint i = 0; i < n; i++) {
+		elt = (uint)(10 * i);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
 		hashset_add(set, &elt);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
@@ -75,27 +75,27 @@ void test_hashset_indel(CuTest *tc)
 	}
 
 	// delete half the elements
-	for (uint i=0; i<n/2; i++) {
-		CuAssertSizeTEquals(tc, n-i, hashset_size(set));
-		elt  = (uint)(10*i);
+	for (uint i = 0; i < n / 2; i++) {
+		CuAssertSizeTEquals(tc, n - i, hashset_size(set));
+		elt  = (uint)(10 * i);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
 		hashset_del(set, &elt);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
 	}
 
 	// delete nonexistent elements
-	for (uint i=0; i<n/2; i++) {
-		elt = (uint)(10*i);
+	for (uint i = 0; i < n / 2; i++) {
+		elt = (uint)(10 * i);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
 		hashset_del(set, &elt);
 		CuAssertTrue(tc, !hashset_contains(set, &elt));
-		CuAssertSizeTEquals(tc, n-(n/2), hashset_size(set));
+		CuAssertSizeTEquals(tc, n - (n / 2), hashset_size(set));
 	}
 
 	// add them back
-	for (uint i=0; i<n; i++) {
-		CuAssertSizeTEquals(tc, MIN((n-(n/2)+i), n), hashset_size(set));
-		elt = (uint)(10*i);
+	for (uint i = 0; i < n; i++) {
+		CuAssertSizeTEquals(tc, MIN((n - (n / 2) + i), n), hashset_size(set));
+		elt = (uint)(10 * i);
 		hashset_add(set, &elt);
 		CuAssertTrue(tc, hashset_contains(set, &elt));
 	}
@@ -109,8 +109,8 @@ void test_hashset_indel(CuTest *tc)
 		//printf("element[%zu] = %u\n",i,*e);
 	}
 	qsort(elts, n, sizeof(uint), &_uint_cmp_fn);
-	for ( size_t i=0; i<n; i++) {
-		CuAssertSizeTEquals(tc, i*10, (size_t)elts[i]);
+	for ( size_t i = 0; i < n; i++) {
+		CuAssertSizeTEquals(tc, i * 10, (size_t)elts[i]);
 		//printf("element[%zu] = %u\n",i, elts[i]);
 	}
 

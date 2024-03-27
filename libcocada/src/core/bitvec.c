@@ -177,19 +177,19 @@ static inline size_t _bitvec_count1(const bitvec *bv, size_t from, size_t to)
 	byte_pos++;
 
 	while (byte_pos + ULLONG_BYTES < last_byte) {
-		ret += ullong_bitcount1(*((ullong *)(bv->bits+byte_pos)));
+		ret += ullong_bitcount1(*((ullong *)(bv->bits + byte_pos)));
 		byte_pos += ULLONG_BYTES;
 	}
 	while (byte_pos + ULONG_BYTES < last_byte) {
-		ret += ulong_bitcount1(*((ulong *)(bv->bits+byte_pos)));
+		ret += ulong_bitcount1(*((ulong *)(bv->bits + byte_pos)));
 		byte_pos += ULONG_BYTES;
 	}
 	while (byte_pos + UINT_BYTES < last_byte) {
-		ret += uint_bitcount1(*((uint *)(bv->bits+byte_pos)));
+		ret += uint_bitcount1(*((uint *)(bv->bits + byte_pos)));
 		byte_pos += UINT_BYTES;
 	}
 	while (byte_pos + USHRT_BYTES < last_byte) {
-		ret += ushort_bitcount1(*((ushort *)(bv->bits+byte_pos)));
+		ret += ushort_bitcount1(*((ushort *)(bv->bits + byte_pos)));
 		byte_pos += USHRT_BYTES;
 	}
 	while (byte_pos < last_byte) {
@@ -232,7 +232,7 @@ size_t _bitvec_select1(const bitvec *bv, size_t rank)
 {
 	byte_t *cur_byte = bv->bits;
 	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
-	size_t count=0, partial_count=0;
+	size_t count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
 	while ( (byte_t *)(llarr + 1) <= last_byte &&
@@ -278,7 +278,7 @@ size_t _bitvec_select0(const bitvec *bv, size_t rank)
 {
 	byte_t *cur_byte = bv->bits;
 	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
-	size_t count=0, partial_count=0;
+	size_t count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
 	while ( (byte_t *)(llarr + 1) <= last_byte &&
@@ -321,7 +321,7 @@ size_t _bitvec_select0(const bitvec *bv, size_t rank)
 
 size_t bitvec_select(const bitvec *bv, bool bit, size_t rank)
 {
-	return bit?_bitvec_select1(bv, rank):_bitvec_select0(bv, rank);
+	return bit ? _bitvec_select1(bv, rank) : _bitvec_select0(bv, rank);
 }
 
 
@@ -362,20 +362,20 @@ void bitvec_push_n(bitvec *bv, size_t nbits, bool bit)
 	if (bit) {
 		size_t nleft = nbits;
 		byte_t nxt_bit = bv->len % BYTESIZE;
-		byte_t *last_byte = bv->bits + (bv->len/BYTESIZE);
-		size_t m = MIN(nleft, BYTESIZE-nxt_bit);
-		if (m==BYTESIZE)
+		byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+		size_t m = MIN(nleft, BYTESIZE - nxt_bit);
+		if (m == BYTESIZE)
 			*(last_byte) = BYTE_MAX;
 		else
-			*(last_byte) |= (~(BYTE_MAX<<m)) << (BYTESIZE - nxt_bit - m);
-		last_byte += ((nxt_bit+m)/BYTESIZE);
-		nxt_bit = ((nxt_bit+m)%BYTESIZE);
+			*(last_byte) |= (~(BYTE_MAX << m)) << (BYTESIZE - nxt_bit - m);
+		last_byte += ((nxt_bit + m) / BYTESIZE);
+		nxt_bit = ((nxt_bit + m) % BYTESIZE);
 		nleft -= m;
-		m = nleft/BYTESIZE;
+		m = nleft / BYTESIZE;
 		memset(last_byte, 0xFF, m);
 		last_byte += m;
-		nleft -= (m*BYTESIZE);
-		*(last_byte) |= ~(BYTE_MAX>>nleft);
+		nleft -= (m * BYTESIZE);
+		*(last_byte) |= ~(BYTE_MAX >> nleft);
 		bv->len += nbits;
 		//bv->count1 += nbits;
 	}
@@ -396,23 +396,23 @@ void bitvec_cat (bitvec *bv, const bitvec *src)
 
 void bitvec_to_string (const bitvec *bv, strbuf *dest, size_t bytes_per_line)
 {
-	int line_label_width = (bv->len>1)?ceil(log10(bv->len)):1;
+	int line_label_width = (bv->len > 1) ? ceil(log10(bv->len)) : 1;
 	char *lbl = cstr_new(line_label_width);
 	size_t bits_per_line = bytes_per_line * BYTESIZE;
-	for (size_t i=0; i<bv->len; i++ )  {
+	for (size_t i = 0; i < bv->len; i++ )  {
 		if ( i % bits_per_line == 0) {
 			if (i) strbuf_append_char(dest, '\n');
 			strbuf_append_char(dest, '[');
 			sprintf(lbl, "%*zu", line_label_width, i);
 			strbuf_nappend(dest, lbl, strlen(lbl));
 			strbuf_append_char(dest, ':');
-			sprintf(lbl, "%*zu", line_label_width, MAX(bv->len, i+bits_per_line));
+			sprintf(lbl, "%*zu", line_label_width, MAX(bv->len, i + bits_per_line));
 			strbuf_nappend(dest, lbl, strlen(lbl));
 			strbuf_append_char(dest, ']');
 		}
 		if ( i % BYTESIZE == 0 )
 			strbuf_append_char(dest, ' ');
-		strbuf_append_char(dest, bitvec_get_bit(bv,i) ? '1' : '0' );
+		strbuf_append_char(dest, bitvec_get_bit(bv, i) ? '1' : '0' );
 	}
 }
 
