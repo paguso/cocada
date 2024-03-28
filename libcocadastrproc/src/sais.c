@@ -81,7 +81,7 @@ static void get_bkt_end( size_t *bkts, size_t *dest, size_t l)
 
 
 static void init_LS( void *str, size_t len, alphabet *ab,
-                     bitvec *lsvec, bitvec *lmsvec, size_t *bkts,
+                     BitVec *lsvec, BitVec *lmsvec, size_t *bkts,
                      bool add_sentinel, char_at_fn char_at)
 {
 	size_t last = 0;
@@ -115,7 +115,7 @@ static void init_LS( void *str, size_t len, alphabet *ab,
 
 
 static void induce_L( void *str, alphabet *ab,
-                      size_t *sarr, bitvec *ls,
+                      size_t *sarr, BitVec *ls,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
@@ -133,7 +133,7 @@ static void induce_L( void *str, alphabet *ab,
 
 
 static void induce_S( void *str, alphabet *ab,
-                      size_t *sarr, bitvec *ls,
+                      size_t *sarr, BitVec *ls,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
@@ -151,7 +151,7 @@ static void induce_S( void *str, alphabet *ab,
 
 
 static void sort_LMS( void *str, alphabet *ab,
-                      size_t *sarr, bitvec *ls, bitvec *lms,
+                      size_t *sarr, BitVec *ls, BitVec *lms,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
@@ -310,8 +310,8 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 {
 	size_t ab_sz = ab_size(ab);
 
-	bitvec *ls   = bitvec_new_with_capacity(len + add_sentinel);
-	bitvec *lms  = bitvec_new_with_capacity(len + add_sentinel);
+	BitVec *ls   = bitvec_new_with_capacity(len + add_sentinel);
+	BitVec *lms  = bitvec_new_with_capacity(len + add_sentinel);
 	size_t *bkts = ARR_OF_0_NEW(size_t, ab_sz + add_sentinel);
 
 	init_LS(str, len, ab, ls, lms, bkts, add_sentinel, char_at);

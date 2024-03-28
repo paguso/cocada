@@ -69,6 +69,7 @@ size_t avlmap_size(const AVLMap *self);
 /**
  * @brief Checks whether the map contains the given @p key.
  */
+
 bool avlmap_contains(const AVLMap *self, const void *key);
 
 
@@ -129,7 +130,6 @@ void avlmap_remv(AVLMap *self, void *key, void *dest_key,
 XX_CORETYPES(AVLMAP_DECL)
 
 
-
 /**
  * @brief Entry type to be used for iteration.
  */
@@ -137,7 +137,11 @@ typedef struct  {
 	const void *key;
 	const void *val;
 } AVLMapEntry;
+
+
 typedef struct _AVLMapIter AVLMapIter;
+
+
 /**
  * @brief Returns an avlmap_entry (key-val pair) iterator.
  * @param self The source map.

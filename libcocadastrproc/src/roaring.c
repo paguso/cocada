@@ -187,7 +187,7 @@ static size_t arrctnr_select(ctnr_t *ctnr, bool bit, size_t rank)
 void convert_arr_to_bitvec_ctnr(ctnr_t *ctnr)
 {
 	vec *v = ctnr->data;
-	bitvec *b = bitvec_new_with_len(BITVEC_SIZE);
+	BitVec *b = bitvec_new_with_len(BITVEC_SIZE);
 	for (size_t i = 0, l = vec_len(v); i < l; i++) {
 		bitvec_set_bit(b, vec_get_uint16_t(v, i), 1);
 	}
@@ -200,7 +200,7 @@ void convert_arr_to_bitvec_ctnr(ctnr_t *ctnr)
 void convert_bitvec_to_arr_ctnr(ctnr_t *ctnr)
 {
 	vec *v = vec_new_with_capacity(sizeof(uint16_t), ctnr->card);
-	bitvec *b = ctnr->data;
+	BitVec *b = ctnr->data;
 	for (size_t i = 0; i < BITVEC_SIZE; i++) {
 		if (bitvec_get_bit(b, i)) {
 			vec_push_uint16_t(v, i);
@@ -221,7 +221,7 @@ void bitvecctnr_init(ctnr_t *ctnr)
 
 bool bitvecctnr_get(ctnr_t *ctnr, size_t index)
 {
-	return bitvec_get_bit((const bitvec *)ctnr->data, index);
+	return bitvec_get_bit((const BitVec *)ctnr->data, index);
 }
 
 

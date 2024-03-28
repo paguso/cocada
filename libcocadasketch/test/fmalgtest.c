@@ -33,7 +33,7 @@
 void test_fmalg(CuTest *tc)
 {
 	uint64_t maxval = (uint64_t)1 << 32;
-	bitvec *ticks = bitvec_new_with_capacity(maxval);
+	BitVec *ticks = bitvec_new_with_capacity(maxval);
 	fmalg *fm  = fmalg_init(maxval, 5, 7);
 	uint64_t val = 0, true_count = 0;
 	double error;

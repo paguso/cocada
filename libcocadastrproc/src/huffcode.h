@@ -123,59 +123,59 @@ void huffcode_print(FILE *stream, const huffcode *hcode);
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-bitvec *huffcode_encode(const char *src, size_t len, const huffcode *code);
+BitVec *huffcode_encode(const char *src, size_t len, const huffcode *code);
 
 
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
-void huffcode_encode_to(bitvec *dest, const char *src, size_t len,
+void huffcode_encode_to(BitVec *dest, const char *src, size_t len,
                         const huffcode *hcode);
 
 
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-bitvec *huffcode_encode_xstr(const xstr *src, const huffcode *code);
+BitVec *huffcode_encode_xstr(const xstr *src, const huffcode *code);
 
 
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
-void huffcode_encode_xstr_to(bitvec *dest, const xstr *src,
+void huffcode_encode_xstr_to(BitVec *dest, const xstr *src,
                              const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream into a binary code.
  */
-bitvec *huffcode_encode_strread(strread *src, const huffcode *hcode);
+BitVec *huffcode_encode_strread(strread *src, const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_strread_to(bitvec *dest, strread *src,
+void huffcode_encode_strread_to(BitVec *dest, strread *src,
                                 const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream into a binary code.
  */
-bitvec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode);
+BitVec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src,
+void huffcode_encode_xstrread_to(BitVec *dest, xstrread *src,
                                  const huffcode *hcode);
 
 
 /**
  * @brief Decodes a binary code to a string.
  */
-xstr *huffcode_decode(const bitvec *code, const huffcode *hcode);
+xstr *huffcode_decode(const BitVec *code, const huffcode *hcode);
 
 
 /**
@@ -183,7 +183,7 @@ xstr *huffcode_decode(const bitvec *code, const huffcode *hcode);
  * @param char_rank The rank of the char w.r.t. the code alphabet
  * @warn  Do NOT destroy of modify the returned bitvector.
  */
-const bitvec *huffcode_charcode(const huffcode *hcode, size_t char_rank);
+const BitVec *huffcode_charcode(const huffcode *hcode, size_t char_rank);
 
 
 /**

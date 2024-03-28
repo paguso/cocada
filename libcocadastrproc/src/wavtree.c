@@ -56,23 +56,23 @@
 static const byte_t LEFT  = 0x0;
 static const byte_t RIGHT = 0x1;
 
-static const bitvec *NULL_CODE = NULL;
+static const BitVec *NULL_CODE = NULL;
 
 typedef struct {
-	const bitvec *code;
+	const BitVec *code;
 	size_t pos;
 } charcode_iter;
 
 
-static const bitvec *get_charcode(vec *code_tbl, xchar_t chr)
+static const BitVec *get_charcode(vec *code_tbl, xchar_t chr)
 {
 	if (chr < vec_len(code_tbl))
-		return *((bitvec **)vec_get(code_tbl, chr));
+		return *((BitVec **)vec_get(code_tbl, chr));
 	return NULL_CODE;
 }
 
 
-static void set_charcode(vec *code_tbl, xchar_t chr, bitvec *code)
+static void set_charcode(vec *code_tbl, xchar_t chr, BitVec *code)
 {
 	for (size_t i = vec_len(code_tbl); i <= (size_t)chr; i++)
 		vec_push(code_tbl, &NULL_CODE);
@@ -87,7 +87,7 @@ bool charcode_iter_next(charcode_iter *it)
 }
 
 
-void chrcode_incr(bitvec *code)
+void chrcode_incr(BitVec *code)
 {
 	byte_t bit, carry = 0x1;
 	for (size_t i = 0, l = bitvec_len(code); carry && (i < l); i++) {
@@ -111,7 +111,7 @@ typedef struct _tmp_wtnode {
 	size_t               offset;
 	size_t               height;
 	byte_t               nxt_chd;
-	bitvec           *bv;
+	BitVec           *bv;
 	struct _tmp_wtnode  *chd[2];
 	xchar_t              chr[2];
 }
@@ -122,12 +122,12 @@ typedef struct _tmp_wavtree {
 	size_t          nnodes;
 	size_t          len;
 	size_t          nchars;
-	bitvec      *nxt_charcode;
+	BitVec      *nxt_charcode;
 	alphabet       *ab;
 	bool            own_alphabet;
 	vec       *chrcodes;
 	huffcode       *hcode;
-	bitvec      *raw_bits;
+	BitVec      *raw_bits;
 	tmp_wtnode     *tmp_root;
 }
 tmp_wavtree;
@@ -164,7 +164,7 @@ static tmp_wavtree *tmp_wavtree_new(const alphabet *ab, bool own_alphabet)
 	tmp_wavtree *twt = NEW(tmp_wavtree);
 	twt->ab       = (alphabet *)ab;
 	twt->own_alphabet = own_alphabet;
-	twt->chrcodes = vec_new(sizeof(bitvec *));
+	twt->chrcodes = vec_new(sizeof(BitVec *));
 	twt->nxt_charcode = bitvec_new();
 	bitvec_push(twt->nxt_charcode, 0x0);
 	twt->nnodes   = 0;
@@ -271,7 +271,7 @@ static void tmp_wt_free(tmp_wavtree *twt)
 }
 
 
-static void tmp_wt_app_char(tmp_wtnode *root, const bitvec *chcode)
+static void tmp_wt_app_char(tmp_wtnode *root, const BitVec *chcode)
 {
 	charcode_iter codeit = {.code = chcode, .pos = 0 };
 	byte_t bit;
@@ -283,7 +283,7 @@ static void tmp_wt_app_char(tmp_wtnode *root, const bitvec *chcode)
 }
 
 
-static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, bitvec *chcode)
+static void tmp_wt_app_new_char(tmp_wtnode *root, xchar_t c, BitVec *chcode)
 {
 	tmp_wtnode *node = root, *parent = NULL;
 	while (true) {
@@ -327,7 +327,7 @@ static void tmp_wt_fill_online( tmp_wavtree *twt, strread *src )
 	strbuf *ab_chars = strbuf_new();
 	strread_reset(src);
 	for (int c; (c = strread_getc(src)) != EOF;) {
-		bitvec *chcode = (bitvec *) get_charcode(twt->chrcodes, c);
+		BitVec *chcode = (BitVec *) get_charcode(twt->chrcodes, c);
 		if (chcode != NULL_CODE) {
 			tmp_wt_app_char(twt->tmp_root, chcode);
 		}
@@ -360,7 +360,7 @@ static size_t tmp_wt_init_height(tmp_wtnode *root)
 
 
 static void _tmp_wavtree_init_veb_layout( tmp_wtnode *node, size_t heig,
-        size_t *vebindex, size_t *offset, bitvec *raw_bits )
+        size_t *vebindex, size_t *offset, BitVec *raw_bits )
 {
 	if (heig == 1) {
 		node->index = (*vebindex)++;
@@ -781,7 +781,7 @@ void wavtree_print(wavtree *wt)
 		printf ("  char codes:\n");
 		strbuf *codestr = strbuf_new_with_capacity(2);
 		for (xchar_t c = 0; c <= UCHAR_MAX; c++) {
-			const bitvec *code = get_charcode(wt->chrcodes, c);
+			const BitVec *code = get_charcode(wt->chrcodes, c);
 			if (code != NULL_CODE) {
 				strbuf_clear(codestr);
 				bitvec_to_string(code, codestr, 4);

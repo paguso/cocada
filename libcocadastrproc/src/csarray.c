@@ -90,7 +90,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 
 	size_t lvl_len = len + 1; // sentinel added by sais
 	csa->lvl_len[0] = lvl_len;
-	bitvec *xchar_stops = bitvec_new_with_capacity(lvl_len);
+	BitVec *xchar_stops = bitvec_new_with_capacity(lvl_len);
 	bitvec_push_n(xchar_stops, lvl_len, 0);
 	strbuf *supp_ab_str = strbuf_new(); // string support alphabet chars
 	size_t ndiff_xchars = 1;            // has at least the SENTINEL
@@ -149,7 +149,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 		// build even-suffix indicator bitvector
 		// push even entries to first half of sarr rescaling its value
 		// if not last level
-		bitvec *even_suff = bitvec_new_with_capacity(lvl_len);
+		BitVec *even_suff = bitvec_new_with_capacity(lvl_len);
 		if (lvl == csa->nlevels - 1) {
 			for (size_t i = 0 ; i < lvl_len; i++)
 				bitvec_push(even_suff, IS_EVEN(sarr[i]));

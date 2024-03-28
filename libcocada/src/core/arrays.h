@@ -32,112 +32,8 @@
  * @author Paulo Fonseca
  *
  * @brief Array utility macros and functions.
- *
- * # Size-annotated arrays
- *
- * Some functions defined here deal with *size-annotated arrays* (`sa_arr`).
- * A size-annotated array is an array with a prepended `size_t` value
- * indicating its useful capacity in bytes. This can be used for
- * bounds-checking in some situations without the need for providing this
- * information explicitly. Notice that the term "size" here refers to the
- * "physical" size of the useful part of array, not its "logical".
- *
- * The physical layout of such an array can be depicted as
- *
- *
- * ```
- *
- *                       |<---------------------- S Bytes ---------------------->|
- *
- *	+--------------------+-------------------------------------------------------+
- *  |     S (size_t)     |                 Useful array area                     |
- *  +--------------------+-------------------------------------------------------+
- *                        ^
- *                        |
- * 	        The handler is a pointer to this location
- *
- *
- * ```
- *
- * When creating such an array of size `S`, one should allocate memory for the whole
- * object at once, that is `S + sizeof(size_t)` bytes. This is necessary to ensure
- * that the size comes immediately before the useful area of the array in memory.
- * However the handler used to manipulate the array, that is to access, read and write
- * elements is actually a pointer to the start of the useful area.
- *
  */
 
-
-/**
- * @brief Allocates an array of @p nmemb elements, each of @p memb_size
- * bytes, **with prepended size information** (sa_arr).
- *
- * This function allocates an array of `S = nmemb * nmemb_size` bytes **plus**
- * the size of a size_t value **immediately before** the useful area
- * of the array. The size `S` is stored at this location as a size_t value,
- * the useful area is initialised with 0's, and a pointer to the start
- * location of the useful area of the array  is returned, as illustrated in
- * the diagram below. This makes the array size readily available via
- * the ::sa_arr_sizeof function, without having to store this information separately.
- *
- * ```
- *
- *                       |<---------- S = (nmemb * nmemb_size) Bytes ----------->|
- *
- *	+--------------------+-------------------------------------------------------+
- *  |     S (size_t)     |                 Useful array area                     |
- *  +--------------------+-------------------------------------------------------+
- *                        ^
- *                        |
- * 	        returns a pointer to this location
- *
- *
- * ```
- *
- * @warning Although it can be seamlessly accessed through the  returned pointer,
- * this array should be only reallocated or freed via the companion functions
- * ::sa_arr_realloc and ::sa_arr_free.
- *
- * @see sa_arr_realloc
- * @see sa_arr_free
- * @see sa_arr_sizeof
- */
-void *sa_arr_calloc(size_t nmemb, size_t memb_size);
-
-
-/**
- * @brief Reallocs an array with prepended size information.
- * @see sa_arr_calloc
- * @see sa_arr_free
- * @see sa_arr_sizeof
- */
-void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size);
-
-
-/**
- * @brief Returns the useful capacity, in bytes, of an array
- * with prepended size info.
- * @see sa_arr_calloc
- * @see sa_arr_free
- * @see sa_arr_sizeof
- */
-size_t sa_arr_sizeof(void *arr);
-
-
-/**
- * @brief Deallocates an array with prepended size info.
- * This will release all allocated memory consisting of the
- * useful area and the prepended capacity.
- */
-void sa_arr_free(void *arr);
-
-
-#define SA_ARR_DECL(TYPE, ...)\
-	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb);\
-	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb);\
-	size_t sa_arr_##TYPE##_len(TYPE *arr);
-
-XX_CORETYPES(SA_ARR_DECL)
 
 /**
  * @brief Allocates a new array of N elements of a given TYPE.
@@ -233,21 +129,21 @@ XX_CORETYPES(SA_ARR_DECL)
 
 /**
  * @brief Expands into a type name for an array with elements of a
- * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
- * A TYPE_array encapsulates an ordinary C array of TYPE and its
+ * given TYPE called TYPEArray (for example int_array, size_t_array, etc).
+ * A TYPEArray encapsulates an ordinary C array of TYPE and its
  * length in a struct. This is convenient because we can pass and
  * receive the array and its length to and from functions as a single
  * argument. Differently from vectors and other generic arrays, the type
  * of the elements makes its use more convenient, without the need for
  * casts and other type conversions.
  *
- * Prior to being used, a TYPE_array must be declared with the macro
+ * Prior to being used, a TYPEArray must be declared with the macro
  * ::DECL_ARRAY. By importing this file you get the declaration of
- * TYPE_array for all the core types defined in coretype.h.
+ * TYPEArray for all the core types defined in coretype.h.
  *
- * A TYPE_array object is primarily meant to be created on the stack,
+ * A TYPEArray object is primarily meant to be created on the stack,
  * although the encapsulated array will typically be allocated on
- * the heap. Thus we can pass and receive a TYPE_array by value.
+ * the heap. Thus we can pass and receive a TYPEArray by value.
  *
  * Example:
  * ```
@@ -267,13 +163,13 @@ XX_CORETYPES(SA_ARR_DECL)
  * }
  * ```
  */
-#define ARRAY(TYPE) TYPE##_array
+#define ARRAY(TYPE) TYPE##Array
 
 /**
  * @brief Declares a type name for an array with elements of a
- * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
+ * given TYPE called TYPEArray (for example int_array, size_t_array, etc).
  * By importing this file you get the declaration of
- * TYPE_array for all the core types defined in coretype.h.
+ * TYPEArray for all the core types defined in coretype.h.
  * @see ARRAY
  */
 #define DECL_ARRAY(TYPE, ...)\
@@ -285,7 +181,7 @@ XX_CORETYPES(SA_ARR_DECL)
 XX_CORETYPES(DECL_ARRAY)
 
 /**
- * @brief Creates a new TYPE_array object with a given length
+ * @brief Creates a new TYPEArray object with a given length
  * on the stack.
  * The encapsulated array is allocated on the heap and is left
  * uninitialized.
@@ -296,7 +192,7 @@ XX_CORETYPES(DECL_ARRAY)
 
 /**
  * @brief Encapsulates an existing array of a given TYPE with a given length
- * in a TYPE_array object on the stack.
+ * in a TYPEArray object on the stack.
  *
  * Example
  * ```
@@ -307,7 +203,7 @@ XX_CORETYPES(DECL_ARRAY)
 #define ARRAY_NEW_FROM_ARR(TYPE, LEN, SRC) ((ARRAY(TYPE)){.len=(LEN), .arr=((TYPE*)(SRC))})
 
 /**
- * @brief Frees the encapsulated array of a TYPE_array object.
+ * @brief Frees the encapsulated array of a TYPEArray object.
  * @warning This is a shallow free. It does not free the contents of the
  * encapsulated array if it contains pointers to other objects. For
  * the proper disposal of structured object collections, use vectors
@@ -316,3 +212,4 @@ XX_CORETYPES(DECL_ARRAY)
 #define ARRAY_FREE(A) free((A).arr)
 
 #endif
+

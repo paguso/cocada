@@ -22,13 +22,9 @@
 #ifndef BITARR_H
 #define BITARR_H
 
-#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 
-#include "bitbyte.h"
 #include "strbuf.h"
 
 /**

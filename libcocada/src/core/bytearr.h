@@ -22,11 +22,9 @@
 #ifndef BYTEARRAY_H
 #define BYTEARRAY_H
 
-#include <limits.h>
 #include <stdlib.h>
-#include <stdint.h>
 
-#include "bitbyte.h"
+#include "coretype.h"
 
 /**
  * @file   bytearr.h

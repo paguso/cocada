@@ -83,7 +83,7 @@ alphabet *alphabet_new(size_t size, const char *letters)
 	for (size_t i = 0; i < UCHAR_RANGE; i++) {
 		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
 	}
-	ret->letters = cstr_crop_len(ret->letters, ret->size);
+	ret->letters = cstr_resize(ret->letters, ret->size);
 	return ret;
 }
 
@@ -121,7 +121,7 @@ alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 	for (size_t i = 0; i < UCHAR_RANGE; i++) {
 		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
 	}
-	ret->letters = cstr_crop_len(ret->letters, ret->size);
+	ret->letters = cstr_resize(ret->letters, ret->size);
 	return ret;
 }
 

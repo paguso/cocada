@@ -202,7 +202,7 @@ typedef void               *rawptr;
 #endif
 
 #ifndef cstr
-typedef char               *cstr;
+typedef char *cstr;
 #endif
 
 

@@ -22,12 +22,11 @@
 #ifndef CSTRUTIL_H
 #define CSTRUTIL_H
 
-#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "new.h"
+#include "coretype.h"
 
 /**
  * @file cstrutil.h
@@ -102,22 +101,17 @@ char *cstr_substr(char *str, size_t from,  size_t to);
  */
 char *cstr_ncpy(char *dest, char *src, size_t n);
 
+
 /**
  * @brief 'Crops' the string @p str to @p str[@p from: @p to].
  *        The cropped char array will end with a '\0'.
  *        The memory used by the parts of the string out of this interval
- *        will be freed. As part of the operation, the remaining 'cropped'
- *        portion may be relocated.
- * @return The address of the trimmed string.
+ *        will be freed.
+ * @warning The remaining 'cropped' string will not be relocated and may
+ * contain trailing unused space.
+ * To free unused space, see ::cstr_fit
  */
-char *cstr_crop(char *str, size_t from, size_t to);
-
-
-
-/**
- * @brief Same as cstr_crop(@p str, 0, @p len)
- */
-char *cstr_crop_len(char *str, size_t len);
+void cstr_crop(char *str, size_t from, size_t to);
 
 
 /**
@@ -130,6 +124,9 @@ char *cstr_crop_len(char *str, size_t len);
  * cstr_trim(s, strlen(s), " -!<>", 5);
  * printf("%s", s); // prints "some nice comment" (w/o the quotes)
  * ```
+ * @warning The remaining 'trimmed' string will not be relocated and may
+ * contain trailing unused space.
+ * To free unused space, see ::cstr_fit
  */
 void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
 
@@ -143,6 +140,13 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
  * @warning The string may be relocated.
  */
 char *cstr_resize(char *str, size_t len);
+
+
+/**
+ * @brief Adjusts the memory allocated to a string to its exact length;
+ * Same as cstr_resize(str, strlen(str));
+ */
+char *cstr_fit(char *str);
 
 
 /**

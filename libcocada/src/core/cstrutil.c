@@ -102,17 +102,10 @@ char *cstr_ncpy(char *dest, char *src, size_t n)
 }
 
 
-char *cstr_crop(char *str, size_t from,  size_t to)
+void cstr_crop(char *str, size_t from,  size_t to)
 {
 	str = memmove(str, str + from, to - from);
-	str = realloc(str, to - from + 1);
 	str[to - from] = '\0';
-	return str;
-}
-
-char *cstr_crop_len(char *str, size_t len)
-{
-	return cstr_crop(str, 0, len);
 }
 
 
@@ -136,8 +129,6 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
 }
 
 
-
-
 char *cstr_resize(char *str, size_t len)
 {
 	size_t l = strlen(str);
@@ -149,6 +140,11 @@ char *cstr_resize(char *str, size_t len)
 	return str;
 }
 
+
+char *cstr_fit(char *str)
+{
+	return cstr_resize(str, strlen(str));
+}
 
 
 char *cstr_cut(char *str, size_t from, size_t to)

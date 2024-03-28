@@ -41,7 +41,7 @@ void bitvec_test_new_with_len(CuTest *tc)
 {
 	memdbg_reset();
 	for (size_t len = 0; len < ba_size; len++) {
-		bitvec *bv = bitvec_new_with_len(len);
+		BitVec *bv = bitvec_new_with_len(len);
 		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
 		for (int i = 0; i < len ; i++) {
 			CuAssert(tc, "Wrong bit", 0 == bitvec_get_bit(bv, i));
@@ -56,7 +56,7 @@ void bitvec_test_get_set(CuTest *tc)
 {
 	memdbg_reset();
 	for (size_t len = 0; len < ba_size; len++) {
-		bitvec *bv = bitvec_new_with_len(len);
+		BitVec *bv = bitvec_new_with_len(len);
 		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
 		for (int i = 0; i < len ; i++) {
 			bool bit = rand() % 2;
@@ -72,7 +72,7 @@ void bitvec_test_get_set(CuTest *tc)
 void bitvec_test_push(CuTest *tc)
 {
 	memdbg_reset();
-	bitvec *bv = bitvec_new_with_capacity(ba_size);
+	BitVec *bv = bitvec_new_with_capacity(ba_size);
 	byte_t *array;
 	array = ARR_NEW(byte_t, ba_size);
 	bool bit;
@@ -93,7 +93,7 @@ void bitvec_test_push(CuTest *tc)
 void bitvec_test_push_n(CuTest *tc)
 {
 	memdbg_reset();
-	bitvec *bv = bitvec_new_with_capacity(0);
+	BitVec *bv = bitvec_new_with_capacity(0);
 	byte_t *array;
 	array = ARR_NEW(byte_t, ba_size);
 	bool bit = false;
@@ -121,7 +121,7 @@ void bitvec_test_push_n(CuTest *tc)
 void bitvec_test_count(CuTest *tc)
 {
 	memdbg_reset();
-	bitvec *bv = bitvec_new_with_capacity(0);
+	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
 	byte_t *ba = bitarr_new(ba_size);
 	size_t count1 = 0;
@@ -160,7 +160,7 @@ void bitvec_test_select(CuTest *tc)
 			for (int i = 0; i < 6; i++) {
 				byte_t *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
-				bitvec *bv = bitvec_new_from_bitarr(ba, len);
+				BitVec *bv = bitvec_new_from_bitarr(ba, len);
 				size_t bitcount = bitvec_count(bv, bit);
 				size_t rank = 0;
 				size_t pos = 0;
@@ -190,7 +190,7 @@ void bitvec_test_select(CuTest *tc)
 void bitvec_test_format(CuTest *tc)
 {
 	memdbg_reset();
-	bitvec *bv = bitvec_new_with_capacity(0);
+	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
 	for (size_t i = 0; i < ba_size; i++) {
 		bit = ((byte_t)rand() % 2);

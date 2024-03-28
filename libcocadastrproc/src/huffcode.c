@@ -55,7 +55,7 @@ struct _huffcode {
 	alphabet *ab;
 	size_t size;
 	hufftnode *tree;
-	bitvec **code;
+	BitVec **code;
 };
 
 typedef struct {
@@ -126,7 +126,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 	}
 	// assert(next==(2*hcode->size-1));
 
-	hcode->code = ARR_NEW(bitvec *, hcode->size);
+	hcode->code = ARR_NEW(BitVec *, hcode->size);
 	if (hcode->size) {
 		byte_t *chrcode = bitarr_new(hcode->size);
 		fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
@@ -245,14 +245,14 @@ void huffcode_print(FILE *stream, const huffcode *hcode)
 	fprintf(stream, "} // end of huffcode@%p\n", (void *)hcode);
 }
 
-bitvec *huffcode_encode(const char *src, size_t len, const huffcode *hcode)
+BitVec *huffcode_encode(const char *src, size_t len, const huffcode *hcode)
 {
-	bitvec *enc = bitvec_new();
+	BitVec *enc = bitvec_new();
 	huffcode_encode_to(enc, src, len, hcode);
 	return enc;
 }
 
-void huffcode_encode_to(bitvec *dest, const char *src, size_t len,
+void huffcode_encode_to(BitVec *dest, const char *src, size_t len,
                         const huffcode *hcode)
 {
 	for (int i = 0; i < len; i++) {
@@ -260,14 +260,14 @@ void huffcode_encode_to(bitvec *dest, const char *src, size_t len,
 	}
 }
 
-bitvec *huffcode_encode_xstr(const xstr *src, const huffcode *hcode)
+BitVec *huffcode_encode_xstr(const xstr *src, const huffcode *hcode)
 {
-	bitvec *enc = bitvec_new();
+	BitVec *enc = bitvec_new();
 	huffcode_encode_xstr_to(enc, src, hcode);
 	return enc;
 }
 
-void huffcode_encode_xstr_to(bitvec *dest, const xstr *src,
+void huffcode_encode_xstr_to(BitVec *dest, const xstr *src,
                              const huffcode *hcode)
 {
 	FOREACH_IN_XSTR(c, src) {
@@ -275,14 +275,14 @@ void huffcode_encode_xstr_to(bitvec *dest, const xstr *src,
 	}
 }
 
-bitvec *huffcode_encode_strread(strread *src, const huffcode *hcode)
+BitVec *huffcode_encode_strread(strread *src, const huffcode *hcode)
 {
-	bitvec *enc = bitvec_new();
+	BitVec *enc = bitvec_new();
 	huffcode_encode_strread_to(enc, src, hcode);
 	return enc;
 }
 
-void huffcode_encode_strread_to(bitvec *dest, strread *src,
+void huffcode_encode_strread_to(BitVec *dest, strread *src,
                                 const huffcode *hcode)
 {
 	for (int c; (c = strread_getc(src)) != EOF;) {
@@ -290,14 +290,14 @@ void huffcode_encode_strread_to(bitvec *dest, strread *src,
 	}
 }
 
-bitvec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode)
+BitVec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode)
 {
-	bitvec *enc = bitvec_new();
+	BitVec *enc = bitvec_new();
 	huffcode_encode_xstrread_to(enc, src, hcode);
 	return enc;
 }
 
-void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src,
+void huffcode_encode_xstrread_to(BitVec *dest, xstrread *src,
                                  const huffcode *hcode)
 {
 	for (xchar_wt c; (c = xstrread_getc(src)) != XEOF;) {
@@ -305,7 +305,7 @@ void huffcode_encode_xstrread_to(bitvec *dest, xstrread *src,
 	}
 }
 
-xstr *huffcode_decode(const bitvec *bcode, const huffcode *hcode)
+xstr *huffcode_decode(const BitVec *bcode, const huffcode *hcode)
 {
 	xstr *dec = xstr_new(nbytes(ab_size(hcode->ab)));
 	hufftnode *cur = (hufftnode *)huffcode_tree(hcode);
@@ -319,7 +319,7 @@ xstr *huffcode_decode(const bitvec *bcode, const huffcode *hcode)
 	return dec;
 }
 
-const bitvec *huffcode_charcode(const huffcode *hcode, size_t char_rank)
+const BitVec *huffcode_charcode(const huffcode *hcode, size_t char_rank)
 {
 	return hcode->code[char_rank];
 }
