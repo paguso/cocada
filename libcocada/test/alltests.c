@@ -20,7 +20,6 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "CuTest.h"
 
@@ -63,7 +62,7 @@ void run_all_tests(void)
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
 	//CuSuiteAddSuite(suite, arrays_get_test_suite());
-	//CuSuiteAddSuite(suite, avl_get_test_suite());
+	CuSuiteAddSuite(suite, avl_get_test_suite());
 	//CuSuiteAddSuite(suite, avlmap_get_test_suite());
 	//CuSuiteAddSuite(suite, binheap_get_test_suite());
 	//CuSuiteAddSuite(suite, bitarray_get_test_suite());

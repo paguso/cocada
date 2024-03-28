@@ -25,7 +25,6 @@
 #include <stdio.h>
 
 #include "coretype.h"
-#include "write.h"
 #include "iter.h"
 #include "new.h"
 #include "order.h"
@@ -91,7 +90,7 @@
  *
  * ```
  *
- * Also, in case the user wants to treat external references as owned,
+ * Also, in case one wants to treat external references as owned,
  * they should care to provide the appropriate destructor when
  * freeing the tree,
  * for instance

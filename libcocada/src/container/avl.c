@@ -26,7 +26,6 @@
 #include "avl.h"
 #include "coretype.h"
 #include "errlog.h"
-#include "memdbg.h"
 #include "new.h"
 #include "stack.h"
 #include "order.h"
@@ -36,23 +35,17 @@
 #define RIGHT 1
 
 
-
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
-
-typedef union {
-	XX_CORETYPES(AVL_FIELD_DECL);
-} core_t;
-
-
 typedef struct _avlnode {
-	//core_t val;
 	int8_t bf; // balance factor
 	struct _avlnode *left;
 	struct _avlnode *right;
 } avlnode;
 
+// store node data right after the avlnode header
 #define NODE_DATA(N) ((void *)((void *)(N) + sizeof(avlnode)))
+
 
 struct _avl {
 	avlnode *root;
