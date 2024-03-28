@@ -130,7 +130,7 @@ hashset_iter *hashset_get_iter(hashset *set);
 void hashset_iter_finalise(void *ptr, const finaliser *fnr);
 
 
-DECL_TRAIT(hashset_iter, iter);
+DECL_TRAIT(hashset_iter, Iter);
 
 
 #endif

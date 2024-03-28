@@ -131,7 +131,7 @@ typedef struct _vebnode {
 	int64_t min;
 	int64_t max;
 	void *summary;
-	avlmap *clusters;
+	AVLMap *clusters;
 } vebnode;
 
 
@@ -163,8 +163,8 @@ void vebnode_free(void *ptr, uint nbits)
 		vebnode_free(self->summary, nbits / 2);
 	}
 	if (self->clusters) {
-		avlmap_iter *it = avlmap_get_iter(self->clusters, IN_ORDER);
-		FOREACH_IN_ITER(entry, avlmap_entry, avlmap_iter_as_iter(it)) {
+		AVLMapIter *it = avlmap_get_iter(self->clusters, IN_ORDER);
+		FOREACH_IN_ITER(entry, AVLMapEntry, AVLMapIter_as_Iter(it)) {
 			vebnode_free(*((void **)(entry->val)), nbits / 2);
 		}
 		avlmap_iter_free(it);

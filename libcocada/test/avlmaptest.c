@@ -52,7 +52,7 @@ void avlmap_test_ins(CuTest *tc)
 
 	// FLAT MAP
 
-	avlmap *map = avlmap_new(sizeof(testkey_t), sizeof(testval_t), cmp_testkey_t);
+	AVLMap *map = avlmap_new(sizeof(testkey_t), sizeof(testval_t), cmp_testkey_t);
 	size_t n = 100;
 
 	for (int i = 0, step = 10; i < step * n; i += step) {
@@ -108,7 +108,7 @@ void avlmap_test_del(CuTest *tc)
 
 	// FLAT MAP
 
-	avlmap *map = avlmap_new(sizeof(testkey_t), sizeof(testval_t), cmp_testkey_t);
+	AVLMap *map = avlmap_new(sizeof(testkey_t), sizeof(testval_t), cmp_testkey_t);
 	size_t n = 100;
 
 	for (int i = 0, step = 10; i < step * n; i += step) {

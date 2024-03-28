@@ -238,7 +238,7 @@ typedef struct _hashmap_iter hashmap_iter;
 hashmap_iter *hashmap_get_iter(const hashmap *hmap);
 
 
-DECL_TRAIT(hashmap_iter, iter);
+DECL_TRAIT(hashmap_iter, Iter);
 
 
 

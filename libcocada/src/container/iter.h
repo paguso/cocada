@@ -40,7 +40,7 @@
  *
  * ```C
  * citer *cit = // get a concrete iter reference
- * iter *it = citer_as_iter(cit); // AS_TRAIT(cit, citer, iter)
+ * iter *it = citer_as_Iter(cit); // AS_TRAIT(cit, citer, iter)
  * while (iter_has_next(it)) {
  * 		void *elt = iter_next(it);
  * }
@@ -53,23 +53,23 @@
  */
 
 
-typedef struct _iter iter;
+typedef struct _Iter Iter;
 
 
 /**
  * @brief Iterator virtual table
  */
 typedef struct {
-	bool (*has_next) (iter *it);
-	const void *(*next) (iter *it);
-} iter_vt;
+	bool (*has_next) (Iter *it);
+	const void *(*next) (Iter *it);
+} Iter_vt;
 
 
 /**
  * @brief Iterator type
  */
-struct _iter {
-	iter_vt *vt;
+struct _Iter {
+	Iter_vt *vt;
 	void *impltor;
 };
 
@@ -77,7 +77,7 @@ struct _iter {
 /**
  * @brief Does the iterator have any remaining element?
  */
-bool iter_has_next(iter *it);
+bool iter_has_next(Iter *it);
 
 
 /**
@@ -86,7 +86,7 @@ bool iter_has_next(iter *it);
  * element. Otherwise, the behaviour is undefined and may result in a
  * fatal error.
  */
-const void *iter_next(iter *it);
+const void *iter_next(Iter *it);
 
 
 /**
@@ -104,7 +104,7 @@ const void *iter_next(iter *it);
  * vec_push_int(v, 20);
  * vec_push_int(v, 30);
  * vec_iter *it = vec_get_iter(v);
- * FOREACH_IN_ITER(val, int, vec_iter_as_iter(it)) {
+ * FOREACH_IN_ITER(val, int, vec_iter_as_Iter(it)) {
  * 		printf ("Element is %d\n", *val); // notice that val is a pointer
  * }
  * FREE(it); // iterator must be manually disposed of after use
@@ -115,7 +115,7 @@ const void *iter_next(iter *it);
  * @param ITER 		An initialised pointer to an ::iter
  */
 #define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
-	for (iter* __it = (iter *) (ITER); __it ; __it = NULL) \
+	for (Iter *__it = (Iter *) (ITER); __it ; __it = NULL) \
 		for (bool __has = iter_has_next(__it); __has; __has = false ) \
 			for ( ELT_TYPE *ELT_NAME = (ELT_TYPE *) iter_next(__it); \
 			        __has && ( (__has = iter_has_next(__it)) || !__has ); \

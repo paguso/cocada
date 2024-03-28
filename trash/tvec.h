@@ -451,7 +451,7 @@ XX_CORETYPES(TVEC_DECL)
 	\
 	\
 	struct _tvec_##TYPE##_iter {                                                   \
-		iter _t_iter;                                                              \
+		iter _t_Iter;                                                              \
 		tvec_##TYPE *src;                                                          \
 		size_t index;                                                              \
 	};                                                                             \
@@ -478,8 +478,8 @@ XX_CORETYPES(TVEC_DECL)
 	tvec_##TYPE##_iter *tvec_##TYPE##_get_iter(tvec_##TYPE *v)                     \
 	{                                                                              \
 		tvec_##TYPE##_iter *ret = NEW(tvec_##TYPE##_iter);                         \
-		ret->_t_iter.impltor = ret;                                                \
-		ret->_t_iter.vt = &_tvec_##TYPE##_iter_vt;                                 \
+		ret->_t_Iter.impltor = ret;                                                \
+		ret->_t_Iter.vt = &_tvec_##TYPE##_iter_vt;                                 \
 		ret->src = v;                                                              \
 		ret->index = 0;                                                            \
 		return ret;                                                                \

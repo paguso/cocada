@@ -44,12 +44,12 @@
  * @brief Array iterator type
  */
 typedef struct {
-	iter _t_iter;
+	Iter _t_Iter;
 	void *src;
 	size_t typesize;
 	size_t len;
 	size_t index;
-} arr_iter;
+} ArrIter;
 
 
 /**
@@ -58,10 +58,10 @@ typedef struct {
  * @param len the source array length
  * @param typesize the size of the elements stored in the source array in bytes
  */
-arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize);
+ArrIter *arr_get_iter(void *arr, size_t len, size_t typesize);
 
 
-DECL_TRAIT(arr_iter, iter);
+DECL_TRAIT(ArrIter, Iter);
 
 
 #endif

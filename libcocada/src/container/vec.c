@@ -510,37 +510,37 @@ XX_CORETYPES(TYPED_VEC_IMPL)
 
 
 struct _vec_iter {
-	iter _t_iter;
+	Iter _t_Iter;
 	const vec *src;
 	size_t index;
 };
 
 
-static bool _vec_iter_has_next(iter *it)
+static bool _vec_iter_has_next(Iter *it)
 {
 	vec_iter *vit = (vec_iter *)it->impltor;
 	return vit->index < vec_len(vit->src);
 }
 
 
-static const void *_vec_iter_next(iter *it)
+static const void *_vec_iter_next(Iter *it)
 {
 	vec_iter *vit = (vec_iter *)it->impltor;
 	return vec_get(vit->src, vit->index++);
 }
 
 
-static iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
+static Iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
 
 
 vec_iter *vec_get_iter(const vec *v)
 {
 	vec_iter *ret = NEW(vec_iter);
-	ret->_t_iter.impltor = ret;
-	ret->_t_iter.vt = &_vec_iter_vt;
+	ret->_t_Iter.impltor = ret;
+	ret->_t_Iter.vt = &_vec_iter_vt;
 	ret->src = v;
 	ret->index = 0;
 	return ret;
 }
 
-IMPL_TRAIT(vec_iter, iter)
+IMPL_TRAIT(vec_iter, Iter)

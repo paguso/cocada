@@ -47,16 +47,16 @@ typedef struct _avlnode {
 #define NODE_DATA(N) ((void *)((void *)(N) + sizeof(avlnode)))
 
 
-struct _avl {
+struct _AVL {
 	avlnode *root;
 	size_t typesize;
 	cmp_func cmp;
 };
 
 
-avl *avl_new(size_t typesize, cmp_func cmp)
+AVL *avl_new(size_t typesize, cmp_func cmp)
 {
-	avl *ret = NEW(avl);
+	AVL *ret = NEW(AVL);
 	ret->typesize = typesize;
 	ret->cmp = cmp;
 	ret->root = NULL;
@@ -82,7 +82,7 @@ static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 
 void avl_finalise(void *ptr, const finaliser *fnr)
 {
-	avl *self = (avl *)ptr;
+	AVL *self = (AVL *)ptr;
 	if (finaliser_nchd(fnr) > 0) {
 		__avl_finaliser(self->root, finaliser_chd(fnr, 0));
 	}
@@ -92,13 +92,13 @@ void avl_finalise(void *ptr, const finaliser *fnr)
 }
 
 
-bool avl_contains(const avl *self, const void *key)
+bool avl_contains(const AVL *self, const void *key)
 {
 	return avl_get(self, key) != NULL;
 }
 
 
-const void *avl_get(const avl *self, const void *key)
+const void *avl_get(const AVL *self, const void *key)
 {
 	avlnode *cur = self->root;
 	while (cur != NULL) {
@@ -118,7 +118,7 @@ const void *avl_get(const avl *self, const void *key)
 
 
 #define AVL_CONTAINS_IMPL(TYPE,...)\
-	bool avl_contains_##TYPE (const avl *self, TYPE key)\
+	bool avl_contains_##TYPE (const AVL *self, TYPE key)\
 	{\
 		return avl_get(self, &key) != NULL;\
 	}
@@ -157,7 +157,7 @@ typedef struct {
 } indel_result;
 
 
-static indel_result __avl_ins(avl *self, avlnode *root, void *val)
+static indel_result __avl_ins(AVL *self, avlnode *root, void *val)
 {
 	if (root == NULL) {
 		indel_result ret;
@@ -225,7 +225,7 @@ static indel_result __avl_ins(avl *self, avlnode *root, void *val)
 }
 
 
-bool avl_ins(avl *self, void *val)
+bool avl_ins(AVL *self, void *val)
 {
 	indel_result ret = __avl_ins(self, self->root, val);
 	self->root = ret.new_root;
@@ -234,7 +234,7 @@ bool avl_ins(avl *self, void *val)
 
 
 #define AVL_INS_IMPL(TYPE, ...)\
-	bool avl_ins_##TYPE(avl *self, TYPE val)\
+	bool avl_ins_##TYPE(AVL *self, TYPE val)\
 	{\
 		return avl_ins(self, &val);\
 	}\
@@ -288,7 +288,7 @@ remv_min_result __avl_remv_min(avlnode *root)
 }
 
 
-indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
+indel_result __avl_remv(AVL *self, avlnode *root, void *val, void *dest)
 {
 	if (root == NULL) {
 		indel_result ret = {.ok = false, .height_chgd = 0, .new_root = NULL};
@@ -370,7 +370,7 @@ indel_result __avl_remv(avl *self, avlnode *root, void *val, void *dest)
 }
 
 
-bool avl_remv(avl *self, void *val, void *dest)
+bool avl_remv(AVL *self, void *val, void *dest)
 {
 	indel_result res = __avl_remv(self, self->root, val, dest);
 	self->root = res.new_root;
@@ -378,14 +378,14 @@ bool avl_remv(avl *self, void *val, void *dest)
 }
 
 
-bool avl_del(avl *self, void *key)
+bool avl_del(AVL *self, void *key)
 {
 	return avl_remv(self, key, NULL);
 }
 
 
 #define AVL_DEL_IMPL(TYPE, ...) \
-	bool avl_del_##TYPE(avl *self, TYPE val) \
+	bool avl_del_##TYPE(AVL *self, TYPE val) \
 	{\
 		return avl_del(self, &val);\
 	}
@@ -411,7 +411,7 @@ static void __avl_print(avlnode *root, size_t level, FILE *stream,
 }
 
 
-void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *,
+void avl_print(const AVL *self, FILE *stream, void (*prt_val)(FILE *,
                const void *))
 {
 	__avl_print(self->root, 0, stream, prt_val);
@@ -421,22 +421,22 @@ void avl_print(const avl *self, FILE *stream, void (*prt_val)(FILE *,
 /* Iterator implementation */
 
 
-struct _avl_iter {
-	iter _t_iter;
-	avl *src;
+struct _AVLIter {
+	Iter _t_Iter;
+	AVL *src;
 	stack *node_stack;
 	stack *next_chd_stack;
-	avl_traversal_order order;
+	AVLTraversalOrder order;
 };
 
 
-bool avl_iter_has_next (iter *it)
+bool avl_iter_has_next (Iter *it)
 {
-	return !stack_empty(((avl_iter *)it->impltor)->node_stack);
+	return !stack_empty(((AVLIter *)it->impltor)->node_stack);
 }
 
 
-static void __next(avl *tree, avl_traversal_order order, stack *node_stack,
+static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
                    stack *next_chd_stack)
 {
 	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
@@ -487,24 +487,24 @@ static void __next(avl *tree, avl_traversal_order order, stack *node_stack,
 }
 
 
-const void *avl_iter_next (iter *it)
+const void *avl_iter_next (Iter *it)
 {
 	assert(avl_iter_has_next(it));
-	avl_iter *avlit = (avl_iter *) it->impltor;
+	AVLIter *avlit = (AVLIter *) it->impltor;
 	const void *ret = NODE_DATA((avlnode *) stack_peek_rawptr(avlit->node_stack));
 	__next(avlit->src, avlit->order, avlit->node_stack, avlit->next_chd_stack);
 	return ret;
 }
 
 
-static iter_vt avl_iter_vt = {.has_next = avl_iter_has_next, .next = avl_iter_next };
+static Iter_vt avl_iter_vt = {.has_next = avl_iter_has_next, .next = avl_iter_next };
 
 
-avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
+AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 {
-	avl_iter *ret = NEW(avl_iter);
-	ret->_t_iter.impltor = ret;
-	ret->_t_iter.vt = &avl_iter_vt;
+	AVLIter *ret = NEW(AVLIter);
+	ret->_t_Iter.impltor = ret;
+	ret->_t_Iter.vt = &avl_iter_vt;
 	ret->src = self;
 	ret->order = order;
 	ret->node_stack = stack_new(sizeof(rawptr));
@@ -559,7 +559,7 @@ avl_iter *avl_get_iter(avl *self, avl_traversal_order order)
 }
 
 
-void avl_iter_free(avl_iter *self)
+void avl_iter_free(AVLIter *self)
 {
 	if (!self) return;
 	DESTROY_FLAT(self->node_stack, stack);
@@ -568,4 +568,4 @@ void avl_iter_free(avl_iter *self)
 }
 
 
-IMPL_TRAIT(avl_iter, iter)
+IMPL_TRAIT(AVLIter, Iter)

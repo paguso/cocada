@@ -461,6 +461,6 @@ typedef struct _vec_iter vec_iter;
 vec_iter *vec_get_iter(const vec *self);
 
 
-DECL_TRAIT(vec_iter, iter)
+DECL_TRAIT(vec_iter, Iter)
 
 #endif

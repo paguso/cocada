@@ -117,7 +117,7 @@ void hashmap_finalise(void *ptr, const finaliser *dst)
 		const finaliser *vals_dst = (free_vals) ? finaliser_chd(dst, 1) : NULL;
 		if (free_keys || free_vals) {
 			hashmap_iter *it = hashmap_get_iter(hmap);
-			FOREACH_IN_ITER(keyval, hashmap_entry, hashmap_iter_as_iter(it)) {
+			FOREACH_IN_ITER(keyval, hashmap_entry, hashmap_iter_as_Iter(it)) {
 				if (free_keys) FINALISE(keyval->key, keys_dst);
 				if (free_vals) FINALISE(keyval->val, vals_dst);
 			}
@@ -400,14 +400,14 @@ void hashmap_fit(hashmap *hmap)
 
 
 struct _hashmap_iter {
-	iter _t_iter;
+	Iter _t_Iter;
 	const hashmap *src;
 	size_t index;
 	hashmap_entry entry;
 };
 
 
-static bool _hashmap_iter_has_next(iter *it)
+static bool _hashmap_iter_has_next(Iter *it)
 {
 	hashmap_iter *hmit = (hashmap_iter *)it->impltor;
 	return (hmit->index < hmit->src->cap);
@@ -422,7 +422,7 @@ static void _hashmap_iter_goto_next(hashmap_iter *hmit)
 }
 
 
-static const void *_hashmap_iter_next(iter *it)
+static const void *_hashmap_iter_next(Iter *it)
 {
 	hashmap_iter *hmit = (hashmap_iter *)it->impltor;
 	if (hmit->index >= hmit->src->cap) {
@@ -436,7 +436,7 @@ static const void *_hashmap_iter_next(iter *it)
 }
 
 
-static iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next,
+static Iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next,
                                     .next = _hashmap_iter_next
                                   };
 
@@ -444,8 +444,8 @@ static iter_vt _hashmap_iter_vt = { .has_next = _hashmap_iter_has_next,
 hashmap_iter *hashmap_get_iter(const hashmap *src)
 {
 	hashmap_iter *ret = NEW(hashmap_iter);
-	ret->_t_iter.vt = &_hashmap_iter_vt;
-	ret->_t_iter.impltor = ret;
+	ret->_t_Iter.vt = &_hashmap_iter_vt;
+	ret->_t_Iter.impltor = ret;
 	ret->src = src;
 	ret->index = 0;
 	_hashmap_iter_goto_next(ret);
@@ -453,7 +453,7 @@ hashmap_iter *hashmap_get_iter(const hashmap *src)
 }
 
 
-IMPL_TRAIT(hashmap_iter, iter);
+IMPL_TRAIT(hashmap_iter, Iter);
 
 
 #define HASHMAP_GET_IMPL( TYPE )\

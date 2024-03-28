@@ -125,7 +125,7 @@
 /**
  * Opaque AVL type
  */
-typedef struct _avl avl;
+typedef struct _AVL AVL;
 
 
 /**
@@ -137,7 +137,7 @@ typedef struct _avl avl;
  * external objects, then @p cmp receives pointers to pointers as arguments.
  * See the header file documentation for an example.
  */
-avl *avl_new(size_t typesize, cmp_func cmp);
+AVL *avl_new(size_t typesize, cmp_func cmp);
 
 
 /**
@@ -150,7 +150,7 @@ void avl_finalise(void *ptr, const finaliser *fnr);
 /**
  * @brief Checks whether the @p key is contained in the tree.
  */
-bool avl_contains(const avl *self, const void *key);
+bool avl_contains(const AVL *self, const void *key);
 
 
 /**
@@ -159,7 +159,7 @@ bool avl_contains(const avl *self, const void *key);
  * returns a pointer to the data stored therein.
  * In no such node is found, returns NULL.
  */
-const void *avl_get(const avl *self, const void *key);
+const void *avl_get(const AVL *self, const void *key);
 
 
 /**
@@ -168,7 +168,7 @@ const void *avl_get(const avl *self, const void *key);
  * value (according to the comparison function). Otherwise
  * this operation has no effect.
  */
-bool avl_ins(avl *self, void *val);
+bool avl_ins(AVL *self, void *val);
 
 
 /**
@@ -183,20 +183,20 @@ bool avl_ins(avl *self, void *val);
  * @warning After the operation, the tree has no longer a
  * reference to the removed value.
  */
-bool avl_remv(avl *self, void *key, void *dest);
+bool avl_remv(AVL *self, void *key, void *dest);
 
 
 /**
  * @brief Same as avl_remv(self, key, NULL)
  */
-bool avl_del(avl *self, void *key);
+bool avl_del(AVL *self, void *key);
 
 
 
 #define AVL_DECLARE_ALL(TYPE, ...)\
-	bool avl_contains_##TYPE(const avl *self, TYPE val);\
-	bool avl_ins_##TYPE(avl *self, TYPE val);\
-	bool avl_del_##TYPE(avl *self, TYPE val);
+	bool avl_contains_##TYPE(const AVL *self, TYPE val);\
+	bool avl_ins_##TYPE(AVL *self, TYPE val);\
+	bool avl_del_##TYPE(AVL *self, TYPE val);
 
 
 XX_CORETYPES(AVL_DECLARE_ALL)
@@ -228,7 +228,7 @@ XX_CORETYPES(AVL_DECLARE_ALL)
  * @deprecated Mixing IO with core functionality. Should move to an external formatter.
  */
 
-void avl_print( const avl *self, FILE *stream,
+void avl_print( const AVL *self, FILE *stream,
                 void (*prt_val)(FILE *, const void *));
 
 
@@ -240,30 +240,30 @@ typedef enum {
 	PRE_ORDER  = 0,
 	IN_ORDER   = 1,
 	POST_ORDER = 2,
-} avl_traversal_order;
+} AVLTraversalOrder;
 
 
 /**
  * @brief AVL iterator. Implements the iter trait.
  * @see trait.h iter.h
  */
-typedef struct _avl_iter avl_iter;
+typedef struct _AVLIter AVLIter;
 
 
 /**
  * @brief Returns an iterator for the AVL nodes in the given
  * traversal order.
  */
-avl_iter *avl_get_iter(avl *self, avl_traversal_order order);
+AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order);
 
 
 /**
  * @brief AVL iterator destructor
  */
-void avl_iter_free(avl_iter *self);
+void avl_iter_free(AVLIter *self);
 
 
-DECL_TRAIT(avl_iter, iter);
+DECL_TRAIT(AVLIter, Iter);
 
 
 

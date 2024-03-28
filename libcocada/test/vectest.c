@@ -237,7 +237,7 @@ void test_vec_iter(CuTest *tc)
 	vec *v = vec_new(sizeof(int));
 
 	vec_iter *it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, int, vec_iter_as_iter(it)) {
+	FOREACH_IN_ITER(j, int, vec_iter_as_Iter(it)) {
 		CuFail(tc, "Vector has no element to iterate.");
 	}
 	FREE(it);
@@ -248,7 +248,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	int i = 0;
 	it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, int, vec_iter_as_iter(it)) {
+	FOREACH_IN_ITER(j, int, vec_iter_as_Iter(it)) {
 		//printf("Iterator[%d]==%d\n", i, *j);
 		CuAssertIntEquals(tc, i, *j);
 		i++;
@@ -264,7 +264,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	i = 0;
 	it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, char *, vec_iter_as_iter(it)) {
+	FOREACH_IN_ITER(j, char *, vec_iter_as_Iter(it)) {
 		//printf("Iterator[%d]==%s\n", i, *j);
 		CuAssertStrEquals(tc, strings[i], *j);
 		i++;

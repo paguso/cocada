@@ -39,7 +39,7 @@
 /**
  * @brief AVL-Map type
  */
-typedef struct _avlmap avlmap;
+typedef struct _AVLMap AVLMap;
 
 
 /**
@@ -48,7 +48,7 @@ typedef struct _avlmap avlmap;
  * @param valsize Size of value in bytes
  * @param keycmp key total-order comparator function
 */
-avlmap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp);
+AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp);
 
 
 /**
@@ -63,26 +63,26 @@ void avlmap_finalise(void *ptr, const finaliser *fnr);
 /**
  * @brief Returns the number of represented key-value pairs.
  */
-size_t avlmap_size(const avlmap *self);
+size_t avlmap_size(const AVLMap *self);
 
 
 /**
  * @brief Checks whether the map contains the given @p key.
  */
-bool avlmap_contains(const avlmap *self, const void *key);
+bool avlmap_contains(const AVLMap *self, const void *key);
 
 
 /**
  * @brief  Gets an internal pointer to the value associated to the given @p key, if any.
  * Else returns NULL.
  */
-const void *avlmap_get(const avlmap *self, const void *key);
+const void *avlmap_get(const AVLMap *self, const void *key);
 
 /**
  * @brief Gets an internal non-const pointer to the value associated to
  * the given @p key, if any. Else returns NULL.
  */
-void *avlmap_get_mut(const avlmap *self, const void *key);
+void *avlmap_get_mut(const AVLMap *self, const void *key);
 
 
 /**
@@ -90,7 +90,7 @@ void *avlmap_get_mut(const avlmap *self, const void *key);
  * @warning  the map already contains the given key, the corresponding
  * value gets overwritten and any reference is therefore lost.
  */
-void avlmap_ins(avlmap *self, const void *key, const void *val);
+void avlmap_ins(AVLMap *self, const void *key, const void *val);
 
 
 /**
@@ -100,7 +100,7 @@ void avlmap_ins(avlmap *self, const void *key, const void *val);
  * @warning This operation does not destroy the key or its value.
  * @see avlmap_remv
 */
-void avlmap_del(avlmap *self, void *key);
+void avlmap_del(AVLMap *self, void *key);
 
 
 /**
@@ -118,13 +118,13 @@ void avlmap_del(avlmap *self, void *key);
  * @warning If the map does not contain the provided @p key, this operation has no effect.
  * @warning This does not destroy the key or its value.
  */
-void avlmap_remv(avlmap *self, void *key, void *dest_key,
+void avlmap_remv(AVLMap *self, void *key, void *dest_key,
                  void *dest_val);
 
 
 #define AVLMAP_DECL(TYPE, ...)\
-	TYPE avlmap_get_##TYPE(avlmap *self, const void *key);\
-	void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val);\
+	TYPE avlmap_get_##TYPE(AVLMap *self, const void *key);\
+	void avlmap_ins_##TYPE(AVLMap *self, const void *key, TYPE val);\
 
 XX_CORETYPES(AVLMAP_DECL)
 
@@ -136,24 +136,21 @@ XX_CORETYPES(AVLMAP_DECL)
 typedef struct  {
 	const void *key;
 	const void *val;
-} avlmap_entry;
-
-typedef struct _avlmap_iter avlmap_iter;
-
-
+} AVLMapEntry;
+typedef struct _AVLMapIter AVLMapIter;
 /**
  * @brief Returns an avlmap_entry (key-val pair) iterator.
  * @param self The source map.
  * @param order The iteration order of the underlying AVL tree.
  * @see avl_get_iter
  */
-avlmap_iter *avlmap_get_iter(avlmap *self, avl_traversal_order order);
+AVLMapIter *avlmap_get_iter(AVLMap *self, AVLTraversalOrder order);
 
 /**
  * @brief Iterator destructor.
  */
-void avlmap_iter_free(avlmap_iter *self);
+void avlmap_iter_free(AVLMapIter *self);
 
-DECL_TRAIT(avlmap_iter, iter);
+DECL_TRAIT(AVLMapIter, Iter);
 
 #endif

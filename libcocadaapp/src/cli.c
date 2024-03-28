@@ -601,7 +601,7 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 	             subcmd->name); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
 	hashmap_iter *it = hashmap_get_iter(subcmd->options);
-	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_iter(it)) {
+	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_Iter(it)) {
 		cliopt *opt = *((cliopt **)(optentry->val));
 		if (opt->type == ARG_CHOICE) {
 			for (size_t i = 0, l = vec_len(opt->choices); i < l; i++) {
@@ -790,7 +790,7 @@ void cliparser_print_help(const cliparser *cmd)
 		printf("\nOptions:\n\n");
 		vec *shortnames = vec_new(sizeof(char));
 		hashmap_iter *it = hashmap_get_iter(cmd->options);
-		FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_iter(it)) {
+		FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_Iter(it)) {
 			vec_push_char(shortnames, *((char *)(entry->key)));
 		}
 		FREE(it);
@@ -839,7 +839,7 @@ static cliparse_res _check_missing_options(cliparser *cmd)
 
 	strbuf *longname = strbuf_new_with_capacity(16);
 	hashmap_iter *opt_it = hashmap_get_iter(cmd->options);
-	FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_iter(opt_it)) {
+	FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_Iter(opt_it)) {
 		cliopt *opt = *((cliopt **)(entry->val));
 		strbuf_clear(longname);
 		if (opt->longname) {

@@ -104,7 +104,7 @@ void test_hashset_indel(CuTest *tc)
 	elts = ARR_NEW(uint, n);
 	hashset_iter *it = hashset_get_iter(set);
 	size_t i = 0;
-	FOREACH_IN_ITER(e, uint, hashset_iter_as_iter(it)) {
+	FOREACH_IN_ITER(e, uint, hashset_iter_as_Iter(it)) {
 		elts[i++] = *e;
 		//printf("element[%zu] = %u\n",i,*e);
 	}

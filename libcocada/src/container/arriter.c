@@ -26,26 +26,26 @@
 #include "trait.h"
 
 
-static bool _arr_iter_has_next(iter *it)
+static bool _arr_iter_has_next(Iter *it)
 {
-	arr_iter *ait = (arr_iter *)it->impltor;
+	ArrIter *ait = (ArrIter *)it->impltor;
 	return ait->index < ait->len;
 }
 
-static const void *_arr_iter_next(iter *it)
+static const void *_arr_iter_next(Iter *it)
 {
-	arr_iter *ait = (arr_iter *)it->impltor;
+	ArrIter *ait = (ArrIter *)it->impltor;
 	return ait->src + (ait->typesize * ait->index++);
 }
 
-static iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};
+static Iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};
 
 
-arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize)
+ArrIter *arr_get_iter(void *arr, size_t len, size_t typesize)
 {
-	arr_iter *ret = NEW(arr_iter);
-	ret->_t_iter.impltor = &ret;
-	ret->_t_iter.vt = &_arr_iter_vt;
+	ArrIter *ret = NEW(ArrIter);
+	ret->_t_Iter.impltor = &ret;
+	ret->_t_Iter.vt = &_arr_iter_vt;
 	ret->src = arr;
 	ret->len = len;
 	ret->typesize = typesize;
@@ -53,4 +53,4 @@ arr_iter *arr_get_iter(void *arr, size_t len, size_t typesize)
 	return ret;
 }
 
-IMPL_TRAIT(arr_iter, iter);
+IMPL_TRAIT(ArrIter, Iter);

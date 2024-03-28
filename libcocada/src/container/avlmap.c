@@ -29,20 +29,20 @@
 #include "iter.h"
 
 
-struct _avlmap {
+struct _AVLMap {
 	size_t sizeofkey;
 	size_t sizeofval;
 	size_t sizeofentry;
 	size_t size;
-	avl *tree;
+	AVL *tree;
 };
 
 #define ENTRY_VAL_SZKEY(E, SK) ((E)?((void *)((void *)(E) + (SK))):NULL)
 #define ENTRY_VAL(E) ENTRY_VAL_SZKEY(E, self->sizeofkey)
 
-avlmap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp)
+AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp)
 {
-	avlmap *ret = NEW(avlmap);
+	AVLMap *ret = NEW(AVLMap);
 	ret->sizeofkey = keysize;
 	ret->sizeofval = valsize;
 	ret->sizeofentry = keysize + valsize;
@@ -54,14 +54,14 @@ avlmap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp)
 
 void avlmap_finalise(void *ptr, const finaliser *fnr)
 {
-	avlmap *self = (avlmap *)ptr;
-	avlmap_iter *it = avlmap_get_iter(self, POST_ORDER);
+	AVLMap *self = (AVLMap *)ptr;
+	AVLMapIter *it = avlmap_get_iter(self, POST_ORDER);
 	const finaliser *key_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
 	                           0) : NULL;
 	const finaliser *val_fnr = (finaliser_nchd(fnr) > 1) ? finaliser_chd(fnr,
 	                           1) : NULL;
 	if (key_fnr != NULL || val_fnr != NULL) {
-		FOREACH_IN_ITER(entry, avlmap_entry, avlmap_iter_as_iter(it)) {
+		FOREACH_IN_ITER(entry, AVLMapEntry, AVLMapIter_as_Iter(it)) {
 			if (key_fnr) {
 				FINALISE(entry->key, key_fnr);
 			}
@@ -75,33 +75,33 @@ void avlmap_finalise(void *ptr, const finaliser *fnr)
 }
 
 
-size_t avlmap_size(const avlmap *self)
+size_t avlmap_size(const AVLMap *self)
 {
 	return self->size;
 }
 
 
-bool avlmap_contains(const avlmap *self, const void *key)
+bool avlmap_contains(const AVLMap *self, const void *key)
 {
 	return (self->size && avl_contains(self->tree, key));
 }
 
 
-const void *avlmap_get(const avlmap *self, const void *key)
+const void *avlmap_get(const AVLMap *self, const void *key)
 {
 	const void *entry = avl_get(self->tree, key);
 	return ENTRY_VAL(entry);
 }
 
 
-void *avlmap_get_mut(const avlmap *self, const void *key)
+void *avlmap_get_mut(const AVLMap *self, const void *key)
 {
 	void *entry = (void *)avl_get(self->tree, key);
 	return ENTRY_VAL(entry);
 }
 
 
-void avlmap_ins(avlmap *self, const void *key, const void *val)
+void avlmap_ins(AVLMap *self, const void *key, const void *val)
 {
 	void *entry = (void *)malloc(self->sizeofentry);
 	memcpy(entry, key, self->sizeofkey);
@@ -117,13 +117,13 @@ void avlmap_ins(avlmap *self, const void *key, const void *val)
 }
 
 
-void avlmap_del(avlmap *self, void *key)
+void avlmap_del(AVLMap *self, void *key)
 {
 	self->size -= avl_del(self->tree, key);
 }
 
 
-void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
+void avlmap_remv(AVLMap *self, void *key, void *dest_key, void *dest_val)
 {
 	void *entry = (void *)malloc(self->sizeofentry);
 	bool removed = avl_remv(self->tree, key, entry);
@@ -138,61 +138,61 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
 
 
 #define AVLMAP_IMPL(TYPE, ...)\
-	TYPE avlmap_get_##TYPE(avlmap *self, const void *key){\
+	TYPE avlmap_get_##TYPE(AVLMap *self, const void *key){\
 		const void *v = avlmap_get(self, key);\
 		return v ? ((TYPE *)v)[0] : (TYPE)0;\
 	}\
 	\
-	void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val){\
+	void avlmap_ins_##TYPE(AVLMap *self, const void *key, TYPE val){\
 		avlmap_ins(self, key, &val);\
 	}\
 
 XX_CORETYPES(AVLMAP_IMPL)
 
-struct _avlmap_iter {
-	iter _t_iter;
-	avlmap *src;
-	avl_iter *tree_iter;
-	avlmap_entry entry;
+struct _AVLMapIter {
+	Iter _t_Iter;
+	AVLMap *src;
+	AVLIter *tree_iter;
+	AVLMapEntry entry;
 };
 
 
-static bool _avlmap_iter_has_next(iter *it)
+static bool _avlmap_iter_has_next(Iter *it)
 {
-	avlmap_iter *amit = (avlmap_iter *)it->impltor;
-	return (iter_has_next((avl_iter_as_iter(amit->tree_iter))));
+	AVLMapIter *amit = (AVLMapIter *)it->impltor;
+	return (iter_has_next((AVLIter_as_Iter(amit->tree_iter))));
 }
 
 
-static const void *_avlmap_iter_next(iter *it)
+static const void *_avlmap_iter_next(Iter *it)
 {
-	avlmap_iter *amit = (avlmap_iter *)it->impltor;
-	const void *rawentry = iter_next(avl_iter_as_iter(amit->tree_iter));
+	AVLMapIter *amit = (AVLMapIter *)it->impltor;
+	const void *rawentry = iter_next(AVLIter_as_Iter(amit->tree_iter));
 	amit->entry.key = rawentry;
 	amit->entry.val = ENTRY_VAL_SZKEY(rawentry, amit->src->sizeofkey);
 	return &amit->entry;
 }
 
 
-static iter_vt _avlmap_iter_vt = { .has_next = _avlmap_iter_has_next,
+static Iter_vt _avlmap_iter_vt = { .has_next = _avlmap_iter_has_next,
                                    .next = _avlmap_iter_next
                                  };
 
 
-IMPL_TRAIT(avlmap_iter, iter)
+IMPL_TRAIT(AVLMapIter, Iter)
 
 
-avlmap_iter *avlmap_get_iter(avlmap *self, avl_traversal_order order)
+AVLMapIter *avlmap_get_iter(AVLMap *self, AVLTraversalOrder order)
 {
-	avlmap_iter *ret = NEW(avlmap_iter);
-	ret->_t_iter.impltor = ret;
-	ret->_t_iter.vt = &_avlmap_iter_vt;
+	AVLMapIter *ret = NEW(AVLMapIter);
+	ret->_t_Iter.impltor = ret;
+	ret->_t_Iter.vt = &_avlmap_iter_vt;
 	ret->src = self;
 	ret->tree_iter = avl_get_iter(self->tree, order);
 	return ret;
 }
 
-void avlmap_iter_free(avlmap_iter *self)
+void avlmap_iter_free(AVLMapIter *self)
 {
 	avl_iter_free(self->tree_iter);
 	FREE(self);

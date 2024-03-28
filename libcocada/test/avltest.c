@@ -82,7 +82,7 @@ void test_avl_ins(CuTest *tc)
 	memdbg_reset();
 	int half_univ = 100;
 	// typed primitive values
-	avl *tree = avl_new(sizeof(int), cmp_int);
+	AVL *tree = avl_new(sizeof(int), cmp_int);
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		DEBUG("Insert %d\n", val);
@@ -157,7 +157,7 @@ void test_avl_get(CuTest *tc)
 	memdbg_reset();
 	int half_univ = 100;
 	// typed primitive values
-	avl *tree = avl_new(sizeof(int), cmp_int);
+	AVL *tree = avl_new(sizeof(int), cmp_int);
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		DEBUG("Get %d\n", val);
@@ -239,7 +239,7 @@ void test_avl_remv(CuTest *tc)
 	memdbg_reset();
 	int half_univ = 10;
 	// typed primitive values
-	avl *tree = avl_new(sizeof(int), cmp_int);
+	AVL *tree = avl_new(sizeof(int), cmp_int);
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		//DEBUG("Insert %d\n", val);
@@ -345,7 +345,7 @@ void test_avl_get_iter(CuTest *tc)
 	memdbg_reset();
 	int half_univ = 10;
 	// typed primitive values
-	avl *tree = avl_new(sizeof(int), cmp_int);
+	AVL *tree = avl_new(sizeof(int), cmp_int);
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		//DEBUG("Insert %d\n", val);
@@ -355,25 +355,25 @@ void test_avl_get_iter(CuTest *tc)
 	DEBUG_EXEC(avl_print(tree, stderr, print_int));
 	DEBUG("\n\n\n");
 
-	avl_iter *it = avl_get_iter(tree, PRE_ORDER);
-	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
-		int val = *((int *)iter_next(avl_iter_as_iter(it)));
+	AVLIter *it = avl_get_iter(tree, PRE_ORDER);
+	for (int k = 0; iter_has_next(AVLIter_as_Iter(it)); k++) {
+		int val = *((int *)iter_next(AVLIter_as_Iter(it)));
 		DEBUG("Pre-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
 
 	DEBUG("\n\n");
 	it = avl_get_iter(tree, IN_ORDER);
-	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
-		int val = *((int *)iter_next(avl_iter_as_iter(it)));
+	for (int k = 0; iter_has_next(AVLIter_as_Iter(it)); k++) {
+		int val = *((int *)iter_next(AVLIter_as_Iter(it)));
 		DEBUG("In-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
 
 	DEBUG("\n\n");
 	it = avl_get_iter(tree, POST_ORDER);
-	for (int k = 0; iter_has_next(avl_iter_as_iter(it)); k++) {
-		int val = *((int *)iter_next(avl_iter_as_iter(it)));
+	for (int k = 0; iter_has_next(AVLIter_as_Iter(it)); k++) {
+		int val = *((int *)iter_next(AVLIter_as_Iter(it)));
 		DEBUG("Post-order[%d] = %d\n", k, val);
 	}
 	avl_iter_free(it);
@@ -388,7 +388,7 @@ void test_avl_del(CuTest *tc)
 
 	// FLAT MAP
 
-	avl *tree = avl_new(sizeof(int), cmp_int);
+	AVL *tree = avl_new(sizeof(int), cmp_int);
 	size_t n = 20;
 
 	for (int i = 0, step = 10; i < step * n; i += step) {

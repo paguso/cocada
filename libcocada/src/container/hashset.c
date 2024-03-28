@@ -101,26 +101,26 @@ XX_CORETYPES(HASHSET_ALL_IMPL)
 
 
 struct _hashset_iter {
-	iter _t_iter;
+	Iter _t_Iter;
 	hashmap_iter *inner;
 };
 
 
-bool _hashset_iter_has_next(iter *it)
+bool _hashset_iter_has_next(Iter *it)
 {
-	return iter_has_next(hashmap_iter_as_iter(((hashset_iter *)(
+	return iter_has_next(hashmap_iter_as_Iter(((hashset_iter *)(
 	                         it->impltor))->inner));
 }
 
 
-const void *_hashset_iter_next(iter *it)
+const void *_hashset_iter_next(Iter *it)
 {
-	return ((hashmap_entry *)iter_next(hashmap_iter_as_iter(((hashset_iter *)(
+	return ((hashmap_entry *)iter_next(hashmap_iter_as_Iter(((hashset_iter *)(
 	                                       it->impltor))->inner)))->key;
 }
 
 
-static iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
+static Iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
                                     .next = _hashset_iter_next
                                   };
 
@@ -129,8 +129,8 @@ static iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
 hashset_iter *hashset_get_iter(hashset *set)
 {
 	hashset_iter *ret = NEW(hashset_iter);
-	ret->_t_iter.impltor = ret;
-	ret->_t_iter.vt = &_hashset_iter_vt;
+	ret->_t_Iter.impltor = ret;
+	ret->_t_Iter.vt = &_hashset_iter_vt;
 	ret->inner = hashmap_get_iter(set);
 	return ret;
 }
@@ -142,4 +142,4 @@ void hashset_iter_finalise(void *ptr, const finaliser *fnr)
 }
 
 
-IMPL_TRAIT(hashset_iter, iter)
+IMPL_TRAIT(hashset_iter, Iter)
