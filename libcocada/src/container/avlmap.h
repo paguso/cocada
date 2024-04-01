@@ -57,7 +57,7 @@ AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp);
  * finaliser for the keys. If it has two childre, the second is assumed
  * to be the finaliser for the values.
  */
-void avlmap_finalise(void *ptr, const finaliser *fnr);
+void avlmap_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

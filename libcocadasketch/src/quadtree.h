@@ -262,7 +262,7 @@ quadtree *quadtree_new(uint width, uint height, uint depth);
  *
  * @see new.h
  */
-void quadtree_finalise(void *ptr, const finaliser *fnr);
+void quadtree_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

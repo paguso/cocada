@@ -107,14 +107,14 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
 }
 
 
-void hashmap_finalise(void *ptr, const finaliser *dst)
+void hashmap_finalise(void *ptr, const Finaliser *dst)
 {
 	hashmap *hmap = (hashmap *)ptr;
 	if (dst != NULL) {
 		bool free_keys = (finaliser_nchd(dst) > 0);
-		const finaliser *keys_dst = (free_keys) ? finaliser_chd(dst, 0) : NULL;
+		const Finaliser *keys_dst = (free_keys) ? finaliser_chd(dst, 0) : NULL;
 		bool free_vals = (finaliser_nchd(dst) > 1);
-		const finaliser *vals_dst = (free_vals) ? finaliser_chd(dst, 1) : NULL;
+		const Finaliser *vals_dst = (free_vals) ? finaliser_chd(dst, 1) : NULL;
 		if (free_keys || free_vals) {
 			hashmap_iter *it = hashmap_get_iter(hmap);
 			FOREACH_IN_ITER(keyval, hashmap_entry, hashmap_iter_as_Iter(it)) {

@@ -56,7 +56,7 @@ void test_minqueue_push_pop(CuTest *tc)
 {
 	memdbg_reset();
 	minqueue *q = minqueue_new(sizeof(minqobj), minqobj_cmp);
-	deque *v = deque_new(sizeof(minqobj));
+	Deque *v = deque_new(sizeof(minqobj));
 
 	size_t n = 1000;
 	for (int i = 0; i < n; i++) {
@@ -128,7 +128,7 @@ void test_minqueue_front_back(CuTest *tc)
 {
 	memdbg_reset();
 	minqueue *q = minqueue_new(sizeof(int), cmp_int);
-	deque *v = deque_new(sizeof(int));
+	Deque *v = deque_new(sizeof(int));
 
 	size_t n = 1000;
 	for (int i = 0; i < n; i++) {

@@ -51,7 +51,7 @@ typedef struct _format format;
 typedef struct {
 	int (*fprint)(format *, FILE *);
 	int (*sprint)(format *, char *);
-	int (*sbprint)(format *, strbuf *);
+	int (*sbprint)(format *, StrBuf *);
 } format_vt;
 
 
@@ -83,6 +83,6 @@ int format_sprint(format *self, char *dest);
  * @brief Prints formatted text to a given string buffer.
  * @return Upon success, returns the number of printed chars
  */
-int format_sbprint(format *self, strbuf *buf);
+int format_sbprint(format *self, StrBuf *buf);
 
 #endif

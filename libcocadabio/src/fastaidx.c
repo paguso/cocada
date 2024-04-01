@@ -42,7 +42,7 @@ fastaidx *fastaidx_new(const char *src_path)
 }
 
 
-void fastaidx_finalise(void *ptr, const finaliser *fnr)
+void fastaidx_finalise(void *ptr, const Finaliser *fnr)
 {
 	fastaidx *self = (fastaidx *)ptr;
 	FREE(self->path);

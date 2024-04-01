@@ -31,8 +31,8 @@
 #include "deque.h"
 
 struct _minqueue {
-	deque *elts;
-	deque *mins;
+	Deque *elts;
+	Deque *mins;
 	size_t dels;
 	cmp_func cmp;
 };
@@ -67,7 +67,7 @@ minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
 }
 
 
-void minqueue_finalise(void *ptr, const finaliser *fnr )
+void minqueue_finalise(void *ptr, const Finaliser *fnr )
 {
 	minqueue *mq = (minqueue *)ptr;
 	deque_finalise(mq->elts, fnr);

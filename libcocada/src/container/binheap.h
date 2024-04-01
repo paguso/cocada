@@ -67,32 +67,32 @@
 /**
  * @brief Binary heap type.
  */
-typedef struct _binheap binheap;
+typedef struct _BinHeap BinHeap;
 
 
 /**
  * @brief Creates a new empty binary heap.
  */
-binheap *binheap_new(size_t typesize, cmp_func cmp);
+BinHeap *binheap_new(size_t typesize, cmp_func cmp);
 
 
 /**
  * @brief Finaliser
  * @see new.h
  */
-void binheap_finalise(void *ptr, const finaliser *fnr);
+void binheap_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Returns the number of elements stored in the heap.
  */
-size_t binheap_size(const binheap *heap);
+size_t binheap_size(const BinHeap *heap);
 
 
 /**
  * @brief Stores a new element in the heap.
  */
-void binheap_ins(binheap *heap, const void *elt);
+void binheap_ins(BinHeap *heap, const void *elt);
 
 
 /**
@@ -100,16 +100,16 @@ void binheap_ins(binheap *heap, const void *elt);
  *        at least one such that no other element has
  *        greater priority) and copies it to @p dest.
  */
-void binheap_remv(binheap *heap, void *dest);
+void binheap_remv(BinHeap *heap, void *dest);
 
 
 
 #define BINHEAP_PUSH_DECL( TYPE )\
-	void binheap_ins_##TYPE(binheap *heap, TYPE val);
+	void binheap_ins_##TYPE(BinHeap *heap, TYPE val);
 
 
 #define BINHEAP_POP_DECL( TYPE )\
-	TYPE binheap_remv_##TYPE(binheap *heap);
+	TYPE binheap_remv_##TYPE(BinHeap *heap);
 
 
 #define BINHEAP_ALL_DECL( TYPE, ... )\

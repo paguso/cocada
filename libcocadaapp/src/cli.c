@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -427,7 +428,7 @@ cliopt *cliopt_new_sc_defaults(char shortname,  char *longname, char *help)
 
 
 
-void cliopt_finalise(void *ptr, const finaliser *fnr)
+void cliopt_finalise(void *ptr, const Finaliser *fnr)
 {
 	cliopt *opt = (cliopt *)ptr;
 	FREE(opt->longname);
@@ -494,7 +495,7 @@ cliarg *cliarg_new_choice_multi(char *name, char *help, vec *choices)
 }
 
 
-void cliarg_finalise(void *ptr, const finaliser *fnr)
+void cliarg_finalise(void *ptr, const Finaliser *fnr)
 {
 	cliarg *arg = (cliarg *)ptr;
 	FREE(arg->name);
@@ -537,7 +538,7 @@ cliparser *cliparser_new(char *name, char *help)
 }
 
 
-void cliparser_finalise(void *ptr, const finaliser *fnr)
+void cliparser_finalise(void *ptr, const Finaliser *fnr)
 {
 	cliparser *clip = (cliparser *)ptr;
 	DESTROY(clip->subcommands, finaliser_cons(finaliser_cons(FNR(hashmap),
@@ -726,7 +727,7 @@ static void _cliopt_print_help(cliopt *opt)
 	// print options
 	if (opt->max_val_no != 0) {
 		char *nbstr = cstr_new(10);
-		strbuf *typedescr = strbuf_new();
+		StrBuf *typedescr = strbuf_new();
 		strbuf_nappend(typedescr, " <", 2);
 		if (opt->type == ARG_CHOICE) {
 			strbuf_join(typedescr, vec_len(opt->choices),
@@ -833,11 +834,11 @@ void cliparser_print_help(const cliparser *cmd)
  * AND
  * Attribute default values for undeclared non-required options when available.
  */
-static cliparse_res _check_missing_options(cliparser *cmd)
+static RESULT_OK_ERR(cliparse) _check_missing_options(cliparser *cmd)
 {
-	cliparse_res result = {.ok = true, .val.ok = cmd};
+	RESULT_OK_ERR(cliparse) result = {.ok = true, .val.ok = cmd};
 
-	strbuf *longname = strbuf_new_with_capacity(16);
+	StrBuf *longname = strbuf_new_with_capacity(16);
 	hashmap_iter *opt_it = hashmap_get_iter(cmd->options);
 	FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_Iter(opt_it)) {
 		cliopt *opt = *((cliopt **)(entry->val));
@@ -919,9 +920,9 @@ cleanup:
 }
 
 
-static cliparse_res _check_option_combos(cliparser *cmd)
+static RESULT_OK_ERR(cliparse) _check_option_combos(cliparser *cmd)
 {
-	cliparse_res result = {.ok = true, .val.ok = cmd};
+	RESULT_OK_ERR(cliparse) result = {.ok = true, .val.ok = cmd};
 
 	for (size_t i = 0, l = vec_len(cmd->optcombos); i < l; i++) {
 		optcombo *c = (optcombo *) vec_get(cmd->optcombos, i);
@@ -1065,11 +1066,11 @@ typedef enum {
 } parse_state;
 
 
-cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
-                             bool exit_on_error)
+RESULT_OK_ERR(cliparse) cliparser_parse(cliparser *clip, int argc, char **argv,
+                                        bool exit_on_error)
 {
-	//cliparse_res result = {.ok = true, .val.ok = clip};
-	cliparse_res result = {0};
+	//RESULT_OK_ERR(cliparse) result = {.ok = true, .val.ok = clip};
+	RESULT_OK_ERR(cliparse) result = {0};
 
 	WARN_IF( clip->parsed, "This CLI has already been processed!"
 	         "Parsing the CLI more than once may cause unexpected errors!\n"

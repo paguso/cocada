@@ -52,7 +52,7 @@ stack *stack_new(size_t typesize);
 /**
  * @brief Destructor.
  */
-void stack_finalise(void *ptr, const finaliser *fnr);
+void stack_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

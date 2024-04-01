@@ -92,7 +92,7 @@ csarray *csarray_new( char *str, size_t len, alphabet *ab )
 	csa->lvl_len[0] = lvl_len;
 	BitVec *xchar_stops = bitvec_new_with_capacity(lvl_len);
 	bitvec_push_n(xchar_stops, lvl_len, 0);
-	strbuf *supp_ab_str = strbuf_new(); // string support alphabet chars
+	StrBuf *supp_ab_str = strbuf_new(); // string support alphabet chars
 	size_t ndiff_xchars = 1;            // has at least the SENTINEL
 	strbuf_append_char(supp_ab_str, SENTINEL);
 	bitvec_set_bit(xchar_stops, 0, 1);

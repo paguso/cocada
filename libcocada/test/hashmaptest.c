@@ -75,7 +75,7 @@ typedef struct {
 	char *k3;
 } object;
 
-void object_finalise(void *ptr, const finaliser *fnr)
+void object_finalise(void *ptr, const Finaliser *fnr)
 {
 }
 

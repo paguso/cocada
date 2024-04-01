@@ -47,7 +47,7 @@ fastaidx *fastaidx_new(const char *src_path);
 /**
  * @brief Finaliser
  */
-void fastaidx_finalise(void *ptr, const finaliser *fnr);
+void fastaidx_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

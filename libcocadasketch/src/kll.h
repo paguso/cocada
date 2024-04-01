@@ -188,7 +188,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  * @see new.h
  */
 kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
-                     finaliser *chd_fr);
+                     Finaliser *chd_fr);
 
 
 /**
@@ -252,7 +252,7 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps,
  * @see kll_new_with_cap
  */
 kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
-                              size_t cap, finaliser *chd_fr);
+                              size_t cap, Finaliser *chd_fr);
 
 
 /**
@@ -260,7 +260,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
  * If this summary is going to store
  * @see new.h
  */
-void kll_finalise(void *ptr, const finaliser *fnr);
+void kll_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

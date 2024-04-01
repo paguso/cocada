@@ -45,6 +45,7 @@ typedef struct _BitVec BitVec;
  */
 BitVec *bitvec_new();
 
+
 /**
  * @brief Creates a new empty (length = 0) bitvector with a given @p capacity.
  */
@@ -71,7 +72,7 @@ BitVec *bitvec_new_from_bitarr(const byte_t *src, size_t len);
  * @brief Finaliser
  * @see new.h
  */
-void bitvec_finalise(void *ptr, const finaliser *fnr);
+void bitvec_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
@@ -189,7 +190,7 @@ void bitvec_cat (BitVec *bv, const BitVec *src);
  * @deprecated Use the bitvec_format interface
  * @see bitvec_get_format()
  */
-void bitvec_to_string ( const BitVec *bv, strbuf *dest, size_t bytes_per_row);
+void bitvec_to_string ( const BitVec *bv, StrBuf *dest, size_t bytes_per_row);
 
 
 /**

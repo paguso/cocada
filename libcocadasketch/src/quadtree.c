@@ -131,10 +131,10 @@ void quadtree_fit(quadtree *tree)
 
 
 
-void quadtree_finalise(void *ptr, const finaliser *fnr)
+void quadtree_finalise(void *ptr, const Finaliser *fnr)
 {
 	quadtree *self = (quadtree *)ptr;
-	finaliser *vec_fnr =
+	Finaliser *vec_fnr =
 	    finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
 	DESTROY(self->nodes, vec_fnr);
 }

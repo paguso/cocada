@@ -25,8 +25,6 @@
 
 #include <stdlib.h>
 
-#include "coretype.h"
-#include "memdbg.h"
 
 /**
  * @file new.h
@@ -239,7 +237,7 @@
  * hierarchies of nested objects. COCADA provides some infrastructure for
  * dealing with the proper disposal of  complex hierarchies of objects.
  *
- * The basic concept is that of a **finaliser** (::finaliser) which encapsulates and
+ * The basic concept is that of a **finaliser** (::Finaliser) which encapsulates and
  * provides a way of nesting **finalise functions** (::finalise_func) used for
  * finalising object hierarchies. A finaliser is a  *closure* object
  * composed of
@@ -268,7 +266,7 @@
  * The finalisation of `C` would go roughly as follows.  First, the finalise function
  *
  * ```C
- * void C_finalise( void *ptr, finaliser *c_fr )
+ * void C_finalise( void *ptr, Finaliser *c_fr )
  * ```
  *
  * checks the finaliser `c_fr` to see if contains a reference to a
@@ -334,7 +332,7 @@
  * In general, we could have any tree-like finaliser hierarchy. Although a specific
  * finaliser could be implemented by the library user, for example, a function
  *
- * `finaliser *C_of_B_of_A_get_finaliser()`
+ * `Finaliser *C_of_B_of_A_get_finaliser()`
  *
  * could be implemented to return a finaliser to the previous example, this would
  * be rather tedious. Instead, COCADA provides a more ergonomic way to construct
@@ -434,9 +432,9 @@
  * </tr>
  * <tr>
  *     <td>4. Finalisation</td>
- *     <td>`FINALISE(obj, finaliser )`</td>
+ *     <td>`FINALISE(obj, Finaliser )`</td>
  *     <td rowspan=3>4+5. Destruction</td>
- *     <td rowspan=3>`DESTROY(obj, finaliser)`<br>
+ *     <td rowspan=3>`DESTROY(obj, Finaliser)`<br>
  *     `DESTROY_FLAT(obj, type)`<br>
  *     `type_free(obj)`</td>
  * </tr>
@@ -468,70 +466,70 @@
  * Finaliser type
  * @see _finaliser
  */
-typedef struct _finaliser finaliser;
+typedef struct _Finaliser Finaliser;
 
 
 /**
  * Finaliser function type
  */
-typedef void (*finalise_func) (void *ptr, const finaliser *fnr);
+typedef void (*finalise_func) (void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Creates a new destructor with destructof function.
  */
-finaliser *finaliser_new(finalise_func fn);
+Finaliser *finaliser_new(finalise_func fn);
 
 
 /**
  * @brief Recursively lones a finaliser
  */
-finaliser *finaliser_clone(const finaliser *src);
+Finaliser *finaliser_clone(const Finaliser *src);
 
 
 /**
  * @brief Recursively frees a destructor.
  */
-void finaliser_free(finaliser *self);
+void finaliser_free(Finaliser *self);
 
 
 /**
  * @brief Calls the finaliser function on @p ptr
  */
-void finaliser_call(const finaliser *self, void *ptr);
+void finaliser_call(const Finaliser *self, void *ptr);
 
 
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
-size_t finaliser_nchd(const finaliser *self);
+size_t finaliser_nchd(const Finaliser *self);
 
 
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
-const finaliser *finaliser_chd(const finaliser *par, size_t index);
+const Finaliser *finaliser_chd(const Finaliser *par, size_t index);
 
 
 /**
  * @brief Composes two destructor by appending @p chd to the children list of @p par.
  * Returns a reference to the modified @p par
  */
-finaliser *finaliser_cons(finaliser *par, const finaliser *chd);
+Finaliser *finaliser_cons(Finaliser *par, const Finaliser *chd);
 
 
 /**
  * @brief Returns a new empty finaliser with no children.
  * @see Module documentation for details.
  */
-finaliser *finaliser_new_empty();
+Finaliser *finaliser_new_empty();
 
 
 /**
  * @brief Returns a new raw-pointer finaliser with no children.
  * @see Module documentation for details.
  */
-finaliser *finaliser_new_ptr();
+Finaliser *finaliser_new_ptr();
 
 
 /**
@@ -539,7 +537,7 @@ finaliser *finaliser_new_ptr();
  * (pointers). Same as finaliser_cons(finaliser_new_ptr(), chd).
  * @param chd Pointed object finaliser
  */
-finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
+Finaliser *finaliser_new_ptr_to_obj(const Finaliser *chd);
 
 
 /**
@@ -564,7 +562,7 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
 #define FINALISE( OBJ, FNR ) \
 	{\
 		void *__OBJ = (void *)(OBJ);\
-		const finaliser *__FNR = (const finaliser *)(FNR);\
+		const Finaliser *__FNR = (const Finaliser *)(FNR);\
 		if (__OBJ) 	finaliser_call(__FNR, __OBJ);\
 	}
 
@@ -584,9 +582,9 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
 #define DESTROY( OBJ, FNR ) \
 	{\
 		void *__OBJ = (void *)(OBJ);\
-		finaliser *__FNR = (finaliser *)(FNR);\
+		Finaliser *__FNR = (Finaliser *)(FNR);\
 		if ((__OBJ)) {\
-			finaliser_call((const finaliser *)(__FNR), __OBJ);\
+			finaliser_call((const Finaliser *)(__FNR), __OBJ);\
 			free(__OBJ);\
 		}\
 		finaliser_free((void *)(__FNR));\

@@ -144,7 +144,7 @@ AVL *avl_new(size_t typesize, cmp_func cmp);
  * @brief Destructor
  * @see new.h
  */
-void avl_finalise(void *ptr, const finaliser *fnr);
+void avl_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

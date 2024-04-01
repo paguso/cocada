@@ -42,7 +42,7 @@ void test_strbuf_new_from_str(CuTest *tc)
 	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
 	str[10] = '\0';
-	strbuf *dstr;
+	StrBuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
 	CuAssertSizeTEquals(tc, 10, strbuf_len(dstr));
 	CuAssertStrEquals(tc, str, strbuf_as_str(dstr));
@@ -59,7 +59,7 @@ void test_strbuf_get(CuTest *tc)
 	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
 	str[10] = '\0';
-	strbuf *dstr;
+	StrBuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
 	for (size_t i = 0; i < strbuf_len(dstr); i++) {
 		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0' + (i % 10));
@@ -76,7 +76,7 @@ void test_strbuf_append_char(CuTest *tc)
 	char *str = (char *)malloc(11 * sizeof(char));
 	strcpy(str, "0123456789");
 	str[10] = '\0';
-	strbuf *dstr;
+	StrBuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
 	for (size_t i = 0; i < 1000; i++) {
 		strbuf_append_char(dstr, '0' + (i % 10));
@@ -94,7 +94,7 @@ void test_strbuf_append_char(CuTest *tc)
 void test_strbuf_append(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_with_capacity(0);
+	StrBuf *sb = strbuf_new_with_capacity(0);
 	strbuf_nappend(sb, "", 0);
 	CuAssertSizeTEquals(tc, strbuf_len(sb), 0);
 	strbuf_nappend(sb, "The", 3);
@@ -113,7 +113,7 @@ void test_strbuf_append(CuTest *tc)
 void test_strbuf_insert(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_with_capacity(0);
+	StrBuf *sb = strbuf_new_with_capacity(0);
 	strbuf_append_char(sb, '.');
 	strbuf_ins(sb, 0, "The", 3);
 	strbuf_ins(sb, 3, " the lazy dog", 13);
@@ -131,7 +131,7 @@ void test_strbuf_insert(CuTest *tc)
 void test_strbuf_cut(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
+	StrBuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
 	                                 44);
 	char dest[40];
 	// "The quick brown fox jumps over the lazy dog."
@@ -160,7 +160,7 @@ void test_strbuf_cut(CuTest *tc)
 void test_strbuf_paste(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_with_capacity(0);
+	StrBuf *sb = strbuf_new_with_capacity(0);
 	strbuf_paste(sb, 0, "The quick green", 15);
 	CuAssertSizeTEquals(tc, 15, strbuf_len(sb));
 	CuAssertStrEquals(tc, "The quick green", strbuf_as_str(sb));
@@ -180,7 +180,7 @@ void test_strbuf_clip(CuTest *tc)
 {
 	memdbg_reset();
 	char *str = "The quick brown fox jumps over the lazy dog.";
-	strbuf *sb = strbuf_new_from_str(str, 44);
+	StrBuf *sb = strbuf_new_from_str(str, 44);
 	strbuf_clip(sb, 0, strbuf_len(sb));
 	CuAssertSizeTEquals(tc, 44, strbuf_len(sb));
 	CuAssertStrEquals(tc, strbuf_as_str(sb), str);
@@ -201,7 +201,7 @@ void test_strbuf_find_n(CuTest *tc)
 	          "0123012301230123012301230123012301230123"
 	          "0123012301230123012301230123012301230123";
 	char *pat = "123";
-	strbuf *sb = strbuf_new_from_str(s, strlen(s));
+	StrBuf *sb = strbuf_new_from_str(s, strlen(s));
 	size_t matches[7];
 	size_t from_pos = 0;
 	size_t expected_pos = 1;
@@ -234,7 +234,7 @@ void test_strbuf_find_n(CuTest *tc)
 void test_strbuf_replace_n(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("macaca", 6);
+	StrBuf *sb = strbuf_new_from_str("macaca", 6);
 	strbuf_replace_n(sb, "ca", "na", 2, 0);
 	CuAssertStrEquals(tc, "manana", strbuf_as_str(sb));
 	strbuf_replace_n(sb, "ma", "ba", 2, 0);
@@ -249,7 +249,7 @@ void test_strbuf_replace_n(CuTest *tc)
 void test_strbuf_replace(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
+	StrBuf *sb = strbuf_new_from_str("The quick brown fox jumps over the lazy dog.",
 	                                 44);
 	strbuf_replace(sb, "black fox", "yellow arara", 0); // do nothing
 	CuAssertStrEquals(tc, "The quick brown fox jumps over the lazy dog.",
@@ -275,7 +275,7 @@ void test_strbuf_replace(CuTest *tc)
 void test_strbuf_replace_all(CuTest *tc)
 {
 	memdbg_reset();
-	strbuf *sb =
+	StrBuf *sb =
 	    strbuf_new_from_str("The__quick__brown__arara__jumps__over__the__lazy__arara.",
 	                        56);
 	strbuf_replace_all(sb, "__", " ", 0);
@@ -302,7 +302,7 @@ void test_strbuf_printf(CuTest *tc)
 	char buf[1 << 12];
 	char *s = buf;
 	buf[0] = '\0';
-	strbuf *sbuf = strbuf_new();
+	StrBuf *sbuf = strbuf_new();
 	int ws, wsbuf;
 
 	ws = sprintf(s, "");

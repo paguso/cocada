@@ -34,7 +34,7 @@ stack *stack_new(size_t typesize)
 }
 
 
-void stack_finalise(void *ptr, const finaliser *fnr)
+void stack_finalise(void *ptr, const Finaliser *fnr)
 {
 	vec_finalise(ptr, fnr);
 }

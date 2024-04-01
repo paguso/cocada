@@ -22,6 +22,7 @@
 #ifndef XSTR_H
 #define XSTR_H
 
+#include "coretype.h"
 #include "new.h"
 #include "xchar.h"
 

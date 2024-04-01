@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -34,15 +35,15 @@
 const static size_t DEFAULT_CAP = 4;
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 
-typedef struct _strbuf {
+typedef struct _StrBuf {
 	char *str;
 	size_t len; // string contents length, excluding the null-terminating char(s)
 	size_t capacity; // string capacity. physical capacity is 1 + this because of ending ('\0')
 }
-strbuf;
+StrBuf;
 
 
-static void _resize_to(strbuf *self, size_t min_cap)
+static void _resize_to(StrBuf *self, size_t min_cap)
 {
 	min_cap = MAX(min_cap, self->len); // losing data not allowed
 	size_t cap;
@@ -61,16 +62,16 @@ static void _double(strbuf *self)
 }
 */
 
-strbuf *strbuf_new()
+StrBuf *strbuf_new()
 {
 	return strbuf_new_with_capacity(DEFAULT_CAP);
 }
 
 
-strbuf *strbuf_new_with_capacity(size_t init_capacity)
+StrBuf *strbuf_new_with_capacity(size_t init_capacity)
 {
-	strbuf *ret;
-	ret = NEW(strbuf);
+	StrBuf *ret;
+	ret = NEW(StrBuf);
 	ret->capacity = init_capacity;
 	ret->len = 0;
 	ret->str = cstr_new(ret->capacity);
@@ -78,10 +79,10 @@ strbuf *strbuf_new_with_capacity(size_t init_capacity)
 }
 
 
-strbuf *strbuf_new_from_str(const char *other, size_t len)
+StrBuf *strbuf_new_from_str(const char *other, size_t len)
 {
-	strbuf *ret;
-	ret = NEW(strbuf);
+	StrBuf *ret;
+	ret = NEW(StrBuf);
 	ret->len = ret->capacity = len;
 	ret->str = cstr_new(ret->capacity);
 	strncpy(ret->str, other, len);
@@ -89,64 +90,64 @@ strbuf *strbuf_new_from_str(const char *other, size_t len)
 }
 
 
-void strbuf_finalise(void *ptr, const finaliser *fnr)
+void strbuf_finalise(void *ptr, const Finaliser *fnr)
 {
-	FREE(((strbuf *)ptr)->str);
+	FREE(((StrBuf *)ptr)->str);
 }
 
 
-void strbuf_free(strbuf *self)
+void strbuf_free(StrBuf *self)
 {
 	FREE(self->str);
 	FREE(self);
 }
 
 
-size_t strbuf_len(strbuf *self)
+size_t strbuf_len(StrBuf *self)
 {
 	return self->len;
 }
 
 
-size_t strbuf_capacity(strbuf *self)
+size_t strbuf_capacity(StrBuf *self)
 {
 	return self->capacity;
 }
 
 
-void strbuf_fit(strbuf *self)
+void strbuf_fit(StrBuf *self)
 {
 	_resize_to(self, self->len);
 }
 
 
-bool strbuf_eq(strbuf *self, strbuf *other)
+bool strbuf_eq(StrBuf *self, StrBuf *other)
 {
 	return (strcmp(self->str, other->str) == 0);
 }
 
 
 
-char strbuf_get(strbuf *self, size_t pos)
+char strbuf_get(StrBuf *self, size_t pos)
 {
 	return self->str[pos];
 }
 
 
-void strbuf_clear(strbuf *self)
+void strbuf_clear(StrBuf *self)
 {
 	memset(self->str, '\0', self->capacity);
 	self->len = 0;
 }
 
 
-void strbuf_set(strbuf *self, size_t pos, char c)
+void strbuf_set(StrBuf *self, size_t pos, char c)
 {
 	self->str[pos] = c;
 }
 
 
-void strbuf_nappend(strbuf *self, const char *other, size_t len)
+void strbuf_nappend(StrBuf *self, const char *other, size_t len)
 {
 	_resize_to(self, self->len + len);
 	strncpy(self->str + self->len, other, len);
@@ -156,25 +157,25 @@ void strbuf_nappend(strbuf *self, const char *other, size_t len)
 }
 
 
-void strbuf_append(strbuf *self, const char *other)
+void strbuf_append(StrBuf *self, const char *other)
 {
 	strbuf_nappend(self, other, strlen(other));
 }
 
 
-void strbuf_ncat(strbuf *dest, const strbuf *other, size_t n)
+void strbuf_ncat(StrBuf *dest, const StrBuf *other, size_t n)
 {
 	strbuf_nappend(dest, (const char *)other->str, MIN(n, other->len));
 }
 
 
-void strbuf_cat(strbuf *dest, const strbuf *other)
+void strbuf_cat(StrBuf *dest, const StrBuf *other)
 {
 	strbuf_nappend(dest, (const char *)other->str, other->len);
 }
 
 
-void strbuf_append_char(strbuf *self, char c)
+void strbuf_append_char(StrBuf *self, char c)
 {
 	_resize_to(self, self->len + 1);
 	self->str[self->len] = c;
@@ -183,7 +184,7 @@ void strbuf_append_char(strbuf *self, char c)
 }
 
 
-void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep)
+void strbuf_join(StrBuf *self, size_t n, const char **arr, const char *sep)
 {
 	size_t seplen = strlen(sep);
 	for (size_t i = 0; i < n; i++) {
@@ -195,13 +196,13 @@ void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep)
 }
 
 
-const char *strbuf_as_str(strbuf *self)
+const char *strbuf_as_str(StrBuf *self)
 {
 	return self->str;
 }
 
 
-char *strbuf_detach(strbuf *self)
+char *strbuf_detach(StrBuf *self)
 {
 	char *str = self->str;
 	str = realloc(str, (self->len + 1));
@@ -210,7 +211,7 @@ char *strbuf_detach(strbuf *self)
 }
 
 
-void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len)
+void strbuf_ins(StrBuf *self, size_t pos, const char *str, size_t len)
 {
 	assert(pos <= self->len);
 	_resize_to(self, self->len + len);
@@ -222,7 +223,7 @@ void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len)
 }
 
 
-void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest)
+void strbuf_cut(StrBuf *self, size_t from, size_t len, char *dest)
 {
 	assert(from + len <= self->len);
 	if (dest != NULL) {
@@ -237,7 +238,7 @@ void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest)
 }
 
 
-void strbuf_paste(strbuf *self, size_t from, const char *other, size_t len)
+void strbuf_paste(StrBuf *self, size_t from, const char *other, size_t len)
 {
 	assert (from <= self->len);
 	if (from + len <= self->len) {
@@ -251,7 +252,7 @@ void strbuf_paste(strbuf *self, size_t from, const char *other, size_t len)
 }
 
 
-void strbuf_clip(strbuf *self, size_t from, size_t to)
+void strbuf_clip(StrBuf *self, size_t from, size_t to)
 {
 	assert(from <= to && to <= self->len);
 	memmove(self->str, self->str + from, to - from);
@@ -299,7 +300,7 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
-size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos,
+size_t strbuf_find_n(StrBuf *self, const char *old, size_t n, size_t from_pos,
                      size_t *dest)
 {
 	size_t patlen = strlen(old);
@@ -323,7 +324,7 @@ size_t strbuf_find_n(strbuf *self, const char *old, size_t n, size_t from_pos,
 }
 
 
-size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace_n(StrBuf *self, const char *old_str, const char *new_str,
                         size_t n, size_t from)
 {
 	if (from > self->len) return 0;
@@ -364,14 +365,14 @@ size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
 }
 
 
-size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace(StrBuf *self, const char *old_str, const char *new_str,
                       size_t from)
 {
 	return strbuf_replace_n(self, old_str, new_str, 1, from);
 }
 
 
-size_t strbuf_replace_all(strbuf *self, const char *old_str,
+size_t strbuf_replace_all(StrBuf *self, const char *old_str,
                           const char *new_str,
                           size_t from)
 {
@@ -379,7 +380,7 @@ size_t strbuf_replace_all(strbuf *self, const char *old_str,
 }
 
 
-void strbuf_reverse(strbuf *self)
+void strbuf_reverse(StrBuf *self)
 {
 	for (size_t i = 0, j = self->len - 1; i < j; i++, j--) {
 		char tmp = self->str[i];
@@ -389,7 +390,7 @@ void strbuf_reverse(strbuf *self)
 }
 
 
-int sbprintf(strbuf *self, const char *fmt, ...)
+int sbprintf(StrBuf *self, const char *fmt, ...)
 {
 	size_t fmt_len = strlen(fmt);
 	size_t avail = self->capacity - self->len;

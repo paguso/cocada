@@ -87,7 +87,7 @@ BitVec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
 }
 
 
-void bitvec_finalise(void *ptr, const finaliser *fnr)
+void bitvec_finalise(void *ptr, const Finaliser *fnr)
 {
 	FREE(((BitVec *)ptr)->bits);
 }
@@ -391,7 +391,7 @@ void bitvec_cat (BitVec *bv, const BitVec *src)
 }
 
 
-void bitvec_to_string (const BitVec *bv, strbuf *dest, size_t bytes_per_line)
+void bitvec_to_string (const BitVec *bv, StrBuf *dest, size_t bytes_per_line)
 {
 	int line_label_width = (bv->len > 1) ? ceil(log10(bv->len)) : 1;
 	char *lbl = cstr_new(line_label_width);
@@ -459,7 +459,7 @@ static int bitvec_format_sprint(format *self, char *out)
 }
 
 
-static int bitvec_format_sbprint(format *self, strbuf *out)
+static int bitvec_format_sbprint(format *self, StrBuf *out)
 {
 	BITVEC_PRINT(sb)
 }

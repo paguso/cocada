@@ -324,7 +324,7 @@ static void tmp_wt_fill( tmp_wavtree *twt, xstrread *rdr )
 // online construction only available for CHAR_TYPE alphabets
 static void tmp_wt_fill_online( tmp_wavtree *twt, strread *src )
 {
-	strbuf *ab_chars = strbuf_new();
+	StrBuf *ab_chars = strbuf_new();
 	strread_reset(src);
 	for (int c; (c = strread_getc(src)) != EOF;) {
 		BitVec *chcode = (BitVec *) get_charcode(twt->chrcodes, c);
@@ -740,7 +740,7 @@ xchar_t wavtree_char(wavtree *wt, size_t pos)
 void _wt_node_print(wavtree *wt, size_t cur, size_t depth)
 {
 	size_t i;
-	strbuf *dmargin = strbuf_new_with_capacity(2 * depth + 2);
+	StrBuf *dmargin = strbuf_new_with_capacity(2 * depth + 2);
 	for (i = 0; i < depth; i++)
 		strbuf_nappend(dmargin, "  ", 2);
 	strbuf_nappend(dmargin, "| ", 2);
@@ -779,7 +779,7 @@ void wavtree_print(wavtree *wt)
 	//csrsbitarr_fprint(wt->bitarr, 4);
 	if (ab_type(wt->ab) == CHAR_TYPE) {
 		printf ("  char codes:\n");
-		strbuf *codestr = strbuf_new_with_capacity(2);
+		StrBuf *codestr = strbuf_new_with_capacity(2);
 		for (xchar_t c = 0; c <= UCHAR_MAX; c++) {
 			const BitVec *code = get_charcode(wt->chrcodes, c);
 			if (code != NULL_CODE) {

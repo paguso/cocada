@@ -36,7 +36,7 @@ const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 const static float  MIN_LOAD = 0.5;   // (!) GROW_BY * MIN_LOAD < 1
 
-struct _deque {
+struct _Deque {
 	size_t typesize;
 	size_t start;
 	size_t len;
@@ -45,15 +45,15 @@ struct _deque {
 };
 
 
-deque *deque_new(size_t typesize)
+Deque *deque_new(size_t typesize)
 {
 	return deque_new_with_capacity(typesize, MIN_CAPACITY);
 }
 
 
-deque *deque_new_with_capacity(size_t typesize, size_t capacity)
+Deque *deque_new_with_capacity(size_t typesize, size_t capacity)
 {
-	deque *q = NEW(deque);
+	Deque *q = NEW(Deque);
 	q->typesize = typesize;
 	q->start = 0;
 	q->len = 0;
@@ -63,11 +63,11 @@ deque *deque_new_with_capacity(size_t typesize, size_t capacity)
 }
 
 
-void deque_finalise(void *ptr, const finaliser *fnr)
+void deque_finalise(void *ptr, const Finaliser *fnr)
 {
-	deque *dq = (deque *)ptr;
+	Deque *dq = (Deque *)ptr;
 	if (finaliser_nchd(fnr)) {
-		const finaliser *chd_fr = finaliser_chd(fnr, 0);
+		const Finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i = 0, l = deque_len(dq); i < l; i++) {
 			void *chd = (void *)deque_get(dq, i);
 			FINALISE(chd, chd_fr);
@@ -77,26 +77,26 @@ void deque_finalise(void *ptr, const finaliser *fnr)
 }
 
 
-bool deque_empty(const deque *q)
+bool deque_empty(const Deque *q)
 {
 	return (q->len == 0);
 }
 
 
-size_t deque_len(const deque *q)
+size_t deque_len(const Deque *q)
 {
 	return q->len;
 }
 
 
-const void *deque_get(const deque *q, size_t pos)
+const void *deque_get(const Deque *q, size_t pos)
 {
 	assert(pos < q->len);
 	return q->data + ( ((q->start + pos) % q->cap) * q->typesize );
 }
 
 
-void deque_get_cpy(const deque *q, size_t pos, void *dest )
+void deque_get_cpy(const Deque *q, size_t pos, void *dest )
 {
 	assert(pos < q->len);
 	memcpy(dest, q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
@@ -104,19 +104,19 @@ void deque_get_cpy(const deque *q, size_t pos, void *dest )
 }
 
 
-const void *deque_front(const deque *q)
+const void *deque_front(const Deque *q)
 {
 	return deque_get(q, 0);
 }
 
 
-const void *deque_back(const deque *q)
+const void *deque_back(const Deque *q)
 {
 	return deque_get(q, q->len - 1);
 }
 
 
-static void check_and_resize(deque *q)
+static void check_and_resize(Deque *q)
 {
 	if (q->len == q->cap) {
 		size_t offset = q->cap;
@@ -146,7 +146,7 @@ static void check_and_resize(deque *q)
 }
 
 
-void deque_push_back(deque *q, const void *elt)
+void deque_push_back(Deque *q, const void *elt)
 {
 	check_and_resize(q);
 	memcpy(q->data + (((q->start + q->len) % q->cap) * q->typesize), elt,
@@ -155,7 +155,7 @@ void deque_push_back(deque *q, const void *elt)
 }
 
 
-void deque_push_front(deque *q, const void *elt)
+void deque_push_front(Deque *q, const void *elt)
 {
 	check_and_resize(q);
 	q->start = (q->start + (q->cap - 1)) % q->cap;
@@ -164,7 +164,7 @@ void deque_push_front(deque *q, const void *elt)
 }
 
 
-void deque_pop_back(deque *q, void *dest)
+void deque_pop_back(Deque *q, void *dest)
 {
 	assert(q->len > 0);
 	memcpy(dest, q->data + (((q->start + q->len - 1) % q->cap) * q->typesize),
@@ -174,7 +174,7 @@ void deque_pop_back(deque *q, void *dest)
 }
 
 
-void deque_del_back(deque *q)
+void deque_del_back(Deque *q)
 {
 	assert(q->len > 0);
 	q->len--;
@@ -182,7 +182,7 @@ void deque_del_back(deque *q)
 }
 
 
-void deque_pop_front(deque *q, void *dest)
+void deque_pop_front(Deque *q, void *dest)
 {
 	assert(q->len > 0);
 	memcpy(dest, q->data + (q->start * q->typesize), q->typesize);
@@ -192,7 +192,7 @@ void deque_pop_front(deque *q, void *dest)
 }
 
 
-void deque_del_front(deque *q)
+void deque_del_front(Deque *q)
 {
 	assert(q->len > 0);
 	q->len--;
@@ -202,44 +202,44 @@ void deque_del_front(deque *q)
 
 
 #define DEQUE_NEW_IMPL( TYPE )\
-	deque *deque_new_##TYPE() {\
+	Deque *deque_new_##TYPE() {\
 		return deque_new(sizeof(TYPE));\
 	}
 
 #define DEQUE_GET_IMPL( TYPE )\
-	TYPE deque_get_##TYPE(const deque *q, size_t pos) {\
+	TYPE deque_get_##TYPE(const Deque *q, size_t pos) {\
 		return ((TYPE *)deque_get(q, pos))[0];\
 	}
 
 #define DEQUE_FRONT_IMPL( TYPE )\
-	TYPE deque_front_##TYPE(const deque *q) {\
+	TYPE deque_front_##TYPE(const Deque *q) {\
 		return deque_get_##TYPE(q, 0);\
 	}
 
 #define DEQUE_BACK_IMPL( TYPE )\
-	TYPE deque_back_##TYPE(const deque *q) {\
+	TYPE deque_back_##TYPE(const Deque *q) {\
 		return deque_get_##TYPE(q, q->len-1);\
 	}
 
 #define DEQUE_PUSH_BACK_IMPL( TYPE )\
-	void deque_push_back_##TYPE(deque *q, TYPE val) {\
+	void deque_push_back_##TYPE(Deque *q, TYPE val) {\
 		deque_push_back(q, &val);\
 	}
 
 #define DEQUE_PUSH_FRONT_IMPL( TYPE )\
-	void deque_push_front_##TYPE(deque *q, TYPE val) {\
+	void deque_push_front_##TYPE(Deque *q, TYPE val) {\
 		deque_push_front(q, &val);\
 	}
 
 #define DEQUE_POP_BACK_IMPL( TYPE ) \
-	TYPE deque_pop_back_##TYPE(deque *q) { \
+	TYPE deque_pop_back_##TYPE(Deque *q) { \
 		TYPE ret;\
 		deque_pop_back(q, &ret);\
 		return ret;\
 	}
 
 #define DEQUE_POP_FRONT_IMPL( TYPE ) \
-	TYPE deque_pop_front_##TYPE(deque *q) {\
+	TYPE deque_pop_front_##TYPE(Deque *q) {\
 		TYPE ret;\
 		deque_pop_front(q, &ret);\
 		return ret;\

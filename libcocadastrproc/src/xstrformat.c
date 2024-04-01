@@ -64,7 +64,7 @@ static int sprint_ascii(format *self, char *out)
 }
 
 
-static int sbprint_ascii(format *self, strbuf *out)
+static int sbprint_ascii(format *self, StrBuf *out)
 {
 	PRINT_ASCII(sb)
 }
@@ -103,7 +103,7 @@ static int sprint_xchar(format *self, char *out)
 }
 
 
-static int sbprint_xchar(format *self, strbuf *out)
+static int sbprint_xchar(format *self, StrBuf *out)
 {
 	PRINT_XCHAR(sb)
 }

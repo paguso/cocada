@@ -35,7 +35,7 @@ int unit_subst(char a, char b)
 }
 
 
-static int read_number_(char *cigar, size_t pos, int *nb)
+static int read_number_(const char *cigar, size_t pos, int *nb)
 {
 	//const char *s = strbuf_as_str(cigar);
 	//s = &s[pos];
@@ -50,7 +50,7 @@ static int read_number_(char *cigar, size_t pos, int *nb)
 }
 
 
-void compress_cigar(strbuf *cigar)
+void compress_cigar(StrBuf *cigar)
 {
 	size_t n = strbuf_len(cigar);
 	//char *cigar_ = strbuf_as_str(cigar);
@@ -78,7 +78,7 @@ void compress_cigar(strbuf *cigar)
 
 
 int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
-                        size_t tgt_len, strbuf *cigar)
+                        size_t tgt_len, StrBuf *cigar)
 {
 	int ret = 0;
 	NEW_MATRIX(C, int, qry_len + 1, tgt_len + 1);
@@ -97,7 +97,7 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
 	ret = C[qry_len][tgt_len];
 	// recover the cigar string
 	if (cigar) {
-		strbuf *aln = strbuf_new();
+		StrBuf *aln = strbuf_new();
 		size_t i = qry_len, j = tgt_len;
 		while (i || j) {
 			if (j == 0) {
@@ -280,7 +280,7 @@ static inline int gap(size_t len, int gap_open, int gap_ext)
 static int aff_slice_aln(const char *qry, size_t from_qry, size_t to_qry,
                          const char *tgt, size_t from_tgt, size_t to_tgt, int gap_open,
                          int gap_open_begin, int gap_open_end, int gap_ext, subst_cost_fn subst,
-                         strbuf *cigar, int *C1, int *D1, int *C2, int *D2)
+                         StrBuf *cigar, int *C1, int *D1, int *C2, int *D2)
 {
 	size_t m = to_qry - from_qry;
 	size_t n = to_tgt - from_tgt;
@@ -392,7 +392,7 @@ static int aff_slice_aln(const char *qry, size_t from_qry, size_t to_qry,
 
 int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
                         size_t tgt_len,
-                        int gap_open, int gap_ext, subst_cost_fn subst, strbuf *cigar)
+                        int gap_open, int gap_ext, subst_cost_fn subst, StrBuf *cigar)
 {
 	if (cigar) {
 		int *C1, *D1, *C2, *D2;
@@ -401,7 +401,7 @@ int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
 		C2 = ARR_NEW(int, tgt_len + 1);
 		D2 = ARR_NEW(int, tgt_len + 1);
 
-		strbuf *cigar_ = strbuf_new();
+		StrBuf *cigar_ = strbuf_new();
 
 		int ret = aff_slice_aln(qry, 0, qry_len, tgt, 0, tgt_len, gap_open, gap_open,
 		                        gap_open, gap_ext, subst, cigar_, C1, D1, C2, D2);
@@ -429,9 +429,9 @@ void fprintf_alignment(FILE *out, const char *qry, size_t qry_from,
 	size_t tgt_len = tgt_to - tgt_from;
 	qry = &qry[qry_from];
 	tgt = &tgt[tgt_from];
-	strbuf *qry_line = strbuf_new();
-	strbuf *tgt_line = strbuf_new();
-	strbuf *cig_line = strbuf_new();
+	StrBuf *qry_line = strbuf_new();
+	StrBuf *tgt_line = strbuf_new();
+	StrBuf *cig_line = strbuf_new();
 	size_t tpos = 0, qpos = 0, cpos = 0, prev_cpos = 0;
 	int pos_len = (qry_from
 	               || tgt_from) ? (int)log10(MAX(qry_from, tgt_from)) + 1 : 1;

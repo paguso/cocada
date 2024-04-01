@@ -54,7 +54,7 @@ void vebset_free(vebset *self);
 /**
  * @brief Finaliser. Should be called with an empty finaliser.
  */
-void vebset_finalise(void *ptr, const finaliser *fnr);
+void vebset_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

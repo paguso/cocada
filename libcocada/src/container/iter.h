@@ -35,12 +35,12 @@
  *
  * To implement this iterator trait, follow the indications in trait.h
  *
- * If a concrete type implements this trait, say `citer` ,then it
+ * If a concrete type implements this trait, say `CIter` ,then it
  * is used as follows.
  *
  * ```C
- * citer *cit = // get a concrete iter reference
- * iter *it = citer_as_Iter(cit); // AS_TRAIT(cit, citer, iter)
+ * CIter *cit = // get a concrete iter reference
+ * iter *it = CIter_as_Iter(cit); // AS_TRAIT(cit, citer, iter)
  * while (iter_has_next(it)) {
  * 		void *elt = iter_next(it);
  * }

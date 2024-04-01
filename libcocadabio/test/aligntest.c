@@ -35,7 +35,7 @@ void test_simple_global_align(CuTest *tc)
 
 	char *qry = "";
 	char *tgt = "aaa";
-	strbuf *cigar = strbuf_new();
+	StrBuf *cigar = strbuf_new();
 	int cost = simple_global_align(qry, strlen(qry), tgt, strlen(tgt), cigar);
 	CuAssertIntEquals(tc, 3, cost);
 	CuAssertStrEquals(tc, "3I", strbuf_as_str(cigar));
@@ -85,7 +85,7 @@ char *random_str(size_t n)
 	return ret;
 }
 
-static int read_number_(strbuf *cigar, size_t pos, int *nb)
+static int read_number_(StrBuf *cigar, size_t pos, int *nb)
 {
 	char *s = strbuf_as_str(cigar);
 	s = &s[pos];
@@ -99,7 +99,7 @@ static int read_number_(strbuf *cigar, size_t pos, int *nb)
 	return p;
 }
 
-int cigar_cost(strbuf *cigar, int gap_open, int gap_ext)
+int cigar_cost(StrBuf *cigar, int gap_open, int gap_ext)
 {
 	int ret = 0;
 	size_t n = strbuf_len(cigar);
@@ -161,7 +161,7 @@ void test_affine_global_align(CuTest *tc)
 	char *tgt = "fcidgh";// "aijdbeijghhdhbccbf";
 	// char *qry = "a";
 	// char *tgt = "b";
-	strbuf *cigar = strbuf_new();
+	StrBuf *cigar = strbuf_new();
 
 	int gap_open = 0;
 	int gap_ext = 1;

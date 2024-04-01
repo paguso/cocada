@@ -35,20 +35,20 @@
  * trait methods are usually **virtual** methods, although the trait
  * may also provide a default implementation.
  *
- * To illustrate, let's suppose we want to define a trait `shape`
+ * To illustrate, let's suppose we want to define a trait `Shape`
  * with two methods
- * - `dimension get_dimension(shape *)`
- * - `void draw(shape *, canvas *)`
+ * - `Dimension get_dimension(Shape *)`
+ * - `void draw(Shape *, Canvas *)`
  *
- * and suppose that we want to implement types `circle`, and `rectangle`
+ * and suppose that we want to implement types `Circle`, and `Rectangle`
  * that implement this trait. Our intent is to be able to write something
  * like
  *
  * ```C
- * 1. circle *c = circle_new(100, 100, 50); // x_origin, y_origin, radius
- * 2. rectangle *r = rectangle_new(5, 10, 40, 90) // x_bot_left, y_bot_left, x_top_right, y_top_right
- * 3. dimension dc = get_dimension(c);
- * 4. dimension dr = get_dimension(r);
+ * 1. Circle *c = circle_new(100, 100, 50); // x_origin, y_origin, radius
+ * 2. Rectangle *r = rectangle_new(5, 10, 40, 90) // x_bot_left, y_bot_left, x_top_right, y_top_right
+ * 3. Dimension dc = get_dimension(c);
+ * 4. Dimension dr = get_dimension(r);
  * 5. printf("circle: width=%d height=%d\n", dc.width, dc.height); // prints circle: width=100 height=100
  * 6. printf("rectangle: width=%d height=%d\n", dr.width, dr.height); // prints rectangle: width=35 height=80
  * 7. draw(c);
@@ -69,21 +69,21 @@
  * ```C
  * // FILE shape.h
  * // I. Virtual table
- * typedef struct _shape shape;
+ * typedef struct _Shape Shape;
  * typedef struct {
- *     dimension (*get_dimension) (shape *);
- *     void (*draw)(shape *, canvas *);
+ *     Dimension (*get_dimension) (Shape *);
+ *     void (*draw)(Shape *, Canvas *);
  * } shape_vt;
  *
  * // II. trait type
- * struct _shape {
+ * struct _Shape {
  *    void *impltor;
- *    shape_vt *vt;
+ *    Shape_vt *vt;
  * };
  *
  * // III. public trait methods
- * dimension get_dimension(shape *);
- * void draw(shape *, canvas *);
+ * Dimension get_dimension(Shape *);
+ * void draw(Shape *, Canvas *);
  * ```
  *
  * The corresponding `shape.c` would tipically contain generic
@@ -91,17 +91,17 @@
  *
  * ```
  * // FILE shape.c
- * dimension get_dimension(shape *s)
+ * Dimension get_dimension(Shape *s)
  * {
  *    return s->vt->get_dimension(s);
  * }
  *
- * void draw(shape *s, canvas *c)
+ * void draw(Shape *s, Canvas *c)
  * {
  *    s->vt->draw(s, c);
  * }
  *
- * DECL_TRAIT(circle, shape)
+ * DECL_TRAIT(Circle, Shape)
  * ```
  *
  * Let's also have a look at the implementation of the `circle` type that
@@ -110,55 +110,55 @@
  * ```C
  * // FIle circle.c
  *
- * struct _circle {
- *    shape _t_shape;
+ * struct _Circle {
+ *    Shape _t_Shape;
  *    int x_orig, y_orig, radius;
  * };
  *
- * static dimension circle_get_dimension(shape *s)
+ * static Dimension circle_get_dimension(Shape *s)
  * {
- *    circle *c = (circle *)s->impltor;
- *    dimension dim = {.width=2*c->radius, .height=2*c->radius};
+ *    Circle *c = (Circle *)s->impltor;
+ *    Dimension dim = {.width=2*c->radius, .height=2*c->radius};
  *    return dim;
  * }
  *
- * static void circle_draw(shape *s, canvas *cv)
+ * static void circle_draw(Shape *s, Canvas *cv)
  * {
  *    ...draw circle...
  * }
  *
  * static shape_vt circle_vt = {.get_dimension=circle_get_dimension, .draw=circle_draw};
  *
- * circle *circle_new(int x, int y, int r)
+ * Circle *circle_new(int x, int y, int r)
  * {
- *    circle *c = NEW(circle);
+ *    Circle *c = NEW(Circle);
  *    // init trait
- *    c->_t_shape.impltor = c;
- *    c->_t_shape.vt = &circle_vt;
+ *    c->_t_Shape.impltor = c;
+ *    c->_t_Shape.vt = &circle_vt;
  *    c->x_orig = x;
  *    c->y_orig = y;
  *    c->radius = r;
  * }
  *
- * IMPL_TRAIT(circle, shape)
+ * IMPL_TRAIT(Circle, Shape)
  * ```
  *
  * The basic trick to implement a trait is to have an implementor object contain
  * a *virtual table* with the set of functions corresponding to the
  * trait. The first section of the `shape.h` file is the specification of
- * such a virtual table, defined as the `shape_vt` type.  Every implementor type
+ * such a virtual table, defined as the `Shape_vt` type.  Every implementor type
  * will have to provide a specific implementation for these functions.
- * The `shape` trait type, defined in the second section of this file,
+ * The `Shape` trait type, defined in the second section of this file,
  * represents an object implementing the interface. It contains a pointer
  * to the object `impltor` plus a pointer to the concrete virtual table
  * with the actual functions that should be executed on the object when
- * regarded as a `shape`. This is the general form for any trait.
+ * regarded as a `Shape`. This is the general form for any trait.
  * In the third section of the file, we have the declarations for the public
  * versions of the trait methods.
  *
  * In order to implement a trait, the implementor has to include a trait object
  * as one of its members. **This trait has to be called `_t_<name of trait>`**.
- * For example, the `circle` type has a member `_t_shape`. This trait object
+ * For example, the `Circle` type has a member `_t_Shape`. This trait object
  * two components. The `impltor` reference must be set to point to the
  * implementor itself. The virtual table `vt` must point to a virtual table
  * with custom functions to the implementor type. Each implementor type typically
@@ -170,32 +170,32 @@
  * the appropriate function of its virtual table. For example, if we have
  * a `circle` object `c`, then
  * ```C
- * dimension dc = c->_t_shape->get_dimension(&c->_t_shape);
+ * Dimension dc = c->_t_shape->get_dimension(&c->_t_shape);
  * ```
  * would call its `circle_get_dimension()` method.
  * However, this form is very inconvenient and very far from that of
  * line 3 in the very first example above. To get closer to that form, we
  * could use the public trait function
  * ```C
- * dimension dc = get_dimension(c->_t_shape);
+ * Dimension dc = get_dimension(c->_t_Shape);
  * ```
  * which is much cleaner and closer to the initially intended form. However,
  * this is still slightly inconvenient for it requires the user of the
  * `circle` type to know implementation details about the type, such as
- * that it has a member `_t_shape`. What we want is to say
- * 'get the dimension of circle `c` seen AS a `shape` TRAIT implementor'.
+ * that it has a member `_t_Shape`. What we want is to say
+ * 'get the Dimension of Circle `c` seen AS a `shape` TRAIT implementor'.
  * For that, we should used the preferred form
  * ```C
- * dimension dc = get_dimension( AS_TRAIT(c, circle, shape) );
+ * Dimension dc = get_dimension( AS_TRAIT(c, Circle, Shape) );
  * ```
  * using the general ::AS_TRAIT macro.
  * Alternatively, we could define a function
  * ```C
- * shape *circle_as_shape(circle *c);
+ * Shape *Circle_as_Shape(Circle *c);
  * ```
- * to return the `shape` representation of a `circle`, and use
+ * to return the `Shape` representation of a `Circle`, and use
  * ```C
- * dimension dc = get_dimension( circle_as_shape(c) );
+ * Dimension dc = get_dimension( Circle_as_Shape(c) );
  * ```
  * This method is declared via the ::DECL_TRAIT macro in `circle.h`
  * and its implementation is generated via the ::IMPL_TRAIT macro in `circle.c`.

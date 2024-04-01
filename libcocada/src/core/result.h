@@ -37,7 +37,7 @@
  * this function could be.
  *
  * ```C
- * T* read_T_from_file(char *path);
+ * T* load_T(char *path);
  * ```
  *
  * However, this process may incur in a IO runtime error. In this case, we
@@ -51,14 +51,14 @@
  * } E;
  * ```
  *
- * By using the macro `DECL_RESULT_OK_ERR(R, T*, E*) a type named `R_res` which could
+ * By using the macro `DECL_RESULT_OK_ERR(LoadT, T*, E) a type named `LoadTOkErrResult` which could
  * be used as follows.
  *
  * ```C
- * DECL_RESULT_OK(R, T*, E*);
+ * DECL_RESULT_OK_ERR(LoadT, T*, E)
  *
- * R_res read_T_from_file(char *path) {
- *  R_res result;
+ * RESULT_OK_ERR(LoadT) load_T(char *path) {
+ *  RESULT_OK_ERR(LoadT) result;
  *  T *read_obj;
  *  // try to read the object from file into read_obj
  *  // if an error occurs at some point, goto FAIL
@@ -81,50 +81,52 @@
 
 #include "coretype.h"
 
-/**
- * @brief Declares a @p NAME_res result type with success value only.
- */
-#define DECL_RESULT_OK(NAME, OK_RES_TYPE) \
+
+#define RESULT_OK(NAME) NAME##OkResult
+
+#define DECL_RESULT_OK(NAME, OK_TYPE) \
 	typedef struct {\
 		bool ok;\
-		OK_RES_TYPE val;\
-	} NAME##_res;
+		OK_TYPE val;\
+	} RESULT_OK(NAME);
 
 
-/**
- * @brief Declares a @p NAME_res result type with error value only.
- */
-#define DECL_RESULT_ERR(NAME, ERR_RES_TYPE) \
+#define RESULT_ERR(NAME) NAME##ErrResult
+
+#define DECL_RESULT_ERR(NAME, ERR_TYPE) \
 	typedef struct {\
 		bool ok;\
-		ERR_RES_TYPE err;\
-	} NAME##_res;
+		ERR_TYPE err;\
+	} RESULT_ERR(NAME);
 
 
 /**
  * @brief Declares a @p NAME_res result type with success and error values.
  */
-#define DECL_RESULT_OK_ERR(NAME, OK_RES_TYPE, ERR_RES_TYPE) \
+#define RESULT_OK_ERR(NAME) NAME##OkErrResult
+
+#define DECL_RESULT_OK_ERR(NAME, OK_TYPE, ERR_TYPE) \
 	typedef struct {\
 		bool ok;\
 		union {\
-			OK_RES_TYPE ok;\
-			ERR_RES_TYPE err;\
+			OK_TYPE ok;\
+			ERR_TYPE err;\
 		} val;\
-	} NAME##_res;
+	} RESULT_OK_ERR(NAME);
+
 
 typedef struct {
 	int code;
 	char *msg;
-} code_msg_err;
+} CodeMsg;
 
 
-DECL_RESULT_ERR(code_msg_err, code_msg_err)
+DECL_RESULT_ERR(CodeMsg, CodeMsg)
 
-#define DECL_OK(TYPE, ...) DECL_RESULT_OK(TYPE##_ok, TYPE)
-#define DECL_OK_ERR(TYPE, ...) DECL_RESULT_OK_ERR(TYPE##_ok_err, TYPE, code_msg_err)
-
+#define DECL_OK(OK_TYPE, ...) DECL_RESULT_OK(OK_TYPE, OK_TYPE)
 XX_CORETYPES(DECL_OK)
+
+#define DECL_OK_ERR(OK_TYPE, ...) DECL_RESULT_OK_ERR(OK_TYPE, OK_TYPE, CodeMsg)
 XX_CORETYPES(DECL_OK_ERR)
 
 #endif

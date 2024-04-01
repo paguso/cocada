@@ -44,7 +44,7 @@ struct __kllsumm {
 	double k_const;
 	size_t npts;
 	size_t cap;
-	finaliser *chd_fr;
+	Finaliser *chd_fr;
 };
 
 
@@ -56,7 +56,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err)
 
 
 kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
-                     finaliser *chd_fr)
+                     Finaliser *chd_fr)
 {
 	size_t cap = (size_t) ceil( (1.0 / (1.0 - KLL_DEFAULT_C)) *
 	                            ( KLL_MIN_K_BIG_OH_CONST * (1.0 / err) * sqrt(log(1.0 / err)) ) );
@@ -74,7 +74,7 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double err,
 
 
 kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
-                              size_t capacity, finaliser *chd_fr)
+                              size_t capacity, Finaliser *chd_fr)
 {
 	assert (err > 0);
 	kllsumm *ret = NEW(kllsumm);
@@ -107,7 +107,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double err,
 }
 
 
-void kll_finalise(void *ptr, const finaliser *fnr)
+void kll_finalise(void *ptr, const Finaliser *fnr)
 {
 	kllsumm *self = (kllsumm *)ptr;
 	DESTROY_FLAT(self->coins, vec);

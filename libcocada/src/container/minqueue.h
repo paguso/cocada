@@ -63,7 +63,7 @@ minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
 /**
  * @brief Desctructor
  */
-void minqueue_finalise(void *ptr, const finaliser *fnr);
+void minqueue_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

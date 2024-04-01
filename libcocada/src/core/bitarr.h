@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "coretype.h"
 #include "strbuf.h"
 
 /**
@@ -94,7 +95,7 @@ int bitarr_sprint( char *str, const byte_t *ba, size_t nbits,
  * @brief Prints a representation of a bitarray as text to a string buffer.
  * @return Upon success returns the number of chars printed
  */
-int bitarr_sbprint(strbuf *buf, const byte_t *ba, size_t nbits,
+int bitarr_sbprint(StrBuf *buf, const byte_t *ba, size_t nbits,
                    uint bytes_per_line, uint indent);
 
 

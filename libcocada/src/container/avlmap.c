@@ -52,13 +52,13 @@ AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp)
 }
 
 
-void avlmap_finalise(void *ptr, const finaliser *fnr)
+void avlmap_finalise(void *ptr, const Finaliser *fnr)
 {
 	AVLMap *self = (AVLMap *)ptr;
 	AVLMapIter *it = avlmap_get_iter(self, POST_ORDER);
-	const finaliser *key_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
+	const Finaliser *key_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
 	                           0) : NULL;
-	const finaliser *val_fnr = (finaliser_nchd(fnr) > 1) ? finaliser_chd(fnr,
+	const Finaliser *val_fnr = (finaliser_nchd(fnr) > 1) ? finaliser_chd(fnr,
 	                           1) : NULL;
 	if (key_fnr != NULL || val_fnr != NULL) {
 		FOREACH_IN_ITER(entry, AVLMapEntry, AVLMapIter_as_Iter(it)) {

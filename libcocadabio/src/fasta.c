@@ -29,6 +29,7 @@
 #include "cstrutil.h"
 #include "fasta.h"
 #include "new.h"
+#include "result.h"
 #include "strread.h"
 #include "trait.h"
 #include "errlog.h"
@@ -53,7 +54,7 @@ static void _reset(strread *self)
 static int _getc(strread *self)
 {
 	fastaread *fr = (fastaread *)self->impltor;
-	int c;
+	int c = EOF;
 	while (true) {
 		c = fgetc(fr->src);
 		if (c == '>') {
@@ -145,15 +146,15 @@ struct _fasta {
 };
 
 
-rawptr_ok_err_res fasta_open(const char *filename)
+RESULT_OK_ERR(rawptr) fasta_open(const char *filename)
 {
-	rawptr_ok_err_res result = {.ok = true};
+	RESULT_OK_ERR(rawptr) result = {.ok = true};
 	fasta *f = NEW(fasta);
 	f->src = fopen(filename, "r");
 	if (errno) {
 		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
 		result.ok = false;
-		result.val.err = (code_msg_err) {
+		result.val.err = (CodeMsg) {
 			.code = errno, .msg = strerror(errno)
 		};
 		goto ERROR;

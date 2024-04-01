@@ -251,11 +251,11 @@ static size_t read_size(FILE *stream)
 }
 
 
-static void write_obj(som *model, void *ptr, FILE *stream, deque *dq,
+static void write_obj(som *model, void *ptr, FILE *stream, Deque *dq,
                       vec *written, bool check_if_written);
 
 
-static void read_obj(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
+static void read_obj(som *model, void *ptr, FILE *stream, Deque *dq, vec *read,
                      hashmap *mem_map);
 
 
@@ -291,7 +291,7 @@ static void read_prim(som *model, void *dest, FILE *stream, vec *read,
 }
 
 
-void write_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *written)
+void write_rawptr(som *model, void *ptr, FILE *stream, Deque *dq, vec *written)
 {
 	write_type(som_rawptr, stream);
 	write_addr(ptr, stream);
@@ -328,7 +328,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
 }
 
 
-void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
+void read_rawptr(som *model, void *ptr, FILE *stream, Deque *dq, vec *read,
                  hashmap *mem_map)
 {
 	rawptr *dest = (rawptr *)ptr;
@@ -369,7 +369,7 @@ void read_rawptr(som *model, void *ptr, FILE *stream, deque *dq, vec *read,
 }
 
 
-void write_struct(som *model, void *obj, FILE *stream, deque *dq, vec *written)
+void write_struct(som *model, void *obj, FILE *stream, Deque *dq, vec *written)
 {
 	write_type(som_struct, stream);
 	write_addr(obj, stream);
@@ -385,7 +385,7 @@ void write_struct(som *model, void *obj, FILE *stream, deque *dq, vec *written)
 }
 
 
-void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read,
+void read_struct(som *model, void *dest, FILE *stream, Deque *dq, vec *read,
                  hashmap *mem_map)
 {
 	size_t type = read_type(stream);
@@ -415,7 +415,7 @@ static void write_blob(void *ptr, size_t size, FILE *stream)
 }
 
 
-void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
+void write_arr(som *model, void *arr, FILE *stream, Deque *dq, vec *written)
 {
 	ERROR_ASSERT(som_nchd(model) == 1, "Array SOM requires one nested child.\n");
 	write_type(som_arr, stream);
@@ -451,7 +451,7 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
 }
 
 
-void write_string(som *model, void *arr, FILE *stream, deque *dq, vec *written)
+void write_string(som *model, void *arr, FILE *stream, Deque *dq, vec *written)
 {
 	write_type(model->type, stream);
 	write_addr(arr, stream);
@@ -473,7 +473,7 @@ static void read_blob(void *ptr, size_t size, FILE *stream)
 // ptr_addr contains the address of the pointer to the array to be read in
 // the space taken by the array is known only when it is read,
 // so the array could not have been allocated before
-void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
+void read_arr(som *model, void *ptr_addr, FILE *stream, Deque *dq, vec *read,
               hashmap *mem_map)
 {
 	size_t type = read_type(stream);
@@ -522,7 +522,7 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 }
 
 
-void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
+void read_string(som *model, void *ptr_addr, FILE *stream, Deque *dq, vec *read,
                  hashmap *mem_map)
 {
 	size_t type = read_type(stream);
@@ -543,7 +543,7 @@ void read_string(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
 
 
 
-static void write_obj(som *model, void *obj, FILE *stream, deque *dq,
+static void write_obj(som *model, void *obj, FILE *stream, Deque *dq,
                       vec *written, bool check_if_written)
 {
 	while (model->type == som_proxy) {
@@ -572,7 +572,7 @@ static void write_obj(som *model, void *obj, FILE *stream, deque *dq,
 }
 
 
-static void read_obj(som *model, void *dest, FILE *stream, deque *dq, vec *read,
+static void read_obj(som *model, void *dest, FILE *stream, Deque *dq, vec *read,
                      hashmap *mem_map)
 {
 	while (model->type == som_proxy) {
@@ -604,7 +604,7 @@ static void bfs_write(som *model, void *obj, FILE *stream)
 	vec *written = vec_new(sizeof(mem_chunk));
 	//vec_push(written, &nullchunk);
 	add_chunk(written, nullchunk);
-	deque *dq = deque_new(sizeof(obj_model));
+	Deque *dq = deque_new(sizeof(obj_model));
 	obj_model om = {.obj = obj, .model = model};
 	deque_push_back(dq, &om);
 	while (!deque_empty(dq)) {
@@ -626,7 +626,7 @@ static void *bfs_read(som *model, FILE *stream)
 	                                ident_hash_size_t, eq_size_t );
 	void *nullptr = NULL;
 	hashmap_ins(mem_map, &nullptr, &nullptr);
-	deque *dq = deque_new(sizeof(obj_model));
+	Deque *dq = deque_new(sizeof(obj_model));
 
 	rawptr *ptr = NEW(rawptr);
 	*ptr = (model->type == som_arr) ? ptr : malloc(model->size);

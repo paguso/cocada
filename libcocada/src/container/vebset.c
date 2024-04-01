@@ -462,7 +462,7 @@ vebset *vebset_new()
 }
 
 
-void vebset_finalise(void *ptr, const finaliser *fnr)
+void vebset_finalise(void *ptr, const Finaliser *fnr)
 {
 	vebset *self = (vebset *)ptr;
 	vebnode_free(self->tree, self->nbits);

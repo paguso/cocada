@@ -64,7 +64,7 @@ AVL *avl_new(size_t typesize, cmp_func cmp)
 }
 
 
-static void __avl_finaliser(avlnode *root, const finaliser *fnr)
+static void __avl_finaliser(avlnode *root, const Finaliser *fnr)
 {
 	if (root == NULL) {
 		return;
@@ -80,7 +80,7 @@ static void __avl_finaliser(avlnode *root, const finaliser *fnr)
 }
 
 
-void avl_finalise(void *ptr, const finaliser *fnr)
+void avl_finalise(void *ptr, const Finaliser *fnr)
 {
 	AVL *self = (AVL *)ptr;
 	if (finaliser_nchd(fnr) > 0) {

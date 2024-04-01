@@ -22,10 +22,7 @@
 #ifndef CLI_H
 #define CLI_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "hashmap.h"
+#include "coretype.h"
 #include "vec.h"
 #include "new.h"
 #include "result.h"
@@ -441,7 +438,7 @@ cliparser *cliparser_new(char *name, char *help);
  * Use with default destructor `FNR(cliparser)`, or
  * simply `DESTROY_FLAT(obj, cliparser)`.
  */
-void cliparser_finalise(void *ptr, const finaliser *fnr);
+void cliparser_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
@@ -589,8 +586,8 @@ DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
  * `3`, `4`, and `5`.
  *
  */
-cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv,
-                             bool exit_on_error);
+RESULT_OK_ERR(cliparse) cliparser_parse(cliparser *cmd, int argc, char **argv,
+                                        bool exit_on_error);
 
 
 //const char *cliparser_parse_status_msg(cliparser *cmd);

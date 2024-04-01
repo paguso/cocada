@@ -31,6 +31,7 @@
 #include "coretype.h"
 #include "arrays.h"
 #include "strbuf.h"
+#include <stdio.h>
 
 /**
  * @brief Substitution cost function type
@@ -61,7 +62,7 @@ int unit_subst(char a, char b);
  * @return int The cost of the alignment.
  */
 int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
-                        size_t tgt_len, strbuf *cigar);
+                        size_t tgt_len, StrBuf *cigar);
 
 
 /**
@@ -87,7 +88,7 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
  */
 int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
                         size_t tgt_len,
-                        int gap_open, int gap_ext, subst_cost_fn subst, strbuf *cigar);
+                        int gap_open, int gap_ext, subst_cost_fn subst, StrBuf *cigar);
 
 /**
  * @brief Prints the alignment of two strings to the given file stream.
@@ -99,6 +100,7 @@ int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
  * @param tgt The target string
  * @param tgt_from The start position of the target string
  * @param tgt_to The end position of the target string
+
  * @param cigar The CIGAR string of the alignment
  * @param cigar_len The length of the CIGAR string
  */
@@ -111,7 +113,7 @@ void fprintf_alignment(FILE *out, const char *qry, size_t qry_from,
  * @brief Simplifies a CIGAR strbuf in place by merging adjacent
  * sequences of the same operation.
  */
-void compress_cigar(strbuf *cigar);
+void compress_cigar(StrBuf *cigar);
 
 
 #endif // ALIGN_H

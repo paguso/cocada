@@ -43,7 +43,7 @@ int format_sprint(format *self, char *dest)
 }
 
 
-int format_sbprint(format *self, strbuf *buf)
+int format_sbprint(format *self, StrBuf *buf)
 {
 	return self->vt.sbprint(self, buf);
 }

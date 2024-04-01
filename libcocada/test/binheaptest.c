@@ -51,7 +51,7 @@ int cmp_ptr_dbl(const void *p1, const void *p2)
 void test_binheap_ins_remv(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *maxheap = binheap_new(sizeof(double *), &cmp_ptr_dbl);
+	BinHeap *maxheap = binheap_new(sizeof(double *), &cmp_ptr_dbl);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
@@ -81,7 +81,7 @@ void test_binheap_ins_remv(CuTest *tc)
 void test_binheap_ins_remv_int(CuTest *tc)
 {
 	size_t len = 10;
-	binheap *maxheap = binheap_new(sizeof(int), cmp_int);
+	BinHeap *maxheap = binheap_new(sizeof(int), cmp_int);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	int rv[len];

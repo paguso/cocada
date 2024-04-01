@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "coretype.h"
 #include "new.h"
 #include "xchar.h"
 
@@ -131,7 +132,7 @@ void alphabet_free(alphabet *ab);
 /**
  * @brief Destructor
  */
-void alphabet_finalise(void *ptr, const finaliser *fnr);
+void alphabet_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**

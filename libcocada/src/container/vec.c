@@ -133,11 +133,11 @@ static void _check_and_resize(vec *v)
 }
 
 
-void vec_finalise(void *ptr, const finaliser *fnr )
+void vec_finalise(void *ptr, const Finaliser *fnr )
 {
 	vec *v = (vec *)ptr;
 	if (finaliser_nchd(fnr)) {
-		const finaliser *chd_fr = finaliser_chd(fnr, 0);
+		const Finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i = 0, l = vec_len(v); i < l; i++) {
 			void *chd =  vec_get_mut(v, i);
 			FINALISE(chd, chd_fr);

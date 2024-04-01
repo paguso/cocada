@@ -101,7 +101,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t freqs[])
 		bitarr_set_bit(hcode->tree[i].ab_mask, i, 1);
 	}
 
-	binheap *nfheap = binheap_new(sizeof(nodefreq), nodefreq_cmp);
+	BinHeap *nfheap = binheap_new(sizeof(nodefreq), nodefreq_cmp);
 	for (size_t i = 0; i < hcode->size; i++) {
 		nodefreq nf = {.node = i, .freq = freqs[i]};
 		binheap_ins(nfheap, &nf);

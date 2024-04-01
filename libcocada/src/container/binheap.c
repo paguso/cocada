@@ -30,36 +30,36 @@
 #include "order.h"
 
 
-struct _binheap {
+struct _BinHeap {
 	vec *data;
 	cmp_func cmp;
 };
 
-binheap *binheap_new( size_t typesize,
+BinHeap *binheap_new( size_t typesize,
                       cmp_func cmp )
 {
-	binheap *heap = NEW(binheap);
+	BinHeap *heap = NEW(BinHeap);
 	heap->data = vec_new(typesize);
 	heap->cmp = cmp;
 	return heap;
 }
 
 
-void binheap_finalise(void *ptr, const finaliser *fnr)
+void binheap_finalise(void *ptr, const Finaliser *fnr)
 {
-	binheap *heap = (binheap *)ptr;
+	BinHeap *heap = (BinHeap *)ptr;
 	vec_finalise(heap->data, fnr);
 	FREE(heap->data);
 }
 
 
-size_t binheap_size(const binheap *heap)
+size_t binheap_size(const BinHeap *heap)
 {
 	return vec_len(heap->data);
 }
 
 
-static size_t _bubble_up(binheap *heap)
+static size_t _bubble_up(BinHeap *heap)
 {
 	size_t i = binheap_size(heap) - 1;
 	while ( i > 0 &&
@@ -72,7 +72,7 @@ static size_t _bubble_up(binheap *heap)
 }
 
 
-static size_t _bubble_down(binheap *heap, size_t pos)
+static size_t _bubble_down(BinHeap *heap, size_t pos)
 {
 	size_t i, l, r, m, n;
 	n = binheap_size(heap);
@@ -103,14 +103,14 @@ static size_t _bubble_down(binheap *heap, size_t pos)
 }
 
 
-void binheap_ins(binheap *heap, const void *elt)
+void binheap_ins(BinHeap *heap, const void *elt)
 {
 	vec_push(heap->data, elt);
 	_bubble_up(heap);
 }
 
 
-void binheap_remv(binheap *heap, void *dest)
+void binheap_remv(BinHeap *heap, void *dest)
 {
 	if (vec_len(heap->data) == 0) return;
 	vec_swap(heap->data, 0, vec_len(heap->data) - 1);
@@ -121,12 +121,12 @@ void binheap_remv(binheap *heap, void *dest)
 
 
 #define BINHEAP_PUSH_IMPL( TYPE )\
-	void binheap_ins_##TYPE(binheap *heap, TYPE val)\
+	void binheap_ins_##TYPE(BinHeap *heap, TYPE val)\
 	{   binheap_ins(heap, &val);   }
 
 
 #define BINHEAP_POP_IMPL( TYPE )\
-	TYPE binheap_remv_##TYPE(binheap *heap)\
+	TYPE binheap_remv_##TYPE(BinHeap *heap)\
 	{   TYPE s; binheap_remv(heap, &s); return s; }
 
 

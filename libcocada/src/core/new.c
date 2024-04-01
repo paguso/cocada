@@ -26,16 +26,16 @@
 #include "memdbg.h"
 
 
-struct _finaliser {
+struct _Finaliser {
 	finalise_func fn;
 	size_t nchd;
-	struct _finaliser **chd;
+	struct _Finaliser **chd;
 };
 
 
-finaliser *finaliser_new( finalise_func fn )
+Finaliser *finaliser_new( finalise_func fn )
 {
-	finaliser *fnr = NEW(finaliser);
+	Finaliser *fnr = NEW(Finaliser);
 	fnr->fn = fn;
 	fnr->nchd = 0;
 	fnr->chd = NULL;
@@ -43,15 +43,15 @@ finaliser *finaliser_new( finalise_func fn )
 }
 
 
-finaliser *finaliser_clone(const finaliser *src)
+Finaliser *finaliser_clone(const Finaliser *src)
 {
 	if (src == NULL) {
 		return NULL;
 	}
-	finaliser *fnr = NEW(finaliser);
+	Finaliser *fnr = NEW(Finaliser);
 	fnr->fn = src->fn;
 	fnr->nchd = src->nchd;
-	fnr->chd = (finaliser **) calloc(src->nchd, sizeof(finaliser *));
+	fnr->chd = (Finaliser **) calloc(src->nchd, sizeof(Finaliser *));
 	for (size_t i = 0; i < src->nchd; i++ ) {
 		fnr->chd[i] = finaliser_clone(src->chd[i]);
 	}
@@ -59,7 +59,7 @@ finaliser *finaliser_clone(const finaliser *src)
 }
 
 
-void finaliser_free(finaliser *self)
+void finaliser_free(Finaliser *self)
 {
 	if (self == NULL) return;
 	for (size_t i = 0; i < self->nchd; i++) {
@@ -70,39 +70,39 @@ void finaliser_free(finaliser *self)
 }
 
 
-void finaliser_call(const finaliser *self, void *ptr)
+void finaliser_call(const Finaliser *self, void *ptr)
 {
-	self->fn(ptr, (finaliser *)self);
+	self->fn(ptr, (Finaliser *)self);
 }
 
 
-size_t finaliser_nchd(const finaliser *self)
+size_t finaliser_nchd(const Finaliser *self)
 {
 	return self->nchd;
 }
 
 
-const finaliser *finaliser_chd(const finaliser *self, size_t index)
+const Finaliser *finaliser_chd(const Finaliser *self, size_t index)
 {
-	return ((finaliser **)self->chd)[index];
+	return ((Finaliser **)self->chd)[index];
 }
 
 
-finaliser *finaliser_cons(finaliser *par, const finaliser *chd)
+Finaliser *finaliser_cons(Finaliser *par, const Finaliser *chd)
 {
-	par->chd = (finaliser **) realloc(par->chd,
-	                                  ( par->nchd + 1) * sizeof(finaliser *));
-	par->chd[par->nchd++] =  (finaliser *)chd;
+	par->chd = (Finaliser **) realloc(par->chd,
+	                                  ( par->nchd + 1) * sizeof(Finaliser *));
+	par->chd[par->nchd++] =  (Finaliser *)chd;
 	return par;
 }
 
 
-static void _empty_finalise(void *ptr, const finaliser *fnr ) {}
+static void _empty_finalise(void *ptr, const Finaliser *fnr ) {}
 
 
-finaliser *finaliser_new_empty()
+Finaliser *finaliser_new_empty()
 {
-	finaliser *ret = NEW(finaliser);
+	Finaliser *ret = NEW(Finaliser);
 	ret->fn = _empty_finalise;
 	ret->nchd = 0;
 	ret->chd = NULL;
@@ -111,7 +111,7 @@ finaliser *finaliser_new_empty()
 
 
 // ptr is a pointer to an object reference (pointer)
-static void _ptr_finalise(void *ptr, const finaliser *fr )
+static void _ptr_finalise(void *ptr, const Finaliser *fr )
 {
 	void *pointee = *((void **)ptr);
 	if ( finaliser_nchd(fr) > 0 )
@@ -121,9 +121,9 @@ static void _ptr_finalise(void *ptr, const finaliser *fr )
 }
 
 
-finaliser *finaliser_new_ptr()
+Finaliser *finaliser_new_ptr()
 {
-	finaliser *ret = NEW(finaliser);
+	Finaliser *ret = NEW(Finaliser);
 	ret->fn = _ptr_finalise;
 	ret->nchd = 0;
 	ret->chd = NULL;
@@ -131,7 +131,7 @@ finaliser *finaliser_new_ptr()
 }
 
 
-finaliser *finaliser_new_ptr_to_obj(const finaliser *chd)
+Finaliser *finaliser_new_ptr_to_obj(const Finaliser *chd)
 {
 	return finaliser_cons(finaliser_new_ptr(), chd);
 }

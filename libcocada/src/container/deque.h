@@ -42,14 +42,14 @@
 /**
  * Opaque deque type
  */
-typedef struct _deque deque;
+typedef struct _Deque Deque;
 
 
 /**
  * @brief Constructor.
  * @param typesize The individual size of stored elements (in bytes).
  */
-deque *deque_new(size_t typesize);
+Deque *deque_new(size_t typesize);
 
 
 /**
@@ -57,125 +57,125 @@ deque *deque_new(size_t typesize);
  * @param typesize The individual size of stored elements (in bytes).
  * @param capacity The initial capacity.
  */
-deque *deque_new_with_capacity(size_t typesize, size_t capacity);
+Deque *deque_new_with_capacity(size_t typesize, size_t capacity);
 
 
 /**
  * @brief Finaliser
  * @see new.h
  */
-void deque_finalise(void *ptr, const finaliser *fnr);
+void deque_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Checks whether the deque is empty.
  */
-bool deque_empty(const deque *q);
+bool deque_empty(const Deque *q);
 
 
 /**
  * @brief Returns the length (logical size) of the deque.
  */
-size_t deque_len(const deque *q);
+size_t deque_len(const Deque *q);
 
 
 /**
  * @brief Returns an internal reference to the element at a given position.
  * @warning No check is performed on @p q bounds.
  */
-const void *deque_get(const deque *q, size_t pos);
+const void *deque_get(const Deque *q, size_t pos);
 
 
 /**
  * @brief Copies the element at a given position into @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
-void deque_get_cpy(const deque *q, size_t pos, void *dest);
+void deque_get_cpy(const Deque *q, size_t pos, void *dest);
 
 
 /**
  * @brief Returns an internal reference to the element at the first position.
  * @warning No check is performed on @p q bounds.
  */
-const void *deque_front(const deque *q);
+const void *deque_front(const Deque *q);
 
 
 /**
  * @brief Returns an internal reference to the element at the last position.
  * @warning No check is performed on @p q bounds.
  */
-const void *deque_back(const deque *q);
+const void *deque_back(const Deque *q);
 
 
 /**
  * @brief Pushes an element onto the back of the deque.
  */
-void deque_push_back(deque *q, const void *elt);
+void deque_push_back(Deque *q, const void *elt);
 
 
 /**
  * @brief Pops the last element of @p q and copies its value to @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
-void deque_pop_back(deque *q, void *dest);
+void deque_pop_back(Deque *q, void *dest);
 
 
 /**
  * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
-void deque_del_back(deque *q);
+void deque_del_back(Deque *q);
 
 
 /**
  * @brief Pushes an element onto the back of the deque.
  */
-void deque_push_front(deque *q, const void *elt);
+void deque_push_front(Deque *q, const void *elt);
 
 
 /**
  * @brief Pops the first element of @p q and copies its value to @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
-void deque_pop_front(deque *q, void *dest);
+void deque_pop_front(Deque *q, void *dest);
 
 
 /**
  * @brief Removes the last element of @p q.
  * @warning No check is performed on @p q bounds.
  */
-void deque_del_front(deque *q);
+void deque_del_front(Deque *q);
 
 
 #define DEQUE_NEW_DECL( TYPE )\
-	deque *deque_new_##TYPE();
+	Deque *deque_new_##TYPE();
 
 #define DEQUE_GET_DECL( TYPE )\
-	TYPE deque_get_##TYPE(const deque *q, size_t pos);
+	TYPE deque_get_##TYPE(const Deque *q, size_t pos);
 
 #define DEQUE_FRONT_DECL( TYPE )\
-	TYPE deque_front_##TYPE(const deque *q);
+	TYPE deque_front_##TYPE(const Deque *q);
 
 #define DEQUE_BACK_DECL( TYPE )\
-	TYPE deque_back_##TYPE(const deque *q);
+	TYPE deque_back_##TYPE(const Deque *q);
 
 #define DEQUE_PUSH_BACK_DECL( TYPE )\
-	void deque_push_back_##TYPE(deque *q, TYPE val);
+	void deque_push_back_##TYPE(Deque *q, TYPE val);
 
 #define DEQUE_POP_BACK_DECL( TYPE )\
-	TYPE deque_pop_back_##TYPE(deque *q);
+	TYPE deque_pop_back_##TYPE(Deque *q);
 
 #define DEQUE_REMV_BACK_DECL( TYPE )\
-	TYPE deque_del_back_##TYPE(deque *q);
+	TYPE deque_del_back_##TYPE(Deque *q);
 
 #define DEQUE_PUSH_FRONT_DECL( TYPE )\
-	void deque_push_front_##TYPE(deque *q, TYPE val);
+	void deque_push_front_##TYPE(Deque *q, TYPE val);
 
 #define DEQUE_POP_FRONT_DECL( TYPE )\
-	TYPE deque_pop_front_##TYPE(deque *q);
+	TYPE deque_pop_front_##TYPE(Deque *q);
 
 #define DEQUE_REMV_FRONT_DECL( TYPE )\
-	TYPE deque_del_front_##TYPE(deque *q);
+	TYPE deque_del_front_##TYPE(Deque *q);
 
 #define DEQUE_ALL_DECL( TYPE, ... )\
 	DEQUE_NEW_DECL(TYPE)\

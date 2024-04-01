@@ -174,7 +174,7 @@ void alphabet_free(alphabet *ab)
 }
 
 
-void alphabet_finalise(void *ptr, const finaliser *fnr)
+void alphabet_finalise(void *ptr, const Finaliser *fnr)
 {
 	alphabet *ab = (alphabet *)ptr;
 	if (ab == NULL) return;

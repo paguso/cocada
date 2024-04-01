@@ -24,10 +24,11 @@
 
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "new.h"
 
-typedef struct _strbuf strbuf;
+typedef struct _StrBuf StrBuf;
 
 /**
  * @file strbuf.h
@@ -39,26 +40,26 @@ typedef struct _strbuf strbuf;
 /**
  * @brief Creates a new empty string buffer.
  */
-strbuf *strbuf_new();
+StrBuf *strbuf_new();
 
 
 /**
  * @brief Creates an empty string buffer with a given initial capacity.
  */
-strbuf *strbuf_new_with_capacity(size_t init_capacity);
+StrBuf *strbuf_new_with_capacity(size_t init_capacity);
 
 
 /**
  * @brief Finaliser
  * @see new.h
  */
-void strbuf_finalise(void *ptr, const finaliser *fnr);
+void strbuf_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Destructor.
  */
-void strbuf_free(strbuf *self);
+void strbuf_free(StrBuf *self);
 
 
 /**
@@ -67,13 +68,13 @@ void strbuf_free(strbuf *self);
  *          string and the former is left untouched.
  * @param src The source string **NO TRANSFER OF OWNERSHIP**.
  */
-strbuf *strbuf_new_from_str(const char *src, size_t len);
+StrBuf *strbuf_new_from_str(const char *src, size_t len);
 
 
 /**
  * @brief Returns the "logical" length of a given dynamic string.
  */
-size_t strbuf_len(strbuf *self);
+size_t strbuf_len(StrBuf *self);
 
 
 /**
@@ -82,67 +83,67 @@ size_t strbuf_len(strbuf *self);
  * be represented in the currently allocated memory, excluding
  * the null terminating '\0'.
  */
-size_t strbuf_capacity(strbuf *self);
+size_t strbuf_capacity(StrBuf *self);
 
 
 /**
  * @brief Adjusts the physical size of the string buffer to the least
  * amount necessary its current content.
  *
- * @warning The strbuf may have a minimum required size.
+ * @warning The StrBuf may have a minimum required size.
  */
-void strbuf_fit(strbuf *self);
+void strbuf_fit(StrBuf *self);
 
 
 /**
  * @brief Tests whether two string buffers have the same contents
  * regardless of their capacity.
  */
-bool strbuf_eq(strbuf *self, strbuf *other);
+bool strbuf_eq(StrBuf *self, StrBuf *other);
 
 
 /**
  * @brief Returns the character at a given position.
  */
-char strbuf_get(strbuf *self, size_t pos);
+char strbuf_get(StrBuf *self, size_t pos);
 
 
 /**
  * @brief Sets all positions to '\0'.
  */
-void strbuf_clear(strbuf *self);
+void strbuf_clear(StrBuf *self);
 
 
 /**
  * @brief Sets (overwrites) the character of a given position @p pos to @p c.
  */
-void strbuf_set(strbuf *self, size_t pos, char c);
+void strbuf_set(StrBuf *self, size_t pos, char c);
 
 
 /**
  * @brief Appends a character @p c.
  */
-void strbuf_append_char(strbuf *self, char c);
+void strbuf_append_char(StrBuf *self, char c);
 
 
 /**
  * @brief Appends a copy of the first @p len chars of a static string @p str.
  * @warning No bounds checks performed.
  */
-void strbuf_nappend(strbuf *self, const char *src, size_t len);
+void strbuf_nappend(StrBuf *self, const char *src, size_t len);
 
 
 /**
  * @brief Same as `strbuf_nappend(self, src, strlen(src))`.
  */
-void strbuf_append(strbuf *self, const char *src);
+void strbuf_append(StrBuf *self, const char *src);
 
 
 /**
  * @brief Inserts a string @p str of length @p len at position @p pos.
  * @warning No bound checks performed.
  */
-void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len);
+void strbuf_ins(StrBuf *self, size_t pos, const char *str, size_t len);
 
 
 /**
@@ -153,7 +154,7 @@ void strbuf_ins(strbuf *self, size_t pos, const char *str, size_t len);
  * chars, since a '\0' is added right after the copied substring such that
  * @p dest is a prorperly null-terminated C string.
  */
-void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest);
+void strbuf_cut(StrBuf *self, size_t from, size_t len, char *dest);
 
 
 /**
@@ -164,39 +165,39 @@ void strbuf_cut(strbuf *self, size_t from, size_t len, char *dest);
  *
  * @warning No bound checks performed.
  */
-void strbuf_paste(strbuf *self, size_t from, const char *src, size_t len);
+void strbuf_paste(StrBuf *self, size_t from, const char *src, size_t len);
 
 
 /**
  * @brief Clips the contents of the stringbuffer.
  */
-void strbuf_clip(strbuf *self, size_t from, size_t to);
+void strbuf_clip(StrBuf *self, size_t from, size_t to);
 
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p self,
  *        separating each of these strings by @p sep
  * # Example
  * ```C
- * strbuf *self = str_buf_new_from_str("Four seasons: ");
+ * StrBuf *self = str_buf_new_from_str("Four seasons: ");
  * char *seasons[4] = {"Spring", "Summer", "Autumn", "Winter"};
  * strbuf_join(self, 4, seasons, " and ");
  * printf("%s", strbuf_as_str(self)); // prints "Four seaons: Spring and Summer and Autumn and Winter"
  * ```
  */
-void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep);
+void strbuf_join(StrBuf *self, size_t n, const char **arr, const char *sep);
 
 
 /**
  * @brief Appends a copy of the contents of @p other to  @p self.
  */
-void strbuf_cat(strbuf *self, const strbuf *other);
+void strbuf_cat(StrBuf *self, const StrBuf *other);
 
 
 /**
  * @brief Appends the @p n-prefix of @p other (or all @p other if its
  * length is <= @p n ) to @p self.
  */
-void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
+void strbuf_ncat(StrBuf *self, const StrBuf *other, size_t n);
 
 
 /**
@@ -208,7 +209,7 @@ void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
  * @p n size_t values.
  * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
  */
-size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
+size_t strbuf_find_n(StrBuf *self, const char *pat, size_t n, size_t from_pos,
                      size_t *dest);
 
 
@@ -219,7 +220,7 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
  *
  * # Example
  * ```
- * strbuf *self = strbuf_new_from_str("macaca", 6, 0);
+ * StrBuf *self = strbuf_new_from_str("macaca", 6, 0);
  * strbuf_replace_n(self, "ca", "na", 2);
  * // yelds "manana"
  * strbuf_replace_n(self, "ma", "ba", 2, 0);
@@ -230,7 +231,7 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
  *
  * @return Returns the number of substitutions actually performed.
  */
-size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace_n(StrBuf *self, const char *old_str, const char *new_str,
                         size_t n, size_t from_pos);
 
 
@@ -238,7 +239,7 @@ size_t strbuf_replace_n(strbuf *self, const char *old_str, const char *new_str,
  * @brief Same as `strbuf_replace_n(self, old_str, new_str, 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
+size_t strbuf_replace(StrBuf *self, const char *old_str, const char *new_str,
                       size_t from_pos);
 
 
@@ -246,7 +247,7 @@ size_t strbuf_replace(strbuf *self, const char *old_str, const char *new_str,
  * @brief Same as `strbuf_replace_n(self, old_str, new_str, strbuf_len(self) + 1, from)`
  * @see strbuf_replace_n
  */
-size_t strbuf_replace_all(strbuf *self, const char *old_str,
+size_t strbuf_replace_all(StrBuf *self, const char *old_str,
                           const char *new_str,
                           size_t from_pos);
 
@@ -254,7 +255,7 @@ size_t strbuf_replace_all(strbuf *self, const char *old_str,
 /**
  * @brief Reverses the contents of the string buffer.
  */
-void strbuf_reverse(strbuf *self);
+void strbuf_reverse(StrBuf *self);
 
 
 /**
@@ -267,7 +268,7 @@ void strbuf_reverse(strbuf *self);
  * null-terminating char '\0').
  *
  */
-int sbprintf(strbuf *self, const char *fmt, ...);
+int sbprintf(StrBuf *self, const char *fmt, ...);
 
 
 /**
@@ -276,7 +277,7 @@ int sbprintf(strbuf *self, const char *fmt, ...);
  * @warning The internal string can change between calls and the returned
  *          reference can become NULL or invalid.
  */
-const char *strbuf_as_str(strbuf *self);
+const char *strbuf_as_str(StrBuf *self);
 
 
 /**
@@ -286,7 +287,7 @@ const char *strbuf_as_str(strbuf *self);
  * @see cstr_trim
  * @warning After this operation, the dynamic string @p self is destroyed.
  */
-char *strbuf_detach(strbuf *self);
+char *strbuf_detach(StrBuf *self);
 
 
 
