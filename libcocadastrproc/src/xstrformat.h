@@ -27,6 +27,7 @@
 #include "xchar.h"
 #include "xstr.h"
 #include "format.h"
+#include "trait.h"
 
 /**
  * @file xstrformat.h
@@ -67,6 +68,6 @@ xstrformat *xstrformat_new_ascii(const xstr *src);
 void xstrformat_free(xstrformat *self);
 
 
-DECL_TRAIT(xstrformat, format)
+DECL_TRAIT(xstrformat, Format)
 
 #endif

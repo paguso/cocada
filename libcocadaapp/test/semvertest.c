@@ -22,6 +22,7 @@
 #include "CuTest.h"
 #include "memdbg.h"
 #include "new.h"
+#include "result.h"
 #include "semver.h"
 
 
@@ -29,9 +30,9 @@ void test_semver_from_str(CuTest *tc)
 {
 	memdbg_reset();
 	char *src = "1.0.0-beta+exp.sha.5114f85";
-	semver_res result = semver_new_from_str(src);
+	RESULT_OK(SemVer) result = semver_new_from_str(src);
 	CuAssert(tc, "Semver parse error", result.ok);
-	semver *ver = result.val;
+	SemVer *ver = result.val;
 	CuAssertIntEquals(tc, 1, ver->major);
 	CuAssertIntEquals(tc, 0, ver->minor);
 	CuAssertIntEquals(tc, 0, ver->patch);

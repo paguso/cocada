@@ -26,9 +26,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "strbuf.h"
-#include "new.h"
+#include "coretype.h"
 #include "format.h"
+#include "new.h"
+#include "strbuf.h"
+#include "trait.h"
 
 /**
  * @file bitvec.h
@@ -202,23 +204,23 @@ void bitvec_to_string ( const BitVec *bv, StrBuf *dest, size_t bytes_per_row);
 void bitvec_print(FILE *stream, const BitVec *bv, size_t bytes_per_row);
 
 
-typedef struct _bitvec_format bitvec_format;
+typedef struct _BitVecFormat BitVecFormat;
 
 
-DECL_TRAIT(bitvec_format, format);
+DECL_TRAIT(BitVecFormat, Format);
 
 
 /**
  * @brief Returns a default formatter for printing the bitvector content.
  * @see format.h
  */
-bitvec_format *bitvec_get_format(BitVec *self, uint bytes_per_row);
+BitVecFormat *bitvec_get_format(BitVec *self, uint bytes_per_row);
 
 
 /**
  * @brief Bitvector formatter destructor
  */
-void bitvec_format_free(bitvec_format *self);
+void bitvec_format_free(BitVecFormat *self);
 
 
 #endif

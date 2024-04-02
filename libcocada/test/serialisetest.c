@@ -25,6 +25,7 @@
 #include "cstrutil.h"
 #include "memdbg.h"
 #include "new.h"
+#include "saarray.h"
 #include "trait.h"
 #include "serialise.h"
 
@@ -57,7 +58,7 @@ void test_serialise_arr(CuTest *tc)
 		arr[i] = i;
 	}
 	FILE *stream = fopen("serialised_arr.obj", "wb");
-	som *model = som_cons(som_arr_new(), 0, get_som_short());
+	SOM *model = som_cons(som_arr_new(), 0, get_som_short());
 	serialise(arr, model, stream);
 	fclose(stream);
 
@@ -81,9 +82,9 @@ typedef struct {
 } test_sub_struct;
 
 
-static som *test_sub_struct_som;
+static SOM *test_sub_struct_som;
 
-som *get_test_sub_struct_som()
+SOM *get_test_sub_struct_som()
 {
 	if (test_sub_struct_som == NULL) {
 		test_sub_struct_som
@@ -108,9 +109,9 @@ typedef struct {
 } test_struct;
 
 
-static som *test_struct_som;
+static SOM *test_struct_som;
 
-som *get_test_struct_som()
+SOM *get_test_struct_som()
 {
 	if (test_struct_som == NULL) {
 		test_struct_som =
@@ -167,9 +168,9 @@ typedef struct _node {
 	struct _node *next;
 } node;
 
-static som *node_som = NULL;
+static SOM *node_som = NULL;
 
-som *get_node_som ()
+SOM *get_node_som ()
 {
 	if (node_som == NULL) {
 		node_som = som_struct_new(sizeof(node), get_node_som);
@@ -207,7 +208,7 @@ void test_serialise_list(CuTest *tc)
 	}
 
 	FILE *stream = fopen("serialised_node.out", "wb");
-	som *model = get_node_som();
+	SOM *model = get_node_som();
 	serialise(head, model, stream);
 	fclose(stream);
 

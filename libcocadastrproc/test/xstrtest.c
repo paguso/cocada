@@ -65,7 +65,7 @@ void test_xstr_format(CuTest *tc)
 		xstr_push(xs, i);
 	}
 	xstrformat *fmt = xstrformat_new_ascii(xs);
-	format_fprint(xstrformat_as_format(fmt), stdout);
+	format_fprint(xstrformat_as_Format(fmt), stdout);
 	xstrformat_free(fmt);
 	xstr_free(xs);
 
@@ -74,7 +74,7 @@ void test_xstr_format(CuTest *tc)
 		xstr_push(xs, i);
 	}
 	fmt = xstrformat_new(xs);
-	format_fprint(xstrformat_as_format(fmt), stdout);
+	format_fprint(xstrformat_as_Format(fmt), stdout);
 	xstrformat_free(fmt);
 	xstr_free(xs);
 	CuAssert(tc, "memory leak.", memdbg_is_empty());

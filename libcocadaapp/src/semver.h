@@ -30,16 +30,16 @@ typedef struct {
 	int patch;
 	char *pre_rel;
 	char *build;
-} semver;
+} SemVer;
 
 
-DECL_RESULT_OK(semver, semver *);
+DECL_RESULT_OK(SemVer, SemVer *);
 
-semver_res semver_new_from_str(const char *src);
+RESULT_OK(SemVer) semver_new_from_str(const char *src);
 
-void semver_free(semver *sver);
+void semver_free(SemVer *sver);
 
-void semver_to_str(const semver *src, char *dest);
+void semver_to_str(const SemVer *src, char *dest);
 
 
 

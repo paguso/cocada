@@ -26,7 +26,6 @@
 #include <stdio.h>
 
 #include "strbuf.h"
-#include "trait.h"
 
 /**
  * @file format.h
@@ -43,19 +42,19 @@
 /**
  * @brief format trait type
  */
-typedef struct _format format;
+typedef struct _Format Format;
 
 /**
  * @brief format virtual table
  */
 typedef struct {
-	int (*fprint)(format *, FILE *);
-	int (*sprint)(format *, char *);
-	int (*sbprint)(format *, StrBuf *);
+	int (*fprint)(Format *, FILE *);
+	int (*sprint)(Format *, char *);
+	int (*sbprint)(Format *, StrBuf *);
 } format_vt;
 
 
-struct _format {
+struct _Format {
 	format_vt vt;
 	void *impltor;
 };
@@ -63,26 +62,26 @@ struct _format {
 /**
  * @brief Prints formatted text to the standard output.
  */
-int format_print(format *self);
+int format_print(Format *self);
 
 /**
  * @brief Prints formatted text to a given @p stream.
  * @return Upon success, returns the number of printed chars
  */
-int format_fprint(format *self, FILE *stream);
+int format_fprint(Format *self, FILE *stream);
 
 
 /**
  * @brief Prints formatted text to a given string.
  * @return Upon success, returns the number of printed chars excluding the terminating '\0'
  */
-int format_sprint(format *self, char *dest);
+int format_sprint(Format *self, char *dest);
 
 
 /**
  * @brief Prints formatted text to a given string buffer.
  * @return Upon success, returns the number of printed chars
  */
-int format_sbprint(format *self, StrBuf *buf);
+int format_sbprint(Format *self, StrBuf *buf);
 
 #endif

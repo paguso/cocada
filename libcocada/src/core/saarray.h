@@ -24,7 +24,6 @@
 #define SAARRAY_H
 
 #include <stddef.h>
-#include <string.h>
 
 #include "coretype.h"
 

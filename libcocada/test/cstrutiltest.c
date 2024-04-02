@@ -29,6 +29,7 @@
 #include "cstrutil.h"
 #include "errlog.h"
 #include "memdbg.h"
+#include "new.h"
 
 
 

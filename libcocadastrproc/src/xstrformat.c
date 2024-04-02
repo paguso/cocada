@@ -30,12 +30,12 @@
 
 
 struct _xstrformat {
-	format _t_format;
+	Format _t_Format;
 	const xstr *src;
 };
 
 
-IMPL_TRAIT(xstrformat, format)
+IMPL_TRAIT(xstrformat, Format)
 
 
 
@@ -53,18 +53,18 @@ IMPL_TRAIT(xstrformat, format)
 	return ret;
 
 
-static int fprint_ascii(format *self, FILE *out)
+static int fprint_ascii(Format *self, FILE *out)
 {
 	PRINT_ASCII(f)
 }
 
-static int sprint_ascii(format *self, char *out)
+static int sprint_ascii(Format *self, char *out)
 {
 	PRINT_ASCII(s)
 }
 
 
-static int sbprint_ascii(format *self, StrBuf *out)
+static int sbprint_ascii(Format *self, StrBuf *out)
 {
 	PRINT_ASCII(sb)
 }
@@ -91,19 +91,19 @@ static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint
 	return ret;
 
 
-static int fprint_xchar(format *self, FILE *out)
+static int fprint_xchar(Format *self, FILE *out)
 {
 	PRINT_XCHAR(f)
 }
 
 
-static int sprint_xchar(format *self, char *out)
+static int sprint_xchar(Format *self, char *out)
 {
 	PRINT_XCHAR(s)
 }
 
 
-static int sbprint_xchar(format *self, StrBuf *out)
+static int sbprint_xchar(Format *self, StrBuf *out)
 {
 	PRINT_XCHAR(sb)
 }
@@ -115,7 +115,7 @@ static format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar, .sprint = sprint
 xstrformat *xstrformat_new(const xstr *src)
 {
 	xstrformat *ret = NEW(xstrformat);
-	ret->_t_format = (format) {
+	ret->_t_Format = (Format) {
 		.impltor = ret, .vt = xstrformat_xchar_vt
 	};
 	ret->src = src;
@@ -126,7 +126,7 @@ xstrformat *xstrformat_new(const xstr *src)
 xstrformat *xstrformat_new_ascii(const xstr *src)
 {
 	xstrformat *ret = NEW(xstrformat);
-	ret->_t_format = (format) {
+	ret->_t_Format = (Format) {
 		.impltor = ret, .vt = xstrformat_ascii_vt
 	};
 	ret->src = src;

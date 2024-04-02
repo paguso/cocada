@@ -108,7 +108,7 @@ void sais_test_xstr(CuTest *tc)
 	for (size_t len = 0; len < max_len; len++) {
 		random_xstr(ab, len, str);
 		CuAssertSizeTEquals(tc, len, xstr_len(str));
-		//format_print(xstrformat_as_format(xf));
+		//format_print(xstrformat_as_Format(xf));
 		size_t *sarr = sais_xstr(str, ab);
 		CuAssertSizeTEquals(tc, len, sarr[0]);
 		for (size_t i = 1; i + 1 < len; i++) {

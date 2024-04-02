@@ -26,6 +26,7 @@
 
 #include "cstrutil.h"
 #include "new.h"
+#include "result.h"
 #include "semver.h"
 
 #define is_letter( chr )     ( ( 'A' <= chr && chr <= 'z' ) )
@@ -90,7 +91,7 @@ static bool is_build_id(const char *str, const size_t len)
 }
 
 
-semver_res semver_new_from_str(const char *src)
+RESULT_OK(SemVer) semver_new_from_str(const char *src)
 {
 	char *start = (char *)src;
 	size_t len = strlen(src);
@@ -162,23 +163,23 @@ cleanup:
 	if ( parse_err ) {
 		FREE(build);
 		FREE(pre_rel);
-		return (semver_res) {
+		return (RESULT_OK(SemVer)) {
 			.ok = false, .val = NULL
 		};
 	}
-	semver *ret = NEW(semver);
+	SemVer *ret = NEW(SemVer);
 	ret->major = major;
 	ret->minor = minor;
 	ret->patch = patch;
 	ret->pre_rel = pre_rel;
 	ret->build = build;
-	return (semver_res) {
+	return (RESULT_OK(SemVer)) {
 		.ok = true, .val = ret
 	};
 }
 
 
-void semver_to_str(const semver *src, char *dest)
+void semver_to_str(const SemVer *src, char *dest)
 {
 	sprintf(dest, "%d.%d.%d%s%s%s%s",
 	        src->major, src->minor, src->patch,
@@ -190,7 +191,7 @@ void semver_to_str(const semver *src, char *dest)
 }
 
 
-void semver_free(semver *sver)
+void semver_free(SemVer *sver)
 {
 	FREE(sver->build);
 	FREE(sver->pre_rel);

@@ -25,25 +25,25 @@
 #include "strbuf.h"
 
 
-int format_print(format *self)
+int format_print(Format *self)
 {
 	return self->vt.fprint(self, stdout);
 }
 
 
-int format_fprint(format *self, FILE *stream)
+int format_fprint(Format *self, FILE *stream)
 {
 	return self->vt.fprint(self, stream);
 }
 
 
-int format_sprint(format *self, char *dest)
+int format_sprint(Format *self, char *dest)
 {
 	return self->vt.sprint(self, dest);
 }
 
 
-int format_sbprint(format *self, StrBuf *buf)
+int format_sbprint(Format *self, StrBuf *buf)
 {
 	return self->vt.sbprint(self, buf);
 }

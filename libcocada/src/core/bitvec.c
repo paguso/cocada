@@ -428,8 +428,8 @@ void bitvec_print(FILE *stream, const BitVec *bv, size_t bytes_per_row)
 
 /* ------------------------ bitvec_format trait  -------------------------- */
 
-struct _bitvec_format {
-	format _t_format;
+struct _BitVecFormat {
+	Format _t_Format;
 	BitVec *src;
 	uint bytes_per_row;
 };
@@ -437,7 +437,7 @@ struct _bitvec_format {
 
 #define BITVEC_PRINT(TYPE)\
 	int ret = 0;\
-	bitvec_format bf = *((bitvec_format *)self->impltor);\
+	BitVecFormat bf = *((BitVecFormat *)self->impltor);\
 	ret += TYPE##printf(out, "bitvector@%p {\n", bf.src);\
 	ret += TYPE##printf(out, "  len     : %zu\n", bf.src->len);\
 	ret += TYPE##printf(out, "  capacity: %zu\n", bf.src->cap);\
@@ -447,19 +447,19 @@ struct _bitvec_format {
 	return ret;
 
 
-static int bitvec_format_fprint(format *self, FILE *out)
+static int bitvec_format_fprint(Format *self, FILE *out)
 {
 	BITVEC_PRINT(f)
 }
 
 
-static int bitvec_format_sprint(format *self, char *out)
+static int bitvec_format_sprint(Format *self, char *out)
 {
 	BITVEC_PRINT(s)
 }
 
 
-static int bitvec_format_sbprint(format *self, StrBuf *out)
+static int bitvec_format_sbprint(Format *self, StrBuf *out)
 {
 	BITVEC_PRINT(sb)
 }
@@ -471,10 +471,10 @@ format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
                              };
 
 
-bitvec_format *bitvec_get_format(BitVec *self, uint bytes_per_row)
+BitVecFormat *bitvec_get_format(BitVec *self, uint bytes_per_row)
 {
-	bitvec_format *ret = NEW(bitvec_format);
-	ret->_t_format = (format) {
+	BitVecFormat *ret = NEW(BitVecFormat);
+	ret->_t_Format = (Format) {
 		.vt = bitvec_format_vt, .impltor = ret
 	};
 	ret->src = self;
@@ -483,10 +483,10 @@ bitvec_format *bitvec_get_format(BitVec *self, uint bytes_per_row)
 }
 
 
-void bitvec_format_free(bitvec_format *self)
+void bitvec_format_free(BitVecFormat *self)
 {
 	FREE(self);
 }
 
 
-IMPL_TRAIT(bitvec_format, format);
+IMPL_TRAIT(BitVecFormat, Format);

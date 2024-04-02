@@ -196,8 +196,8 @@ void bitvec_test_format(CuTest *tc)
 		bit = ((byte_t)rand() % 2);
 		bitvec_push(bv, bit);
 	}
-	bitvec_format *fmt = bitvec_get_format(bv, 4);
-	format_fprint(bitvec_format_as_format(fmt), stdout);
+	BitVecFormat *fmt = bitvec_get_format(bv, 4);
+	format_fprint(BitVecFormat_as_Format(fmt), stdout);
 	bitvec_format_free(fmt);
 	bitvec_free(bv);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());

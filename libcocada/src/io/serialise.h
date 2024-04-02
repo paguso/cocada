@@ -163,15 +163,15 @@
  * 		float x;
  * 		float y;
  * 		float radius;
- * } circle;
+ * } Circle;
  *
  * // (2) Struct SOM singleton. Should not be accessed directly
- * static som *circle_som = NULL;
+ * static SOM *circle_som = NULL;
  *
  * // (3) Returns the singleton struct SOM
  * som *get_circle_som() {
  * 		if (circle_som == NULL) {
- * 			circle_som = som_struct_new(sizeof(circle), get_circle_som);
+ * 			circle_som = som_struct_new(sizeof(Circle), get_circle_som);
  * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, x), get_float_som());
  * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, y), get_float_som());
  * 			circle_som = som_cons(circle_som, STR_OFFSET(circle, radius), get_float_som());
@@ -181,15 +181,13 @@
  *
  * ```
  *
- * The example above illustrates the four components required for
+ * The example above illustrates the three components required for
  * providing a SOM for a struct object.
  *
  * 1. The struct type declaration itself
- * 2. The STR_SOM_INFO is a required preparation for being able to use the STR_OFFSET macro
- * for composing the struct SOM with its fields' SOMs.
- * 3. The struct SOM singleton object. This should not be accessed directly but rather via
+ * 2. The struct SOM singleton object. This should not be accessed directly but rather via
  * the get_som_func function defined for this struct on step 4
- * 4. The definition of the get_som_func that returns the struct SOM singleton
+ * 3. The definition of the GetSOMFunc that returns the struct SOM singleton
  * after initialisation, if needed.
  *
  * Notice that when composing the struct SOM with the SOMs of its fields via calls
@@ -239,7 +237,7 @@
  * another node SOM, and so forth.
  *
  * To cope with situations like that, COCADA provides a **proxy SOM**
- * which contains a reference to get_som_func function such that a
+ * which contains a reference to GetSOMFunc function such that a
  * reference to a SOM could be obtained 'on demand', eliminating the loop
  * in the SOM definition. The corrected version of the function is shown below
  *
@@ -302,23 +300,22 @@
  *
  */
 
-typedef struct _sub_som sub_som;
 
 /**
  * SOM object type
  */
-typedef struct _som som;
+typedef struct _SOM SOM;
 
 
 /**
  * @brief get_som function type, required for the proxy SOM.
  */
-typedef som *(*get_som_func) ();
+typedef SOM *(*GetSOMFunc) ();
 
 
 
 #define GET_SOM_DECL(TYPE, ...) \
-	som* get_som_##TYPE();
+	SOM* get_som_##TYPE();
 
 XX_PRIMITIVES(GET_SOM_DECL)
 GET_SOM_DECL(cstr)
@@ -334,12 +331,13 @@ GET_SOM_DECL(cstr)
  * constructors defined in arrays.h
  * @see arrays.h
  */
-som *som_arr_new();
+SOM *som_arr_new();
+
 
 /**
  * @brief Returns a new SOM to a pointer value.
  */
-som *som_ptr_new();
+SOM *som_ptr_new();
 
 
 /**
@@ -349,7 +347,7 @@ som *som_ptr_new();
  * returned by the corresponding @p get_som function.
  * @see Module documentation
  */
-som *som_struct_new(size_t size, get_som_func get_som);
+SOM *som_struct_new(size_t size, GetSOMFunc get_som);
 
 
 /**
@@ -359,7 +357,7 @@ som *som_struct_new(size_t size, get_som_func get_som);
  * recursion when definining self-referential SOMs.
  * @see Module documentation.
  */
-som *som_proxy_new(get_som_func get_som);
+SOM *som_proxy_new(GetSOMFunc get_som);
 
 
 /**
@@ -371,19 +369,7 @@ som *som_proxy_new(get_som_func get_som);
  * @par chd The child SOM, i.e. the model of the object member.
  * @warning If the parent is but a struct SOM, the @p offset is ignored.
  */
-som *som_cons(som *par, size_t offset, som *chd);
-
-
-/**
- * @brief Returns the number of 'child' sub-SOMs
- */
-size_t som_nchd(som *self);
-
-
-/**
- * @brief Returns a 'child' sub-SOM by its index.
- */
-sub_som som_chd(som *self, size_t i);
+SOM *som_cons(SOM *par, size_t offset, SOM *chd);
 
 
 /**
@@ -393,7 +379,7 @@ sub_som som_chd(som *self, size_t i);
  *
  * @see deserialise
  */
-void serialise(void *obj, som *model, FILE *stream);
+void serialise(void *obj, SOM *model, FILE *stream);
 
 /**
  * @brief Reads the serialised form of an object @p obj and its
@@ -405,6 +391,6 @@ void serialise(void *obj, som *model, FILE *stream);
  *
  * @see serialise
  */
-void *deserialise(som *model, FILE *stream);
+void *deserialise(SOM *model, FILE *stream);
 
 #endif
