@@ -48,7 +48,7 @@ struct _quadtree {
 	uint width;
 	uint height;
 	uint depth;
-	vec *nodes;
+	Vec *nodes;
 };
 
 

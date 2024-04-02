@@ -30,7 +30,7 @@
 
 typedef struct __gksumm gksumm;
 
-gksumm *gk_new(size_t typesize, cmp_func cmp, double err);
+gksumm *gk_new(size_t typesize, CmpFunc cmp, double err);
 
 void gk_upd(gksumm *self, const void *val);
 

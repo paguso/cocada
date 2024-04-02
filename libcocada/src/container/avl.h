@@ -137,7 +137,7 @@ typedef struct _AVL AVL;
  * external objects, then @p cmp receives pointers to pointers as arguments.
  * See the header file documentation for an example.
  */
-AVL *avl_new(size_t typesize, cmp_func cmp);
+AVL *avl_new(size_t typesize, CmpFunc cmp);
 
 
 /**

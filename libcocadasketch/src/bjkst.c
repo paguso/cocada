@@ -23,6 +23,7 @@
 
 #include "arrays.h"
 #include "bjkst.h"
+#include "bitbyte.h"
 #include "coretype.h"
 #include "errlog.h"
 #include "hash.h"
@@ -40,7 +41,7 @@ struct _bjkst {
 	twuhash *g;        // 2-way indep hash function
 	size_t buf_cap;    // buffer capacity
 	size_t buf_size;   // current buffer size
-	hashset **buf;     // buffers. one for each nb of trailing zeros
+	HashSet **buf;     // buffers. one for each nb of trailing zeros
 	size_t min_zeros;  // min nb of trailing zeros currently being accounted for
 };
 
@@ -61,7 +62,7 @@ bjkst *bjkst_init(size_t nbits, double eps, double delta)
 	ret->eps = eps;
 	ret->delta = delta;
 	ret->g = twuhash_new(nbits, nbits);
-	ret->buf = ARR_NEW(hashset *, nbits + 1);
+	ret->buf = ARR_NEW(HashSet *, nbits + 1);
 	ret->buf_cap = get_buf_cap(eps, delta);
 	ret->buf_size = 0;
 	ret->min_zeros = 0;

@@ -36,7 +36,7 @@
 void test_hashmap_int(CuTest *tc)
 {
 	memdbg_reset();
-	hashmap *hmap = hashmap_new(sizeof(uint32_t), sizeof(uint32_t),
+	HashMap *hmap = hashmap_new(sizeof(uint32_t), sizeof(uint32_t),
 	                            ident_hash_uint32_t, eq_uint32_t);
 
 	size_t n = 1000000;
@@ -101,7 +101,7 @@ bool bin_str_eq(const void *a, const void *b)
 void test_hashmap_obj(CuTest *tc)
 {
 	memdbg_reset();
-	hashmap *hmap = hashmap_new(sizeof(char *), sizeof(object), hash_bin_str,
+	HashMap *hmap = hashmap_new(sizeof(char *), sizeof(object), hash_bin_str,
 	                            bin_str_eq);
 
 	uint64_t n = 100;

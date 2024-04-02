@@ -49,7 +49,7 @@ static int _uint_cmp_fn(const void *elt1, const void *elt2)
 void test_hashset_indel(CuTest *tc)
 {
 	size_t n = 105;
-	hashset *set;
+	HashSet *set;
 	uint elt, *elts;
 	set = hashset_new(sizeof(uint), &_key_fn, &_equals_fn);
 
@@ -102,9 +102,9 @@ void test_hashset_indel(CuTest *tc)
 	CuAssertSizeTEquals(tc, n, hashset_size(set));
 
 	elts = ARR_NEW(uint, n);
-	hashset_iter *it = hashset_get_iter(set);
+	HashSetIter *it = hashset_get_iter(set);
 	size_t i = 0;
-	FOREACH_IN_ITER(e, uint, hashset_iter_as_Iter(it)) {
+	FOREACH_IN_ITER(e, uint, HashSetIter_as_Iter(it)) {
 		elts[i++] = *e;
 		//printf("element[%zu] = %u\n",i,*e);
 	}

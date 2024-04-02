@@ -36,7 +36,7 @@
  * @brief Unordered, hashmap-based set
  */
 
-typedef hashmap hashset;
+typedef HashMap HashSet;
 
 
 /**
@@ -45,7 +45,7 @@ typedef hashmap hashset;
  * @param hashfunc Hash function pointer.
  * @param eqfunc Equality comparator function pointer.
  */
-hashset *hashset_new( size_t typesize, hash_func hashfunc, equals_func eqfunc );
+HashSet *hashset_new( size_t typesize, HashFunc hashfunc, EqualsFunc eqfunc );
 
 
 /**
@@ -57,19 +57,19 @@ void hashset_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the number of stored elements.
  */
-size_t hashset_size(const hashset *set);
+size_t hashset_size(const HashSet *set);
 
 
 /**
  * @brief Checks whether the @p set contains an element equal to @p elt.
  */
-bool hashset_contains(const hashset *set, const void *elt);
+bool hashset_contains(const HashSet *set, const void *elt);
 
 
 /**
  * @brief Adds a copy of the element @p elt to the @p set.
  */
-void hashset_add(hashset *set, const void *elt);
+void hashset_add(HashSet *set, const void *elt);
 
 
 /**
@@ -77,7 +77,7 @@ void hashset_add(hashset *set, const void *elt);
  * and returns it by copying into @p dest. If no such element is
  * found, the operation has no effect.
  */
-void hashset_remv(hashset *set, const void *elt, void *dest);
+void hashset_remv(HashSet *set, const void *elt, void *dest);
 
 
 /**
@@ -87,22 +87,22 @@ void hashset_remv(hashset *set, const void *elt, void *dest);
  * external objects, these might not be properly destroyed.
  * @see hashset_remv
  */
-void hashset_del(hashset *set, const void *elt);
+void hashset_del(HashSet *set, const void *elt);
 
 
 
 
 
 #define HASHSET_CONTAINS_DECL( TYPE ) \
-	bool hashset_contains_##TYPE(hashset *set, TYPE elt );
+	bool hashset_contains_##TYPE(HashSet *set, TYPE elt );
 
 
 #define HASHSET_ADD_DECL( TYPE ) \
-	void hashset_add_##TYPE(hashset *set, TYPE elt );
+	void hashset_add_##TYPE(HashSet *set, TYPE elt );
 
 
 #define HASHSET_DEL_DECL( TYPE ) \
-	void hashset_del_##TYPE(hashset *set, TYPE elt );
+	void hashset_del_##TYPE(HashSet *set, TYPE elt );
 
 
 #define HASHSET_ALL_DECL( TYPE, ... )\
@@ -112,7 +112,7 @@ void hashset_del(hashset *set, const void *elt);
 
 XX_CORETYPES(HASHSET_ALL_DECL)
 
-typedef struct _hashset_iter hashset_iter;
+typedef struct _HashSetIter HashSetIter;
 
 
 /**
@@ -120,7 +120,7 @@ typedef struct _hashset_iter hashset_iter;
  * Implements the iter trait.
  * The ::iter_next method returns an internal pointer to an element.
  */
-hashset_iter *hashset_get_iter(hashset *set);
+HashSetIter *hashset_get_iter(HashSet *set);
 
 
 /**
@@ -130,7 +130,7 @@ hashset_iter *hashset_get_iter(hashset *set);
 void hashset_iter_finalise(void *ptr, const Finaliser *fnr);
 
 
-DECL_TRAIT(hashset_iter, Iter);
+DECL_TRAIT(HashSetIter, Iter);
 
 
 #endif

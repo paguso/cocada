@@ -64,7 +64,7 @@ typedef struct {
 } charcode_iter;
 
 
-static const BitVec *get_charcode(vec *code_tbl, xchar_t chr)
+static const BitVec *get_charcode(Vec *code_tbl, xchar_t chr)
 {
 	if (chr < vec_len(code_tbl))
 		return *((BitVec **)vec_get(code_tbl, chr));
@@ -72,7 +72,7 @@ static const BitVec *get_charcode(vec *code_tbl, xchar_t chr)
 }
 
 
-static void set_charcode(vec *code_tbl, xchar_t chr, BitVec *code)
+static void set_charcode(Vec *code_tbl, xchar_t chr, BitVec *code)
 {
 	for (size_t i = vec_len(code_tbl); i <= (size_t)chr; i++)
 		vec_push(code_tbl, &NULL_CODE);
@@ -125,7 +125,7 @@ typedef struct _tmp_wavtree {
 	BitVec      *nxt_charcode;
 	alphabet       *ab;
 	bool            own_alphabet;
-	vec       *chrcodes;
+	Vec       *chrcodes;
 	huffcode       *hcode;
 	BitVec      *raw_bits;
 	tmp_wtnode     *tmp_root;
@@ -489,7 +489,7 @@ struct _wavtree {
 	wtnode       *nodes;
 	alphabet     *ab;
 	bool          own_ab;
-	vec     *chrcodes;
+	Vec     *chrcodes;
 	size_t        len;
 	csrsbitarr *bitarr;
 };

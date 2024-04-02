@@ -47,7 +47,7 @@ void test_segtree_upd(CuTest *tc)
 	int zero = 0;
 	size_t max_range = 100;
 	for (size_t range = 0; range < max_range; range++) {
-		segtree *tree = segtree_new(range, sizeof(int), segtree_merge_sum_int, &zero);
+		SegTree *tree = segtree_new(range, sizeof(int), segtree_merge_sum_int, &zero);
 		for (size_t i = 0; i < range; i++) {
 			int v = (int)i;
 			segtree_upd(tree, i, &v);
@@ -109,7 +109,7 @@ void test_segtree_upd_obj(CuTest *tc)
 	size_t max_range = 100;
 	for (size_t range = 0; range < max_range; range++) {
 		size_t range = 10;
-		segtree *tree = segtree_new(range, sizeof(obj_t), merge_obj, &zero);
+		SegTree *tree = segtree_new(range, sizeof(obj_t), merge_obj, &zero);
 		for (size_t i = 0; i < range; i++) {
 			obj_t v  = (obj_t) {
 				.val = (int)i, .dval = (double)i * 2
@@ -142,7 +142,7 @@ void test_segtree_range_qry(CuTest *tc)
 	uint32_t ZERO32 = 0;
 	memdbg_reset();
 	for (size_t range = 0; range < max_range; range++) {
-		segtree *st = segtree_new(range, sizeof(uint32_t), segtree_merge_sum_uint32_t,
+		SegTree *st = segtree_new(range, sizeof(uint32_t), segtree_merge_sum_uint32_t,
 		                          &ZERO32);
 		uint32_t val = UINT32_MAX / MAX(1, range);
 		for (size_t i = 0; i < range; i++) {

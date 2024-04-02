@@ -62,7 +62,7 @@ struct _roaringbitvec {
 	size_t len;
 	size_t ncntrs;
 	ctnr_t *ctnrs;
-	segtree *count_st;
+	SegTree *count_st;
 };
 
 
@@ -186,7 +186,7 @@ static size_t arrctnr_select(ctnr_t *ctnr, bool bit, size_t rank)
 
 void convert_arr_to_bitvec_ctnr(ctnr_t *ctnr)
 {
-	vec *v = ctnr->data;
+	Vec *v = ctnr->data;
 	BitVec *b = bitvec_new_with_len(BITVEC_SIZE);
 	for (size_t i = 0, l = vec_len(v); i < l; i++) {
 		bitvec_set_bit(b, vec_get_uint16_t(v, i), 1);
@@ -199,7 +199,7 @@ void convert_arr_to_bitvec_ctnr(ctnr_t *ctnr)
 
 void convert_bitvec_to_arr_ctnr(ctnr_t *ctnr)
 {
-	vec *v = vec_new_with_capacity(sizeof(uint16_t), ctnr->card);
+	Vec *v = vec_new_with_capacity(sizeof(uint16_t), ctnr->card);
 	BitVec *b = ctnr->data;
 	for (size_t i = 0; i < BITVEC_SIZE; i++) {
 		if (bitvec_get_bit(b, i)) {

@@ -23,11 +23,6 @@
 #define HASH_H
 
 
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "bitbyte.h"
 #include "coretype.h"
 
 /**
@@ -42,7 +37,7 @@
  *        for an element. This key is then used internally to determine the
  *        location in which the element will be stored.
  */
-typedef uint64_t (*hash_func)(const void *);
+typedef uint64_t (*HashFunc)(const void *);
 
 
 /**
@@ -51,7 +46,7 @@ typedef uint64_t (*hash_func)(const void *);
  *        equal *must* have the same hash key and, conversely, if two elements
  *        have different hash values, then they must compare as different.
  */
-typedef bool (*equals_func)(const void *, const void *);
+typedef bool (*EqualsFunc)(const void *, const void *);
 
 
 /**

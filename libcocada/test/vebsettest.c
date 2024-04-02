@@ -38,7 +38,7 @@ void vebset_test_add(CuTest *tc)
 	setbuf(stdout, NULL);
 
 	uint n = 10000;
-	vec *vec_vals = vec_new_uint32_t();
+	Vec *vec_vals = vec_new_uint32_t();
 	for (uint i = 0; i < n; i++) {
 		uint32_t x = rand_next() % UINT32_MAX;
 		vec_push_uint32_t(vec_vals, x);
@@ -80,7 +80,7 @@ void vebset_test_del(CuTest *tc)
 	setbuf(stdout, NULL);
 
 	uint n = 10000;
-	vec *vec_vals = vec_new_uint32_t();
+	Vec *vec_vals = vec_new_uint32_t();
 	for (uint i = 0; i < n; i++) {
 		uint32_t x = rand_next() % UINT32_MAX;
 		vec_push_uint32_t(vec_vals, x);
@@ -128,7 +128,7 @@ void vebset_test_succ(CuTest *tc)
 	setbuf(stdout, NULL);
 
 	uint n = 1000;
-	vec *vec_vals = vec_new_uint32_t();
+	Vec *vec_vals = vec_new_uint32_t();
 	vebset *vset = vebset_new();
 
 	for (uint i = 0; i < n; i++) {
@@ -174,7 +174,7 @@ void vebset_test_pred(CuTest *tc)
 	setbuf(stdout, NULL);
 
 	uint n = 1000;
-	vec *vec_vals = vec_new_uint32_t();
+	Vec *vec_vals = vec_new_uint32_t();
 	vebset *vset = vebset_new();
 
 	for (uint i = 0; i < n; i++) {

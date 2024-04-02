@@ -118,7 +118,7 @@ void quadtree_ins_hollow_test(CuTest *tc)
 
 void upd_node_ins_pt(quadtree *tree, size_t node, void *pt)
 {
-	vec *pts = (vec *) quadtree_node_get_data(tree, node);
+	Vec *pts = (Vec *) quadtree_node_get_data(tree, node);
 	if (pts == NULL) {
 		pts = vec_new(sizeof(point2d));
 		quadtree_node_set_data(tree, node, pts);
@@ -129,7 +129,7 @@ void upd_node_ins_pt(quadtree *tree, size_t node, void *pt)
 
 void qry_node_qty(quadtree *tree, size_t node, void *dest)
 {
-	vec *pts = (vec *)quadtree_node_get_data(tree, node);
+	Vec *pts = (Vec *)quadtree_node_get_data(tree, node);
 	if (pts != NULL) {
 		*((size_t *)dest) += vec_len(pts);
 	}

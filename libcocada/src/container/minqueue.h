@@ -22,7 +22,6 @@
 #define MINQUEUE_H
 
 #include <stdlib.h>
-#include <stdint.h>
 #include <stddef.h>
 
 #include "coretype.h"
@@ -36,9 +35,9 @@
  *
  * @brief Queue with FIFO push/pop and constant-time *minimum* query.
  */
-typedef struct _minqueue minqueue;
+typedef struct _MinQueue MinQueue;
 
-typedef struct _minqueue_iter minqueue_iter;
+typedef struct _MinQueueIter MinQueueIter;
 
 /**
  * @brief Constructor
@@ -46,7 +45,7 @@ typedef struct _minqueue_iter minqueue_iter;
  * @param cmp Comparator function
  * @see order.h
  */
-minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
+MinQueue *minqueue_new(size_t typesize,  CmpFunc cmp);
 
 
 /**
@@ -56,7 +55,7 @@ minqueue *minqueue_new(size_t typesize,  cmp_func cmp);
  * @param cmp Comparator function
  * @see order.h
  */
-minqueue *minqueue_new_with_capacity(size_t typesize,  cmp_func cmp,
+MinQueue *minqueue_new_with_capacity(size_t typesize,  CmpFunc cmp,
                                      size_t capacity);
 
 
@@ -69,27 +68,27 @@ void minqueue_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the number of elements in the queue.
  */
-size_t minqueue_len(const minqueue *queue);
+size_t minqueue_len(const MinQueue *queue);
 
 
 /**
  * @brief Pushes a new element to the end of the queue.
  */
-void minqueue_push(minqueue *queue, const void *elt);
+void minqueue_push(MinQueue *queue, const void *elt);
 
 
 /**
  * @brief Pops the element from the front of the queue and copies it into @p dest.
  * @warning No check is performed on @p queue bounds, or @p dest.
  */
-void minqueue_pop(minqueue *queue, void *dest);
+void minqueue_pop(MinQueue *queue, void *dest);
 
 
 /**
  * @brief  Deletes the element from the front of the queue.
  * @warning No check is performed on @p queue bounds.
  */
-void minqueue_del(minqueue *queue);
+void minqueue_del(MinQueue *queue);
 
 
 /**
@@ -97,36 +96,36 @@ void minqueue_del(minqueue *queue);
  * (least recently added element)
  * @warning Do not change this value directly.
  */
-const void *minqueue_front(const minqueue *queue);
+const void *minqueue_front(const MinQueue *queue);
 
 /**
  * @brief Returns a pointer to the element at the back of the queue
  * (most recently added element).
  * @warning Do not change this value directly.
  */
-const void *minqueue_back(const minqueue *queue);
+const void *minqueue_back(const MinQueue *queue);
 
 
 /**
  * @brief Returns the minimum element of the queue.
  * If there are many, returns the first to have entered the queue.
  */
-const void *minqueue_min(const minqueue *queue);
+const void *minqueue_min(const MinQueue *queue);
 
 
 /**
  * @brief Copies the minimum element of the queue into @p dest.
  * If there are many, copies the first to have entered the queue.
  */
-void minqueue_min_cpy(const minqueue *queue, void *dest);
+void minqueue_min_cpy(const MinQueue *queue, void *dest);
 
 
 #define MINQUEUE_ALL_DECL( TYPE , ...)\
-	void minqueue_push_##TYPE(minqueue *queue, TYPE val);\
-	TYPE minqueue_pop_##TYPE(minqueue *queue);\
-	TYPE minqueue_front_##TYPE(const minqueue *queue);\
-	TYPE minqueue_back_##TYPE(const minqueue *queue);\
-	TYPE minqueue_min_##TYPE(const minqueue *queue);
+	void minqueue_push_##TYPE(MinQueue *queue, TYPE val);\
+	TYPE minqueue_pop_##TYPE(MinQueue *queue);\
+	TYPE minqueue_front_##TYPE(const MinQueue *queue);\
+	TYPE minqueue_back_##TYPE(const MinQueue *queue);\
+	TYPE minqueue_min_##TYPE(const MinQueue *queue);
 
 XX_CORETYPES(MINQUEUE_ALL_DECL)
 
@@ -135,26 +134,26 @@ XX_CORETYPES(MINQUEUE_ALL_DECL)
  * @brief Returns an iterator over all min elements of the queue
  * in FIFO order.
  */
-minqueue_iter *minqueue_all_min(const minqueue *queue);
+MinQueueIter *minqueue_all_min(const MinQueue *queue);
 
 
 /**
  * @brief  Destructor.
  */
-void minqueue_iter_free(minqueue_iter *iter);
+void minqueue_iter_free(MinQueueIter *iter);
 
 
 /**
  * @brief Returns whether the iteration is not yet finished.
  */
-bool minqueue_iter_has_next(const minqueue_iter *iter);
+bool minqueue_iter_has_next(const MinQueueIter *iter);
 
 
 /**
  * @brief Returns the next element of the iteration.
  * If iteration has finished, a memory access error may occur.
  */
-const void *minqueue_iter_next(minqueue_iter *iter);
+const void *minqueue_iter_next(MinQueueIter *iter);
 
 
 #endif

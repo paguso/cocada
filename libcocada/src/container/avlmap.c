@@ -40,7 +40,7 @@ struct _AVLMap {
 #define ENTRY_VAL_SZKEY(E, SK) ((E)?((void *)((void *)(E) + (SK))):NULL)
 #define ENTRY_VAL(E) ENTRY_VAL_SZKEY(E, self->sizeofkey)
 
-AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp)
+AVLMap *avlmap_new(size_t keysize, size_t valsize, CmpFunc keycmp)
 {
 	AVLMap *ret = NEW(AVLMap);
 	ret->sizeofkey = keysize;

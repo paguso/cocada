@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #include "new.h"
 #include "order.h"
@@ -73,7 +72,7 @@ typedef struct _BinHeap BinHeap;
 /**
  * @brief Creates a new empty binary heap.
  */
-BinHeap *binheap_new(size_t typesize, cmp_func cmp);
+BinHeap *binheap_new(size_t typesize, CmpFunc cmp);
 
 
 /**

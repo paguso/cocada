@@ -168,7 +168,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * @see kll_new_with_cap
  *
  */
-kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
+kllsumm *kll_new(size_t typesize, CmpFunc cmp, double err);
 
 
 /**
@@ -187,7 +187,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  *
  * @see new.h
  */
-kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
+kllsumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
                      Finaliser *chd_fr);
 
 
@@ -241,7 +241,7 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
  *
  * @see errlog.h
  */
-kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps,
+kllsumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
                           size_t cap);
 
 
@@ -251,7 +251,7 @@ kllsumm *kll_new_with_cap(size_t typesize, cmp_func cmp, double eps,
  * @see kll_new_own
  * @see kll_new_with_cap
  */
-kllsumm *kll_new_own_with_cap(size_t typesize, cmp_func cmp, double eps,
+kllsumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double eps,
                               size_t cap, Finaliser *chd_fr);
 
 

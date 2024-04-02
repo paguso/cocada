@@ -21,22 +21,21 @@
 
 #include <string.h>
 #include <stddef.h>
-#include <stdint.h>
 
+#include "coretype.h"
 #include "vec.h"
-#include "arrays.h"
 #include "binheap.h"
 #include "new.h"
 #include "order.h"
 
 
 struct _BinHeap {
-	vec *data;
-	cmp_func cmp;
+	Vec *data;
+	CmpFunc cmp;
 };
 
 BinHeap *binheap_new( size_t typesize,
-                      cmp_func cmp )
+                      CmpFunc cmp )
 {
 	BinHeap *heap = NEW(BinHeap);
 	heap->data = vec_new(typesize);

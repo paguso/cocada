@@ -104,7 +104,7 @@ const void *iter_next(Iter *it);
  * vec_push_int(v, 20);
  * vec_push_int(v, 30);
  * vec_iter *it = vec_get_iter(v);
- * FOREACH_IN_ITER(val, int, vec_iter_as_Iter(it)) {
+ * FOREACH_IN_ITER(val, int, VecIter_as_Iter(it)) {
  * 		printf ("Element is %d\n", *val); // notice that val is a pointer
  * }
  * FREE(it); // iterator must be manually disposed of after use

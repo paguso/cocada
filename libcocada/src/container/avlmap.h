@@ -48,7 +48,7 @@ typedef struct _AVLMap AVLMap;
  * @param valsize Size of value in bytes
  * @param keycmp key total-order comparator function
 */
-AVLMap *avlmap_new(size_t keysize, size_t valsize, cmp_func keycmp);
+AVLMap *avlmap_new(size_t keysize, size_t valsize, CmpFunc keycmp);
 
 
 /**

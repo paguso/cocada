@@ -37,24 +37,24 @@
 
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
-typedef struct _avlnode {
+typedef struct _AVLNode {
 	int8_t bf; // balance factor
-	struct _avlnode *left;
-	struct _avlnode *right;
-} avlnode;
+	struct _AVLNode *left;
+	struct _AVLNode *right;
+} AVLNode;
 
 // store node data right after the avlnode header
-#define NODE_DATA(N) ((void *)((void *)(N) + sizeof(avlnode)))
+#define NODE_DATA(N) ((void *)((byte_t *)(N) + sizeof(AVLNode)))
 
 
 struct _AVL {
-	avlnode *root;
+	AVLNode *root;
 	size_t typesize;
-	cmp_func cmp;
+	CmpFunc cmp;
 };
 
 
-AVL *avl_new(size_t typesize, cmp_func cmp)
+AVL *avl_new(size_t typesize, CmpFunc cmp)
 {
 	AVL *ret = NEW(AVL);
 	ret->typesize = typesize;
@@ -64,7 +64,7 @@ AVL *avl_new(size_t typesize, cmp_func cmp)
 }
 
 
-static void __avl_finaliser(avlnode *root, const Finaliser *fnr)
+static void __avl_finaliser(AVLNode *root, const Finaliser *fnr)
 {
 	if (root == NULL) {
 		return;
@@ -100,7 +100,7 @@ bool avl_contains(const AVL *self, const void *key)
 
 const void *avl_get(const AVL *self, const void *key)
 {
-	avlnode *cur = self->root;
+	AVLNode *cur = self->root;
 	while (cur != NULL) {
 		int where = self->cmp(key, NODE_DATA(cur));
 		if (where == 0) {
@@ -126,10 +126,10 @@ const void *avl_get(const AVL *self, const void *key)
 XX_CORETYPES(AVL_CONTAINS_IMPL)
 
 
-static avlnode *__rotate_left(avlnode *root)
+static AVLNode *__rotate_left(AVLNode *root)
 {
-	avlnode *r = root->right;
-	avlnode *rl = r->left;
+	AVLNode *r = root->right;
+	AVLNode *rl = r->left;
 	r->left = root;
 	root->right = rl;
 	root->bf = root->bf - 1 - ((r->bf > 0) ? r->bf  : 0);
@@ -138,10 +138,10 @@ static avlnode *__rotate_left(avlnode *root)
 }
 
 
-static avlnode *__rotate_right(avlnode *root)
+static AVLNode *__rotate_right(AVLNode *root)
 {
-	avlnode *l = root->left;
-	avlnode *lr = l->right;
+	AVLNode *l = root->left;
+	AVLNode *lr = l->right;
 	root->left = lr;
 	l->right = root;
 	root->bf = root->bf + 1 - ( (l->bf < 0) ? l->bf : 0 );
@@ -152,17 +152,17 @@ static avlnode *__rotate_right(avlnode *root)
 
 typedef struct {
 	bool ok;
-	avlnode *new_root;
+	AVLNode *new_root;
 	bool height_chgd;
 } indel_result;
 
 
-static indel_result __avl_ins(AVL *self, avlnode *root, void *val)
+static indel_result __avl_ins(AVL *self, AVLNode *root, void *val)
 {
 	if (root == NULL) {
 		indel_result ret;
 		ret.ok = true;
-		ret.new_root = malloc(sizeof(avlnode) + self->typesize);
+		ret.new_root = malloc(sizeof(AVLNode) + self->typesize);
 		ret.new_root->bf = 0;
 		ret.new_root->left = NULL;
 		ret.new_root->right = NULL;
@@ -244,12 +244,12 @@ XX_CORETYPES(AVL_INS_IMPL)
 
 typedef struct {
 	bool height_chgd;
-	avlnode *root;
-	avlnode *remvd_node;
+	AVLNode *root;
+	AVLNode *remvd_node;
 } remv_min_result;
 
 
-remv_min_result __avl_remv_min(avlnode *root)
+remv_min_result __avl_remv_min(AVLNode *root)
 {
 	assert(root != NULL);
 	if (root->left == NULL) { //root is the min node
@@ -288,7 +288,7 @@ remv_min_result __avl_remv_min(avlnode *root)
 }
 
 
-indel_result __avl_remv(AVL *self, avlnode *root, void *val, void *dest)
+indel_result __avl_remv(AVL *self, AVLNode *root, void *val, void *dest)
 {
 	if (root == NULL) {
 		indel_result ret = {.ok = false, .height_chgd = 0, .new_root = NULL};
@@ -394,7 +394,7 @@ XX_CORETYPES(AVL_DEL_IMPL)
 
 
 
-static void __avl_print(avlnode *root, size_t level, FILE *stream,
+static void __avl_print(AVLNode *root, size_t level, FILE *stream,
                         void (*prt_val)(FILE *, const void *))
 {
 	if (root == NULL) {
@@ -444,7 +444,7 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 	bool read = false;
 	//void *ret == NULL;
 	while (!stack_empty(node_stack)) {
-		avlnode *cur = stack_peek_rawptr(node_stack);
+		AVLNode *cur = stack_peek_rawptr(node_stack);
 		if (cur == NULL) {
 			stack_pop_rawptr(node_stack);
 			stack_pop_byte_t(next_chd_stack);
@@ -491,7 +491,7 @@ const void *avl_iter_next (Iter *it)
 {
 	assert(avl_iter_has_next(it));
 	AVLIter *avlit = (AVLIter *) it->impltor;
-	const void *ret = NODE_DATA((avlnode *) stack_peek_rawptr(avlit->node_stack));
+	const void *ret = NODE_DATA((AVLNode *) stack_peek_rawptr(avlit->node_stack));
 	__next(avlit->src, avlit->order, avlit->node_stack, avlit->next_chd_stack);
 	return ret;
 }
@@ -510,7 +510,7 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 	ret->node_stack = stack_new(sizeof(rawptr));
 	ret->next_chd_stack = stack_new(sizeof(byte_t));
 	if (self->root) {
-		avlnode *cur;
+		AVLNode *cur;
 		switch (order) {
 		case PRE_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
@@ -519,11 +519,11 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 		case IN_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
 			stack_push_byte_t(ret->next_chd_stack, 0);
-			cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			while (cur->left != NULL) {
 				stack_push_rawptr(ret->node_stack, cur->left);
 				stack_push_byte_t(ret->next_chd_stack, 0);
-				cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+				cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			}
 			stack_pop_byte_t(ret->next_chd_stack);
 			stack_push_byte_t(ret->next_chd_stack, 1);
@@ -531,7 +531,7 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 		case POST_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
 			stack_push_byte_t(ret->next_chd_stack, 0);
-			cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			while ( cur->left != NULL || cur->right != NULL) {
 				if (cur->left != NULL) {
 					//stack_pop_byte_t(ret->next_chd_stack);
@@ -545,7 +545,7 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 					stack_push_rawptr(ret->node_stack, cur->right);
 					stack_push_byte_t(ret->next_chd_stack, 0);
 				}
-				cur = (avlnode *)stack_peek_rawptr(ret->node_stack);
+				cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			}
 			stack_pop_byte_t(ret->next_chd_stack);
 			stack_push_byte_t(ret->next_chd_stack, 2);

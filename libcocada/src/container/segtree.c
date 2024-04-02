@@ -49,25 +49,25 @@ XX_PRIMITIVES(SEGTREE_MERGE_IMPL)
 
 
 
-struct __segtree {
+struct _SegTree {
 	size_t range;
 	size_t typesize;
-	merge_func merge;
+	MergeFunc merge;
 	void *init_val;
-	vec *tree;
+	Vec *tree;
 };
 
 
-static void segtree_reset(segtree *self)
+static void segtree_reset(SegTree *self)
 {
 	vec_push_n(self->tree, self->init_val, 2 * self->range);
 }
 
 
-segtree *segtree_new(size_t range, size_t typesize, merge_func merge,
+SegTree *segtree_new(size_t range, size_t typesize, MergeFunc merge,
                      const void *init_val)
 {
-	segtree *ret = NEW(segtree);
+	SegTree *ret = NEW(SegTree);
 	ret->range = range;
 	ret->typesize = typesize;
 	ret->merge = merge;
@@ -79,7 +79,7 @@ segtree *segtree_new(size_t range, size_t typesize, merge_func merge,
 }
 
 
-void segtree_free(segtree *self)
+void segtree_free(SegTree *self)
 {
 	DESTROY_FLAT(self->tree, vec);
 	FREE(self->init_val);
@@ -87,7 +87,7 @@ void segtree_free(segtree *self)
 }
 
 
-void segtree_upd(segtree *self, size_t pos, const void *val)
+void segtree_upd(SegTree *self, size_t pos, const void *val)
 {
 	pos += self->range;
 	vec_set(self->tree, pos, val);
@@ -99,13 +99,13 @@ void segtree_upd(segtree *self, size_t pos, const void *val)
 }
 
 
-const void *segtree_qry(segtree *self, size_t pos)
+const void *segtree_qry(SegTree *self, size_t pos)
 {
 	return vec_get(self->tree, pos + self->range);
 }
 
 
-void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
+void segtree_range_qry(SegTree *self, size_t left, size_t right, void *dest)
 {
 	memcpy(dest, self->init_val, self->typesize);
 	for (left += self->range, right += self->range; left < right;
@@ -121,19 +121,19 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 
 
 #define SEGTREE_UPD_IMPL(TYPE)\
-	void segtree_upd_##TYPE(segtree *self, size_t pos, TYPE val) {\
+	void segtree_upd_##TYPE(SegTree *self, size_t pos, TYPE val) {\
 		segtree_upd(self, pos, &val);\
 	}
 
 
 #define SEGTREE_QRY_IMPL(TYPE)\
-	TYPE segtree_qry_##TYPE(segtree *self, size_t pos) {\
+	TYPE segtree_qry_##TYPE(SegTree *self, size_t pos) {\
 		return *((TYPE *)segtree_qry(self, pos));\
 	}
 
 
 #define SEGTREE_RANGE_QRY_IMPL(TYPE)\
-	TYPE segtree_range_qry_##TYPE(segtree *self, size_t left, size_t right) {\
+	TYPE segtree_range_qry_##TYPE(SegTree *self, size_t left, size_t right) {\
 		TYPE ret;\
 		segtree_range_qry(self, left, right, &ret);\
 		return ret;\

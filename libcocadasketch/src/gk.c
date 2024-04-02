@@ -38,15 +38,15 @@ typedef struct {
 
 
 struct __gksumm {
-	vec *vals;
-	vec *qtys;
-	cmp_func cmp;
+	Vec *vals;
+	Vec *qtys;
+	CmpFunc cmp;
 	double err;
 	size_t total_qty;
 };
 
 
-gksumm *gk_new(size_t typesize, cmp_func cmp, double err)
+gksumm *gk_new(size_t typesize, CmpFunc cmp, double err)
 {
 	gksumm *ret = NEW(gksumm);
 	ret->vals = vec_new(typesize);
@@ -64,7 +64,7 @@ gksumm *gk_new(size_t typesize, cmp_func cmp, double err)
 }
 
 
-static size_t succ(vec *data, cmp_func cmp, const void *val)
+static size_t succ(Vec *data, CmpFunc cmp, const void *val)
 {
 	if ( vec_len(data) == 0
 	        || cmp(val, vec_get(data, 0)) < 0 ) { // treat last elt as INFINITY

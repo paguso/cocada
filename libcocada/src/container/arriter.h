@@ -24,11 +24,8 @@
 #define ARRITER_H
 
 #include <stdlib.h>
-#include <string.h>
 
-#include "bitbyte.h"
-#include "new.h"
-#include "cstrutil.h"
+#include "coretype.h"
 #include "iter.h"
 #include "trait.h"
 

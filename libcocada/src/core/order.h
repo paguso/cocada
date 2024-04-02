@@ -47,7 +47,7 @@
  *
  * @see cmp_`type` for type-specific comparison
  */
-typedef int (*cmp_func)(const void *left, const void *right);
+typedef int (*CmpFunc)(const void *left, const void *right);
 
 
 /**
@@ -59,7 +59,7 @@ typedef int (*cmp_func)(const void *left, const void *right);
  *
  * @see eq_`type` for type-specific comparison
  */
-typedef bool (*eq_func)(const void *left, const void *right);
+typedef bool (*EqFunc)(const void *left, const void *right);
 
 
 /**

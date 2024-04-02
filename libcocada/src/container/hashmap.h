@@ -39,7 +39,7 @@
 /**
  * Hashmap type
  */
-typedef struct _hashmap hashmap;
+typedef struct _HashMap HashMap;
 
 
 /**
@@ -49,7 +49,7 @@ typedef struct _hashmap hashmap;
 typedef struct  {
 	const void *key; /**< key */
 	const void *val; /**< value */
-} hashmap_entry;
+} HashMapEntry;
 
 
 /**
@@ -65,12 +65,12 @@ typedef struct  {
  * different hash values must compare as different and,
  * conversely, any two keys which compare as equal by the key
  * comparator function are required to have the same hash value.
-
+ *
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
-                     eq_func keyeq);
+HashMap *hashmap_new(size_t keysize, size_t valsize, HashFunc keyhash,
+                     EqFunc keyeq);
 
 
 /**
@@ -78,8 +78,8 @@ hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
  * Analogous to ::hashmap_new
  * @see hashmap_new
  */
-void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
-                  hash_func keyhash, eq_func keyeq);
+void hashmap_init(HashMap *map, size_t keysize, size_t valsize,
+                  HashFunc keyhash, EqFunc keyeq);
 
 
 /**
@@ -87,8 +87,8 @@ void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
  * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
-hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
-                                   hash_func keyhash, eq_func keyeq,
+HashMap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
+                                   HashFunc keyhash, EqFunc keyeq,
                                    size_t min_capacity);
 
 
@@ -97,8 +97,8 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
  * Analogous to ::hashmap_new_with_capacit
  * @see hashmap_new_with_capacity
  */
-void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize,
-                                hash_func keyhash, eq_func keyeq,
+void hashmap_init_with_capacity(HashMap *map, size_t keysize, size_t valsize,
+                                HashFunc keyhash, EqFunc keyeq,
                                 size_t min_capacity);
 
 
@@ -121,13 +121,13 @@ size_t hashmap_sizeof();
 /**
  * @brief Adjusts the size of the table to the number of stored elements.
  */
-void hashmap_fit(hashmap *hmap);
+void hashmap_fit(HashMap *hmap);
 
 
 /**
  * @brief Checks whether the map @p hmap already contains a given @p key.
  */
-bool hashmap_contains(const hashmap *hmap, const void *key);
+bool hashmap_contains(const HashMap *hmap, const void *key);
 
 
 /**
@@ -135,7 +135,7 @@ bool hashmap_contains(const hashmap *hmap, const void *key);
  *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-const void *hashmap_get(const hashmap *hmap, const void *key);
+const void *hashmap_get(const HashMap *hmap, const void *key);
 
 
 /**
@@ -143,7 +143,7 @@ const void *hashmap_get(const hashmap *hmap, const void *key);
  *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-const hashmap_entry hashmap_get_entry(const hashmap *hmap, const void *key);
+const HashMapEntry hashmap_get_entry(const HashMap *hmap, const void *key);
 
 
 /**
@@ -151,7 +151,7 @@ const hashmap_entry hashmap_get_entry(const hashmap *hmap, const void *key);
  *
  * @warning If the map does not contain the provided @p key, an error may occur.
  */
-void *hashmap_get_mut(const hashmap *hmap, const void *key);
+void *hashmap_get_mut(const HashMap *hmap, const void *key);
 
 
 /**
@@ -160,7 +160,7 @@ void *hashmap_get_mut(const hashmap *hmap, const void *key);
  * @warning If the map already contains the provided @p key, the current value
  * gets overwitten.
  */
-void hashmap_ins(hashmap *hmap, const void *key, const void *val);
+void hashmap_ins(HashMap *hmap, const void *key, const void *val);
 
 
 /**
@@ -170,7 +170,7 @@ void hashmap_ins(hashmap *hmap, const void *key, const void *val);
  * @warning This operation does not destroy the key or its value.
  * @see hashmap_remv
  */
-void hashmap_del(hashmap *hmap, const void *key);
+void hashmap_del(HashMap *hmap, const void *key);
 
 
 /**
@@ -211,14 +211,14 @@ void hashmap_del(hashmap *hmap, const void *key);
  * @warning If the map does not contain the provided @p key, this operation has no effect.
  * @warning This does not destroy the key or its value.
  */
-void hashmap_remv(hashmap *hmap, const void *key, void *dest_key,
+void hashmap_remv(HashMap *hmap, const void *key, void *dest_key,
                   void *dest_val);
 
 
 /**
  * @brief Returns the number of elements currently stored.
  */
-size_t hashmap_size(const hashmap *hmap);
+size_t hashmap_size(const HashMap *hmap);
 
 
 
@@ -226,7 +226,7 @@ size_t hashmap_size(const hashmap *hmap);
 /**
  * Hashmap iterator type
  */
-typedef struct _hashmap_iter hashmap_iter;
+typedef struct _HashMapIter HashMapIter;
 
 
 /**
@@ -235,18 +235,18 @@ typedef struct _hashmap_iter hashmap_iter;
  * The ::iter_next method returns a pointer to a ::hashmap_entry.
  * @see iter
  */
-hashmap_iter *hashmap_get_iter(const hashmap *hmap);
+HashMapIter *hashmap_get_iter(const HashMap *hmap);
 
 
-DECL_TRAIT(hashmap_iter, Iter);
+DECL_TRAIT(HashMapIter, Iter);
 
 
 
 #define HASHMAP_GET_DECL( TYPE ) \
-	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
+	TYPE hashmap_get_##TYPE(HashMap *hmap, const void *key);
 
 #define HASHMAP_SET_DECL( TYPE ) \
-	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val);
+	void hashmap_ins_##TYPE(HashMap *hmap, const void *key, TYPE val);
 
 #define HASHMAP_ALL_DECL( TYPE , ...) \
 	HASHMAP_GET_DECL(TYPE) \

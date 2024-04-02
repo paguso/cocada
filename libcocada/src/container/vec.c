@@ -42,7 +42,7 @@ const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 const static float  MIN_LOAD = 0.5;   // (!) GROW_BY*MIN_LOAD < 1
 
-struct _vec {
+struct _Vec {
 	void *data;
 	size_t typesize;
 	size_t len;
@@ -50,14 +50,14 @@ struct _vec {
 };
 
 
-size_t vec_memsize(vec *self)
+size_t vec_memsize(Vec *self)
 {
-	return sizeof(struct _vec) + (self->capacity * self->typesize);
+	return sizeof(struct _Vec) + (self->capacity * self->typesize);
 }
 
 
 
-vec *vec_new(size_t typesize)
+Vec *vec_new(size_t typesize)
 {
 	return vec_new_with_capacity(typesize, MIN_CAPACITY);
 }
@@ -65,14 +65,14 @@ vec *vec_new(size_t typesize)
 
 size_t vec_sizeof()
 {
-	return sizeof(struct  _vec);
+	return sizeof(struct  _Vec);
 }
 
 
-vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
+Vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 {
-	vec *ret;
-	ret = NEW(vec);
+	Vec *ret;
+	ret = NEW(Vec);
 	ret->typesize = typesize;
 	ret->capacity = MAX(MIN_CAPACITY, init_capacity);
 	ret->len = 0;
@@ -83,9 +83,9 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 
 
 
-vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
+Vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
 {
-	vec *ret = NEW(vec);
+	Vec *ret = NEW(Vec);
 	ret->typesize = typesize;
 	ret->len = len;
 	ret->data = buf;
@@ -95,9 +95,9 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
 }
 
 
-vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
+Vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
 {
-	vec *ret = NEW(vec);
+	Vec *ret = NEW(Vec);
 	ret->typesize = typesize;
 	ret->len = len;
 	ret->capacity = ret->len;
@@ -107,7 +107,7 @@ vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
 }
 
 
-void vec_fit(vec *v)
+void vec_fit(Vec *v)
 {
 	v->capacity = v->len;
 	v->data = realloc(v->data, (v->capacity + 1) * v->typesize);
@@ -115,14 +115,14 @@ void vec_fit(vec *v)
 
 
 
-static void _resize_to(vec *v, size_t cap)
+static void _resize_to(Vec *v, size_t cap)
 {
 	v->capacity = MAX3(MIN_CAPACITY, v->len, cap);
 	v->data = realloc(v->data, (v->capacity + 1) * v->typesize);
 }
 
 
-static void _check_and_resize(vec *v)
+static void _check_and_resize(Vec *v)
 {
 	if (v->len == v->capacity) {
 		_resize_to(v, GROW_BY * v->capacity);
@@ -135,7 +135,7 @@ static void _check_and_resize(vec *v)
 
 void vec_finalise(void *ptr, const Finaliser *fnr )
 {
-	vec *v = (vec *)ptr;
+	Vec *v = (Vec *)ptr;
 	if (finaliser_nchd(fnr)) {
 		const Finaliser *chd_fr = finaliser_chd(fnr, 0);
 		for (size_t i = 0, l = vec_len(v); i < l; i++) {
@@ -147,31 +147,31 @@ void vec_finalise(void *ptr, const Finaliser *fnr )
 }
 
 
-size_t vec_len(const vec *v)
+size_t vec_len(const Vec *v)
 {
 	return v->len;
 }
 
 
-size_t vec_typesize(const vec *v)
+size_t vec_typesize(const Vec *v)
 {
 	return v->typesize;
 }
 
 
-void vec_clear(vec *v)
+void vec_clear(Vec *v)
 {
 	v->len = 0;
 }
 
 
-const void *vec_as_array(vec *v)
+const void *vec_as_array(Vec *v)
 {
 	return v->data;
 }
 
 
-void *vec_detach(vec *v)
+void *vec_detach(Vec *v)
 {
 	vec_fit(v);
 	void *data = realloc(v->data, v->len * v->typesize);
@@ -180,56 +180,56 @@ void *vec_detach(vec *v)
 }
 
 
-const void *vec_get(const vec *v, size_t pos)
+const void *vec_get(const Vec *v, size_t pos)
 {
 	return v->data + ( pos * v->typesize );
 }
 
 
-const void *vec_first(const vec *v)
+const void *vec_first(const Vec *v)
 {
 	return (v->len) ? vec_get(v, 0) : NULL;
 }
 
 
-const void *vec_last(const vec *v)
+const void *vec_last(const Vec *v)
 {
 	return (v->len) ? vec_get(v, v->len - 1) : NULL;
 }
 
 
-void *vec_get_mut(const vec *v, size_t pos)
+void *vec_get_mut(const Vec *v, size_t pos)
 {
 	return v->data + ( pos * v->typesize );
 }
 
 
-void *vec_first_mut(const vec *v)
+void *vec_first_mut(const Vec *v)
 {
 	return (v->len) ? vec_get_mut(v, 0) : NULL;
 }
 
 
-void *vec_last_mut(const vec *v)
+void *vec_last_mut(const Vec *v)
 {
 	return (v->len) ? vec_get_mut(v, v->len - 1) : NULL;
 }
 
 
-void vec_get_cpy(const vec *v, size_t pos, void *dest)
+void vec_get_cpy(const Vec *v, size_t pos, void *dest)
 {
 	memcpy(dest, v->data + (pos * v->typesize), v->typesize);
 }
 
 
-void vec_set(vec *v, size_t pos, const void *src)
+void vec_set(Vec *v, size_t pos, const void *src)
 {
 	_check_and_resize(v);
 	memcpy(v->data + (pos * v->typesize), src, v->typesize);
 }
 
 
-void vec_swap(vec *v, size_t i, size_t j)
+void vec_swap(Vec *v, size_t i, size_t j)
 {
 	void *swp = v->data + (v->capacity * v->typesize);
 	if (i == j) return;
@@ -239,7 +239,7 @@ void vec_swap(vec *v, size_t i, size_t j)
 }
 
 
-void vec_push(vec *v, const void *src)
+void vec_push(Vec *v, const void *src)
 {
 	_check_and_resize(v);
 	memcpy(v->data + (v->len * v->typesize), src, v->typesize);
@@ -247,7 +247,7 @@ void vec_push(vec *v, const void *src)
 }
 
 
-void vec_push_n(vec *v, const void *src, size_t n)
+void vec_push_n(Vec *v, const void *src, size_t n)
 {
 	if (n == 0) return;
 	_resize_to(v, v->len + n);
@@ -265,7 +265,7 @@ void vec_push_n(vec *v, const void *src, size_t n)
 }
 
 
-void vec_ins(vec *v, size_t pos, const void *src)
+void vec_ins(Vec *v, size_t pos, const void *src)
 {
 	_check_and_resize(v);
 	pos = MIN(pos, v->len);
@@ -276,7 +276,7 @@ void vec_ins(vec *v, size_t pos, const void *src)
 }
 
 
-void vec_cat(vec *dest, const vec *src)
+void vec_cat(Vec *dest, const Vec *src)
 {
 	_resize_to(dest, dest->len + src->len);
 	memcpy(dest->data + (dest->len * dest->typesize), src->data,
@@ -285,7 +285,7 @@ void vec_cat(vec *dest, const vec *src)
 }
 
 
-void vec_pop(vec *v, size_t pos, void *dest)
+void vec_pop(Vec *v, size_t pos, void *dest)
 {
 	vec_get_cpy(v, pos, dest);
 	memmove( v->data + (pos * v->typesize), v->data + ((pos + 1) * v->typesize),
@@ -295,7 +295,7 @@ void vec_pop(vec *v, size_t pos, void *dest)
 }
 
 
-void vec_del(vec *v, size_t pos)
+void vec_del(Vec *v, size_t pos)
 {
 	memmove( v->data + (pos * v->typesize), v->data + ((pos + 1) * v->typesize),
 	         (v->len - pos - 1) * v->typesize );
@@ -304,14 +304,14 @@ void vec_del(vec *v, size_t pos)
 }
 
 
-void vec_clip(vec *v, size_t from, size_t to)
+void vec_clip(Vec *v, size_t from, size_t to)
 {
 	memmove( v->data, v->data + (from * v->typesize), (to - from) * v->typesize );
 	v->len = (to - from);
 }
 
 
-void vec_reverse(vec *v)
+void vec_reverse(Vec *v)
 {
 	size_t l = 0, r = v->len - 1;
 	while (l < r) {
@@ -320,7 +320,7 @@ void vec_reverse(vec *v)
 }
 
 
-void vec_rotate_left(vec *v, size_t npos)
+void vec_rotate_left(Vec *v, size_t npos)
 {
 	if (v->len == 0 || npos % v->len == 0) return;
 	npos = npos % v->len;
@@ -332,14 +332,14 @@ void vec_rotate_left(vec *v, size_t npos)
 }
 
 
-void vec_rotate_right(vec *v, size_t npos)
+void vec_rotate_right(Vec *v, size_t npos)
 {
 	vec_rotate_left(v, v->len - (npos % v->len));
 }
 
 
 
-size_t vec_find(const vec *v, const void *val, eq_func eq)
+size_t vec_find(const Vec *v, const void *val, EqFunc eq)
 {
 	size_t i, l;
 	for (i = 0, l = vec_len(v); i < l && !eq(val, vec_get(v, i)); i++);
@@ -348,7 +348,7 @@ size_t vec_find(const vec *v, const void *val, eq_func eq)
 
 
 // returns the first position i s.t. val <= v[i] if any; else vec_len(v)
-static size_t _first_geq_bsearch(const vec *v, const void *val, cmp_func cmp)
+static size_t _first_geq_bsearch(const Vec *v, const void *val, CmpFunc cmp)
 {
 	if (vec_len(v) == 0 ) {
 		return 0;
@@ -375,7 +375,7 @@ static size_t _first_geq_bsearch(const vec *v, const void *val, cmp_func cmp)
 }
 
 
-size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp)
+size_t vec_bsearch(const Vec *v, const void *val, CmpFunc cmp)
 {
 	size_t fgeq = _first_geq_bsearch(v, val, cmp);
 	if ( ( fgeq < vec_len(v) ) && (cmp(vec_get(v, fgeq), val) == 0) ) {
@@ -388,14 +388,14 @@ size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp)
 
 
 
-void vec_qsort(vec *v, cmp_func cmp)
+void vec_qsort(Vec *v, CmpFunc cmp)
 {
 	qsort(v->data, v->len, v->typesize, cmp);
 	//_qsort(v, 0, vec_len(v), cmp);
 }
 
 
-size_t vec_min(const vec *v, cmp_func cmp)
+size_t vec_min(const Vec *v, CmpFunc cmp)
 {
 	size_t m = 0;
 	for (size_t i = 1, l = vec_len(v); i < l; ++i) {
@@ -405,7 +405,7 @@ size_t vec_min(const vec *v, cmp_func cmp)
 }
 
 
-size_t vec_max(const vec *v, cmp_func cmp)
+size_t vec_max(const Vec *v, CmpFunc cmp)
 {
 	size_t m = 0;
 	for (size_t i = 1, l = vec_len(v); i < l; ++i) {
@@ -415,7 +415,7 @@ size_t vec_max(const vec *v, cmp_func cmp)
 }
 
 
-void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
+void vec_radixsort(Vec *v, size_t (*key_fn)(const void *, size_t),
                    size_t key_size, size_t max_key)
 {
 	size_t n = vec_len(v);
@@ -443,35 +443,35 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_NEW_IMPL( TYPE ) \
-	vec *vec_new_##TYPE() \
+	Vec *vec_new_##TYPE() \
 	{ return vec_new(sizeof(TYPE)); }
 
 
 #define VEC_GET_IMPL( TYPE ) \
-	TYPE vec_get_##TYPE(const vec *v, size_t pos)\
+	TYPE vec_get_##TYPE(const Vec *v, size_t pos)\
 	{ return ((TYPE *)v->data)[pos]; }
 
 
 #define VEC_FIRST_IMPL( TYPE ) \
-	TYPE vec_first_##TYPE(const vec *v)\
+	TYPE vec_first_##TYPE(const Vec *v)\
 	{ return ((TYPE *)v->data)[0]; }
 
 
 #define VEC_LAST_IMPL( TYPE ) \
-	TYPE vec_last_##TYPE(const vec *v)\
+	TYPE vec_last_##TYPE(const Vec *v)\
 	{ return ((TYPE *)v->data)[v->len - 1]; }
 
 
 
 #define VEC_SET_IMPL( TYPE ) \
-	void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
+	void vec_set_##TYPE(Vec *v, size_t pos, TYPE val)\
 	{\
 		((TYPE *)v->data)[pos] = val;\
 	}
 
 
 #define VEC_PUSH_IMPL( TYPE ) \
-	void vec_push_##TYPE(vec *v, TYPE val)\
+	void vec_push_##TYPE(Vec *v, TYPE val)\
 	{\
 		_check_and_resize(v);\
 		((TYPE *)v->data)[v->len++] = val;\
@@ -479,14 +479,14 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define VEC_INS_IMPL( TYPE ) \
-	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
+	void vec_ins_##TYPE(Vec *v, size_t pos, TYPE val)\
 	{\
 		vec_ins(v, pos, &val);\
 	}
 
 
 #define VEC_POP_IMPL( TYPE ) \
-	TYPE vec_pop_##TYPE(vec *v, size_t pos)\
+	TYPE vec_pop_##TYPE(Vec *v, size_t pos)\
 	{\
 		TYPE r;\
 		vec_pop(v, pos, &r);\
@@ -509,23 +509,23 @@ XX_CORETYPES(TYPED_VEC_IMPL)
 
 
 
-struct _vec_iter {
+struct _VecIter {
 	Iter _t_Iter;
-	const vec *src;
+	const Vec *src;
 	size_t index;
 };
 
 
 static bool _vec_iter_has_next(Iter *it)
 {
-	vec_iter *vit = (vec_iter *)it->impltor;
+	VecIter *vit = (VecIter *)it->impltor;
 	return vit->index < vec_len(vit->src);
 }
 
 
 static const void *_vec_iter_next(Iter *it)
 {
-	vec_iter *vit = (vec_iter *)it->impltor;
+	VecIter *vit = (VecIter *)it->impltor;
 	return vec_get(vit->src, vit->index++);
 }
 
@@ -533,9 +533,9 @@ static const void *_vec_iter_next(Iter *it)
 static Iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
 
 
-vec_iter *vec_get_iter(const vec *v)
+VecIter *vec_get_iter(const Vec *v)
 {
-	vec_iter *ret = NEW(vec_iter);
+	VecIter *ret = NEW(VecIter);
 	ret->_t_Iter.impltor = ret;
 	ret->_t_Iter.vt = &_vec_iter_vt;
 	ret->src = v;
@@ -543,4 +543,4 @@ vec_iter *vec_get_iter(const vec *v)
 	return ret;
 }
 
-IMPL_TRAIT(vec_iter, Iter)
+IMPL_TRAIT(VecIter, Iter)

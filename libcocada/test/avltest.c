@@ -114,7 +114,7 @@ void test_avl_ins(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
-	vec *buf = vec_new(sizeof(obj_t));
+	Vec *buf = vec_new(sizeof(obj_t));
 	tree = avl_new(sizeof(obj_t *), cmp_obj_t_refs);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);
@@ -193,7 +193,7 @@ void test_avl_get(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
-	vec *buf = vec_new(sizeof(obj_t));
+	Vec *buf = vec_new(sizeof(obj_t));
 	tree = avl_new(sizeof(obj_t *), cmp_obj_t_refs);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);

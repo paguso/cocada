@@ -38,7 +38,7 @@
 void test_vec_new(CuTest *tc)
 {
 	memdbg_reset();
-	vec *v = vec_new_with_capacity(sizeof(int), 10);
+	Vec *v = vec_new_with_capacity(sizeof(int), 10);
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 	DESTROY_FLAT(v, vec);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
@@ -49,7 +49,7 @@ void test_vec_app(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(short));
+	Vec *v = vec_new(sizeof(short));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 0; i < len; i++) {
@@ -74,7 +74,7 @@ void test_vec_get_cpy(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double));
+	Vec *v = vec_new(sizeof(double));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 0; i < len; i++) {
@@ -100,7 +100,7 @@ void test_vec_set(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(int));
+	Vec *v = vec_new(sizeof(int));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (int i = 0; i < len; i++) {
@@ -129,7 +129,7 @@ void test_vec_ins(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 110;
-	vec *v = vec_new(sizeof(double *));
+	Vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 1; i < len; i += 2) {
@@ -156,7 +156,7 @@ void test_vec_del(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double *));
+	Vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 0; i < len; i++) {
@@ -184,7 +184,7 @@ void test_vec_swap(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double *));
+	Vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 0; i < len; i++) {
@@ -209,7 +209,7 @@ void test_vec_reverse(CuTest *tc)
 {
 	memdbg_reset();
 	size_t len = 100;
-	vec *v = vec_new(sizeof(double *));
+	Vec *v = vec_new(sizeof(double *));
 	CuAssertSizeTEquals(tc, 0, vec_len(v));
 
 	for (size_t i = 0; i < len; i++) {
@@ -234,10 +234,10 @@ void test_vec_reverse(CuTest *tc)
 void test_vec_iter(CuTest *tc)
 {
 	memdbg_reset();
-	vec *v = vec_new(sizeof(int));
+	Vec *v = vec_new(sizeof(int));
 
-	vec_iter *it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, int, vec_iter_as_Iter(it)) {
+	VecIter *it = vec_get_iter(v);
+	FOREACH_IN_ITER(j, int, VecIter_as_Iter(it)) {
 		CuFail(tc, "Vector has no element to iterate.");
 	}
 	FREE(it);
@@ -248,7 +248,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	int i = 0;
 	it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, int, vec_iter_as_Iter(it)) {
+	FOREACH_IN_ITER(j, int, VecIter_as_Iter(it)) {
 		//printf("Iterator[%d]==%d\n", i, *j);
 		CuAssertIntEquals(tc, i, *j);
 		i++;
@@ -264,7 +264,7 @@ void test_vec_iter(CuTest *tc)
 	}
 	i = 0;
 	it = vec_get_iter(v);
-	FOREACH_IN_ITER(j, char *, vec_iter_as_Iter(it)) {
+	FOREACH_IN_ITER(j, char *, VecIter_as_Iter(it)) {
 		//printf("Iterator[%d]==%s\n", i, *j);
 		CuAssertStrEquals(tc, strings[i], *j);
 		i++;
@@ -302,7 +302,7 @@ void test_vec_radixsort(CuTest *tc)
 {
 	memdbg_reset();
 	size_t max_key = 3;
-	vec *v;
+	Vec *v;
 	v = vec_new(sizeof(triple));
 	for (size_t d1 = 0; d1 < max_key; d1++) {
 		for (size_t d0 = 0; d0 < max_key; d0++) {
@@ -356,7 +356,7 @@ void test_vec_qsort(CuTest *tc)
 		arr[i] = t;
 	}
 	shuffle_arr(arr, max_key, sizeof(triple));
-	vec *v = vec_new(sizeof(triple));
+	Vec *v = vec_new(sizeof(triple));
 	for (size_t i = 0; i < max_key; i++) {
 		vec_push(v, &arr[i]);
 	}
@@ -376,7 +376,7 @@ void test_vec_qsort(CuTest *tc)
 void test_vec_bsearch(CuTest *tc)
 {
 	memdbg_reset();
-	vec *v = vec_new(sizeof(int));
+	Vec *v = vec_new(sizeof(int));
 	int maxval = 100;
 	CuAssertIntEquals(tc, 0, (int)vec_bsearch(v, &maxval, cmp_int));
 	for (int i = 0; i < maxval; i += 2) {
@@ -404,9 +404,9 @@ void test_vec_free(CuTest *tc)
 {
 	memdbg_reset();
 	size_t n = 10;
-	vec *v = vec_new(sizeof(vec *));
+	Vec *v = vec_new(sizeof(Vec *));
 	for (size_t i = 0; i < n; i++) {
-		vec *c = vec_new(sizeof(vobj *));
+		Vec *c = vec_new(sizeof(vobj *));
 		for (size_t j = 0; j < i; j++) {
 			vobj *e = NEW(vobj);
 			e->i = (int)i;
@@ -427,9 +427,9 @@ void test_vec_flat_free(CuTest *tc)
 {
 	memdbg_reset();
 	size_t n = 10;
-	vec *v = vec_new(vec_sizeof());
+	Vec *v = vec_new(vec_sizeof());
 	for (size_t i = 0; i < n; i++) {
-		vec *c = vec_new(sizeof(vobj));
+		Vec *c = vec_new(sizeof(vobj));
 		for (size_t j = 0; j < i; j++) {
 			vobj e = {(int)i, (double)i};
 			vec_push(c, &e);
@@ -440,7 +440,7 @@ void test_vec_flat_free(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, vec_len(v));
 	for (size_t i = 0; i < n; i++) {
-		vec *c = (vec *)vec_get(v, i);
+		Vec *c = (Vec *)vec_get(v, i);
 		for (size_t j = 0; j < i; j++) {
 			vobj e = {(int)i, (double)i};
 			vec_push(c, &e);
@@ -458,12 +458,12 @@ void test_vec_flat_free(CuTest *tc)
 void test_vec_cat(CuTest *tc)
 {
 	memdbg_reset();
-	vec *v1 = vec_new(sizeof(vobj));
+	Vec *v1 = vec_new(sizeof(vobj));
 	for (size_t i = 0; i < 100; i++) {
 		vobj o = {.i = (int)i, .d = (double)i};
 		vec_push(v1, &o);
 	}
-	vec *v2 = vec_new(sizeof(vobj));
+	Vec *v2 = vec_new(sizeof(vobj));
 	for (size_t i = 100; i < 200; i++) {
 		vobj o = {.i = (int)i, .d = (double)i};
 		vec_push(v2, &o);
@@ -491,7 +491,7 @@ void test_vec_get_speed(CuTest *tc)
 	memdbg_reset();
 	size_t n = 1000000;
 	int *arr = ARR_NEW(int, n);
-	vec *v = vec_new_int();
+	Vec *v = vec_new_int();
 	for (size_t i = 0; i < n; i++) {
 		int x = rand_range_int(0, INT_MAX);
 		arr[i] = x;
@@ -542,7 +542,7 @@ void test_vec_arr_of_from_vec(CuTest *tc)
 {
 	memdbg_reset();
 	size_t n = 100;
-	vec *v = vec_new_int();
+	Vec *v = vec_new_int();
 	for (size_t i = 0; i < n; i++) {
 		vec_push_int(v, i);
 	}

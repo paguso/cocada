@@ -357,7 +357,7 @@ typedef struct _cliparser cliparser;
 cliopt *cliopt_new(char shortname,  char *longname, char *help,
                    clioptneed need, clioptmultiplicity multiplicity,
                    cliargtype type, int min_val_no, int max_val_no,
-                   vec *choices, vec *defaults );
+                   Vec *choices, Vec *defaults );
 
 
 /**
@@ -385,7 +385,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
  */
 cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
                       cliargtype type, int min_val_no, int max_val_no,
-                      vec *choices, vec *defaults );
+                      Vec *choices, Vec *defaults );
 
 
 /**
@@ -632,7 +632,7 @@ const cliopt *cliparser_active_sc_option(const cliparser *cmd);
  * vector with with two child vectors, the first with three long ints
  * and the second with two long ints.
  */
-const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
+const Vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
         char shortname);
 
 
@@ -645,7 +645,7 @@ const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
  * @see cliparser_opt_val_from_shortname
  *
  */
-const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
+const Vec *cliparser_opt_val_from_longname(const cliparser *cmd,
         char *longname);
 
 
@@ -661,7 +661,7 @@ const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */
-const vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos);
+const Vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos);
 
 
 

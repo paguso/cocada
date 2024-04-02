@@ -28,9 +28,9 @@
 
 
 
-hashset *hashset_new(size_t typesize, hash_func hfunc, equals_func eqfunc)
+HashSet *hashset_new(size_t typesize, HashFunc hfunc, EqualsFunc eqfunc)
 {
-	hashset *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
+	HashSet *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
 	return ret;
 }
 
@@ -41,13 +41,13 @@ void hashset_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-size_t hashset_size(const hashset *set)
+size_t hashset_size(const HashSet *set)
 {
 	return hashmap_size(set);
 }
 
 
-bool hashset_contains(const hashset *set, const void *elt)
+bool hashset_contains(const HashSet *set, const void *elt)
 {
 	return hashmap_contains(set, elt);
 }
@@ -56,37 +56,37 @@ static char __NOCHAR;
 #define __NOTHING ((void *)(&__NOCHAR))
 
 
-void hashset_add(hashset *set, const void *elt)
+void hashset_add(HashSet *set, const void *elt)
 {
 	hashmap_ins(set, elt, __NOTHING);
 }
 
 
-void hashset_remv(hashset *set, const void *elt, void *dest)
+void hashset_remv(HashSet *set, const void *elt, void *dest)
 {
 	hashmap_remv(set, elt, __NOTHING, dest);
 }
 
 
-void hashset_del(hashset *set, const void *elt)
+void hashset_del(HashSet *set, const void *elt)
 {
 	hashmap_del(set, elt);
 }
 
 #define HASHSET_CONTAINS_IMPL( TYPE ) \
-	bool hashset_contains_##TYPE(hashset *set, TYPE elt ) {\
+	bool hashset_contains_##TYPE(HashSet *set, TYPE elt ) {\
 		return hashset_contains(set, &elt);\
 	}
 
 
 #define HASHSET_ADD_IMPL( TYPE ) \
-	void hashset_add_##TYPE(hashset *set, TYPE elt ) {\
+	void hashset_add_##TYPE(HashSet *set, TYPE elt ) {\
 		hashset_add(set, &elt);\
 	}
 
 
 #define HASHSET_DEL_IMPL( TYPE ) \
-	void hashset_del_##TYPE(hashset *set, TYPE elt ) {\
+	void hashset_del_##TYPE(HashSet *set, TYPE elt ) {\
 		hashset_del(set, &elt);\
 	}
 
@@ -100,23 +100,23 @@ XX_CORETYPES(HASHSET_ALL_IMPL)
 
 
 
-struct _hashset_iter {
+struct _HashSetIter {
 	Iter _t_Iter;
-	hashmap_iter *inner;
+	HashMapIter *inner;
 };
 
 
 bool _hashset_iter_has_next(Iter *it)
 {
-	return iter_has_next(hashmap_iter_as_Iter(((hashset_iter *)(
+	return iter_has_next(HashMapIter_as_Iter(((HashSetIter *)(
 	                         it->impltor))->inner));
 }
 
 
 const void *_hashset_iter_next(Iter *it)
 {
-	return ((hashmap_entry *)iter_next(hashmap_iter_as_Iter(((hashset_iter *)(
-	                                       it->impltor))->inner)))->key;
+	return ((HashMapEntry *)iter_next(HashMapIter_as_Iter(((HashSetIter *)(
+	                                      it->impltor))->inner)))->key;
 }
 
 
@@ -126,9 +126,9 @@ static Iter_vt _hashset_iter_vt = { .has_next = _hashset_iter_has_next,
 
 
 
-hashset_iter *hashset_get_iter(hashset *set)
+HashSetIter *hashset_get_iter(HashSet *set)
 {
-	hashset_iter *ret = NEW(hashset_iter);
+	HashSetIter *ret = NEW(HashSetIter);
 	ret->_t_Iter.impltor = ret;
 	ret->_t_Iter.vt = &_hashset_iter_vt;
 	ret->inner = hashmap_get_iter(set);
@@ -138,8 +138,8 @@ hashset_iter *hashset_get_iter(hashset *set)
 
 void hashset_iter_finalise(void *ptr, const Finaliser *fnr)
 {
-	FREE(((hashset_iter *)ptr)->inner);
+	FREE(((HashSetIter *)ptr)->inner);
 }
 
 
-IMPL_TRAIT(hashset_iter, Iter)
+IMPL_TRAIT(HashSetIter, Iter)

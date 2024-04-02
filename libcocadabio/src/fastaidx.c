@@ -27,8 +27,8 @@
 
 struct _fastaidx {
 	char *path;
-	vec *dscs;
-	vec *seqs;
+	Vec *dscs;
+	Vec *seqs;
 };
 
 

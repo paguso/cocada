@@ -39,7 +39,7 @@
 /**
  * Stack type
  */
-typedef vec stack;
+typedef Vec stack;
 
 
 /**

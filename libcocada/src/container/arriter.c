@@ -22,7 +22,9 @@
 #include <stdlib.h>
 
 #include "arriter.h"
+#include "coretype.h"
 #include "iter.h"
+#include "new.h"
 #include "trait.h"
 
 
@@ -35,7 +37,7 @@ static bool _arr_iter_has_next(Iter *it)
 static const void *_arr_iter_next(Iter *it)
 {
 	ArrIter *ait = (ArrIter *)it->impltor;
-	return ait->src + (ait->typesize * ait->index++);
+	return (byte_t *)ait->src + (ait->typesize * ait->index++);
 }
 
 static Iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};

@@ -56,9 +56,9 @@ struct _cliopt {
 	cliargtype type;	/* The type of option values */
 	int min_val_no;		/* Minimum number of option values (default = 0) */
 	int max_val_no;		/* Maximum number of option values (default = 0) */
-	vec *choices;		/* Value choices if type==ARG_CHOICE */
-	vec *defaults;		/* Default values */
-	vec *values;		/* Actual parsed values */
+	Vec *choices;		/* Value choices if type==ARG_CHOICE */
+	Vec *defaults;		/* Default values */
+	Vec *values;		/* Actual parsed values */
 };
 
 
@@ -67,8 +67,8 @@ struct _cliarg {
 	char *help;			/* help message */
 	cliargtype type;	/* value type */
 	bool single_val;	/* true=one single value; false=multiple */
-	vec *choices;		/* value choices if type=ARG_CHOICE */
-	vec *values;		/* Actual parsed value(s) */
+	Vec *choices;		/* value choices if type=ARG_CHOICE */
+	Vec *values;		/* Actual parsed value(s) */
 };
 
 
@@ -83,22 +83,22 @@ struct _cliparser {
 	struct _cliparser *par;		/* parent command (for subcommands) */
 	char *name;					/* command name */
 	char *help;					/* help message */
-	hashmap *subcommands;		/* subcommands indexed by name */
-	vec *subcmd_names;			/* subcommand names by order of addition */
+	HashMap *subcommands;		/* subcommands indexed by name */
+	Vec *subcmd_names;			/* subcommand names by order of addition */
 	cliparser *active_subcmd;	/* used subcommand in a command call */
-	hashmap *options;			/* command options indexed by short name */
-	vec *optcombos;				/* Option combos */
-	hashmap *long_to_short;		/* Long-to-short option name map */
+	HashMap *options;			/* command options indexed by short name */
+	Vec *optcombos;				/* Option combos */
+	HashMap *long_to_short;		/* Long-to-short option name map */
 	cliopt *active_sc_opt;
-	vec *args;					/* Vector of positional arguments */
+	Vec *args;					/* Vector of positional arguments */
 	bool parsed;				/* has this been processed/parsed yet? */
 };
 
 
 
-static vec *_vals_vec_new(clioptmultiplicity multi, cliargtype type)
+static Vec *_vals_vec_new(clioptmultiplicity multi, cliargtype type)
 {
-	vec *ret = NULL;
+	Vec *ret = NULL;
 	switch (multi) {
 	case OPT_SINGLE:
 		switch (type) {
@@ -132,14 +132,14 @@ static vec *_vals_vec_new(clioptmultiplicity multi, cliargtype type)
 		}
 		break;
 	case OPT_MULTIPLE:
-		ret	= vec_new(sizeof(vec *));
+		ret	= vec_new(sizeof(Vec *));
 		break;
 	}
 	return ret;
 }
 
 
-static void _vals_vec_free(vec *vals, clioptmultiplicity multi, cliargtype type)
+static void _vals_vec_free(Vec *vals, clioptmultiplicity multi, cliargtype type)
 {
 	switch (type) {
 	case ARG_NONE:
@@ -260,7 +260,7 @@ static bool _isid(char *id)
 	return ok;
 }
 
-static bool _arechoices(vec *choices)
+static bool _arechoices(Vec *choices)
 {
 	bool ok = true;
 	ok &= (choices != NULL);
@@ -283,7 +283,7 @@ static bool _str_eq(const void *s1, const void *s2)
  * Validates NON-NULL default values. If type==ARG_CHOICE, choices contains
  * the valid alternatives
  */
-static bool _validate_defaults(vec *defaults, cliargtype type, vec *choices)
+static bool _validate_defaults(Vec *defaults, cliargtype type, Vec *choices)
 {
 	switch (type) {
 	case ARG_NONE:
@@ -355,7 +355,7 @@ static bool _validate_defaults(vec *defaults, cliargtype type, vec *choices)
 cliopt *cliopt_new(char shortname,  char *longname, char *help,
                    clioptneed need, clioptmultiplicity multiplicity,
                    cliargtype type, int min_val_no, int max_val_no,
-                   vec *choices, vec *defaults )
+                   Vec *choices, Vec *defaults )
 {
 	ERROR_ASSERT( _isletter(shortname), "Option shortname must be a letter.");
 	ERROR_ASSERT( _isid(longname), "Invalid option long name %s.", longname );
@@ -412,7 +412,7 @@ cliopt *cliopt_new_defaults(char shortname, char *longname, char *help)
 
 cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
                       cliargtype type, int min_val_no, int max_val_no,
-                      vec *choices, vec *defaults )
+                      Vec *choices, Vec *defaults )
 {
 	cliopt *ret = cliopt_new(shortname, longname, help,
 	                         OPT_OPTIONAL, OPT_SINGLE, type, min_val_no, max_val_no, choices, defaults);
@@ -478,7 +478,7 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type)
 }
 
 
-cliarg *cliarg_new_choice(char *name, char *help, vec *choices)
+cliarg *cliarg_new_choice(char *name, char *help, Vec *choices)
 {
 	ERROR_ASSERT( _arechoices(choices), "Invalid choices for argument %s.", name);
 	cliarg *ret = cliarg_new(name, help, ARG_CHOICE);
@@ -487,7 +487,7 @@ cliarg *cliarg_new_choice(char *name, char *help, vec *choices)
 }
 
 
-cliarg *cliarg_new_choice_multi(char *name, char *help, vec *choices)
+cliarg *cliarg_new_choice_multi(char *name, char *help, Vec *choices)
 {
 	cliarg *ret = cliarg_new_choice(name, help, choices);
 	ret->single_val = false;
@@ -601,8 +601,8 @@ void cliparser_add_subcommand(cliparser *cmd,  cliparser *subcmd)
 	             "Subcommand name %s already in use. Use a unique name.",
 	             subcmd->name); // all subcommand names are unique
 	// assert that no subcmd option choice is equal to a subcommand name in cmd
-	hashmap_iter *it = hashmap_get_iter(subcmd->options);
-	FOREACH_IN_ITER(optentry, hashmap_entry, hashmap_iter_as_Iter(it)) {
+	HashMapIter *it = hashmap_get_iter(subcmd->options);
+	FOREACH_IN_ITER(optentry, HashMapEntry, HashMapIter_as_Iter(it)) {
 		cliopt *opt = *((cliopt **)(optentry->val));
 		if (opt->type == ARG_CHOICE) {
 			for (size_t i = 0, l = vec_len(opt->choices); i < l; i++) {
@@ -789,9 +789,9 @@ void cliparser_print_help(const cliparser *cmd)
 	}
 	if (has_options) {
 		printf("\nOptions:\n\n");
-		vec *shortnames = vec_new(sizeof(char));
-		hashmap_iter *it = hashmap_get_iter(cmd->options);
-		FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_Iter(it)) {
+		Vec *shortnames = vec_new(sizeof(char));
+		HashMapIter *it = hashmap_get_iter(cmd->options);
+		FOREACH_IN_ITER(entry, HashMapEntry, HashMapIter_as_Iter(it)) {
 			vec_push_char(shortnames, *((char *)(entry->key)));
 		}
 		FREE(it);
@@ -839,8 +839,8 @@ static RESULT_OK_ERR(cliparse) _check_missing_options(cliparser *cmd)
 	RESULT_OK_ERR(cliparse) result = {.ok = true, .val.ok = cmd};
 
 	StrBuf *longname = strbuf_new_with_capacity(16);
-	hashmap_iter *opt_it = hashmap_get_iter(cmd->options);
-	FOREACH_IN_ITER(entry, hashmap_entry, hashmap_iter_as_Iter(opt_it)) {
+	HashMapIter *opt_it = hashmap_get_iter(cmd->options);
+	FOREACH_IN_ITER(entry, HashMapEntry, HashMapIter_as_Iter(opt_it)) {
 		cliopt *opt = *((cliopt **)(entry->val));
 		strbuf_clear(longname);
 		if (opt->longname) {
@@ -858,7 +858,7 @@ static RESULT_OK_ERR(cliparse) _check_missing_options(cliparser *cmd)
 		if (opt->need == OPT_OPTIONAL && vec_len(opt->values) == 0
 		        && opt->defaults != NULL) {
 			// add default values
-			vec *vals = _vals_vec_new(opt->multi, opt->type);
+			Vec *vals = _vals_vec_new(opt->multi, opt->type);
 			switch (opt->type) {
 			case ARG_NONE:
 				vec_cat(vals, opt->defaults);
@@ -975,8 +975,8 @@ static RESULT_OK_ERR(cliparse) _check_option_combos(cliparser *cmd)
  * If type=ARGV_CHOICE, a non-null choices vector must be informed.
  * Returns whether parsing went OK.
  */
-static bool _parse_and_add_value(vec *vals, char *tok, cliargtype type,
-                                 vec *choices,
+static bool _parse_and_add_value(Vec *vals, char *tok, cliargtype type,
+                                 Vec *choices,
                                  cliparser *cmd)
 {
 	switch (type) {
@@ -1083,7 +1083,7 @@ RESULT_OK_ERR(cliparse) cliparser_parse(cliparser *clip, int argc, char **argv,
 	int cur_opt_pos = -1;
 	cliopt *cur_opt = NULL;
 	int cur_arg_no = 0;
-	vec *cur_vals = NULL;
+	Vec *cur_vals = NULL;
 
 	char *tok;
 	int toklen;
@@ -1336,7 +1336,7 @@ cleanup:
 }
 
 
-const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
+const Vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
         char shortname)
 {
 	if (hashmap_contains(cmd->options, &shortname)) {
@@ -1348,7 +1348,7 @@ const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
 }
 
 
-const vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname)
+const Vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname)
 {
 	if (hashmap_contains(cmd->long_to_short, &longname)) {
 		char shortname = hashmap_get_char(cmd->long_to_short, &longname);
@@ -1360,7 +1360,7 @@ const vec *cliparser_opt_val_from_longname(const cliparser *cmd, char *longname)
 }
 
 
-const vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos)
+const Vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos)
 {
 	if (pos < vec_len(cmd->args)) {
 		return ((cliarg *)vec_get_rawptr(cmd->args, pos))->values;

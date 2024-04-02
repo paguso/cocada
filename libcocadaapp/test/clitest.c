@@ -39,7 +39,7 @@ static void test_setup()
 {
 	cmd = cliparser_new("test", "A Test Program");
 	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
-	vec *choices = vec_new(sizeof(char *));
+	Vec *choices = vec_new(sizeof(char *));
 	for (size_t i = 0; i < 3;
 	        vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
 	cliparser_add_option(cmd,
@@ -57,7 +57,7 @@ static void test_setup()
 	                         OPT_OPTIONAL, OPT_SINGLE, ARG_BOOL, 1, 1, NULL, NULL
 	                     )
 	                    );
-	vec *def = vec_new(sizeof(long));
+	Vec *def = vec_new(sizeof(long));
 	vec_push_long(def, 1234);
 	vec_push_long(def, 4321);
 	vec_push_long(def, 2143);
@@ -176,7 +176,7 @@ static char **make_argv(char *call, int *argc)
 	char *str, *saveptr;
 	int i;
 	saveptr = call;
-	vec *ret = vec_new(sizeof(char *));
+	Vec *ret = vec_new(sizeof(char *));
 	for (i = 0, str = call; ; i++, str = NULL) {
 		char *tok = strtok_r(str, " ", &saveptr);
 		if (!tok) break;
@@ -210,7 +210,7 @@ void test_cli_parse(CuTest *tc)
 	    "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
 	char **argv = make_argv(call, &argc);
 
-	cliparse_res result = cliparser_parse(cmd, argc, argv, false);
+	cliparseOkErrResult result = cliparser_parse(cmd, argc, argv, false);
 	CuAssert(tc, "CLI Parse error", result.ok);
 
 	freeargv(argc, argv);
