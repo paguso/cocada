@@ -31,7 +31,7 @@
 
 #include <stddef.h>
 
-#include "strread.h"
+#include "read.h"
 #include "trait.h"
 
 
@@ -50,7 +50,7 @@ strreader *strreader_new(char *src, size_t len);
 void strreader_free(strreader *rdr);
 
 
-DECL_TRAIT(strreader, strread)
+DECL_TRAIT(strreader, Read)
 
 
 #endif

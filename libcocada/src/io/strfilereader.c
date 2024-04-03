@@ -25,42 +25,42 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "strread.h"
+#include "read.h"
 #include "strfilereader.h"
 #include "new.h"
 
 
 
 struct _strfilereader {
-	strread _t_strread;
+	Read _t_Read;
 	FILE *src;
 	size_t pos;
 	bool own_stream;
 };
 
 
-IMPL_TRAIT(strfilereader, strread)
+IMPL_TRAIT(strfilereader, Read)
 
 
-static void _reset(strread *self)
+static void _reset(Read *self)
 {
 	rewind( ((strfilereader *)self->impltor)->src );
 }
 
 
-static int _getc(strread *self)
+static int _getc(Read *self)
 {
 	return fgetc( ((strfilereader *)self->impltor)->src );
 }
 
 
-static size_t _read_str(strread *self, char *dest, size_t n)
+static size_t _read_str(Read *self, char *dest, size_t n)
 {
 	return fread(dest, sizeof(char), n, ((strfilereader *)self->impltor)->src);
 }
 
 
-static size_t _read_str_until(strread *self, char *dest, char delim)
+static size_t _read_str_until(Read *self, char *dest, char delim)
 {
 	FILE *src = ((strfilereader *)self->impltor)->src;
 	size_t nread;
@@ -76,7 +76,7 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 }
 
 
-static strread_vt _strread_vt  = {
+static Read_vt _strfilereader_vt  = {
 	.getc = _getc,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
@@ -91,8 +91,8 @@ strfilereader *strfilereader_new_from_path(const char *path)
 		return NULL;
 	}
 	strfilereader *ret = NEW(strfilereader);
-	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vt = &_strread_vt;
+	ret->_t_Read.impltor = ret;
+	ret->_t_Read.vt = &_strfilereader_vt;
 	ret->src = src;
 	ret->own_stream = true;
 	ret->pos = 0;
@@ -103,8 +103,8 @@ strfilereader *strfilereader_new_from_path(const char *path)
 strfilereader *strfilereader_new(FILE *stream)
 {
 	strfilereader *ret = NEW(strfilereader);
-	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vt = &_strread_vt;
+	ret->_t_Read.impltor = ret;
+	ret->_t_Read.vt = &_strfilereader_vt;
 	ret->src = stream;
 	ret->own_stream = false;
 	ret->pos = 0;

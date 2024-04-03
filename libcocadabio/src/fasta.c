@@ -30,28 +30,28 @@
 #include "fasta.h"
 #include "new.h"
 #include "result.h"
-#include "strread.h"
+#include "read.h"
 #include "trait.h"
 #include "errlog.h"
 
 typedef struct _fastaread {
-	strread _t_strread;
+	Read _t_Read;
 	FILE *src;
 	size_t file_pos;
 } fastaread;
 
 
-IMPL_TRAIT(fastaread, strread)
+IMPL_TRAIT(fastaread, Read)
 
 
-static void _reset(strread *self)
+static void _reset(Read *self)
 {
 	fastaread *fr = (fastaread *)self->impltor;
 	fseek(fr->src, fr->file_pos, SEEK_SET);
 }
 
 
-static int _getc(strread *self)
+static int _getc(Read *self)
 {
 	fastaread *fr = (fastaread *)self->impltor;
 	int c = EOF;
@@ -73,7 +73,7 @@ static int _getc(strread *self)
 }
 
 
-static size_t _read_str(strread *self, char *dest, size_t n)
+static size_t _read_str(Read *self, char *dest, size_t n)
 {
 	FILE *src = ((fastaread *)self->impltor)->src;
 	char *origdest = dest;
@@ -96,7 +96,7 @@ static size_t _read_str(strread *self, char *dest, size_t n)
 }
 
 
-static size_t _read_str_until(strread *self, char *dest, char delim)
+static size_t _read_str_until(Read *self, char *dest, char delim)
 {
 	FILE *src = ((fastaread *)self->impltor)->src;
 	size_t nread = 0;
@@ -117,7 +117,7 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 }
 
 
-static strread_vt _strread_vt  = {
+static Read_vt _strread_vt  = {
 	.getc = _getc,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
@@ -129,8 +129,8 @@ static void _fastaread_init(fastaread *fr, FILE *src)
 {
 
 	fr->src = src;
-	fr->_t_strread.impltor = fr;
-	fr->_t_strread.vt = &_strread_vt;
+	fr->_t_Read.impltor = fr;
+	fr->_t_Read.vt = &_strread_vt;
 }
 
 
@@ -166,7 +166,7 @@ RESULT_OK_ERR(rawptr) fasta_open(const char *filename)
 	f->cur_rec.descr = cstr_new(f->cur_rec_len[0]);
 	f->cur_rec.seq = cstr_new(f->cur_rec_len[1]);
 	f->cur_rec_rd.descr = cstr_new(f->cur_rec_rd_len[0]);
-	f->cur_rec_rd.seqrdr = fastaread_as_strread(&(f->rd));
+	f->cur_rec_rd.seqrdr = fastaread_as_Read(&(f->rd));
 	goto SUCCESS;
 ERROR:
 	FREE(f);

@@ -25,24 +25,24 @@
 
 #include "mathutil.h"
 #include "new.h"
-#include "strread.h"
+#include "read.h"
 #include "strreader.h"
 
 struct _strreader {
-	strread _t_strread;
+	Read _t_Read;
 	char *src;
 	size_t len;
 	size_t index;
 };
 
 
-static void _strreader_reset(strread *t)
+static void _strreader_reset(Read *t)
 {
 	((strreader *)(t->impltor))->index = 0;
 }
 
 
-static int _strreader_getc(strread *t)
+static int _strreader_getc(Read *t)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	if (rdr->index < rdr->len) {
@@ -54,7 +54,7 @@ static int _strreader_getc(strread *t)
 }
 
 
-static int _strreader_ungetc(strread *t)
+static int _strreader_ungetc(Read *t)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	if (0 < rdr->index && rdr->index <= rdr->len) {
@@ -67,7 +67,7 @@ static int _strreader_ungetc(strread *t)
 }
 
 
-static size_t _strreader_read_str(strread *t, char *dest, size_t n)
+static size_t _strreader_read_str(Read *t, char *dest, size_t n)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	size_t r = MIN(n, rdr->len - rdr->index);
@@ -77,7 +77,7 @@ static size_t _strreader_read_str(strread *t, char *dest, size_t n)
 }
 
 
-static size_t _strreader_read_str_until(strread *t, char *dest, char delim)
+static size_t _strreader_read_str_until(Read *t, char *dest, char delim)
 {
 	strreader *rdr = (strreader *) t->impltor;
 	size_t i, j;
@@ -90,19 +90,19 @@ static size_t _strreader_read_str_until(strread *t, char *dest, char delim)
 }
 
 
-static strread_vt _strreader_vt = { .reset = _strreader_reset,
-                                    .getc = _strreader_getc,
-                                    .ungetc = _strreader_ungetc,
-                                    .read_str = _strreader_read_str,
-                                    .read_str_until = _strreader_read_str_until
-                                  };
+static Read_vt _strreader_vt = { .reset = _strreader_reset,
+                                 .getc = _strreader_getc,
+                                 .ungetc = _strreader_ungetc,
+                                 .read_str = _strreader_read_str,
+                                 .read_str_until = _strreader_read_str_until
+                               };
 
 
 strreader *strreader_new(char *src, size_t len)
 {
 	strreader *ret = NEW(strreader);
-	ret->_t_strread.impltor = ret;
-	ret->_t_strread.vt = &_strreader_vt;
+	ret->_t_Read.impltor = ret;
+	ret->_t_Read.vt = &_strreader_vt;
 	ret->src = src;
 	ret->len = len;
 	ret->index = 0;
@@ -116,4 +116,4 @@ void strreader_free(strreader *rdr)
 }
 
 
-IMPL_TRAIT(strreader, strread)
+IMPL_TRAIT(strreader, Read)

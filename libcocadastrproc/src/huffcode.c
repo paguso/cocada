@@ -38,7 +38,7 @@
 #include "strbuf.h"
 #include "huffcode.h"
 #include "mathutil.h"
-#include "strread.h"
+#include "read.h"
 #include "xstr.h"
 #include "xstrread.h"
 
@@ -146,10 +146,10 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src)
 	return hc;
 }
 
-huffcode *huffcode_new_from_strread(const alphabet *ab, strread *reader)
+huffcode *huffcode_new_from_strread(const alphabet *ab, Read *reader)
 {
 	size_t *counts = ARR_OF_0_NEW(size_t, ab_size(ab));
-	for (int c; (c = strread_getc(reader)) != EOF;) {
+	for (int c; (c = read_getc(reader)) != EOF;) {
 		counts[ab_rank(ab, c)]++;
 	}
 	huffcode *hc = huffcode_new(ab, counts);
@@ -275,17 +275,17 @@ void huffcode_encode_xstr_to(BitVec *dest, const xstr *src,
 	}
 }
 
-BitVec *huffcode_encode_strread(strread *src, const huffcode *hcode)
+BitVec *huffcode_encode_strread(Read *src, const huffcode *hcode)
 {
 	BitVec *enc = bitvec_new();
 	huffcode_encode_strread_to(enc, src, hcode);
 	return enc;
 }
 
-void huffcode_encode_strread_to(BitVec *dest, strread *src,
+void huffcode_encode_strread_to(BitVec *dest, Read *src,
                                 const huffcode *hcode)
 {
-	for (int c; (c = strread_getc(src)) != EOF;) {
+	for (int c; (c = read_getc(src)) != EOF;) {
 		bitvec_cat(dest, hcode->code[ab_rank(hcode->ab, c)]);
 	}
 }

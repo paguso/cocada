@@ -25,7 +25,7 @@
 #include "cstrutil.h"
 #include "mathutil.h"
 #include "new.h"
-#include "strread.h"
+#include "read.h"
 #include "trait.h"
 #include "xchar.h"
 #include "xstr.h"
@@ -179,24 +179,24 @@ xstrreader *xstrreader_open_str(char *src, size_t len)
 static void _strread_reset(xstrread *t)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
-	strread *sr = (strread *) rdr->src;
-	strread_reset(sr);
+	Read *sr = (Read *) rdr->src;
+	read_reset(sr);
 }
 
 static xchar_wt _strread_getc(xstrread *t)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
-	strread *sr = (strread *) rdr->src;
-	return (xchar_wt) strread_getc(sr);
+	Read *sr = (Read *) rdr->src;
+	return (xchar_wt) read_getc(sr);
 }
 
 
 size_t  _strread_read(xstrread *t, xstr *dest, size_t n)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
-	strread *sr = (strread *) rdr->src;
+	Read *sr = (Read *) rdr->src;
 	char *s = cstr_new(n);
-	size_t r = strread_read_str(sr, s, n);
+	size_t r = read_read_str(sr, s, n);
 	xstr *xs = xstr_new_from_arr(s, r, sizeof(char));
 	if (dest != NULL) {
 		xstr_ncpy(dest, 0, xs, 0, r);
@@ -208,32 +208,32 @@ size_t  _strread_read(xstrread *t, xstr *dest, size_t n)
 size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 {
 	xstrreader *rdr = (xstrreader *) t->impltor;
-	strread *sr = (strread *) rdr->src;
+	Read *sr = (Read *) rdr->src;
 	size_t r = 0;
 	if (dest != NULL) {
-		int c = strread_getc(sr);
+		int c = read_getc(sr);
 		while (c != EOF && c != delim && r < xstr_len(dest)) {
 			xstr_set(dest, r, c);
 			r++;
-			c = strread_getc(sr);
+			c = read_getc(sr);
 		}
 		while (c != EOF && c != delim) {
 			xstr_push(dest, c);
 			r++;
-			c = strread_getc(sr);
+			c = read_getc(sr);
 		}
 		if (c == delim) {
-			strread_ungetc(sr);
+			read_ungetc(sr);
 		}
 	}
 	else {
-		int c = strread_getc(sr);
+		int c = read_getc(sr);
 		while (c != EOF && c != delim) {
 			r++;
-			c = strread_getc(sr);
+			c = read_getc(sr);
 		}
 		if (c == delim) {
-			strread_ungetc(sr);
+			read_ungetc(sr);
 		}
 	}
 	return r;
@@ -247,7 +247,7 @@ static xstrread_vt _strread_vt = { .reset = _strread_reset,
                                  };
 
 
-xstrreader *xstrreader_open_strread(strread *src)
+xstrreader *xstrreader_open_strread(Read *src)
 {
 	xstrreader *ret = NEW(xstrreader);
 	ret->_t_xstrread.impltor = ret;

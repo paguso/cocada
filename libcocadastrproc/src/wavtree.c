@@ -41,7 +41,7 @@
 #include "new.h"
 #include "stack.h"
 #include "strbuf.h"
-#include "strread.h"
+#include "read.h"
 #include "strreader.h"
 #include "vec.h"
 #include "wavtree.h"
@@ -322,11 +322,11 @@ static void tmp_wt_fill( tmp_wavtree *twt, xstrread *rdr )
 
 
 // online construction only available for CHAR_TYPE alphabets
-static void tmp_wt_fill_online( tmp_wavtree *twt, strread *src )
+static void tmp_wt_fill_online( tmp_wavtree *twt, Read *src )
 {
 	StrBuf *ab_chars = strbuf_new();
-	strread_reset(src);
-	for (int c; (c = strread_getc(src)) != EOF;) {
+	read_reset(src);
+	for (int c; (c = read_getc(src)) != EOF;) {
 		BitVec *chcode = (BitVec *) get_charcode(twt->chrcodes, c);
 		if (chcode != NULL_CODE) {
 			tmp_wt_app_char(twt->tmp_root, chcode);
@@ -596,7 +596,7 @@ wavtree *wavtree_new_from_reader( alphabet *ab, xstrread *src, wtshape shape )
 }
 
 
-wavtree *wavtree_new_online( strread *src )
+wavtree *wavtree_new_online( Read *src )
 {
 	tmp_wavtree *twt =  tmp_wt_init_bal(NULL, true);
 	tmp_wt_fill_online(twt, src);

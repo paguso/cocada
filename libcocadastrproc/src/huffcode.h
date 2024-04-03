@@ -29,7 +29,7 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "new.h"
-#include "strread.h"
+#include "read.h"
 #include "xstr.h"
 #include "xstrread.h"
 
@@ -88,7 +88,7 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_strread(const alphabet *ab, strread *src);
+huffcode *huffcode_new_from_strread(const alphabet *ab, Read *src);
 
 
 /**
@@ -149,13 +149,13 @@ void huffcode_encode_xstr_to(BitVec *dest, const xstr *src,
 /**
  * @brief Encodes a source stream into a binary code.
  */
-BitVec *huffcode_encode_strread(strread *src, const huffcode *hcode);
+BitVec *huffcode_encode_strread(Read *src, const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_strread_to(BitVec *dest, strread *src,
+void huffcode_encode_strread_to(BitVec *dest, Read *src,
                                 const huffcode *hcode);
 
 

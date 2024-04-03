@@ -19,7 +19,7 @@
  *
  */
 
-#include "strread.h"
+#include "read.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -28,39 +28,39 @@
 
 
 
-strread_vt strread_vt_new()
+Read_vt read_vt_new()
 {
-	strread_vt vt;
-	memset(&vt, 0x0, sizeof(strread_vt)); // set all functions to NULL
+	Read_vt vt;
+	memset(&vt, 0x0, sizeof(Read_vt)); // set all functions to NULL
 	return vt;
 }
 
 
-void strread_reset(strread *self)
+void read_reset(Read *self)
 {
 	self->vt->reset(self);
 }
 
 
-int strread_getc(strread *self)
+int read_getc(Read *self)
 {
 	return self->vt->getc(self);
 }
 
 
-int strread_ungetc(strread *self)
+int read_ungetc(Read *self)
 {
 	return self->vt->ungetc(self);
 }
 
 
-size_t strread_read_str(strread *self, char *dest, size_t n)
+size_t read_read_str(Read *self, char *dest, size_t n)
 {
 	return self->vt->read_str(self, dest, n);
 }
 
 
-size_t strread_read_str_until(strread *self, char *dest, char delim)
+size_t read_read_str_until(Read *self, char *dest, char delim)
 {
 	return self->vt->read_str_until(self, dest, delim);
 }

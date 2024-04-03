@@ -43,7 +43,7 @@
 #include <stdio.h>
 
 #include "trait.h"
-#include "strread.h"
+#include "read.h"
 
 
 /**
@@ -52,7 +52,7 @@
 typedef struct _strfilereader strfilereader;
 
 
-DECL_TRAIT(strfilereader, strread)
+DECL_TRAIT(strfilereader, Read)
 
 
 /**

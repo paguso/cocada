@@ -38,34 +38,34 @@
 #include <stddef.h>
 
 
-typedef struct _strread strread;
+typedef struct _Read Read;
 
 /**
  * @brief String reader virtual table
  */
 typedef struct {
-	void    (*reset) (strread *self);
-	int		(*getc) (strread *self);
-	int		(*ungetc) (strread *self);
-	size_t  (*read_str) (strread *self, char *dest, size_t n);
-	size_t  (*read_str_until) (strread *self, char *dest, char delim);
-}  strread_vt;
+	void    (*reset) (Read *self);
+	int		(*getc) (Read *self);
+	int		(*ungetc) (Read *self);
+	size_t  (*read_str) (Read *self, char *dest, size_t n);
+	size_t  (*read_str_until) (Read *self, char *dest, char delim);
+}  Read_vt;
 
 
-struct _strread {
-	strread_vt *vt;
+struct _Read {
+	Read_vt *vt;
 	void *impltor;
 };
 
 
-strread_vt strread_vt_new();
+Read_vt read_vt_new();
 
 
 /**
  * @brief Resets the reader, that is moves cursor to initial position,
  * if supported by the underlying stream.
  */
-void strread_reset(strread *self);
+void read_reset(Read *self);
 
 
 /**
@@ -74,7 +74,7 @@ void strread_reset(strread *self);
  *          reached its end.
  *
  */
-int strread_getc(strread *self);
+int read_getc(Read *self);
 
 
 /**
@@ -89,7 +89,7 @@ int strread_getc(strread *self);
  * @warning Only one char can be put back into the stream. Once a char is put back,
  * a subsequent call to this function will return 0.
  */
-int strread_ungetc(strread *self);
+int read_ungetc(Read *self);
 
 
 /**
@@ -97,7 +97,7 @@ int strread_ungetc(strread *self);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strread_read_str(strread *self, char *dest, size_t n);
+size_t read_read_str(Read *self, char *dest, size_t n);
 
 
 /**
@@ -106,7 +106,7 @@ size_t strread_read_str(strread *self, char *dest, size_t n);
  * 		  or the end of the stream is reached.
  * @returns The number of chars actually read.
  */
-size_t strread_read_str_until(strread *self, char *dest, char delim);
+size_t read_read_str_until(Read *self, char *dest, char delim);
 
 
 

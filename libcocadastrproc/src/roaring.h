@@ -66,6 +66,13 @@ size_t roaringbitvec_len(roaringbitvec *self);
 
 
 /**
+ * @brief Returns the cardinality of the set respresented to a
+ * roaring bitvector
+ */
+size_t roaringbitvec_card(roaringbitvec *self);
+
+
+/**
  * @brief Returns the number of positions with a given @p bit value.
  */
 size_t roaringbitvec_count(roaringbitvec *self, bool bit);
