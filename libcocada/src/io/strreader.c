@@ -28,7 +28,7 @@
 #include "read.h"
 #include "strreader.h"
 
-struct _strreader {
+struct _StrReader {
 	Read _t_Read;
 	char *src;
 	size_t len;
@@ -38,13 +38,13 @@ struct _strreader {
 
 static void _strreader_reset(Read *t)
 {
-	((strreader *)(t->impltor))->index = 0;
+	((StrReader *)(t->impltor))->index = 0;
 }
 
 
 static int _strreader_getc(Read *t)
 {
-	strreader *rdr = (strreader *) t->impltor;
+	StrReader *rdr = (StrReader *) t->impltor;
 	if (rdr->index < rdr->len) {
 		return rdr->src[rdr->index++];
 	}
@@ -56,7 +56,7 @@ static int _strreader_getc(Read *t)
 
 static int _strreader_ungetc(Read *t)
 {
-	strreader *rdr = (strreader *) t->impltor;
+	StrReader *rdr = (StrReader *) t->impltor;
 	if (0 < rdr->index && rdr->index <= rdr->len) {
 		rdr->index--;
 		return 1;
@@ -69,7 +69,7 @@ static int _strreader_ungetc(Read *t)
 
 static size_t _strreader_read_str(Read *t, char *dest, size_t n)
 {
-	strreader *rdr = (strreader *) t->impltor;
+	StrReader *rdr = (StrReader *) t->impltor;
 	size_t r = MIN(n, rdr->len - rdr->index);
 	strncpy(dest, rdr->src + rdr->index, r);
 	rdr->index += r;
@@ -79,7 +79,7 @@ static size_t _strreader_read_str(Read *t, char *dest, size_t n)
 
 static size_t _strreader_read_str_until(Read *t, char *dest, char delim)
 {
-	strreader *rdr = (strreader *) t->impltor;
+	StrReader *rdr = (StrReader *) t->impltor;
 	size_t i, j;
 	for (i = rdr->index, j = 0; i < rdr->len && rdr->src[i] != delim; i++) {
 		dest[j++] = rdr->src[i];
@@ -98,9 +98,9 @@ static Read_vt _strreader_vt = { .reset = _strreader_reset,
                                };
 
 
-strreader *strreader_new(char *src, size_t len)
+StrReader *strreader_new(char *src, size_t len)
 {
-	strreader *ret = NEW(strreader);
+	StrReader *ret = NEW(StrReader);
 	ret->_t_Read.impltor = ret;
 	ret->_t_Read.vt = &_strreader_vt;
 	ret->src = src;
@@ -110,10 +110,10 @@ strreader *strreader_new(char *src, size_t len)
 }
 
 
-void strreader_free(strreader *rdr)
+void strreader_free(StrReader *rdr)
 {
 	FREE(rdr);
 }
 
 
-IMPL_TRAIT(strreader, Read)
+IMPL_TRAIT(StrReader, Read)

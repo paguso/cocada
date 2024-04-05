@@ -23,13 +23,13 @@
 
 #include "write.h"
 
-int write_write (write *self, void *buf)
+int write_write (Write *self, char *buf)
 {
 	return self->vt->write(self, buf);
 }
 
 
-int write_write_n (write *self, void *buf, size_t n)
+int write_write_n (Write *self, char *buf, size_t n)
 {
 	return self->vt->write_n(self, buf, n);
 }

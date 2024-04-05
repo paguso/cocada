@@ -26,12 +26,12 @@
 #include <errno.h>
 
 #include "read.h"
-#include "strfilereader.h"
+#include "filereader.h"
 #include "new.h"
 
 
 
-struct _strfilereader {
+struct _FileReader {
 	Read _t_Read;
 	FILE *src;
 	size_t pos;
@@ -39,30 +39,30 @@ struct _strfilereader {
 };
 
 
-IMPL_TRAIT(strfilereader, Read)
+IMPL_TRAIT(FileReader, Read)
 
 
 static void _reset(Read *self)
 {
-	rewind( ((strfilereader *)self->impltor)->src );
+	rewind( ((FileReader *)self->impltor)->src );
 }
 
 
 static int _getc(Read *self)
 {
-	return fgetc( ((strfilereader *)self->impltor)->src );
+	return fgetc( ((FileReader *)self->impltor)->src );
 }
 
 
 static size_t _read_str(Read *self, char *dest, size_t n)
 {
-	return fread(dest, sizeof(char), n, ((strfilereader *)self->impltor)->src);
+	return fread(dest, sizeof(char), n, ((FileReader *)self->impltor)->src);
 }
 
 
 static size_t _read_str_until(Read *self, char *dest, char delim)
 {
-	FILE *src = ((strfilereader *)self->impltor)->src;
+	FILE *src = ((FileReader *)self->impltor)->src;
 	size_t nread;
 	char c;
 	for (nread = 0; !feof(src); nread++) {
@@ -84,13 +84,13 @@ static Read_vt _strfilereader_vt  = {
 };
 
 
-strfilereader *strfilereader_new_from_path(const char *path)
+FileReader *filereader_new_from_path(const char *path)
 {
 	FILE *src = fopen(path, "r");
 	if (!src) {
 		return NULL;
 	}
-	strfilereader *ret = NEW(strfilereader);
+	FileReader *ret = NEW(FileReader);
 	ret->_t_Read.impltor = ret;
 	ret->_t_Read.vt = &_strfilereader_vt;
 	ret->src = src;
@@ -100,9 +100,9 @@ strfilereader *strfilereader_new_from_path(const char *path)
 }
 
 
-strfilereader *strfilereader_new(FILE *stream)
+FileReader *filereader_new(FILE *stream)
 {
-	strfilereader *ret = NEW(strfilereader);
+	FileReader *ret = NEW(FileReader);
 	ret->_t_Read.impltor = ret;
 	ret->_t_Read.vt = &_strfilereader_vt;
 	ret->src = stream;
@@ -113,7 +113,7 @@ strfilereader *strfilereader_new(FILE *stream)
 
 
 
-void strfilereader_free(strfilereader *self)
+void filereader_free(FileReader *self)
 {
 	if (self->own_stream) {
 		fclose(self->src);

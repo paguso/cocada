@@ -27,29 +27,29 @@
 #include "trait.h"
 
 
-typedef struct _write write;
+typedef struct _Write Write;
 
 /**
  * @brief Writer virtual table
  */
 typedef struct {
-	int (*write) (write *self, void *buf);
-	int (*write_n) (write *self, void *buf, size_t n);
-} write_vt;
+	int (*write) (Write *self, char *buf);
+	int (*write_n) (Write *self, char *buf, size_t n);
+} Write_vt;
 
 
 /**
  * @brief writer trait type
  */
-struct _write {
-	write_vt *vt;
+struct _Write {
+	Write_vt *vt;
 	void *impltor;
 };
 
 
-int write_write (write *self, void *buf);
+int write_write (Write *self, char *buf);
 
-int write_write_n (write *self, void *buf, size_t n);
+int write_write_n (Write *self, char *buf, size_t n);
 
 
 

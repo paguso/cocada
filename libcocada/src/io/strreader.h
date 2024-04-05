@@ -22,7 +22,7 @@
 /**
  * @file strreader.h
  * @author Paulo Fonseca
- * @brief String reader. Implements the strread trait over an in-memory char string.
+ * @brief String reader. Implements the Read trait over an in-memory char string.
  */
 
 
@@ -35,22 +35,22 @@
 #include "trait.h"
 
 
-typedef struct _strreader strreader;
+typedef struct _StrReader StrReader;
 
 /**
  * @brief "Opens" the in-memory source string @p src of length @p len as a stream reader.
  */
-strreader *strreader_new(char *src, size_t len);
+StrReader *strreader_new(char *src, size_t len);
 
 
 /**
  * @brief Destructor.
  * @warning This *does not* deallocate de source string.
  */
-void strreader_free(strreader *rdr);
+void strreader_free(StrReader *rdr);
 
 
-DECL_TRAIT(strreader, Read)
+DECL_TRAIT(StrReader, Read)
 
 
 #endif

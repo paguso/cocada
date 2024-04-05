@@ -19,11 +19,11 @@
  *
  */
 
-#ifndef STRFILEREADER_H
-#define STRFILEREADER_H
+#ifndef FILEREADER_H
+#define FILEREADER_H
 
 /**
- * @file strfilereader.h
+ * @file filereader.h
  * @author Paulo Fonseca
  * @brief String file reader. Implements the strread trait for reading char
  * strings from a FILE stream.
@@ -32,11 +32,11 @@
  * # Example
  *
  * ```C
- * strfilereader *sfr = strfilereader_new_from_path(filename);
- * strread *r = strfilereader_as_strread(sfr);
- * for (int c; (c=strread_getc(r)) != EOF;)
+ * FileReader *fr = filereader_new_from_path(filename);
+ * Reader *r = FileReader_as_Reader(fr);
+ * for (int c; (c=read_getc(r)) != EOF;)
  *     printf ("Read c=%c\n", (char)c);
- * strfilereader_free(sfr);
+ * filereader_free(fr);
  * ```
  */
 
@@ -49,10 +49,10 @@
 /**
  * @brief String file reader
  */
-typedef struct _strfilereader strfilereader;
+typedef struct _FileReader FileReader;
 
 
-DECL_TRAIT(strfilereader, Read)
+DECL_TRAIT(FileReader, Read)
 
 
 /**
@@ -61,7 +61,7 @@ DECL_TRAIT(strfilereader, Read)
  * @warning The stream is supposed to be a proper text FILE open for reading.
  * No checks performed.
  */
-strfilereader *strfilereader_new(FILE *stream);
+FileReader *filereader_new(FILE *stream);
 
 
 /**
@@ -69,15 +69,15 @@ strfilereader *strfilereader_new(FILE *stream);
  * A new input stream is created and opened for reading.
  * @returns NULL if the FILE at specified @p path cannot be open in "r" mode.
  */
-strfilereader *strfilereader_new_from_path(const char *path);
+FileReader *filereader_new_from_path(const char *path);
 
 
 /**
- * @brief Destructor. If the reader was created with strfilereader_new(),
+ * @brief Destructor. If the reader was created with filereader_new(),
  * the underlying stream is not closed. If the reader was created with the
- * strfilereader_new_from_path() constructor, the stream is closed.
+ * filereader_new_from_path() constructor, the stream is closed.
  */
-void strfilereader_free(strfilereader *self);
+void filereader_free(FileReader *self);
 
 
 

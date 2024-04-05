@@ -27,7 +27,7 @@
 
 #include "CuTest.h"
 #include "read.h"
-#include "strfilereader.h"
+#include "filereader.h"
 
 static char *filename = "test_strfileread.txt";
 
@@ -49,14 +49,14 @@ static void test_teardown()
 void test_getc(CuTest *tc)
 {
 	test_setup();
-	strfilereader *sfr = strfilereader_new_from_path(filename);
+	FileReader *sfr = filereader_new_from_path(filename);
 	size_t n = strlen(file_content);
 	char c;
 	for (size_t i = 0; i < n; i++) {
-		c = read_getc(strfilereader_as_Read(sfr));
+		c = read_getc(FileReader_as_Read(sfr));
 		CuAssertCharEquals(tc, file_content[i], c);
 	}
-	c = read_getc(strfilereader_as_Read(sfr));
+	c = read_getc(FileReader_as_Read(sfr));
 	CuAssertIntEquals(tc, EOF, c);
 	test_teardown();
 }
