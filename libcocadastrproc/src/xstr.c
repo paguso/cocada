@@ -119,9 +119,9 @@ void xstr_free(xstr *self)
 }
 
 
-xchar_t xstr_get(const xstr *self, size_t pos)
+xchar xstr_get(const xstr *self, size_t pos)
 {
-	xchar_t ret = 0;
+	xchar ret = 0;
 #if ENDIANNESS==LITTLE
 	memcpy(&ret, self->buf + (pos * self->sizeof_char), self->sizeof_char);
 #elif ENDIANNESS==BIG
@@ -132,7 +132,7 @@ xchar_t xstr_get(const xstr *self, size_t pos)
 }
 
 
-void xstr_set(xstr *self, size_t pos, xchar_t val)
+void xstr_set(xstr *self, size_t pos, xchar val)
 {
 #if ENDIANNESS==LITTLE
 	memcpy(self->buf + (pos * self->sizeof_char), &val, self->sizeof_char);
@@ -143,7 +143,7 @@ void xstr_set(xstr *self, size_t pos, xchar_t val)
 }
 
 
-void xstr_nset(xstr *self, size_t n, xchar_t val)
+void xstr_nset(xstr *self, size_t n, xchar val)
 {
 	size_t l = MIN(xstr_len(self), n);
 	for (size_t i = 0; i < l; i++) {
@@ -179,13 +179,13 @@ size_t xstr_nbytes(const xstr *self)
 }
 
 
-void xstr_push(xstr *self, xchar_t c)
+void xstr_push(xstr *self, xchar c)
 {
 	xstr_push_n(self, c, 1);
 }
 
 
-void xstr_push_n(xstr *self, xchar_t c, size_t n)
+void xstr_push_n(xstr *self, xchar c, size_t n)
 {
 	check_and_resize_by(self, n);
 	void *last = self->buf + (self->len * self->sizeof_char);

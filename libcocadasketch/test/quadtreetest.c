@@ -33,9 +33,9 @@ void rectangle_snap_to_grid_test(CuTest *tc)
 	uint w = 1024;
 	uint h = 1024;
 	uint d = 2;
-	quadtree *tree = quadtree_new(w, h, d);
-	rectangle r = {.top_left.x = 0, .top_left.y = 0, .width = 1024, .height = 1024};
-	rectangle b = rectangle_snap_to_grid(tree, r, SNAP_OUT);
+	QuadTree *tree = quadtree_new(w, h, d);
+	Rectangle r = {.top_left.x = 0, .top_left.y = 0, .width = 1024, .height = 1024};
+	Rectangle b = rectangle_snap_to_grid(tree, r, SNAP_OUT);
 	CuAssertIntEquals(tc, r.top_left.x, b.top_left.x);
 	CuAssertIntEquals(tc, r.top_left.y, b.top_left.y);
 	CuAssertIntEquals(tc, w, b.width);
@@ -91,7 +91,7 @@ void rectangle_snap_to_grid_test(CuTest *tc)
 
 
 
-void quadtree_do_nothing(quadtree *tree, size_t node, void *data)
+void quadtree_do_nothing(QuadTree *tree, size_t node, void *data)
 {
 }
 
@@ -101,10 +101,10 @@ void quadtree_ins_hollow_test(CuTest *tc)
 	uint depth = 10;
 	uint side = 1 << depth;
 	memdbg_reset();
-	quadtree *tree = quadtree_new(side, side, depth);
+	QuadTree *tree = quadtree_new(side, side, depth);
 	for (uint x = 0; x < side; x++) {
 		for (uint y = 0; y < side; y++) {
-			point2d p = {.x = x, .y = y};
+			Point2D p = {.x = x, .y = y};
 			quadtree_ins(tree, p, NULL, quadtree_do_nothing);
 		}
 	}
@@ -116,18 +116,18 @@ void quadtree_ins_hollow_test(CuTest *tc)
 }
 
 
-void upd_node_ins_pt(quadtree *tree, size_t node, void *pt)
+void upd_node_ins_pt(QuadTree *tree, size_t node, void *pt)
 {
 	Vec *pts = (Vec *) quadtree_node_get_data(tree, node);
 	if (pts == NULL) {
-		pts = vec_new(sizeof(point2d));
+		pts = vec_new(sizeof(Point2D));
 		quadtree_node_set_data(tree, node, pts);
 	}
 	vec_push(pts, pt);
 }
 
 
-void qry_node_qty(quadtree *tree, size_t node, void *dest)
+void qry_node_qty(QuadTree *tree, size_t node, void *dest)
 {
 	Vec *pts = (Vec *)quadtree_node_get_data(tree, node);
 	if (pts != NULL) {
@@ -143,9 +143,9 @@ void quadtree_ins_test(CuTest *tc)
 	uint depth = 7;
 	uint npts = 500;
 	memdbg_reset();
-	quadtree *tree = quadtree_new(width, height, depth);
+	QuadTree *tree = quadtree_new(width, height, depth);
 	for (uint i = 0; i < npts; i++) {
-		point2d pt = {.x = rand_range_uint(0, width), .y = rand_range_uint(0, height) };
+		Point2D pt = {.x = rand_range_uint(0, width), .y = rand_range_uint(0, height) };
 		quadtree_ins(tree, pt, &pt, upd_node_ins_pt);
 	}
 	//memdbg_print_stats(stdout, false);
@@ -162,10 +162,10 @@ void quadtree_qry_test(CuTest *tc)
 	uint height = 1024;
 	uint depth = 10;
 	memdbg_reset();
-	quadtree *tree = quadtree_new(width, height, depth);
+	QuadTree *tree = quadtree_new(width, height, depth);
 	for (uint x = 0; x < width; x++) {
 		for (uint y = 0; y < height; y++) {
-			point2d pt = {.x = x, .y = y };
+			Point2D pt = {.x = x, .y = y };
 			quadtree_ins(tree, pt, &pt, upd_node_ins_pt);
 		}
 	}
@@ -175,7 +175,7 @@ void quadtree_qry_test(CuTest *tc)
 		uint y = rand_range_uint(0, height - 1);
 		uint w = rand_range_uint(0, width - x);
 		uint h = rand_range_uint(0, height - y);
-		rectangle rect = {.top_left.x = x, .top_left.y = y, .width = w, .height = h};
+		Rectangle rect = {.top_left.x = x, .top_left.y = y, .width = w, .height = h};
 		size_t qty = 0;
 		quadtree_qry(tree, rect, qry_node_qty, &qty, true);
 		if (qty != (w * h)) {

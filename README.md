@@ -38,7 +38,6 @@ cocadaapp  cocadasketch    cocadabio
 
 I plan to keep the libraries free from cyclic dependencies.
 
-
 ## How to use it
 
 COCADA libraries can be used in a few different ways. First you can just clone the source files and use them in a separate project, as long as you respect the dependencies above. Alternatively they can be compiled and used as either  [static](http://www.tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html)  or  [shared](http://www.tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html) libraries.

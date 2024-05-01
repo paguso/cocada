@@ -34,7 +34,7 @@
 static size_t MIN_RANK_SAMPLE_INTERVAL =
     2 * BYTESIZE; // (!) THIS HAS TO BE A MULTIPLE OF BYTESIZE (!)
 
-struct _csrsbitarr {
+struct _CSRSBitArr {
 	byte_t *data;
 	size_t len;
 	size_t byte_size;
@@ -52,7 +52,7 @@ struct _csrsbitarr {
 };
 
 
-static void init_rank_tables(csrsbitarr *ba)
+static void init_rank_tables(CSRSBitArr *ba)
 {
 	size_t byte_pos, group, cumul_rank, next_group_byte_pos;
 	ba->rank_samples_bit_interval = MAX( MIN_RANK_SAMPLE_INTERVAL,
@@ -140,7 +140,7 @@ static void init_rank_tables(csrsbitarr *ba)
 }
 
 
-static void init_select_tables(csrsbitarr *ba)
+static void init_select_tables(CSRSBitArr *ba)
 {
 	size_t byte_pos, group, chunk_rank, cumul_rank, target_rank;
 
@@ -246,10 +246,10 @@ static void init_select_tables(csrsbitarr *ba)
 }
 
 
-csrsbitarr *csrsbitarr_new(byte_t *ba, size_t len)
+CSRSBitArr *csrsbitarr_new(byte_t *ba, size_t len)
 {
-	csrsbitarr *ret;
-	ret = NEW(csrsbitarr);
+	CSRSBitArr *ret;
+	ret = NEW(CSRSBitArr);
 	ret->data = ba;
 	ret->len = len;
 	ret->byte_size = DIVCEIL(ret->len, BYTESIZE);
@@ -264,7 +264,7 @@ csrsbitarr *csrsbitarr_new(byte_t *ba, size_t len)
 	return ret;
 }
 
-void csrsbitarr_free(csrsbitarr *ba, bool free_data)
+void csrsbitarr_free(CSRSBitArr *ba, bool free_data)
 {
 	if (ba == NULL) return;
 	if (free_data) {
@@ -279,19 +279,19 @@ void csrsbitarr_free(csrsbitarr *ba, bool free_data)
 }
 
 
-const byte_t *csrsbitarr_data(csrsbitarr *ba)
+const byte_t *csrsbitarr_data(CSRSBitArr *ba)
 {
 	return ba->data;
 }
 
 
-size_t csrsbitarr_len(csrsbitarr *ba)
+size_t csrsbitarr_len(CSRSBitArr *ba)
 {
 	return ba->len;
 }
 
 
-void csrsbitarr_fprint(FILE *stream, csrsbitarr *ba, size_t bytes_per_row)
+void csrsbitarr_fprint(FILE *stream, CSRSBitArr *ba, size_t bytes_per_row)
 {
 	fprintf(stream, "csrsbitarr@%p {\n", (void *)ba);
 	fprintf(stream, "->size = %zu\n", ba->len);
@@ -338,19 +338,19 @@ void csrsbitarr_fprint(FILE *stream, csrsbitarr *ba, size_t bytes_per_row)
 	fprintf(stream, "}//end of csrsbitarr@%p\n", (void *)ba);
 }
 
-bool csrsbitarr_get(csrsbitarr *ba, size_t pos)
+bool csrsbitarr_get(CSRSBitArr *ba, size_t pos)
 {
 	return bitarr_get_bit(ba->data, pos);
 }
 
-size_t csrsbitarr_rank0(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_rank0(CSRSBitArr *ba, size_t pos)
 {
 	if (pos >= ba->len) return ba->total_bit_count[0];
 
 	return (pos - csrsbitarr_rank1(ba, pos));
 }
 
-size_t csrsbitarr_rank1(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_rank1(CSRSBitArr *ba, size_t pos)
 {
 	size_t rank, group, sel_grp, byte_sel_smpl, byte_pos, last_byte;
 
@@ -418,13 +418,13 @@ size_t csrsbitarr_rank1(csrsbitarr *ba, size_t pos)
 }
 
 
-size_t csrsbitarr_rank(csrsbitarr *ba, size_t pos, bool bit)
+size_t csrsbitarr_rank(CSRSBitArr *ba, size_t pos, bool bit)
 {
 	return bit ? csrsbitarr_rank1(ba, pos) : csrsbitarr_rank0(ba, pos);
 }
 
 
-size_t csrsbitarr_select0(csrsbitarr *ba, size_t rank)
+size_t csrsbitarr_select0(CSRSBitArr *ba, size_t rank)
 {
 	if (rank >= ba->total_bit_count[0]) return ba->len;
 
@@ -512,7 +512,7 @@ size_t csrsbitarr_select0(csrsbitarr *ba, size_t rank)
 }
 
 
-size_t csrsbitarr_select1(csrsbitarr *ba, size_t rank)
+size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank)
 {
 	if (rank >= ba->total_bit_count[1]) return ba->len;
 
@@ -597,7 +597,7 @@ size_t csrsbitarr_select1(csrsbitarr *ba, size_t rank)
 }
 
 
-size_t csrsbitarr_select(csrsbitarr *ba, size_t rank, bool bit)
+size_t csrsbitarr_select(CSRSBitArr *ba, size_t rank, bool bit)
 {
 
 	return bit ? csrsbitarr_select1(ba, rank) : csrsbitarr_select0(ba, rank);
@@ -605,28 +605,28 @@ size_t csrsbitarr_select(csrsbitarr *ba, size_t rank, bool bit)
 
 
 
-size_t csrsbitarr_pred0(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_pred0(CSRSBitArr *ba, size_t pos)
 {
 	size_t rank = csrsbitarr_rank0(ba, pos);
 	return (rank > 0) ? csrsbitarr_select0(ba, rank - 1) : ba->len;
 }
 
 
-size_t csrsbitarr_pred1(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_pred1(CSRSBitArr *ba, size_t pos)
 {
 	size_t rank = csrsbitarr_rank1(ba, pos);
 	return (rank > 0) ? csrsbitarr_select1(ba, rank - 1) : ba->len;
 }
 
 
-size_t csrsbitarr_pred(csrsbitarr *ba, size_t pos, bool bit)
+size_t csrsbitarr_pred(CSRSBitArr *ba, size_t pos, bool bit)
 {
 	return bit ? csrsbitarr_pred1(ba, pos) : csrsbitarr_pred0(ba, pos);
 }
 
 
 
-size_t csrsbitarr_succ0(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_succ0(CSRSBitArr *ba, size_t pos)
 {
 	if (pos >= ba->len) return ba->len;
 	if (csrsbitarr_get(ba, pos) == 0)
@@ -636,7 +636,7 @@ size_t csrsbitarr_succ0(csrsbitarr *ba, size_t pos)
 }
 
 
-size_t csrsbitarr_succ1(csrsbitarr *ba, size_t pos)
+size_t csrsbitarr_succ1(CSRSBitArr *ba, size_t pos)
 {
 	if (pos >= ba->len) return ba->len;
 	if (csrsbitarr_get(ba, pos) == 1)
@@ -646,7 +646,7 @@ size_t csrsbitarr_succ1(csrsbitarr *ba, size_t pos)
 }
 
 
-size_t csrsbitarr_succ(csrsbitarr *ba, size_t pos, bool bit)
+size_t csrsbitarr_succ(CSRSBitArr *ba, size_t pos, bool bit)
 {
 	return bit ? csrsbitarr_succ1(ba, pos) : csrsbitarr_succ0(ba, pos);
 }

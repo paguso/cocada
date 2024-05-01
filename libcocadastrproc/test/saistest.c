@@ -35,19 +35,19 @@
 #include "xstr.h"
 #include "xstrformat.h"
 
-void random_str(alphabet *ab, size_t len, char *dest)
+void random_str(Alphabet *ab, size_t len, char *dest)
 {
 	for (size_t i = 0; i < len; i++) {
-		dest[i] = (char)ab_char(ab, rand_range_size_t(0, ab_size(ab)));
+		dest[i] = (char)alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab)));
 	}
 	dest[len] = '\0';
 }
 
-void random_xstr(alphabet *ab, size_t len, xstr *dest)
+void random_xstr(Alphabet *ab, size_t len, xstr *dest)
 {
 	xstr_clear(dest);
 	for (size_t i = 0; i < len; i++) {
-		xstr_push(dest, ab_char(ab, rand_range_size_t(0, ab_size(ab))));
+		xstr_push(dest, alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab))));
 	}
 }
 
@@ -55,7 +55,7 @@ void random_xstr(alphabet *ab, size_t len, xstr *dest)
 void sais_test_str(CuTest *tc)
 {
 	memdbg_reset();
-	alphabet *ab = alphabet_new(10, "abcdefghij");
+	Alphabet *ab = alphabet_new(10, "abcdefghij");
 	size_t max_len = 1000;
 	char *str = cstr_new(max_len);
 	for (size_t len = 0; len < max_len; len++) {
@@ -101,10 +101,10 @@ int xstr_suff_cmp(xstr *str, size_t i, size_t j)
 void sais_test_xstr(CuTest *tc)
 {
 	memdbg_reset();
-	alphabet *ab = int_alphabet_new(300);
+	Alphabet *ab = alphabet_new_int_ab(300);
 	size_t max_len = 5000;
-	xstr *str = xstr_new(nbytes(ab_size(ab)));
-	xstrformat *xf = xstrformat_new(str);
+	xstr *str = xstr_new(nbytes(alphabet_size(ab)));
+	xstrFormat *xf = xstrformat_new(str);
 	for (size_t len = 0; len < max_len; len++) {
 		random_xstr(ab, len, str);
 		CuAssertSizeTEquals(tc, len, xstr_len(str));

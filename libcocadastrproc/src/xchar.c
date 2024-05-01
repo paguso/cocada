@@ -24,7 +24,7 @@
 
 #include "xchar.h"
 
-void xchar_flip_bytes(xchar_t *c)
+void xchar_flip_bytes(xchar *c)
 {
 #if XCHAR_BYTES==2
 	*c = bswap_16(*c);

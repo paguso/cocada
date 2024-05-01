@@ -22,28 +22,29 @@
 #ifndef FMALG_H
 #define FMALG_H
 
-#include <inttypes.h>
+#include "coretype.h"
 
 
-typedef struct _fmalg fmalg;
+
+typedef struct _FMAlg FMAlg;
 
 
-fmalg *fmalg_init_single(uint64_t maxval);
+FMAlg *fmalg_init_single(uint64_t maxval);
 
 
-fmalg *fmalg_init(uint64_t maxval, size_t navg, size_t mmedian);
+FMAlg *fmalg_init(uint64_t maxval, size_t navg, size_t mmedian);
 
 
-void fmalg_free(fmalg *fm);
+void fmalg_free(FMAlg *fm);
 
 
-void fmalg_reset(fmalg *fm);
+void fmalg_reset(FMAlg *fm);
 
 
-void fmalg_process(fmalg *fm, uint64_t val);
+void fmalg_process(FMAlg *fm, uint64_t val);
 
 
-uint64_t fmalg_query(fmalg *fm);
+uint64_t fmalg_query(FMAlg *fm);
 
 
 #endif

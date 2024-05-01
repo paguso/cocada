@@ -33,7 +33,7 @@
 #include "vec.h"
 
 
-struct __kllsumm {
+struct _KLLSumm {
 	double err;
 	double c;
 	double k;
@@ -49,13 +49,13 @@ struct __kllsumm {
 
 
 
-kllsumm *kll_new(size_t typesize, CmpFunc cmp, double err)
+KLLSumm *kll_new(size_t typesize, CmpFunc cmp, double err)
 {
 	return kll_new_own(typesize, cmp, err, finaliser_new_empty());
 }
 
 
-kllsumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
+KLLSumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
                      Finaliser *chd_fr)
 {
 	size_t cap = (size_t) ceil( (1.0 / (1.0 - KLL_DEFAULT_C)) *
@@ -64,7 +64,7 @@ kllsumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
 }
 
 
-kllsumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double err,
+KLLSumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double err,
                           size_t capacity)
 {
 	return kll_new_own_with_cap(typesize, cmp, err, capacity,
@@ -73,11 +73,11 @@ kllsumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double err,
 
 
 
-kllsumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double err,
+KLLSumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double err,
                               size_t capacity, Finaliser *chd_fr)
 {
 	assert (err > 0);
-	kllsumm *ret = NEW(kllsumm);
+	KLLSumm *ret = NEW(KLLSumm);
 	ret->typesize = typesize;
 	ret->cmp = cmp;
 	ret->buffs = vec_new(sizeof(Vec *));
@@ -109,7 +109,7 @@ kllsumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double err,
 
 void kll_finalise(void *ptr, const Finaliser *fnr)
 {
-	kllsumm *self = (kllsumm *)ptr;
+	KLLSumm *self = (KLLSumm *)ptr;
 	DESTROY_FLAT(self->coins, vec);
 	if (finaliser_nchd(fnr)) {
 		DESTROY(self->buffs, finaliser_cons(FNR(vec),
@@ -122,20 +122,20 @@ void kll_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-static inline size_t _nlevels(kllsumm *self)
+static inline size_t _nlevels(KLLSumm *self)
 {
 	return vec_len(self->buffs);
 }
 
 
-static inline size_t _cap(kllsumm *self, size_t i)
+static inline size_t _cap(KLLSumm *self, size_t i)
 {
 	size_t ret = self->k * pow(self->c, _nlevels(self) - 1 - i);
 	return MAX(2, (size_t)ret);
 }
 
 
-static void _compress(kllsumm *self)
+static void _compress(KLLSumm *self)
 {
 	for (size_t i = 0; i < vec_len(self->buffs); i++) {
 		size_t cap = _cap(self, i);
@@ -177,7 +177,7 @@ static void _compress(kllsumm *self)
 }
 
 
-void kll_upd(kllsumm *self, void *val)
+void kll_upd(KLLSumm *self, void *val)
 {
 	vec_push(vec_get_rawptr(self->buffs, 0), val);
 	self->npts++;
@@ -209,7 +209,7 @@ static size_t _rank(Vec *buf, void *val, CmpFunc cmp)
 }
 
 
-size_t kll_rank(kllsumm *self, void *val)
+size_t kll_rank(KLLSumm *self, void *val)
 {
 	uint64_t ret = 0,  pow = 1;
 	for (size_t i = 0, l = _nlevels(self); i < l; i++) {
@@ -223,7 +223,7 @@ size_t kll_rank(kllsumm *self, void *val)
 }
 
 
-void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *,
+void kll_print(KLLSumm *self, FILE *stream, void (*print_val)(FILE *,
                const void *))
 {
 	fprintf(stream, "KLL @%p:\n", self);

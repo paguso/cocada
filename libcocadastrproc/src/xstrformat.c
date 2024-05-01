@@ -29,19 +29,19 @@
 #include "xstrformat.h"
 
 
-struct _xstrformat {
+struct _xstrFormat {
 	Format _t_Format;
 	const xstr *src;
 };
 
 
-IMPL_TRAIT(xstrformat, Format)
+IMPL_TRAIT(xstrFormat, Format)
 
 
 
 #define PRINT_ASCII(TYPE)\
 	int ret = 0;\
-	const xstr *xs = ((xstrformat *)(self->impltor))->src;\
+	const xstr *xs = ((xstrFormat *)(self->impltor))->src;\
 	WARN_ASSERT(xstr_sizeof_char(xs)==sizeof(char),\
 	            "Formatting xstr @%p with char size = %zubytes as ASCII.\n", xs,\
 	            xstr_sizeof_char(xs));\
@@ -75,7 +75,7 @@ static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint
 
 #define PRINT_XCHAR(TYPE)\
 	int ret = 0;\
-	const xstr *xs = ((xstrformat *)(self->impltor))->src;\
+	const xstr *xs = ((xstrFormat *)(self->impltor))->src;\
 	WARN_ASSERT(xstr_sizeof_char(xs)==XCHAR_BYTES,\
 	            "Formatting xstr @%p with char size = %zu bytes as a sequence of xchars, whereas XCHAR_BYTES=%d\n",\
 	            xs, xstr_sizeof_char(xs), XCHAR_BYTES);\
@@ -112,9 +112,9 @@ static int sbprint_xchar(Format *self, StrBuf *out)
 static format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar, .sprint = sprint_xchar, .sbprint = sbprint_xchar};
 
 
-xstrformat *xstrformat_new(const xstr *src)
+xstrFormat *xstrformat_new(const xstr *src)
 {
-	xstrformat *ret = NEW(xstrformat);
+	xstrFormat *ret = NEW(xstrFormat);
 	ret->_t_Format = (Format) {
 		.impltor = ret, .vt = xstrformat_xchar_vt
 	};
@@ -123,9 +123,9 @@ xstrformat *xstrformat_new(const xstr *src)
 }
 
 
-xstrformat *xstrformat_new_ascii(const xstr *src)
+xstrFormat *xstrformat_new_ascii(const xstr *src)
 {
-	xstrformat *ret = NEW(xstrformat);
+	xstrFormat *ret = NEW(xstrFormat);
 	ret->_t_Format = (Format) {
 		.impltor = ret, .vt = xstrformat_ascii_vt
 	};
@@ -135,7 +135,7 @@ xstrformat *xstrformat_new_ascii(const xstr *src)
 
 
 
-void xstrformat_free(xstrformat *self)
+void xstrformat_free(xstrFormat *self)
 {
 	FREE(self);
 }

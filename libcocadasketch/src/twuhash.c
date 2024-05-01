@@ -26,18 +26,18 @@
 #include "twuhash.h"
 
 
-struct _twuhash {
+struct _TWUHash {
 	byte_t in_bits, out_bits;
 	uint64_t *A;
 	uint64_t B;
 };
 
 
-twuhash *twuhash_new(byte_t in_bits, byte_t out_bits)
+TWUHash *twuhash_new(byte_t in_bits, byte_t out_bits)
 {
 	ERROR_ASSERT( 0 < in_bits && in_bits <= 64 && 0 < out_bits && out_bits <= 64,
 	              "twuhash must hash m to n bits where 0 < m,n <= 64");
-	twuhash *ret = NEW(twuhash);
+	TWUHash *ret = NEW(TWUHash);
 	ret->in_bits = in_bits;
 	ret->out_bits = out_bits;
 	ret->A = ARR_OF_0_NEW(uint64_t, out_bits);
@@ -52,7 +52,7 @@ twuhash *twuhash_new(byte_t in_bits, byte_t out_bits)
 
 
 
-uint64_t twuhash_hash(twuhash *h, uint64_t x)
+uint64_t twuhash_hash(TWUHash *h, uint64_t x)
 {
 	uint64_t ret = 0;
 	for (size_t k = 0; k < h->out_bits; k++) {

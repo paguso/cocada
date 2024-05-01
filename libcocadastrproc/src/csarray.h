@@ -34,33 +34,33 @@
  * @brief Compressed Suffix Array.
  */
 
-typedef struct _csarray csarray;
+typedef struct _CSArray CSArray;
 
 
 /**
  * @brief Creates a CSA for the string @p str of length @p len over
  *        the alphabet @p ab
  */
-csarray *csarray_new(char *str, size_t len, alphabet *ab);
+CSArray *csarray_new(char *str, size_t len, Alphabet *ab);
 
 
 /**
  * @brief Creates a CSA from the stream @p sst over the alphabet @p ab
  */
-csarray *csarray_new_from_stream(strstream *sst, alphabet *ab);
+CSArray *csarray_new_from_stream(StrStream *sst, Alphabet *ab);
 
 
 /**
  * @brief Destructor
  * @param csarr
  */
-void csarray_free(csarray *csa);
+void csarray_free(CSArray *csa);
 
 
 /**
  * @brief Print the CSA to the standard output.
  */
-void csarray_print(FILE *stream, csarray *csa);
+void csarray_print(FILE *stream, CSArray *csa);
 
 
 /**
@@ -69,7 +69,7 @@ void csarray_print(FILE *stream, csarray *csa);
  *        string s.t. the length of the CSA will be the length of
  *        the source string plus one
  */
-size_t csarray_len(csarray *csa);
+size_t csarray_len(CSArray *csa);
 
 
 /**
@@ -77,7 +77,7 @@ size_t csarray_len(csarray *csa);
  *        SA' is the inverse of the suffix array and
  *        pos' = SA[i] + 1, if SA[i] < SA.len, or 0 otherwise.
  */
-size_t csarray_phi(csarray *csa, size_t i);
+size_t csarray_phi(CSArray *csa, size_t i);
 
 
 /**
@@ -87,7 +87,7 @@ size_t csarray_phi(csarray *csa, size_t i);
  *        Because of the virtually added sentinel we have
  *        csarray_get(csarr, 0)==csarray_len(csarr)-1
  */
-size_t csarray_get(csarray *csa, size_t i);
+size_t csarray_get(CSArray *csa, size_t i);
 
 
 /**
@@ -96,14 +96,14 @@ size_t csarray_get(csarray *csa, size_t i);
  *        This corresponds to the lexicographic rank of the
  *        source string suffix starting at position @p i.
  */
-size_t csarray_get_inv(csarray *csa, size_t i);
+size_t csarray_get_inv(CSArray *csa, size_t i);
 
 
 /**
  * @brief Returns the char at position @p i of the source string inferred
  *        from the CSA.
  */
-xchar_t csarray_get_char(csarray *csa, size_t pos);
+xchar csarray_get_char(CSArray *csa, size_t pos);
 
 
 #endif

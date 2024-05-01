@@ -38,17 +38,17 @@ void test_huffcode_new(CuTest *tc)
 {
 	char *letters = "abcde";
 	size_t freqs[5] = {15, 7, 6, 6, 5};
-	alphabet *ab;
+	Alphabet *ab;
 	ab = alphabet_new(5, letters);
 	huffcode *hc = huffcode_new(ab, freqs);
 	//huffcode_print(hc);
 	huffcode_free(hc);
 }
 
-static void _random_str(char *dest, alphabet *ab, size_t len)
+static void _random_str(char *dest, Alphabet *ab, size_t len)
 {
 	for (size_t i = 0; i < len;
-	        dest[i++] = ab_char(ab, rand_range_size_t(0, ab_size(ab))));
+	        dest[i++] = alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab))));
 }
 
 
@@ -57,7 +57,7 @@ void test_huffcode_codec(CuTest *tc)
 	size_t max_len = 1024;
 	char *letters = "abcdefghijklmnopqrstuvwxyz";
 	for (size_t len = 2; len < max_len; len++) {
-		alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
+		Alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
 		char *str = cstr_new(len);
 		_random_str(str, ab, len);
 		huffcode *hc = huffcode_new_from_str(ab, str);

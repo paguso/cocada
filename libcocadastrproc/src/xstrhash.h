@@ -29,26 +29,26 @@
 #include "new.h"
 #include "xstr.h"
 
-typedef struct _xstrhash xstrhash;
+typedef struct _xstrHash xstrHash;
 
 
 /**
  * @param ab (move) alphabet
  */
-xstrhash *xstrhash_new(alphabet *ab);
+xstrHash *xstrhash_new(Alphabet *ab);
 
 void xstrhash_finalise(void *ptr, const Finaliser *fnr);
 
-uint64_t xstrhash_lex(const xstrhash *self, const xstr *s);
+uint64_t xstrhash_lex(const xstrHash *self, const xstr *s);
 
-uint64_t xstrhash_lex_sub(const xstrhash *self, const xstr *s, size_t from,
+uint64_t xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
                           size_t to);
 
-uint64_t xstrhash_roll_lex(const xstrhash *self, const xstr *s, uint64_t hash,
-                           xchar_t c);
+uint64_t xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64_t hash,
+                           xchar c);
 
-uint64_t xstrhash_roll_lex_sub(const xstrhash *self, const xstr *s, size_t from,
-                               size_t to, uint64_t hash, xchar_t c);
+uint64_t xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
+                               size_t to, uint64_t hash, xchar c);
 
 
 #endif

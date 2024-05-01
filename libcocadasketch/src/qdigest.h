@@ -22,14 +22,18 @@
 #ifndef QDIGEST_H
 #define QDIGEST_H
 
-typedef struct _qdigest qdigest;
+#include <stdio.h>
 
-qdigest *qdigest_new(size_t range, double err);
+#include "coretype.h"
 
-void  qdigest_upd(qdigest *self, size_t val, size_t qty);
+typedef struct _QDigest QDigest;
 
-size_t qdigest_rank(qdigest *self, size_t val);
+QDigest *qdigest_new(size_t range, double err);
 
-void qdigest_print(qdigest *self, FILE *stream);
+void  qdigest_upd(QDigest *self, size_t val, size_t qty);
+
+size_t qdigest_rank(QDigest *self, size_t val);
+
+void qdigest_print(QDigest *self, FILE *stream);
 
 #endif

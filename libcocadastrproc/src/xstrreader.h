@@ -28,17 +28,17 @@
 #include "xstr.h"
 #include "xstrread.h"
 
-typedef struct _xstrreader xstrreader;
+typedef struct _xstrReader xstrReader;
 
-xstrreader *xstrreader_open(xstr *src);
+xstrReader *xstrreader_open(xstr *src);
 
-xstrreader *xstrreader_open_str(char *src, size_t len);
+xstrReader *xstrreader_open_str(char *src, size_t len);
 
-xstrreader *xstrreader_open_strread(Read *read);
+xstrReader *xstrreader_open_strread(Read *read);
 
-void xstrreader_close(xstrreader *self);
+void xstrreader_close(xstrReader *self);
 
-DECL_TRAIT(xstrreader, xstrread)
+DECL_TRAIT(xstrReader, xstrRead)
 
 
 #endif

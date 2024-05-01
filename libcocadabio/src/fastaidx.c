@@ -25,16 +25,16 @@
 #include "vec.h"
 
 
-struct _fastaidx {
+struct _FASTAIndex {
 	char *path;
 	Vec *dscs;
 	Vec *seqs;
 };
 
 
-fastaidx *fastaidx_new(const char *src_path)
+FASTAIndex *FASTAIndex_new(const char *src_path)
 {
-	fastaidx *ret = NEW(fastaidx);
+	FASTAIndex *ret = NEW(FASTAIndex);
 	ret->path = cstr_clone(src_path);
 	ret->dscs = vec_new(sizeof(size_t));
 	ret->seqs = vec_new(sizeof(size_t));
@@ -42,38 +42,38 @@ fastaidx *fastaidx_new(const char *src_path)
 }
 
 
-void fastaidx_finalise(void *ptr, const Finaliser *fnr)
+void FASTAIndex_finalise(void *ptr, const Finaliser *fnr)
 {
-	fastaidx *self = (fastaidx *)ptr;
+	FASTAIndex *self = (FASTAIndex *)ptr;
 	FREE(self->path);
 	DESTROY_FLAT(self->dscs, vec);
 	DESTROY_FLAT(self->seqs, vec);
 }
 
 
-void fastaidx_free(fastaidx *self)
+void fasta_index_free(FASTAIndex *self)
 {
-	DESTROY_FLAT(self, fastaidx);
+	DESTROY_FLAT(self, FASTAIndex);
 }
 
 
-size_t fastaidx_size(fastaidx *self)
+size_t fasta_index_size(FASTAIndex *self)
 {
 	return vec_len(self->dscs);
 }
 
 
-void fastaidx_add(fastaidx *self, size_t dsc_offset, size_t seq_offset)
+void fasta_index_add(FASTAIndex *self, size_t dsc_offset, size_t seq_offset)
 {
 	vec_push_size_t(self->dscs, dsc_offset);
 	vec_push_size_t(self->seqs, seq_offset);
 }
 
 
-fasta_rec_offs fastaidx_get(fastaidx *self, size_t rec_no)
+FASTARecOffsets fasta_index_get(FASTAIndex *self, size_t rec_no)
 {
-	fasta_rec_offs ret;
-	ret.descr_off = vec_get_size_t(self->dscs, rec_no);
-	ret.seq_off = vec_get_size_t(self->seqs, rec_no);
+	FASTARecOffsets ret;
+	ret.descr_offset = vec_get_size_t(self->dscs, rec_no);
+	ret.seq_offset = vec_get_size_t(self->seqs, rec_no);
 	return ret;
 }

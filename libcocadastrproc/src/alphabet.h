@@ -44,40 +44,41 @@
  * 2. INT alphabets, whose characters are integers in the range 0..size-1
  *
  * For this reason, the characters taken and returned by functions
- * are of type xchar_t (eXtended char type), which is actually an
+ * are of type xchar (eXtended char type), which is actually an
  * unsigned integer type large enough to hold both types of supported chars.
  */
 
 
 /**
  * @brief Alphabet types returned by the ab_type() function.
- * @see ab_type()
+ * @see alphabet_type()
  */
 typedef enum {
 	CHAR_TYPE = 0, /**< Character alphabet type */
 	INT_TYPE  = 1  /**< Integer alphabet type */
-} alphabet_type;
+} AlphabetType;
 
 
 /**
  * @brief alphabet type
  */
-typedef struct _alphabet alphabet;
+typedef struct _Alphabet Alphabet;
 
 
-/**
+/*
  * @brief char rank function type
  */
-typedef size_t (*char_rank_func)(xchar_t c);
+typedef size_t (*char_rank_func)(xchar c);
 
 
 /**
  * @brief Creates a char alphabet from a string with letters in
  *        lexicographic order.
  * @param size Number of letters.
- * @param letters (no transfer) String with letters in lexicographic order.
+ * @param letters (**no transfer**) String with letters in lexicographic order.
  */
-alphabet *alphabet_new(size_t size, const char *letters);
+Alphabet *alphabet_new(size_t size, const char *letters);
+
 
 /**
  * @brief Creates a char alphabet with the possibility of multiple
@@ -106,7 +107,7 @@ alphabet *alphabet_new(size_t size, const char *letters);
  * s.t. `letters[i]` contains a string with the equivalent letters
  * to be assigned rank `i`
  */
-alphabet *alphabet_new_with_equivs(size_t size, char **letters);
+Alphabet *alphabet_new_with_equivs(size_t size, char **letters);
 
 
 /**
@@ -114,19 +115,19 @@ alphabet *alphabet_new_with_equivs(size_t size, char **letters);
  *        0 to @p size-1
  * @param size The alphabet size.
  */
-alphabet *int_alphabet_new(size_t size);
+Alphabet *alphabet_new_int_ab(size_t size);
 
 
 /**
  * @brief Clones an alphabet
  */
-alphabet *alphabet_clone(const alphabet *src);
+Alphabet *alphabet_clone(const Alphabet *src);
 
 
 /**
  * @brief Destructor.
  */
-void alphabet_free(alphabet *ab);
+void alphabet_free(Alphabet *ab);
 
 
 /**
@@ -138,26 +139,26 @@ void alphabet_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Return the base char type of the alphabet
  */
-alphabet_type ab_type(const alphabet *ab);
+AlphabetType alphabet_type(const Alphabet *ab);
 
 
 /**
  * @brief Returns the number of letters.
  */
-size_t ab_size(const alphabet *ab);
+size_t alphabet_size(const Alphabet *ab);
 
 
 /**
  * @brief Indicates whether alphabet @p ab contains the character @c.
  */
-bool ab_contains(const alphabet *ab, xchar_t c);
+bool alphabet_contains(const Alphabet *ab, xchar c);
 
 
 /**
  * @brief Returns the letter of given rank. If rank >= alphabet size, the
  * behaviour is undefined.
  */
-xchar_t ab_char(const alphabet *ab, size_t rank);
+xchar alphabet_char(const Alphabet *ab, size_t rank);
 
 
 /**
@@ -167,7 +168,7 @@ xchar_t ab_char(const alphabet *ab, size_t rank);
  * This means that all chars not in the alphabet are lexicographically
  * identical and strictly greater than any char in the alphabet.
  */
-size_t ab_rank(const alphabet *ab, xchar_t c);
+size_t alphabet_rank(const Alphabet *ab, xchar c);
 
 
 /**
@@ -176,7 +177,7 @@ size_t ab_rank(const alphabet *ab, xchar_t c);
  *         or +1 if rank(@p a)==rank(@p b);
  * @see ab_rank
  */
-int ab_cmp(const alphabet *ab, xchar_t a, xchar_t b);
+int alphabet_cmp(const Alphabet *ab, xchar a, xchar b);
 
 
 #endif

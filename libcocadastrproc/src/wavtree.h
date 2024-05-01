@@ -56,9 +56,9 @@ typedef enum {
 	WT_BALANCED = 0, /**< Balanced, i.e. at each node the alphabet is split in halves. */
 	WT_HUFFMAN = 1   /**< Shaped after a Huffman code tree */
 }
-wtshape;
+WavTreeShape;
 
-typedef struct _wavtree wavtree;
+typedef struct _WavTree WavTree;
 
 /**
  * @brief Creates a wavelet tree representing a string @p src over an alphabet
@@ -68,7 +68,7 @@ typedef struct _wavtree wavtree;
  * @param len The length of the source string.
  * @param shape The WT shape.
  */
-wavtree *wavtree_new(alphabet *ab, char *src, size_t len, wtshape shape);
+WavTree *wavtree_new(Alphabet *ab, char *src, size_t len, WavTreeShape shape);
 
 
 /**
@@ -78,7 +78,8 @@ wavtree *wavtree_new(alphabet *ab, char *src, size_t len, wtshape shape);
  * @param shape The WT shape.
  * @param layout The WT memory layout.
  */
-wavtree *wavtree_new_from_reader(alphabet *ab, xstrread *src, wtshape shape);
+WavTree *wavtree_new_from_reader(Alphabet *ab, xstrRead *src,
+                                 WavTreeShape shape);
 
 
 /**
@@ -88,7 +89,7 @@ wavtree *wavtree_new_from_reader(alphabet *ab, xstrread *src, wtshape shape);
  * @param shape The WT shape.
  * @param layout The WT memory layout.
  */
-wavtree *wavtree_new_from_xstr(alphabet *ab, xstr *src, wtshape shape);
+WavTree *wavtree_new_from_xstr(Alphabet *ab, xstr *src, WavTreeShape shape);
 
 /**
  * @brief Create a balanced wavelet tree from a stream with unknown alphabet
@@ -96,18 +97,18 @@ wavtree *wavtree_new_from_xstr(alphabet *ab, xstr *src, wtshape shape);
  * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*,
  * 16th Int'l Symposium on Experimental Algorithms (SEA 2017), London, UK.
  */
-wavtree *wavtree_new_online(Read *src);
+WavTree *wavtree_new_online(Read *src);
 
 /**
  * @brief Destructor
  */
-void wavtree_free(wavtree *wt);
+void wavtree_free(WavTree *wt);
 
 
 /**
  * @brief Returns the lenght of the string represented by the WT.
  */
-size_t wavtree_len(wavtree *wt);
+size_t wavtree_len(WavTree *wt);
 
 
 /**
@@ -116,7 +117,7 @@ size_t wavtree_len(wavtree *wt);
  *        str is string represented by the WT.
  *        @p pos must be in the range [0, length(str))
  */
-size_t wavtree_rank_pos(wavtree *wt, size_t pos);
+size_t wavtree_rank_pos(WavTree *wt, size_t pos);
 
 
 /**
@@ -124,7 +125,7 @@ size_t wavtree_rank_pos(wavtree *wt, size_t pos);
  *        the # of positions 0<=j<@p pos s.t. str[j]==@p c, where
  *        str is string represented by the WT.
  */
-size_t wavtree_rank(wavtree *wt, size_t pos, xchar_t c);
+size_t wavtree_rank(WavTree *wt, size_t pos, xchar c);
 
 
 /**
@@ -134,7 +135,7 @@ size_t wavtree_rank(wavtree *wt, size_t pos, xchar_t c);
  *        If no such position exists, returns the length of the represented
  *        string.
  */
-size_t wavtree_select(wavtree *wt, xchar_t c, size_t rank);
+size_t wavtree_select(WavTree *wt, xchar c, size_t rank);
 
 
 /**
@@ -143,7 +144,7 @@ size_t wavtree_select(wavtree *wt, xchar_t c, size_t rank);
  *        If no such position exists, returns the length of the represented
  *        string.
  */
-size_t wavtree_pred(wavtree *wt, size_t pos, xchar_t c);
+size_t wavtree_pred(WavTree *wt, size_t pos, xchar c);
 
 
 /**
@@ -152,7 +153,7 @@ size_t wavtree_pred(wavtree *wt, size_t pos, xchar_t c);
  *        If no such position exists, returns the length of the  represented
  *        string.
  */
-size_t wavtree_succ(wavtree *wt, size_t pos, xchar_t c);
+size_t wavtree_succ(WavTree *wt, size_t pos, xchar c);
 
 
 /**
@@ -160,12 +161,12 @@ size_t wavtree_succ(wavtree *wt, size_t pos, xchar_t c);
  *        the WT. Notice that the WT does <b>not</b> explicitly store
  *        the string.
  */
-xchar_t wavtree_char(wavtree *wt, size_t pos);
+xchar wavtree_char(WavTree *wt, size_t pos);
 
 
 /**
  * @brief Prints a representation of the WT to standard output.
  */
-void wavtree_print(wavtree *wt);
+void wavtree_print(WavTree *wt);
 
 #endif

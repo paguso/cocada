@@ -93,7 +93,7 @@ void test_fasta_goto(CuTest *tc)
 
 	RESULT_OK_ERR(rawptr) result = fasta_open(filename);
 	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
+	FASTA *f = result.val.ok;
 	for (size_t i = 0; i < nseq; i++) {
 		CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
 		CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
@@ -124,10 +124,10 @@ void test_fasta_next(CuTest *tc)
 
 	RESULT_OK_ERR(rawptr) result = fasta_open(filename);
 	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
+	FASTA *f = result.val.ok;
 	size_t i = 0;
 	for (i = 0; fasta_has_next(f); i++) {
-		const fasta_rec *rr = fasta_next(f);
+		const FASTARec *rr = fasta_next(f);
 		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
 		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
@@ -159,10 +159,10 @@ void test_fasta_next_read(CuTest *tc)
 
 	RESULT_OK_ERR(rawptr) result = fasta_open(filename);
 	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
+	FASTA *f = result.val.ok;
 	size_t i = 0;
 	for (i = 0; fasta_has_next(f); i++) {
-		const fasta_rec_rdr *rr = fasta_next_reader(f);
+		const FASTARecRdr *rr = fasta_next_reader(f);
 		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
 		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertStrEquals(tc, desc[i], rr->descr);

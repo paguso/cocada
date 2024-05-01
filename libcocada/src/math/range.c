@@ -61,12 +61,12 @@
 		return n;\
 	}\
 	\
-	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step) \
+	Range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step) \
 	{\
 		size_t n = range_arr_len_##TYPE(from, to, step);\
 		TYPE *arr = (TYPE *)malloc(n * sizeof(TYPE));\
 		range_arr_fill_##TYPE(arr, from, to, step);\
-		return (range_##TYPE){.n = n, .arr = arr};\
+		return (Range_##TYPE){.n = n, .arr = arr};\
 	}\
 
 XX_INTS(RANGE_ARR_IMPL)

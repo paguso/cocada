@@ -28,17 +28,17 @@
 #include "order.h"
 
 
-typedef struct __gksumm gksumm;
+typedef struct _GKSumm GKSumm;
 
-gksumm *gk_new(size_t typesize, CmpFunc cmp, double err);
+GKSumm *gk_new(size_t typesize, CmpFunc cmp, double err);
 
-void gk_upd(gksumm *self, const void *val);
+void gk_upd(GKSumm *self, const void *val);
 
-void gk_merge(gksumm *self, const gksumm *other);
+void gk_merge(GKSumm *self, const GKSumm *other);
 
-size_t gk_rank(gksumm *self, const void *val);
+size_t gk_rank(GKSumm *self, const void *val);
 
-void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *,
+void gk_print(GKSumm *self, FILE *stream, void (*print_val)(FILE *,
               const void *));
 
 #endif

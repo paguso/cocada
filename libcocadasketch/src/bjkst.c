@@ -33,12 +33,12 @@
 #include "new.h"
 
 
-struct _bjkst {
+struct _BJKST {
 	size_t nbits;      // size of stream elts in bits
 	uint64_t max_val;  // max allowed stream value = 1<<nbits
 	double eps;        // error
 	double delta;      // error prob
-	twuhash *g;        // 2-way indep hash function
+	TWUHash *g;        // 2-way indep hash function
 	size_t buf_cap;    // buffer capacity
 	size_t buf_size;   // current buffer size
 	HashSet **buf;     // buffers. one for each nb of trailing zeros
@@ -52,11 +52,11 @@ static size_t get_buf_cap(double eps, double delta)
 }
 
 
-bjkst *bjkst_init(size_t nbits, double eps, double delta)
+BJKST *bjkst_init(size_t nbits, double eps, double delta)
 {
 	ERROR_ASSERT( 0 < nbits && nbits < 64,
 	              "BJKST: Allowed #bits range is 1..63.");
-	bjkst *ret = NEW(bjkst);
+	BJKST *ret = NEW(BJKST);
 	ret->nbits = nbits;
 	ret->max_val = (1 << nbits);
 	ret->eps = eps;
@@ -73,7 +73,7 @@ bjkst *bjkst_init(size_t nbits, double eps, double delta)
 
 
 
-void bjkst_process(bjkst *counter, uint64_t val)
+void bjkst_process(BJKST *counter, uint64_t val)
 {
 	WARN_ASSERT( val < counter->max_val,
 	             "BJKST: Ignoring out-of-range value %"PRIu64"."
@@ -99,7 +99,7 @@ void bjkst_process(bjkst *counter, uint64_t val)
 }
 
 
-uint64_t bjkst_qry(bjkst *counter)
+uint64_t bjkst_qry(BJKST *counter)
 {
 	size_t min_nonempty_zeros = counter->min_zeros;
 	while (min_nonempty_zeros < counter->nbits

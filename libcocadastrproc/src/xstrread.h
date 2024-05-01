@@ -28,18 +28,18 @@
 #include "xstr.h"
 
 
-typedef struct _xstrread xstrread;
+typedef struct _xstrRead xstrRead;
 
 
 typedef struct {
-	void 	 (*reset) (xstrread *self);
-	xchar_wt (*getch) (xstrread *self);
-	size_t   (*read) (xstrread *self, xstr *dest, size_t n);
-	size_t   (*read_until) (xstrread *self, xstr *dest, xchar_t delim);
+	void 	 (*reset) (xstrRead *self);
+	xwchar (*getch) (xstrRead *self);
+	size_t   (*read) (xstrRead *self, xstr *dest, size_t n);
+	size_t   (*read_until) (xstrRead *self, xstr *dest, xchar delim);
 } xstrread_vt;
 
 
-struct _xstrread {
+struct _xstrRead {
 	xstrread_vt *vt;
 	void *impltor;
 };
@@ -48,15 +48,15 @@ struct _xstrread {
 /**
  * @brief Resets the stream, i.e. moves cursor to initial position.
  */
-void xstrread_reset(xstrread *trait);
+void xstrread_reset(xstrRead *trait);
 
 
 /**
- * @brief Reads the next xchar_t from a stream.
- * @returns The next character as an xchar_wt, or XEOF if the stream has
+ * @brief Reads the next xchar from a stream.
+ * @returns The next character as an xwchar, or XEOF if the stream has
  *          reached its end.
  */
-xchar_wt xstrread_getc(xstrread *trait);
+xwchar xstrread_getc(xstrRead *trait);
 
 
 /**
@@ -67,19 +67,19 @@ xchar_wt xstrread_getc(xstrread *trait);
  * @returns The number of chars actually read (and possibly discarded if @p dest is NULL).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
-size_t xstrread_read(xstrread *trait, xstr *dest, size_t n);
+size_t xstrread_read(xstrRead *trait, xstr *dest, size_t n);
 
 
 /**
  * @brief Reads characters from the reader into the xstring @p dest until a
- *        delimiter xchar_t @p delim is found. This delimiter xchar is not
+ *        delimiter xchar @p delim is found. This delimiter xchar is not
  *        consumed.
  * @param dest The destination xstring. If @p dest is NULL, the data are read from the reader and then ignored.
  * @param n The number of chars to attempt reading.
  * @returns The number of chars actually read (excluding the delimiter).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
-size_t xstrread_read_until(xstrread *trait, xstr *dest, xchar_t delim);
+size_t xstrread_read_until(xstrRead *trait, xstr *dest, xchar delim);
 
 
 

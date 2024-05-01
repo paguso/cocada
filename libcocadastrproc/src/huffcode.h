@@ -72,7 +72,7 @@ typedef struct _hufftnode hufftnode;
  * @param ab (no transfer) The base alphabet.
  * @param freqs (no transfer) Individual letter frequencies in lexycographic order.
  */
-huffcode *huffcode_new(const alphabet *ab, const size_t *freqs);
+huffcode *huffcode_new(const Alphabet *ab, const size_t *freqs);
 
 
 /**
@@ -80,7 +80,7 @@ huffcode *huffcode_new(const alphabet *ab, const size_t *freqs);
  * @param ab (no transfer) The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
+huffcode *huffcode_new_from_str(const Alphabet *ab, const char *src);
 
 
 /**
@@ -88,7 +88,7 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_strread(const alphabet *ab, Read *src);
+huffcode *huffcode_new_from_strread(const Alphabet *ab, Read *src);
 
 
 /**
@@ -96,7 +96,7 @@ huffcode *huffcode_new_from_strread(const alphabet *ab, Read *src);
  * @param ab (no transfer) The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src);
+huffcode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src);
 
 
 /**
@@ -104,7 +104,7 @@ huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *src);
+huffcode *huffcode_new_from_xstrread(const Alphabet *ab, xstrRead *src);
 
 
 
@@ -162,13 +162,13 @@ void huffcode_encode_strread_to(BitVec *dest, Read *src,
 /**
  * @brief Encodes a source stream into a binary code.
  */
-BitVec *huffcode_encode_xstrread(xstrread *src, const huffcode *hcode);
+BitVec *huffcode_encode_xstrread(xstrRead *src, const huffcode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_xstrread_to(BitVec *dest, xstrread *src,
+void huffcode_encode_xstrread_to(BitVec *dest, xstrRead *src,
                                  const huffcode *hcode);
 
 
@@ -197,7 +197,7 @@ const hufftnode *huffcode_tree(const huffcode *hcode);
  * @brief Returns the alphabet from a given HC.
  * @warning Do NOT modify or destroy the returned value
  */
-const alphabet *huffcode_ab(const huffcode *code);
+const Alphabet *huffcode_ab(const huffcode *code);
 
 
 /**

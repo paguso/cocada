@@ -23,19 +23,20 @@
 #define BJKST_H
 
 #include <stdint.h>
+#include "coretype.h"
 
-typedef struct _bjkst bjkst;
+typedef struct _BJKST BJKST;
 
 
 /**
  * @param nbits Number of bits of elements in the stream
  * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
  */
-bjkst *bjkst_init(size_t nbits, double eps, double delta);
+BJKST *bjkst_init(size_t nbits, double eps, double delta);
 
-void bjkst_process(bjkst *counter, uint64_t val);
+void bjkst_process(BJKST *counter, uint64_t val);
 
-uint64_t bjkst_qry(bjkst *counter);
+uint64_t bjkst_qry(BJKST *counter);
 
 
 #endif

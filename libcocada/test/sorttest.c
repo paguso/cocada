@@ -69,7 +69,7 @@ void test_index_q_sort(CuTest *tc)
 void test_succ(CuTest *tc)
 {
 	memdbg_reset();
-	range_int r = range_arr_new_int(0, 500, 5);
+	Range_int r = range_arr_new_int(0, 500, 5);
 	for (int i = 0; i < 505; i++) {
 		size_t idx = succ(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (idx == 0) {
@@ -90,7 +90,7 @@ void test_succ(CuTest *tc)
 void test_strict_succ(CuTest *tc)
 {
 	memdbg_reset();
-	range_int r = range_arr_new_int(0, 500, 5);
+	Range_int r = range_arr_new_int(0, 500, 5);
 	for (int i = 0; i < 505; i++) {
 		size_t idx = strict_succ(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (idx == 0) {
@@ -112,7 +112,7 @@ void test_strict_succ(CuTest *tc)
 void test_pred(CuTest *tc)
 {
 	memdbg_reset();
-	range_int r = range_arr_new_int(20, 520, 5);
+	Range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
 		size_t idx = pred(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (0 <= idx && idx < r.n - 1) {
@@ -133,7 +133,7 @@ void test_pred(CuTest *tc)
 void test_strict_pred(CuTest *tc)
 {
 	memdbg_reset();
-	range_int r = range_arr_new_int(20, 520, 5);
+	Range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
 		size_t idx = strict_pred(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (0 <= idx && idx < r.n - 1) {

@@ -123,7 +123,7 @@
 /**
  *@brief Opaque KLL summary type.
  */
-typedef struct __kllsumm kllsumm;
+typedef struct _KLLSumm KLLSumm;
 
 /**
  * @brief Default minimum KLL summary capacity (nb. of physically stored data points)
@@ -168,7 +168,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * @see kll_new_with_cap
  *
  */
-kllsumm *kll_new(size_t typesize, CmpFunc cmp, double err);
+KLLSumm *kll_new(size_t typesize, CmpFunc cmp, double err);
 
 
 /**
@@ -187,7 +187,7 @@ kllsumm *kll_new(size_t typesize, CmpFunc cmp, double err);
  *
  * @see new.h
  */
-kllsumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
+KLLSumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
                      Finaliser *chd_fr);
 
 
@@ -241,7 +241,7 @@ kllsumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
  *
  * @see errlog.h
  */
-kllsumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
+KLLSumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
                           size_t cap);
 
 
@@ -251,7 +251,7 @@ kllsumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
  * @see kll_new_own
  * @see kll_new_with_cap
  */
-kllsumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double eps,
+KLLSumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double eps,
                               size_t cap, Finaliser *chd_fr);
 
 
@@ -266,20 +266,20 @@ void kll_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Updates the summary with a new a data point with a given value.
  */
-void kll_upd(kllsumm *self, void *val);
+void kll_upd(KLLSumm *self, void *val);
 
 /**
  * @brief Returns an `O(err*N)` approximation of the rank of @p val
  * with constant `O(err)` error probability.
  * @see kll.h module documentation
  */
-size_t kll_rank(kllsumm *self, void *val);
+size_t kll_rank(KLLSumm *self, void *val);
 
 /**
  * @brief Prints a representation of the summary to a given output stream
  * @param print_val A function to print the stored values.
  */
-void kll_print(kllsumm *self, FILE *stream, void (*print_val)(FILE *,
+void kll_print(KLLSumm *self, FILE *stream, void (*print_val)(FILE *,
                const void *));
 
 

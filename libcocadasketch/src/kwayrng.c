@@ -31,7 +31,7 @@
 #include "randutil.h"
 
 
-struct  _kwayrng {
+struct  _KWayRNG {
 	size_t k;
 	uint64_t maxval;
 	uint64_t *coefs;
@@ -39,10 +39,10 @@ struct  _kwayrng {
 };
 
 
-kwayrng *kwayrng_new(size_t k, size_t nbits)
+KWayRNG *kwayrng_new(size_t k, size_t nbits)
 {
 	ERROR_ASSERT(nbits <= 64, "Maximum number of random bits is 64");
-	kwayrng *ret = NEW(kwayrng);
+	KWayRNG *ret = NEW(KWayRNG);
 	ret->k = k;
 	ret->maxval = (uint64_t)1 << nbits;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
@@ -55,10 +55,10 @@ kwayrng *kwayrng_new(size_t k, size_t nbits)
 }
 
 
-kwayrng *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
+KWayRNG *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
 {
 	ERROR_ASSERT(nbits < 64, "Maximum number of random bits is 63");
-	kwayrng *ret = NEW(kwayrng);
+	KWayRNG *ret = NEW(KWayRNG);
 	ret->k = k;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
 	ret->maxval = (uint64_t)1 << nbits;
@@ -71,38 +71,38 @@ kwayrng *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
 }
 
 
-void kwayrng_free(kwayrng *rng)
+void kwayrng_free(KWayRNG *rng)
 {
 	FREE(rng->coefs);
 	FREE(rng);
 }
 
 
-size_t kwayrng_k(kwayrng *rng)
+size_t kwayrng_k(KWayRNG *rng)
 {
 	return rng->k;
 }
 
 
-const uint64_t *kwayrng_coefs(kwayrng *rng)
+const uint64_t *kwayrng_coefs(KWayRNG *rng)
 {
 	return rng->coefs;
 }
 
 
-void kwayrng_reset(kwayrng *rng)
+void kwayrng_reset(KWayRNG *rng)
 {
 	rng->count = 0;
 }
 
 
-uint64_t kwayrng_maxval(kwayrng *rng)
+uint64_t kwayrng_maxval(KWayRNG *rng)
 {
 	return rng->maxval;
 }
 
 
-uint64_t kwayrng_next(kwayrng *rng)
+uint64_t kwayrng_next(KWayRNG *rng)
 {
 	uint64_t ret = 0;
 	for (uint64_t i = 0, pow = 1; i < rng->k; i++) {
@@ -114,7 +114,7 @@ uint64_t kwayrng_next(kwayrng *rng)
 }
 
 
-uint64_t kwayrng_val(kwayrng *rng, uint64_t ith)
+uint64_t kwayrng_val(KWayRNG *rng, uint64_t ith)
 {
 	uint64_t ret = 0;
 	ith =  ith % rng->maxval;

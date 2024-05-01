@@ -37,8 +37,8 @@
  * fixed length. The exact number of bytes needed to represent
  * individual characters is provided by the user to optmise space.
  * Characters are read from/written to the string via methods that
- * return/receive xchar_t values. Thus xstr characters must fit
- * into the xchar_t value, that is, they must require at most
+ * return/receive xchar values. Thus xstr characters must fit
+ * into the xchar value, that is, they must require at most
  * XCHAR_BYTES bytes.
  *
  * @see xchar.h
@@ -163,41 +163,41 @@ size_t xstr_nbytes(const xstr *self);
  * @brief Returns the char at a specified position.
  * @warning  No out-of-bounds verification is assumed.
  */
-xchar_t xstr_get(const xstr *self, size_t pos);
+xchar xstr_get(const xstr *self, size_t pos);
 
 
 /**
  * @brief Sets the char at a specified position.
  * @warn  No out-of-bounds verification is assumed.
  * @warn  May result in information loss if the internal representation uses a
- *        smaller number of bytes for each position than sizeof(xchar_t).
+ *        smaller number of bytes for each position than sizeof(xchar).
  */
-void xstr_set(xstr *self, size_t pos, xchar_t val);
+void xstr_set(xstr *self, size_t pos, xchar val);
 
 
 /**
  * @brief Sets the first n chars to a specified value
  * @warning  No out-of-bounds verification is assumed.
  * @warning  May result in information loss if the internal representation uses a
- *        smaller number of bytes for each position than sizeof(xchar_t).
+ *        smaller number of bytes for each position than sizeof(xchar).
  */
-void xstr_nset(xstr *self, size_t n, xchar_t val);
+void xstr_nset(xstr *self, size_t n, xchar val);
 
 
 /**
  * @brief Appends a new char to a xstr.
  * @warning  May result in information loss if the internal representation uses a
- *        smaller number of bytes for each position than sizeof(xchar_t).
+ *        smaller number of bytes for each position than sizeof(xchar).
  */
-void xstr_push(xstr *self, xchar_t c);
+void xstr_push(xstr *self, xchar c);
 
 
 /**
  * @brief Appends @p n copies of char @p to the string.
  * @warning  May result in information loss if the internal representation uses a
- *        smaller number of bytes for each position than sizeof(xchar_t).
+ *        smaller number of bytes for each position than sizeof(xchar).
  */
-void xstr_push_n(xstr *self, xchar_t c, size_t n);
+void xstr_push_n(xstr *self, xchar c, size_t n);
 
 
 /**
@@ -256,7 +256,7 @@ int xstr_cmp(const xstr *self, const xstr *other);
 
 #define FOREACH_IN_XSTR(CHR, STR) \
 	for (xstr *__s = (xstr *)(STR); __s; __s = NULL) \
-		for (xchar_t CHR = 1; CHR ; CHR = 0) \
+		for (xchar CHR = 1; CHR ; CHR = 0) \
 			for (size_t __i = 0, __l = xstr_len(__s); __i < __l; __i = __l) \
 				for (CHR = xstr_get(__s, __i); __i < __l; CHR = ((++__i) < __l) ? xstr_get(__s, __i) : CHR )
 

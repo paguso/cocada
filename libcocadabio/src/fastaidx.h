@@ -35,51 +35,51 @@
 /**
  * @brief
  */
-typedef struct _fastaidx fastaidx;
+typedef struct _FASTAIndex FASTAIndex;
 
 
 /**
  * @brief
  */
-fastaidx *fastaidx_new(const char *src_path);
+FASTAIndex *fasta_index_new(const char *src_path);
 
 
 /**
  * @brief Finaliser
  */
-void fastaidx_finalise(void *ptr, const Finaliser *fnr);
+void fasta_index_finalise(void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Destructor
  */
-void fastaidx_free(fastaidx *self);
+void fasta_index_free(FASTAIndex *self);
 
 
 /**
  * @brief
  */
-size_t fastaidx_size(fastaidx *self);
+size_t fasta_index_size(FASTAIndex *self);
 
 
 /**
  * @brief
  */
-void fastaidx_add(fastaidx *self, size_t descr_offset, size_t seq_offset);
+void fasta_index_add(FASTAIndex *self, size_t descr_offset, size_t seq_offset);
 
 
 /**
  * @brief FASTA record offset.
  */
 typedef struct {
-	size_t descr_off;	/**< Record description offset. */
-	size_t seq_off;	/**< Record sequence offset. */
-} fasta_rec_offs;
+	size_t descr_offset;	/**< Record description offset. */
+	size_t seq_offset;	/**< Record sequence offset. */
+} FASTARecOffsets;
 
 
 /**
  * @brief Returns the offsets (description, sequence) of the record #@p rec_no.
  */
-fasta_rec_offs fastaidx_get(fastaidx *self, size_t rec_no);
+FASTARecOffsets fasta_index_get(FASTAIndex *self, size_t rec_no);
 
 #endif

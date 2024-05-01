@@ -45,7 +45,7 @@
 /**
  * @brief FASTA file/stream type.
  */
-typedef struct _fasta fasta;
+typedef struct _FASTA FASTA;
 
 
 /**
@@ -56,7 +56,7 @@ typedef struct {
 	char *seq;   	/**< In-memory sequence content */
 	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
 	size_t seq_offset;		/**< Sequence offset from the start of the file **/
-} fasta_rec;
+} FASTARec;
 
 
 /**
@@ -67,7 +67,7 @@ typedef struct {
 	Read *seqrdr;	/**< Sequence contents reader */
 	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
 	size_t seq_offset;		/**< Sequence offset from the start of the file **/
-} fasta_rec_rdr;
+} FASTARecRdr;
 
 
 
@@ -81,13 +81,13 @@ RESULT_OK_ERR(rawptr) fasta_open(const char *filename);
 /**
  * @brief Returns the FASTA file path
  */
-const char *fasta_path(fasta *self);
+const char *fasta_path(FASTA *self);
 
 /**
  * @brief Checks whether there is a sequence *after* the current
  * cursor position
  */
-bool fasta_has_next(fasta *self);
+bool fasta_has_next(FASTA *self);
 
 
 /**
@@ -96,13 +96,13 @@ bool fasta_has_next(fasta *self);
  *
  * @return true on success, false on fail.
  */
-bool fasta_goto(fasta *self, size_t descr_offset);
+bool fasta_goto(FASTA *self, size_t descr_offset);
 
 
 /**
  * @brief Sets the position of the stream to the beginning of the file.
  */
-void fasta_rewind(fasta *self);
+void fasta_rewind(FASTA *self);
 
 
 /**
@@ -117,9 +117,9 @@ void fasta_rewind(fasta *self);
  * -------
  *
  * ```C
- * fasta *fr = fasta_open("teste.fa");
+ * FASTA *fr = fasta_open("teste.fa");
  * while(fasta_has_next(fr)) {
- *  fasta_rec_rdr rec = fasta_next_reader(fr);
+ *  FASTARecRdr rec = fasta_next_reader(fr);
  *  for (xchar c; (c=strread_getc(rec->seqrdr)) != EOF;) {
  *      //do something with c
  *  }
@@ -129,7 +129,7 @@ void fasta_rewind(fasta *self);
  * should *not* be modified or destroyed directly.
  * @see strread
  */
-const fasta_rec_rdr *fasta_next_reader(fasta *self);
+const FASTARecRdr *fasta_next_reader(FASTA *self);
 
 
 /**
@@ -149,12 +149,12 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self);
  * @warning The returned record object should *not* be modified or
  * destroyed directly.
  */
-const fasta_rec *fasta_next(fasta *self);
+const FASTARec *fasta_next(FASTA *self);
 
 
 /**
  * @brief Destructor. Closes the reader and releases used resources
  */
-void fasta_close(fasta *self);
+void fasta_close(FASTA *self);
 
 #endif

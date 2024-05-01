@@ -37,10 +37,10 @@
 
 static size_t Nab;
 static size_t Narr;
-static alphabet **ab;
+static Alphabet **ab;
 static char **strings;
 static size_t *slens;
-static csarray **csarrays;
+static CSArray **csarrays;
 static size_t **sarrays;
 static size_t **sarrinvs;
 
@@ -58,7 +58,7 @@ int suffix_compare(char *str, size_t len, size_t i, size_t j)
 	}
 }
 
-void csarray_sanity_check(CuTest *tc, csarray *csarr, char *str, size_t len)
+void csarray_sanity_check(CuTest *tc, CSArray *csarr, char *str, size_t len)
 {
 	size_t sa_len = csarray_len(csarr);
 	CuAssertSizeTEquals(tc, len + 1, sa_len);
@@ -74,7 +74,7 @@ void csarray_sanity_check(CuTest *tc, csarray *csarr, char *str, size_t len)
 /*
  * creates an alphabet with len ascii letters starting with 'a'
  */
-static alphabet *seq_ab(size_t len)
+static Alphabet *seq_ab(size_t len)
 {
 	char *ab_letters = cstr_new(len);
 	for (size_t i = 0; i < len; i++)
@@ -82,11 +82,11 @@ static alphabet *seq_ab(size_t len)
 	return alphabet_new(len, ab_letters);
 }
 
-static char *random_str(alphabet *ab, size_t len)
+static char *random_str(Alphabet *ab, size_t len)
 {
 	char *ret = cstr_new(len);
 	for (size_t i = 0; i < len; i++)
-		ret[i] = ab_char(ab, rand() % ab_size(ab));
+		ret[i] = alphabet_char(ab, rand() % alphabet_size(ab));
 	return ret;
 }
 
@@ -101,10 +101,10 @@ void xxxcsarray_test_setup(CuTest *tc)
 {
 	Nab = 1;
 	Narr = 1;
-	ab = ARR_NEW(alphabet *, Narr);
+	ab = ARR_NEW(Alphabet *, Narr);
 	strings = ARR_NEW(char *, Narr);
 	slens = ARR_NEW(size_t, Narr);
-	csarrays = ARR_NEW(csarray *, Narr);
+	csarrays = ARR_NEW(CSArray *, Narr);
 	sarrays = ARR_NEW(size_t *, Narr);
 	sarrinvs = ARR_NEW(size_t *, Narr);
 	ab[0] = alphabet_new(4, "elns");
@@ -123,12 +123,12 @@ void csarray_test_setup(CuTest *tc)
 {
 	Nab = 10;
 	Narr = Nab * MAX_STR_SIZE;
-	ab = ARR_NEW(alphabet *, Narr);
+	ab = ARR_NEW(Alphabet *, Narr);
 	strings = ARR_NEW(char *, Narr);
 	slens = ARR_NEW(size_t, Narr);
 	sarrays = ARR_NEW(size_t *, Narr);
 	sarrinvs = ARR_NEW(size_t *, Narr);
-	csarrays = ARR_NEW(csarray *, Narr);
+	csarrays = ARR_NEW(CSArray *, Narr);
 	for (int l = 0; l < Nab; l++) {
 		for (int i = 0, j = 0; i < MAX_STR_SIZE; i++) {
 			//printf("l=%d i=%d\n",l,i);
@@ -175,7 +175,7 @@ static size_t phi_bf(size_t *sa, size_t len, size_t pos)
 void csarray_test_phi(CuTest *tc)
 {
 	for (size_t i = 0; i < Narr; i++) {
-		csarray *csa = csarrays[i];
+		CSArray *csa = csarrays[i];
 		size_t slen = slens[i];
 		size_t *sa = sarrays[i];
 		for (size_t j = 0; j < slen + 1; j++) {
@@ -191,7 +191,7 @@ void csarray_test_phi(CuTest *tc)
 void csarray_test_get(CuTest *tc)
 {
 	for (size_t i = 0; i < Narr; i++) {
-		csarray *csa = csarrays[i];
+		CSArray *csa = csarrays[i];
 		size_t  *sa = sarrays[i];
 		size_t sa_len = csarray_len(csa);
 		for (size_t j = 0; j < sa_len; j++) {
@@ -210,7 +210,7 @@ void csarray_test_get(CuTest *tc)
 void csarray_test_get_inv(CuTest *tc)
 {
 	for (size_t k = 0; k < Narr; k++) {
-		csarray *csa = csarrays[k];
+		CSArray *csa = csarrays[k];
 		size_t  *sainv = sarrinvs[k];
 		size_t sa_len = csarray_len(csa);
 		for (size_t i = 0; i < sa_len; i++) {
@@ -226,11 +226,11 @@ void csarray_test_get_inv(CuTest *tc)
 void csarray_test_get_char(CuTest *tc)
 {
 	for (size_t k = 0; k < Narr; k++) {
-		csarray *csa = csarrays[k];
+		CSArray *csa = csarrays[k];
 		char *str = strings[k];
 		size_t slen = slens[k];
 		for (size_t i = 0; i < slen; i++) {
-			xchar_t c = csarray_get_char(csa, i);
+			xchar c = csarray_get_char(csa, i);
 			//printf("csa[%zu].get_char(%zu) = "XCHAR_FMT"(%c) (bf = %c)\n", k, i,
 			//        c, (char)c, str[i]);
 			CuAssertCharEquals(tc, str[i], (char)c);

@@ -41,7 +41,7 @@
 /**
  * String stream type
  */
-typedef struct _strstream strstream;
+typedef struct _StrStream StrStream;
 
 
 /**
@@ -49,38 +49,38 @@ typedef struct _strstream strstream;
  * @param str The source string.
  * @param slen The source string length.
  */
-strstream *strstream_open_str(char *str, size_t slen);
+StrStream *strstream_open_str(char *str, size_t slen);
 
 
 /**
  * @brief Opens a stream for a in-memory source xstr.
  * @param str The source xstr.
  */
-strstream *strstream_open_xstr(xstr *xstr);
+StrStream *strstream_open_xstr(xstr *xstr);
 
 
 /**
  * @brief Opens a stream for a source text file.
  */
-strstream *strstream_open_file(char *filename);
+StrStream *strstream_open_file(char *filename);
 
 
 /**
  * @brief Opens a stream for a source xstr text file.
  */
-strstream *strstream_open_xfile(char *filename, size_t bytes_per_char);
+StrStream *strstream_open_xfile(char *filename, size_t bytes_per_char);
 
 
 /**
  * @brief Resets the stream, i.e. moves cursor to initial position.
  */
-void strstream_reset(strstream *sst);
+void strstream_reset(StrStream *sst);
 
 
 /**
  * @brief Tests whether a stream has reached its end.
  */
-bool strstream_end(strstream *sst);
+bool strstream_end(StrStream *sst);
 
 
 /**
@@ -96,7 +96,7 @@ bool strstream_end(strstream *sst);
  * strstream_close(fsst);
  * @endcode
  */
-xchar_t strstream_getc(strstream *sst);
+xchar strstream_getc(StrStream *sst);
 
 
 /**
@@ -104,7 +104,7 @@ xchar_t strstream_getc(strstream *sst);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strstream_reads(strstream *sst, char *dest, size_t n);
+size_t strstream_reads(StrStream *sst, char *dest, size_t n);
 
 
 /**
@@ -112,7 +112,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strstream_reads_until(strstream *sst, char *dest, char delim);
+size_t strstream_reads_until(StrStream *sst, char *dest, char delim);
 
 
 /**
@@ -120,7 +120,7 @@ size_t strstream_reads_until(strstream *sst, char *dest, char delim);
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs(strstream *sst, xstr *xstr, size_t n);
+size_t strstream_readxs(StrStream *sst, xstr *xstr, size_t n);
 
 
 /**
@@ -128,18 +128,18 @@ size_t strstream_readxs(strstream *sst, xstr *xstr, size_t n);
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs_until(strstream *sst, xstr *xstr, xchar_t delim);
+size_t strstream_readxs_until(StrStream *sst, xstr *xstr, xchar delim);
 
 
 /**
  * @brief Closes the stream and disposes the stream object.
  */
-void strstream_close(strstream *sst);
+void strstream_close(StrStream *sst);
 
 
 /**
  * @brief Returns the size of the xchar used in the stream.
  */
-size_t strstream_sizeof_char(strstream *sst);
+size_t strstream_sizeof_char(StrStream *sst);
 
 #endif

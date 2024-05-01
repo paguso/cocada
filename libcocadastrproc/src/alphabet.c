@@ -46,8 +46,8 @@ typedef enum {
 } rankmode;
 
 
-struct _alphabet {
-	alphabet_type  type;
+struct _Alphabet {
+	AlphabetType  type;
 	rankmode rank_mode;
 	size_t   size;
 	char    *letters;
@@ -58,10 +58,10 @@ struct _alphabet {
 };
 
 
-alphabet *alphabet_new(size_t size, const char *letters)
+Alphabet *alphabet_new(size_t size, const char *letters)
 {
-	alphabet *ret;
-	ret =  NEW(alphabet);
+	Alphabet *ret;
+	ret =  NEW(Alphabet);
 	ret->type = CHAR_TYPE;
 	ret->rank_mode = ARRAY;
 	ret->letters = ARR_NEW(char, size);
@@ -88,9 +88,9 @@ alphabet *alphabet_new(size_t size, const char *letters)
 }
 
 
-alphabet *alphabet_new_with_equivs(size_t size, char **letters)
+Alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 {
-	alphabet *ret = NEW(alphabet);
+	Alphabet *ret = NEW(Alphabet);
 	ret->type = CHAR_TYPE;
 	ret->letters = cstr_new(size);
 	ret->size = 0;
@@ -126,16 +126,16 @@ alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 }
 
 
-static inline size_t int_ab_rank(xchar_t c)
+static inline size_t int_ab_rank(xchar c)
 {
 	return (size_t)c;
 }
 
 
-alphabet *int_alphabet_new(size_t size)
+Alphabet *alphabet_new_int_ab(size_t size)
 {
-	alphabet *ret;
-	ret =  NEW(alphabet);
+	Alphabet *ret;
+	ret =  NEW(Alphabet);
 	ret->type = INT_TYPE;
 	ret->rank_mode = FUNC;
 	ret->size = size;
@@ -145,21 +145,21 @@ alphabet *int_alphabet_new(size_t size)
 }
 
 
-alphabet *alphabet_clone(const alphabet *src)
+Alphabet *alphabet_clone(const Alphabet *src)
 {
 	switch (src->type) {
 	case CHAR_TYPE:
 		return alphabet_new(src->size, src->letters);
 		break;
 	case INT_TYPE:
-		return int_alphabet_new(src->size);
+		return alphabet_new_int_ab(src->size);
 		break;
 	}
 	return NULL;
 }
 
 
-void alphabet_free(alphabet *ab)
+void alphabet_free(Alphabet *ab)
 {
 	if (ab == NULL) return;
 	switch (ab->rank_mode) {
@@ -176,7 +176,7 @@ void alphabet_free(alphabet *ab)
 
 void alphabet_finalise(void *ptr, const Finaliser *fnr)
 {
-	alphabet *ab = (alphabet *)ptr;
+	Alphabet *ab = (Alphabet *)ptr;
 	if (ab == NULL) return;
 	switch (ab->rank_mode) {
 	case ARRAY:
@@ -189,39 +189,39 @@ void alphabet_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-alphabet_type ab_type(const alphabet *ab)
+AlphabetType alphabet_type(const Alphabet *ab)
 {
 	return ab->type;
 }
 
 
-size_t ab_size(const alphabet *ab)
+size_t alphabet_size(const Alphabet *ab)
 {
 	return ab->size;
 }
 
 
-bool ab_contains(const alphabet *ab, xchar_t c)
+bool alphabet_contains(const Alphabet *ab, xchar c)
 {
-	return (ab_rank(ab, c) < ab->size);
+	return (alphabet_rank(ab, c) < ab->size);
 }
 
 
-xchar_t ab_char(const alphabet *ab, size_t index)
+xchar alphabet_char(const Alphabet *ab, size_t index)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
 		return (char)(ab->letters[index]);
 		break;
 	case INT_TYPE:
-		return (xchar_t)index;
+		return (xchar)index;
 		break;
 	}
 	return 0;
 }
 
 
-size_t ab_rank(const alphabet *ab, xchar_t c)
+size_t alphabet_rank(const Alphabet *ab, xchar c)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
@@ -235,10 +235,10 @@ size_t ab_rank(const alphabet *ab, xchar_t c)
 }
 
 
-int ab_cmp(const alphabet *ab, xchar_t a, xchar_t b)
+int alphabet_cmp(const Alphabet *ab, xchar a, xchar b)
 {
-	size_t ra = ab_rank(ab, a);
-	size_t rb = ab_rank(ab, b);
+	size_t ra = alphabet_rank(ab, a);
+	size_t rb = alphabet_rank(ab, b);
 	if (ra == rb) return 0;
 	else if (ra < rb) return -1;
 	else return +1;

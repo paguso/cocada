@@ -135,13 +135,13 @@ static void _fastaread_init(fastaread *fr, FILE *src)
 
 
 
-struct _fasta {
+struct _FASTA {
 	FILE *src;
 	char *src_path;
-	fasta_rec cur_rec;
+	FASTARec cur_rec;
 	size_t cur_rec_len[2];
 	fastaread rd;
-	fasta_rec_rdr cur_rec_rd;
+	FASTARecRdr cur_rec_rd;
 	size_t cur_rec_rd_len[2];
 };
 
@@ -149,7 +149,7 @@ struct _fasta {
 RESULT_OK_ERR(rawptr) fasta_open(const char *filename)
 {
 	RESULT_OK_ERR(rawptr) result = {.ok = true};
-	fasta *f = NEW(fasta);
+	FASTA *f = NEW(FASTA);
 	f->src = fopen(filename, "r");
 	if (errno) {
 		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
@@ -178,13 +178,13 @@ SUCCESS:
 }
 
 
-const char *fasta_path(fasta *self)
+const char *fasta_path(FASTA *self)
 {
 	return self->src_path;
 }
 
 
-static bool _goto_next(fasta *self)
+static bool _goto_next(FASTA *self)
 {
 	int c;
 	while (!feof(self->src)) {
@@ -197,7 +197,7 @@ static bool _goto_next(fasta *self)
 }
 
 
-bool fasta_has_next(fasta *self)
+bool fasta_has_next(FASTA *self)
 {
 	long cur = ftell(self->src);
 	bool ret = _goto_next(self);
@@ -206,20 +206,20 @@ bool fasta_has_next(fasta *self)
 }
 
 
-bool fasta_goto(fasta *self, size_t descr_offset)
+bool fasta_goto(FASTA *self, size_t descr_offset)
 {
 	return ((fseek(self->src, descr_offset, SEEK_SET) == 0) &&
 	        _goto_next(self));
 }
 
 
-void fasta_rewind(fasta *self)
+void fasta_rewind(FASTA *self)
 {
 	rewind(self->src);
 }
 
 
-const fasta_rec *fasta_next(fasta *self)
+const FASTARec *fasta_next(FASTA *self)
 {
 	if (!_goto_next(self)) {
 		return NULL;
@@ -270,7 +270,7 @@ const fasta_rec *fasta_next(fasta *self)
 }
 
 
-const fasta_rec_rdr *fasta_next_reader(fasta *self)
+const FASTARecRdr *fasta_next_reader(FASTA *self)
 {
 	if (!_goto_next(self)) {
 		return NULL;
@@ -305,7 +305,7 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self)
 }
 
 
-void fasta_close(fasta *self)
+void fasta_close(FASTA *self)
 {
 	fclose(self->src);
 	FREE(self->src_path);

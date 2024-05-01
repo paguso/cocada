@@ -33,7 +33,7 @@ void test_kwayrng(CuTest *tc)
 {
 	size_t nbits = 4;
 	for (size_t k = 0; k < 10; k++) {
-		kwayrng *rng = kwayrng_new(k, nbits);
+		KWayRNG *rng = kwayrng_new(k, nbits);
 		const uint64_t *coef = kwayrng_coefs(rng);
 		ARR_FPRINT(stderr, coef, 0, k, 10, "coef", "%zu", " ", "");
 		DEBUG("%zu-way independent sequence:\n", k);
@@ -55,7 +55,7 @@ void test_uniform(CuTest *tc)
 				coefs[2] = k2;
 				for (size_t k3 = 0; k3 < 32; k3++) {
 					coefs[3] = k3;
-					kwayrng *rng = kwayrng_new_with_coefs(4, coefs,  4);
+					KWayRNG *rng = kwayrng_new_with_coefs(4, coefs,  4);
 					for (size_t x = 0; x < 32; x++) {
 						uint64_t val = kwayrng_next(rng);
 						counts[(size_t)val]++;

@@ -43,7 +43,7 @@
  * @brief Formatter type.
  *
  */
-typedef struct _xstrformat xstrformat;
+typedef struct _xstrFormat xstrFormat;
 
 
 /**
@@ -51,7 +51,7 @@ typedef struct _xstrformat xstrformat;
  * xchars according to the default format specification XCHAR_FMT
  * @see xchar.h
  */
-xstrformat *xstrformat_new(const xstr *src);
+xstrFormat *xstrformat_new(const xstr *src);
 
 
 /**
@@ -59,15 +59,15 @@ xstrformat *xstrformat_new(const xstr *src);
  * as the corresponding ASCII chars.
  * @warning Assumes xstr_sizeof_char(src) == sizeof(char)
  */
-xstrformat *xstrformat_new_ascii(const xstr *src);
+xstrFormat *xstrformat_new_ascii(const xstr *src);
 
 
 /**
  * @brief Destructor
  */
-void xstrformat_free(xstrformat *self);
+void xstrformat_free(xstrFormat *self);
 
 
-DECL_TRAIT(xstrformat, Format)
+DECL_TRAIT(xstrFormat, Format)
 
 #endif

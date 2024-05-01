@@ -31,9 +31,9 @@
 #include "new.h"
 
 
-struct _fmalg {
+struct _FMAlg {
 	size_t n, m;
-	kwayrng ***rng;
+	KWayRNG ***rng;
 	uint64_t maxval;
 	uint64_t p2ceil;
 	byte_t **maxlsb;
@@ -41,22 +41,22 @@ struct _fmalg {
 };
 
 
-fmalg *fmalg_init_single(uint64_t maxval)
+FMAlg *fmalg_init_single(uint64_t maxval)
 {
 	return fmalg_init(maxval, 1, 1);
 }
 
 
-fmalg *fmalg_init(uint64_t maxval, size_t n, size_t m)
+FMAlg *fmalg_init(uint64_t maxval, size_t n, size_t m)
 {
 	assert(maxval <= 0x7FFFFFFFFFFFFFFF);
-	fmalg *ret = NEW(fmalg);
+	FMAlg *ret = NEW(FMAlg);
 	ret->maxval = maxval;
 	ret->n = n;
 	ret->m = m;
 	ret->p2ceil = uint64_lobit( pow2ceil_uint64_t(maxval) );
 	assert (ret->p2ceil <= 63);
-	NEW_MATRIX(rngs, kwayrng *, m, n);
+	NEW_MATRIX(rngs, KWayRNG *, m, n);
 	FILL_MATRIX(rngs, m, n, kwayrng_new(2, ret->p2ceil));
 	ret->rng = rngs;
 	NEW_MATRIX_0(lsbs, byte_t, m, n);
@@ -66,7 +66,7 @@ fmalg *fmalg_init(uint64_t maxval, size_t n, size_t m)
 }
 
 
-void fmalg_free(fmalg *fm)
+void fmalg_free(FMAlg *fm)
 {
 	for (size_t i = 0; i < fm->m; i++) {
 		for (size_t j = 0; j < fm->n; j++) {
@@ -79,14 +79,14 @@ void fmalg_free(fmalg *fm)
 }
 
 
-void fmalg_reset(fmalg *fm)
+void fmalg_reset(FMAlg *fm)
 {
 	FILL_MATRIX(fm->maxlsb, fm->m, fm->n, 0);
 }
 
 
 
-void fmalg_process(fmalg *fm, uint64_t val)
+void fmalg_process(FMAlg *fm, uint64_t val)
 {
 	WARN_ASSERT(val < fm->maxval, "Ignoring invalid FM value %"PRIu64\
 	            ". Max allowed value is %"PRIu64"", val, fm->maxval - 1);
@@ -120,7 +120,7 @@ static long double pow_avg(byte_t *vals, size_t n)
 }
 
 
-uint64_t fmalg_query(fmalg *fm)
+uint64_t fmalg_query(FMAlg *fm)
 {
 	ARR_FILL(fm->avgs, 0, fm->m, 0);
 	for (size_t i = 0; i < fm->m; i++) {

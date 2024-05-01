@@ -42,7 +42,7 @@ qdnode;
 #define HAS_CHD(node) ((node)->chd[LEFT]!=NULL || (node)->chd[RIGHT]!=NULL)
 
 
-struct _qdigest {
+struct _QDigest {
 	double err;
 	size_t range;
 	size_t next_compress_cap;
@@ -52,11 +52,11 @@ struct _qdigest {
 };
 
 
-qdigest *qdigest_new(size_t range, double err)
+QDigest *qdigest_new(size_t range, double err)
 {
 	assert(err > 0);
 	assert(range > 0);
-	qdigest *ret = NEW(qdigest);
+	QDigest *ret = NEW(QDigest);
 	ret->range = range;
 	ret->next_compress_cap = 2;
 	ret->errlogrange = err / log10(range);
@@ -68,7 +68,7 @@ qdigest *qdigest_new(size_t range, double err)
 }
 
 
-static inline size_t qdigest_cap(qdigest *self)
+static inline size_t qdigest_cap(QDigest *self)
 {
 	return MAX(1, (size_t)(self->errlogrange * (double)(self->total_qty)));
 }
@@ -142,7 +142,7 @@ static comp_pair __qdigest_compress(qdnode *root, size_t cap, size_t spare_up)
 }
 
 
-static void qdigest_compress(qdigest *self)
+static void qdigest_compress(QDigest *self)
 {
 	if ( self->root != NULL ) {
 		__qdigest_compress(self->root, self->errlogrange * self->total_qty, 0);
@@ -150,7 +150,7 @@ static void qdigest_compress(qdigest *self)
 }
 
 
-void qdigest_upd(qdigest *self, size_t val, size_t qty)
+void qdigest_upd(QDigest *self, size_t val, size_t qty)
 {
 	if ( val > self->range ) {
 		WARN("QDigest: ignoring insertion of invalid value %zu.\n", val );
@@ -214,7 +214,7 @@ size_t _sum_tree(qdnode *root)
 }
 
 
-size_t qdigest_rank(qdigest *self, size_t val)
+size_t qdigest_rank(QDigest *self, size_t val)
 {
 	qdnode *cur = self->root;
 	size_t l = 0, r = self->range, m;
@@ -252,7 +252,7 @@ static void _print(FILE *stream, qdnode *root, size_t l, size_t r, size_t level)
 }
 
 
-void qdigest_print(qdigest *self, FILE *stream)
+void qdigest_print(QDigest *self, FILE *stream)
 {
 	fprintf(stream, "QDigest @%p\n", self);
 	fprintf(stream, "- range = [0..%zu)\n", self->range);

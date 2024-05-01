@@ -38,7 +38,7 @@ typedef enum {
 } sstream_type;
 
 
-struct _strstream {
+struct _StrStream {
 	union {
 		FILE    *file;
 		char    *str;
@@ -51,20 +51,20 @@ struct _strstream {
 };
 
 
-static xchar_t _getchar_from_str(void *str)
+static xchar _getchar_from_str(void *str)
 {
-	strstream *sst = (strstream *)str;
+	StrStream *sst = (StrStream *)str;
 	if (sst->pos >= sst->slen)
-		return (xchar_t)EOF;
+		return (xchar)EOF;
 	else
-		return (xchar_t)sst->src.str[sst->pos++];
+		return (xchar)sst->src.str[sst->pos++];
 }
 
 
-strstream *strstream_open_str(char *str, size_t slen)
+StrStream *strstream_open_str(char *str, size_t slen)
 {
-	strstream *sst;
-	sst = NEW(strstream);
+	StrStream *sst;
+	sst = NEW(StrStream);
 	sst->type = SSTR_STR;
 	sst->src.str = str;
 	sst->pos = 0;
@@ -74,10 +74,10 @@ strstream *strstream_open_str(char *str, size_t slen)
 }
 
 
-strstream *strstream_open_xstr(xstr *xstr)
+StrStream *strstream_open_xstr(xstr *xstr)
 {
-	strstream *sst;
-	sst = NEW(strstream);
+	StrStream *sst;
+	sst = NEW(StrStream);
 	sst->type = SSTR_XSTR;
 	sst->src.xstr = xstr;
 	sst->pos = 0;
@@ -87,10 +87,10 @@ strstream *strstream_open_xstr(xstr *xstr)
 
 }
 
-strstream *strstream_open_file(char *filename)
+StrStream *strstream_open_file(char *filename)
 {
-	strstream *sst;
-	sst = NEW(strstream);
+	StrStream *sst;
+	sst = NEW(StrStream);
 	sst->type = SSTR_FILE;
 	sst->src.file = fopen(filename, "r");
 	sst->pos = 0;
@@ -99,10 +99,10 @@ strstream *strstream_open_file(char *filename)
 }
 
 
-strstream *strstream_open_xfile(char *filename, size_t bytes_per_char)
+StrStream *strstream_open_xfile(char *filename, size_t bytes_per_char)
 {
-	strstream *sst;
-	sst = NEW(strstream);
+	StrStream *sst;
+	sst = NEW(StrStream);
 	sst->type = SSTR_XFILE;
 	sst->bytes_per_char = bytes_per_char;
 	sst->src.file = fopen(filename, "rb");
@@ -111,13 +111,13 @@ strstream *strstream_open_xfile(char *filename, size_t bytes_per_char)
 }
 
 
-size_t strstream_sizeof_char(strstream *sst)
+size_t strstream_sizeof_char(StrStream *sst)
 {
 	return sst->bytes_per_char;
 }
 
 
-void strstream_reset(strstream *sst)
+void strstream_reset(StrStream *sst)
 {
 	switch (sst->type) {
 	case SSTR_STR:
@@ -135,7 +135,7 @@ void strstream_reset(strstream *sst)
 	}
 }
 
-bool strstream_end(strstream *sst)
+bool strstream_end(StrStream *sst)
 {
 	switch (sst->type) {
 	case SSTR_STR:
@@ -155,14 +155,14 @@ bool strstream_end(strstream *sst)
 	}
 }
 
-xchar_t strstream_getc(strstream *sst)
+xchar strstream_getc(StrStream *sst)
 {
 	switch (sst->type) {
 	case SSTR_STR:
 		if (sst->pos >= sst->slen)
-			return (xchar_t)EOF;
+			return (xchar)EOF;
 		else
-			return (xchar_t)sst->src.str[sst->pos++];
+			return (xchar)sst->src.str[sst->pos++];
 		break;
 	case SSTR_FILE:
 		return fgetc(sst->src.file);
@@ -175,8 +175,8 @@ xchar_t strstream_getc(strstream *sst)
 		break;
 	case SSTR_XFILE:
 		;
-		xchar_t ret = 0;
-		fread(&ret, sizeof(xchar_t),  1, sst->src.file);
+		xchar ret = 0;
+		fread(&ret, sizeof(xchar),  1, sst->src.file);
 		return ret;
 		break;
 	default:
@@ -184,7 +184,7 @@ xchar_t strstream_getc(strstream *sst)
 	}
 }
 
-size_t strstream_reads(strstream *sst, char *dest, size_t n)
+size_t strstream_reads(StrStream *sst, char *dest, size_t n)
 {
 	size_t nread;
 	switch (sst->type) {
@@ -205,7 +205,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n)
 
 
 
-size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
+size_t strstream_readxs(StrStream *sst, xstr *dest, size_t n)
 {
 	size_t nread;
 	switch (sst->type) {
@@ -217,7 +217,7 @@ size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 		break;
 	case SSTR_XFILE:
 		;
-		xchar_t c;
+		xchar c;
 		size_t bpc = xstr_sizeof_char(dest);
 		size_t nread = 0;
 		while (nread < n) {
@@ -234,7 +234,7 @@ size_t strstream_readxs(strstream *sst, xstr *dest, size_t n)
 }
 
 
-void strstream_close(strstream *sst)
+void strstream_close(StrStream *sst)
 {
 	if (sst == NULL) return;
 	switch (sst->type) {

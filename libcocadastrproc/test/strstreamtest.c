@@ -55,7 +55,7 @@ void test_strstream_getc(CuTest *tc)
 {
 	strstream_test_setup(tc);
 
-	strstream *ssst, *fsst;
+	StrStream *ssst, *fsst;
 	size_t i;
 	int c;
 
@@ -90,7 +90,7 @@ void test_strstream_reads(CuTest *tc)
 {
 	strstream_test_setup(tc);
 
-	strstream *ssst, *fsst;
+	StrStream *ssst, *fsst;
 	size_t dlen = 7;
 	char *dest = cstr_new(slen);
 	char *exp = cstr_new(slen);

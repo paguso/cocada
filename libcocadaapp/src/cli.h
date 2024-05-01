@@ -244,16 +244,16 @@ typedef enum {
 	ARG_DIR = 7,   /* Directory type (no validation, used for
 						descriptive/documentation purposes) */
 	ARG_CHOICE = 8 /* Finite set of string alternatives */
-} cliargtype;
+} CLIArgType;
 
 
 /**
- * @brief Does a CLI option need to bee used on each call?
+ * @brief Tells whether an option has to be used on each call.
  */
 typedef enum {
 	OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
 	OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
-} clioptneed;
+} CLIOptNecessity;
 
 
 /**
@@ -262,7 +262,7 @@ typedef enum {
 typedef enum {
 	OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
 	OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
-} clioptmultiplicity;
+} CLIOptMultiplicity;
 
 
 /**
@@ -274,11 +274,11 @@ typedef enum {
 /**
  * @brief CLI Option type (opaque)
  */
-typedef struct _cliopt cliopt;
+typedef struct _CLIOpt CLIOpt;
 
 
 /**
- * @brief Option combo type which specifies how groups of inderdependent
+ * @brief Option combo type which specifies how groups of interdependent
  * options should be used together.
  */
 typedef enum {
@@ -286,13 +286,13 @@ typedef enum {
 	ALL_OF,		/**< All of the options in the combo should be used. **/
 	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
 	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
-} clioptcombotype;
+} CLIOptComboType;
 
 
 /**
  * @brief CLI Positional argument type (opaque)
  */
-typedef struct _cliarg cliarg;
+typedef struct _CLIArg CLIArg;
 
 
 /**
@@ -305,7 +305,7 @@ typedef struct _cliarg cliarg;
  * Currently only one level of program nesting is supported (subprograms
  * cannot contain sub-subprograms),
  */
-typedef struct _cliparser cliparser;
+typedef struct _CLIParser CLIParser;
 
 
 /**
@@ -315,7 +315,7 @@ typedef struct _cliparser cliparser;
  * @param longname		(**no transfer**) The multi-character distinct name
  * @param help			(**no transfer**) A short description of the option
  * 						used for help messages.
- * @param need			Is the option use mandatory?
+ * @param necess			Is the option use mandatory?
  * @param multiplicity	Can the option be declared multiple times?
  * @param type			The type of the option values (ir any)
  * @param min_val_no	The minimum number of option values
@@ -332,13 +332,13 @@ typedef struct _cliparser cliparser;
  *   a string of alphanumeric chars, dash '-' or underscores '_')
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @p type == ARG_NONE and vice versa (iff)
- * - If @p need == OPT_REQUIRED, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
+ * - If @p necess == OPT_REQUIRED, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @p multiplicity == OPT_MULTIPLE, then @p max_val_no != 0 (equiv @p type != ARG_NONE)
  * - If @p type == ARG_CHOICE then @p choices must be a non-empty vector of strings with
  *   every member being a valid <id> according to the CLI grammar
  * - If @p max_val_no == 0 (equiv @p type == ARG_NONE), then @p multiplicity == OPT_SINGLE
- * - If @p need == OPT_REQUIRED, @p defaults is discarded
- * - If @p need == OPT_OPTIONAL, and @p defaults is given, it must have at least
+ * - If @p necess == OPT_REQUIRED, @p defaults is discarded
+ * - If @p necess == OPT_OPTIONAL, and @p defaults is given, it must have at least
  *   @p min_val_no and at most @p max_val_no elements. In such case, the type of @p defaults
  *   and the constraints that each of its elements must observe is given in the following table.
  *
@@ -354,9 +354,9 @@ typedef struct _cliparser cliparser;
  * ARG_CHOICE   | vec of heap-allocated char *  | elt must be equal to some member of choices
  *
  */
-cliopt *cliopt_new(char shortname,  char *longname, char *help,
-                   clioptneed need, clioptmultiplicity multiplicity,
-                   cliargtype type, int min_val_no, int max_val_no,
+CLIOpt *cliopt_new(char shortname,  char *longname, char *help,
+                   CLIOptNecessity necess, CLIOptMultiplicity multiplicity,
+                   CLIArgType type, int min_val_no, int max_val_no,
                    Vec *choices, Vec *defaults );
 
 
@@ -376,15 +376,15 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
  * clopt_new(shortname, longname, help, OPT_OPTIONAL, OPT_SINGLE, ARG_NONE, 0, 0, NULL, NULL )
  * ```
  */
-cliopt *cliopt_new_defaults(char shortname, char *longname, char *help);
+CLIOpt *cliopt_new_defaults(char shortname, char *longname, char *help);
 
 
 /**
  * @brief Creates a new short circuit (sc) option.
  * @see cliopt_new
  */
-cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
-                      cliargtype type, int min_val_no, int max_val_no,
+CLIOpt *cliopt_new_sc(char shortname,  char *longname, char *help,
+                      CLIArgType type, int min_val_no, int max_val_no,
                       Vec *choices, Vec *defaults );
 
 
@@ -392,13 +392,13 @@ cliopt *cliopt_new_sc(char shortname,  char *longname, char *help,
  * @brief Creates a new short circuit (sc) option with default settings.
  * @see cliopt_new_defaults
  */
-cliopt *cliopt_new_sc_defaults(char shortname,  char *longname, char *help);
+CLIOpt *cliopt_new_sc_defaults(char shortname,  char *longname, char *help);
 
 
 /**
  * @brief Returns the option shortname.
  */
-const char cliopt_shortname(const cliopt *opt);
+const char cliopt_shortname(const CLIOpt *opt);
 
 
 /**
@@ -409,7 +409,7 @@ const char cliopt_shortname(const cliopt *opt);
  * 				used for help messages.
  * @param type	The type of the argument.
  */
-cliarg *cliarg_new(char *name, char *help, cliargtype type);
+CLIArg *cliarg_new(char *name, char *help, CLIArgType type);
 
 
 /**
@@ -421,7 +421,7 @@ cliarg *cliarg_new(char *name, char *help, cliargtype type);
  * 				used for help messages.
  * @param type	The type of the argument.
  */
-cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
+CLIArg *cliarg_new_multi(char *name, char *help, CLIArgType type);
 
 
 /**
@@ -430,7 +430,7 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
  * @param help	(**no transfer**) A short description of the (sub)program
  * 				used for help messages.
  */
-cliparser *cliparser_new(char *name, char *help);
+CLIParser *cliparser_new(char *name, char *help);
 
 
 /**
@@ -444,7 +444,7 @@ void cliparser_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the name of a command parser
  */
-const char *cliparser_name(const cliparser *cmd);
+const char *cliparser_name(const CLIParser *cmd);
 
 
 /**
@@ -462,7 +462,7 @@ const char *cliparser_name(const cliparser *cmd);
  *   none of its choice values can be equal to a command
  *   or subcommand name of the @p cmd parser.
  */
-void cliparser_add_subcommand(cliparser *cmd, cliparser *subcmd);
+void cliparser_add_subcommand(CLIParser *cmd, CLIParser *subcmd);
 
 
 /**
@@ -476,7 +476,7 @@ void cliparser_add_subcommand(cliparser *cmd, cliparser *subcmd);
  * - if @p opt is of type ARG_CHOICE, then none of its choice values
  *   can be equal to any command or subcommand name of the parser @p cmd
  */
-void cliparser_add_option(cliparser *cmd, cliopt *opt);
+void cliparser_add_option(CLIParser *cmd, CLIOpt *opt);
 
 
 /**
@@ -486,7 +486,7 @@ void cliparser_add_option(cliparser *cmd, cliopt *opt);
  * @warning The combo specifies the dependencies between the options only,
  * and they must be independently added via ::cliparser_add_option.
  */
-void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n,
+void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, size_t n,
                                 ...);
 
 
@@ -496,14 +496,14 @@ void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n,
  * Ir
  *
  */
-void cliparser_add_pos_arg(cliparser *cmd, cliarg *arg);
+void cliparser_add_pos_arg(CLIParser *cmd, CLIArg *arg);
 
 
 /**
  * @brief Prints the automatically-generated help message of a program
  * 			to the standard output.
  */
-void cliparser_print_help(const cliparser *cmd);
+void cliparser_print_help(const CLIParser *cmd);
 
 
 /**
@@ -521,7 +521,7 @@ typedef enum {
 	INVALID_ARG_VAL,
 	INVALID_ARG_VAL_NO,
 	UNDEF_ERR
-} cliparse_err_code;
+} CLIParserErrCode;
 
 #define CLIPARSE_ERROR_BUFSZ 128
 
@@ -529,12 +529,12 @@ typedef enum {
  * CLI parse error result type.
  */
 typedef struct {
-	cliparse_err_code code;
+	CLIParserErrCode code;
 	char msg[CLIPARSE_ERROR_BUFSZ];
-} cliparse_error;
+} CLIParserError;
 
 
-DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
+DECL_RESULT_OK_ERR(CLIParser, CLIParser *, CLIParserError)
 
 /**
  * @brief Parses a program call.
@@ -586,8 +586,8 @@ DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
  * `3`, `4`, and `5`.
  *
  */
-RESULT_OK_ERR(cliparse) cliparser_parse(cliparser *cmd, int argc, char **argv,
-                                        bool exit_on_error);
+RESULT_OK_ERR(CLIParser) cliparser_parse(CLIParser *cmd, int argc, char **argv,
+        bool exit_on_error);
 
 
 //const char *cliparser_parse_status_msg(cliparser *cmd);
@@ -598,7 +598,7 @@ RESULT_OK_ERR(cliparse) cliparser_parse(cliparser *cmd, int argc, char **argv,
  * After parsing a call, if a subcommand was called, returns the
  * corresponding (populated) parser, else returns NULL.
  */
-const cliparser *cliparser_active_subcommand(const cliparser *cmd);
+const CLIParser *cliparser_active_subcommand(const CLIParser *cmd);
 
 
 /**
@@ -607,7 +607,7 @@ const cliparser *cliparser_active_subcommand(const cliparser *cmd);
  * After parsing a call, if an sc option was declared, returns the
  * corresponding (populated) cliopt, else returns NULL.
  */
-const cliopt *cliparser_active_sc_option(const cliparser *cmd);
+const CLIOpt *cliparser_active_sc_option(const CLIParser *cmd);
 
 
 /**
@@ -632,7 +632,7 @@ const cliopt *cliparser_active_sc_option(const cliparser *cmd);
  * vector with with two child vectors, the first with three long ints
  * and the second with two long ints.
  */
-const Vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
+const Vec *cliparser_opt_val_from_shortname(const CLIParser *cmd,
         char shortname);
 
 
@@ -645,7 +645,7 @@ const Vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
  * @see cliparser_opt_val_from_shortname
  *
  */
-const Vec *cliparser_opt_val_from_longname(const cliparser *cmd,
+const Vec *cliparser_opt_val_from_longname(const CLIParser *cmd,
         char *longname);
 
 
@@ -661,7 +661,7 @@ const Vec *cliparser_opt_val_from_longname(const cliparser *cmd,
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */
-const Vec *cliparser_arg_val_from_pos(const cliparser *cmd, size_t pos);
+const Vec *cliparser_arg_val_from_pos(const CLIParser *cmd, size_t pos);
 
 
 

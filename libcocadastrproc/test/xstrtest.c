@@ -50,7 +50,7 @@ void test_xstr_get_set(CuTest *tc)
 }
 
 
-void print_int16(FILE *stream, xchar_t c)
+void print_int16(FILE *stream, xchar c)
 {
 	fprintf(stream, "{%d}", c);
 }
@@ -61,20 +61,20 @@ void test_xstr_format(CuTest *tc)
 	memdbg_reset();
 	size_t l = 26;
 	xstr *xs = xstr_new(1);
-	for (xchar_t i = 65; i < 65 + l; i++) {
+	for (xchar i = 65; i < 65 + l; i++) {
 		xstr_push(xs, i);
 	}
-	xstrformat *fmt = xstrformat_new_ascii(xs);
-	format_fprint(xstrformat_as_Format(fmt), stdout);
+	xstrFormat *fmt = xstrformat_new_ascii(xs);
+	format_fprint(xstrFormat_as_Format(fmt), stdout);
 	xstrformat_free(fmt);
 	xstr_free(xs);
 
 	xs = xstr_new(2);
-	for (xchar_t i = 65; i < 65 + l; i++) {
+	for (xchar i = 65; i < 65 + l; i++) {
 		xstr_push(xs, i);
 	}
 	fmt = xstrformat_new(xs);
-	format_fprint(xstrformat_as_Format(fmt), stdout);
+	format_fprint(xstrFormat_as_Format(fmt), stdout);
 	xstrformat_free(fmt);
 	xstr_free(xs);
 	CuAssert(tc, "memory leak.", memdbg_is_empty());

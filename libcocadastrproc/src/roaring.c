@@ -58,7 +58,7 @@ typedef struct {
 } ctnr_t;
 
 
-struct _roaringbitvec {
+struct _RoaringBitVec {
 	size_t len;
 	size_t ncntrs;
 	ctnr_t *ctnrs;
@@ -66,9 +66,9 @@ struct _roaringbitvec {
 };
 
 
-size_t roaringbitvec_memsize(roaringbitvec *self)
+size_t roaringbitvec_memsize(RoaringBitVec *self)
 {
-	size_t ret = sizeof(struct _roaringbitvec);
+	size_t ret = sizeof(struct _RoaringBitVec);
 	ret += self->ncntrs * sizeof(ctnr_t);
 	for (size_t i = 0; i < self->ncntrs; i++) {
 		ctnr_t *ctnr = self->ctnrs + i;
@@ -250,7 +250,7 @@ size_t bitvecctnr_select(ctnr_t *ctnr, bool bit, size_t rank)
 }
 
 
-static size_t ctnr_card(roaringbitvec *self,  size_t ctnr_index)
+static size_t ctnr_card(RoaringBitVec *self,  size_t ctnr_index)
 {
 	return self->ctnrs[ctnr_index].card;
 }
@@ -258,9 +258,9 @@ static size_t ctnr_card(roaringbitvec *self,  size_t ctnr_index)
 
 static const uint32_t ZERO32 = 0;
 
-roaringbitvec *roaringbitvec_new(uint32_t n)
+RoaringBitVec *roaringbitvec_new(uint32_t n)
 {
-	roaringbitvec *ret = NEW(roaringbitvec);
+	RoaringBitVec *ret = NEW(RoaringBitVec);
 	ret->len = n;
 	ret->ncntrs = (size_t)DIVCEIL(n, BITVEC_SIZE);
 	ret->ctnrs = calloc(ret->ncntrs, sizeof(ctnr_t));
@@ -275,9 +275,9 @@ roaringbitvec *roaringbitvec_new(uint32_t n)
 }
 
 
-roaringbitvec *roaringbitvec_new_from_bitarr(byte_t *b, uint32_t n)
+RoaringBitVec *roaringbitvec_new_from_bitarr(byte_t *b, uint32_t n)
 {
-	roaringbitvec *ret = roaringbitvec_new(n);
+	RoaringBitVec *ret = roaringbitvec_new(n);
 	for (size_t i = 0; i < n; i++) {
 		if (bitarr_get_bit(b, i)) {
 			roaringbitvec_set(ret, i, 1);
@@ -287,7 +287,7 @@ roaringbitvec *roaringbitvec_new_from_bitarr(byte_t *b, uint32_t n)
 }
 
 
-void roaringbitvec_free(roaringbitvec *self)
+void roaringbitvec_free(RoaringBitVec *self)
 {
 	for (size_t i = 0; i < self->ncntrs; i++) {
 		switch (self->ctnrs[i].type) {
@@ -307,26 +307,26 @@ void roaringbitvec_free(roaringbitvec *self)
 }
 
 
-size_t roaringbitvec_len(roaringbitvec *self)
+size_t roaringbitvec_len(RoaringBitVec *self)
 {
 	return self->len;
 }
 
 
-size_t roaringbitvec_card(roaringbitvec *self)
+size_t roaringbitvec_card(RoaringBitVec *self)
 {
 	return self->len ? segtree_range_qry_uint32_t(self->count_st, 0,
 	        self->ncntrs) : 0;
 }
 
 
-size_t roaringbitvec_count(roaringbitvec *self, bool bit)
+size_t roaringbitvec_count(RoaringBitVec *self, bool bit)
 {
 	return bit ? roaringbitvec_card(self) : self->len - roaringbitvec_card(self);
 }
 
 
-void roaringbitvec_set(roaringbitvec *self, size_t pos, bool val)
+void roaringbitvec_set(RoaringBitVec *self, size_t pos, bool val)
 {
 	assert(pos < self->len);
 	size_t bucket = MSB(pos);
@@ -363,7 +363,7 @@ void roaringbitvec_set(roaringbitvec *self, size_t pos, bool val)
 }
 
 
-bool roaringbitvec_get(roaringbitvec *self, size_t pos)
+bool roaringbitvec_get(RoaringBitVec *self, size_t pos)
 {
 	assert(pos < self->len);
 	size_t bucket = MSB(pos);
@@ -387,7 +387,7 @@ bool roaringbitvec_get(roaringbitvec *self, size_t pos)
 }
 
 
-void roaringbitvec_fit(roaringbitvec *self)
+void roaringbitvec_fit(RoaringBitVec *self)
 {
 	for (size_t i = 0; i < self->ncntrs; i++) {
 		ctnr_t *ctnr = self->ctnrs + i;
@@ -407,7 +407,7 @@ void roaringbitvec_fit(roaringbitvec *self)
 }
 
 
-size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos)
+size_t roaringbitvec_rank1(RoaringBitVec *self, size_t pos)
 {
 	pos = MIN(self->len, pos);
 	size_t bucket = MSB(pos);
@@ -431,13 +431,13 @@ size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos)
 }
 
 
-size_t roaringbitvec_rank0(roaringbitvec *self, size_t pos)
+size_t roaringbitvec_rank0(RoaringBitVec *self, size_t pos)
 {
 	return MIN(self->len, pos) - roaringbitvec_rank1(self, pos);
 }
 
 
-size_t roaringbitvec_rank(roaringbitvec *self, bool bit, size_t pos)
+size_t roaringbitvec_rank(RoaringBitVec *self, bool bit, size_t pos)
 {
 	return bit ? roaringbitvec_rank1(self, pos) : roaringbitvec_rank0(self, pos);
 }
@@ -447,7 +447,7 @@ size_t roaringbitvec_rank(roaringbitvec *self, bool bit, size_t pos)
 #define BKTRANK1(b) segtree_range_qry_uint32_t(self->count_st, 0, (b))
 #define BKTRANK(bkt, bit) ((bit) ? BKTRANK1((bkt)) : BKTRANK0((bkt)))
 
-size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank)
+size_t roaringbitvec_select(RoaringBitVec *self, bool bit, size_t rank)
 {
 
 	if (rank >= roaringbitvec_count(self,
@@ -489,19 +489,19 @@ size_t roaringbitvec_select(roaringbitvec *self, bool bit, size_t rank)
 }
 
 
-size_t roaringbitvec_select0(roaringbitvec *self, size_t rank)
+size_t roaringbitvec_select0(RoaringBitVec *self, size_t rank)
 {
 	return roaringbitvec_select(self, 0, rank);
 }
 
 
-size_t roaringbitvec_select1(roaringbitvec *self, size_t rank)
+size_t roaringbitvec_select1(RoaringBitVec *self, size_t rank)
 {
 	return roaringbitvec_select(self, 1, rank);
 }
 
 
-void roaringbitvec_fprint(FILE *stream, roaringbitvec *self)
+void roaringbitvec_fprint(FILE *stream, RoaringBitVec *self)
 {
 	char *types[3] = {"EMPTY", "ARRAY", "BITVEC"};
 	fprintf(stream, "roaringbitvec@%p {\n", self);

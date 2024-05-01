@@ -37,7 +37,7 @@ typedef struct {
 } gk_qty ;
 
 
-struct __gksumm {
+struct _GKSumm {
 	Vec *vals;
 	Vec *qtys;
 	CmpFunc cmp;
@@ -46,9 +46,9 @@ struct __gksumm {
 };
 
 
-gksumm *gk_new(size_t typesize, CmpFunc cmp, double err)
+GKSumm *gk_new(size_t typesize, CmpFunc cmp, double err)
 {
-	gksumm *ret = NEW(gksumm);
+	GKSumm *ret = NEW(GKSumm);
 	ret->vals = vec_new(typesize);
 	ret->qtys = vec_new(sizeof(gk_qty));
 	void *inf = malloc(typesize);
@@ -87,7 +87,7 @@ static size_t succ(Vec *data, CmpFunc cmp, const void *val)
 }
 
 
-void gk_upd(gksumm *self, const void *val)
+void gk_upd(GKSumm *self, const void *val)
 {
 	self->total_qty++;
 	size_t succ_pos = succ(self->vals, self->cmp, val);
@@ -117,7 +117,7 @@ void gk_upd(gksumm *self, const void *val)
 }
 
 
-void gk_merge(gksumm *self, const gksumm *other)
+void gk_merge(GKSumm *self, const GKSumm *other)
 {
 	ERROR_ASSERT( self->cmp == other->cmp
 	              && self->err == other->err
@@ -167,7 +167,7 @@ void gk_merge(gksumm *self, const gksumm *other)
 }
 
 
-size_t gk_rank(gksumm *self, const void *val)
+size_t gk_rank(GKSumm *self, const void *val)
 {
 	if (vec_len(self->vals) == 1) {
 		return 0;
@@ -182,7 +182,7 @@ size_t gk_rank(gksumm *self, const void *val)
 }
 
 
-void gk_print(gksumm *self, FILE *stream, void (*print_val)(FILE *,
+void gk_print(GKSumm *self, FILE *stream, void (*print_val)(FILE *,
               const void *))
 {
 	size_t l = vec_len(self->vals);

@@ -42,7 +42,7 @@
 /**
  * String dBG type.
  */
-typedef struct _dbgraph dbgraph;
+typedef struct _BOSSdBG BOSSdBG;
 
 
 /**
@@ -55,66 +55,66 @@ typedef struct _dbgraph dbgraph;
  *        this string after padding.
  * @param k A stictly positive order.
  */
-dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k,
-                                  bool multigraph);
+BOSSdBG *bossdbg_new_from_str(Alphabet *ab, char *txt, size_t k,
+                              bool multigraph);
 
 
 /**
  * @brief Creates a dBG from a source stream.
  * @see bossbossdbg_new_from_string
  */
-dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
-                                      bool multigraph );
+BOSSdBG *bossdbg_new_from_stream( Alphabet *ab, StrStream *sst, size_t k,
+                                  bool multigraph );
 
 
 /**
  * @brief Destructor.
  */
-void bossdbg_free(dbgraph *g);
+void bossdbg_free(BOSSdBG *g);
 
 
 /**
  * @brief Returns the sentinel character of a given deBruijn graph.
  */
-char bossdbg_sentinel(dbgraph *g);
+char bossdbg_sentinel(BOSSdBG *g);
 
 
 /**
  * @brief Returns the input alphabet
  */
-alphabet *bossdbg_ab(dbgraph *g);
+Alphabet *bossdbg_ab(BOSSdBG *g);
 
 
 /**
  * @brief Returns the extended alphabet, including the sentinel
  * character of a given de Bruijn graph.
  */
-alphabet *bossdbg_ext_ab(dbgraph *g);
+Alphabet *bossdbg_ext_ab(BOSSdBG *g);
 
 
 /**
  * @brief Returns the number of distinct nodes of the dBG.
  */
-size_t bossdbg_nnodes(dbgraph *g);
+size_t bossdbg_nnodes(BOSSdBG *g);
 
 
 /**
  * @brief Returns the number of distinct edges of the dBG.
  */
-size_t bossdbg_nedges(dbgraph *g);
+size_t bossdbg_nedges(BOSSdBG *g);
 
 
 /**
  * @brief Returns the order of the dBG.
  */
-size_t bossdbg_k(dbgraph *g);
+size_t bossdbg_k(BOSSdBG *g);
 
 
 /**
  * @brief Returns whether the a node may have multiple outgoing edges with the
  *        same label.
  */
-bool bossdbg_is_multigraph(dbgraph *g);
+bool bossdbg_is_multigraph(BOSSdBG *g);
 
 
 /**
@@ -125,7 +125,7 @@ bool bossdbg_is_multigraph(dbgraph *g);
  * @param nrk The node rank. If nrk>=nnodes, the result is undefined.
  * @see bossdbg_node_rank
  */
-size_t bossdbg_node_id(dbgraph *g, size_t nrk);
+size_t bossdbg_node_id(BOSSdBG *g, size_t nrk);
 
 
 /**
@@ -136,7 +136,7 @@ size_t bossdbg_node_id(dbgraph *g, size_t nrk);
  *            undefined.
  * @see bossdbg_node_rank
  */
-size_t bossdbg_node_rank(dbgraph *g, size_t nid);
+size_t bossdbg_node_rank(BOSSdBG *g, size_t nid);
 
 
 /**
@@ -144,14 +144,14 @@ size_t bossdbg_node_rank(dbgraph *g, size_t nid);
  * @param nid The node id. If a nonexistant id is given, the result is
  *            the empty string.
  */
-void bossdbg_node_lbl(dbgraph *g, size_t nid, xstr *dest);
+void bossdbg_node_lbl(BOSSdBG *g, size_t nid, xstr *dest);
 
 
 /**
  * @brief Returns the outdegree of a node given its id.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t bossdbg_outdeg(dbgraph *g, size_t nid);
+size_t bossdbg_outdeg(BOSSdBG *g, size_t nid);
 
 
 /**
@@ -159,7 +159,7 @@ size_t bossdbg_outdeg(dbgraph *g, size_t nid);
  *        edge label @p c.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t bossdbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c);
+size_t bossdbg_lbl_outdeg(BOSSdBG *g, size_t nid, xchar c);
 
 
 /**
@@ -171,7 +171,7 @@ size_t bossdbg_lbl_outdeg(dbgraph *g, size_t nid, xchar_t c);
  * @param nid The id of the parent node.
  * @param c The outgoing edge label.
  */
-size_t bossdbg_child(dbgraph *g, size_t nid, xchar_t c);
+size_t bossdbg_child(BOSSdBG *g, size_t nid, xchar c);
 
 
 /**
@@ -180,12 +180,12 @@ size_t bossdbg_child(dbgraph *g, size_t nid, xchar_t c);
  * @param nid The node id of the child node. If a nonexistant id is given,
  *        the result is undefined.
  */
-size_t bossdbg_parent(dbgraph *g, size_t nid);
+size_t bossdbg_parent(BOSSdBG *g, size_t nid);
 
 
 /**
  * @brief Prints the dBG @p g to std output.
  */
-void  bossdbg_print(dbgraph *g);
+void  bossdbg_print(BOSSdBG *g);
 
 #endif

@@ -58,7 +58,7 @@ static inline llong size_t_char_at(void *str, size_t i)
 typedef llong (*char_at_fn)(void *, size_t);
 
 
-void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
+void build_sarr( void *str, size_t len, Alphabet *ab, size_t *sarr,
                  bool add_sentinel, char_at_fn char_at );
 
 
@@ -80,7 +80,7 @@ static void get_bkt_end( size_t *bkts, size_t *dest, size_t l)
 }
 
 
-static void init_LS( void *str, size_t len, alphabet *ab,
+static void init_LS( void *str, size_t len, Alphabet *ab,
                      BitVec *lsvec, BitVec *lmsvec, size_t *bkts,
                      bool add_sentinel, char_at_fn char_at)
 {
@@ -88,7 +88,7 @@ static void init_LS( void *str, size_t len, alphabet *ab,
 	byte_t ls, lastls;
 	int cmp;
 	for (size_t i = 1; i < len; i++) {
-		cmp = ab_cmp(ab, char_at(str, i - 1), char_at(str, i));
+		cmp = alphabet_cmp(ab, char_at(str, i - 1), char_at(str, i));
 		if (cmp == 0) {
 			continue;
 		}
@@ -96,7 +96,7 @@ static void init_LS( void *str, size_t len, alphabet *ab,
 		bitvec_push_n(lsvec, i - last, ls);
 		bitvec_push(lmsvec, (last > 0 && ls == S && lastls == L));
 		bitvec_push_n(lmsvec, (i - last - 1), 0);
-		bkts[ab_rank(ab, char_at(str, i - 1)) + add_sentinel] += (i - last);
+		bkts[alphabet_rank(ab, char_at(str, i - 1)) + add_sentinel] += (i - last);
 		last = i;
 		lastls = ls;
 	}
@@ -105,7 +105,7 @@ static void init_LS( void *str, size_t len, alphabet *ab,
 		bitvec_push_n(lsvec, len - last, L);
 		bitvec_push(lmsvec, (last > 0 && ls == S && lastls == L));
 		bitvec_push_n(lmsvec, (len - last - 1), 0);
-		bkts[ab_rank(ab, char_at(str, len - 1)) + add_sentinel] += (len - last);
+		bkts[alphabet_rank(ab, char_at(str, len - 1)) + add_sentinel] += (len - last);
 	}
 	// last run must be the sentinel
 	bitvec_push(lsvec, S);
@@ -114,50 +114,50 @@ static void init_LS( void *str, size_t len, alphabet *ab,
 }
 
 
-static void induce_L( void *str, alphabet *ab,
+static void induce_L( void *str, Alphabet *ab,
                       size_t *sarr, BitVec *ls,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
-	size_t l = ab_size(ab) + add_sentinel;
+	size_t l = alphabet_size(ab) + add_sentinel;
 	get_bkt_start(bkts, offsets, l);
 	size_t n = bitvec_len(ls);
 	for (size_t i = 0, j; i < n; i++) {
 		j = sarr[i];
 		if ( j != UNSET && j > 0 && bitvec_get_bit(ls, j - 1) == L ) {
 			j -= 1;
-			sarr[offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]++] = j;
+			sarr[offsets[alphabet_rank(ab, char_at(str, j)) + add_sentinel]++] = j;
 		}
 	}
 }
 
 
-static void induce_S( void *str, alphabet *ab,
+static void induce_S( void *str, Alphabet *ab,
                       size_t *sarr, BitVec *ls,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
-	size_t l = ab_size(ab) + add_sentinel;
+	size_t l = alphabet_size(ab) + add_sentinel;
 	get_bkt_end(bkts, offsets, l);
 	size_t n = bitvec_len(ls);
 	for (size_t i = n - 1, j; i > 0; i--) {
 		j = sarr[i];
 		if ( j != UNSET && j > 0 && bitvec_get_bit(ls, j - 1) == S ) {
 			j -= 1;
-			sarr[--offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]] = j;
+			sarr[--offsets[alphabet_rank(ab, char_at(str, j)) + add_sentinel]] = j;
 		}
 	}
 }
 
 
-static void sort_LMS( void *str, alphabet *ab,
+static void sort_LMS( void *str, Alphabet *ab,
                       size_t *sarr, BitVec *ls, BitVec *lms,
                       size_t *bkts, size_t *offsets,
                       bool add_sentinel, char_at_fn char_at)
 {
 	//assert(char_at != size_t_char_at || add_sentinel == false);
 	size_t n = bitvec_len(ls);
-	size_t l = ab_size(ab) + add_sentinel;
+	size_t l = alphabet_size(ab) + add_sentinel;
 
 	// 1. Sort LMS segments
 	get_bkt_end(bkts, offsets, l);
@@ -166,7 +166,7 @@ static void sort_LMS( void *str, alphabet *ab,
 		if (!bitvec_get_bit(lms, i)) {
 			continue;
 		}
-		sarr[--offsets[ab_rank(ab, char_at(str, i)) + add_sentinel]] = i;
+		sarr[--offsets[alphabet_rank(ab, char_at(str, i)) + add_sentinel]] = i;
 	}
 	//printf("1)\n");
 	//ARR_PRINT(sarr, SA, %zu, 0, n, 10, "");
@@ -261,7 +261,7 @@ static void sort_LMS( void *str, alphabet *ab,
 	else {
 		//printf("reducing\n");
 		//ARR_PRINT(red_str, red_str, %zu, 0, nlms, 10, "");
-		alphabet *red_ab = int_alphabet_new(ndifflms);
+		Alphabet *red_ab = alphabet_new_int_ab(ndifflms);
 		build_sarr(red_str, nlms, red_ab, red_sarr, 0, size_t_char_at);
 		alphabet_free(red_ab);
 	}
@@ -292,7 +292,7 @@ static void sort_LMS( void *str, alphabet *ab,
 	for (size_t i = nlms - 1, j; i > 0; i--) {
 		j = sarr[i];
 		sarr[i] = UNSET;
-		sarr[--offsets[ab_rank(ab, char_at(str, j)) + add_sentinel]] = j;
+		sarr[--offsets[alphabet_rank(ab, char_at(str, j)) + add_sentinel]] = j;
 	}
 	// Done. All LMS suffixes are sorted and correctly placed in the SA
 	//printf("10)\n");
@@ -305,10 +305,10 @@ static void sort_LMS( void *str, alphabet *ab,
  * If add_sentinel is false, the smallest char in the alphabet must occur
  * exactly once at the end of the string.
  */
-void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
+void build_sarr( void *str, size_t len, Alphabet *ab, size_t *sarr,
                  bool add_sentinel, char_at_fn char_at)
 {
-	size_t ab_sz = ab_size(ab);
+	size_t ab_sz = alphabet_size(ab);
 
 	BitVec *ls   = bitvec_new_with_capacity(len + add_sentinel);
 	BitVec *lms  = bitvec_new_with_capacity(len + add_sentinel);
@@ -345,9 +345,9 @@ void build_sarr( void *str, size_t len, alphabet *ab, size_t *sarr,
 }
 
 
-size_t *sais(char *str, size_t len, alphabet *ab)
+size_t *sais(char *str, size_t len, Alphabet *ab)
 {
-	ERROR_ASSERT(ab_type(ab) == CHAR_TYPE,
+	ERROR_ASSERT(alphabet_type(ab) == CHAR_TYPE,
 	             "Incompatible alphabet type for SA-IS");
 	if (len < 2) {
 		size_t *sarr = ARR_NEW(size_t, len + 1);
@@ -362,7 +362,7 @@ size_t *sais(char *str, size_t len, alphabet *ab)
 }
 
 
-size_t *sais_xstr(xstr *str, alphabet *ab)
+size_t *sais_xstr(xstr *str, Alphabet *ab)
 {
 	size_t len = xstr_len(str);
 	if (len < 2) {

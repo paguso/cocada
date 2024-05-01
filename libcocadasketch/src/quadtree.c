@@ -44,7 +44,7 @@ Quadrant encoding
 #define IS_SOUTH(QUAD) ( QUAD >> 1 )
 
 
-struct _quadtree {
+struct _QuadTree {
 	uint width;
 	uint height;
 	uint depth;
@@ -52,16 +52,16 @@ struct _quadtree {
 };
 
 
-typedef struct _quadtree_node {
+typedef struct  {
 	void *payload;
 	size_t first_chd;
-} quadtree_node;
+} QuadTreeNode;
 
 
-static quadtree_node DUMMY_NODE = {.payload = NULL, .first_chd = 0};
+static QuadTreeNode DUMMY_NODE = {.payload = NULL, .first_chd = 0};
 
 
-static size_t quadtree_node_new(quadtree *tree)
+static size_t quadtree_node_new(QuadTree *tree)
 {
 	size_t new_node_pos = vec_len(tree->nodes);
 	vec_push(tree->nodes, &DUMMY_NODE);
@@ -72,59 +72,59 @@ static size_t quadtree_node_new(quadtree *tree)
 }
 
 
-bool quadtree_node_is_leaf(quadtree *tree, size_t node)
+bool quadtree_node_is_leaf(QuadTree *tree, size_t node)
 {
-	return (((quadtree_node *) vec_get(tree->nodes, node))->first_chd) == 0;
+	return (((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd) == 0;
 }
 
 
-size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos pos)
+size_t quadtree_node_get_chd(QuadTree *tree, size_t node, QuadPos pos)
 {
-	size_t fch = ((quadtree_node *) vec_get(tree->nodes, node))->first_chd;
+	size_t fch = ((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd;
 	return (fch == 0) ? fch : fch + pos;
 }
 
 
-static size_t quadtree_node_get_or_ins_chd(quadtree *tree, size_t node,
-        quad_pos pos)
+static size_t quadtree_node_get_or_ins_chd(QuadTree *tree, size_t node,
+        QuadPos pos)
 {
-	size_t fchd = ((const quadtree_node *)vec_get(tree->nodes, node))->first_chd;
+	size_t fchd = ((const QuadTreeNode *)vec_get(tree->nodes, node))->first_chd;
 	if ( fchd == 0 ) {
 		fchd = quadtree_node_new(tree);
 	}
-	((quadtree_node *)vec_get_mut(tree->nodes, node))->first_chd = fchd;
+	((QuadTreeNode *)vec_get_mut(tree->nodes, node))->first_chd = fchd;
 	return fchd + pos;
 }
 
 
-const void *quadtree_node_get_data(quadtree *tree, size_t node)
+const void *quadtree_node_get_data(QuadTree *tree, size_t node)
 {
-	return (const void *)(((const quadtree_node *)vec_get(tree->nodes,
+	return (const void *)(((const QuadTreeNode *)vec_get(tree->nodes,
 	                       node))->payload);
 }
 
 
-void quadtree_node_set_data(quadtree *tree, size_t node, void *data)
+void quadtree_node_set_data(QuadTree *tree, size_t node, void *data)
 {
-	((quadtree_node *)vec_get_mut(tree->nodes, node))->payload = data;
+	((QuadTreeNode *)vec_get_mut(tree->nodes, node))->payload = data;
 }
 
 
 #define ROOT 3
 
-quadtree *quadtree_new(uint width, uint height, uint depth)
+QuadTree *quadtree_new(uint width, uint height, uint depth)
 {
-	quadtree *ret = NEW(quadtree);
+	QuadTree *ret = NEW(QuadTree);
 	ret->width = width;
 	ret->height = height;
 	ret->depth = depth;
-	ret->nodes = vec_new_with_capacity(sizeof(quadtree_node), 4);
+	ret->nodes = vec_new_with_capacity(sizeof(QuadTreeNode), 4);
 	quadtree_node_new(ret);
 	return ret;
 }
 
 
-void quadtree_fit(quadtree *tree)
+void quadtree_fit(QuadTree *tree)
 {
 	vec_fit(tree->nodes);
 }
@@ -133,7 +133,7 @@ void quadtree_fit(quadtree *tree)
 
 void quadtree_finalise(void *ptr, const Finaliser *fnr)
 {
-	quadtree *self = (quadtree *)ptr;
+	QuadTree *self = (QuadTree *)ptr;
 	Finaliser *vec_fnr =
 	    finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0)));
 	DESTROY(self->nodes, vec_fnr);
@@ -144,11 +144,11 @@ void quadtree_finalise(void *ptr, const Finaliser *fnr)
 
 #define SND_HALF(LEN) ((LEN) - ((LEN) / 2))
 
-static const rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0,
+static const Rectangle EMPTY_REC = {.top_left.x = 0, .top_left.y = 0,
                                     .width = 0, .height = 0
                                    };
 
-static rectangle rectangle_clip(rectangle rect, rectangle viewport)
+static Rectangle rectangle_clip(Rectangle rect, Rectangle viewport)
 {
 	if (rect.top_left.x + rect.width < viewport.top_left.x ||
 	        rect.top_left.x >= viewport.top_left.x + viewport.width ||
@@ -156,7 +156,7 @@ static rectangle rectangle_clip(rectangle rect, rectangle viewport)
 	        rect.top_left.y >= viewport.top_left.y + viewport.height) {
 		return EMPTY_REC;
 	}
-	rectangle clr;
+	Rectangle clr;
 	clr.top_left.x = MAX(rect.top_left.x, viewport.top_left.x);
 	clr.top_left.y = MAX(rect.top_left.y, viewport.top_left.y);
 	clr.width = MIN(rect.top_left.x + rect.width,
@@ -167,7 +167,7 @@ static rectangle rectangle_clip(rectangle rect, rectangle viewport)
 }
 
 
-void quadtree_ins(quadtree *tree, point2d p, void *payload,
+void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
                   quadtree_node_upd_func upd_func)
 {
 	WARN_ASSERT(p.x < tree->width,
@@ -179,11 +179,11 @@ void quadtree_ins(quadtree *tree, point2d p, void *payload,
 	}
 	size_t cur_node = ROOT;
 	upd_func(tree, cur_node, payload);
-	rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
-	point2d centre = {.x = rect.width / 2, .y = rect.height / 2};
+	Rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
+	Point2D centre = {.x = rect.width / 2, .y = rect.height / 2};
 	uint cur_depth = 0;
 	while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-		quad_pos pos = (((byte_t)(p.y >= centre.y)) << 1) | ((byte_t)(p.x >= centre.x));
+		QuadPos pos = (((byte_t)(p.y >= centre.y)) << 1) | ((byte_t)(p.x >= centre.x));
 		if (IS_EAST(pos)) {
 			rect.top_left.x = centre.x;
 			rect.width = SND_HALF(rect.width);
@@ -207,19 +207,19 @@ void quadtree_ins(quadtree *tree, point2d p, void *payload,
 }
 
 
-rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
+Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor)
 {
-	point2d bounds[2]; // top_left, bot_right
+	Point2D bounds[2]; // top_left, bot_right
 	bounds[0] = rect.top_left;
 	bounds[1].x = rect.top_left.x + rect.width;
 	bounds[1].y = rect.top_left.y + rect.height;
 	for (uint i = 0; i < 2; i++) {
-		rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
-		point2d centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
+		Rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
+		Point2D centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
 		uint cur_depth = 0;
 		while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-			quad_pos pos = (((byte_t)(bounds[i].y >= centre.y)) << 1) |
-			               ((byte_t)(bounds[i].x >= centre.x));
+			QuadPos pos = (((byte_t)(bounds[i].y >= centre.y)) << 1) |
+			              ((byte_t)(bounds[i].x >= centre.x));
 			if (IS_EAST(pos)) {
 				rect.top_left.x = centre.x;
 				rect.width = SND_HALF(rect.width);
@@ -238,7 +238,7 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 			centre.y = rect.top_left.y + FST_HALF(rect.height);
 			cur_depth++;
 		}
-		point2d rectbounds[2];
+		Point2D rectbounds[2];
 		rectbounds[0] = rect.top_left;
 		rectbounds[1].x = rect.top_left.x + rect.width;
 		rectbounds[1].y = rect.top_left.x + rect.height;
@@ -259,14 +259,14 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor)
 			}
 		}
 	}
-	rectangle ret = {.top_left = bounds[0], .width = bounds[1].x - bounds[0].x, .height = bounds[1].y - bounds[0].y};
+	Rectangle ret = {.top_left = bounds[0], .width = bounds[1].x - bounds[0].x, .height = bounds[1].y - bounds[0].y};
 	return ret;
 }
 
 
-static void quadtree_qry_node(quadtree *tree, size_t node,
-                              rectangle search_area,
-                              rectangle rect, quadtree_node_qry_func qry_func, void *dest, bool backtrack)
+static void quadtree_qry_node(QuadTree *tree, size_t node,
+                              Rectangle search_area,
+                              Rectangle rect, quadtree_node_qry_func qry_func, void *dest, bool backtrack)
 {
 	if (node == 0) {
 		return;
@@ -285,17 +285,17 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 		return;
 	}
 
-	point2d centre = {.x = search_area.top_left.x + FST_HALF(search_area.width),
+	Point2D centre = {.x = search_area.top_left.x + FST_HALF(search_area.width),
 	                  .y = search_area.top_left.y + FST_HALF(search_area.height)
 	                 };
 
 	if (rect.top_left.x < centre.x && rect.top_left.y < centre.y) {
-		rectangle NW_area = {
+		Rectangle NW_area = {
 			.top_left = search_area.top_left,
 			.width = FST_HALF(search_area.width),
 			.height = FST_HALF(search_area.height)
 		};
-		rectangle NW_rect = {
+		Rectangle NW_rect = {
 			.top_left = rect.top_left,
 			.width = MIN(rect.width, centre.x - rect.top_left.x),
 			.height = MIN(rect.height,  centre.y - rect.top_left.y)
@@ -305,13 +305,13 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 	}
 	if (rect.top_left.x + rect.width >= centre.x
 	        && rect.top_left.y < centre.y) {
-		rectangle NE_area = {
+		Rectangle NE_area = {
 			.top_left.x = centre.x,
 			.top_left.y = search_area.top_left.y,
 			.width = SND_HALF(search_area.width),
 			.height = FST_HALF(search_area.height)
 		};
-		rectangle NE_rect = {
+		Rectangle NE_rect = {
 			.top_left.x = MAX(rect.top_left.x, centre.x),
 			.top_left.y = rect.top_left.y,
 			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
@@ -322,13 +322,13 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 	}
 	if (rect.top_left.x < centre.x
 	        && rect.top_left.y + rect.height >= centre.y) {
-		rectangle SW_area = {
+		Rectangle SW_area = {
 			.top_left.x = search_area.top_left.x,
 			.top_left.y = centre.y,
 			.width = FST_HALF(search_area.width),
 			.height = SND_HALF(search_area.height)
 		};
-		rectangle SW_rect = {
+		Rectangle SW_rect = {
 			.top_left.x = rect.top_left.x,
 			.top_left.y = MAX(rect.top_left.y, centre.y),
 			.width = MIN(rect.width, centre.x - rect.top_left.x),
@@ -339,12 +339,12 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 	}
 	if (rect.top_left.x + rect.width >= centre.x
 	        && rect.top_left.y + rect.height >= centre.y) {
-		rectangle SE_area = {
+		Rectangle SE_area = {
 			.top_left = centre,
 			.width = SND_HALF(search_area.width),
 			.height = SND_HALF(search_area.height)
 		};
-		rectangle SE_rect = {
+		Rectangle SE_rect = {
 			.top_left.x = MAX(rect.top_left.x, centre.x),
 			.top_left.y = MAX(rect.top_left.y, centre.y),
 			.width = MIN(rect.width, rect.top_left.x + rect.width - centre.x),
@@ -356,9 +356,9 @@ static void quadtree_qry_node(quadtree *tree, size_t node,
 }
 
 
-void quadtree_qry(quadtree *tree, rectangle rect,
+void quadtree_qry(QuadTree *tree, Rectangle rect,
                   quadtree_node_qry_func qry_func, void *dest, bool backtrack)
 {
-	rectangle search_area = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
+	Rectangle search_area = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
 	quadtree_qry_node(tree, ROOT, search_area, rect, qry_func, dest, backtrack);
 }

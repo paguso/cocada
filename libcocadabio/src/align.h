@@ -110,7 +110,7 @@ void fprintf_alignment(FILE *out, const char *qry, size_t qry_from,
 
 
 /**
- * @brief Simplifies a CIGAR strbuf in place by merging adjacent
+ * @brief Simplifies a CIGAR StrBuf in place by merging adjacent
  * sequences of the same operation.
  */
 void compress_cigar(StrBuf *cigar);

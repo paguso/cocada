@@ -23,6 +23,7 @@
 #define QUADTREE_H
 
 #include "coretype.h"
+#include "new.h"
 
 /**
  * @file quadtree.h
@@ -36,7 +37,7 @@
  * no subdivision, depth=1 means one subdivision, and so forth.
  * The diagram below illustrates a complete quadtree with depth=2.
  *
- * ```
+ * ```EEE
  *  +-------+-------+-------+-------+
  *  |       |       |       |       |
  *  |   F   |   G   |   J   |   K   |
@@ -137,43 +138,43 @@ typedef enum {
 	NE, /**< Northeast = top-right */
 	SW, /**< Southwest = bottom-left */
 	SE  /**< Southeast = bottom-right */
-} quad_pos;
+} QuadPos;
 
 
 /**
  * @brief Quadtree opaque type.
  */
-typedef struct _quadtree quadtree;
+typedef struct _QuadTree QuadTree;
 
 
 /**
  * @brief Returns the child of a node.
  */
-size_t quadtree_node_get_chd(quadtree *tree, size_t node, quad_pos pos);
+size_t quadtree_node_get_chd(QuadTree *tree, size_t node, QuadPos pos);
 
 
 /**
  * @brief Gets the node data (payload).
  */
-const void *quadtree_node_get_data(quadtree *tree, size_t node);
+const void *quadtree_node_get_data(QuadTree *tree, size_t node);
 
 
 /**
  * @brief Sets the node data (payload).
  */
-void quadtree_node_set_data(quadtree *tree, size_t node, void *data);
+void quadtree_node_set_data(QuadTree *tree, size_t node, void *data);
 
 
 /**
  * @brief Node update callback function type
  */
-typedef void (*quadtree_node_upd_func)(quadtree *tree, size_t node, void *data);
+typedef void (*quadtree_node_upd_func)(QuadTree *tree, size_t node, void *data);
 
 
 /**
  * @brief Node query callback function type
  */
-typedef void (*quadtree_node_qry_func)(quadtree *tree, size_t node, void *dest);
+typedef void (*quadtree_node_qry_func)(QuadTree *tree, size_t node, void *dest);
 
 
 /**
@@ -182,17 +183,17 @@ typedef void (*quadtree_node_qry_func)(quadtree *tree, size_t node, void *dest);
 typedef struct {
 	uint x;
 	uint y;
-} point2d;
+} Point2D;
 
 
 /**
  * @brief Discretised rectangle type.
  */
 typedef struct {
-	point2d top_left;
+	Point2D top_left;
 	uint width;
 	uint height;
-} rectangle;
+} Rectangle;
 
 
 /**
@@ -236,7 +237,7 @@ typedef enum {
  *  + - - - + - - - + - - - + - - - +
  * ```
  */
-rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor);
+Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor);
 
 
 /**
@@ -244,7 +245,7 @@ rectangle rectangle_snap_to_grid(quadtree *tree, rectangle rect, snap_t anchor);
  * maximum depth. However this may not be achieved if rectangles with
  * side 1
  */
-quadtree *quadtree_new(uint width, uint height, uint depth);
+QuadTree *quadtree_new(uint width, uint height, uint depth);
 
 
 /**
@@ -268,7 +269,7 @@ void quadtree_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Adjusts internal representation trimming off unused memory
  */
-void quadtree_fit(quadtree *tree);
+void quadtree_fit(QuadTree *tree);
 
 
 /**
@@ -316,7 +317,7 @@ void quadtree_fit(quadtree *tree);
  *
  * ```
  */
-void quadtree_ins(quadtree *tree, point2d pt, void *payload,
+void quadtree_ins(QuadTree *tree, Point2D pt, void *payload,
                   quadtree_node_upd_func upd_func);
 
 
@@ -383,7 +384,7 @@ void quadtree_ins(quadtree *tree, point2d pt, void *payload,
  *
  *
  */
-void quadtree_qry(quadtree *tree, rectangle area,
+void quadtree_qry(QuadTree *tree, Rectangle area,
                   quadtree_node_qry_func qry_func, void *dest, bool backtrack);
 
 #endif

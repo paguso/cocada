@@ -28,11 +28,12 @@
 #include "arrays.h"
 #include "cli.h"
 #include "cstrutil.h"
+#include "result.h"
 #include "vec.h"
 #include "new.h"
 #include "errlog.h"
 
-static cliparser *cmd;
+static CLIParser *cmd;
 
 
 static void test_setup()
@@ -111,7 +112,7 @@ static void test_setup()
 	                      cliarg_new_multi("arg3", "third multiple file argument", ARG_FILE)
 	                     );
 
-	cliparser *scmd1 = cliparser_new("subcommand1", "first subcommand");
+	CLIParser *scmd1 = cliparser_new("subcommand1", "first subcommand");
 	cliparser_add_option(scmd1,
 	                     cliopt_new_defaults(
 	                         'j',
@@ -210,7 +211,7 @@ void test_cli_parse(CuTest *tc)
 	    "test -d somestring  subcommand1 -k true --lll true 0 -n some_string A 12.75 file1.c file2.c";
 	char **argv = make_argv(call, &argc);
 
-	cliparseOkErrResult result = cliparser_parse(cmd, argc, argv, false);
+	RESULT_OK_ERR(CLIParser) result = cliparser_parse(cmd, argc, argv, false);
 	CuAssert(tc, "CLI Parse error", result.ok);
 
 	freeargv(argc, argv);

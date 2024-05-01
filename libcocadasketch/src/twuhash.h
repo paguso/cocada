@@ -46,20 +46,20 @@
  */
 
 
-typedef struct _twuhash twuhash;
+typedef struct _TWUHash TWUHash;
 
 /**
  * @brief Creates a new random hash function from the two-way
  * universal family mapping @p in_bits to @p out_bits bits.
  * @warning We must have 0 < @p in_bits, @p out_bits <= 64
  */
-twuhash *twuhash_new(byte_t in_bits, byte_t out_bits);
+TWUHash *twuhash_new(byte_t in_bits, byte_t out_bits);
 
 /**
  * @brief Hashes a value @p x with @p h:m->n bits.
  * Only the lowest m bits of @p x are considered.
  */
-uint64_t twuhash_hash(twuhash *h, uint64_t x);
+uint64_t twuhash_hash(TWUHash *h, uint64_t x);
 
 
 #endif

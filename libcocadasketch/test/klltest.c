@@ -38,7 +38,7 @@ static void print_int(FILE *stream, const void *val)
 void test_kll_upd(CuTest *tc)
 {
 	double err = 0.01;
-	kllsumm *summ = kll_new(sizeof(int), cmp_int, err);
+	KLLSumm *summ = kll_new(sizeof(int), cmp_int, err);
 	kll_print(summ, stderr, print_int);
 	size_t n = 10000;
 	int univ = 300;
@@ -95,7 +95,7 @@ void test_kll_upd_obj (CuTest *tc)
 	int n = 10000;
 	int univ = 300;
 	double err = 0.1;
-	kllsumm *summ = kll_new(sizeof(kllsumm *), cmp_kll_obj, err);
+	KLLSumm *summ = kll_new(sizeof(KLLSumm *), cmp_kll_obj, err);
 	for (int i = 0; i < n; i++) {
 		int k = rand_range_int(0, univ);
 		kll_obj *obj = NEW(kll_obj);

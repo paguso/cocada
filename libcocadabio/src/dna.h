@@ -24,7 +24,7 @@
 
 #include "alphabet.h"
 
-alphabet *dna_ab_new();
+Alphabet *dna_ab_new();
 
 
 #endif
