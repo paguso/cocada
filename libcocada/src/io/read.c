@@ -54,13 +54,13 @@ int read_ungetc(Read *self)
 }
 
 
-size_t read_read_str(Read *self, char *dest, size_t n)
+usize read_read_str(Read *self, char *dest, usize n)
 {
 	return self->vt->read_str(self, dest, n);
 }
 
 
-size_t read_read_str_until(Read *self, char *dest, char delim)
+usize read_read_str_until(Read *self, char *dest, char delim)
 {
 	return self->vt->read_str_until(self, dest, delim);
 }

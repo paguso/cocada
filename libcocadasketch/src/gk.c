@@ -32,8 +32,8 @@
 
 
 typedef struct {
-	size_t qty;
-	size_t delta;
+	usize qty;
+	usize delta;
 } gk_qty ;
 
 
@@ -42,11 +42,11 @@ struct _GKSumm {
 	Vec *qtys;
 	CmpFunc cmp;
 	double err;
-	size_t total_qty;
+	usize total_qty;
 };
 
 
-GKSumm *gk_new(size_t typesize, CmpFunc cmp, double err)
+GKSumm *gk_new(usize typesize, CmpFunc cmp, double err)
 {
 	GKSumm *ret = NEW(GKSumm);
 	ret->vals = vec_new(typesize);
@@ -64,17 +64,17 @@ GKSumm *gk_new(size_t typesize, CmpFunc cmp, double err)
 }
 
 
-static size_t succ(Vec *data, CmpFunc cmp, const void *val)
+static usize succ(Vec *data, CmpFunc cmp, const void *val)
 {
 	if ( vec_len(data) == 0
 	        || cmp(val, vec_get(data, 0)) < 0 ) { // treat last elt as INFINITY
 		return 0;
 	}
 	else {
-		size_t l = 0;
-		size_t r = vec_len(data) - 1;
+		usize l = 0;
+		usize r = vec_len(data) - 1;
 		while ( r - l > 1 ) {
-			size_t m = (l + r) / 2;
+			usize m = (l + r) / 2;
 			if ( cmp(val, vec_get(data, m)) < 0 ) {
 				r = m;
 			}
@@ -90,9 +90,9 @@ static size_t succ(Vec *data, CmpFunc cmp, const void *val)
 void gk_upd(GKSumm *self, const void *val)
 {
 	self->total_qty++;
-	size_t succ_pos = succ(self->vals, self->cmp, val);
+	usize succ_pos = succ(self->vals, self->cmp, val);
 	gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
-	const size_t qty_thres = ceil(2.0 * self->err * self->total_qty);
+	const usize qty_thres = ceil(2.0 * self->err * self->total_qty);
 	if ( succ_qty->qty + succ_qty->delta + 1 < qty_thres ) {
 		succ_qty->qty++;
 	}
@@ -103,7 +103,7 @@ void gk_upd(GKSumm *self, const void *val)
 
 		gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, 0);
 		gk_qty *iplus1th_qty;
-		for (size_t i = 0, l = vec_len(self->vals); i < l - 1; i++ ) {
+		for (usize i = 0, l = vec_len(self->vals); i < l - 1; i++ ) {
 			iplus1th_qty = (gk_qty *) vec_get(self->qtys, i + 1);
 			if (ith_qty->qty + iplus1th_qty->qty + iplus1th_qty->delta < qty_thres) {
 				iplus1th_qty->qty += ith_qty->qty;
@@ -123,7 +123,7 @@ void gk_merge(GKSumm *self, const GKSumm *other)
 	              && self->err == other->err
 	              && vec_typesize(self->vals) == vec_typesize(other->vals),
 	              "Incompatible GK sketches." );
-	size_t i = 0, j = 0;
+	usize i = 0, j = 0;
 	gk_qty *i_qty = (gk_qty *) vec_get(self->qtys, i);
 	gk_qty *j_qty = (gk_qty *) vec_get(other->qtys, j);
 	while (i < ( vec_len(self->vals) - 1 ) && j < ( vec_len(other->vals) - 1 ) ) {
@@ -150,7 +150,7 @@ void gk_merge(GKSumm *self, const GKSumm *other)
 		j_qty = (gk_qty *) vec_get(other->qtys, j);
 	}
 	self->total_qty += other->total_qty;
-	const size_t qty_thres = ceil(2.0 * self->err * self->total_qty);
+	const usize qty_thres = ceil(2.0 * self->err * self->total_qty);
 	i = 0;
 	while ( i < vec_len(self->vals) - 1 ) {
 		gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, i);
@@ -167,15 +167,15 @@ void gk_merge(GKSumm *self, const GKSumm *other)
 }
 
 
-size_t gk_rank(GKSumm *self, const void *val)
+usize gk_rank(GKSumm *self, const void *val)
 {
 	if (vec_len(self->vals) == 1) {
 		return 0;
 	}
-	size_t succ_pos = succ(self->vals, self->cmp, val);
+	usize succ_pos = succ(self->vals, self->cmp, val);
 	gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
-	size_t ret = 0;
-	for (size_t i = 0; i < succ_pos; i++) {
+	usize ret = 0;
+	for (usize i = 0; i < succ_pos; i++) {
 		ret += ((gk_qty *)vec_get(self->qtys, i))->qty;
 	}
 	return ret - 1 + (succ_qty->qty + succ_qty->delta) / 2;
@@ -185,8 +185,8 @@ size_t gk_rank(GKSumm *self, const void *val)
 void gk_print(GKSumm *self, FILE *stream, void (*print_val)(FILE *,
               const void *))
 {
-	size_t l = vec_len(self->vals);
-	for (size_t i = 0; i < l - 1; i++) {
+	usize l = vec_len(self->vals);
+	for (usize i = 0; i < l - 1; i++) {
 		fprintf(stream, "(");
 		print_val(stream, vec_get(self->vals, i));
 		fprintf(stream, ", ");

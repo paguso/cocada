@@ -39,7 +39,7 @@
  * @param typesize The size of each element in the array.
  * @param cmp The comparison function.
  */
-void quicksort(void *arr, size_t n, size_t typesize, CmpFunc cmp);
+void quicksort(void *arr, usize n, usize typesize, CmpFunc cmp);
 
 
 /**
@@ -51,7 +51,7 @@ void quicksort(void *arr, size_t n, size_t typesize, CmpFunc cmp);
  * @param cmp The comparison function.
  * @return The array `I=(I[0]...I[n-1])` of sorted indexes of the original array s.t. for all `0 <= q < n`, `arr[I[q]] <= arr[I[q+1]]` according to @p cmp.
  */
-size_t *index_quicksort(void *arr, size_t n, size_t typesize, CmpFunc cmp);
+usize *index_quicksort(void *arr, usize n, usize typesize, CmpFunc cmp);
 
 
 /**
@@ -62,10 +62,10 @@ size_t *index_quicksort(void *arr, size_t n, size_t typesize, CmpFunc cmp);
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the first element in the array that is greater or equal to @p val.
+ * @return usize The index of the first element in the array that is greater or equal to @p val.
  */
-size_t succ(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
-            void *val);
+usize succ(void *sorted_arr, usize n, usize typesize, CmpFunc cmp,
+           void *val);
 
 
 /**
@@ -76,10 +76,10 @@ size_t succ(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the first element in the array that is strictly greater than @p val.
+ * @return usize The index of the first element in the array that is strictly greater than @p val.
  */
-size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
-                   void *val);
+usize strict_succ(void *sorted_arr, usize n, usize typesize, CmpFunc cmp,
+                  void *val);
 
 
 /**
@@ -90,10 +90,10 @@ size_t strict_succ(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the last element in the array that is smaller or equal to @p val.
+ * @return usize The index of the last element in the array that is smaller or equal to @p val.
  */
-size_t pred(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
-            void *val);
+usize pred(void *sorted_arr, usize n, usize typesize, CmpFunc cmp,
+           void *val);
 
 
 /**
@@ -104,9 +104,9 @@ size_t pred(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
  * @param typesize The size of each element in the array in bytes
  * @param cmp The comparison function
  * @param val The value to be compared
- * @return size_t The index of the last element in the array that is strictly smaller than @p val.
+ * @return usize The index of the last element in the array that is strictly smaller than @p val.
  */
-size_t strict_pred(void *sorted_arr, size_t n, size_t typesize, CmpFunc cmp,
-                   void *val);
+usize strict_pred(void *sorted_arr, usize n, usize typesize, CmpFunc cmp,
+                  void *val);
 
 #endif

@@ -45,9 +45,9 @@ struct _StrStream {
 		xstr *xstr;
 	} src;
 	sstream_type type;
-	size_t bytes_per_char;
-	size_t pos;
-	size_t slen;
+	usize bytes_per_char;
+	usize pos;
+	usize slen;
 };
 
 
@@ -61,7 +61,7 @@ static xchar _getchar_from_str(void *str)
 }
 
 
-StrStream *strstream_open_str(char *str, size_t slen)
+StrStream *strstream_open_str(char *str, usize slen)
 {
 	StrStream *sst;
 	sst = NEW(StrStream);
@@ -99,7 +99,7 @@ StrStream *strstream_open_file(char *filename)
 }
 
 
-StrStream *strstream_open_xfile(char *filename, size_t bytes_per_char)
+StrStream *strstream_open_xfile(char *filename, usize bytes_per_char)
 {
 	StrStream *sst;
 	sst = NEW(StrStream);
@@ -111,7 +111,7 @@ StrStream *strstream_open_xfile(char *filename, size_t bytes_per_char)
 }
 
 
-size_t strstream_sizeof_char(StrStream *sst)
+usize strstream_sizeof_char(StrStream *sst)
 {
 	return sst->bytes_per_char;
 }
@@ -184,9 +184,9 @@ xchar strstream_getc(StrStream *sst)
 	}
 }
 
-size_t strstream_reads(StrStream *sst, char *dest, size_t n)
+usize strstream_reads(StrStream *sst, char *dest, usize n)
 {
-	size_t nread;
+	usize nread;
 	switch (sst->type) {
 	case SSTR_STR:
 		nread = MIN(n, (sst->pos < sst->slen) ? (sst->slen - sst->pos) : 0);
@@ -205,9 +205,9 @@ size_t strstream_reads(StrStream *sst, char *dest, size_t n)
 
 
 
-size_t strstream_readxs(StrStream *sst, xstr *dest, size_t n)
+usize strstream_readxs(StrStream *sst, xstr *dest, usize n)
 {
-	size_t nread;
+	usize nread;
 	switch (sst->type) {
 	case SSTR_XSTR:
 		nread = MIN(n, (sst->pos < sst->slen) ? (sst->slen - sst->pos) : 0);
@@ -218,8 +218,8 @@ size_t strstream_readxs(StrStream *sst, xstr *dest, size_t n)
 	case SSTR_XFILE:
 		;
 		xchar c;
-		size_t bpc = xstr_sizeof_char(dest);
-		size_t nread = 0;
+		usize bpc = xstr_sizeof_char(dest);
+		usize nread = 0;
 		while (nread < n) {
 			if (fread(&c, bpc, 1, sst->src.file) == bpc)
 				xstr_set(dest, nread++, c);

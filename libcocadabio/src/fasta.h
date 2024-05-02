@@ -54,8 +54,8 @@ typedef struct _FASTA FASTA;
 typedef struct {
 	char *descr;	/**< Sequence descriptor (does not include the `>`) */
 	char *seq;   	/**< In-memory sequence content */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
-	size_t seq_offset;		/**< Sequence offset from the start of the file **/
+	usize descr_offset;	/**< Descriptor offset from the start of the file **/
+	usize seq_offset;		/**< Sequence offset from the start of the file **/
 } FASTARec;
 
 
@@ -65,8 +65,8 @@ typedef struct {
 typedef struct {
 	char *descr;      	/**< Sequence descriptor */
 	Read *seqrdr;	/**< Sequence contents reader */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
-	size_t seq_offset;		/**< Sequence offset from the start of the file **/
+	usize descr_offset;	/**< Descriptor offset from the start of the file **/
+	usize seq_offset;		/**< Sequence offset from the start of the file **/
 } FASTARecRdr;
 
 
@@ -96,7 +96,7 @@ bool fasta_has_next(FASTA *self);
  *
  * @return true on success, false on fail.
  */
-bool fasta_goto(FASTA *self, size_t descr_offset);
+bool fasta_goto(FASTA *self, usize descr_offset);
 
 
 /**

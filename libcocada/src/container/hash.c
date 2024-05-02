@@ -41,7 +41,7 @@ uint64 fib_hash(uint64 key)
  * Simplified 64-bit FNV hashing
  * source: http://www.isthe.com/chongo/tech/comp/fnv
  */
-uint64 fnv1a_64bit_hash(const void *obj, size_t objsize)
+uint64 fnv1a_64bit_hash(const void *obj, usize objsize)
 {
 	uint64 hval = 0;
 
@@ -64,9 +64,9 @@ uint64 fnv1a_64bit_hash(const void *obj, size_t objsize)
 
 
 /*
-size_t djb2_hash(const unsigned char *str)
+usize djb2_hash(const unsigned char *str)
 {
-	size_t hash = 5381;
+	usize hash = 5381;
 	int c;
 
 	while ( (c = *(str++)) )

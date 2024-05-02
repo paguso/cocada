@@ -25,49 +25,49 @@
 #include "saarray.h"
 #include "errlog.h"
 
-void *sa_arr_calloc(size_t nmemb, size_t memb_size)
+void *sa_arr_calloc(usize nmemb, usize memb_size)
 {
-	size_t size = nmemb * memb_size;
-	void *ret = malloc(size + sizeof(size_t));
-	*((size_t *)ret) = size;
-	return ret + sizeof(size_t);
+	usize size = nmemb * memb_size;
+	void *ret = malloc(size + sizeof(usize));
+	*((usize *)ret) = size;
+	return ret + sizeof(usize);
 }
 
 
-void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size)
+void *sa_arr_realloc(void *arr, usize nmemb, usize memb_size)
 {
-	size_t size = nmemb * memb_size;
-	arr -= sizeof(size_t);
-	arr = realloc(arr, size + sizeof(size_t));
-	*((size_t *)arr) = size;
-	return arr + sizeof(size_t);
+	usize size = nmemb * memb_size;
+	arr -= sizeof(usize);
+	arr = realloc(arr, size + sizeof(usize));
+	*((usize *)arr) = size;
+	return arr + sizeof(usize);
 }
 
 
-size_t sa_arr_sizeof(void *arr)
+usize sa_arr_sizeof(void *arr)
 {
-	return *((size_t *)(arr - sizeof(size_t)));
+	return *((usize *)(arr - sizeof(usize)));
 }
 
 
 void sa_arr_free(void *arr)
 {
-	free (arr - sizeof(size_t));
+	free (arr - sizeof(usize));
 }
 
 
 #define SA_ARR_IMPL(TYPE, ...)\
-	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb)\
+	TYPE *sa_arr_##TYPE##_calloc(usize nmemb)\
 	{\
 		return (TYPE *)sa_arr_calloc(nmemb, sizeof(TYPE));\
 	}\
 	\
-	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb)\
+	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, usize nmemb)\
 	{\
 		return (TYPE *)sa_arr_realloc(arr, nmemb, sizeof(TYPE));\
 	}\
 	\
-	size_t sa_arr_##TYPE##_len(TYPE *arr)\
+	usize sa_arr_##TYPE##_len(TYPE *arr)\
 	{\
 		WARN_IF(sa_arr_sizeof(arr) % sizeof(TYPE),\
 		        "Physical array size is not a multiple of TYPE size");\

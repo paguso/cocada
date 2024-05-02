@@ -28,9 +28,9 @@
 #include "mathutil.h"
 
 
-size_t nbytes(size_t nvalues)
+usize nbytes(usize nvalues)
 {
-	return (nvalues < 2) ? nvalues : (size_t)(DIVCEIL(log2((double)nvalues),
+	return (nvalues < 2) ? nvalues : (usize)(DIVCEIL(log2((double)nvalues),
 	        BYTESIZE));
 }
 

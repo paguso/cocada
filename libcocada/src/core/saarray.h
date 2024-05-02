@@ -34,7 +34,7 @@
  * @brief Size-annotated arrays
  *
  * Some functions defined here deal with *size-annotated arrays* (`sa_arr`).
- * A size-annotated array is an array with a prepended `size_t` value
+ * A size-annotated array is an array with a prepended `usize` value
  * indicating its useful capacity in bytes. This can be used for
  * bounds-checking in some situations without the need for providing this
  * information explicitly. Notice that the term "size" here refers to the
@@ -48,7 +48,7 @@
  *                       |<---------------------- S Bytes ---------------------->|
  *
  *	+--------------------+-------------------------------------------------------+
- *  |     S (size_t)     |                 Useful array area                     |
+ *  |     S (usize)     |                 Useful array area                     |
  *  +--------------------+-------------------------------------------------------+
  *                        ^
  *                        |
@@ -58,7 +58,7 @@
  * ```
  *
  * When creating such an array of size `S`, one should allocate memory for the whole
- * object at once, that is `S + sizeof(size_t)` bytes. This is necessary to ensure
+ * object at once, that is `S + sizeof(usize)` bytes. This is necessary to ensure
  * that the size comes immediately before the useful area of the array in memory.
  * However the handler used to manipulate the array, that is to access, read and write
  * elements is actually a pointer to the start of the useful area.
@@ -71,8 +71,8 @@
  * bytes, **with prepended size information** (sa_arr).
  *
  * This function allocates an array of `S = nmemb * nmemb_size` bytes **plus**
- * the size of a size_t value **immediately before** the useful area
- * of the array. The size `S` is stored at this location as a size_t value,
+ * the size of a usize value **immediately before** the useful area
+ * of the array. The size `S` is stored at this location as a usize value,
  * the useful area is initialised with 0's, and a pointer to the start
  * location of the useful area of the array  is returned, as illustrated in
  * the diagram below. This makes the array size readily available via
@@ -83,7 +83,7 @@
  *                       |<---------- S = (nmemb * nmemb_size) Bytes ----------->|
  *
  *	+--------------------+-------------------------------------------------------+
- *  |     S (size_t)     |                 Useful array area                     |
+ *  |     S (usize)     |                 Useful array area                     |
  *  +--------------------+-------------------------------------------------------+
  *                        ^
  *                        |
@@ -100,7 +100,7 @@
  * @see sa_arr_free
  * @see sa_arr_sizeof
  */
-void *sa_arr_calloc(size_t nmemb, size_t memb_size);
+void *sa_arr_calloc(usize nmemb, usize memb_size);
 
 
 /**
@@ -109,7 +109,7 @@ void *sa_arr_calloc(size_t nmemb, size_t memb_size);
  * @see sa_arr_free
  * @see sa_arr_sizeof
  */
-void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size);
+void *sa_arr_realloc(void *arr, usize nmemb, usize memb_size);
 
 
 /**
@@ -119,7 +119,7 @@ void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size);
  * @see sa_arr_free
  * @see sa_arr_sizeof
  */
-size_t sa_arr_sizeof(void *arr);
+usize sa_arr_sizeof(void *arr);
 
 
 /**
@@ -131,9 +131,9 @@ void sa_arr_free(void *arr);
 
 
 #define SA_ARR_DECL(TYPE, ...)\
-	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb);\
-	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb);\
-	size_t sa_arr_##TYPE##_len(TYPE *arr);
+	TYPE *sa_arr_##TYPE##_calloc(usize nmemb);\
+	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, usize nmemb);\
+	usize sa_arr_##TYPE##_len(TYPE *arr);
 
 XX_CORETYPES(SA_ARR_DECL)
 

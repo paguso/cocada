@@ -48,7 +48,7 @@ void vebset_test_add(CuTest *tc)
 	vec_push_uint32(vec_vals,  UINT32_MAX);
 
 	vebset *vset = vebset_new();
-	for (size_t i = 0; i < vec_len(vec_vals); i++) {
+	for (usize i = 0; i < vec_len(vec_vals); i++) {
 		uint32 x = vec_get_uint32(vec_vals, i);
 		CuAssert(tc, "vset contains non-added element", !vebset_contains(vset, x));
 		vebset_add(vset, x);
@@ -89,13 +89,13 @@ void vebset_test_del(CuTest *tc)
 	vec_push_uint32(vec_vals,  UINT32_MAX);
 
 	vebset *vset = vebset_new();
-	size_t size = 0;
-	for (size_t i = 0; i < vec_len(vec_vals); i++) {
+	usize size = 0;
+	for (usize i = 0; i < vec_len(vec_vals); i++) {
 		uint32 x = vec_get_uint32(vec_vals, i);
 		size += vebset_add(vset, x);
 	}
 
-	for (size_t i = 0; i < vec_len(vec_vals); i++) {
+	for (usize i = 0; i < vec_len(vec_vals); i++) {
 		uint32 x = vec_get_uint32(vec_vals, i);
 		bool has = vebset_contains(vset, x);
 		bool del = vebset_del(vset, x);
@@ -104,7 +104,7 @@ void vebset_test_del(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, 0, size);
 
-	for (size_t i = 0; i < 100; i++) {
+	for (usize i = 0; i < 100; i++) {
 		uint32 x = rand_next() % UINT32_MAX;
 		bool del = vebset_del(vset, x);
 		CuAssert(tc, "Wrong deletion result", !del);
@@ -138,7 +138,7 @@ void vebset_test_succ(CuTest *tc)
 	}
 	vec_qsort(vec_vals, cmp_uint32);
 
-	size_t i = 0;
+	usize i = 0;
 	while ( i < vec_len(vec_vals) ) {
 		uint32 x = vec_get_uint32(vec_vals, i);
 		int64 succ = vebset_succ(vset, x);
@@ -222,7 +222,7 @@ void vebset_test_memory(CuTest *tc)
 
 	uint n = 40000;
 	vebset *vset = vebset_new();
-	size_t size = 0;
+	usize size = 0;
 	for (uint i = 0; i < n; i++) {
 		uint32 x = rand_next() % UINT32_MAX;
 		size += vebset_add(vset, x);

@@ -91,7 +91,7 @@ void rectangle_snap_to_grid_test(CuTest *tc)
 
 
 
-void quadtree_do_nothing(QuadTree *tree, size_t node, void *data)
+void quadtree_do_nothing(QuadTree *tree, usize node, void *data)
 {
 }
 
@@ -116,7 +116,7 @@ void quadtree_ins_hollow_test(CuTest *tc)
 }
 
 
-void upd_node_ins_pt(QuadTree *tree, size_t node, void *pt)
+void upd_node_ins_pt(QuadTree *tree, usize node, void *pt)
 {
 	Vec *pts = (Vec *) quadtree_node_get_data(tree, node);
 	if (pts == NULL) {
@@ -127,11 +127,11 @@ void upd_node_ins_pt(QuadTree *tree, size_t node, void *pt)
 }
 
 
-void qry_node_qty(QuadTree *tree, size_t node, void *dest)
+void qry_node_qty(QuadTree *tree, usize node, void *dest)
 {
 	Vec *pts = (Vec *)quadtree_node_get_data(tree, node);
 	if (pts != NULL) {
-		*((size_t *)dest) += vec_len(pts);
+		*((usize *)dest) += vec_len(pts);
 	}
 }
 
@@ -176,7 +176,7 @@ void quadtree_qry_test(CuTest *tc)
 		uint w = rand_range_uint(0, width - x);
 		uint h = rand_range_uint(0, height - y);
 		Rectangle rect = {.top_left.x = x, .top_left.y = y, .width = w, .height = h};
-		size_t qty = 0;
+		usize qty = 0;
 		quadtree_qry(tree, rect, qry_node_qty, &qty, true);
 		if (qty != (w * h)) {
 			printf("erro\n");

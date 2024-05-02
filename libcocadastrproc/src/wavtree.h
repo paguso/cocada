@@ -68,7 +68,7 @@ typedef struct _WavTree WavTree;
  * @param len The length of the source string.
  * @param shape The WT shape.
  */
-WavTree *wavtree_new(Alphabet *ab, char *src, size_t len, WavTreeShape shape);
+WavTree *wavtree_new(Alphabet *ab, char *src, usize len, WavTreeShape shape);
 
 
 /**
@@ -108,7 +108,7 @@ void wavtree_free(WavTree *wt);
 /**
  * @brief Returns the lenght of the string represented by the WT.
  */
-size_t wavtree_len(WavTree *wt);
+usize wavtree_len(WavTree *wt);
 
 
 /**
@@ -117,7 +117,7 @@ size_t wavtree_len(WavTree *wt);
  *        str is string represented by the WT.
  *        @p pos must be in the range [0, length(str))
  */
-size_t wavtree_rank_pos(WavTree *wt, size_t pos);
+usize wavtree_rank_pos(WavTree *wt, usize pos);
 
 
 /**
@@ -125,7 +125,7 @@ size_t wavtree_rank_pos(WavTree *wt, size_t pos);
  *        the # of positions 0<=j<@p pos s.t. str[j]==@p c, where
  *        str is string represented by the WT.
  */
-size_t wavtree_rank(WavTree *wt, size_t pos, xchar c);
+usize wavtree_rank(WavTree *wt, usize pos, xchar c);
 
 
 /**
@@ -135,7 +135,7 @@ size_t wavtree_rank(WavTree *wt, size_t pos, xchar c);
  *        If no such position exists, returns the length of the represented
  *        string.
  */
-size_t wavtree_select(WavTree *wt, xchar c, size_t rank);
+usize wavtree_select(WavTree *wt, xchar c, usize rank);
 
 
 /**
@@ -144,7 +144,7 @@ size_t wavtree_select(WavTree *wt, xchar c, size_t rank);
  *        If no such position exists, returns the length of the represented
  *        string.
  */
-size_t wavtree_pred(WavTree *wt, size_t pos, xchar c);
+usize wavtree_pred(WavTree *wt, usize pos, xchar c);
 
 
 /**
@@ -153,7 +153,7 @@ size_t wavtree_pred(WavTree *wt, size_t pos, xchar c);
  *        If no such position exists, returns the length of the  represented
  *        string.
  */
-size_t wavtree_succ(WavTree *wt, size_t pos, xchar c);
+usize wavtree_succ(WavTree *wt, usize pos, xchar c);
 
 
 /**
@@ -161,7 +161,7 @@ size_t wavtree_succ(WavTree *wt, size_t pos, xchar c);
  *        the WT. Notice that the WT does <b>not</b> explicitly store
  *        the string.
  */
-xchar wavtree_char(WavTree *wt, size_t pos);
+xchar wavtree_char(WavTree *wt, usize pos);
 
 
 /**

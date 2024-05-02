@@ -322,7 +322,7 @@ GET_SOM_DECL(cstr)
 
 
 
-#define STR_OFFSET(STRUCT, FIELD)	((size_t)(&(((STRUCT *)NULL)->FIELD)))
+#define STR_OFFSET(STRUCT, FIELD)	((usize)(&(((STRUCT *)NULL)->FIELD)))
 
 
 /**
@@ -347,7 +347,7 @@ SOM *som_ptr_new();
  * returned by the corresponding @p get_som function.
  * @see Module documentation
  */
-SOM *som_struct_new(size_t size, GetSOMFunc get_som);
+SOM *som_struct_new(usize size, GetSOMFunc get_som);
 
 
 /**
@@ -369,7 +369,7 @@ SOM *som_proxy_new(GetSOMFunc get_som);
  * @par chd The child SOM, i.e. the model of the object member.
  * @warning If the parent is but a struct SOM, the @p offset is ignored.
  */
-SOM *som_cons(SOM *par, size_t offset, SOM *chd);
+SOM *som_cons(SOM *par, usize offset, SOM *chd);
 
 
 /**

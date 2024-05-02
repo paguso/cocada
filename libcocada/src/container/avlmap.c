@@ -30,17 +30,17 @@
 
 
 struct _AVLMap {
-	size_t sizeofkey;
-	size_t sizeofval;
-	size_t sizeofentry;
-	size_t size;
+	usize sizeofkey;
+	usize sizeofval;
+	usize sizeofentry;
+	usize size;
 	AVL *tree;
 };
 
 #define ENTRY_VAL_SZKEY(E, SK) ((E)?((void *)((void *)(E) + (SK))):NULL)
 #define ENTRY_VAL(E) ENTRY_VAL_SZKEY(E, self->sizeofkey)
 
-AVLMap *avlmap_new(size_t keysize, size_t valsize, CmpFunc keycmp)
+AVLMap *avlmap_new(usize keysize, usize valsize, CmpFunc keycmp)
 {
 	AVLMap *ret = NEW(AVLMap);
 	ret->sizeofkey = keysize;
@@ -75,7 +75,7 @@ void avlmap_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-size_t avlmap_size(const AVLMap *self)
+usize avlmap_size(const AVLMap *self)
 {
 	return self->size;
 }

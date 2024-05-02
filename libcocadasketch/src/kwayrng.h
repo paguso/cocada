@@ -51,7 +51,7 @@ typedef struct _KWayRNG KWayRNG;
  * @param nbits The size of the generated values in bits. This value
  * should range from 1 to 64.
  */
-KWayRNG *kwayrng_new(size_t k, size_t nbits);
+KWayRNG *kwayrng_new(usize k, usize nbits);
 
 
 /**
@@ -61,7 +61,7 @@ KWayRNG *kwayrng_new(size_t k, size_t nbits);
  * Values are considered modulo the appropriate max value
  * p=2^@p nbits.
  */
-KWayRNG *kwayrng_new_with_coefs(size_t k, uint64 *coefs, size_t nbits);
+KWayRNG *kwayrng_new_with_coefs(usize k, uint64 *coefs, usize nbits);
 
 
 /**
@@ -73,7 +73,7 @@ void kwayrng_free(KWayRNG *rng);
 /**
  * @brief Returns the k-value of the k-way independent r.n.g.
  */
-size_t kwayrng_k(KWayRNG *rng);
+usize kwayrng_k(KWayRNG *rng);
 
 
 /**

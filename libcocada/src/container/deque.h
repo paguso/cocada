@@ -49,7 +49,7 @@ typedef struct _Deque Deque;
  * @brief Constructor.
  * @param typesize The individual size of stored elements (in bytes).
  */
-Deque *deque_new(size_t typesize);
+Deque *deque_new(usize typesize);
 
 
 /**
@@ -57,7 +57,7 @@ Deque *deque_new(size_t typesize);
  * @param typesize The individual size of stored elements (in bytes).
  * @param capacity The initial capacity.
  */
-Deque *deque_new_with_capacity(size_t typesize, size_t capacity);
+Deque *deque_new_with_capacity(usize typesize, usize capacity);
 
 
 /**
@@ -76,21 +76,21 @@ bool deque_empty(const Deque *q);
 /**
  * @brief Returns the length (logical size) of the deque.
  */
-size_t deque_len(const Deque *q);
+usize deque_len(const Deque *q);
 
 
 /**
  * @brief Returns an internal reference to the element at a given position.
  * @warning No check is performed on @p q bounds.
  */
-const void *deque_get(const Deque *q, size_t pos);
+const void *deque_get(const Deque *q, usize pos);
 
 
 /**
  * @brief Copies the element at a given position into @p dest.
  * @warning No check is performed on @p q bounds or @p dest.
  */
-void deque_get_cpy(const Deque *q, size_t pos, void *dest);
+void deque_get_cpy(const Deque *q, usize pos, void *dest);
 
 
 /**
@@ -151,7 +151,7 @@ void deque_del_front(Deque *q);
 	Deque *deque_new_##TYPE();
 
 #define DEQUE_GET_DECL( TYPE )\
-	TYPE deque_get_##TYPE(const Deque *q, size_t pos);
+	TYPE deque_get_##TYPE(const Deque *q, usize pos);
 
 #define DEQUE_FRONT_DECL( TYPE )\
 	TYPE deque_front_##TYPE(const Deque *q);

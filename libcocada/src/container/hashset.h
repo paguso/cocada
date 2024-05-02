@@ -45,7 +45,7 @@ typedef HashMap HashSet;
  * @param hashfunc Hash function pointer.
  * @param eqfunc Equality comparator function pointer.
  */
-HashSet *hashset_new( size_t typesize, HashFunc hashfunc, EqualsFunc eqfunc );
+HashSet *hashset_new( usize typesize, HashFunc hashfunc, EqualsFunc eqfunc );
 
 
 /**
@@ -57,7 +57,7 @@ void hashset_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the number of stored elements.
  */
-size_t hashset_size(const HashSet *set);
+usize hashset_size(const HashSet *set);
 
 
 /**

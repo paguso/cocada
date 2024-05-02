@@ -45,7 +45,7 @@
  *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
  *        will have size @p len+1 and SA[0]==len.
  */
-size_t *sais(char *str, size_t len, Alphabet *ab);
+usize *sais(char *str, usize len, Alphabet *ab);
 
 
 /**
@@ -56,6 +56,6 @@ size_t *sais(char *str, size_t len, Alphabet *ab);
  *        @p ab is 'virtually' added to @p str s.t. the returned suffix array SA
  *        will have size xstr_len(str)+1 and SA[0]==xstr_len(str).
  */
-size_t *sais_xstr(xstr *str, Alphabet *ab);
+usize *sais_xstr(xstr *str, Alphabet *ab);
 
 #endif

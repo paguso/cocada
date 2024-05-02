@@ -28,11 +28,11 @@
 
 typedef struct _QDigest QDigest;
 
-QDigest *qdigest_new(size_t range, double err);
+QDigest *qdigest_new(usize range, double err);
 
-void  qdigest_upd(QDigest *self, size_t val, size_t qty);
+void  qdigest_upd(QDigest *self, usize val, usize qty);
 
-size_t qdigest_rank(QDigest *self, size_t val);
+usize qdigest_rank(QDigest *self, usize val);
 
 void qdigest_print(QDigest *self, FILE *stream);
 

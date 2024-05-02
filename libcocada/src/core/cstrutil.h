@@ -43,7 +43,7 @@
  *        The returned array will thus be capable of storing strings whose
  *        strlen varies from 0 to @p len.
  */
-char *cstr_new(size_t len);
+char *cstr_new(usize len);
 
 
 /**
@@ -55,7 +55,7 @@ char *cstr_clone(const char *src);
 /**
  * @brief Creates a clone of a source string up to a given length @p len.
  */
-char *cstr_clone_len(const char *src, size_t len);
+char *cstr_clone_len(const char *src, usize len);
 
 
 /**
@@ -79,19 +79,19 @@ char *cstr_reassign(char *dest, const char *src);
 /**
  * @brief Sets @p str[j]=@p c for @p from <= j < @p to.
  */
-void cstr_fill(char *str, size_t from, size_t to, char c);
+void cstr_fill(char *str, usize from, usize to, char c);
 
 
 /**
  * @brief Sets the first @p len positons of @p str to '\0'.
  */
-void cstr_clear(char *str, size_t len);
+void cstr_clear(char *str, usize len);
 
 
 /**
  * @brief Returns a new string equals to @p str[@p from..@p to-1].
  */
-char *cstr_substr(char *str, size_t from,  size_t to);
+char *cstr_substr(char *str, usize from,  usize to);
 
 
 /**
@@ -99,7 +99,7 @@ char *cstr_substr(char *str, size_t from,  size_t to);
  * a NULL-terminating char '\0' to @p dest.
  * @return a pointer to the destination string @p dest.
  */
-char *cstr_ncpy(char *dest, char *src, size_t n);
+char *cstr_ncpy(char *dest, char *src, usize n);
 
 
 /**
@@ -111,7 +111,7 @@ char *cstr_ncpy(char *dest, char *src, size_t n);
  * contain trailing unused space.
  * To free unused space, see ::cstr_fit
  */
-void cstr_crop(char *str, size_t from, size_t to);
+void cstr_crop(char *str, usize from, usize to);
 
 
 /**
@@ -128,7 +128,7 @@ void cstr_crop(char *str, size_t from, size_t to);
  * contain trailing unused space.
  * To free unused space, see ::cstr_fit
  */
-void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
+void cstr_trim(char *str, usize len, char *unwanted, usize unw_len);
 
 
 /**
@@ -139,7 +139,7 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len);
  * set to '\0'.
  * @warning The string may be relocated.
  */
-char *cstr_resize(char *str, size_t len);
+char *cstr_resize(char *str, usize len);
 
 
 /**
@@ -163,13 +163,13 @@ char *cstr_fit(char *str);
  * new size
  * @warning No bound checks are performed.
  */
-char *cstr_cut(char *str, size_t from, size_t to);
+char *cstr_cut(char *str, usize from, usize to);
 
 
 /**
  * @brief Reverts a string in place.
  */
-void cstr_revert(char *str, size_t len);
+void cstr_revert(char *str, usize len);
 
 
 /**
@@ -207,12 +207,12 @@ bool cstr_equals_ignore_case(const char *left, const char *right);
  * printf("%s\n",lifecicle);// prints "code-test-repeat"
  * ```
  */
-char *cstr_join(const char *sep, size_t n, ...);
+char *cstr_join(const char *sep, usize n, ...);
 
 
 #define FOREACH_IN_SUBSTR(CHR, STR, FROM, TO) \
 	for (char *__s = (char *)(STR), CHR; __s; __s = NULL) \
-		for (size_t __i = FROM, __l = TO; __i < __l; __i = __l) \
+		for (usize __i = FROM, __l = TO; __i < __l; __i = __l) \
 			for (CHR = __s[__i]; __i < __l; CHR = ((++__i) < __l) ? __s[__i] : CHR )
 
 

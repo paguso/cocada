@@ -32,7 +32,7 @@ typedef struct _FMAlg FMAlg;
 FMAlg *fmalg_init_single(uint64 maxval);
 
 
-FMAlg *fmalg_init(uint64 maxval, size_t navg, size_t mmedian);
+FMAlg *fmalg_init(uint64 maxval, usize navg, usize mmedian);
 
 
 void fmalg_free(FMAlg *fm);

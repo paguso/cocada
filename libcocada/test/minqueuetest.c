@@ -58,7 +58,7 @@ void test_minqueue_push_pop(CuTest *tc)
 	MinQueue *q = minqueue_new(sizeof(minqobj), minqobj_cmp);
 	Deque *v = deque_new(sizeof(minqobj));
 
-	size_t n = 1000;
+	usize n = 1000;
 	for (int i = 0; i < n; i++) {
 		int r = rand_range_int(0, n);
 		minqobj o = {(int)r, (double)r, (char)r};
@@ -100,7 +100,7 @@ void test_minqueue_push_pop(CuTest *tc)
 	CuAssertSizeTEquals(tc, minqueue_len(q), n - (n / 2));
 
 	min = minqueue_min(q);
-	size_t nmin = 0;
+	usize nmin = 0;
 	MinQueueIter *iter = minqueue_all_min(q);
 	for (int j = 0; j < deque_len(v); j++) {
 		if (minqobj_cmp(min, deque_get(v, j)) == 0) {
@@ -130,7 +130,7 @@ void test_minqueue_front_back(CuTest *tc)
 	MinQueue *q = minqueue_new(sizeof(int), cmp_int);
 	Deque *v = deque_new(sizeof(int));
 
-	size_t n = 1000;
+	usize n = 1000;
 	for (int i = 0; i < n; i++) {
 		int r = rand_range_int(0, n);
 		minqueue_push_int(q, r);

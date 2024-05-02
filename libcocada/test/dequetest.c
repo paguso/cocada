@@ -38,7 +38,7 @@ typedef struct _dequeobj {
 void test_deque_push_pop(CuTest *tc)
 {
 	memdbg_reset();
-	size_t n = 10000;
+	usize n = 10000;
 	Deque *q = deque_new(sizeof(dequeobj));
 	CuAssertSizeTEquals(tc, 0, deque_len(q));
 	CuAssertTrue(tc, deque_empty(q));
@@ -90,7 +90,7 @@ void test_deque_push_pop(CuTest *tc)
 void test_deque_push_pop_refs(CuTest *tc)
 {
 	memdbg_reset();
-	size_t n = 10000;
+	usize n = 10000;
 	Deque *q = deque_new(sizeof(dequeobj *));
 	CuAssertSizeTEquals(tc, 0, deque_len(q));
 	CuAssertTrue(tc, deque_empty(q));
@@ -148,7 +148,7 @@ void test_deque_push_pop_refs(CuTest *tc)
 
 void test_deque_push_pop_int(CuTest *tc)
 {
-	size_t n = 10000;
+	usize n = 10000;
 	Deque *q = deque_new_int();
 	CuAssertSizeTEquals(tc, 0, deque_len(q));
 	CuAssertTrue(tc, deque_empty(q));

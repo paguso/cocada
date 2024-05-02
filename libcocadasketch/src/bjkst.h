@@ -32,7 +32,7 @@ typedef struct _BJKST BJKST;
  * @param nbits Number of bits of elements in the stream
  * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
  */
-BJKST *bjkst_init(size_t nbits, double eps, double delta);
+BJKST *bjkst_init(usize nbits, double eps, double delta);
 
 void bjkst_process(BJKST *counter, uint64 val);
 

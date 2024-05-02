@@ -46,30 +46,30 @@ static const byte LEFT = 0;
 static const byte RIGHT = 1;
 
 struct _hufftnode {
-	size_t chr_rank;
+	usize chr_rank;
 	hufftnode *chd[2];
 	byte *ab_mask;
 };
 
 struct _huffcode {
 	Alphabet *ab;
-	size_t size;
+	usize size;
 	hufftnode *tree;
 	BitVec **code;
 };
 
 typedef struct {
-	size_t freq; // must come first
-	size_t node;
+	usize freq; // must come first
+	usize node;
 } nodefreq;
 
 static int nodefreq_cmp(const void *p1, const void *p2)
 {
-	return (*((size_t *)p2) - * ((size_t *)p1));
+	return (*((usize *)p2) - * ((usize *)p1));
 }
 
 static void fill_code_table(huffcode *hcode, const hufftnode *node,
-                            size_t code_len, byte *code)
+                            usize code_len, byte *code)
 {
 	if (hufftnode_is_leaf(node)) {
 		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
@@ -83,7 +83,7 @@ static void fill_code_table(huffcode *hcode, const hufftnode *node,
 	}
 }
 
-huffcode *huffcode_new(const Alphabet *ab, const size_t freqs[])
+huffcode *huffcode_new(const Alphabet *ab, const usize freqs[])
 {
 	huffcode *hcode;
 
@@ -91,9 +91,9 @@ huffcode *huffcode_new(const Alphabet *ab, const size_t freqs[])
 	hcode->ab = alphabet_clone(ab);
 	hcode->size = alphabet_size(ab);
 
-	size_t ab_bytesize = (size_t)DIVCEIL(hcode->size, BYTESIZE);
+	usize ab_bytesize = (usize)DIVCEIL(hcode->size, BYTESIZE);
 	hcode->tree = ARR_NEW(hufftnode, MAX(0, 2 * hcode->size - 1));
-	for (size_t i = 0; i < hcode->size; i++) {
+	for (usize i = 0; i < hcode->size; i++) {
 		hcode->tree[i].chr_rank = i;
 		hcode->tree[i].chd[LEFT] = &hcode->tree[i];
 		hcode->tree[i].chd[RIGHT] = &hcode->tree[i];
@@ -102,11 +102,11 @@ huffcode *huffcode_new(const Alphabet *ab, const size_t freqs[])
 	}
 
 	BinHeap *nfheap = binheap_new(sizeof(nodefreq), nodefreq_cmp);
-	for (size_t i = 0; i < hcode->size; i++) {
+	for (usize i = 0; i < hcode->size; i++) {
 		nodefreq nf = {.node = i, .freq = freqs[i]};
 		binheap_ins(nfheap, &nf);
 	}
-	size_t next = hcode->size;
+	usize next = hcode->size;
 	while (binheap_size(nfheap) > 1) {
 		nodefreq smallest, snd_smallest, new_nf;
 		binheap_remv(nfheap, &smallest);
@@ -137,7 +137,7 @@ huffcode *huffcode_new(const Alphabet *ab, const size_t freqs[])
 
 huffcode *huffcode_new_from_str(const Alphabet *ab, const char *src)
 {
-	size_t *counts = ARR_OF_0_NEW(size_t, alphabet_size(ab));
+	usize *counts = ARR_OF_0_NEW(usize, alphabet_size(ab));
 	FOREACH_IN_CSTR(c, src) {
 		counts[alphabet_rank(ab, c)]++;
 	}
@@ -148,7 +148,7 @@ huffcode *huffcode_new_from_str(const Alphabet *ab, const char *src)
 
 huffcode *huffcode_new_from_strread(const Alphabet *ab, Read *reader)
 {
-	size_t *counts = ARR_OF_0_NEW(size_t, alphabet_size(ab));
+	usize *counts = ARR_OF_0_NEW(usize, alphabet_size(ab));
 	for (int c; (c = read_getc(reader)) != EOF;) {
 		counts[alphabet_rank(ab, c)]++;
 	}
@@ -159,7 +159,7 @@ huffcode *huffcode_new_from_strread(const Alphabet *ab, Read *reader)
 
 huffcode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src)
 {
-	size_t *counts = ARR_OF_0_NEW(size_t, alphabet_size(ab));
+	usize *counts = ARR_OF_0_NEW(usize, alphabet_size(ab));
 	FOREACH_IN_XSTR(c, src) {
 		counts[alphabet_rank(ab, c)]++;
 	}
@@ -170,7 +170,7 @@ huffcode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src)
 
 huffcode *huffcode_new_from_xstrread(const Alphabet *ab, xstrRead *reader)
 {
-	size_t *counts = ARR_OF_0_NEW(size_t, alphabet_size(ab));
+	usize *counts = ARR_OF_0_NEW(usize, alphabet_size(ab));
 	for (xwchar c; (c = xstrread_getc(reader)) != XEOF;) {
 		counts[alphabet_rank(ab, c)]++;
 	}
@@ -184,12 +184,12 @@ void huffcode_free(huffcode *hcode)
 	if (hcode == NULL)
 		return;
 	alphabet_free(hcode->ab);
-	for (size_t i = 0; i < hcode->size; i++) {
+	for (usize i = 0; i < hcode->size; i++) {
 		// DESTROY_FLAT(hcode->code[i], bitvec); // no null codes
 		bitvec_free(hcode->code[i]);
 	}
 	FREE(hcode->code);
-	for (size_t i = 0; hcode->size > 0 && i < (2 * hcode->size) - 1; i++) {
+	for (usize i = 0; hcode->size > 0 && i < (2 * hcode->size) - 1; i++) {
 		if (hcode->tree[i].ab_mask)
 			FREE(hcode->tree[i].ab_mask);
 	}
@@ -198,7 +198,7 @@ void huffcode_free(huffcode *hcode)
 }
 
 static void _print_htree(FILE *stream, const huffcode *hc,
-                         const hufftnode *node, size_t level, const char *code)
+                         const hufftnode *node, usize level, const char *code)
 {
 	if (node == NULL)
 		return;
@@ -208,11 +208,11 @@ static void _print_htree(FILE *stream, const huffcode *hc,
 		fprintf(stream, "%s[%p code=%s chr=%c(%d)]\n", space, node, code,
 		        alphabet_char(hc->ab, node->chr_rank), (int)(alphabet_char(hc->ab,
 		                node->chr_rank)));
-		// bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
+		// bytearr_print(hufftnode_ab_mask(node), (usize)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 	}
 	else {
 		fprintf(stream, "%s[%p code=%s]\n", space, node, code);
-		// bytearr_print(hufftnode_ab_mask(node), (size_t)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
+		// bytearr_print(hufftnode_ab_mask(node), (usize)mult_ceil(ab_size(hc->ab), BYTESIZE), 4, space);
 		char *ccode = cstr_new(level + 1);
 		strcpy(ccode, code);
 		ccode[level] = '0';
@@ -231,13 +231,13 @@ void huffcode_print(FILE *stream, const huffcode *hcode)
 	fprintf(stream, "    codes:\n");
 	switch (alphabet_type(hcode->ab)) {
 	case CHAR_TYPE:
-		for (size_t i = 0; i < hcode->size; i++) {
+		for (usize i = 0; i < hcode->size; i++) {
 			fprintf(stream, "%c: ", alphabet_char(hcode->ab, i));
 			bitvec_print(stream, hcode->code[i], 8);
 		}
 		break;
 	case INT_TYPE:
-		for (size_t i = 0; i < hcode->size; i++) {
+		for (usize i = 0; i < hcode->size; i++) {
 			fprintf(stream, "%" XCHAR_FMT ": ", alphabet_char(hcode->ab, i));
 			bitvec_print(stream, hcode->code[i], 8);
 		}
@@ -246,14 +246,14 @@ void huffcode_print(FILE *stream, const huffcode *hcode)
 	fprintf(stream, "} // end of huffcode@%p\n", (void *)hcode);
 }
 
-BitVec *huffcode_encode(const char *src, size_t len, const huffcode *hcode)
+BitVec *huffcode_encode(const char *src, usize len, const huffcode *hcode)
 {
 	BitVec *enc = bitvec_new();
 	huffcode_encode_to(enc, src, len, hcode);
 	return enc;
 }
 
-void huffcode_encode_to(BitVec *dest, const char *src, size_t len,
+void huffcode_encode_to(BitVec *dest, const char *src, usize len,
                         const huffcode *hcode)
 {
 	for (int i = 0; i < len; i++) {
@@ -310,7 +310,7 @@ xstr *huffcode_decode(const BitVec *bcode, const huffcode *hcode)
 {
 	xstr *dec = xstr_new(nbytes(alphabet_size(hcode->ab)));
 	hufftnode *cur = (hufftnode *)huffcode_tree(hcode);
-	for (size_t i = 0, l = bitvec_len(bcode); i < l; i++) {
+	for (usize i = 0, l = bitvec_len(bcode); i < l; i++) {
 		cur = cur->chd[bitvec_get_bit(bcode, i)];
 		if (hufftnode_is_leaf(cur)) {
 			xstr_push(dec, alphabet_char(hcode->ab, cur->chr_rank));
@@ -320,7 +320,7 @@ xstr *huffcode_decode(const BitVec *bcode, const huffcode *hcode)
 	return dec;
 }
 
-const BitVec *huffcode_charcode(const huffcode *hcode, size_t char_rank)
+const BitVec *huffcode_charcode(const huffcode *hcode, usize char_rank)
 {
 	return hcode->code[char_rank];
 }
@@ -355,7 +355,7 @@ const byte *hufftnode_ab_mask(const hufftnode *node)
 	return node->ab_mask;
 }
 
-size_t hufftnode_char_rank(const hufftnode *node)
+usize hufftnode_char_rank(const hufftnode *node)
 {
 	return node->chr_rank;
 }

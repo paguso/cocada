@@ -33,14 +33,14 @@
 void test_q_sort(CuTest *tc)
 {
 	memdbg_reset();
-	size_t n = 100;
-	size_t typesize = sizeof(int);
+	usize n = 100;
+	usize typesize = sizeof(int);
 	int *arr = (int *)malloc(n * typesize);
-	for (size_t i = 0; i < n; i++) {
-		arr[i] = rand_range_size_t(0, 100);
+	for (usize i = 0; i < n; i++) {
+		arr[i] = rand_range_usize(0, 100);
 	}
 	quicksort(arr, n, typesize, cmp_int);
-	for (size_t i = 0; i < n - 1; i++) {
+	for (usize i = 0; i < n - 1; i++) {
 		CuAssertTrue(tc, arr[i] <= arr[i + 1]);
 	}
 	free(arr);
@@ -51,14 +51,14 @@ void test_q_sort(CuTest *tc)
 void test_index_q_sort(CuTest *tc)
 {
 	memdbg_reset();
-	size_t n = 100;
-	size_t typesize = sizeof(int);
+	usize n = 100;
+	usize typesize = sizeof(int);
 	int *arr = (int *)malloc(n * typesize);
-	for (size_t i = 0; i < n; i++) {
-		arr[i] = rand_range_size_t(0, 100);
+	for (usize i = 0; i < n; i++) {
+		arr[i] = rand_range_usize(0, 100);
 	}
-	size_t *idx = index_quicksort(arr, n, typesize, cmp_int);
-	for (size_t i = 0; i < n - 1; i++) {
+	usize *idx = index_quicksort(arr, n, typesize, cmp_int);
+	for (usize i = 0; i < n - 1; i++) {
 		CuAssertTrue(tc, arr[idx[i]] <= arr[idx[i + 1]]);
 	}
 	free(arr);
@@ -71,7 +71,7 @@ void test_succ(CuTest *tc)
 	memdbg_reset();
 	Range_int r = range_arr_new_int(0, 500, 5);
 	for (int i = 0; i < 505; i++) {
-		size_t idx = succ(r.arr, r.n, sizeof(int), cmp_int, &i);
+		usize idx = succ(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (idx == 0) {
 			CuAssertTrue(tc, i <= r.arr[0]);
 		}
@@ -92,7 +92,7 @@ void test_strict_succ(CuTest *tc)
 	memdbg_reset();
 	Range_int r = range_arr_new_int(0, 500, 5);
 	for (int i = 0; i < 505; i++) {
-		size_t idx = strict_succ(r.arr, r.n, sizeof(int), cmp_int, &i);
+		usize idx = strict_succ(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (idx == 0) {
 			CuAssertTrue(tc, i < r.arr[0]);
 		}
@@ -114,7 +114,7 @@ void test_pred(CuTest *tc)
 	memdbg_reset();
 	Range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
-		size_t idx = pred(r.arr, r.n, sizeof(int), cmp_int, &i);
+		usize idx = pred(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (0 <= idx && idx < r.n - 1) {
 			CuAssertTrue(tc, r.arr[idx] <= i);
 			CuAssertTrue(tc, i < r.arr[idx + 1]);
@@ -135,7 +135,7 @@ void test_strict_pred(CuTest *tc)
 	memdbg_reset();
 	Range_int r = range_arr_new_int(20, 520, 5);
 	for (int i = 0; i < 525; i++) {
-		size_t idx = strict_pred(r.arr, r.n, sizeof(int), cmp_int, &i);
+		usize idx = strict_pred(r.arr, r.n, sizeof(int), cmp_int, &i);
 		if (0 <= idx && idx < r.n - 1) {
 			CuAssertTrue(tc, r.arr[idx] < i);
 			CuAssertTrue(tc, i <= r.arr[idx + 1]);

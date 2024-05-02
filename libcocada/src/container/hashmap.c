@@ -30,7 +30,7 @@
 #include "string.h"
 
 
-static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
+static usize MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
 static float GROW_BY = 2.0F; // DO NOT TOUCH
 static float MAX_LOAD = 0.75;
 
@@ -38,12 +38,12 @@ static byte  ST_EMPTY = 0x80; // empty slot ctrl code   0b10000000
 static byte  ST_DEL   = 0xFE; // deleted slot ctrl code 0b11111110
 
 struct _HashMap {
-	size_t cap;
-	size_t size;
-	size_t occ;
-	size_t max_occ;
-	size_t keysize;
-	size_t valsize;
+	usize cap;
+	usize size;
+	usize occ;
+	usize max_occ;
+	usize keysize;
+	usize valsize;
 	EqFunc keyeq;
 	HashFunc keyhash;
 	void   *data;
@@ -53,14 +53,14 @@ struct _HashMap {
 
 
 
-void hashmap_init(HashMap *map, size_t keysize, size_t valsize,
+void hashmap_init(HashMap *map, usize keysize, usize valsize,
                   HashFunc keyhash, EqFunc keyeq)
 {
 	hashmap_init_with_capacity(map, keysize, valsize, keyhash, keyeq, MIN_CAPACITY);
 }
 
 
-HashMap *hashmap_new(size_t keysize, size_t valsize, HashFunc keyhash,
+HashMap *hashmap_new(usize keysize, usize valsize, HashFunc keyhash,
                      EqFunc keyeq)
 {
 	return hashmap_new_with_capacity(keysize, valsize, keyhash, keyeq,
@@ -68,7 +68,7 @@ HashMap *hashmap_new(size_t keysize, size_t valsize, HashFunc keyhash,
 }
 
 
-static void _reset_data(HashMap *hmap, size_t cap)
+static void _reset_data(HashMap *hmap, usize cap)
 {
 	hmap->cap = cap;
 	hmap->size = 0;
@@ -81,21 +81,21 @@ static void _reset_data(HashMap *hmap, size_t cap)
 }
 
 
-void hashmap_init_with_capacity(HashMap *ret, size_t keysize, size_t valsize,
+void hashmap_init_with_capacity(HashMap *ret, usize keysize, usize valsize,
                                 HashFunc keyhash, EqFunc keyeq,
-                                size_t min_capacity)
+                                usize min_capacity)
 {
 	ret->keysize = keysize;
 	ret->valsize = valsize;
 	ret->keyhash = keyhash;
 	ret->keyeq   = keyeq;
-	_reset_data(ret, pow2ceil_size_t(MAX(MIN_CAPACITY, min_capacity)));
+	_reset_data(ret, pow2ceil_usize(MAX(MIN_CAPACITY, min_capacity)));
 }
 
 
-HashMap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
+HashMap *hashmap_new_with_capacity(usize keysize, usize valsize,
                                    HashFunc keyhash, EqFunc keyeq,
-                                   size_t min_capacity)
+                                   usize min_capacity)
 {
 	HashMap *ret = NEW(HashMap);
 	hashmap_init_with_capacity(ret, keysize, valsize, keyhash, keyeq, min_capacity);
@@ -124,7 +124,7 @@ void hashmap_finalise(void *ptr, const Finaliser *dst)
 }
 
 
-size_t hashmap_sizeof()
+usize hashmap_sizeof()
 {
 	return sizeof(HashMap);
 }
@@ -149,13 +149,13 @@ static inline uint64 _h1(uint64 h)
 }
 
 
-static inline void *_key_at(const HashMap *hmap, size_t pos)
+static inline void *_key_at(const HashMap *hmap, usize pos)
 {
 	return hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
 }
 
 
-static inline void *_value_at(const HashMap *hmap, size_t pos)
+static inline void *_value_at(const HashMap *hmap, usize pos)
 {
 	return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) +
 	                         hmap->keysize);
@@ -163,7 +163,7 @@ static inline void *_value_at(const HashMap *hmap, size_t pos)
 
 
 typedef struct {
-	size_t pos;
+	usize pos;
 	bool found;
 } _find_res;
 
@@ -204,12 +204,12 @@ static _find_res _find_sse(hashmap *hmap, void *key, uint64 h)
 {
     uint64 h1 = _h1(h);
     uint64 h2 = _h2(h);
-    //size_t pos = h1 % hmap->cap;
+    //usize pos = h1 % hmap->cap;
     //printf("starting probe at pos %zu\n", ret.pos );
     _find_res ret = {.found=false, .pos=h1 % hmap->cap};
-    size_t group = ret.pos / GROUPSIZE;
-    size_t ngroups = (size_t)multceil((double)hmap->cap , ((double)GROUPSIZE));
-    size_t tested_groups = 0;
+    usize group = ret.pos / GROUPSIZE;
+    usize ngroups = (usize)multceil((double)hmap->cap , ((double)GROUPSIZE));
+    usize tested_groups = 0;
     uint32 stamp = 0x00000001;
     ret.pos = group * GROUPSIZE;
     while ( tested_groups < ngroups ) {
@@ -275,7 +275,7 @@ static void _print(const hashmap *hmap)
 {
 	printf("Hashmap at %p\n", hmap);
 	char *c = cstr_new(8);
-	for (size_t i=0; i<hmap->cap; i++) {
+	for (usize i=0; i<hmap->cap; i++) {
 		byteo_str(hmap->tally[i], c);
 		printf("   %zu) %s\n", i, c);
 	}
@@ -303,10 +303,10 @@ static inline void _set(HashMap *hmap, const void *key, const void *val)
 
 
 
-static void _resize(HashMap *hmap, size_t new_cap)
+static void _resize(HashMap *hmap, usize new_cap)
 {
-	size_t old_cap = hmap->cap;
-	size_t old_size = hmap->size;
+	usize old_cap = hmap->cap;
+	usize old_size = hmap->size;
 	void   *old_data = hmap->data;
 	byte *old_tally = (byte *) old_data;
 	void   *old_entries = old_data + old_cap;
@@ -314,8 +314,8 @@ static void _resize(HashMap *hmap, size_t new_cap)
 	_reset_data(hmap, new_cap);
 	//_print(hmap);
 
-	//size_t rehash_attempts = 0;
-	for (size_t i = 0; i < old_cap; ++i) {
+	//usize rehash_attempts = 0;
+	for (usize i = 0; i < old_cap; ++i) {
 		if (! (old_tally[i] >> 7) ) {
 			//rehash_attempts += 1;
 			//printf("rehashing element at pos %zu\n",i);
@@ -338,7 +338,7 @@ static void _check_resize(HashMap *hmap)
 	if (hmap->occ < hmap->max_occ) {
 		return;
 	}
-	_resize( hmap, (size_t)(GROW_BY * hmap->cap) );
+	_resize( hmap, (usize)(GROW_BY * hmap->cap) );
 }
 
 
@@ -379,7 +379,7 @@ void hashmap_remv(HashMap *hmap, const void *key, void *dest_key,
 }
 
 
-size_t hashmap_size(const HashMap *map)
+usize hashmap_size(const HashMap *map)
 {
 	return map->size;
 }
@@ -387,10 +387,10 @@ size_t hashmap_size(const HashMap *map)
 
 void hashmap_fit(HashMap *hmap)
 {
-	size_t new_cap;
+	usize new_cap;
 	for ( new_cap = MIN_CAPACITY;
 	        hmap->size >= MAX_LOAD * new_cap;
-	        new_cap = (size_t)(new_cap * GROW_BY) );
+	        new_cap = (usize)(new_cap * GROW_BY) );
 	_resize(hmap, new_cap);
 }
 
@@ -398,7 +398,7 @@ void hashmap_fit(HashMap *hmap)
 struct _HashMapIter {
 	Iter _t_Iter;
 	const HashMap *src;
-	size_t index;
+	usize index;
 	HashMapEntry entry;
 };
 

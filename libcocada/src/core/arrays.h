@@ -54,7 +54,7 @@
  *          will be set to a different instance.
  */
 #define ARR_FILL( ARR, FROM, TO, EXPR ) \
-	for(size_t _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
+	for(usize _i=(FROM), _to=(TO); _i<_to; (ARR)[_i++]=(EXPR))
 
 
 /**
@@ -62,7 +62,7 @@
  *        into an array DEST from position =FROMDEST.
  */
 #define ARR_COPY( DEST, FROMDEST, SRC, FROMSRC, N )\
-	for(size_t _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
+	for(usize _i=0, _n=(N), _fs=(FROMSRC), _fd=(FROMDEST); _i<_n; _i++)\
 		(DEST)[_fd+_i]=(SRC)[_fs+_i]
 
 
@@ -73,8 +73,8 @@
  *        @p LEFT_MARGIN is a string that is printed at the beginning of each line.
  */
 #define ARR_FPRINT(STREAM, ARR, FROM, TO, ELTSPERLINE, LABEL, FORMAT, SEPARATOR, LEFT_MARGIN)\
-	{ fprintf(STREAM, "%s"LABEL"[%zu:%zu] =", LEFT_MARGIN, ((size_t)(FROM)), ((size_t)(TO)));\
-		for (size_t __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
+	{ fprintf(STREAM, "%s"LABEL"[%zu:%zu] =", LEFT_MARGIN, ((usize)(FROM)), ((usize)(TO)));\
+		for (usize __i=FROM, __el=(ELTSPERLINE); __i<TO; __i++) {\
 			if(!((__i-FROM)%__el)) fprintf(STREAM, "\n%s%4zu: ",LEFT_MARGIN, __i);\
 			fprintf(STREAM, FORMAT"%s" , ARR[__i], (__i<(TO-1))?SEPARATOR:"");}\
 		fprintf(STREAM, "\n");}
@@ -93,7 +93,7 @@
 #define NEW_MATRIX(ID, TYPE, ROWS, COLS)\
 	TYPE** ID = (TYPE**) malloc( ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE)));\
 	TYPE* __ptr##ID =(TYPE *) (ID + (ROWS));\
-	for (size_t __i=0; __i < (ROWS); __i++){\
+	for (usize __i=0; __i < (ROWS); __i++){\
 		ID[__i] = __ptr##ID;\
 		__ptr##ID += (COLS);\
 	}
@@ -103,11 +103,11 @@
  * and initializes it to 0.
  */
 #define NEW_MATRIX_0(ID, TYPE, ROWS, COLS)\
-	size_t __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
+	usize __len##ID =  ( (ROWS) * sizeof(TYPE*) ) + ((ROWS) * (COLS) * sizeof(TYPE) );\
 	TYPE** ID = (TYPE**) malloc(__len##ID);\
 	memset(ID, 0x0, __len##ID);\
 	TYPE* __ptr##ID = (TYPE *) (ID + (ROWS));\
-	for (size_t __i=0; __i < (ROWS); __i++){\
+	for (usize __i=0; __i < (ROWS); __i++){\
 		ID[__i] = __ptr##ID;\
 		__ptr##ID += (COLS);\
 	}
@@ -122,14 +122,14 @@
  * @warning The expression @p EXPR is evaluated for every element to be set.
  */
 #define FILL_MATRIX(ID, ROWS, COLS, EXPR)\
-	for (size_t __i=0, __li = (ROWS); __i < __li; __i++) \
-		for (size_t __j=0, __lj = (COLS); __j < __lj; __j++) \
+	for (usize __i=0, __li = (ROWS); __i < __li; __i++) \
+		for (usize __j=0, __lj = (COLS); __j < __lj; __j++) \
 			ID[__i][__j] = (EXPR);\
 
 
 /**
  * @brief Expands into a type name for an array with elements of a
- * given TYPE called TYPEArray (for example int_array, size_t_array, etc).
+ * given TYPE called TYPEArray (for example int_array, usize_array, etc).
  * A TYPEArray encapsulates an ordinary C array of TYPE and its
  * length in a struct. This is convenient because we can pass and
  * receive the array and its length to and from functions as a single
@@ -148,14 +148,14 @@
  * Example:
  * ```
  * void print_int_array(ARRAY(int) a){
- * 	for (size_t i=0; i<a.len; i++){
+ * 	for (usize i=0; i<a.len; i++){
  * 		printf("%d ", a.arr[i]);
  * 	}
  * }
  *
  * int main() {
  * 	ARRAY(int) a = ARRAY_NEW(int, 10);
- * 	for (size_t i=0; i<a.len; i++){
+ * 	for (usize i=0; i<a.len; i++){
  * 		a.arr[i] = i;
  * 	}
  * 	print_int_array(a);
@@ -167,7 +167,7 @@
 
 /**
  * @brief Declares a type name for an array with elements of a
- * given TYPE called TYPEArray (for example int_array, size_t_array, etc).
+ * given TYPE called TYPEArray (for example int_array, usize_array, etc).
  * By importing this file you get the declaration of
  * TYPEArray for all the core types defined in coretype.h.
  * @see ARRAY
@@ -175,7 +175,7 @@
 #define DECL_ARRAY(TYPE, ...)\
 	typedef struct {\
 		TYPE *arr;\
-		size_t len;\
+		usize len;\
 	} ARRAY(TYPE);
 
 XX_CORETYPES(DECL_ARRAY)

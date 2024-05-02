@@ -33,7 +33,7 @@
 #include "new.h"
 
 
-char *cstr_new(size_t len)
+char *cstr_new(usize len)
 {
 	char *ret;
 	ret = (char *) malloc((len + 1) * sizeof(char));
@@ -53,7 +53,7 @@ char *cstr_clone(const char *src)
 }
 
 
-char *cstr_clone_len(const char *src, size_t len)
+char *cstr_clone_len(const char *src, usize len)
 {
 	char *ret = cstr_new(len);
 	memcpy(ret, src, len * sizeof(char));
@@ -63,7 +63,7 @@ char *cstr_clone_len(const char *src, size_t len)
 
 char *cstr_reassign(char *dest, const char *src)
 {
-	const size_t n = strlen(src);
+	const usize n = strlen(src);
 	char *ret = (char *) realloc(dest, (n + 1) * sizeof(char));
 	strncpy(ret, src, n);
 	ret[n] = '\0';
@@ -71,21 +71,21 @@ char *cstr_reassign(char *dest, const char *src)
 }
 
 
-void cstr_fill(char *str, size_t from, size_t to, char c)
+void cstr_fill(char *str, usize from, usize to, char c)
 {
-	for (size_t i = from; i < to; i++) {
+	for (usize i = from; i < to; i++) {
 		str[i] = c;
 	}
 }
 
 
-void cstr_clear(char *str, size_t len)
+void cstr_clear(char *str, usize len)
 {
 	memset(str, '\0', (len + 1)*sizeof(char));
 }
 
 
-char *cstr_substr(char *str, size_t from,  size_t to)
+char *cstr_substr(char *str, usize from,  usize to)
 {
 	char *ret = cstr_new(to - from);
 	memcpy(ret, str + from, to - from);
@@ -93,32 +93,32 @@ char *cstr_substr(char *str, size_t from,  size_t to)
 }
 
 
-char *cstr_ncpy(char *dest, char *src, size_t n)
+char *cstr_ncpy(char *dest, char *src, usize n)
 {
-	size_t m = strlen(src);
+	usize m = strlen(src);
 	m = MIN(m, n);
 	dest[m] = '\0';
 	return strncpy(dest, src, m);
 }
 
 
-void cstr_crop(char *str, size_t from,  size_t to)
+void cstr_crop(char *str, usize from,  usize to)
 {
 	str = memmove(str, str + from, to - from);
 	str[to - from] = '\0';
 }
 
 
-void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
+void cstr_trim(char *str, usize len, char *unwanted, usize unw_len)
 {
-	size_t end = len;
-	for (size_t j = 0; j < unw_len; j++) {
+	usize end = len;
+	for (usize j = 0; j < unw_len; j++) {
 		while (end && str[end - 1] == unwanted[j]) end--;
 	}
 	str[end] = '\0';
 	if (end) {
-		size_t begin = 0;
-		for (size_t j = 0; j < unw_len; j++) {
+		usize begin = 0;
+		for (usize j = 0; j < unw_len; j++) {
 			while (str[begin] == unwanted[j]) begin++;
 		}
 		if (begin) {
@@ -129,9 +129,9 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
 }
 
 
-char *cstr_resize(char *str, size_t len)
+char *cstr_resize(char *str, usize len)
 {
-	size_t l = strlen(str);
+	usize l = strlen(str);
 	str = realloc(str, len + 1);
 	if (l < len) {
 		memset(str + l, '\0', (len - l));
@@ -147,7 +147,7 @@ char *cstr_fit(char *str)
 }
 
 
-char *cstr_cut(char *str, size_t from, size_t to)
+char *cstr_cut(char *str, usize from, usize to)
 {
 	if (from >= to) return str;
 	strcpy(&(str[from]), &(str[to]));
@@ -156,9 +156,9 @@ char *cstr_cut(char *str, size_t from, size_t to)
 
 
 
-void cstr_revert(char *str, size_t len)
+void cstr_revert(char *str, usize len)
 {
-	size_t i = 0, j = len - 1;
+	usize i = 0, j = len - 1;
 	char c;
 	while (i < j) {
 		c = str[i];
@@ -218,7 +218,7 @@ bool cstr_equals_ignore_case(const char *left, const char *right)
 {
 	if ((left == NULL) ^ (right == NULL)) return false;
 	else if ((left == NULL) && (right == NULL)) return true;
-	size_t i, l = strlen(left);
+	usize i, l = strlen(left);
 	if ( l != strlen(right) )
 		return false;
 	for (i = 0; i < l && tolower(left[i]) == tolower(right[i]); i++);
@@ -226,13 +226,13 @@ bool cstr_equals_ignore_case(const char *left, const char *right)
 }
 
 
-char *cstr_join(const char *sep, size_t n, ...)
+char *cstr_join(const char *sep, usize n, ...)
 {
 	va_list valist;
-	size_t len = 0;
+	usize len = 0;
 	{
 		va_start(valist, n);
-		for (size_t i = 0; i < n; i++) {
+		for (usize i = 0; i < n; i++) {
 			len += strlen(va_arg(valist, char *));
 		}
 		va_end(valist);
@@ -241,7 +241,7 @@ char *cstr_join(const char *sep, size_t n, ...)
 	char *ret = cstr_new(len);
 	{
 		va_start(valist, n);
-		for (size_t i = 0; i < n; i++) {
+		for (usize i = 0; i < n; i++) {
 			strcat(ret, va_arg(valist, char *));
 			if (i + 1 < n) {
 				strcat(ret, sep);

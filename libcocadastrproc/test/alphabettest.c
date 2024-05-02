@@ -31,14 +31,14 @@
 void test_ab(CuTest *tc)
 {
 	memdbg_reset();
-	size_t size = 16;
+	usize size = 16;
 	char *letters =
 	    "0123456789ABCDEF0123456789ABCDEF"; // len=60
 	Alphabet *ab;
 	ab = alphabet_new(strlen(letters), letters);
 	CuAssertSizeTEquals(tc, 16, alphabet_size(ab));
-	for (size_t i = 0; i < alphabet_size(ab); i++) {
-		size_t rk = alphabet_rank(ab, letters[i]);
+	for (usize i = 0; i < alphabet_size(ab); i++) {
+		usize rk = alphabet_rank(ab, letters[i]);
 		CuAssertSizeTEquals(tc, i, rk);
 		xchar c = alphabet_char(ab, i);
 		CuAssert(tc, "ab_char error", letters[i] == c);
@@ -52,12 +52,12 @@ void test_ab(CuTest *tc)
 void test_int_ab(CuTest *tc)
 {
 	memdbg_reset();
-	size_t size = 16;
+	usize size = 16;
 	Alphabet *ab;
 	ab = alphabet_new_int_ab(size);
-	for (size_t i = 0; i < size; i++) {
+	for (usize i = 0; i < size; i++) {
 		xchar c = (xchar)i;
-		size_t rk = alphabet_rank(ab, c);
+		usize rk = alphabet_rank(ab, c);
 		CuAssertSizeTEquals(tc, i, rk);
 		xchar d = alphabet_char(ab, i);
 		CuAssert(tc, "ab_char error", c == d);
@@ -76,8 +76,8 @@ void test_ab_with_equivs(CuTest *tc)
 
 	CuAssertSizeTEquals(tc, 4, alphabet_size(ab));
 
-	for (size_t r = 0; r < 4; r++) {
-		for (size_t j = 0, l = strlen(letters[r]); j < l; j++) {
+	for (usize r = 0; r < 4; r++) {
+		for (usize j = 0, l = strlen(letters[r]); j < l; j++) {
 			CuAssertSizeTEquals(tc, r, alphabet_rank(ab, letters[r][j]));
 		}
 	}

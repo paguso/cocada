@@ -148,7 +148,7 @@ uint64 prime_succ(uint64 n);
  * @warning This function is slow because it takes care of overflows.
  */
 #define AVG_DECL(TYPE, ...)\
-	double average_##TYPE(TYPE *vals, size_t n);
+	double average_##TYPE(TYPE *vals, usize n);
 
 XX_UNSIGNED_INT(AVG_DECL)
 
@@ -159,7 +159,7 @@ XX_UNSIGNED_INT(AVG_DECL)
  * Else, a copy is first created and @p v is left intact.
  */
 #define KTH_SMALLEST_DECL(TYPE, ...)\
-	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty);
+	TYPE kth_smallest_##TYPE(TYPE *v, usize len, usize k, bool dirty);
 
 XX_PRIMITIVES(KTH_SMALLEST_DECL)
 
@@ -170,7 +170,7 @@ XX_PRIMITIVES(KTH_SMALLEST_DECL)
  * Else, a copy is first created and @p v is left intact.
  */
 #define MEDIAN_DECL(TYPE, ...)\
-	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);
+	TYPE median_##TYPE(TYPE *v, usize len, bool dirty);
 
 XX_PRIMITIVES(MEDIAN_DECL)
 

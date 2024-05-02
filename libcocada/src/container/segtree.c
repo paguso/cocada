@@ -50,8 +50,8 @@ XX_PRIMITIVES(SEGTREE_MERGE_IMPL)
 
 
 struct _SegTree {
-	size_t range;
-	size_t typesize;
+	usize range;
+	usize typesize;
 	MergeFunc merge;
 	void *init_val;
 	Vec *tree;
@@ -64,7 +64,7 @@ static void segtree_reset(SegTree *self)
 }
 
 
-SegTree *segtree_new(size_t range, size_t typesize, MergeFunc merge,
+SegTree *segtree_new(usize range, usize typesize, MergeFunc merge,
                      const void *init_val)
 {
 	SegTree *ret = NEW(SegTree);
@@ -87,7 +87,7 @@ void segtree_free(SegTree *self)
 }
 
 
-void segtree_upd(SegTree *self, size_t pos, const void *val)
+void segtree_upd(SegTree *self, usize pos, const void *val)
 {
 	pos += self->range;
 	vec_set(self->tree, pos, val);
@@ -99,13 +99,13 @@ void segtree_upd(SegTree *self, size_t pos, const void *val)
 }
 
 
-const void *segtree_qry(SegTree *self, size_t pos)
+const void *segtree_qry(SegTree *self, usize pos)
 {
 	return vec_get(self->tree, pos + self->range);
 }
 
 
-void segtree_range_qry(SegTree *self, size_t left, size_t right, void *dest)
+void segtree_range_qry(SegTree *self, usize left, usize right, void *dest)
 {
 	memcpy(dest, self->init_val, self->typesize);
 	for (left += self->range, right += self->range; left < right;
@@ -121,19 +121,19 @@ void segtree_range_qry(SegTree *self, size_t left, size_t right, void *dest)
 
 
 #define SEGTREE_UPD_IMPL(TYPE)\
-	void segtree_upd_##TYPE(SegTree *self, size_t pos, TYPE val) {\
+	void segtree_upd_##TYPE(SegTree *self, usize pos, TYPE val) {\
 		segtree_upd(self, pos, &val);\
 	}
 
 
 #define SEGTREE_QRY_IMPL(TYPE)\
-	TYPE segtree_qry_##TYPE(SegTree *self, size_t pos) {\
+	TYPE segtree_qry_##TYPE(SegTree *self, usize pos) {\
 		return *((TYPE *)segtree_qry(self, pos));\
 	}
 
 
 #define SEGTREE_RANGE_QRY_IMPL(TYPE)\
-	TYPE segtree_range_qry_##TYPE(SegTree *self, size_t left, size_t right) {\
+	TYPE segtree_range_qry_##TYPE(SegTree *self, usize left, usize right) {\
 		TYPE ret;\
 		segtree_range_qry(self, left, right, &ret);\
 		return ret;\

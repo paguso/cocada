@@ -40,7 +40,7 @@ void test_kll_upd(CuTest *tc)
 	double err = 0.01;
 	KLLSumm *summ = kll_new(sizeof(int), cmp_int, err);
 	kll_print(summ, stderr, print_int);
-	size_t n = 10000;
+	usize n = 10000;
 	int univ = 300;
 	int *ranks = ARR_OF_0_NEW(int, univ);
 	for (int i = 0; i < n; i++) {
@@ -60,7 +60,7 @@ void test_kll_upd(CuTest *tc)
 	for (int sum = 0, nxtsum = 0, i = 0; i < univ; i++) {
 		nxtsum += ranks[i];
 		ranks[i] = sum;
-		size_t kllrk =  kll_rank(summ, &i);
+		usize kllrk =  kll_rank(summ, &i);
 		DEBUG("val=%d  rank=%d  kll_rank=%zu  rel.err=%f\n", i, ranks[i], kllrk,
 		      abs(((double)kllrk - (double)ranks[i])) / (double)n);
 		if ( abs((double)kllrk - (double)ranks[i]) > epsN) {
@@ -106,7 +106,7 @@ void test_kll_upd_obj (CuTest *tc)
 	kll_obj *val = NEW(kll_obj);
 	for (int i = 0; i < univ; i++) {
 		val->key = i;
-		size_t r = kll_rank(summ, &val);
+		usize r = kll_rank(summ, &val);
 		DEBUG("KLL Obj rank (key=%d) = %zu\n", i, r);
 	}
 	FREE(val);

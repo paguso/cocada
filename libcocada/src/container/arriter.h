@@ -43,9 +43,9 @@
 typedef struct {
 	Iter _t_Iter;
 	void *src;
-	size_t typesize;
-	size_t len;
-	size_t index;
+	usize typesize;
+	usize len;
+	usize index;
 } ArrIter;
 
 
@@ -55,7 +55,7 @@ typedef struct {
  * @param len the source array length
  * @param typesize the size of the elements stored in the source array in bytes
  */
-ArrIter *arr_get_iter(void *arr, size_t len, size_t typesize);
+ArrIter *arr_get_iter(void *arr, usize len, usize typesize);
 
 
 DECL_TRAIT(ArrIter, Iter);

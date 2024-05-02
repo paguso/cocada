@@ -30,7 +30,7 @@
 #include "strstream.h"
 
 static char *str;
-static size_t slen;
+static usize slen;
 static char *filename;
 static FILE *file;
 
@@ -56,13 +56,13 @@ void test_strstream_getc(CuTest *tc)
 	strstream_test_setup(tc);
 
 	StrStream *ssst, *fsst;
-	size_t i;
+	usize i;
 	int c;
 
 	ssst = strstream_open_str(str, slen);
 	fsst = strstream_open_file(filename);
 
-	for (size_t k = 0; k < 5; k++) {
+	for (usize k = 0; k < 5; k++) {
 		i = 0;
 		for (i = 0; (c = strstream_getc(ssst)) != EOF; i++) {
 			//printf ("s i=%zu c=%c\n", i, (char)c);
@@ -91,15 +91,15 @@ void test_strstream_reads(CuTest *tc)
 	strstream_test_setup(tc);
 
 	StrStream *ssst, *fsst;
-	size_t dlen = 7;
+	usize dlen = 7;
 	char *dest = cstr_new(slen);
 	char *exp = cstr_new(slen);
-	size_t i, n;
+	usize i, n;
 
 	ssst = strstream_open_str(str, slen);
 	fsst = strstream_open_file(filename);
 
-	for (size_t k = 0; k < 5; k++) {
+	for (usize k = 0; k < 5; k++) {
 		for (i = 0; (n = strstream_reads(ssst, dest, dlen)); i += n) {
 			exp = strncpy(dest, str + i, n);
 			//printf ("s read=%s exp=%s\n", dest, exp);

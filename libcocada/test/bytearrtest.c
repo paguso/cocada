@@ -31,11 +31,11 @@
 #include "memdbg.h"
 
 static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
-static size_t ba_size;
+static usize ba_size;
 
 static void reset_arrays()
 {
-	size_t i, j;
+	usize i, j;
 	for (i = 0; i < ba_size; i++) {
 		ba_zeros[i] = 0x0;
 		ba_ones[i] = ~(0x0);
@@ -81,7 +81,7 @@ void bytearray_test_teardown(CuTest *tc)
 
 void test_revert_bytes(CuTest *tc)
 {
-	size_t i;
+	usize i;
 	uint32 a, ainv;
 	byte *ap, *ainvp;
 	a = 0xccddeeff;
@@ -98,7 +98,7 @@ void test_revert_bytes(CuTest *tc)
 
 void test_bytearr_write_int(CuTest *tc)
 {
-	size_t ntests, from_byte, i, bytecrop;
+	usize ntests, from_byte, i, bytecrop;
 	int written, read;
 	ntests = 10000;
 	for (i = 0; i < ntests; i++) {
@@ -128,7 +128,7 @@ void test_bytearr_write_int(CuTest *tc)
 
 void test_bytearr_write_uint(CuTest *tc)
 {
-	size_t ntests, from_byte, i, bytecrop;
+	usize ntests, from_byte, i, bytecrop;
 	unsigned int written, read;
 	ntests = 1000;
 	for (i = 0; i < ntests; i++) {
@@ -138,7 +138,7 @@ void test_bytearr_write_uint(CuTest *tc)
 		bytearr_write_uint(ba_zeros, from_byte, written, bytecrop);
 		read = bytearr_read_uint(ba_zeros, from_byte, bytecrop);
 		if (bytecrop < sizeof(unsigned int)) {
-			written &= (size_t)((((unsigned int)0x1) << (bytecrop * BYTESIZE)) - 1);
+			written &= (usize)((((unsigned int)0x1) << (bytecrop * BYTESIZE)) - 1);
 			written <<= (BYTESIZE * sizeof(unsigned int) - (bytecrop * BYTESIZE));
 			if (written < 0) {
 				written = ~0 & written >> ((BYTESIZE * sizeof(unsigned int)) -
@@ -155,25 +155,25 @@ void test_bytearr_write_uint(CuTest *tc)
 }
 
 
-void test_bytearr_write_size_t(CuTest *tc)
+void test_bytearr_write_usize(CuTest *tc)
 {
-	size_t ntests, from_byte, i, bytecrop;
-	size_t written, read;
+	usize ntests, from_byte, i, bytecrop;
+	usize written, read;
 	ntests = 1000;
 	for (i = 0; i < ntests; i++) {
-		from_byte = rand() % (ba_size - sizeof(size_t));
-		written = (size_t)(rand());
-		bytecrop = i % (sizeof(size_t) +1);
-		bytearr_write_size_t(ba_zeros, from_byte, written, bytecrop);
-		read = bytearr_read_size_t(ba_zeros, from_byte, bytecrop);
-		if (bytecrop < sizeof(size_t)) {
-			written &= (size_t)((((size_t)0x1) << (bytecrop * BYTESIZE)) - 1);
-			written <<= (BYTESIZE * sizeof(size_t) - (bytecrop * BYTESIZE));
+		from_byte = rand() % (ba_size - sizeof(usize));
+		written = (usize)(rand());
+		bytecrop = i % (sizeof(usize) + 1);
+		bytearr_write_usize(ba_zeros, from_byte, written, bytecrop);
+		read = bytearr_read_usize(ba_zeros, from_byte, bytecrop);
+		if (bytecrop < sizeof(usize)) {
+			written &= (usize)((((usize)0x1) << (bytecrop * BYTESIZE)) - 1);
+			written <<= (BYTESIZE * sizeof(usize) - (bytecrop * BYTESIZE));
 			if (written < 0) {
-				written = ~0 & written >> ((BYTESIZE * sizeof(size_t)) - (bytecrop * BYTESIZE));
+				written = ~0 & written >> ((BYTESIZE * sizeof(usize)) - (bytecrop * BYTESIZE));
 			}
 			else {
-				written >>= ((BYTESIZE * sizeof(size_t)) - (bytecrop * BYTESIZE));
+				written >>= ((BYTESIZE * sizeof(usize)) - (bytecrop * BYTESIZE));
 			}
 		}
 		//printf(">> written = %x. read = %x\n", written, read);
@@ -188,7 +188,7 @@ CuSuite *bytearray_get_test_suite()
 	SUITE_ADD_TEST(suite, bytearray_test_setup);
 	SUITE_ADD_TEST(suite, test_bytearr_write_int);
 	SUITE_ADD_TEST(suite, test_bytearr_write_uint);
-	SUITE_ADD_TEST(suite, test_bytearr_write_size_t);
+	SUITE_ADD_TEST(suite, test_bytearr_write_usize);
 	SUITE_ADD_TEST(suite, bytearray_test_teardown);
 	return suite;
 }

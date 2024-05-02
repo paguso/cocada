@@ -42,7 +42,7 @@ TWUHash *twuhash_new(byte in_bits, byte out_bits)
 	ret->in_bits = in_bits;
 	ret->out_bits = out_bits;
 	ret->A = ARR_OF_0_NEW(uint64, out_bits);
-	for (size_t i = 0; i < out_bits; i++) {
+	for (usize i = 0; i < out_bits; i++) {
 		ret->A[i] = rand_next();
 		ret->A[i] >>= (64 - out_bits);
 	}
@@ -56,7 +56,7 @@ TWUHash *twuhash_new(byte in_bits, byte out_bits)
 uint64 twuhash_hash(TWUHash *h, uint64 x)
 {
 	uint64 ret = 0;
-	for (size_t k = 0; k < h->out_bits; k++) {
+	for (usize k = 0; k < h->out_bits; k++) {
 		ret <<= 1;
 		ret |= (uint64_bitcount1(h->A[k] & x) & 1);
 	}

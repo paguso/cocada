@@ -59,27 +59,27 @@ void fasta_index_free(FASTAIndex *self);
 /**
  * @brief
  */
-size_t fasta_index_size(FASTAIndex *self);
+usize fasta_index_size(FASTAIndex *self);
 
 
 /**
  * @brief
  */
-void fasta_index_add(FASTAIndex *self, size_t descr_offset, size_t seq_offset);
+void fasta_index_add(FASTAIndex *self, usize descr_offset, usize seq_offset);
 
 
 /**
  * @brief FASTA record offset.
  */
 typedef struct {
-	size_t descr_offset;	/**< Record description offset. */
-	size_t seq_offset;	/**< Record sequence offset. */
+	usize descr_offset;	/**< Record description offset. */
+	usize seq_offset;	/**< Record sequence offset. */
 } FASTARecOffsets;
 
 
 /**
  * @brief Returns the offsets (description, sequence) of the record #@p rec_no.
  */
-FASTARecOffsets fasta_index_get(FASTAIndex *self, size_t rec_no);
+FASTARecOffsets fasta_index_get(FASTAIndex *self, usize rec_no);
 
 #endif

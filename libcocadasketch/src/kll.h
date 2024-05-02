@@ -128,7 +128,7 @@ typedef struct _KLLSumm KLLSumm;
 /**
  * @brief Default minimum KLL summary capacity (nb. of physically stored data points)
  */
-static const size_t KLL_DEFAULT_CAP = 1024;
+static const usize KLL_DEFAULT_CAP = 1024;
 
 /**
  * @brief Default value of `c` constant (see kll.h module documentation)
@@ -168,7 +168,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * @see kll_new_with_cap
  *
  */
-KLLSumm *kll_new(size_t typesize, CmpFunc cmp, double err);
+KLLSumm *kll_new(usize typesize, CmpFunc cmp, double err);
 
 
 /**
@@ -187,7 +187,7 @@ KLLSumm *kll_new(size_t typesize, CmpFunc cmp, double err);
  *
  * @see new.h
  */
-KLLSumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
+KLLSumm *kll_new_own(usize typesize, CmpFunc cmp, double err,
                      Finaliser *chd_fr);
 
 
@@ -241,8 +241,8 @@ KLLSumm *kll_new_own(size_t typesize, CmpFunc cmp, double err,
  *
  * @see errlog.h
  */
-KLLSumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
-                          size_t cap);
+KLLSumm *kll_new_with_cap(usize typesize, CmpFunc cmp, double eps,
+                          usize cap);
 
 
 /**
@@ -251,8 +251,8 @@ KLLSumm *kll_new_with_cap(size_t typesize, CmpFunc cmp, double eps,
  * @see kll_new_own
  * @see kll_new_with_cap
  */
-KLLSumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double eps,
-                              size_t cap, Finaliser *chd_fr);
+KLLSumm *kll_new_own_with_cap(usize typesize, CmpFunc cmp, double eps,
+                              usize cap, Finaliser *chd_fr);
 
 
 /**
@@ -273,7 +273,7 @@ void kll_upd(KLLSumm *self, void *val);
  * with constant `O(err)` error probability.
  * @see kll.h module documentation
  */
-size_t kll_rank(KLLSumm *self, void *val);
+usize kll_rank(KLLSumm *self, void *val);
 
 /**
  * @brief Prints a representation of the summary to a given output stream

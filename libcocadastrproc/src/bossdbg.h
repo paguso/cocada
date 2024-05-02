@@ -55,7 +55,7 @@ typedef struct _BOSSdBG BOSSdBG;
  *        this string after padding.
  * @param k A stictly positive order.
  */
-BOSSdBG *bossdbg_new_from_str(Alphabet *ab, char *txt, size_t k,
+BOSSdBG *bossdbg_new_from_str(Alphabet *ab, char *txt, usize k,
                               bool multigraph);
 
 
@@ -63,7 +63,7 @@ BOSSdBG *bossdbg_new_from_str(Alphabet *ab, char *txt, size_t k,
  * @brief Creates a dBG from a source stream.
  * @see bossbossdbg_new_from_string
  */
-BOSSdBG *bossdbg_new_from_stream( Alphabet *ab, StrStream *sst, size_t k,
+BOSSdBG *bossdbg_new_from_stream( Alphabet *ab, StrStream *sst, usize k,
                                   bool multigraph );
 
 
@@ -95,19 +95,19 @@ Alphabet *bossdbg_ext_ab(BOSSdBG *g);
 /**
  * @brief Returns the number of distinct nodes of the dBG.
  */
-size_t bossdbg_nnodes(BOSSdBG *g);
+usize bossdbg_nnodes(BOSSdBG *g);
 
 
 /**
  * @brief Returns the number of distinct edges of the dBG.
  */
-size_t bossdbg_nedges(BOSSdBG *g);
+usize bossdbg_nedges(BOSSdBG *g);
 
 
 /**
  * @brief Returns the order of the dBG.
  */
-size_t bossdbg_k(BOSSdBG *g);
+usize bossdbg_k(BOSSdBG *g);
 
 
 /**
@@ -125,7 +125,7 @@ bool bossdbg_is_multigraph(BOSSdBG *g);
  * @param nrk The node rank. If nrk>=nnodes, the result is undefined.
  * @see bossdbg_node_rank
  */
-size_t bossdbg_node_id(BOSSdBG *g, size_t nrk);
+usize bossdbg_node_id(BOSSdBG *g, usize nrk);
 
 
 /**
@@ -136,7 +136,7 @@ size_t bossdbg_node_id(BOSSdBG *g, size_t nrk);
  *            undefined.
  * @see bossdbg_node_rank
  */
-size_t bossdbg_node_rank(BOSSdBG *g, size_t nid);
+usize bossdbg_node_rank(BOSSdBG *g, usize nid);
 
 
 /**
@@ -144,14 +144,14 @@ size_t bossdbg_node_rank(BOSSdBG *g, size_t nid);
  * @param nid The node id. If a nonexistant id is given, the result is
  *            the empty string.
  */
-void bossdbg_node_lbl(BOSSdBG *g, size_t nid, xstr *dest);
+void bossdbg_node_lbl(BOSSdBG *g, usize nid, xstr *dest);
 
 
 /**
  * @brief Returns the outdegree of a node given its id.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t bossdbg_outdeg(BOSSdBG *g, size_t nid);
+usize bossdbg_outdeg(BOSSdBG *g, usize nid);
 
 
 /**
@@ -159,7 +159,7 @@ size_t bossdbg_outdeg(BOSSdBG *g, size_t nid);
  *        edge label @p c.
  *        If @p nid is invalid, the result is undefined.
  */
-size_t bossdbg_lbl_outdeg(BOSSdBG *g, size_t nid, xchar c);
+usize bossdbg_lbl_outdeg(BOSSdBG *g, usize nid, xchar c);
 
 
 /**
@@ -171,7 +171,7 @@ size_t bossdbg_lbl_outdeg(BOSSdBG *g, size_t nid, xchar c);
  * @param nid The id of the parent node.
  * @param c The outgoing edge label.
  */
-size_t bossdbg_child(BOSSdBG *g, size_t nid, xchar c);
+usize bossdbg_child(BOSSdBG *g, usize nid, xchar c);
 
 
 /**
@@ -180,7 +180,7 @@ size_t bossdbg_child(BOSSdBG *g, size_t nid, xchar c);
  * @param nid The node id of the child node. If a nonexistant id is given,
  *        the result is undefined.
  */
-size_t bossdbg_parent(BOSSdBG *g, size_t nid);
+usize bossdbg_parent(BOSSdBG *g, usize nid);
 
 
 /**

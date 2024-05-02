@@ -34,8 +34,8 @@ typedef struct _xstrRead xstrRead;
 typedef struct {
 	void 	 (*reset) (xstrRead *self);
 	xwchar (*getch) (xstrRead *self);
-	size_t   (*read) (xstrRead *self, xstr *dest, size_t n);
-	size_t   (*read_until) (xstrRead *self, xstr *dest, xchar delim);
+	usize   (*read) (xstrRead *self, xstr *dest, usize n);
+	usize   (*read_until) (xstrRead *self, xstr *dest, xchar delim);
 } xstrread_vt;
 
 
@@ -67,7 +67,7 @@ xwchar xstrread_getc(xstrRead *trait);
  * @returns The number of chars actually read (and possibly discarded if @p dest is NULL).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
-size_t xstrread_read(xstrRead *trait, xstr *dest, size_t n);
+usize xstrread_read(xstrRead *trait, xstr *dest, usize n);
 
 
 /**
@@ -79,7 +79,7 @@ size_t xstrread_read(xstrRead *trait, xstr *dest, size_t n);
  * @returns The number of chars actually read (excluding the delimiter).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
-size_t xstrread_read_until(xstrRead *trait, xstr *dest, xchar delim);
+usize xstrread_read_until(xstrRead *trait, xstr *dest, xchar delim);
 
 
 

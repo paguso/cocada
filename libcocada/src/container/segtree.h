@@ -110,7 +110,7 @@ XX_PRIMITIVES(SEGTREE_MERGE_DECL)
  * @param init_val The default value returned by the query over an empty interval.
  * This value is also used for initialising the array elements.
  */
-SegTree *segtree_new(size_t range, size_t typesize, MergeFunc merge,
+SegTree *segtree_new(usize range, usize typesize, MergeFunc merge,
                      const void *init_val);
 
 
@@ -123,25 +123,25 @@ void segtree_free(SegTree *self);
 /**
  * @brief Updates an individual position
  */
-void segtree_upd(SegTree *self, size_t pos, const void *val);
+void segtree_upd(SegTree *self, usize pos, const void *val);
 
 
 /**
  * @brief Queries an individual position
  */
-const void *segtree_qry(SegTree *self, size_t pos);
+const void *segtree_qry(SegTree *self, usize pos);
 
 
 /**
  * @brief Range query over `T[left, right)`.
  */
-void segtree_range_qry(SegTree *self, size_t left, size_t right, void *dest);
+void segtree_range_qry(SegTree *self, usize left, usize right, void *dest);
 
 
 #define SEGTREE_OPS_DECL(TYPE, ...)\
-	void segtree_upd_##TYPE(SegTree *self, size_t pos, TYPE val);\
-	TYPE segtree_qry_##TYPE(SegTree *self, size_t pos);\
-	TYPE segtree_range_qry_##TYPE(SegTree *self, size_t left, size_t right);\
+	void segtree_upd_##TYPE(SegTree *self, usize pos, TYPE val);\
+	TYPE segtree_qry_##TYPE(SegTree *self, usize pos);\
+	TYPE segtree_range_qry_##TYPE(SegTree *self, usize left, usize right);\
 
 
 XX_CORETYPES(SEGTREE_OPS_DECL)

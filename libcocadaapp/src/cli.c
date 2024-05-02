@@ -74,7 +74,7 @@ struct _CLIArg {
 
 typedef struct {
 	CLIOptComboType type;
-	size_t size;
+	usize size;
 	char shortnames[32];
 } optcombo;
 
@@ -265,7 +265,7 @@ static bool _arechoices(Vec *choices)
 	bool ok = true;
 	ok &= (choices != NULL);
 	ok &= (vec_len(choices) > 0);
-	for (size_t i = 0, l = vec_len(choices); ok && (i < l); i++) {
+	for (usize i = 0, l = vec_len(choices); ok && (i < l); i++) {
 		char *id = vec_get_cstr(choices, i);
 		ok &= _isid(id);
 	}
@@ -291,7 +291,7 @@ static bool _validate_defaults(Vec *defaults, CLIArgType type, Vec *choices)
 	case ARG_CHAR:
 		ERROR_ASSERT(vec_typesize(defaults) == sizeof(char),
 		             "Default values for ARG_CHAR arguments must be of char type.");
-		for (size_t i = 0, l = vec_len(defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(defaults); i < l; i++) {
 			char c = vec_get_char(defaults, i);
 			ERROR_ASSERT(isprint(c),
 			             "Default values for ARG_CHAR arguments must be printable chars");
@@ -312,7 +312,7 @@ static bool _validate_defaults(Vec *defaults, CLIArgType type, Vec *choices)
 	case ARG_STR:
 		ERROR_ASSERT(vec_typesize(defaults) == sizeof(char *),
 		             "Default values for ARG_STR arguments must be of char* type.");
-		for (size_t i = 0, l = vec_len(defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(defaults); i < l; i++) {
 			char *c = vec_get_cstr(defaults, i);
 			ERROR_ASSERT(strlen(c) == 0 || c[0] != '-',
 			             "Default values for ARG_STR arguments must not begin with '-'.");
@@ -321,7 +321,7 @@ static bool _validate_defaults(Vec *defaults, CLIArgType type, Vec *choices)
 	case ARG_FILE:
 		ERROR_ASSERT(vec_typesize(defaults) == sizeof(char *),
 		             "Default values for ARG_FILE arguments must be of char* type.");
-		for (size_t i = 0, l = vec_len(defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(defaults); i < l; i++) {
 			char *c = vec_get_cstr(defaults, i);
 			ERROR_ASSERT(strlen(c) == 0 || c[0] != '-',
 			             "Default values for ARG_FILE arguments must not begin with '-'.");
@@ -330,7 +330,7 @@ static bool _validate_defaults(Vec *defaults, CLIArgType type, Vec *choices)
 	case ARG_DIR:
 		ERROR_ASSERT(vec_typesize(defaults) == sizeof(char *),
 		             "Default values for ARG_DIR arguments must be of char* type.");
-		for (size_t i = 0, l = vec_len(defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(defaults); i < l; i++) {
 			char *c = vec_get_cstr(defaults, i);
 			ERROR_ASSERT(strlen(c) == 0 || c[0] != '-',
 			             "Default values for ARG_DIR arguments must not begin with '-'.");
@@ -339,7 +339,7 @@ static bool _validate_defaults(Vec *defaults, CLIArgType type, Vec *choices)
 	case ARG_CHOICE:
 		ERROR_ASSERT(vec_typesize(defaults) == sizeof(char *),
 		             "Default values for ARG_CHOICE arguments must be of char* type.");
-		for (size_t i = 0, l = vec_len(defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(defaults); i < l; i++) {
 			char *c = vec_get_cstr(defaults, i);
 			ERROR_ASSERT(strlen(c) == 0 || c[0] != '-',
 			             "Default values for ARG_CHOICE arguments must not begin with '-'.");
@@ -605,7 +605,7 @@ void cliparser_add_subcommand(CLIParser *cmd,  CLIParser *subcmd)
 	FOREACH_IN_ITER(optentry, HashMapEntry, HashMapIter_as_Iter(it)) {
 		CLIOpt *opt = *((CLIOpt **)(optentry->val));
 		if (opt->type == ARG_CHOICE) {
-			for (size_t i = 0, l = vec_len(opt->choices); i < l; i++) {
+			for (usize i = 0, l = vec_len(opt->choices); i < l; i++) {
 				char *ch = vec_get_cstr(opt->choices, i);
 				ERROR_ASSERT(_not_a_subcmd_name(ch, cmd),
 				             "Subcommand choice option '%s' is a subcommand name of %s.",
@@ -614,7 +614,7 @@ void cliparser_add_subcommand(CLIParser *cmd,  CLIParser *subcmd)
 		}
 		if (opt->defaults != NULL && ( opt->type == ARG_STR || opt->type == ARG_FILE
 		                               || opt->type == ARG_DIR || opt->type == ARG_CHOICE ) ) {
-			for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+			for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 				char *val = vec_get_cstr(opt->defaults, i);
 				ERROR_ASSERT(_not_a_subcmd_name(val, cmd),
 				             "Value '%s' of option of -%c of %s is a subcommand name of %s.",
@@ -637,7 +637,7 @@ void cliparser_add_option(CLIParser *cmd, CLIOpt *opt)
 	              || !hashmap_contains(cmd->long_to_short, &(opt->longname)),
 	              "Duplicate option longname --%s.", opt->longname );
 	if (opt->type == ARG_CHOICE) {
-		for (size_t i = 0, l = vec_len(opt->choices); i < l; i++) {
+		for (usize i = 0, l = vec_len(opt->choices); i < l; i++) {
 			char *ch = vec_get_cstr(opt->choices, i);
 			ERROR_ASSERT(_not_a_subcmd_name(ch, cmd),
 			             "Value '%s' for option -%c is not allowed because it is a (sub)command name.\n",
@@ -646,7 +646,7 @@ void cliparser_add_option(CLIParser *cmd, CLIOpt *opt)
 	}
 	if (opt->defaults != NULL && ( opt->type == ARG_STR || opt->type == ARG_FILE
 	                               || opt->type == ARG_DIR || opt->type == ARG_CHOICE ) ) {
-		for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+		for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 			char *val = vec_get_cstr(opt->defaults, i);
 			ERROR_ASSERT(_not_a_subcmd_name(val, cmd),
 			             "Default value '%s' for option -%c is not allowed because it is a (sub)command name.\n",
@@ -660,7 +660,7 @@ void cliparser_add_option(CLIParser *cmd, CLIOpt *opt)
 }
 
 
-void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, size_t n,
+void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, usize n,
                                 ...)
 {
 	optcombo c;
@@ -668,7 +668,7 @@ void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, size_t n,
 	c.size = 0;
 	va_list valist;
 	va_start(valist, n);
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		CLIOpt *opt = va_arg(valist, CLIOpt *);
 		c.shortnames[c.size++] = opt->shortname;
 	}
@@ -695,7 +695,7 @@ static char *type_lbl[9] = {"", "boolean", "char", "integer", "float", "literal"
 
 static void _cliopt_print_help(CLIOpt *opt)
 {
-	size_t mult_idx = 0;
+	usize mult_idx = 0;
 	switch (opt->need) {
 	case OPT_REQUIRED:
 		switch (opt->multi) {
@@ -778,7 +778,7 @@ void cliparser_print_help(const CLIParser *cmd)
 	if (has_options) {
 		printf(" <options>");
 	}
-	for (size_t i = 0, l = vec_len(cmd->args); i < l; i++) {
+	for (usize i = 0, l = vec_len(cmd->args); i < l; i++) {
 		CLIArg *arg = (CLIArg *)vec_get_rawptr(cmd->args, i);
 		printf(" <%s%s>", arg->name, (arg->single_val) ? "" : "...");
 	}
@@ -796,7 +796,7 @@ void cliparser_print_help(const CLIParser *cmd)
 		}
 		FREE(it);
 		vec_qsort(shortnames, cmp_char);
-		for (size_t i = 0, l = vec_len(shortnames); i < l; i++) {
+		for (usize i = 0, l = vec_len(shortnames); i < l; i++) {
 			CLIOpt *opt = (CLIOpt *) hashmap_get_rawptr(cmd->options, vec_get(shortnames,
 			              i));
 			_cliopt_print_help(opt);
@@ -808,7 +808,7 @@ void cliparser_print_help(const CLIParser *cmd)
 	}
 	if (has_args) {
 		printf("\nArguments:\n\n");
-		for (size_t i = 0, l = vec_len(cmd->args); i < l; i++) {
+		for (usize i = 0, l = vec_len(cmd->args); i < l; i++) {
 			CLIArg *arg = (CLIArg *)vec_get_rawptr(cmd->args, i);
 			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single_val) ? "" : "...",
 			       (arg->help) ? arg->help : "", type_lbl[arg->type],
@@ -817,7 +817,7 @@ void cliparser_print_help(const CLIParser *cmd)
 	}
 	if (has_subcmds) {
 		printf("\nSubcommands:\n\n");
-		for (size_t i = 0, l = vec_len(cmd->subcmd_names); i < l; i++) {
+		for (usize i = 0, l = vec_len(cmd->subcmd_names); i < l; i++) {
 			char *subcmd_name = vec_get_cstr(cmd->subcmd_names, i);
 			CLIParser *subcmd = (CLIParser *)hashmap_get_rawptr(cmd->subcommands,
 			                    &subcmd_name);
@@ -876,25 +876,25 @@ static RESULT_OK_ERR(CLIParser) _check_missing_options(CLIParser *cmd)
 				vec_cat(vals, opt->defaults);
 				break;
 			case ARG_STR:
-				for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+				for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_FILE:
-				for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+				for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_DIR:
-				for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+				for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
 				break;
 			case ARG_CHOICE:
-				for (size_t i = 0, l = vec_len(opt->defaults); i < l; i++) {
+				for (usize i = 0, l = vec_len(opt->defaults); i < l; i++) {
 					char *val = vec_get_cstr(opt->defaults, i);
 					vec_push_rawptr(vals, cstr_clone(val));
 				}
@@ -924,10 +924,10 @@ static RESULT_OK_ERR(CLIParser) _check_option_combos(CLIParser *cmd)
 {
 	RESULT_OK_ERR(CLIParser) result = {.ok = true, .val.ok = cmd};
 
-	for (size_t i = 0, l = vec_len(cmd->optcombos); i < l; i++) {
+	for (usize i = 0, l = vec_len(cmd->optcombos); i < l; i++) {
 		optcombo *c = (optcombo *) vec_get(cmd->optcombos, i);
-		size_t nused = 0;
-		for (size_t j = 0; j < c->size; j++) {
+		usize nused = 0;
+		for (usize j = 0; j < c->size; j++) {
 			char shortname = c->shortnames[j];
 			if (hashmap_contains(cmd->options, &shortname)) {
 				nused++;
@@ -1360,7 +1360,7 @@ const Vec *cliparser_opt_val_from_longname(const CLIParser *cmd, char *longname)
 }
 
 
-const Vec *cliparser_arg_val_from_pos(const CLIParser *cmd, size_t pos)
+const Vec *cliparser_arg_val_from_pos(const CLIParser *cmd, usize pos)
 {
 	if (pos < vec_len(cmd->args)) {
 		return ((CLIArg *)vec_get_rawptr(cmd->args, pos))->values;

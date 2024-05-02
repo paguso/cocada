@@ -49,12 +49,12 @@ typedef struct _AVLNode {
 
 struct _AVL {
 	AVLNode *root;
-	size_t typesize;
+	usize typesize;
 	CmpFunc cmp;
 };
 
 
-AVL *avl_new(size_t typesize, CmpFunc cmp)
+AVL *avl_new(usize typesize, CmpFunc cmp)
 {
 	AVL *ret = NEW(AVL);
 	ret->typesize = typesize;
@@ -394,14 +394,14 @@ XX_CORETYPES(AVL_DEL_IMPL)
 
 
 
-static void __avl_print(AVLNode *root, size_t level, FILE *stream,
+static void __avl_print(AVLNode *root, usize level, FILE *stream,
                         void (*prt_val)(FILE *, const void *))
 {
 	if (root == NULL) {
 		return;
 	}
 	__avl_print(root->left, level + 1, stream, prt_val);
-	for (size_t i = 0; i < level; i++) {
+	for (usize i = 0; i < level; i++) {
 		fprintf(stream, "    ");
 	}
 	fprintf(stream, "[val=");

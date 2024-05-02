@@ -35,13 +35,13 @@ xwchar xstrread_getc(xstrRead *trait)
 }
 
 
-size_t xstrread_read(xstrRead *trait, xstr *dest, size_t n)
+usize xstrread_read(xstrRead *trait, xstr *dest, usize n)
 {
 	return trait->vt->read(trait, dest, n);
 }
 
 
-size_t xstrread_read_until(xstrRead *trait,  xstr *dest, xchar delim)
+usize xstrread_read_until(xstrRead *trait,  xstr *dest, xchar delim)
 {
 	return trait->vt->read_until(trait, dest, delim);
 }

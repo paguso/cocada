@@ -193,7 +193,7 @@ See release notes for porting issues."
  * @brief returns the minimal number of bytes required to represent @p nvalues
  * distinct values, that is ceil(log2(nvalues)/8).
  */
-size_t nbytes(size_t nvalues);
+usize nbytes(usize nvalues);
 
 
 /**

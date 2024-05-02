@@ -56,19 +56,19 @@
  * Library type         | One-word name  | Defined in
  * ---------------------|----------------|--------------------
  * _Bool                | bool           | stdbool.h
- * size_t               | size_t         | stddef.h
- * int8               | int8         | stdint.h
- * uint8              | uint8        | stdint.h
- * int16              | int16        | stdint.h
- * uint16             | uint16       | stdint.h
- * int32              | int32        | stdint.h
- * uint32             | uint32       | stdint.h
- * int64              | int64        | stdint.h
- * uint64             | uint64       | stdint.h
+ * size_t               | usize          | stddef.h
+ * int8_t               | int8           | stdint.h
+ * uint8_t              | uint8          | stdint.h
+ * int16_t              | int16          | stdint.h
+ * uint16_t             | uint16         | stdint.h
+ * int32_t              | int32          | stdint.h
+ * uint32_t             | uint32         | stdint.h
+ * int64_t              | int64          | stdint.h
+ * uint64_t             | uint64         | stdint.h
  *
  * Custom types         | One-word name  | Defined in
  * ---------------------|----------------|--------------------
- * byte               | byte         | coretype.h
+ * byte                 | byte           | coretype.h
  * void *               | rawptr         | coretype.h
  * char *               | cstr           | coretype.h
  *
@@ -109,7 +109,6 @@ typedef unsigned char byte;
 #error Error: this code requires an 8-bit byte type
 #endif
 #define BYTE_MAX UCHAR_MAX
-
 
 
 #ifndef uchar
@@ -168,6 +167,10 @@ typedef long long	llong;
 typedef unsigned long long	ullong;
 #endif
 
+#ifndef usize
+typedef size_t usize;
+#endif
+
 #ifndef ldouble
 typedef long double	ldouble;
 #endif
@@ -198,7 +201,7 @@ typedef void	*rawptr;
 #define SIGNED_bool int8
 #define SIGNED__Bool int8
 #define SIGNED_byte int8
-#define SIGNED_size_t llong
+#define SIGNED_usize llong
 #define UNSIGNED_char uchar
 #define UNSIGNED_uchar uchar
 #define UNSIGNED_short ushort
@@ -220,7 +223,7 @@ typedef void	*rawptr;
 #define UNSIGNED_bool uint8
 #define UNSIGNED__Bool uint8
 #define UNSIGNED_byte uint8
-#define UNSIGNED_size_t size_t
+#define UNSIGNED_usize usize
 
 #define SIGNED(TYPE) SIGNED_##TYPE
 #define UNSIGNED(TYPE) UNSIGNED_##TYPE
@@ -299,7 +302,7 @@ typedef char *cstr;
 	XX(uint, __VA_ARGS__) \
 	XX(ulong, __VA_ARGS__) \
 	XX(ullong, __VA_ARGS__) \
-	XX(size_t, __VA_ARGS__) \
+	XX(usize, __VA_ARGS__) \
 	XX(uint8, __VA_ARGS__) \
 	XX(uint16, __VA_ARGS__) \
 	XX(uint32, __VA_ARGS__) \

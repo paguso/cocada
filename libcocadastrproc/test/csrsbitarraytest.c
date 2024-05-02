@@ -35,19 +35,19 @@
 
 #include "CuTest.h"
 
-static size_t nof_arrays;
+static usize nof_arrays;
 static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
 static byte **all_ba;
 static CSRSBitArr *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even,
        *csrsba_rand, *csrsba_alt;
 static CSRSBitArr **all_srsba;
 
-static size_t ba_size = 7000;
+static usize ba_size = 7000;
 
 static void reset_arrays()
 {
-	size_t i, j, ba_byte_size;
-	ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
+	usize i, j, ba_byte_size;
+	ba_byte_size =  (usize)DIVCEIL(ba_size, BYTESIZE);
 	for (i = 0; i < ba_byte_size; i++) {
 		ba_zeros[i] = 0x0;
 		ba_ones[i] = ~(0x0);
@@ -65,8 +65,8 @@ static void reset_arrays()
 
 void csrsbitarr_test_setup(CuTest *tc)
 {
-	size_t ba_byte_size;
-	ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
+	usize ba_byte_size;
+	ba_byte_size =  (usize)DIVCEIL(ba_size, BYTESIZE);
 	nof_arrays = 6;
 	ba_zeros = malloc(ba_byte_size);
 	ba_ones = malloc(ba_byte_size);
@@ -135,11 +135,11 @@ void csrsbitarr_test_teardown(CuTest *tc)
 void test_csrsbitarr_rank0(CuTest *tc)
 {
 	CSRSBitArr *ba;
-	size_t b, i, count;
-	size_t *bf_ranks;
-	size_t max_rank;
+	usize b, i, count;
+	usize *bf_ranks;
+	usize max_rank;
 
-	bf_ranks = calloc(ba_size, sizeof(size_t));
+	bf_ranks = calloc(ba_size, sizeof(usize));
 	for (b = 0; b < nof_arrays; b++) {
 		//printf("Testing rank0 with bitarray #%zu:\n", b);
 
@@ -174,11 +174,11 @@ void test_csrsbitarr_rank0(CuTest *tc)
 void test_csrsbitarr_rank1(CuTest *tc)
 {
 	CSRSBitArr *ba;
-	size_t b, i, count;
-	size_t *bf_ranks;
-	size_t max_rank;
+	usize b, i, count;
+	usize *bf_ranks;
+	usize max_rank;
 
-	bf_ranks = calloc(ba_size, sizeof(size_t));
+	bf_ranks = calloc(ba_size, sizeof(usize));
 	for (b = 0; b < nof_arrays; b++) {
 		//printf("Testing rank1 with bitarray #%zu:\n", b);
 
@@ -212,16 +212,16 @@ void test_csrsbitarr_rank1(CuTest *tc)
 void test_csrsbitarr_select0(CuTest *tc)
 {
 	CSRSBitArr *ba;
-	size_t *bf_selects;
+	usize *bf_selects;
 
-	bf_selects = calloc(ba_size + 1, sizeof(size_t));
-	for (size_t b = 0; b < nof_arrays; b++) {
+	bf_selects = calloc(ba_size + 1, sizeof(usize));
+	for (usize b = 0; b < nof_arrays; b++) {
 		//printf("Testing select0 with bitarray #%zu:\n", b);
 		ba = all_srsba[b];
 		//compute selects by brute force
-		size_t totalzeroes = 0;
-		size_t rank = 0;
-		for (size_t i = 0; i < ba_size; i++) {
+		usize totalzeroes = 0;
+		usize rank = 0;
+		for (usize i = 0; i < ba_size; i++) {
 			if (bitarr_get_bit(all_ba[b], i) == 0) {
 				bf_selects[rank++] = i;
 				//printf("select0[%zu]=%zu\n", rank-1, i);
@@ -230,12 +230,12 @@ void test_csrsbitarr_select0(CuTest *tc)
 		totalzeroes = rank;
 		// then compare them with the function results
 		for (rank = 0; rank < totalzeroes; rank++) {
-			size_t i = csrsbitarr_select0(ba, rank);
+			usize i = csrsbitarr_select0(ba, rank);
 			//printf("select0 of %zu = %zu  (expected %zu)\n", rank, i, bf_selects[rank]);
 			CuAssertSizeTEquals(tc, bf_selects[rank], i);
 		}
 		for (rank = totalzeroes + 1; rank < totalzeroes + (3 * BYTESIZE); rank++) {
-			size_t i = csrsbitarr_select0(ba, rank);
+			usize i = csrsbitarr_select0(ba, rank);
 			//printf("select0 of %zu (>total) = %zu (expected %zu)\n", rank, i, ba_size);
 			CuAssertSizeTEquals(tc, ba_size, i);
 		}
@@ -247,16 +247,16 @@ void test_csrsbitarr_select0(CuTest *tc)
 void test_csrsbitarr_select1(CuTest *tc)
 {
 	CSRSBitArr *ba;
-	size_t *bf_selects;
+	usize *bf_selects;
 
-	bf_selects = calloc(ba_size + 1, sizeof(size_t));
-	for (size_t b = 0; b < nof_arrays; b++) {
+	bf_selects = calloc(ba_size + 1, sizeof(usize));
+	for (usize b = 0; b < nof_arrays; b++) {
 		//printf("Testing select1 with bitarray #%zu:\n", b);
 		ba = all_srsba[b];
 		//compute selects by brute force
-		size_t totalones = 0;
-		size_t rank = 0;
-		for (size_t i = 0; i < ba_size; i++) {
+		usize totalones = 0;
+		usize rank = 0;
+		for (usize i = 0; i < ba_size; i++) {
 			if (bitarr_get_bit(all_ba[b], i) == 1) {
 				bf_selects[rank++] = i;
 				//printf("select1[%zu]=%zu\n", rank-1, i);
@@ -265,12 +265,12 @@ void test_csrsbitarr_select1(CuTest *tc)
 		totalones = rank;
 		// then compare them with the function results
 		for (rank = 0; rank < totalones; rank++) {
-			size_t i = csrsbitarr_select1(ba, rank);
+			usize i = csrsbitarr_select1(ba, rank);
 			//printf("select1 of %zu = %zu  (expected %zu)\n", rank, i, bf_selects[rank]);
 			CuAssertSizeTEquals(tc, bf_selects[rank], i);
 		}
 		for (rank = totalones + 1; rank < totalones + (3 * BYTESIZE); rank++) {
-			size_t i = csrsbitarr_select1(ba, rank);
+			usize i = csrsbitarr_select1(ba, rank);
 			//printf("select1 of %zu (>total) = %zu (expected %zu)\n", rank, i, ba_size);
 			CuAssertSizeTEquals(tc, ba_size, i);
 		}
@@ -283,12 +283,12 @@ void test_csrsbitarr_select1(CuTest *tc)
 void test_csrsbitarr_pred(CuTest *tc)
 {
 	for (byte bit = 0; bit <= 1; bit++) {
-		for (size_t b = 0; b < nof_arrays; b++) {
+		for (usize b = 0; b < nof_arrays; b++) {
 			CSRSBitArr *ba = all_srsba[b];
 
-			size_t exp_pred = ba_size;
-			for (size_t i = 0; i < ba_size; i++) {
-				size_t pred = csrsbitarr_pred(ba, i, bit);
+			usize exp_pred = ba_size;
+			for (usize i = 0; i < ba_size; i++) {
+				usize pred = csrsbitarr_pred(ba, i, bit);
 
 				CuAssertSizeTEquals(tc, exp_pred, pred);
 
@@ -303,12 +303,12 @@ void test_csrsbitarr_pred(CuTest *tc)
 void test_csrsbitarr_succ(CuTest *tc)
 {
 	for (byte bit = 0; bit <= 1; bit++) {
-		for (size_t b = 0; b < nof_arrays; b++) {
+		for (usize b = 0; b < nof_arrays; b++) {
 			CSRSBitArr *ba = all_srsba[b];
 
-			size_t exp_succ = ba_size;
+			usize exp_succ = ba_size;
 			for (long i = ba_size - 1; i > 0; i--) {
-				size_t succ = csrsbitarr_succ(ba, i, bit);
+				usize succ = csrsbitarr_succ(ba, i, bit);
 
 				CuAssertSizeTEquals(tc, exp_succ, succ);
 
@@ -324,7 +324,7 @@ void csrsbitarr_test_empty(CuTest *tc)
 {
 	byte *ba_empty = ARR_NEW(byte, 0);
 	CSRSBitArr *b = csrsbitarr_new(ba_empty, 0);
-	for (size_t i = 0; i < 2; i++) {
+	for (usize i = 0; i < 2; i++) {
 		//csrsbitarr_get(b, i);
 		CuAssertSizeTEquals(tc, 0, csrsbitarr_rank0(b, i));
 		CuAssertSizeTEquals(tc, 0, csrsbitarr_rank1(b, i));

@@ -76,16 +76,16 @@ void test_simple_global_align(CuTest *tc)
 	CuAssert(tc, "Memory leak detected", memdbg_is_empty());
 }
 
-char *random_str(size_t n)
+char *random_str(usize n)
 {
 	char *ret = cstr_new(n);
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		ret[i] = 'a' + rand() % 10;
 	}
 	return ret;
 }
 
-static int read_number_(StrBuf *cigar, size_t pos, int *nb)
+static int read_number_(StrBuf *cigar, usize pos, int *nb)
 {
 	char *s = strbuf_as_str(cigar);
 	s = &s[pos];
@@ -102,10 +102,10 @@ static int read_number_(StrBuf *cigar, size_t pos, int *nb)
 int cigar_cost(StrBuf *cigar, int gap_open, int gap_ext)
 {
 	int ret = 0;
-	size_t n = strbuf_len(cigar);
+	usize n = strbuf_len(cigar);
 	if (n == 0)
 		return 0;
-	size_t i = 0;
+	usize i = 0;
 	int count;
 	i += read_number_(cigar, i, &count);
 	char last_c = strbuf_get(cigar, i++);
@@ -178,8 +178,8 @@ void test_affine_global_align(CuTest *tc)
 	// CuAssertIntEquals(tc, gotoh_cost, align_cost);
 	for (int gap_open = 0; gap_open < 2; gap_open++) {
 		for (int gap_ext = 1; gap_ext < 3; gap_ext++) {
-			for (size_t m = 0; m < 20; m++) {
-				for (size_t n = 0; n < 20; n++) {
+			for (usize m = 0; m < 20; m++) {
+				for (usize n = 0; n < 20; n++) {
 					qry = random_str(m);
 					tgt = random_str(n);
 					strbuf_clear(cigar);

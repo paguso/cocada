@@ -80,11 +80,11 @@ void CuAssertIntEquals_LineMsg(CuTest *tc,
                                const char *file, int line, const char *message,
                                int expected, int actual);
 void CuAssertUIntEquals_LineMsg(CuTest *tc,
-                               const char *file, int line, const char *message,
-                               unsigned int expected, unsigned int actual);
+                                const char *file, int line, const char *message,
+                                unsigned int expected, unsigned int actual);
 void CuAssertLongEquals_LineMsg(CuTest *tc,
-                                 const char *file, int line, const char *message,
-                                 long expected, long actual);
+                                const char *file, int line, const char *message,
+                                long expected, long actual);
 void CuAssertULongEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
                                  unsigned long expected, unsigned long actual);
@@ -92,11 +92,11 @@ void CuAssertLlongEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
                                  long long expected, long long actual);
 void CuAssertULlongEquals_LineMsg(CuTest *tc,
-                                 const char *file, int line, const char *message,
-                                 unsigned long long expected, unsigned long long actual);
+                                  const char *file, int line, const char *message,
+                                  unsigned long long expected, unsigned long long actual);
 void CuAssertSizeTEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
-                                 size_t expected, size_t actual);
+                                 usize expected, usize actual);
 void CuAssertDblEquals_LineMsg(CuTest *tc,
                                const char *file, int line, const char *message,
                                double expected, double actual, double delta);

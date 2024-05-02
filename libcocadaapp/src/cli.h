@@ -486,7 +486,7 @@ void cliparser_add_option(CLIParser *cmd, CLIOpt *opt);
  * @warning The combo specifies the dependencies between the options only,
  * and they must be independently added via ::cliparser_add_option.
  */
-void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, size_t n,
+void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, usize n,
                                 ...);
 
 
@@ -661,7 +661,7 @@ const Vec *cliparser_opt_val_from_longname(const CLIParser *cmd,
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */
-const Vec *cliparser_arg_val_from_pos(const CLIParser *cmd, size_t pos);
+const Vec *cliparser_arg_val_from_pos(const CLIParser *cmd, usize pos);
 
 
 

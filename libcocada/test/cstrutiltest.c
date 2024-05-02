@@ -36,10 +36,10 @@
 void test_sizet_to_cstr(CuTest *tc)
 {
 	memdbg_reset();
-	size_t max = ~0x0;
+	usize max = ~0x0;
 	char str[100];
 	memset(str, 0, 100);
-	for (size_t n = max - 100; n <= max; n++) {
+	for (usize n = max - 100; n <= max; n++) {
 		uint_to_cstr(str, n, 'b');
 		DEBUG("binary  n = %s\n", str);
 		uint_to_cstr(str, n, 'o');

@@ -30,13 +30,13 @@
 
 typedef struct _GKSumm GKSumm;
 
-GKSumm *gk_new(size_t typesize, CmpFunc cmp, double err);
+GKSumm *gk_new(usize typesize, CmpFunc cmp, double err);
 
 void gk_upd(GKSumm *self, const void *val);
 
 void gk_merge(GKSumm *self, const GKSumm *other);
 
-size_t gk_rank(GKSumm *self, const void *val);
+usize gk_rank(GKSumm *self, const void *val);
 
 void gk_print(GKSumm *self, FILE *stream, void (*print_val)(FILE *,
               const void *));

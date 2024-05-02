@@ -41,14 +41,14 @@ void xstrhash_finalise(void *ptr, const Finaliser *fnr);
 
 uint64 xstrhash_lex(const xstrHash *self, const xstr *s);
 
-uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                        size_t to);
+uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, usize from,
+                        usize to);
 
 uint64 xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64 hash,
                          xchar c);
 
-uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                             size_t to, uint64 hash, xchar c);
+uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, usize from,
+                             usize to, uint64 hash, xchar c);
 
 
 #endif

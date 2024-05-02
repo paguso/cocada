@@ -37,7 +37,7 @@
 void test_huffcode_new(CuTest *tc)
 {
 	char *letters = "abcde";
-	size_t freqs[5] = {15, 7, 6, 6, 5};
+	usize freqs[5] = {15, 7, 6, 6, 5};
 	Alphabet *ab;
 	ab = alphabet_new(5, letters);
 	huffcode *hc = huffcode_new(ab, freqs);
@@ -45,18 +45,18 @@ void test_huffcode_new(CuTest *tc)
 	huffcode_free(hc);
 }
 
-static void _random_str(char *dest, Alphabet *ab, size_t len)
+static void _random_str(char *dest, Alphabet *ab, usize len)
 {
-	for (size_t i = 0; i < len;
-	        dest[i++] = alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab))));
+	for (usize i = 0; i < len;
+	        dest[i++] = alphabet_char(ab, rand_range_usize(0, alphabet_size(ab))));
 }
 
 
 void test_huffcode_codec(CuTest *tc)
 {
-	size_t max_len = 1024;
+	usize max_len = 1024;
 	char *letters = "abcdefghijklmnopqrstuvwxyz";
-	for (size_t len = 2; len < max_len; len++) {
+	for (usize len = 2; len < max_len; len++) {
 		Alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
 		char *str = cstr_new(len);
 		_random_str(str, ab, len);
@@ -64,7 +64,7 @@ void test_huffcode_codec(CuTest *tc)
 		//huffcode_print(hc);
 		BitVec *code = huffcode_encode(str, len, hc);
 		xstr *xsdec = huffcode_decode(code, hc);
-		//bytearr_print(code.rawcode, (size_t)mult_ceil(code.code_len, BYTESIZE), 4, "");
+		//bytearr_print(code.rawcode, (usize)mult_ceil(code.code_len, BYTESIZE), 4, "");
 		//printf("original=%s\n",str);
 		//printf("decoded =%s\n",dec);
 		char *dec = xstr_detach(xsdec);

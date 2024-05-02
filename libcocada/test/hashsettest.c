@@ -31,14 +31,14 @@
 
 typedef uint32 uint;
 
-static size_t _key_fn(const void *elt)
+static usize _key_fn(const void *elt)
 {
-	return (size_t)(*((uint *)elt));
+	return (usize)(*((uint *)elt));
 }
 
 static bool _equals_fn(const void *elt1, const void *elt2)
 {
-	return ((size_t)(*((uint *)elt1)) == (size_t)(*((uint *)elt2)));
+	return ((usize)(*((uint *)elt1)) == (usize)(*((uint *)elt2)));
 }
 
 static int _uint_cmp_fn(const void *elt1, const void *elt2)
@@ -48,7 +48,7 @@ static int _uint_cmp_fn(const void *elt1, const void *elt2)
 
 void test_hashset_indel(CuTest *tc)
 {
-	size_t n = 105;
+	usize n = 105;
 	HashSet *set;
 	uint elt, *elts;
 	set = hashset_new(sizeof(uint), &_key_fn, &_equals_fn);
@@ -103,14 +103,14 @@ void test_hashset_indel(CuTest *tc)
 
 	elts = ARR_NEW(uint, n);
 	HashSetIter *it = hashset_get_iter(set);
-	size_t i = 0;
+	usize i = 0;
 	FOREACH_IN_ITER(e, uint, HashSetIter_as_Iter(it)) {
 		elts[i++] = *e;
 		//printf("element[%zu] = %u\n",i,*e);
 	}
 	qsort(elts, n, sizeof(uint), &_uint_cmp_fn);
-	for ( size_t i = 0; i < n; i++) {
-		CuAssertSizeTEquals(tc, i * 10, (size_t)elts[i]);
+	for ( usize i = 0; i < n; i++) {
+		CuAssertSizeTEquals(tc, i * 10, (usize)elts[i]);
 		//printf("element[%zu] = %u\n",i, elts[i]);
 	}
 

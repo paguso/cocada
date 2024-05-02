@@ -50,9 +50,9 @@ void test_getc(CuTest *tc)
 {
 	test_setup();
 	FileReader *sfr = filereader_new_from_path(filename);
-	size_t n = strlen(file_content);
+	usize n = strlen(file_content);
 	char c;
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		c = read_getc(FileReader_as_Read(sfr));
 		CuAssertCharEquals(tc, file_content[i], c);
 	}

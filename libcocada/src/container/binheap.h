@@ -22,7 +22,6 @@
 #ifndef BINHEAP_H
 #define BINHEAP_H
 
-#include <stdlib.h>
 #include <stddef.h>
 
 #include "new.h"
@@ -72,7 +71,7 @@ typedef struct _BinHeap BinHeap;
 /**
  * @brief Creates a new empty binary heap.
  */
-BinHeap *binheap_new(size_t typesize, CmpFunc cmp);
+BinHeap *binheap_new(usize typesize, CmpFunc cmp);
 
 
 /**
@@ -85,7 +84,7 @@ void binheap_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the number of elements stored in the heap.
  */
-size_t binheap_size(const BinHeap *heap);
+usize binheap_size(const BinHeap *heap);
 
 
 /**

@@ -32,7 +32,7 @@ typedef struct _xstrReader xstrReader;
 
 xstrReader *xstrreader_open(xstr *src);
 
-xstrReader *xstrreader_open_str(char *src, size_t len);
+xstrReader *xstrreader_open_str(char *src, usize len);
 
 xstrReader *xstrreader_open_strread(Read *read);
 

@@ -29,7 +29,7 @@ int write_write (Write *self, char *buf)
 }
 
 
-int write_write_n (Write *self, char *buf, size_t n)
+int write_write_n (Write *self, char *buf, usize n)
 {
 	return self->vt->write_n(self, buf, n);
 }

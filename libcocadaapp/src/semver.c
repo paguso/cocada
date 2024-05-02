@@ -39,7 +39,7 @@
 
 #define is_id_char( chr )     ( is_digit(chr) || is_non_digit(chr) )
 
-static  bool is_digits(const char *str, size_t len )
+static  bool is_digits(const char *str, usize len )
 {
 	if (len == 0) return false;
 	for (char *c = (char *)str; c != str + len; c++) {
@@ -49,7 +49,7 @@ static  bool is_digits(const char *str, size_t len )
 }
 
 /*
-static bool is_id_chars(const char *str, size_t len ) {
+static bool is_id_chars(const char *str, usize len ) {
     if (len==0) return false;
     for (char *c = str; c != str + len; c++) {
         if ( !is_id_char(*c) ) return false;
@@ -58,7 +58,7 @@ static bool is_id_chars(const char *str, size_t len ) {
 }
 */
 
-bool is_num_id(const char *str, const size_t len)
+bool is_num_id(const char *str, const usize len)
 {
 	if (len == 0) return false;
 	if (len == 1 && *str == '0') return true;
@@ -69,7 +69,7 @@ bool is_num_id(const char *str, const size_t len)
 	return is_digits(c, len - 1);
 }
 
-bool is_alphanum_id(const char *str, const size_t len)
+bool is_alphanum_id(const char *str, const usize len)
 {
 	if (len == 0) return false;
 	bool hasnondigit = false;
@@ -80,12 +80,12 @@ bool is_alphanum_id(const char *str, const size_t len)
 	return hasnondigit;
 }
 
-static bool is_pre_rel_id(const char *str, const size_t len)
+static bool is_pre_rel_id(const char *str, const usize len)
 {
 	return is_alphanum_id(str, len) || is_num_id(str, len);
 }
 
-static bool is_build_id(const char *str, const size_t len)
+static bool is_build_id(const char *str, const usize len)
 {
 	return is_alphanum_id(str, len) || is_digits(str, len);
 }
@@ -94,7 +94,7 @@ static bool is_build_id(const char *str, const size_t len)
 RESULT_OK(SemVer) semver_new_from_str(const char *src)
 {
 	char *start = (char *)src;
-	size_t len = strlen(src);
+	usize len = strlen(src);
 	char *stop;
 	int major, minor, patch;
 	char *pre_rel = NULL, *build = NULL;
@@ -129,7 +129,7 @@ RESULT_OK(SemVer) semver_new_from_str(const char *src)
 		char *dot = strpbrk(start, ".");
 		dot = (dot != NULL) ? dot : stop;
 		while ( dot <= stop) {
-			size_t n = (dot - start) / sizeof(char);
+			usize n = (dot - start) / sizeof(char);
 			if (!is_pre_rel_id(start, n)) {
 				parse_err = true;
 				goto cleanup;
@@ -148,7 +148,7 @@ RESULT_OK(SemVer) semver_new_from_str(const char *src)
 		char *dot = strpbrk(start, ".");
 		dot = (dot != NULL) ? dot : stop;
 		while ( dot <= stop) {
-			size_t n = (dot - start) / sizeof(char);
+			usize n = (dot - start) / sizeof(char);
 			if (!is_build_id(start, n)) {
 				parse_err = true;
 				goto cleanup;

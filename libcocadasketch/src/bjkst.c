@@ -34,25 +34,25 @@
 
 
 struct _BJKST {
-	size_t nbits;      // size of stream elts in bits
+	usize nbits;      // size of stream elts in bits
 	uint64 max_val;  // max allowed stream value = 1<<nbits
 	double eps;        // error
 	double delta;      // error prob
 	TWUHash *g;        // 2-way indep hash function
-	size_t buf_cap;    // buffer capacity
-	size_t buf_size;   // current buffer size
+	usize buf_cap;    // buffer capacity
+	usize buf_size;   // current buffer size
 	HashSet **buf;     // buffers. one for each nb of trailing zeros
-	size_t min_zeros;  // min nb of trailing zeros currently being accounted for
+	usize min_zeros;  // min nb of trailing zeros currently being accounted for
 };
 
 
-static size_t get_buf_cap(double eps, double delta)
+static usize get_buf_cap(double eps, double delta)
 {
-	return  (size_t)(1.0 / (eps * eps));
+	return  (usize)(1.0 / (eps * eps));
 }
 
 
-BJKST *bjkst_init(size_t nbits, double eps, double delta)
+BJKST *bjkst_init(usize nbits, double eps, double delta)
 {
 	ERROR_ASSERT( 0 < nbits && nbits < 64,
 	              "BJKST: Allowed #bits range is 1..63.");
@@ -80,7 +80,7 @@ void bjkst_process(BJKST *counter, uint64 val)
 	             " Allowed range is [0,%"PRIu64").", val, counter->max_val);
 	uint64 hval = twuhash_hash(counter->g, val);
 	ERROR_ASSERT( hval < counter->max_val, "BJKST: invalid hvalue." );
-	size_t zeros = uint64_lobit(hval);
+	usize zeros = uint64_lobit(hval);
 	zeros = MIN(zeros, counter->nbits);
 	if ( zeros < counter->min_zeros
 	        || hashset_contains_uint64(counter->buf[zeros], hval)) return;
@@ -101,7 +101,7 @@ void bjkst_process(BJKST *counter, uint64 val)
 
 uint64 bjkst_qry(BJKST *counter)
 {
-	size_t min_nonempty_zeros = counter->min_zeros;
+	usize min_nonempty_zeros = counter->min_zeros;
 	while (min_nonempty_zeros < counter->nbits
 	        && hashset_size(counter->buf[min_nonempty_zeros]) == 0 ) {
 		min_nonempty_zeros++;

@@ -36,8 +36,8 @@
 struct _xstrReader {
 	xstrRead _t_xstrRead;
 	void     *src;
-	size_t   index;
-	size_t   len;
+	usize   index;
+	usize   len;
 };
 
 
@@ -59,11 +59,11 @@ static xwchar _xstr_getc(xstrRead *t)
 	}
 }
 
-size_t  _xstr_read(xstrRead *t, xstr *dest, size_t n)
+usize  _xstr_read(xstrRead *t, xstr *dest, usize n)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	xstr *src = (xstr *) rdr->src;
-	size_t r = MIN(n, xstr_len(src) - rdr->index);
+	usize r = MIN(n, xstr_len(src) - rdr->index);
 	if (dest != NULL) {
 		xstr_ncpy(dest, 0, src, rdr->index, r);
 	}
@@ -72,13 +72,13 @@ size_t  _xstr_read(xstrRead *t, xstr *dest, size_t n)
 }
 
 
-size_t  _xstr_read_until(xstrRead *t, xstr *dest, xchar delim)
+usize  _xstr_read_until(xstrRead *t, xstr *dest, xchar delim)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	xstr *src = (xstr *) rdr->src;
-	size_t i;
+	usize i;
 	for (i = rdr->index; i < xstr_len(src) && xstr_get(src, i) != delim; i++);
-	size_t r = i - rdr->index;
+	usize r = i - rdr->index;
 	if (dest != NULL) {
 		xstr_ncpy(src, 0, dest, rdr->index, r);
 	}
@@ -119,11 +119,11 @@ static xwchar _str_getc(xstrRead *t)
 }
 
 
-size_t  _str_read(xstrRead *t, xstr *dest, size_t n)
+usize  _str_read(xstrRead *t, xstr *dest, usize n)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	char *src = (char *) rdr->src;
-	size_t i, j, l;
+	usize i, j, l;
 	for (i = rdr->index, j = 0, l = MIN(xstr_len(dest), n); j < l
 	        && i < rdr->len ; i++, j++) {
 		xstr_set(dest, j, src[i]);
@@ -136,11 +136,11 @@ size_t  _str_read(xstrRead *t, xstr *dest, size_t n)
 }
 
 
-size_t  _str_read_until(xstrRead *t, xstr *dest, xchar delim)
+usize  _str_read_until(xstrRead *t, xstr *dest, xchar delim)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	char *src = (char *) rdr->src;
-	size_t i, j, l;
+	usize i, j, l;
 	for (i = rdr->index, j = 0, l = xstr_len(dest); j < l && i < rdr->len
 	        && (xchar) src[i] != delim; i++, j++) {
 		xstr_set(dest, j, src[i]);
@@ -164,7 +164,7 @@ static xstrread_vt _str_vt = { .reset = _xstr_reset,
 
 
 
-xstrReader *xstrreader_open_str(char *src, size_t len)
+xstrReader *xstrreader_open_str(char *src, usize len)
 {
 	xstrReader *ret = NEW(xstrReader);
 	ret->_t_xstrRead.impltor = ret;
@@ -191,12 +191,12 @@ static xwchar _strread_getc(xstrRead *t)
 }
 
 
-size_t  _strread_read(xstrRead *t, xstr *dest, size_t n)
+usize  _strread_read(xstrRead *t, xstr *dest, usize n)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	Read *sr = (Read *) rdr->src;
 	char *s = cstr_new(n);
-	size_t r = read_read_str(sr, s, n);
+	usize r = read_read_str(sr, s, n);
 	xstr *xs = xstr_new_from_arr(s, r, sizeof(char));
 	if (dest != NULL) {
 		xstr_ncpy(dest, 0, xs, 0, r);
@@ -205,11 +205,11 @@ size_t  _strread_read(xstrRead *t, xstr *dest, size_t n)
 	return r;
 }
 
-size_t  _strread_read_until(xstrRead *t, xstr *dest, xchar delim)
+usize  _strread_read_until(xstrRead *t, xstr *dest, xchar delim)
 {
 	xstrReader *rdr = (xstrReader *) t->impltor;
 	Read *sr = (Read *) rdr->src;
-	size_t r = 0;
+	usize r = 0;
 	if (dest != NULL) {
 		int c = read_getc(sr);
 		while (c != EOF && c != delim && r < xstr_len(dest)) {

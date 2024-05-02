@@ -28,7 +28,7 @@
 
 
 
-stack *stack_new(size_t typesize)
+stack *stack_new(usize typesize)
 {
 	return vec_new(typesize);
 }

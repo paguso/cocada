@@ -389,7 +389,7 @@ void test_avl_del(CuTest *tc)
 	// FLAT MAP
 
 	AVL *tree = avl_new(sizeof(int), cmp_int);
-	size_t n = 20;
+	usize n = 20;
 
 	for (int i = 0, step = 10; i < step * n; i += step) {
 		int key = i;

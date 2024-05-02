@@ -58,7 +58,7 @@ uint64 rand_next ();
  * Shuffle in-place the elements of array @p arr containing @p n elements
  * of size @p typesize
  */
-void shuffle_arr(void *arr, size_t n, size_t typesize);
+void shuffle_arr(void *arr, usize n, usize typesize);
 
 
 /*
@@ -66,7 +66,7 @@ void shuffle_arr(void *arr, size_t n, size_t typesize);
  */
 #define SHUFFLE_ARR_DECL(TYPE)\
 	/** Suffles an array of @p n TYPE elements in place */\
-	void shuffle_arr_##TYPE(TYPE *arr, size_t n);
+	void shuffle_arr_##TYPE(TYPE *arr, usize n);
 
 
 #define RAND_ALL_DECL(TYPE, ...)\

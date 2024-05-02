@@ -49,26 +49,26 @@ typedef enum {
 struct _Alphabet {
 	AlphabetType  type;
 	rankmode rank_mode;
-	size_t   size;
+	usize   size;
 	char    *letters;
 	union {
-		size_t        *arr;
+		usize        *arr;
 		char_rank_func func;
 	} ranks;
 };
 
 
-Alphabet *alphabet_new(size_t size, const char *letters)
+Alphabet *alphabet_new(usize size, const char *letters)
 {
 	Alphabet *ret;
 	ret =  NEW(Alphabet);
 	ret->type = CHAR_TYPE;
 	ret->rank_mode = ARRAY;
 	ret->letters = ARR_NEW(char, size);
-	ret->ranks.arr = ARR_NEW(size_t, UCHAR_RANGE);
+	ret->ranks.arr = ARR_NEW(usize, UCHAR_RANGE);
 	ARR_FILL(ret->ranks.arr, 0, UCHAR_RANGE, size);
 	ret->size = 0;
-	for (size_t i = 0; i < size; i++) {
+	for (usize i = 0; i < size; i++) {
 		uchar c = letters[i];
 		if (ret->ranks.arr[c] == size) {
 			ret->ranks.arr[c] = ret->size;
@@ -80,7 +80,7 @@ Alphabet *alphabet_new(size_t size, const char *letters)
 			     ret->ranks.arr[c]);
 		}
 	}
-	for (size_t i = 0; i < UCHAR_RANGE; i++) {
+	for (usize i = 0; i < UCHAR_RANGE; i++) {
 		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
 	}
 	ret->letters = cstr_resize(ret->letters, ret->size);
@@ -88,19 +88,19 @@ Alphabet *alphabet_new(size_t size, const char *letters)
 }
 
 
-Alphabet *alphabet_new_with_equivs(size_t size, char **letters)
+Alphabet *alphabet_new_with_equivs(usize size, char **letters)
 {
 	Alphabet *ret = NEW(Alphabet);
 	ret->type = CHAR_TYPE;
 	ret->letters = cstr_new(size);
 	ret->size = 0;
-	ret->ranks.arr = ARR_NEW(size_t, UCHAR_RANGE);
+	ret->ranks.arr = ARR_NEW(usize, UCHAR_RANGE);
 	ret->rank_mode = ARRAY;
 	ARR_FILL(ret->ranks.arr, 0, UCHAR_RANGE, size);
 
-	for (size_t i = 0; i < size; i++) {
+	for (usize i = 0; i < size; i++) {
 		bool i_used = false;
-		for (size_t j = 0, l = strlen(letters[i]); j < l; j++) {
+		for (usize j = 0, l = strlen(letters[i]); j < l; j++) {
 			uchar c = letters[i][j];
 			if (ret->ranks.arr[c] == size) {
 				ret->ranks.arr[c] = ret->size;
@@ -118,7 +118,7 @@ Alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 			ret->size++;
 		}
 	}
-	for (size_t i = 0; i < UCHAR_RANGE; i++) {
+	for (usize i = 0; i < UCHAR_RANGE; i++) {
 		ret->ranks.arr[i] = MIN(ret->ranks.arr[i], ret->size);
 	}
 	ret->letters = cstr_resize(ret->letters, ret->size);
@@ -126,13 +126,13 @@ Alphabet *alphabet_new_with_equivs(size_t size, char **letters)
 }
 
 
-static inline size_t int_ab_rank(xchar c)
+static inline usize int_ab_rank(xchar c)
 {
-	return (size_t)c;
+	return (usize)c;
 }
 
 
-Alphabet *alphabet_new_int_ab(size_t size)
+Alphabet *alphabet_new_int_ab(usize size)
 {
 	Alphabet *ret;
 	ret =  NEW(Alphabet);
@@ -195,7 +195,7 @@ AlphabetType alphabet_type(const Alphabet *ab)
 }
 
 
-size_t alphabet_size(const Alphabet *ab)
+usize alphabet_size(const Alphabet *ab)
 {
 	return ab->size;
 }
@@ -207,7 +207,7 @@ bool alphabet_contains(const Alphabet *ab, xchar c)
 }
 
 
-xchar alphabet_char(const Alphabet *ab, size_t index)
+xchar alphabet_char(const Alphabet *ab, usize index)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
@@ -221,7 +221,7 @@ xchar alphabet_char(const Alphabet *ab, size_t index)
 }
 
 
-size_t alphabet_rank(const Alphabet *ab, xchar c)
+usize alphabet_rank(const Alphabet *ab, xchar c)
 {
 	switch (ab->type) {
 	case CHAR_TYPE:
@@ -237,8 +237,8 @@ size_t alphabet_rank(const Alphabet *ab, xchar c)
 
 int alphabet_cmp(const Alphabet *ab, xchar a, xchar b)
 {
-	size_t ra = alphabet_rank(ab, a);
-	size_t rb = alphabet_rank(ab, b);
+	usize ra = alphabet_rank(ab, a);
+	usize rb = alphabet_rank(ab, b);
 	if (ra == rb) return 0;
 	else if (ra < rb) return -1;
 	else return +1;

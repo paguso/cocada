@@ -31,8 +31,8 @@
 struct _StrReader {
 	Read _t_Read;
 	char *src;
-	size_t len;
-	size_t index;
+	usize len;
+	usize index;
 };
 
 
@@ -67,20 +67,20 @@ static int _strreader_ungetc(Read *t)
 }
 
 
-static size_t _strreader_read_str(Read *t, char *dest, size_t n)
+static usize _strreader_read_str(Read *t, char *dest, usize n)
 {
 	StrReader *rdr = (StrReader *) t->impltor;
-	size_t r = MIN(n, rdr->len - rdr->index);
+	usize r = MIN(n, rdr->len - rdr->index);
 	strncpy(dest, rdr->src + rdr->index, r);
 	rdr->index += r;
 	return r;
 }
 
 
-static size_t _strreader_read_str_until(Read *t, char *dest, char delim)
+static usize _strreader_read_str_until(Read *t, char *dest, char delim)
 {
 	StrReader *rdr = (StrReader *) t->impltor;
-	size_t i, j;
+	usize i, j;
 	for (i = rdr->index, j = 0; i < rdr->len && rdr->src[i] != delim; i++) {
 		dest[j++] = rdr->src[i];
 	}
@@ -98,7 +98,7 @@ static Read_vt _strreader_vt = { .reset = _strreader_reset,
                                };
 
 
-StrReader *strreader_new(char *src, size_t len)
+StrReader *strreader_new(char *src, usize len)
 {
 	StrReader *ret = NEW(StrReader);
 	ret->_t_Read.impltor = ret;

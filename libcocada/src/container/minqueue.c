@@ -33,34 +33,34 @@
 struct _MinQueue {
 	Deque *elts;
 	Deque *mins;
-	size_t dels;
+	usize dels;
 	CmpFunc cmp;
 };
 
 
 struct _MinQueueIter {
 	const MinQueue *src;
-	size_t index;
+	usize index;
 };
 
 
-MinQueue *minqueue_new(size_t typesize,  CmpFunc cmp)
+MinQueue *minqueue_new(usize typesize,  CmpFunc cmp)
 {
 	MinQueue *ret = NEW(MinQueue);
 	ret->elts = deque_new(typesize);
-	ret->mins = deque_new_size_t();
+	ret->mins = deque_new_usize();
 	ret->cmp = cmp;
 	ret->dels = 0;
 	return ret;
 }
 
 
-MinQueue *minqueue_new_with_capacity(size_t typesize,  CmpFunc cmp,
-                                     size_t capacity)
+MinQueue *minqueue_new_with_capacity(usize typesize,  CmpFunc cmp,
+                                     usize capacity)
 {
 	MinQueue *ret = NEW(MinQueue);
 	ret->elts = deque_new_with_capacity(typesize, capacity);
-	ret->mins = deque_new_with_capacity(sizeof(size_t), capacity);
+	ret->mins = deque_new_with_capacity(sizeof(usize), capacity);
 	ret->cmp = cmp;
 	ret->dels = 0;
 	return ret;
@@ -76,7 +76,7 @@ void minqueue_finalise(void *ptr, const Finaliser *fnr )
 }
 
 
-size_t minqueue_len(const MinQueue *queue)
+usize minqueue_len(const MinQueue *queue)
 {
 	return deque_len(queue->elts);
 }
@@ -86,18 +86,18 @@ void minqueue_push(MinQueue *queue, const void *elt)
 {
 	while ( deque_len(queue->mins) > 0 &&
 	        queue->cmp( elt, deque_get(queue->elts,
-	                                   deque_back_size_t(queue->mins) - queue->dels) ) < 0 ) {
-		deque_pop_back_size_t(queue->mins);
+	                                   deque_back_usize(queue->mins) - queue->dels) ) < 0 ) {
+		deque_pop_back_usize(queue->mins);
 	}
-	deque_push_back_size_t(queue->mins, queue->dels + deque_len(queue->elts));
+	deque_push_back_usize(queue->mins, queue->dels + deque_len(queue->elts));
 	deque_push_back(queue->elts, elt);
 }
 
 
 void minqueue_pop(MinQueue *queue, void *dest)
 {
-	if ( deque_front_size_t(queue->mins) == queue->dels ) {
-		deque_pop_front_size_t(queue->mins);
+	if ( deque_front_usize(queue->mins) == queue->dels ) {
+		deque_pop_front_usize(queue->mins);
 	}
 	queue->dels++;
 	deque_pop_front(queue->elts, dest);
@@ -106,8 +106,8 @@ void minqueue_pop(MinQueue *queue, void *dest)
 
 void minqueue_del(MinQueue *queue)
 {
-	if ( deque_front_size_t(queue->mins) == queue->dels ) {
-		deque_pop_front_size_t(queue->mins);
+	if ( deque_front_usize(queue->mins) == queue->dels ) {
+		deque_pop_front_usize(queue->mins);
 	}
 	queue->dels++;
 	deque_del_front(queue->elts);
@@ -129,13 +129,13 @@ const void *minqueue_back(const MinQueue *queue)
 
 const void *minqueue_min(const MinQueue *queue)
 {
-	return deque_get(queue->elts, deque_front_size_t(queue->mins) - queue->dels );
+	return deque_get(queue->elts, deque_front_usize(queue->mins) - queue->dels );
 }
 
 
 void minqueue_min_cpy(const MinQueue *queue, void *dest)
 {
-	deque_get_cpy(queue->elts, deque_front_size_t(queue->mins) - queue->dels,
+	deque_get_cpy(queue->elts, deque_front_usize(queue->mins) - queue->dels,
 	              dest );
 
 }
@@ -185,7 +185,7 @@ XX_CORETYPES(MINQUEUE_ALL_IMPL)
 struct _minqueue_iter
 {
     const minqueue *src;
-    size_t index;
+    usize index;
 };
 */
 
@@ -195,8 +195,8 @@ static void _minqueue_iter_goto_next(MinQueueIter *iter)
 	if (iter->index == 0) return;
 	const MinQueue *src = iter->src;
 	if ( iter->index < deque_len(src->mins) &&
-	        src->cmp( deque_get(src->elts, deque_front_size_t(src->mins) - src->dels),
-	                  deque_get(src->elts, deque_get_size_t(src->mins,
+	        src->cmp( deque_get(src->elts, deque_front_usize(src->mins) - src->dels),
+	                  deque_get(src->elts, deque_get_usize(src->mins,
 	                            iter->index) - src->dels) ) < 0 ) {
 		iter->index = deque_len(src->mins);
 	}
@@ -229,7 +229,7 @@ bool minqueue_iter_has_next(const MinQueueIter *iter)
 const void *minqueue_iter_next(MinQueueIter *iter)
 {
 	const void *ret;
-	ret = deque_get(iter->src->elts, deque_get_size_t(iter->src->mins,
+	ret = deque_get(iter->src->elts, deque_get_usize(iter->src->mins,
 	                iter->index) - iter->src->dels );
 	iter->index += 1;
 	_minqueue_iter_goto_next(iter);

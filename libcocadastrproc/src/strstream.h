@@ -49,7 +49,7 @@ typedef struct _StrStream StrStream;
  * @param str The source string.
  * @param slen The source string length.
  */
-StrStream *strstream_open_str(char *str, size_t slen);
+StrStream *strstream_open_str(char *str, usize slen);
 
 
 /**
@@ -68,7 +68,7 @@ StrStream *strstream_open_file(char *filename);
 /**
  * @brief Opens a stream for a source xstr text file.
  */
-StrStream *strstream_open_xfile(char *filename, size_t bytes_per_char);
+StrStream *strstream_open_xfile(char *filename, usize bytes_per_char);
 
 
 /**
@@ -104,7 +104,7 @@ xchar strstream_getc(StrStream *sst);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strstream_reads(StrStream *sst, char *dest, size_t n);
+usize strstream_reads(StrStream *sst, char *dest, usize n);
 
 
 /**
@@ -112,7 +112,7 @@ size_t strstream_reads(StrStream *sst, char *dest, size_t n);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t strstream_reads_until(StrStream *sst, char *dest, char delim);
+usize strstream_reads_until(StrStream *sst, char *dest, char delim);
 
 
 /**
@@ -120,7 +120,7 @@ size_t strstream_reads_until(StrStream *sst, char *dest, char delim);
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs(StrStream *sst, xstr *xstr, size_t n);
+usize strstream_readxs(StrStream *sst, xstr *xstr, usize n);
 
 
 /**
@@ -128,7 +128,7 @@ size_t strstream_readxs(StrStream *sst, xstr *xstr, size_t n);
  *        Less than @p n xchars can be read if the stream reaches its end.
  * @returns The number of xchars actually read.
  */
-size_t strstream_readxs_until(StrStream *sst, xstr *xstr, xchar delim);
+usize strstream_readxs_until(StrStream *sst, xstr *xstr, xchar delim);
 
 
 /**
@@ -140,6 +140,6 @@ void strstream_close(StrStream *sst);
 /**
  * @brief Returns the size of the xchar used in the stream.
  */
-size_t strstream_sizeof_char(StrStream *sst);
+usize strstream_sizeof_char(StrStream *sst);
 
 #endif

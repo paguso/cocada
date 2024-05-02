@@ -34,9 +34,8 @@
  * @see trait.h
  */
 
-#include <stdbool.h>
-#include <stddef.h>
 
+#include "coretype.h"
 
 typedef struct _Read Read;
 
@@ -47,8 +46,8 @@ typedef struct {
 	void    (*reset) (Read *self);
 	int		(*getc) (Read *self);
 	int		(*ungetc) (Read *self);
-	size_t  (*read_str) (Read *self, char *dest, size_t n);
-	size_t  (*read_str_until) (Read *self, char *dest, char delim);
+	usize  (*read_str) (Read *self, char *dest, usize n);
+	usize  (*read_str_until) (Read *self, char *dest, char delim);
 }  Read_vt;
 
 
@@ -97,7 +96,7 @@ int read_ungetc(Read *self);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-size_t read_read_str(Read *self, char *dest, size_t n);
+usize read_read_str(Read *self, char *dest, usize n);
 
 
 /**
@@ -106,7 +105,7 @@ size_t read_read_str(Read *self, char *dest, size_t n);
  * 		  or the end of the stream is reached.
  * @returns The number of chars actually read.
  */
-size_t read_read_str_until(Read *self, char *dest, char delim);
+usize read_read_str_until(Read *self, char *dest, char delim);
 
 
 

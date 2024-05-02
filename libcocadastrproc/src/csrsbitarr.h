@@ -50,7 +50,7 @@ typedef struct _CSRSBitArr CSRSBitArr;
  *       The raw bitarray may be disposed in the r&s bitarray destructor
  *       by setting the free_data parameter to true.
  */
-CSRSBitArr *csrsbitarr_new(byte *ba, size_t len);
+CSRSBitArr *csrsbitarr_new(byte *ba, usize len);
 
 
 /**
@@ -69,33 +69,33 @@ const byte *csrsbitarr_data(CSRSBitArr *ba);
 /**
  * @brief Prints a representations of the bitarray to standard output.
  */
-void csrsbitarr_fprint(FILE *stream, CSRSBitArr *ba, size_t bytes_per_row);
+void csrsbitarr_fprint(FILE *stream, CSRSBitArr *ba, usize bytes_per_row);
 
 
 /**
  * @brief Returns the length of the bitarray.
  */
-size_t csrsbitarr_len(CSRSBitArr *ba);
+usize csrsbitarr_len(CSRSBitArr *ba);
 
 
 /**
  * @brief Returns the bit at a certain position @p pos.
  */
-bool csrsbitarr_get(CSRSBitArr *ba, size_t pos);
+bool csrsbitarr_get(CSRSBitArr *ba, usize pos);
 
 
 /**
  * @brief Same as csrsbitarr_rank(@p ba, @p pos, 0).
  * @see csrsbitarr_rank
  */
-size_t csrsbitarr_rank0(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_rank0(CSRSBitArr *ba, usize pos);
 
 
 /**
  * @brief Same as csrsbitarr_rank(@p ba, @p pos, 1).
  * @see csrsbitarr_rank
  */
-size_t csrsbitarr_rank1(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_rank1(CSRSBitArr *ba, usize pos);
 
 
 /**
@@ -103,21 +103,21 @@ size_t csrsbitarr_rank1(CSRSBitArr *ba, size_t pos);
  * s.t. @p ba[j]==@p bit, for 0 <= @p pos < @p ba.len. If @pos>= @ba.len
  * returns the total number of positions with value == @p bit.
  */
-size_t csrsbitarr_rank(CSRSBitArr *ba, size_t pos, bool bit);
+usize csrsbitarr_rank(CSRSBitArr *ba, usize pos, bool bit);
 
 
 /**
  * @brief Same as csrsbitarr_select(@p ba, @p rank, 0).
  * @see csrsbitarr_select
  */
-size_t csrsbitarr_select0(CSRSBitArr *ba, size_t rank);
+usize csrsbitarr_select0(CSRSBitArr *ba, usize rank);
 
 
 /**
  * @brief Same as csrsbitarr_select(@p ba, @p rank, 1).
  * @see csrsbitarr_select
  */
-size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank);
+usize csrsbitarr_select1(CSRSBitArr *ba, usize rank);
 
 
 /**
@@ -125,21 +125,21 @@ size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank);
  * @p ba[j]==@p bit and rank_@p bit(@p ba, j)=@p rank.
  * If no such position exists, return @p ba.len.
  */
-size_t csrsbitarr_select(CSRSBitArr *ba, size_t rank, bool bit);
+usize csrsbitarr_select(CSRSBitArr *ba, usize rank, bool bit);
 
 
 /**
  * @brief Same as csrsbitarr_pred(@p ba, @p pos, 0).
  * @see csrsbitarr_pred
  */
-size_t csrsbitarr_pred0(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_pred0(CSRSBitArr *ba, usize pos);
 
 
 /**
  * @brief Same as csrsbitarr_pred(@p ba, @p pos, 1).
  * @see csrsbitarr_pred
  */
-size_t csrsbitarr_pred1(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_pred1(CSRSBitArr *ba, usize pos);
 
 
 /**
@@ -147,21 +147,21 @@ size_t csrsbitarr_pred1(CSRSBitArr *ba, size_t pos);
  * strictly to the left of @p pos, i.e max{j<pos | @p ba[j]==@p bit}.
  * If no such position exists, returns @p ba.len.
  */
-size_t csrsbitarr_pred(CSRSBitArr *ba, size_t pos, bool bit);
+usize csrsbitarr_pred(CSRSBitArr *ba, usize pos, bool bit);
 
 
 /**
  * @brief Same as csrsbitarr_succ(@p ba, @p pos, 0).
  * @see csrsbitarr_succ
  */
-size_t csrsbitarr_succ0(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_succ0(CSRSBitArr *ba, usize pos);
 
 
 /**
  * @brief Same as csrsbitarr_succ(@p ba, @p pos, 1).
  * @see csrsbitarr_succ
  */
-size_t csrsbitarr_succ1(CSRSBitArr *ba, size_t pos);
+usize csrsbitarr_succ1(CSRSBitArr *ba, usize pos);
 
 
 /**
@@ -169,7 +169,7 @@ size_t csrsbitarr_succ1(CSRSBitArr *ba, size_t pos);
  * strictly to the right of @p pos, i.e min{j>pos | @p ba[j]==@p bit}.
  * If no such position exists, returns @p ba.len.
  */
-size_t csrsbitarr_succ(CSRSBitArr *ba, size_t pos, bool bit);
+usize csrsbitarr_succ(CSRSBitArr *ba, usize pos, bool bit);
 
 
 #endif

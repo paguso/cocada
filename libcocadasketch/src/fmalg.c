@@ -32,7 +32,7 @@
 
 
 struct _FMAlg {
-	size_t n, m;
+	usize n, m;
 	KWayRNG ***rng;
 	uint64 maxval;
 	uint64 p2ceil;
@@ -47,7 +47,7 @@ FMAlg *fmalg_init_single(uint64 maxval)
 }
 
 
-FMAlg *fmalg_init(uint64 maxval, size_t n, size_t m)
+FMAlg *fmalg_init(uint64 maxval, usize n, usize m)
 {
 	assert(maxval <= 0x7FFFFFFFFFFFFFFF);
 	FMAlg *ret = NEW(FMAlg);
@@ -68,8 +68,8 @@ FMAlg *fmalg_init(uint64 maxval, size_t n, size_t m)
 
 void fmalg_free(FMAlg *fm)
 {
-	for (size_t i = 0; i < fm->m; i++) {
-		for (size_t j = 0; j < fm->n; j++) {
+	for (usize i = 0; i < fm->m; i++) {
+		for (usize j = 0; j < fm->n; j++) {
 			kwayrng_free(fm->rng[i][j]);
 		}
 	}
@@ -92,8 +92,8 @@ void fmalg_process(FMAlg *fm, uint64 val)
 	            ". Max allowed value is %"PRIu64"", val, fm->maxval - 1);
 	uint64 hashval;
 	byte lsb;
-	for (size_t i = 0; i < fm->m; i++) {
-		for (size_t j = 0; j < fm->n; j++) {
+	for (usize i = 0; i < fm->m; i++) {
+		for (usize j = 0; j < fm->n; j++) {
 			hashval = kwayrng_val(fm->rng[i][j], val);
 			lsb = uint64_lobit( hashval );
 			lsb = MIN(fm->p2ceil, lsb);
@@ -104,11 +104,11 @@ void fmalg_process(FMAlg *fm, uint64 val)
 }
 
 
-static long double pow_avg(byte *vals, size_t n)
+static long double pow_avg(byte *vals, usize n)
 {
 	long double avg = 0;
 	uint64 acc = 0;
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		if ((UINT64_MAX - acc) < vals[i]) {
 			avg += (long double) acc / (long double) n;
 			acc = 0;
@@ -123,7 +123,7 @@ static long double pow_avg(byte *vals, size_t n)
 uint64 fmalg_query(FMAlg *fm)
 {
 	ARR_FILL(fm->avgs, 0, fm->m, 0);
-	for (size_t i = 0; i < fm->m; i++) {
+	for (usize i = 0; i < fm->m; i++) {
 		fm->avgs[i] = pow_avg(fm->maxlsb[i], fm->n);
 	}
 	long double med =  median_ldouble(fm->avgs, fm->m, true);

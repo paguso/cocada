@@ -37,7 +37,7 @@
 typedef struct _fastaread {
 	Read _t_Read;
 	FILE *src;
-	size_t file_pos;
+	usize file_pos;
 } fastaread;
 
 
@@ -73,14 +73,14 @@ static int _getc(Read *self)
 }
 
 
-static size_t _read_str(Read *self, char *dest, size_t n)
+static usize _read_str(Read *self, char *dest, usize n)
 {
 	FILE *src = ((fastaread *)self->impltor)->src;
 	char *origdest = dest;
 	memset(dest, '\0', n + 1);
 	while ( !feof(src) && n > 0 ) {
 		fgets(dest, n + 1, src);
-		size_t l = strlen(dest);
+		usize l = strlen(dest);
 		if (dest[0] == '>') {
 			memset(dest, '\0', l );
 			break;
@@ -96,10 +96,10 @@ static size_t _read_str(Read *self, char *dest, size_t n)
 }
 
 
-static size_t _read_str_until(Read *self, char *dest, char delim)
+static usize _read_str_until(Read *self, char *dest, char delim)
 {
 	FILE *src = ((fastaread *)self->impltor)->src;
-	size_t nread = 0;
+	usize nread = 0;
 	char c;
 	while ( !feof(src) ) {
 		c = fgetc(src);
@@ -139,10 +139,10 @@ struct _FASTA {
 	FILE *src;
 	char *src_path;
 	FASTARec cur_rec;
-	size_t cur_rec_len[2];
+	usize cur_rec_len[2];
 	fastaread rd;
 	FASTARecRdr cur_rec_rd;
-	size_t cur_rec_rd_len[2];
+	usize cur_rec_rd_len[2];
 };
 
 
@@ -206,7 +206,7 @@ bool fasta_has_next(FASTA *self)
 }
 
 
-bool fasta_goto(FASTA *self, size_t descr_offset)
+bool fasta_goto(FASTA *self, usize descr_offset)
 {
 	return ((fseek(self->src, descr_offset, SEEK_SET) == 0) &&
 	        _goto_next(self));
@@ -230,7 +230,7 @@ const FASTARec *fasta_next(FASTA *self)
 	             "Expected '>' at position %ld of %s.\n", self->cur_rec.descr_offset,
 	             self->src_path );
 	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
-	size_t l = 0;
+	usize l = 0;
 	bool eol = false;
 	while (!eol) {
 		if (self->cur_rec_len[0] == l) {
@@ -252,7 +252,7 @@ const FASTARec *fasta_next(FASTA *self)
 	while ( !feof(self->src) ) {
 		if (self->cur_rec_len[1] == l) {
 			self->cur_rec_len[1] *= 1.66f;
-			//(size_t)(1.66f * self->cur_rec_len[1]);
+			//(usize)(1.66f * self->cur_rec_len[1]);
 			self->cur_rec.seq = cstr_resize(self->cur_rec.seq, self->cur_rec_len[1]);
 		}
 		fgets(self->cur_rec.seq + l, self->cur_rec_len[1] - l + 1, self->src);
@@ -281,12 +281,12 @@ const FASTARecRdr *fasta_next_reader(FASTA *self)
 	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset,
 	             self->src_path );
 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
-	size_t l = 0;
+	usize l = 0;
 	bool eol = false;
 	while (!eol) {
 		if (self->cur_rec_rd_len[0] == l) {
 			self->cur_rec_rd_len[0] *= 1.66f;
-			//(size_t)(1.66f * self->cur_rec_rd_len[0]);
+			//(usize)(1.66f * self->cur_rec_rd_len[0]);
 			self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr,
 			                                     self->cur_rec_rd_len[0]);
 		}

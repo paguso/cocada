@@ -92,7 +92,7 @@ int64 vebleaf16_max(vebleaf16_t *leaf)
 }
 
 
-size_t vebleaf16_size(vebleaf16_t *leaf)
+usize vebleaf16_size(vebleaf16_t *leaf)
 {
 	return uint16_bitcount1(*leaf);
 }
@@ -446,7 +446,7 @@ int64 vebnode_pred(void *root, uint32 x, uint nbits)
 
 
 struct _vebset {
-	size_t size;
+	usize size;
 	uint nbits;
 	vebnode *tree;
 };
@@ -477,7 +477,7 @@ void vebset_free(vebset *self)
 }
 
 
-size_t vebset_size(vebset *self)
+usize vebset_size(vebset *self)
 {
 	return self->size;
 }

@@ -31,13 +31,13 @@
 
 void test_kwayrng(CuTest *tc)
 {
-	size_t nbits = 4;
-	for (size_t k = 0; k < 10; k++) {
+	usize nbits = 4;
+	for (usize k = 0; k < 10; k++) {
 		KWayRNG *rng = kwayrng_new(k, nbits);
 		const uint64 *coef = kwayrng_coefs(rng);
 		ARR_FPRINT(stderr, coef, 0, k, 10, "coef", "%zu", " ", "");
 		DEBUG("%zu-way independent sequence:\n", k);
-		for (size_t i = 0; i < kwayrng_maxval(rng); i++) {
+		for (usize i = 0; i < kwayrng_maxval(rng); i++) {
 			DEBUG("X[%zu] = %"PRIu64"\n", i,  kwayrng_next(rng));
 		}
 	}
@@ -45,20 +45,20 @@ void test_kwayrng(CuTest *tc)
 
 void test_uniform(CuTest *tc)
 {
-	size_t *counts = ARR_OF_0_NEW(size_t, 32);
+	usize *counts = ARR_OF_0_NEW(usize, 32);
 	uint64 *coefs = ARR_NEW(uint64, 4);
-	for (size_t k0 = 0; k0 < 32; k0++) {
+	for (usize k0 = 0; k0 < 32; k0++) {
 		coefs[0] = k0;
-		for (size_t k1 = 0; k1 < 32; k1++) {
+		for (usize k1 = 0; k1 < 32; k1++) {
 			coefs[1] = k1;
-			for (size_t k2 = 0; k2 < 32; k2++) {
+			for (usize k2 = 0; k2 < 32; k2++) {
 				coefs[2] = k2;
-				for (size_t k3 = 0; k3 < 32; k3++) {
+				for (usize k3 = 0; k3 < 32; k3++) {
 					coefs[3] = k3;
 					KWayRNG *rng = kwayrng_new_with_coefs(4, coefs,  4);
-					for (size_t x = 0; x < 32; x++) {
+					for (usize x = 0; x < 32; x++) {
 						uint64 val = kwayrng_next(rng);
-						counts[(size_t)val]++;
+						counts[(usize)val]++;
 					}
 				}
 			}

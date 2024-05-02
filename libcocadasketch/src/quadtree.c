@@ -54,16 +54,16 @@ struct _QuadTree {
 
 typedef struct  {
 	void *payload;
-	size_t first_chd;
+	usize first_chd;
 } QuadTreeNode;
 
 
 static QuadTreeNode DUMMY_NODE = {.payload = NULL, .first_chd = 0};
 
 
-static size_t quadtree_node_new(QuadTree *tree)
+static usize quadtree_node_new(QuadTree *tree)
 {
-	size_t new_node_pos = vec_len(tree->nodes);
+	usize new_node_pos = vec_len(tree->nodes);
 	vec_push(tree->nodes, &DUMMY_NODE);
 	vec_push(tree->nodes, &DUMMY_NODE);
 	vec_push(tree->nodes, &DUMMY_NODE);
@@ -72,23 +72,23 @@ static size_t quadtree_node_new(QuadTree *tree)
 }
 
 
-bool quadtree_node_is_leaf(QuadTree *tree, size_t node)
+bool quadtree_node_is_leaf(QuadTree *tree, usize node)
 {
 	return (((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd) == 0;
 }
 
 
-size_t quadtree_node_get_chd(QuadTree *tree, size_t node, QuadPos pos)
+usize quadtree_node_get_chd(QuadTree *tree, usize node, QuadPos pos)
 {
-	size_t fch = ((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd;
+	usize fch = ((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd;
 	return (fch == 0) ? fch : fch + pos;
 }
 
 
-static size_t quadtree_node_get_or_ins_chd(QuadTree *tree, size_t node,
+static usize quadtree_node_get_or_ins_chd(QuadTree *tree, usize node,
         QuadPos pos)
 {
-	size_t fchd = ((const QuadTreeNode *)vec_get(tree->nodes, node))->first_chd;
+	usize fchd = ((const QuadTreeNode *)vec_get(tree->nodes, node))->first_chd;
 	if ( fchd == 0 ) {
 		fchd = quadtree_node_new(tree);
 	}
@@ -97,14 +97,14 @@ static size_t quadtree_node_get_or_ins_chd(QuadTree *tree, size_t node,
 }
 
 
-const void *quadtree_node_get_data(QuadTree *tree, size_t node)
+const void *quadtree_node_get_data(QuadTree *tree, usize node)
 {
 	return (const void *)(((const QuadTreeNode *)vec_get(tree->nodes,
 	                       node))->payload);
 }
 
 
-void quadtree_node_set_data(QuadTree *tree, size_t node, void *data)
+void quadtree_node_set_data(QuadTree *tree, usize node, void *data)
 {
 	((QuadTreeNode *)vec_get_mut(tree->nodes, node))->payload = data;
 }
@@ -177,7 +177,7 @@ void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
 	if (p.x > tree->width || p.y > tree->height) {
 		return;
 	}
-	size_t cur_node = ROOT;
+	usize cur_node = ROOT;
 	upd_func(tree, cur_node, payload);
 	Rectangle rect = {.top_left.x = 0, .top_left.y = 0, .width = tree->width, .height = tree->height};
 	Point2D centre = {.x = rect.width / 2, .y = rect.height / 2};
@@ -264,7 +264,7 @@ Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor)
 }
 
 
-static void quadtree_qry_node(QuadTree *tree, size_t node,
+static void quadtree_qry_node(QuadTree *tree, usize node,
                               Rectangle search_area,
                               Rectangle rect, quadtree_node_qry_func qry_func, void *dest, bool backtrack)
 {

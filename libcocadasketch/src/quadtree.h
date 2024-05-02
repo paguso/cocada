@@ -150,31 +150,31 @@ typedef struct _QuadTree QuadTree;
 /**
  * @brief Returns the child of a node.
  */
-size_t quadtree_node_get_chd(QuadTree *tree, size_t node, QuadPos pos);
+usize quadtree_node_get_chd(QuadTree *tree, usize node, QuadPos pos);
 
 
 /**
  * @brief Gets the node data (payload).
  */
-const void *quadtree_node_get_data(QuadTree *tree, size_t node);
+const void *quadtree_node_get_data(QuadTree *tree, usize node);
 
 
 /**
  * @brief Sets the node data (payload).
  */
-void quadtree_node_set_data(QuadTree *tree, size_t node, void *data);
+void quadtree_node_set_data(QuadTree *tree, usize node, void *data);
 
 
 /**
  * @brief Node update callback function type
  */
-typedef void (*quadtree_node_upd_func)(QuadTree *tree, size_t node, void *data);
+typedef void (*quadtree_node_upd_func)(QuadTree *tree, usize node, void *data);
 
 
 /**
  * @brief Node query callback function type
  */
-typedef void (*quadtree_node_qry_func)(QuadTree *tree, size_t node, void *dest);
+typedef void (*quadtree_node_qry_func)(QuadTree *tree, usize node, void *dest);
 
 
 /**

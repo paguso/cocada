@@ -41,7 +41,7 @@ typedef struct _CSArray CSArray;
  * @brief Creates a CSA for the string @p str of length @p len over
  *        the alphabet @p ab
  */
-CSArray *csarray_new(char *str, size_t len, Alphabet *ab);
+CSArray *csarray_new(char *str, usize len, Alphabet *ab);
 
 
 /**
@@ -69,7 +69,7 @@ void csarray_print(FILE *stream, CSArray *csa);
  *        string s.t. the length of the CSA will be the length of
  *        the source string plus one
  */
-size_t csarray_len(CSArray *csa);
+usize csarray_len(CSArray *csa);
 
 
 /**
@@ -77,7 +77,7 @@ size_t csarray_len(CSArray *csa);
  *        SA' is the inverse of the suffix array and
  *        pos' = SA[i] + 1, if SA[i] < SA.len, or 0 otherwise.
  */
-size_t csarray_phi(CSArray *csa, size_t i);
+usize csarray_phi(CSArray *csa, usize i);
 
 
 /**
@@ -87,7 +87,7 @@ size_t csarray_phi(CSArray *csa, size_t i);
  *        Because of the virtually added sentinel we have
  *        csarray_get(csarr, 0)==csarray_len(csarr)-1
  */
-size_t csarray_get(CSArray *csa, size_t i);
+usize csarray_get(CSArray *csa, usize i);
 
 
 /**
@@ -96,14 +96,14 @@ size_t csarray_get(CSArray *csa, size_t i);
  *        This corresponds to the lexicographic rank of the
  *        source string suffix starting at position @p i.
  */
-size_t csarray_get_inv(CSArray *csa, size_t i);
+usize csarray_get_inv(CSArray *csa, usize i);
 
 
 /**
  * @brief Returns the char at position @p i of the source string inferred
  *        from the CSA.
  */
-xchar csarray_get_char(CSArray *csa, size_t pos);
+xchar csarray_get_char(CSArray *csa, usize pos);
 
 
 #endif

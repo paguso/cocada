@@ -22,9 +22,8 @@
 #ifndef WRITE_H
 #define WRITE_H
 
-#include <stdio.h>
 
-#include "trait.h"
+#include "coretype.h"
 
 
 typedef struct _Write Write;
@@ -34,7 +33,7 @@ typedef struct _Write Write;
  */
 typedef struct {
 	int (*write) (Write *self, char *buf);
-	int (*write_n) (Write *self, char *buf, size_t n);
+	int (*write_n) (Write *self, char *buf, usize n);
 } Write_vt;
 
 
@@ -49,7 +48,7 @@ struct _Write {
 
 int write_write (Write *self, char *buf);
 
-int write_write_n (Write *self, char *buf, size_t n);
+int write_write_n (Write *self, char *buf, usize n);
 
 
 

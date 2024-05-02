@@ -46,7 +46,7 @@ typedef Vec stack;
  * @brief Constructor.
  * @param typesize The individual size of stored elements in bytes.
  */
-stack *stack_new(size_t typesize);
+stack *stack_new(usize typesize);
 
 
 /**

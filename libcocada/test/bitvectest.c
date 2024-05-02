@@ -34,13 +34,13 @@
 #include "mathutil.h"
 #include "memdbg.h"
 
-static size_t ba_size = 1043;
+static usize ba_size = 1043;
 
 
 void bitvec_test_new_with_len(CuTest *tc)
 {
 	memdbg_reset();
-	for (size_t len = 0; len < ba_size; len++) {
+	for (usize len = 0; len < ba_size; len++) {
 		BitVec *bv = bitvec_new_with_len(len);
 		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
 		for (int i = 0; i < len ; i++) {
@@ -55,7 +55,7 @@ void bitvec_test_new_with_len(CuTest *tc)
 void bitvec_test_get_set(CuTest *tc)
 {
 	memdbg_reset();
-	for (size_t len = 0; len < ba_size; len++) {
+	for (usize len = 0; len < ba_size; len++) {
 		BitVec *bv = bitvec_new_with_len(len);
 		CuAssertSizeTEquals(tc, len, bitvec_len(bv));
 		for (int i = 0; i < len ; i++) {
@@ -97,9 +97,9 @@ void bitvec_test_push_n(CuTest *tc)
 	byte *array;
 	array = ARR_NEW(byte, ba_size);
 	bool bit = false;
-	size_t n = 0, s = 0;
+	usize n = 0, s = 0;
 	while (s < ba_size) {
-		n = MAX(1, ((size_t)rand()) % (ba_size - s));
+		n = MAX(1, ((usize)rand()) % (ba_size - s));
 		bit = 1 - bit;
 		//printf("current size=%zu adding %zu %c-bits\n",s, n, bit?'1':'0');
 		bitvec_push_n(bv, n, bit);
@@ -124,8 +124,8 @@ void bitvec_test_count(CuTest *tc)
 	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
 	byte *ba = bitarr_new(ba_size);
-	size_t count1 = 0;
-	for (size_t i = 0; i < ba_size; i++) {
+	usize count1 = 0;
+	for (usize i = 0; i < ba_size; i++) {
 		bit = ((byte)rand() % 2);
 		bitarr_set_bit(ba, i, bit);
 		bitvec_push(bv, bit);
@@ -134,10 +134,10 @@ void bitvec_test_count(CuTest *tc)
 	if (count1 != bitvec_count(bv, 1))
 		CuAssertSizeTEquals(tc, count1, bitvec_count(bv, 1));
 	CuAssertSizeTEquals(tc, ba_size - count1, bitvec_count(bv, 0));
-	for (size_t i = 0; i < ba_size; i++) {
-		for (size_t j = i; j < ba_size; j++) {
+	for (usize i = 0; i < ba_size; i++) {
+		for (usize j = i; j < ba_size; j++) {
 			count1 = 0;
-			for (size_t k = i; k < j; k++) {
+			for (usize k = i; k < j; k++) {
 				count1 += bitarr_get_bit(ba, k);
 			}
 			CuAssertSizeTEquals(tc, count1, bitvec_count_range(bv, 1, i, j));
@@ -156,26 +156,26 @@ void bitvec_test_select(CuTest *tc)
 	memdbg_reset();
 	for (int intbit = 0; intbit < 2; intbit++) {
 		bool bit = (bool)intbit;
-		for (size_t len = 0; len < ba_size; len++) {
+		for (usize len = 0; len < ba_size; len++) {
 			for (int i = 0; i < 6; i++) {
 				byte *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
 				BitVec *bv = bitvec_new_from_bitarr(ba, len);
-				size_t bitcount = bitvec_count(bv, bit);
-				size_t rank = 0;
-				size_t pos = 0;
-				for (size_t r = 0; r < bitcount; r++) {
+				usize bitcount = bitvec_count(bv, bit);
+				usize rank = 0;
+				usize pos = 0;
+				for (usize r = 0; r < bitcount; r++) {
 					while (pos < len && rank < r) {
 						rank += (bitvec_get_bit(bv, pos++) == bit);
 					}
 					while (pos < len && bitvec_get_bit(bv, pos) != bit) {
 						pos++;
 					}
-					size_t sel = bitvec_select(bv, bit, r);
+					usize sel = bitvec_select(bv, bit, r);
 					CuAssertSizeTEquals(tc, pos, sel);
 				}
-				for (size_t r = bitcount; r < bitcount + 20; r++) {
-					size_t sel = bitvec_select(bv, bit, r);
+				for (usize r = bitcount; r < bitcount + 20; r++) {
+					usize sel = bitvec_select(bv, bit, r);
 					CuAssertSizeTEquals(tc, len, sel);
 				}
 				FREE(ba);
@@ -192,7 +192,7 @@ void bitvec_test_format(CuTest *tc)
 	memdbg_reset();
 	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
-	for (size_t i = 0; i < ba_size; i++) {
+	for (usize i = 0; i < ba_size; i++) {
 		bit = ((byte)rand() % 2);
 		bitvec_push(bv, bit);
 	}

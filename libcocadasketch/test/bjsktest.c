@@ -30,11 +30,11 @@
 
 void bjkst_test(CuTest *tc)
 {
-	size_t nbits = 16;
+	usize nbits = 16;
 	uint64 maxval = 1 << nbits;
-	size_t ndistinct = maxval >> 3;
+	usize ndistinct = maxval >> 3;
 	uint64 step = maxval / ndistinct;
-	size_t n = 1 << 20;
+	usize n = 1 << 20;
 
 	double eps = 0.1;
 	double delta = 0.1;

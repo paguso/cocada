@@ -60,7 +60,7 @@ void vebset_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the cardinality of the set.
 */
-size_t vebset_size(vebset *self);
+usize vebset_size(vebset *self);
 
 
 /**

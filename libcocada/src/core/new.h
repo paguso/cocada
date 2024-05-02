@@ -156,7 +156,7 @@
  * #define NMAX = 4;
  * struct _A {         +-----------------------------------+
  *     ...             |   A                               |
- *     size_t size;    |                                   |
+ *     usize size;    |                                   |
  *     B b[NMAX];      | +------+-------+-------+-------+  |
  *     ...             | | b[0] | b[1]  |  b[2] |  b[3] |  |
  * }                   | |      |       |       |       |  |
@@ -174,8 +174,8 @@
  *
  * struct _A {         +------------+
  *     ...             |   A        |
- *     size_t size;    |            |
- *     size_t cap;     | b +----+   |     ,...> +------+-------+-   -+----------+
+ *     usize size;    |            |
+ *     usize cap;     | b +----+   |     ,...> +------+-------+-   -+----------+
  *     B *b.           |   |    |   |    .      | b[0] | b[1]  | ... | b[cap-1] |
  * }                   |   | .........../       |      |       |     |          |
  *                     |   +----+   |           +------+-------+-   -+----------+
@@ -200,8 +200,8 @@
  *                                                  .
  * struct _A {         +------------+               .
  *     ...             |   A        |               .
- *     size_t size;    |            |               .
- *     size_t cap;     | b +----+   |     ,...> +---.--+------+-   -+----------+
+ *     usize size;    |            |               .
+ *     usize cap;     | b +----+   |     ,...> +---.--+------+-   -+----------+
  *     B **b.          |   |    |   |    .      | b[0] | b[1] | ... | b[cap-1] |
  * }                   |   | .........../       +------+--.---+-   -+----------+
  *                     |   +----+   |                     .
@@ -448,6 +448,7 @@
  *
  */
 
+#include "coretype.h"
 
 /**
  * Allocates a new non-initialised object of a given @p TYPE in the heap
@@ -502,13 +503,13 @@ void finaliser_call(const Finaliser *self, void *ptr);
 /**
  * @brief Returns the number of nested child destructors of @p dst.
  */
-size_t finaliser_nchd(const Finaliser *self);
+usize finaliser_nchd(const Finaliser *self);
 
 
 /**
  * @brief Returns the child destructor @p par with the given @p index
  */
-const Finaliser *finaliser_chd(const Finaliser *par, size_t index);
+const Finaliser *finaliser_chd(const Finaliser *par, usize index);
 
 
 /**

@@ -41,7 +41,7 @@ static void test_setup()
 	cmd = cliparser_new("test", "A Test Program");
 	char choice_arr[3][8]  = {"choice1", "choice2", "choice3"};
 	Vec *choices = vec_new(sizeof(char *));
-	for (size_t i = 0; i < 3;
+	for (usize i = 0; i < 3;
 	        vec_push_rawptr(choices, cstr_clone(choice_arr[i++])));
 	cliparser_add_option(cmd,
 	                     cliopt_new_defaults(

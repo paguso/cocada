@@ -51,14 +51,14 @@ BitVec *bitvec_new();
 /**
  * @brief Creates a new empty (length = 0) bitvector with a given @p capacity.
  */
-BitVec *bitvec_new_with_capacity(size_t capacity);
+BitVec *bitvec_new_with_capacity(usize capacity);
 
 
 /**
  * @brief Creates a new array with a given @p length, with all
  * positions set to zero.
  */
-BitVec *bitvec_new_with_len(size_t length);
+BitVec *bitvec_new_with_len(usize length);
 
 
 /**
@@ -67,7 +67,7 @@ BitVec *bitvec_new_with_len(size_t length);
  * @param src (no transfer) The source bit array
  * @param len Number of bits to be copied
  */
-BitVec *bitvec_new_from_bitarr(const byte *src, size_t len);
+BitVec *bitvec_new_from_bitarr(const byte *src, usize len);
 
 
 /**
@@ -95,7 +95,7 @@ BitVec *bitvec_clone(const BitVec *src);
  * @param src (no transfer) The source bitvector
  * @param nbits Number of bits to be copied
  */
-BitVec *bitvec_cropped_clone(const BitVec *src, size_t nbits);
+BitVec *bitvec_cropped_clone(const BitVec *src, usize nbits);
 
 
 
@@ -109,7 +109,7 @@ void bitvec_fit(BitVec *bv);
 /**
  * @brief Returns the physical memory used by the bitvector in bytes
  */
-size_t bitvec_memsize(BitVec *bv);
+usize bitvec_memsize(BitVec *bv);
 
 
 /**
@@ -132,36 +132,36 @@ byte *bitvec_detach (BitVec *bv);
 /**
  * @brief Returns the (bit) length of the bitvector.
  */
-size_t bitvec_len(const BitVec *bv);
+usize bitvec_len(const BitVec *bv);
 
 
 /**
  * @brief Returns the bit value stored at a given position @p pos.
  */
-bool bitvec_get_bit (const BitVec *bv, size_t pos);
+bool bitvec_get_bit (const BitVec *bv, usize pos);
 
 
 /**
  * @brief Returns the number of positions set to a given @p bit value.
  */
-size_t bitvec_count(const BitVec *bv, bool bit);
+usize bitvec_count(const BitVec *bv, bool bit);
 
 
 /**
  * @brief Returns the number of positions set to a given @p bit value
  * in the subvector @p bv[@p from: @p to].
  */
-size_t bitvec_count_range(const BitVec *bv, bool bit, size_t from, size_t to);
+usize bitvec_count_range(const BitVec *bv, bool bit, usize from, usize to);
 
 
 
-size_t bitvec_select(const BitVec *bv, bool bit, size_t rank);
+usize bitvec_select(const BitVec *bv, bool bit, usize rank);
 
 
 /**
  * @brief Sets the bit at a given position.
  */
-void bitvec_set_bit (BitVec *bv, size_t pos, bool bit);
+void bitvec_set_bit (BitVec *bv, usize pos, bool bit);
 
 
 /**
@@ -173,7 +173,7 @@ void bitvec_push (BitVec *bv, bool bit);
 /**
  * @brief Appends @p n new positions with the same @p bit value.
  */
-void bitvec_push_n (BitVec *bv, size_t n, bool bit);
+void bitvec_push_n (BitVec *bv, usize n, bool bit);
 
 
 /**
@@ -192,7 +192,7 @@ void bitvec_cat (BitVec *bv, const BitVec *src);
  * @deprecated Use the bitvec_format interface
  * @see bitvec_get_format()
  */
-void bitvec_to_string ( const BitVec *bv, StrBuf *dest, size_t bytes_per_row);
+void bitvec_to_string ( const BitVec *bv, StrBuf *dest, usize bytes_per_row);
 
 
 /**
@@ -201,7 +201,7 @@ void bitvec_to_string ( const BitVec *bv, StrBuf *dest, size_t bytes_per_row);
  * @deprecated Use the bitvec_format interface
  * @see bitvec_get_format()
  */
-void bitvec_print(FILE *stream, const BitVec *bv, size_t bytes_per_row);
+void bitvec_print(FILE *stream, const BitVec *bv, usize bytes_per_row);
 
 
 typedef struct _BitVecFormat BitVecFormat;

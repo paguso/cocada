@@ -50,55 +50,55 @@ static const char SENTINEL = '$';
 
 struct _CSArray {
 	Alphabet *xab;
-	size_t nlevels;
-	size_t *lvl_len;
+	usize nlevels;
+	usize *lvl_len;
 	CSRSBitArr **even_bv;
 	CSRSBitArr **char_stop_bv;
 	WavTree **phi_wt;
-	size_t *root_sa;
-	size_t *root_sa_inv;
+	usize *root_sa;
+	usize *root_sa_inv;
 	//xstr **phi_str;
 };
 
 
-static void sarr_invert(size_t *src, size_t len, size_t *dest)
+static void sarr_invert(usize *src, usize len, usize *dest)
 {
-	for (size_t i = 0; i < len; i++)
+	for (usize i = 0; i < len; i++)
 		dest[src[i]] = i;
 }
 
 
-CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
+CSArray *csarray_new( char *str, usize len, Alphabet *ab )
 {
 	CSArray *csa = NEW(CSArray);
 
 	csa->nlevels = 1;  // # of levels, including root level
-	for ( size_t lvl_len = len + 1; lvl_len > MAX_PLAIN_SA_LEN;
-	        lvl_len = (size_t) ceil(lvl_len / 2.0f) )
+	for ( usize lvl_len = len + 1; lvl_len > MAX_PLAIN_SA_LEN;
+	        lvl_len = (usize) ceil(lvl_len / 2.0f) )
 		csa->nlevels++;
 
-	csa->lvl_len = ARR_NEW(size_t, csa->nlevels);
+	csa->lvl_len = ARR_NEW(usize, csa->nlevels);
 	csa->even_bv = ARR_NEW(CSRSBitArr *, csa->nlevels);
 	csa->char_stop_bv = ARR_NEW(CSRSBitArr *, csa->nlevels);
 	csa->phi_wt = ARR_NEW(WavTree *, csa->nlevels);
 	//csa->phi_str = NEW_ARR(xstr*, csa->nlevels);
 
 	// build plain sarray and its inverse
-	size_t *sarr = sais(str, len, ab);
-	size_t *sarr_inv = ARR_NEW(size_t, len + 1);
+	usize *sarr = sais(str, len, ab);
+	usize *sarr_inv = ARR_NEW(usize, len + 1);
 	sarr_invert(sarr, len + 1, sarr_inv);
 
-	size_t lvl_len = len + 1; // sentinel added by sais
+	usize lvl_len = len + 1; // sentinel added by sais
 	csa->lvl_len[0] = lvl_len;
 	BitVec *xchar_stops = bitvec_new_with_capacity(lvl_len);
 	bitvec_push_n(xchar_stops, lvl_len, 0);
 	StrBuf *supp_ab_str = strbuf_new(); // string support alphabet chars
-	size_t ndiff_xchars = 1;            // has at least the SENTINEL
+	usize ndiff_xchars = 1;            // has at least the SENTINEL
 	strbuf_append_char(supp_ab_str, SENTINEL);
 	bitvec_set_bit(xchar_stops, 0, 1);
 	bitvec_set_bit(xchar_stops, lvl_len - 1, 1);
 	//ndiff_xchars++;
-	for (size_t i = 1; i < lvl_len; i++) {
+	for (usize i = 1; i < lvl_len; i++) {
 		if (str[sarr[i]] != str[sarr[i - 1]]) {
 			bitvec_set_bit(xchar_stops, i - 1, 1);
 			strbuf_append_char(supp_ab_str, str[sarr[i]]);
@@ -112,7 +112,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 	xstr *cur_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 	xstr_push_n(cur_xstr, 0, lvl_len);
 	xchar cur_xchar = 0;
-	for (size_t i = 0; i < lvl_len; i++) {
+	for (usize i = 0; i < lvl_len; i++) {
 		xstr_set(cur_xstr, sarr[i], cur_xchar);
 		if ( bitvec_get_bit(xchar_stops, i) )
 			cur_xchar++;
@@ -124,7 +124,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 	//ARR_PRINT(sarr_inv, sarr_inv[0], %zu, 0, lvl_len, lvl_len);
 
 	// iterate over levels
-	for ( size_t lvl = 0; lvl < csa->nlevels; lvl++ ) {
+	for ( usize lvl = 0; lvl < csa->nlevels; lvl++ ) {
 		// current SA, SA^-1, char stops and normalised string ready
 
 		//printf("building level %zu\n",lvl);
@@ -138,7 +138,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 
 		xstr *phi_xstr = xstr_new_with_capacity(nbytes(ndiff_xchars), lvl_len);
 		xstr_push_n(phi_xstr, 0, lvl_len);
-		for (size_t i = 0; i < lvl_len; i++)
+		for (usize i = 0; i < lvl_len; i++)
 			xstr_set( phi_xstr, sarr_inv[(sarr[i] + 1) % lvl_len],
 			          xstr_get(cur_xstr, sarr[i]) );
 		csa->phi_wt[lvl] = wavtree_new_from_xstr( alphabet_new_int_ab(ndiff_xchars),
@@ -151,12 +151,12 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 		// if not last level
 		BitVec *even_suff = bitvec_new_with_capacity(lvl_len);
 		if (lvl == csa->nlevels - 1) {
-			for (size_t i = 0 ; i < lvl_len; i++)
+			for (usize i = 0 ; i < lvl_len; i++)
 				bitvec_push(even_suff, IS_EVEN(sarr[i]));
 			break;
 		}
 		else {
-			for (size_t i = 0, last = 0; i < lvl_len; i++) {
+			for (usize i = 0, last = 0; i < lvl_len; i++) {
 				if (IS_EVEN(sarr[i])) {
 					bitvec_push(even_suff, 1);
 					sarr[last++] = sarr[i] / 2;
@@ -168,7 +168,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 		csa->even_bv[lvl] = csrsbitarr_new(bitvec_detach(even_suff), lvl_len);
 
 		// prepare next level base string and sarr
-		size_t nxt_lvl_len = (size_t) ceil(lvl_len / 2.0f);
+		usize nxt_lvl_len = (usize) ceil(lvl_len / 2.0f);
 		sarr_invert(sarr, nxt_lvl_len, sarr_inv);
 		xchar_stops = bitvec_new_with_capacity(nxt_lvl_len);
 		bitvec_push_n(xchar_stops, nxt_lvl_len, 0);
@@ -176,7 +176,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 		xchar ai, bi, aiminus1, biminus1;
 		ai = xstr_get(cur_xstr, 2 * sarr[0]);
 		bi = (2 * sarr[0] + 1 < lvl_len) ? xstr_get(cur_xstr, 2 * sarr[0] + 1) : 0;
-		for (size_t i = 1; i < nxt_lvl_len; i++) {
+		for (usize i = 1; i < nxt_lvl_len; i++) {
 			aiminus1 = ai;
 			biminus1 = bi;
 			ai = xstr_get(cur_xstr, 2 * sarr[i]);
@@ -192,7 +192,7 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 		cur_xstr = xstr_new_with_capacity( nbytes(ndiff_xchars), nxt_lvl_len );
 		xstr_push_n(cur_xstr, 0, nxt_lvl_len);
 		cur_xchar = 0;
-		for (size_t i = 0; i < nxt_lvl_len; i++) {
+		for (usize i = 0; i < nxt_lvl_len; i++) {
 			xstr_set(cur_xstr, sarr[i], cur_xchar);
 			if (bitvec_get_bit(xchar_stops, i))
 				cur_xchar++;
@@ -202,9 +202,9 @@ CSArray *csarray_new( char *str, size_t len, Alphabet *ab )
 	}
 	xstr_free(cur_xstr);
 
-	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels - 1] * sizeof(size_t));
+	csa->root_sa = realloc(sarr, csa->lvl_len[csa->nlevels - 1] * sizeof(usize));
 	csa->root_sa_inv = realloc(sarr_inv,
-	                           csa->lvl_len[csa->nlevels - 1] * sizeof(size_t));
+	                           csa->lvl_len[csa->nlevels - 1] * sizeof(usize));
 	return csa;
 }
 
@@ -216,7 +216,7 @@ void csarray_print(FILE *stream, CSArray *csa)
 	fprintf (stream, "csarray@%p {\n", csa);
 	fprintf (stream, "\tlen:%zu\n", csa->lvl_len[0]);
 	fprintf (stream, "\tlevels:%zu\n", csa->nlevels);
-	for (size_t lvl = 0; lvl < csa->nlevels - 1; lvl++) {
+	for (usize lvl = 0; lvl < csa->nlevels - 1; lvl++) {
 		fprintf(stream, "\t--- LEVEL %zu ---\n", lvl);
 		fprintf(stream, "\teven_bv[%zu]:\n\t", lvl);
 		bitarr_fprint( stream,  csrsbitarr_data(csa->even_bv[lvl]),
@@ -247,7 +247,7 @@ void csarray_print(FILE *stream, CSArray *csa)
 void csarray_free(CSArray *csa)
 {
 	if (csa == NULL) return;
-	for (size_t l = 0; l < csa->nlevels - 1; l++) {
+	for (usize l = 0; l < csa->nlevels - 1; l++) {
 		csrsbitarr_free(csa->even_bv[l], true);
 		csrsbitarr_free(csa->char_stop_bv[l], true);
 		wavtree_free(csa->phi_wt[l]);
@@ -262,74 +262,74 @@ void csarray_free(CSArray *csa)
 }
 
 
-size_t csarray_len(CSArray *csarr)
+usize csarray_len(CSArray *csarr)
 {
 	return csarr->lvl_len[0];
 }
 
 
 
-static size_t csa_phi(CSArray *csa, size_t lvl, size_t i)
+static usize csa_phi(CSArray *csa, usize lvl, usize i)
 {
 	xchar c = csrsbitarr_rank1(csa->char_stop_bv[lvl], i);
-	size_t  r = csrsbitarr_pred1(csa->char_stop_bv[lvl], i);
+	usize  r = csrsbitarr_pred1(csa->char_stop_bv[lvl], i);
 	r = ( r < csa->lvl_len[lvl] ) ? i - r - 1 : i ;
 	return wavtree_select(csa->phi_wt[lvl], c, r);
 }
 
 
-size_t csarray_phi(CSArray *csa, size_t i)
+usize csarray_phi(CSArray *csa, usize i)
 {
 	return csa_phi(csa, 0, i);
 }
 
 
-static size_t csa_get(CSArray *csa, size_t lvl, size_t i)
+static usize csa_get(CSArray *csa, usize lvl, usize i)
 {
 	if ( lvl == csa->nlevels - 1 )
 		return csa->root_sa[i];
 	if ( csrsbitarr_get(csa->even_bv[lvl], i) ) {
-		size_t epos = csrsbitarr_rank1(csa->even_bv[lvl], i);
+		usize epos = csrsbitarr_rank1(csa->even_bv[lvl], i);
 		return 2 * csa_get( csa, lvl + 1, epos );
 	}
 	else {
-		size_t phi = csa_phi(csa, lvl, i);
-		size_t sa_i_plus1 = csa_get( csa, lvl, phi );
+		usize phi = csa_phi(csa, lvl, i);
+		usize sa_i_plus1 = csa_get( csa, lvl, phi );
 		return (sa_i_plus1 > 0) ? sa_i_plus1 - 1 : csa->lvl_len[lvl] - 1;
 	}
 }
 
 
-size_t csarray_get(CSArray *csa, size_t i)
+usize csarray_get(CSArray *csa, usize i)
 {
 	return csa_get(csa, 0, i);
 }
 
 
-static size_t csa_get_inv(CSArray *csa, size_t lvl, size_t i)
+static usize csa_get_inv(CSArray *csa, usize lvl, usize i)
 {
 	if (lvl == csa->nlevels - 1)
 		return csa->root_sa_inv[i];
 	if ( IS_EVEN(i) ) {
-		size_t rec_inv = csa_get_inv(csa, lvl + 1, i / 2);
+		usize rec_inv = csa_get_inv(csa, lvl + 1, i / 2);
 		return csrsbitarr_select1(csa->even_bv[lvl], rec_inv);
 	}
 	else {
-		size_t inv_i_minus1 = csa_get_inv( csa, lvl, i - 1 );
+		usize inv_i_minus1 = csa_get_inv( csa, lvl, i - 1 );
 		return csa_phi(csa, lvl, inv_i_minus1);
 	}
 }
 
 
-size_t csarray_get_inv(CSArray *csa, size_t i)
+usize csarray_get_inv(CSArray *csa, usize i)
 {
 	return csa_get_inv(csa, 0, i);
 }
 
 
-xchar csarray_get_char(CSArray *csa, size_t i)
+xchar csarray_get_char(CSArray *csa, usize i)
 {
-	size_t inv = csarray_get_inv(csa, i);
-	size_t crk = csrsbitarr_rank1(csa->char_stop_bv[0], inv);
+	usize inv = csarray_get_inv(csa, i);
+	usize crk = csrsbitarr_rank1(csa->char_stop_bv[0], inv);
 	return alphabet_char(csa->xab, crk);
 }

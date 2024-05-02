@@ -43,7 +43,7 @@ static const void *_arr_iter_next(Iter *it)
 static Iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};
 
 
-ArrIter *arr_get_iter(void *arr, size_t len, size_t typesize)
+ArrIter *arr_get_iter(void *arr, usize len, usize typesize)
 {
 	ArrIter *ret = NEW(ArrIter);
 	ret->_t_Iter.impltor = &ret;

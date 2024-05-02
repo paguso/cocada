@@ -40,7 +40,7 @@ typedef struct _StrReader StrReader;
 /**
  * @brief "Opens" the in-memory source string @p src of length @p len as a stream reader.
  */
-StrReader *strreader_new(char *src, size_t len);
+StrReader *strreader_new(char *src, usize len);
 
 
 /**

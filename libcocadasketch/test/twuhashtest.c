@@ -35,20 +35,20 @@ void twuhash_test_hash(CuTest *tc)
 	byte out_bits = 16;
 	TWUHash *h = twuhash_new(in_bits, out_bits);
 	uint64 *sample;
-	size_t samplesize = 1 << 20;
+	usize samplesize = 1 << 20;
 	sample = ARR_NEW(uint64, samplesize);
-	for (size_t i = 0; i < samplesize; i++) {
+	for (usize i = 0; i < samplesize; i++) {
 		uint64 x = rand_next();
 		x >>= (64 - in_bits);
 		sample[i] = twuhash_hash(h, x);
 		DEBUG("hash(%"PRIu64")=%"PRIu64"\n", x, sample[i] );
 	}
 	uint64 mask_i = 1;
-	for (size_t i = 0; i < out_bits; i++) {
+	for (usize i = 0; i < out_bits; i++) {
 		uint64 mask_j = (1 << (i + 1));
-		for (size_t j = i + 1; j < out_bits; j++) {
-			size_t counts[4] = {0, 0, 0, 0};
-			for (size_t k = 0; k < samplesize; k++) {
+		for (usize j = i + 1; j < out_bits; j++) {
+			usize counts[4] = {0, 0, 0, 0};
+			for (usize k = 0; k < samplesize; k++) {
 				unsigned char pair = ((mask_i & sample[k]) > 0);
 				pair <<= 1;
 				pair |= ((mask_j & sample[k]) > 0);

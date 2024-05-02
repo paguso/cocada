@@ -50,23 +50,23 @@ int cmp_ptr_dbl(const void *p1, const void *p2)
  */
 void test_binheap_ins_remv(CuTest *tc)
 {
-	size_t len = 10;
+	usize len = 10;
 	BinHeap *maxheap = binheap_new(sizeof(double *), &cmp_ptr_dbl);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	double rv[len];
-	for (size_t i = 0; i < len; ++i) rv[i] = (double)i;
+	for (usize i = 0; i < len; ++i) rv[i] = (double)i;
 	shuffle_arr(rv, len, sizeof(double));
 
 
-	for (size_t i = 0; i < len; i++) {
+	for (usize i = 0; i < len; i++) {
 		double *d = &rv[i];
 		binheap_ins(maxheap, &d);
 		CuAssertSizeTEquals(tc, i + 1, binheap_size(maxheap));
 	}
 
 
-	for (size_t i = 0; i < len; i++) {
+	for (usize i = 0; i < len; i++) {
 		double *d;
 		binheap_remv(maxheap, &d);
 		//printf("maxheap #%zu = %f\n",i,d);
@@ -80,21 +80,21 @@ void test_binheap_ins_remv(CuTest *tc)
 
 void test_binheap_ins_remv_int(CuTest *tc)
 {
-	size_t len = 10;
+	usize len = 10;
 	BinHeap *maxheap = binheap_new(sizeof(int), cmp_int);
 	CuAssertSizeTEquals(tc, 0, binheap_size(maxheap));
 
 	int rv[len];
-	for (size_t i = 0; i < len; i++) rv[i] = i;
+	for (usize i = 0; i < len; i++) rv[i] = i;
 	shuffle_arr(rv, len, sizeof(int));
 
-	for (size_t i = 0; i < len; i++) {
+	for (usize i = 0; i < len; i++) {
 		binheap_ins_int(maxheap, rv[i]);
 		CuAssertSizeTEquals(tc, i + 1, binheap_size(maxheap));
 	}
 
 
-	for (size_t i = 0; i < len; i++) {
+	for (usize i = 0; i < len; i++) {
 		int d;
 		d = binheap_remv_int(maxheap);
 		//printf("maxheap #%zu = %d\n",i,d);

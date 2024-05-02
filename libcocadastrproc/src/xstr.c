@@ -38,9 +38,9 @@
 
 struct _xstr {
 	void *buf;
-	size_t len;
-	size_t cap;
-	size_t sizeof_char;
+	usize len;
+	usize cap;
+	usize sizeof_char;
 };
 
 
@@ -48,9 +48,9 @@ struct _xstr {
 #define GROWBY 1.66f
 
 
-static void check_and_resize_by(xstr *self, size_t n)
+static void check_and_resize_by(xstr *self, usize n)
 {
-	size_t new_cap = MAX(MIN_CAP, self->cap);
+	usize new_cap = MAX(MIN_CAP, self->cap);
 	while (new_cap - self->len < n + 1) {
 		new_cap *= GROWBY;
 	}
@@ -63,13 +63,13 @@ static void check_and_resize_by(xstr *self, size_t n)
 }
 
 
-xstr *xstr_new(size_t sizeof_char)
+xstr *xstr_new(usize sizeof_char)
 {
 	return xstr_new_with_capacity(sizeof_char, MIN_CAP);
 }
 
 
-xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
+xstr *xstr_new_with_capacity(usize sizeof_char, usize cap)
 {
 	ERROR_ASSERT(sizeof_char <= XCHAR_BYTES,
 	             "Invalid xstr char size %zu. "
@@ -85,7 +85,7 @@ xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap)
 }
 
 
-xstr *xstr_new_from_arr(void *src, size_t len, size_t sizeof_char)
+xstr *xstr_new_from_arr(void *src, usize len, usize sizeof_char)
 {
 	xstr *ret = NEW(xstr);
 	ret->sizeof_char = sizeof_char;
@@ -97,7 +97,7 @@ xstr *xstr_new_from_arr(void *src, size_t len, size_t sizeof_char)
 }
 
 
-xstr *xstr_new_from_arr_cpy(const void *src, size_t len, size_t sizeof_char)
+xstr *xstr_new_from_arr_cpy(const void *src, usize len, usize sizeof_char)
 {
 	xstr *ret = NEW(xstr);
 	ret->sizeof_char = sizeof_char;
@@ -119,7 +119,7 @@ void xstr_free(xstr *self)
 }
 
 
-xchar xstr_get(const xstr *self, size_t pos)
+xchar xstr_get(const xstr *self, usize pos)
 {
 	xchar ret = 0;
 #if ENDIANNESS==LITTLE
@@ -132,7 +132,7 @@ xchar xstr_get(const xstr *self, size_t pos)
 }
 
 
-void xstr_set(xstr *self, size_t pos, xchar val)
+void xstr_set(xstr *self, usize pos, xchar val)
 {
 #if ENDIANNESS==LITTLE
 	memcpy(self->buf + (pos * self->sizeof_char), &val, self->sizeof_char);
@@ -143,10 +143,10 @@ void xstr_set(xstr *self, size_t pos, xchar val)
 }
 
 
-void xstr_nset(xstr *self, size_t n, xchar val)
+void xstr_nset(xstr *self, usize n, xchar val)
 {
-	size_t l = MIN(xstr_len(self), n);
-	for (size_t i = 0; i < l; i++) {
+	usize l = MIN(xstr_len(self), n);
+	for (usize i = 0; i < l; i++) {
 		xstr_set(self, i, val);
 	}
 	if (n > l) {
@@ -155,13 +155,13 @@ void xstr_nset(xstr *self, size_t n, xchar val)
 }
 
 
-inline size_t xstr_len(const xstr *self)
+inline usize xstr_len(const xstr *self)
 {
 	return self->len;
 }
 
 
-inline size_t xstr_sizeof_char(const xstr *self)
+inline usize xstr_sizeof_char(const xstr *self)
 {
 	return self->sizeof_char;
 }
@@ -173,7 +173,7 @@ const byte *xstr_as_bytes(const xstr *self)
 }
 
 
-size_t xstr_nbytes(const xstr *self)
+usize xstr_nbytes(const xstr *self)
 {
 	return self->len * self->sizeof_char;
 }
@@ -185,11 +185,11 @@ void xstr_push(xstr *self, xchar c)
 }
 
 
-void xstr_push_n(xstr *self, xchar c, size_t n)
+void xstr_push_n(xstr *self, xchar c, usize n)
 {
 	check_and_resize_by(self, n);
 	void *last = self->buf + (self->len * self->sizeof_char);
-	for (size_t i = 0; i < n; i++, last += self->sizeof_char) {
+	for (usize i = 0; i < n; i++, last += self->sizeof_char) {
 #if ENDIANNESS==LITTLE
 		memcpy(last, &c, self->sizeof_char);
 #elif ENDIANNESS==BIG
@@ -215,14 +215,14 @@ void xstr_cpy(xstr *self, const xstr *src)
 }
 
 
-void xstr_ncpy( xstr *self, size_t from_dest, const xstr *src,
-                size_t from_src, size_t n )
+void xstr_ncpy( xstr *self, usize from_dest, const xstr *src,
+                usize from_src, usize n )
 {
-	size_t l = MIN(n, xstr_len(self) - from_dest);
-	for (size_t i = 0; i < l; i++ ) {
+	usize l = MIN(n, xstr_len(self) - from_dest);
+	for (usize i = 0; i < l; i++ ) {
 		xstr_set(self, from_dest + i, xstr_get(src, from_src + i));
 	}
-	for (size_t i = l; i < n; i++) {
+	for (usize i = l; i < n; i++) {
 		xstr_push(self, xstr_get(src, from_src + i));
 	}
 }
@@ -235,7 +235,7 @@ void xstr_fit(xstr *self)
 }
 
 
-void xstr_clip(xstr *self, size_t from, size_t to)
+void xstr_clip(xstr *self, usize from, usize to)
 {
 	memmove( self->buf, self->buf + (from * self->sizeof_char),
 	         (to - from) * self->sizeof_char );
@@ -245,10 +245,10 @@ void xstr_clip(xstr *self, size_t from, size_t to)
 }
 
 
-void xstr_rot_left(xstr *self, size_t npos)
+void xstr_rot_left(xstr *self, usize npos)
 {
-	size_t h = npos % self->len;
-	size_t t = self->len - h;
+	usize h = npos % self->len;
+	usize t = self->len - h;
 	if (h) {
 		void *tmp = malloc(h * self->sizeof_char);
 		memcpy(tmp, self->buf, h * self->sizeof_char);
@@ -275,13 +275,13 @@ void *xstr_detach(xstr *self)
 }
 
 
-int xstr_ncmp(const xstr *self, const xstr *other, size_t n)
+int xstr_ncmp(const xstr *self, const xstr *other, usize n)
 {
-	size_t lt = xstr_len(self);
-	size_t lo = xstr_len(other);
-	size_t m = MIN3(n, lt, lo);
+	usize lt = xstr_len(self);
+	usize lo = xstr_len(other);
+	usize m = MIN3(n, lt, lo);
 	intmax_t cmp;
-	for (size_t i = 0; i < m;  i++) {
+	for (usize i = 0; i < m;  i++) {
 		cmp = (intmax_t)xstr_get(self, i) - (intmax_t)xstr_get(other, i);
 		if (cmp) return cmp / abs(cmp);
 	}

@@ -28,7 +28,7 @@
 
 
 
-HashSet *hashset_new(size_t typesize, HashFunc hfunc, EqualsFunc eqfunc)
+HashSet *hashset_new(usize typesize, HashFunc hfunc, EqualsFunc eqfunc)
 {
 	HashSet *ret = hashmap_new(typesize, 0, hfunc, eqfunc);
 	return ret;
@@ -41,7 +41,7 @@ void hashset_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-size_t hashset_size(const HashSet *set)
+usize hashset_size(const HashSet *set)
 {
 	return hashmap_size(set);
 }

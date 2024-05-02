@@ -68,7 +68,7 @@ typedef struct _Alphabet Alphabet;
 /*
  * @brief char rank function type
  */
-typedef size_t (*char_rank_func)(xchar c);
+typedef usize (*char_rank_func)(xchar c);
 
 
 /**
@@ -77,7 +77,7 @@ typedef size_t (*char_rank_func)(xchar c);
  * @param size Number of letters.
  * @param letters (**no transfer**) String with letters in lexicographic order.
  */
-Alphabet *alphabet_new(size_t size, const char *letters);
+Alphabet *alphabet_new(usize size, const char *letters);
 
 
 /**
@@ -107,7 +107,7 @@ Alphabet *alphabet_new(size_t size, const char *letters);
  * s.t. `letters[i]` contains a string with the equivalent letters
  * to be assigned rank `i`
  */
-Alphabet *alphabet_new_with_equivs(size_t size, char **letters);
+Alphabet *alphabet_new_with_equivs(usize size, char **letters);
 
 
 /**
@@ -115,7 +115,7 @@ Alphabet *alphabet_new_with_equivs(size_t size, char **letters);
  *        0 to @p size-1
  * @param size The alphabet size.
  */
-Alphabet *alphabet_new_int_ab(size_t size);
+Alphabet *alphabet_new_int_ab(usize size);
 
 
 /**
@@ -145,7 +145,7 @@ AlphabetType alphabet_type(const Alphabet *ab);
 /**
  * @brief Returns the number of letters.
  */
-size_t alphabet_size(const Alphabet *ab);
+usize alphabet_size(const Alphabet *ab);
 
 
 /**
@@ -158,7 +158,7 @@ bool alphabet_contains(const Alphabet *ab, xchar c);
  * @brief Returns the letter of given rank. If rank >= alphabet size, the
  * behaviour is undefined.
  */
-xchar alphabet_char(const Alphabet *ab, size_t rank);
+xchar alphabet_char(const Alphabet *ab, usize rank);
 
 
 /**
@@ -168,7 +168,7 @@ xchar alphabet_char(const Alphabet *ab, size_t rank);
  * This means that all chars not in the alphabet are lexicographically
  * identical and strictly greater than any char in the alphabet.
  */
-size_t alphabet_rank(const Alphabet *ab, xchar c);
+usize alphabet_rank(const Alphabet *ab, xchar c);
 
 
 /**

@@ -59,22 +59,24 @@
  */
 
 
+#include "coretype.h"
+
 /**
  * @brief malloc wrapper. Not meant do be called directly.
  */
-extern void *memdbg_malloc(size_t size, char *file, int line);
+extern void *memdbg_malloc(usize size, char *file, int line);
 
 
 /**
  * @brief calloc wrapper. Not meant do be called directly.
  */
-extern void *memdbg_calloc(size_t nmemb, size_t size, char *file, int line);
+extern void *memdbg_calloc(usize nmemb, usize size, char *file, int line);
 
 
 /**
  * @brief realloc wrapper. Not meant do be called directly.
  */
-extern void *memdbg_realloc(void *ptr, size_t size, char *file, int line);
+extern void *memdbg_realloc(void *ptr, usize size, char *file, int line);
 
 
 /**
@@ -100,13 +102,13 @@ extern void memdbg_reset();
 /**
  * @brief Returns the total memory (in bytes) accounted for in the tally.
  */
-extern size_t memdbg_total();
+extern usize memdbg_total();
 
 
 /**
  * @brief Return the current number of allocated chunks in the tally
  */
-extern size_t memdbg_nchunks();
+extern usize memdbg_nchunks();
 
 
 /**
@@ -119,7 +121,7 @@ extern bool memdbg_is_empty();
 
 typedef struct {
 	bool active;
-	size_t size;
+	usize size;
 } memdbg_query_t;
 
 extern memdbg_query_t memdbg_query(const void *addr);

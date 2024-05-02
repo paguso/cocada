@@ -34,18 +34,18 @@
 
 
 static const float GROW_BY = 1.61803398875f;
-static const size_t MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
+static const usize MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
 
-#define NBYTES(NBITS) ((size_t)DIVCEIL(NBITS, BYTESIZE))
+#define NBYTES(NBITS) ((usize)DIVCEIL(NBITS, BYTESIZE))
 
 struct _BitVec {
 	byte *bits;
-	size_t  len;
-	size_t  cap;
+	usize  len;
+	usize  cap;
 };
 
 
-size_t bitvec_memsize(BitVec *bv)
+usize bitvec_memsize(BitVec *bv)
 {
 	return sizeof(struct _BitVec) + NBYTES(bv->cap);
 }
@@ -57,7 +57,7 @@ BitVec *bitvec_new()
 }
 
 
-BitVec *bitvec_new_with_len(size_t len)
+BitVec *bitvec_new_with_len(usize len)
 {
 	BitVec *ret = bitvec_new_with_capacity(len);
 	ret->len = len;
@@ -66,19 +66,19 @@ BitVec *bitvec_new_with_len(size_t len)
 
 
 
-BitVec *bitvec_new_with_capacity(size_t capacity)
+BitVec *bitvec_new_with_capacity(usize capacity)
 {
 	BitVec *bv = NEW(BitVec);
 	bv->len = 0;
 	bv->cap = MAX(MIN_CAP, NBYTES(capacity) * BYTESIZE);
-	size_t byte_cap = bv->cap / BYTESIZE;
+	usize byte_cap = bv->cap / BYTESIZE;
 	bv->bits = malloc(byte_cap);
 	memset(bv->bits, 0, byte_cap); //(!) unused positions must be 0
 	return bv;
 }
 
 
-BitVec *bitvec_new_from_bitarr(const byte *src, size_t len)
+BitVec *bitvec_new_from_bitarr(const byte *src, usize len)
 {
 	BitVec *bv = bitvec_new_with_capacity(len);
 	memcpy(bv->bits, src, NBYTES(len));
@@ -106,13 +106,13 @@ BitVec *bitvec_clone(const BitVec *src)
 }
 
 
-BitVec *bitvec_cropped_clone(const BitVec *src, size_t nbits)
+BitVec *bitvec_cropped_clone(const BitVec *src, usize nbits)
 {
 	BitVec *bv = bitvec_new_with_capacity(nbits);
-	size_t nbytes = NBYTES(nbits);
+	usize nbytes = NBYTES(nbits);
 	memcpy(bv->bits, src->bits, nbytes);
 	bv->len = nbits;
-	for (size_t i = bv->len; i < nbytes * BYTESIZE; i++)
+	for (usize i = bv->len; i < nbytes * BYTESIZE; i++)
 		bitvec_set_bit(bv, i, 0);
 	return bv;
 }
@@ -120,7 +120,7 @@ BitVec *bitvec_cropped_clone(const BitVec *src, size_t nbits)
 
 void bitvec_fit(BitVec *bv)
 {
-	size_t byte_cap = MAX(MIN_CAP / BYTESIZE, NBYTES(bv->len));
+	usize byte_cap = MAX(MIN_CAP / BYTESIZE, NBYTES(bv->len));
 	bv->cap = byte_cap * BYTESIZE;
 	bv->bits = realloc(bv->bits, byte_cap);
 }
@@ -140,25 +140,25 @@ byte *bitvec_detach(BitVec *bv)
 }
 
 
-size_t bitvec_len(const BitVec *bv)
+usize bitvec_len(const BitVec *bv)
 {
 	return bv->len;
 }
 
 
-inline bool bitvec_get_bit(const BitVec *bv, size_t pos)
+inline bool bitvec_get_bit(const BitVec *bv, usize pos)
 {
 	return bitarr_get_bit(bv->bits, pos);
 }
 
 
-static inline size_t _bitvec_count1(const BitVec *bv, size_t from, size_t to)
+static inline usize _bitvec_count1(const BitVec *bv, usize from, usize to)
 {
 	if (from >= to) return 0;
 	assert(from < to && to <= bv->len);
 
-	size_t byte_pos = from / BYTESIZE;
-	size_t last_byte = to / BYTESIZE;
+	usize byte_pos = from / BYTESIZE;
+	usize last_byte = to / BYTESIZE;
 
 	// if range is within one byte
 	if (byte_pos == last_byte) {
@@ -168,7 +168,7 @@ static inline size_t _bitvec_count1(const BitVec *bv, size_t from, size_t to)
 	}
 
 	//count bits from first byte
-	size_t ret = 0;
+	usize ret = 0;
 	ret += byte_bitcount1(bv->bits[byte_pos] & LSBMASK(BYTESIZE -
 	                      (from % BYTESIZE)));
 	byte_pos++;
@@ -201,35 +201,35 @@ static inline size_t _bitvec_count1(const BitVec *bv, size_t from, size_t to)
 }
 
 
-static inline size_t _bitvec_count0(const BitVec *bv, size_t from, size_t to)
+static inline usize _bitvec_count0(const BitVec *bv, usize from, usize to)
 {
 	return (to - from) - _bitvec_count1(bv, from, to);
 }
 
 
-typedef size_t (*_bv_cnt_func)(const BitVec *, size_t from, size_t to);
+typedef usize (*_bv_cnt_func)(const BitVec *, usize from, usize to);
 
 
 static _bv_cnt_func _bitvec_count_func[2] = {_bitvec_count0, _bitvec_count1};
 
 
-size_t bitvec_count(const BitVec *bv, bool bit)
+usize bitvec_count(const BitVec *bv, bool bit)
 {
 	return _bitvec_count_func[bit](bv, 0, bv->len);
 }
 
 
-size_t bitvec_count_range(const BitVec *bv, bool bit, size_t from, size_t to)
+usize bitvec_count_range(const BitVec *bv, bool bit, usize from, usize to)
 {
 	return _bitvec_count_func[bit](bv, from, to);
 }
 
 
-size_t _bitvec_select1(const BitVec *bv, size_t rank)
+usize _bitvec_select1(const BitVec *bv, usize rank)
 {
 	byte *cur_byte = bv->bits;
 	byte *last_byte = bv->bits + (bv->len / BYTESIZE);
-	size_t count = 0, partial_count = 0;
+	usize count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
 	while ( (byte *)(llarr + 1) <= last_byte &&
@@ -264,18 +264,18 @@ size_t _bitvec_select1(const BitVec *bv, size_t rank)
 	}
 	// cur_byte is the rightmost byte with rank < desired rank
 	// selected position has to be within cur_byte if it exists
-	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) +
-	             byte_select1(*cur_byte, MIN(BYTESIZE, rank - count));
+	usize ret = ((usize)(cur_byte - bv->bits) * BYTESIZE) +
+	            byte_select1(*cur_byte, MIN(BYTESIZE, rank - count));
 
 	return MIN(bv->len, ret);
 }
 
 
-size_t _bitvec_select0(const BitVec *bv, size_t rank)
+usize _bitvec_select0(const BitVec *bv, usize rank)
 {
 	byte *cur_byte = bv->bits;
 	byte *last_byte = bv->bits + (bv->len / BYTESIZE);
-	size_t count = 0, partial_count = 0;
+	usize count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
 	while ( (byte *)(llarr + 1) <= last_byte &&
@@ -310,31 +310,31 @@ size_t _bitvec_select0(const BitVec *bv, size_t rank)
 	}
 	// cur_byte is the rightmost byte with rank < desired rank
 	// selected position has to be within cur_byte if it exists
-	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) +
-	             byte_select0(*cur_byte, MIN(BYTESIZE, rank - count));
+	usize ret = ((usize)(cur_byte - bv->bits) * BYTESIZE) +
+	            byte_select0(*cur_byte, MIN(BYTESIZE, rank - count));
 
 	return MIN(bv->len, ret);
 }
 
-size_t bitvec_select(const BitVec *bv, bool bit, size_t rank)
+usize bitvec_select(const BitVec *bv, bool bit, usize rank)
 {
 	return bit ? _bitvec_select1(bv, rank) : _bitvec_select0(bv, rank);
 }
 
 
-inline void bitvec_set_bit(BitVec *bv, size_t pos, bool bit)
+inline void bitvec_set_bit(BitVec *bv, usize pos, bool bit)
 {
 	bitarr_set_bit(bv->bits, pos, bit);
 }
 
 
-static void _growto_bits(BitVec *bv, size_t min_cap)
+static void _growto_bits(BitVec *bv, usize min_cap)
 {
-	size_t old_byte_cap = bv->cap / BYTESIZE;
+	usize old_byte_cap = bv->cap / BYTESIZE;
 	while (bv->cap < min_cap) {
 		bv->cap *= GROW_BY;
 	}
-	size_t new_byte_cap = NBYTES(bv->cap);
+	usize new_byte_cap = NBYTES(bv->cap);
 	bv->cap = new_byte_cap * BYTESIZE;
 	bv->bits = realloc(bv->bits, new_byte_cap);
 	memset(bv->bits + old_byte_cap, 0, (new_byte_cap - old_byte_cap));
@@ -351,16 +351,16 @@ void bitvec_push(BitVec *bv, bool bit)
 }
 
 
-void bitvec_push_n(BitVec *bv, size_t nbits, bool bit)
+void bitvec_push_n(BitVec *bv, usize nbits, bool bit)
 {
 	if (bv->len + nbits > bv->cap) {
 		_growto_bits(bv, bv->len + nbits);
 	}
 	if (bit) {
-		size_t nleft = nbits;
+		usize nleft = nbits;
 		byte nxt_bit = bv->len % BYTESIZE;
 		byte *last_byte = bv->bits + (bv->len / BYTESIZE);
-		size_t m = MIN(nleft, BYTESIZE - nxt_bit);
+		usize m = MIN(nleft, BYTESIZE - nxt_bit);
 		if (m == BYTESIZE)
 			*(last_byte) = BYTE_MAX;
 		else
@@ -391,12 +391,12 @@ void bitvec_cat (BitVec *bv, const BitVec *src)
 }
 
 
-void bitvec_to_string (const BitVec *bv, StrBuf *dest, size_t bytes_per_line)
+void bitvec_to_string (const BitVec *bv, StrBuf *dest, usize bytes_per_line)
 {
 	int line_label_width = (bv->len > 1) ? ceil(log10(bv->len)) : 1;
 	char *lbl = cstr_new(line_label_width);
-	size_t bits_per_line = bytes_per_line * BYTESIZE;
-	for (size_t i = 0; i < bv->len; i++ )  {
+	usize bits_per_line = bytes_per_line * BYTESIZE;
+	for (usize i = 0; i < bv->len; i++ )  {
 		if ( i % bits_per_line == 0) {
 			if (i) strbuf_append_char(dest, '\n');
 			strbuf_append_char(dest, '[');
@@ -415,7 +415,7 @@ void bitvec_to_string (const BitVec *bv, StrBuf *dest, size_t bytes_per_line)
 
 
 
-void bitvec_print(FILE *stream, const BitVec *bv, size_t bytes_per_row)
+void bitvec_print(FILE *stream, const BitVec *bv, usize bytes_per_row)
 {
 	fprintf(stream, "bitvector@%p {\n", bv);
 	fprintf(stream, "  len     : %zu\n", bv->len);

@@ -20,9 +20,10 @@
  */
 
 #include <stdio.h>
-#include <stddef.h>
 #include <stdlib.h>
 
+
+#include "coretype.h"
 #include "errlog.h"
 
 #if defined(__GNUC__)
@@ -32,9 +33,9 @@
 void print_trace(FILE *out)
 {
 	void *array[20];
-	size_t size;
+	usize size;
 	char **strings;
-	size_t i;
+	usize i;
 
 	size = backtrace (array, 20);
 	strings = backtrace_symbols (array, size);

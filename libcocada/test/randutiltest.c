@@ -32,12 +32,12 @@
 
 void test_rand_unif(CuTest *tc)
 {
-	size_t n = 1 << 20;
-	size_t nbins = 100;
-	size_t *counts = calloc(nbins, sizeof(size_t));
-	size_t max_count = 0;
-	for (size_t i = 0; i < n; i++) {
-		size_t bin = rand_unif() * nbins;
+	usize n = 1 << 20;
+	usize nbins = 100;
+	usize *counts = calloc(nbins, sizeof(usize));
+	usize max_count = 0;
+	for (usize i = 0; i < n; i++) {
+		usize bin = rand_unif() * nbins;
 		counts[bin]++;
 		max_count = MAX(max_count, counts[bin]);
 	}
@@ -57,19 +57,19 @@ void test_rand_unif(CuTest *tc)
 
 void test_rand_norm(CuTest *tc)
 {
-	size_t n = 1 << 20;
-	size_t nbins = 100;
+	usize n = 1 << 20;
+	usize nbins = 100;
 	double range_min = -5.0, range_max = +5.0;
 	double range = range_max - range_min;
-	size_t *counts = calloc(nbins, sizeof(size_t));
-	size_t max_count = 0;
-	for (size_t i = 0; i < n; i++) {
+	usize *counts = calloc(nbins, sizeof(usize));
+	usize max_count = 0;
+	for (usize i = 0; i < n; i++) {
 		double x;
 		do {
 			x = rand_norm();
 		}
 		while (x < range_min || x > range_max);
-		size_t bin = ( ( x - range_min) / range ) * nbins;
+		usize bin = ( ( x - range_min) / range ) * nbins;
 		counts[bin]++;
 		max_count = MAX(max_count, counts[bin]);
 	}

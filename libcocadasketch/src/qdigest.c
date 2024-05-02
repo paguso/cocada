@@ -31,7 +31,7 @@
 
 
 typedef struct _qdnode {
-	size_t qty;
+	usize qty;
 	struct _qdnode *chd[2];
 }
 qdnode;
@@ -44,15 +44,15 @@ qdnode;
 
 struct _QDigest {
 	double err;
-	size_t range;
-	size_t next_compress_cap;
+	usize range;
+	usize next_compress_cap;
 	double errlogrange; // err / log(range) constant
-	size_t total_qty;
+	usize total_qty;
 	qdnode *root;
 };
 
 
-QDigest *qdigest_new(size_t range, double err)
+QDigest *qdigest_new(usize range, double err)
 {
 	assert(err > 0);
 	assert(range > 0);
@@ -68,15 +68,15 @@ QDigest *qdigest_new(size_t range, double err)
 }
 
 
-static inline size_t qdigest_cap(QDigest *self)
+static inline usize qdigest_cap(QDigest *self)
 {
-	return MAX(1, (size_t)(self->errlogrange * (double)(self->total_qty)));
+	return MAX(1, (usize)(self->errlogrange * (double)(self->total_qty)));
 }
 
 
 typedef struct qdigest {
-	size_t fst;
-	size_t snd;
+	usize fst;
+	usize snd;
 } size_pair;
 
 
@@ -101,17 +101,17 @@ static size_pair tree_size (qdnode *root)
 
 typedef struct {
 	qdnode *new_root;
-	size_t move_up;
+	usize move_up;
 } comp_pair;
 
 
-static comp_pair __qdigest_compress(qdnode *root, size_t cap, size_t spare_up)
+static comp_pair __qdigest_compress(qdnode *root, usize cap, usize spare_up)
 {
 
 	assert(root != NULL);
 	assert(root->qty > 0);
 	comp_pair cp;
-	size_t move_up = 0, spare_here, put_here;
+	usize move_up = 0, spare_here, put_here;
 	if ( HAS_CHD(root) ) { //non-leaf
 		for (int dir = LEFT; dir <= RIGHT; dir++)  {
 			if ( root->chd[dir] != NULL ) {
@@ -125,7 +125,7 @@ static comp_pair __qdigest_compress(qdnode *root, size_t cap, size_t spare_up)
 			}
 		}
 	}
-	size_t m = MIN(spare_up, root->qty);
+	usize m = MIN(spare_up, root->qty);
 	move_up += m;
 	root->qty -= m;
 	if ( root->qty == 0 ) {
@@ -150,18 +150,18 @@ static void qdigest_compress(QDigest *self)
 }
 
 
-void qdigest_upd(QDigest *self, size_t val, size_t qty)
+void qdigest_upd(QDigest *self, usize val, usize qty)
 {
 	if ( val > self->range ) {
 		WARN("QDigest: ignoring insertion of invalid value %zu.\n", val );
 		return;
 	}
 	self->total_qty += qty;
-	size_t cap = qdigest_cap(self);
+	usize cap = qdigest_cap(self);
 	assert(self->root != NULL);
 	qdnode *par = self->root, *cur = self->root;
 	int dir;
-	size_t l = 0, r = self->range, m;
+	usize l = 0, r = self->range, m;
 	while ( qty ) {
 		if (cur == NULL) {
 			cur = NEW(qdnode);
@@ -170,7 +170,7 @@ void qdigest_upd(QDigest *self, size_t val, size_t qty)
 			par->chd[dir] = cur;
 		}
 		if ( r - l > 1) { // non-leaf
-			size_t qty_to_add = MIN( cap - cur->qty, qty);
+			usize qty_to_add = MIN( cap - cur->qty, qty);
 			cur->qty += qty_to_add;
 			qty -= qty_to_add;
 
@@ -207,18 +207,18 @@ void qdigest_upd(QDigest *self, size_t val, size_t qty)
 }
 
 
-size_t _sum_tree(qdnode *root)
+usize _sum_tree(qdnode *root)
 {
 	return (root) ?
 	       root->qty + _sum_tree(root->chd[0]) + _sum_tree(root->chd[1]) : 0;
 }
 
 
-size_t qdigest_rank(QDigest *self, size_t val)
+usize qdigest_rank(QDigest *self, usize val)
 {
 	qdnode *cur = self->root;
-	size_t l = 0, r = self->range, m;
-	size_t ret = 0;
+	usize l = 0, r = self->range, m;
+	usize ret = 0;
 	while ( cur != NULL && HAS_CHD(cur) ) {
 		m = (l + r) / 2;
 		if (val < m) {
@@ -235,7 +235,7 @@ size_t qdigest_rank(QDigest *self, size_t val)
 }
 
 
-static void _print(FILE *stream, qdnode *root, size_t l, size_t r, size_t level)
+static void _print(FILE *stream, qdnode *root, usize l, usize r, usize level)
 {
 	if (root == NULL ) return;
 	for (int i = 0; i < level; i++)  {

@@ -37,7 +37,7 @@ void test_fmalg(CuTest *tc)
 	FMAlg *fm  = fmalg_init(maxval, 5, 7);
 	uint64 val = 0, true_count = 0;
 	double error;
-	for (size_t i = 0; i < 100000; i++) {
+	for (usize i = 0; i < 100000; i++) {
 		val = rand_range_uint64(0, maxval);
 		if ( bitvec_get_bit(ticks, val) == 0 ) {
 			true_count++;

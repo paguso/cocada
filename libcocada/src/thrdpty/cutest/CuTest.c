@@ -146,7 +146,7 @@ void CuTestDelete(CuTest *t)
 
 void CuTestRun(CuTest *tc)
 {
-	printf("Running test %s...\n", (tc->name)?tc->name:"Undefined");
+	printf("Running test %s...\n", (tc->name) ? tc->name : "Undefined");
 	jmp_buf buf;
 	tc->jumpBuf = &buf;
 	if (setjmp(buf) == 0) {
@@ -154,7 +154,7 @@ void CuTestRun(CuTest *tc)
 		(tc->function)(tc);
 	}
 	tc->jumpBuf = 0;
-	printf("Done running %s.\n\n", (tc->name)?tc->name:"Undefined");
+	printf("Done running %s.\n\n", (tc->name) ? tc->name : "Undefined");
 }
 
 static void CuFailInternal(CuTest *tc, const char *file, int line,
@@ -238,8 +238,8 @@ void CuAssertIntEquals_LineMsg(CuTest *tc, const char *file, int line,
 
 
 void CuAssertUIntEquals_LineMsg(CuTest *tc, const char *file,  int line,
-                               const char *message,
-                               unsigned int expected, unsigned int actual)
+                                const char *message,
+                                unsigned int expected, unsigned int actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -250,8 +250,8 @@ void CuAssertUIntEquals_LineMsg(CuTest *tc, const char *file,  int line,
 
 
 void CuAssertLongEquals_LineMsg(CuTest *tc, const char *file,  int line,
-                               const char *message,
-                               long expected, long actual)
+                                const char *message,
+                                long expected, long actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -261,8 +261,8 @@ void CuAssertLongEquals_LineMsg(CuTest *tc, const char *file,  int line,
 
 
 void CuAssertULongEquals_LineMsg(CuTest *tc, const char *file,  int line,
-                               const char *message,
-                               unsigned long expected, unsigned long actual)
+                                 const char *message,
+                                 unsigned long expected, unsigned long actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -272,8 +272,8 @@ void CuAssertULongEquals_LineMsg(CuTest *tc, const char *file,  int line,
 
 
 void CuAssertLlongEquals_LineMsg(CuTest *tc, const char *file,  int line,
-                               const char *message,
-                               long long expected, long long actual)
+                                 const char *message,
+                                 long long expected, long long actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -283,8 +283,8 @@ void CuAssertLlongEquals_LineMsg(CuTest *tc, const char *file,  int line,
 
 
 void CuAssertULlongEquals_LineMsg(CuTest *tc, const char *file, int line,
-                               const char *message,
-                               unsigned long long expected, unsigned long long actual)
+                                  const char *message,
+                                  unsigned long long expected, unsigned long long actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -295,7 +295,7 @@ void CuAssertULlongEquals_LineMsg(CuTest *tc, const char *file, int line,
 
 void CuAssertSizeTEquals_LineMsg(CuTest *tc, const char *file, int line,
                                  const char *message,
-                                 size_t expected, size_t actual)
+                                 usize expected, usize actual)
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
@@ -346,7 +346,7 @@ CuSuite *CuSuiteNew(void)
 void CuSuiteDelete(CuSuite *testSuite)
 {
 	unsigned int n;
-	for (n=0; n < MAX_TEST_CASES; n++) {
+	for (n = 0; n < MAX_TEST_CASES; n++) {
 		if (testSuite->list[n]) {
 			CuTestDelete(testSuite->list[n]);
 		}
@@ -402,7 +402,8 @@ void CuSuiteDetails(CuSuite *testSuite, CuString *details)
 		int passCount = testSuite->count - testSuite->failCount;
 		const char *testWord = passCount == 1 ? "test" : "tests";
 		CuStringAppendFormat(details, "OK (%d %s)\n", passCount, testWord);
-	} else {
+	}
+	else {
 		if (testSuite->failCount == 1)
 			CuStringAppend(details, "There was 1 failure:\n");
 		else

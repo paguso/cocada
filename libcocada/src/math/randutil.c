@@ -78,13 +78,13 @@ uint64 rand_next ()
 	}
 
 
-void shuffle_arr(void *arr, size_t n, size_t typesize)
+void shuffle_arr(void *arr, usize n, usize typesize)
 {
 	_randinit();
 	byte tmp[typesize];
 	if (n > 1) {
-		for (size_t j, i = n - 1; i > 0; i--) {
-			j = (size_t)_rand_next_unchecked() % (i + 1);
+		for (usize j, i = n - 1; i > 0; i--) {
+			j = (usize)_rand_next_unchecked() % (i + 1);
 			memcpy(tmp, arr + (j * typesize), typesize);
 			memcpy(arr + (j * typesize), arr + (i * typesize), typesize);
 			memcpy(arr + (i * typesize), tmp, typesize);
@@ -93,7 +93,7 @@ void shuffle_arr(void *arr, size_t n, size_t typesize)
 }
 
 #define SHUFFLE_ARR_IMPL(TYPE) \
-	void shuffle_arr_##TYPE(TYPE *arr, size_t n) {\
+	void shuffle_arr_##TYPE(TYPE *arr, usize n) {\
 		shuffle_arr(arr, n, sizeof(TYPE));\
 	}
 

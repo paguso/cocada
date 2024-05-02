@@ -61,8 +61,8 @@ int unit_subst(char a, char b);
  * @note The algorithm runs in O(nm) time and O(nm) space, where m = @p qry_len and n= @p tgt_len.
  * @return int The cost of the alignment.
  */
-int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
-                        size_t tgt_len, StrBuf *cigar);
+int simple_global_align(const char *qry, usize qry_len, const char *tgt,
+                        usize tgt_len, StrBuf *cigar);
 
 
 /**
@@ -86,8 +86,8 @@ int simple_global_align(const char *qry, size_t qry_len, const char *tgt,
  * @see "E.W. Myers, W. Miller, Optimal Alignments in Linear Space, Bioinformatics, Volume 4,
  * Issue 1, March 1988, Pages 11-17, https://doi.org/10.1093/bioinformatics/4.1.11"
  */
-int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
-                        size_t tgt_len,
+int affine_global_align(const char *qry, usize qry_len, const char *tgt,
+                        usize tgt_len,
                         int gap_open, int gap_ext, subst_cost_fn subst, StrBuf *cigar);
 
 /**
@@ -104,9 +104,9 @@ int affine_global_align(const char *qry, size_t qry_len, const char *tgt,
  * @param cigar The CIGAR string of the alignment
  * @param cigar_len The length of the CIGAR string
  */
-void fprintf_alignment(FILE *out, const char *qry, size_t qry_from,
-                       size_t qry_to, const char *tgt, size_t tgt_from, size_t tgt_to,
-                       const char *cigar, size_t cigar_len);
+void fprintf_alignment(FILE *out, const char *qry, usize qry_from,
+                       usize qry_to, const char *tgt, usize tgt_from, usize tgt_to,
+                       const char *cigar, usize cigar_len);
 
 
 /**

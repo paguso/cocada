@@ -45,7 +45,7 @@ typedef struct _MinQueueIter MinQueueIter;
  * @param cmp Comparator function
  * @see order.h
  */
-MinQueue *minqueue_new(size_t typesize,  CmpFunc cmp);
+MinQueue *minqueue_new(usize typesize,  CmpFunc cmp);
 
 
 /**
@@ -55,8 +55,8 @@ MinQueue *minqueue_new(size_t typesize,  CmpFunc cmp);
  * @param cmp Comparator function
  * @see order.h
  */
-MinQueue *minqueue_new_with_capacity(size_t typesize,  CmpFunc cmp,
-                                     size_t capacity);
+MinQueue *minqueue_new_with_capacity(usize typesize,  CmpFunc cmp,
+                                     usize capacity);
 
 
 /**
@@ -68,7 +68,7 @@ void minqueue_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the number of elements in the queue.
  */
-size_t minqueue_len(const MinQueue *queue);
+usize minqueue_len(const MinQueue *queue);
 
 
 /**

@@ -29,7 +29,7 @@
 
 
 #define RANGE_ARR_IMPL(TYPE, ...)\
-	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\
+	usize range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\
 	{\
 		if (from == to) {\
 			return 0;\
@@ -38,7 +38,7 @@
 			if (step < 0) {\
 				return 0;\
 			}\
-			size_t n = (to - from);\
+			usize n = (to - from);\
 			n = (n / step) + ((n % step) ? 1 : 0);\
 			return n;\
 		} else {\
@@ -46,16 +46,16 @@
 			if (step > 0) {\
 				return 0;\
 			}\
-			size_t n = (from - to);\
+			usize n = (from - to);\
 			n = (n / (-step)) + ((n % (-step)) ? 1 : 0);\
 			return n;\
 		}\
 	}\
 	\
-	size_t range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step)\
+	usize range_arr_fill_##TYPE(TYPE *dest, TYPE from, TYPE to, SIGNED(TYPE) step)\
 	{\
-		size_t n = range_arr_len_##TYPE(from, to, step);\
-		for (size_t i = 0; i < n; i++, from += step) {\
+		usize n = range_arr_len_##TYPE(from, to, step);\
+		for (usize i = 0; i < n; i++, from += step) {\
 			dest[i] = from;\
 		}\
 		return n;\
@@ -63,7 +63,7 @@
 	\
 	Range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step) \
 	{\
-		size_t n = range_arr_len_##TYPE(from, to, step);\
+		usize n = range_arr_len_##TYPE(from, to, step);\
 		TYPE *arr = (TYPE *)malloc(n * sizeof(TYPE));\
 		range_arr_fill_##TYPE(arr, from, to, step);\
 		return (Range_##TYPE){.n = n, .arr = arr};\

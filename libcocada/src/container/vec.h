@@ -57,7 +57,7 @@ typedef struct _Vec Vec;
  * @brief Vector constructor.
  * @param typesize The size of the elements to be stored (in bytes).
  */
-Vec *vec_new(size_t typesize);
+Vec *vec_new(usize typesize);
 
 
 /**
@@ -65,7 +65,7 @@ Vec *vec_new(size_t typesize);
  * @param typesize The size of the elements to be stored (in bytes).
  * @param init_capacity The initial capacity (in # of elements).
  */
-Vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
+Vec *vec_new_with_capacity(usize typesize, usize init_capacity);
 
 
 /**
@@ -86,7 +86,7 @@ Vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  *   should be used.
  * @see vec_new_from_arr_cpy
  */
-Vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
+Vec *vec_new_from_arr(void *buf, usize len, usize typesize);
 
 
 /**
@@ -100,13 +100,13 @@ Vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
  * @param typesize The  size in bytes of each vector element.
  * @see vec_new_from_arr
  */
-Vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize);
+Vec *vec_new_from_arr_cpy(const void *buf, usize len, usize typesize);
 
 
 /**
  * @brief Returns the type size of the actual implementation in bytes.
  */
-size_t vec_sizeof();
+usize vec_sizeof();
 
 
 /**
@@ -119,19 +119,19 @@ void vec_finalise(void *v, const Finaliser *fnr);
 /**
  * @brief Returns the physical memory size (in bytes) taken by the vector.
  */
-size_t vec_memsize(Vec *self);
+usize vec_memsize(Vec *self);
 
 
 /**
  * @brief Returns the # of elements logically stored.
  */
-size_t vec_len(const Vec *v);
+usize vec_len(const Vec *v);
 
 
 /**
  * @brief Returns the individual size of stored elements (in bytes).
  */
-size_t vec_typesize(const Vec *v);
+usize vec_typesize(const Vec *v);
 
 
 /**
@@ -172,7 +172,7 @@ void *vec_detach(Vec *v);
 /**
  * @brief Returns (the internal reference to) the element at position @p pos.
  */
-const void *vec_get(const Vec *v, size_t pos);
+const void *vec_get(const Vec *v, usize pos);
 
 
 /**
@@ -192,7 +192,7 @@ const void *vec_last(const Vec *v);
 /**
  * @brief Returns a mutable (non-const) reference to the element at position @p pos.
  */
-void *vec_get_mut(const Vec *v, size_t pos);
+void *vec_get_mut(const Vec *v, usize pos);
 
 
 /**
@@ -213,20 +213,20 @@ void *vec_last_mut(const Vec *v);
  * @brief Copies the element at position @p pos into the location
  *        pointed to by @p dest
  */
-void  vec_get_cpy(const Vec *v, size_t pos, void *dest);
+void  vec_get_cpy(const Vec *v, usize pos, void *dest);
 
 
 /**
  * @brief Sets (overwrites) the element at position @p pos to a copy
  *        of the value pointed to by @p src.
  */
-void  vec_set(Vec *v, size_t pos, const void *src);
+void  vec_set(Vec *v, usize pos, const void *src);
 
 
 /**
  * @brief Swaps elements at positions @p i and @p j
  */
-void vec_swap(Vec *v, size_t i, size_t j);
+void vec_swap(Vec *v, usize i, usize j);
 
 
 /**
@@ -238,14 +238,14 @@ void vec_push(Vec *v, const void *src);
 /**
  * @brief Appends @p n copies of the value pointed to by @p src to the vector.
  */
-void vec_push_n(Vec *v, const void *src, size_t n);
+void vec_push_n(Vec *v, const void *src, usize n);
 
 
 /**
  * @brief Inserts a copy of the element pointed to by @p src
  *        at position @p pos.
  */
-void vec_ins(Vec *v, size_t pos, const void *src);
+void vec_ins(Vec *v, usize pos, const void *src);
 
 
 /**
@@ -261,14 +261,14 @@ void vec_cat(Vec *dest, const Vec *src);
  * copying its value to the position pointed to by @p dest.
  * @warning @p dest should be a valid address with enough space. No check is performed.
  */
-void vec_pop(Vec *v, size_t pos, void *dest);
+void vec_pop(Vec *v, usize pos, void *dest);
 
 
 /**
  * @brief Deletes the element at position @p pos from the vector.
  * The value/reference is lost.
  */
-void vec_del(Vec *v, size_t pos);
+void vec_del(Vec *v, usize pos);
 
 
 /**
@@ -276,7 +276,7 @@ void vec_del(Vec *v, size_t pos);
  * @warning Requires 0<=from<=to<=vec_len(@p v). No checks performed.
  * The data outside the [from:to] boundaries are lost.
  */
-void vec_clip(Vec *v, size_t from, size_t to);
+void vec_clip(Vec *v, usize from, usize to);
 
 
 /**
@@ -292,14 +292,14 @@ void vec_reverse(Vec *v);
  *        @p npos % `n` positions.
  *        Example: `vec_rotate_left(v=[a,b,c,d,e,f,g], 3)` => `v[d,e,f,g,a,b,c]`.
  */
-void vec_rotate_left(Vec *v, size_t npos);
+void vec_rotate_left(Vec *v, usize npos);
 
 
 /**
  * @brief Rotates the vector contents @p npos positions to the right.
  * @see vec_rotate_left
  */
-void vec_rotate_right(Vec *v, size_t npos);
+void vec_rotate_right(Vec *v, usize npos);
 
 
 /**
@@ -308,7 +308,7 @@ void vec_rotate_right(Vec *v, size_t npos);
  *        If no element satisfies the condition, returns vec_len(v)
  * @note That is a linear search that performs O(n) comparisons
  */
-size_t vec_find(const Vec *v, const void *val, EqFunc eq);
+usize vec_find(const Vec *v, const void *val, EqFunc eq);
 
 
 /**
@@ -320,21 +320,21 @@ size_t vec_find(const Vec *v, const void *val, EqFunc eq);
  * @warning Requires that the vector be in ascending order according
  * to the @p cmp order.
  */
-size_t vec_bsearch(const Vec *v, const void *val, CmpFunc cmp);
+usize vec_bsearch(const Vec *v, const void *val, CmpFunc cmp);
 
 
 /**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
-size_t vec_min(const Vec *v, CmpFunc cmp);
+usize vec_min(const Vec *v, CmpFunc cmp);
 
 
 /**
  * @brief Returns the position of the minimum element according to
  *        the order @p cmp. If the vector is empty, returns 0.
  */
-size_t vec_max(const Vec *v, CmpFunc cmp);
+usize vec_max(const Vec *v, CmpFunc cmp);
 
 
 /**
@@ -396,8 +396,8 @@ void vec_qsort(Vec *v, CmpFunc cmp);
  * @param key_size The size of the key vector
  * @param max_key The noninclusive maximum value for each key position
  */
-void vec_radixsort(Vec *v, size_t (*key_fn)(const void *, size_t),
-                   size_t key_size, size_t max_key);
+void vec_radixsort(Vec *v, usize (*key_fn)(const void *, usize),
+                   usize key_size, usize max_key);
 
 
 
@@ -407,7 +407,7 @@ void vec_radixsort(Vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_GET_DECL( TYPE ) \
 	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
-	TYPE vec_get_##TYPE(const Vec *v, size_t pos);
+	TYPE vec_get_##TYPE(const Vec *v, usize pos);
 
 #define VEC_FIRST_DECL( TYPE ) \
 	/** @brief Returns TYPE copy of the first element @see coretype.h */ \
@@ -419,7 +419,7 @@ void vec_radixsort(Vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_SET_DECL( TYPE ) \
 	/** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
-	void vec_set_##TYPE(Vec *v, size_t pos, TYPE val);
+	void vec_set_##TYPE(Vec *v, usize pos, TYPE val);
 
 #define VEC_PUSH_DECL( TYPE ) \
 	/** @brief Appends a TYPE copy of @p val @see coretype.h */ \
@@ -427,11 +427,11 @@ void vec_radixsort(Vec *v, size_t (*key_fn)(const void *, size_t),
 
 #define VEC_INS_DECL( TYPE ) \
 	/** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
-	void vec_ins_##TYPE(Vec *v, size_t pos, TYPE val);
+	void vec_ins_##TYPE(Vec *v, usize pos, TYPE val);
 
 #define VEC_POP_DECL( TYPE ) \
 	/** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
-	TYPE vec_pop_##TYPE(Vec *v, size_t pos);
+	TYPE vec_pop_##TYPE(Vec *v, usize pos);
 
 
 #define TYPED_VEC_DECL( TYPE , ...) \

@@ -68,7 +68,7 @@ void test_serialise_arr(CuTest *tc)
 	remove("serialised_arr.obj");
 
 	CuAssertSizeTEquals(tc, sa_arr_short_len(arr), sa_arr_short_len(arr_cpy));
-	for (size_t i = 0; i < sa_arr_short_len(arr); i++) {
+	for (usize i = 0; i < sa_arr_short_len(arr); i++) {
 		CuAssertIntEquals(tc, arr[i], arr_cpy[i]);
 	}
 	sa_arr_free(arr);
@@ -222,7 +222,7 @@ void test_serialise_list(CuTest *tc)
 		CuAssertIntEquals(tc, cur->val, cur_cpy->val);
 		CuAssertStrEquals(tc, cur->str, cur_cpy->str);
 		CuAssertSizeTEquals(tc, sa_arr_int_len(cur->arr), sa_arr_int_len(cur_cpy->arr));
-		for (size_t i = 0; i < sa_arr_int_len(cur->arr); i++) {
+		for (usize i = 0; i < sa_arr_int_len(cur->arr); i++) {
 			CuAssertIntEquals(tc, cur->arr[i], cur_cpy->arr[i]);
 		}
 	}

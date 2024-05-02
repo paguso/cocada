@@ -32,7 +32,7 @@
 
 void test_mult_floor(CuTest *tc)
 {
-	size_t i, ntests = 1000000;
+	usize i, ntests = 1000000;
 	double value, base, expected, actual;
 
 	for (i = 0; i < ntests; i++) {
@@ -84,7 +84,7 @@ void test_mult_floor(CuTest *tc)
 
 void test_mult_ceil(CuTest *tc)
 {
-	size_t i, ntests = 1000000;
+	usize i, ntests = 1000000;
 	double value, base, expected, actual;
 
 	for (i = 0; i < ntests; i++) {
@@ -142,8 +142,8 @@ void test_is_prime_mr(CuTest *tc)
 	//bool b = is_prime_naive(18023405708736723011);
 
 	uint64 val = 1;
-	for (size_t p = 0; p < 63; p++) {
-		for (size_t n = 0; n < 1000; n++) {
+	for (usize p = 0; p < 63; p++) {
+		for (usize n = 0; n < 1000; n++) {
 			bool ispr = is_prime_mr(val);
 			DEBUG("%zu is %s prime\n", val, ispr ? "" : "NOT");
 			if (ispr != is_prime_naive(val)) {

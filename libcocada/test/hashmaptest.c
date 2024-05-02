@@ -39,7 +39,7 @@ void test_hashmap_int(CuTest *tc)
 	HashMap *hmap = hashmap_new(sizeof(uint32), sizeof(uint32),
 	                            ident_hash_uint32, eq_uint32);
 
-	size_t n = 1000000;
+	usize n = 1000000;
 	for (int i = 0; i < n; i++) {
 		//printf("Adding [%d,%d] to hashmap\n", i, i);
 		hashmap_ins(hmap, &i, &i);
@@ -82,10 +82,10 @@ void object_finalise(void *ptr, const Finaliser *fnr)
 uint64 hash_bin_str(const void *key)
 {
 	char *s = ((char **)key)[0];
-	size_t n = strlen(s);
+	usize n = strlen(s);
 	uint64 h = 0;
 	uint64 pow = 2;
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		h = (pow * h) +  (s[i] - '0');
 	}
 	return h;

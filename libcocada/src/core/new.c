@@ -28,7 +28,7 @@
 
 struct _Finaliser {
 	finalise_func fn;
-	size_t nchd;
+	usize nchd;
 	struct _Finaliser **chd;
 };
 
@@ -52,7 +52,7 @@ Finaliser *finaliser_clone(const Finaliser *src)
 	fnr->fn = src->fn;
 	fnr->nchd = src->nchd;
 	fnr->chd = (Finaliser **) calloc(src->nchd, sizeof(Finaliser *));
-	for (size_t i = 0; i < src->nchd; i++ ) {
+	for (usize i = 0; i < src->nchd; i++ ) {
 		fnr->chd[i] = finaliser_clone(src->chd[i]);
 	}
 	return fnr;
@@ -62,7 +62,7 @@ Finaliser *finaliser_clone(const Finaliser *src)
 void finaliser_free(Finaliser *self)
 {
 	if (self == NULL) return;
-	for (size_t i = 0; i < self->nchd; i++) {
+	for (usize i = 0; i < self->nchd; i++) {
 		finaliser_free(self->chd[i]);
 	}
 	FREE(self->chd);
@@ -76,13 +76,13 @@ void finaliser_call(const Finaliser *self, void *ptr)
 }
 
 
-size_t finaliser_nchd(const Finaliser *self)
+usize finaliser_nchd(const Finaliser *self)
 {
 	return self->nchd;
 }
 
 
-const Finaliser *finaliser_chd(const Finaliser *self, size_t index)
+const Finaliser *finaliser_chd(const Finaliser *self, usize index)
 {
 	return ((Finaliser **)self->chd)[index];
 }

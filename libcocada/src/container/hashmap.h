@@ -69,7 +69,7 @@ typedef struct  {
  * @param hfunc A pointer to a hash function.
  * @param keqfunc A pointer to a key comparator function.
  */
-HashMap *hashmap_new(size_t keysize, size_t valsize, HashFunc keyhash,
+HashMap *hashmap_new(usize keysize, usize valsize, HashFunc keyhash,
                      EqFunc keyeq);
 
 
@@ -78,7 +78,7 @@ HashMap *hashmap_new(size_t keysize, size_t valsize, HashFunc keyhash,
  * Analogous to ::hashmap_new
  * @see hashmap_new
  */
-void hashmap_init(HashMap *map, size_t keysize, size_t valsize,
+void hashmap_init(HashMap *map, usize keysize, usize valsize,
                   HashFunc keyhash, EqFunc keyeq);
 
 
@@ -87,9 +87,9 @@ void hashmap_init(HashMap *map, size_t keysize, size_t valsize,
  * @note  Ensures initial capacity >= @p min_capacity
  * @see hashmap_new
  */
-HashMap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
+HashMap *hashmap_new_with_capacity(usize keysize, usize valsize,
                                    HashFunc keyhash, EqFunc keyeq,
-                                   size_t min_capacity);
+                                   usize min_capacity);
 
 
 /**
@@ -97,9 +97,9 @@ HashMap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
  * Analogous to ::hashmap_new_with_capacit
  * @see hashmap_new_with_capacity
  */
-void hashmap_init_with_capacity(HashMap *map, size_t keysize, size_t valsize,
+void hashmap_init_with_capacity(HashMap *map, usize keysize, usize valsize,
                                 HashFunc keyhash, EqFunc keyeq,
-                                size_t min_capacity);
+                                usize min_capacity);
 
 
 /**
@@ -115,7 +115,7 @@ void hashmap_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the size of the type in bytes
  */
-size_t hashmap_sizeof();
+usize hashmap_sizeof();
 
 
 /**
@@ -218,7 +218,7 @@ void hashmap_remv(HashMap *hmap, const void *key, void *dest_key,
 /**
  * @brief Returns the number of elements currently stored.
  */
-size_t hashmap_size(const HashMap *hmap);
+usize hashmap_size(const HashMap *hmap);
 
 
 

@@ -23,7 +23,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 
 #include "read.h"
 #include "filereader.h"
@@ -34,7 +33,7 @@
 struct _FileReader {
 	Read _t_Read;
 	FILE *src;
-	size_t pos;
+	usize pos;
 	bool own_stream;
 };
 
@@ -54,16 +53,16 @@ static int _getc(Read *self)
 }
 
 
-static size_t _read_str(Read *self, char *dest, size_t n)
+static usize _read_str(Read *self, char *dest, usize n)
 {
 	return fread(dest, sizeof(char), n, ((FileReader *)self->impltor)->src);
 }
 
 
-static size_t _read_str_until(Read *self, char *dest, char delim)
+static usize _read_str_until(Read *self, char *dest, char delim)
 {
 	FILE *src = ((FileReader *)self->impltor)->src;
-	size_t nread;
+	usize nread;
 	char c;
 	for (nread = 0; !feof(src); nread++) {
 		if ( (c = fgetc(src)) == delim ) {

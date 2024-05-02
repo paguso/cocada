@@ -32,26 +32,26 @@
 #include "memdbg.h"
 #include "new.h"
 
-const static size_t MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
+const static usize MIN_CAPACITY = 4; // (!) MIN_CAPACITY > 1
 const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
 const static float  MIN_LOAD = 0.5;   // (!) GROW_BY * MIN_LOAD < 1
 
 struct _Deque {
-	size_t typesize;
-	size_t start;
-	size_t len;
-	size_t cap;
+	usize typesize;
+	usize start;
+	usize len;
+	usize cap;
 	void  *data;
 };
 
 
-Deque *deque_new(size_t typesize)
+Deque *deque_new(usize typesize)
 {
 	return deque_new_with_capacity(typesize, MIN_CAPACITY);
 }
 
 
-Deque *deque_new_with_capacity(size_t typesize, size_t capacity)
+Deque *deque_new_with_capacity(usize typesize, usize capacity)
 {
 	Deque *q = NEW(Deque);
 	q->typesize = typesize;
@@ -68,7 +68,7 @@ void deque_finalise(void *ptr, const Finaliser *fnr)
 	Deque *dq = (Deque *)ptr;
 	if (finaliser_nchd(fnr)) {
 		const Finaliser *chd_fr = finaliser_chd(fnr, 0);
-		for (size_t i = 0, l = deque_len(dq); i < l; i++) {
+		for (usize i = 0, l = deque_len(dq); i < l; i++) {
 			void *chd = (void *)deque_get(dq, i);
 			FINALISE(chd, chd_fr);
 		}
@@ -83,20 +83,20 @@ bool deque_empty(const Deque *q)
 }
 
 
-size_t deque_len(const Deque *q)
+usize deque_len(const Deque *q)
 {
 	return q->len;
 }
 
 
-const void *deque_get(const Deque *q, size_t pos)
+const void *deque_get(const Deque *q, usize pos)
 {
 	assert(pos < q->len);
 	return (byte *)q->data + ( ((q->start + pos) % q->cap) * q->typesize );
 }
 
 
-void deque_get_cpy(const Deque *q, size_t pos, void *dest )
+void deque_get_cpy(const Deque *q, usize pos, void *dest )
 {
 	assert(pos < q->len);
 	memcpy(dest, (byte *)q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
@@ -119,7 +119,7 @@ const void *deque_back(const Deque *q)
 static void check_and_resize(Deque *q)
 {
 	if (q->len == q->cap) {
-		size_t offset = q->cap;
+		usize offset = q->cap;
 		q->cap = MAX(GROW_BY * q->cap, MIN_CAPACITY);
 		q->data = realloc(q->data, q->cap * q->typesize);
 		if (q->start == 0) return;
@@ -209,7 +209,7 @@ void deque_del_front(Deque *q)
 	}
 
 #define DEQUE_GET_IMPL( TYPE )\
-	TYPE deque_get_##TYPE(const Deque *q, size_t pos) {\
+	TYPE deque_get_##TYPE(const Deque *q, usize pos) {\
 		return ((TYPE *)deque_get(q, pos))[0];\
 	}
 

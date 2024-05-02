@@ -31,7 +31,7 @@
 
 struct _xstrHash {
 	Alphabet *ab;
-	size_t max_exp;
+	usize max_exp;
 	uint64 *pow;
 };
 
@@ -39,7 +39,7 @@ struct _xstrHash {
 static void _initpow(xstrHash *self)
 {
 	uint64 base = alphabet_size(self->ab);
-	size_t e = 0;
+	usize e = 0;
 	uint64 p = 1;
 	while ( (uint64)(base * p) > p ) {
 		e++;
@@ -48,13 +48,13 @@ static void _initpow(xstrHash *self)
 	self->max_exp = e;
 	self->pow = ARR_NEW(uint64, e);
 	p = 1;
-	for (size_t i = 0; i < e; i++) {
+	for (usize i = 0; i < e; i++) {
 		self->pow[i] = p;
 		p *= base;
 	}
 }
 
-static inline uint64 _pow(const xstrHash *self, size_t exp)
+static inline uint64 _pow(const xstrHash *self, usize exp)
 {
 	uint64 ret = 1;
 	while (exp > self->max_exp) {
@@ -87,11 +87,11 @@ uint64 xstrhash_lex(const xstrHash *self, const xstr *s)
 }
 
 
-uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                        size_t to)
+uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, usize from,
+                        usize to)
 {
 	uint64 hash = 0;
-	for (size_t i = from; i < to; i++) {
+	for (usize i = from; i < to; i++) {
 		hash *= alphabet_size(self->ab);
 		hash += alphabet_rank(self->ab, xstr_get(s, i));
 	}
@@ -108,8 +108,8 @@ uint64 xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64 hash,
 }
 
 
-uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                             size_t to,  uint64 hash, xchar c)
+uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, usize from,
+                             usize to,  uint64 hash, xchar c)
 {
 	hash -= _pow(self, to - from - 1) * alphabet_rank(self->ab, xstr_get(s, from));
 	hash *= alphabet_size(self->ab);

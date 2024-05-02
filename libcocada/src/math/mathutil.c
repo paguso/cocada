@@ -104,13 +104,13 @@ bool is_prime_mr(uint64 n)
 {
 	uint64 a[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
 	uint64 limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615ull};
-	size_t nwitness[] = {1, 2, 3, 4, 5, 6, 7, 9, 12};
+	usize nwitness[] = {1, 2, 3, 4, 5, 6, 7, 9, 12};
 	if (n < 2) return false;
 	if (n == 2) return true;
 	if (IS_EVEN(n)) return false;
 
-	size_t nwit = 1;
-	for (size_t j = 0; j < 9 && n >= limits[j]; nwit = nwitness[++j]);
+	usize nwit = 1;
+	for (usize j = 0; j < 9 && n >= limits[j]; nwit = nwitness[++j]);
 
 	uint64 d = n - 1;
 	uint64 r = 0;
@@ -120,14 +120,14 @@ bool is_prime_mr(uint64 n)
 	}
 
 	bool prime = true;
-	for (size_t i = 0; prime && i < nwit; i++) {
+	for (usize i = 0; prime && i < nwit; i++) {
 		prime = false;
 		uint64 x = mod_pow(a[i], d, n); // (a[i]^d) mod n
 		if ( x == 1 || x == (n - 1) ) {
 			prime = true;
 			continue;
 		}
-		for (size_t _j = 0; _j < r - 1; _j++) {
+		for (usize _j = 0; _j < r - 1; _j++) {
 			x = mod_mult(x, x, n); // (x*x) % n;
 			if ( x == n - 1 ) {
 				prime = true;
@@ -164,7 +164,7 @@ uint64 prime_succ(uint64 n)
 #define __uint_max UINT_MAX
 #define __ulong_max ULONG_MAX
 #define __ullong_max ULLONG_MAX
-#define __size_t_max SIZE_MAX
+#define __usize_max SIZE_MAX
 #define __uint8_max UINT8_MAX
 #define __uint16_max UINT16_MAX
 #define __uint32_max UINT32_MAX
@@ -172,11 +172,11 @@ uint64 prime_succ(uint64 n)
 #define __byte_max BYTE_MAX
 
 #define AVG_IMPL(TYPE, ...)\
-	double average_##TYPE(TYPE *vals, size_t n)\
+	double average_##TYPE(TYPE *vals, usize n)\
 	{\
 		double avg = 0;\
 		TYPE acc = 0;\
-		for (size_t i = 0; i < n; i++) {\
+		for (usize i = 0; i < n; i++) {\
 			if ((__##TYPE##_max - acc) < vals[i]) {\
 				avg += (double) acc / (double) n;\
 				acc = 0;\
@@ -189,11 +189,11 @@ uint64 prime_succ(uint64 n)
 
 XX_UNSIGNED_INT(AVG_IMPL)
 
-/*double average_uint64(uint64 *vals, size_t n)
+/*double average_uint64(uint64 *vals, usize n)
 {
 	double avg = 0;
 	uint64 acc = 0;
-	for (size_t i = 0; i < n; i++) {
+	for (usize i = 0; i < n; i++) {
 		if ((UINT64_MAX - acc) < vals[i]) {
 			avg += (double) acc / (double) n;
 			acc = 0;
@@ -210,13 +210,13 @@ XX_UNSIGNED_INT(AVG_IMPL)
 
 
 #define _PARTITION(TYPE, ...)\
-	static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\
+	static usize _partition_##TYPE(TYPE *v, usize l, usize r) {\
 		assert(l < r);\
 		TYPE tmp;\
-		size_t p = rand_range_size_t(l, r);\
+		usize p = rand_range_usize(l, r);\
 		SWAP(v[l], v[p], tmp);\
-		size_t i = l;\
-		size_t j = r-1;\
+		usize i = l;\
+		usize j = r-1;\
 		while ( i < j ) {\
 			while ( i < r && v[i] <= v[l] )\
 				i++;\
@@ -233,7 +233,7 @@ XX_PRIMITIVES(_PARTITION)
 
 
 #define KTH_SMALLEST_IMPL(TYPE, ...)\
-	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty)\
+	TYPE kth_smallest_##TYPE(TYPE *v, usize len, usize k, bool dirty)\
 	{\
 		assert(k < len);\
 		TYPE *w = v;\
@@ -241,8 +241,8 @@ XX_PRIMITIVES(_PARTITION)
 			w = ARR_NEW(TYPE , len);\
 			memcpy(w, v, len * sizeof(TYPE));\
 		}\
-		size_t p = len;\
-		size_t l = 0, r = len;\
+		usize p = len;\
+		usize l = 0, r = len;\
 		do {\
 			p = _partition_##TYPE(w, l, r);\
 			if ( p < k ) {\
@@ -263,7 +263,7 @@ XX_PRIMITIVES(KTH_SMALLEST_IMPL)
 
 
 #define MEDIAN_IMPL(TYPE, ...)\
-	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty)\
+	TYPE median_##TYPE(TYPE *v, usize len, bool dirty)\
 	{\
 		return kth_smallest_##TYPE(v, len, len/2, dirty);\
 	}

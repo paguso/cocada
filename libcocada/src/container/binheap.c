@@ -34,7 +34,7 @@ struct _BinHeap {
 	CmpFunc cmp;
 };
 
-BinHeap *binheap_new( size_t typesize,
+BinHeap *binheap_new( usize typesize,
                       CmpFunc cmp )
 {
 	BinHeap *heap = NEW(BinHeap);
@@ -52,15 +52,15 @@ void binheap_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-size_t binheap_size(const BinHeap *heap)
+usize binheap_size(const BinHeap *heap)
 {
 	return vec_len(heap->data);
 }
 
 
-static size_t _bubble_up(BinHeap *heap)
+static usize _bubble_up(BinHeap *heap)
 {
-	size_t i = binheap_size(heap) - 1;
+	usize i = binheap_size(heap) - 1;
 	while ( i > 0 &&
 	        heap->cmp( vec_get(heap->data, i),
 	                   vec_get(heap->data, (i - 1) / 2) ) > 0 )  {
@@ -71,9 +71,9 @@ static size_t _bubble_up(BinHeap *heap)
 }
 
 
-static size_t _bubble_down(BinHeap *heap, size_t pos)
+static usize _bubble_down(BinHeap *heap, usize pos)
 {
-	size_t i, l, r, m, n;
+	usize i, l, r, m, n;
 	n = binheap_size(heap);
 	i = pos;
 	while (true) {

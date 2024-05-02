@@ -35,19 +35,19 @@
 #include "xstr.h"
 #include "xstrformat.h"
 
-void random_str(Alphabet *ab, size_t len, char *dest)
+void random_str(Alphabet *ab, usize len, char *dest)
 {
-	for (size_t i = 0; i < len; i++) {
-		dest[i] = (char)alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab)));
+	for (usize i = 0; i < len; i++) {
+		dest[i] = (char)alphabet_char(ab, rand_range_usize(0, alphabet_size(ab)));
 	}
 	dest[len] = '\0';
 }
 
-void random_xstr(Alphabet *ab, size_t len, xstr *dest)
+void random_xstr(Alphabet *ab, usize len, xstr *dest)
 {
 	xstr_clear(dest);
-	for (size_t i = 0; i < len; i++) {
-		xstr_push(dest, alphabet_char(ab, rand_range_size_t(0, alphabet_size(ab))));
+	for (usize i = 0; i < len; i++) {
+		xstr_push(dest, alphabet_char(ab, rand_range_usize(0, alphabet_size(ab))));
 	}
 }
 
@@ -56,14 +56,14 @@ void sais_test_str(CuTest *tc)
 {
 	memdbg_reset();
 	Alphabet *ab = alphabet_new(10, "abcdefghij");
-	size_t max_len = 1000;
+	usize max_len = 1000;
 	char *str = cstr_new(max_len);
-	for (size_t len = 0; len < max_len; len++) {
+	for (usize len = 0; len < max_len; len++) {
 		random_str(ab, len, str);
-		size_t *sarr = sais(str, len, ab);
+		usize *sarr = sais(str, len, ab);
 		//DEBUG_EXEC(ARR_PRINT(sarr, SA, %zu, 0, len + 1, 10, "   "));
 		CuAssertSizeTEquals(tc, len, sarr[0]);
-		for (size_t i = 1; i + 1 < len; i++) {
+		for (usize i = 1; i + 1 < len; i++) {
 			CuAssert(tc, "Wrong SARR order", strcmp(&str[sarr[i]], &str[sarr[i + 1]]) < 0);
 		}
 		FREE(sarr);
@@ -74,12 +74,12 @@ void sais_test_str(CuTest *tc)
 }
 
 
-int xstr_suff_cmp(xstr *str, size_t i, size_t j)
+int xstr_suff_cmp(xstr *str, usize i, usize j)
 {
 	if (i == j) {
 		return 0;
 	}
-	size_t len = xstr_len(str);
+	usize len = xstr_len(str);
 	while (true) {
 		if (i == len) {
 			return -1;
@@ -102,16 +102,16 @@ void sais_test_xstr(CuTest *tc)
 {
 	memdbg_reset();
 	Alphabet *ab = alphabet_new_int_ab(300);
-	size_t max_len = 5000;
+	usize max_len = 5000;
 	xstr *str = xstr_new(nbytes(alphabet_size(ab)));
 	xstrFormat *xf = xstrformat_new(str);
-	for (size_t len = 0; len < max_len; len++) {
+	for (usize len = 0; len < max_len; len++) {
 		random_xstr(ab, len, str);
 		CuAssertSizeTEquals(tc, len, xstr_len(str));
 		//format_print(xstrformat_as_Format(xf));
-		size_t *sarr = sais_xstr(str, ab);
+		usize *sarr = sais_xstr(str, ab);
 		CuAssertSizeTEquals(tc, len, sarr[0]);
-		for (size_t i = 1; i + 1 < len; i++) {
+		for (usize i = 1; i + 1 < len; i++) {
 			CuAssert(tc, "Wrong SARR order", xstr_suff_cmp(str, sarr[i], sarr[i + 1]) < 0);
 		}
 		FREE(sarr);

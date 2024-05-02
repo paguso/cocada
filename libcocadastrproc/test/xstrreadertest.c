@@ -37,7 +37,7 @@ void test_xstrreader(CuTest *tc)
 	xwchar c;
 	c = xstrread_getc(xstrReader_as_xstrRead(xrdr));
 	CuAssertCharEquals(tc, '0', c);
-	size_t nread = xstrread_read_until(xstrReader_as_xstrRead(xrdr), NULL, '0');
+	usize nread = xstrread_read_until(xstrReader_as_xstrRead(xrdr), NULL, '0');
 	CuAssertSizeTEquals(tc, 9, nread);
 	c = xstrread_getc(xstrReader_as_xstrRead(xrdr));
 	CuAssertCharEquals(tc, '0', c);
@@ -67,7 +67,7 @@ void test_xstrreader_from_strread(CuTest *tc)
 	xwchar c;
 	c = xstrread_getc(xstrReader_as_xstrRead(xrdr));
 	CuAssertCharEquals(tc, '0', c);
-	size_t nread = xstrread_read_until(xstrReader_as_xstrRead(xrdr), NULL, '0');
+	usize nread = xstrread_read_until(xstrReader_as_xstrRead(xrdr), NULL, '0');
 	CuAssertSizeTEquals(tc, 9, nread);
 	c = xstrread_getc(xstrReader_as_xstrRead(xrdr));
 	CuAssertCharEquals(tc, '0', c);

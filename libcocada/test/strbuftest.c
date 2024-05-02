@@ -61,7 +61,7 @@ void test_strbuf_get(CuTest *tc)
 	str[10] = '\0';
 	StrBuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
-	for (size_t i = 0; i < strbuf_len(dstr); i++) {
+	for (usize i = 0; i < strbuf_len(dstr); i++) {
 		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0' + (i % 10));
 	}
 	free(str);
@@ -78,10 +78,10 @@ void test_strbuf_append_char(CuTest *tc)
 	str[10] = '\0';
 	StrBuf *dstr;
 	dstr = strbuf_new_from_str(str, strlen(str));
-	for (size_t i = 0; i < 1000; i++) {
+	for (usize i = 0; i < 1000; i++) {
 		strbuf_append_char(dstr, '0' + (i % 10));
 	}
-	for (size_t i = 0; i < strbuf_len(dstr); i++) {
+	for (usize i = 0; i < strbuf_len(dstr); i++) {
 		CuAssertIntEquals(tc, strbuf_get(dstr, i), '0' + (i % 10));
 	}
 	//printf("final strbuf = %s\ncapacity=%zu\n", strbuf_as_str(dstr), strbuf_capacity(dstr));
@@ -202,12 +202,12 @@ void test_strbuf_find_n(CuTest *tc)
 	          "0123012301230123012301230123012301230123";
 	char *pat = "123";
 	StrBuf *sb = strbuf_new_from_str(s, strlen(s));
-	size_t matches[7];
-	size_t from_pos = 0;
-	size_t expected_pos = 1;
-	size_t n;
+	usize matches[7];
+	usize from_pos = 0;
+	usize expected_pos = 1;
+	usize n;
 	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
-		for (size_t i = 0; i < n; i++) {
+		for (usize i = 0; i < n; i++) {
 			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
 			from_pos = matches[i] + 1;
 			expected_pos += 4;
@@ -217,7 +217,7 @@ void test_strbuf_find_n(CuTest *tc)
 	from_pos = 0;
 	expected_pos = 0;
 	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
-		for (size_t i = 0; i < n; i++) {
+		for (usize i = 0; i < n; i++) {
 			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
 			from_pos = matches[i] + 1;
 			expected_pos += 1;

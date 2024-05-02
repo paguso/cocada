@@ -72,7 +72,7 @@ typedef struct _hufftnode hufftnode;
  * @param ab (no transfer) The base alphabet.
  * @param freqs (no transfer) Individual letter frequencies in lexycographic order.
  */
-huffcode *huffcode_new(const Alphabet *ab, const size_t *freqs);
+huffcode *huffcode_new(const Alphabet *ab, const usize *freqs);
 
 
 /**
@@ -123,13 +123,13 @@ void huffcode_print(FILE *stream, const huffcode *hcode);
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-BitVec *huffcode_encode(const char *src, size_t len, const huffcode *code);
+BitVec *huffcode_encode(const char *src, usize len, const huffcode *code);
 
 
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
-void huffcode_encode_to(BitVec *dest, const char *src, size_t len,
+void huffcode_encode_to(BitVec *dest, const char *src, usize len,
                         const huffcode *hcode);
 
 
@@ -183,7 +183,7 @@ xstr *huffcode_decode(const BitVec *code, const huffcode *hcode);
  * @param char_rank The rank of the char w.r.t. the code alphabet
  * @warn  Do NOT destroy of modify the returned bitvector.
  */
-const BitVec *huffcode_charcode(const huffcode *hcode, size_t char_rank);
+const BitVec *huffcode_charcode(const huffcode *hcode, usize char_rank);
 
 
 /**
@@ -236,6 +236,6 @@ const byte *hufftnode_ab_mask(const hufftnode *node);
  *        of the corresponding letter in the represented alphabet.
  *        If the given HT @p node is not a leaf, returns the alphabet size.
  */
-size_t hufftnode_char_rank(const hufftnode *node);
+usize hufftnode_char_rank(const hufftnode *node);
 
 #endif
