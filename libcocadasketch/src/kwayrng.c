@@ -33,9 +33,9 @@
 
 struct  _KWayRNG {
 	size_t k;
-	uint64_t maxval;
-	uint64_t *coefs;
-	uint64_t count;
+	uint64 maxval;
+	uint64 *coefs;
+	uint64 count;
 };
 
 
@@ -44,25 +44,25 @@ KWayRNG *kwayrng_new(size_t k, size_t nbits)
 	ERROR_ASSERT(nbits <= 64, "Maximum number of random bits is 64");
 	KWayRNG *ret = NEW(KWayRNG);
 	ret->k = k;
-	ret->maxval = (uint64_t)1 << nbits;
+	ret->maxval = (uint64)1 << nbits;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
-	ret->coefs = ARR_NEW(uint64_t, k);
+	ret->coefs = ARR_NEW(uint64, k);
 	for (size_t i = 0; i < k; i++) {
-		ret->coefs[i] = rand_range_uint64_t(1, ret->maxval);
+		ret->coefs[i] = rand_range_uint64(1, ret->maxval);
 	}
 	ret->count = 0;
 	return ret;
 }
 
 
-KWayRNG *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits)
+KWayRNG *kwayrng_new_with_coefs(size_t k, uint64 *coefs, size_t nbits)
 {
 	ERROR_ASSERT(nbits < 64, "Maximum number of random bits is 63");
 	KWayRNG *ret = NEW(KWayRNG);
 	ret->k = k;
 	//ret->maxval = prime_succ((1 << nbits) - 1 );
-	ret->maxval = (uint64_t)1 << nbits;
-	ret->coefs = ARR_NEW(uint64_t, k);
+	ret->maxval = (uint64)1 << nbits;
+	ret->coefs = ARR_NEW(uint64, k);
 	for (size_t i = 0; i < k; i++) {
 		ret->coefs[i] = coefs[i] % ret->maxval;
 	}
@@ -84,7 +84,7 @@ size_t kwayrng_k(KWayRNG *rng)
 }
 
 
-const uint64_t *kwayrng_coefs(KWayRNG *rng)
+const uint64 *kwayrng_coefs(KWayRNG *rng)
 {
 	return rng->coefs;
 }
@@ -96,16 +96,16 @@ void kwayrng_reset(KWayRNG *rng)
 }
 
 
-uint64_t kwayrng_maxval(KWayRNG *rng)
+uint64 kwayrng_maxval(KWayRNG *rng)
 {
 	return rng->maxval;
 }
 
 
-uint64_t kwayrng_next(KWayRNG *rng)
+uint64 kwayrng_next(KWayRNG *rng)
 {
-	uint64_t ret = 0;
-	for (uint64_t i = 0, pow = 1; i < rng->k; i++) {
+	uint64 ret = 0;
+	for (uint64 i = 0, pow = 1; i < rng->k; i++) {
 		ret = mod_sum(ret, mod_mult(rng->coefs[i], pow, rng->maxval), rng->maxval);
 		pow = mod_mult(pow, rng->count, rng->maxval);
 	}
@@ -114,11 +114,11 @@ uint64_t kwayrng_next(KWayRNG *rng)
 }
 
 
-uint64_t kwayrng_val(KWayRNG *rng, uint64_t ith)
+uint64 kwayrng_val(KWayRNG *rng, uint64 ith)
 {
-	uint64_t ret = 0;
+	uint64 ret = 0;
 	ith =  ith % rng->maxval;
-	for (uint64_t i = 0, pow = 1; i < rng->k; i++) {
+	for (uint64 i = 0, pow = 1; i < rng->k; i++) {
 		ret = mod_sum(ret, mod_mult(rng->coefs[i], pow, rng->maxval), rng->maxval);
 		pow = mod_mult(pow, ith, rng->maxval);
 	}

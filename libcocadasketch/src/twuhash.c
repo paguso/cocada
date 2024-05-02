@@ -20,6 +20,7 @@
  */
 
 #include "arrays.h"
+#include "bitbyte.h"
 #include "errlog.h"
 #include "new.h"
 #include "randutil.h"
@@ -27,20 +28,20 @@
 
 
 struct _TWUHash {
-	byte_t in_bits, out_bits;
-	uint64_t *A;
-	uint64_t B;
+	byte in_bits, out_bits;
+	uint64 *A;
+	uint64 B;
 };
 
 
-TWUHash *twuhash_new(byte_t in_bits, byte_t out_bits)
+TWUHash *twuhash_new(byte in_bits, byte out_bits)
 {
 	ERROR_ASSERT( 0 < in_bits && in_bits <= 64 && 0 < out_bits && out_bits <= 64,
 	              "twuhash must hash m to n bits where 0 < m,n <= 64");
 	TWUHash *ret = NEW(TWUHash);
 	ret->in_bits = in_bits;
 	ret->out_bits = out_bits;
-	ret->A = ARR_OF_0_NEW(uint64_t, out_bits);
+	ret->A = ARR_OF_0_NEW(uint64, out_bits);
 	for (size_t i = 0; i < out_bits; i++) {
 		ret->A[i] = rand_next();
 		ret->A[i] >>= (64 - out_bits);
@@ -52,9 +53,9 @@ TWUHash *twuhash_new(byte_t in_bits, byte_t out_bits)
 
 
 
-uint64_t twuhash_hash(TWUHash *h, uint64_t x)
+uint64 twuhash_hash(TWUHash *h, uint64 x)
 {
-	uint64_t ret = 0;
+	uint64 ret = 0;
 	for (size_t k = 0; k < h->out_bits; k++) {
 		ret <<= 1;
 		ret |= (uint64_bitcount1(h->A[k] & x) & 1);

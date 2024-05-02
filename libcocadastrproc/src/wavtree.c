@@ -48,8 +48,8 @@
  * Convenience constants & hash functions                                   *
  ****************************************************************************/
 
-static const byte_t LEFT  = 0x0;
-static const byte_t RIGHT = 0x1;
+static const byte LEFT  = 0x0;
+static const byte RIGHT = 0x1;
 
 static const BitVec *NULL_CODE = NULL;
 
@@ -84,7 +84,7 @@ bool charcode_iter_next(charcode_iter *it)
 
 void chrcode_incr(BitVec *code)
 {
-	byte_t bit, carry = 0x1;
+	byte bit, carry = 0x1;
 	for (size_t i = 0, l = bitvec_len(code); carry && (i < l); i++) {
 		bit = bitvec_get_bit(code, i);
 		bit ^= carry;
@@ -105,7 +105,7 @@ typedef struct _tmp_wtnode {
 	size_t               index;
 	size_t               offset;
 	size_t               height;
-	byte_t               nxt_chd;
+	byte               nxt_chd;
 	BitVec           *bv;
 	struct _tmp_wtnode  *chd[2];
 	xchar              chr[2];
@@ -215,7 +215,7 @@ static tmp_wavtree *tmp_wt_init_bal(Alphabet *ab, bool own_ab)
 static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
                                const hufftnode *htnode, const huffcode *hcode )
 {
-	for (byte_t dir = LEFT; dir <= RIGHT; dir++) {
+	for (byte dir = LEFT; dir <= RIGHT; dir++) {
 		const hufftnode *chd = ( (dir == LEFT) ? hufftnode_left(htnode) :
 		                         hufftnode_right(htnode) );
 		if (hufftnode_is_leaf(chd)) {
@@ -269,7 +269,7 @@ static void tmp_wt_free(tmp_wavtree *twt)
 static void tmp_wt_app_char(tmp_wtnode *root, const BitVec *chcode)
 {
 	charcode_iter codeit = {.code = chcode, .pos = 0 };
-	byte_t bit;
+	byte bit;
 	while (root != NULL) {
 		bit = charcode_iter_next(&codeit);
 		bitvec_push(root->bv, bit);
@@ -292,7 +292,7 @@ static void tmp_wt_app_new_char(tmp_wtnode *root, xchar c, BitVec *chcode)
 			// case first & second symbols: 'ignore'
 			if (bitvec_len(chcode) < 2) return;
 			// add new leaf
-			byte_t bit = parent->nxt_chd ^ 0x1;
+			byte bit = parent->nxt_chd ^ 0x1;
 			size_t q = bitvec_count(parent->bv, bit);
 			tmp_wtnode *new_node = tmp_wtnode_new(q);
 			bitvec_push_n(new_node->bv, q - 1, 0x0);
@@ -471,7 +471,7 @@ typedef struct _wtnode {
 	size_t len;
 	size_t offset;
 	size_t cumul_bits[2];
-	byte_t has_chd; //code: 0=none (leaf), 1=left chd only, 2=right only, 3=both
+	byte has_chd; //code: 0=none (leaf), 1=left chd only, 2=right only, 3=both
 	size_or_xchar cc[2]; // if leaf stores left/right chars;
 	// else stores left/right children indexes.
 }
@@ -629,7 +629,7 @@ size_t wavtree_rank_pos(WavTree *wt, size_t pos)
 	if (pos >= wt->len) return SIZE_MAX;
 	size_t cur = 0;
 	size_t rank = pos;
-	byte_t bit;
+	byte bit;
 	while ( true ) {
 		bit = csrsbitarr_get(wt->bitarr, wt->nodes[cur].offset + rank);
 		rank = csrsbitarr_rank(wt->bitarr, wt->nodes[cur].offset + rank, bit)
@@ -649,7 +649,7 @@ size_t wavtree_rank(WavTree *wt, size_t pos, xchar c)
 	charcode_iter codeit = {.code = get_charcode(wt->chrcodes, c), .pos = 0};
 	if ( codeit.code == NULL_CODE || wt->len == 0 ) return 0;
 	size_t rank = MIN(wt->nodes[cur].len, pos);
-	byte_t bit;
+	byte bit;
 	while ( true ) {
 		bit = charcode_iter_next(&codeit);
 		rank = csrsbitarr_rank( wt->bitarr,
@@ -671,7 +671,7 @@ static size_t _wavtree_select( WavTree *wt, size_t cur,
 {
 	if (cur >= wt->nnodes || wt->nodes[cur].len == 0) return 0;
 	size_t sel;
-	byte_t bit;
+	byte bit;
 	bit = charcode_iter_next(codeit);
 	if ( !(wt->nodes[cur].has_chd & (bit + 1)) ) {
 		sel = csrsbitarr_select( wt->bitarr,
@@ -717,7 +717,7 @@ xchar wavtree_char(WavTree *wt, size_t pos)
 	if ( pos >= wt->len ) return XEOF;
 	size_t cur = 0;
 	size_t rank = pos;
-	byte_t bit;
+	byte bit;
 	while ( true ) {
 		bit = csrsbitarr_get(wt->bitarr, wt->nodes[cur].offset + rank);
 		rank = csrsbitarr_rank(wt->bitarr, wt->nodes[cur].offset + rank, bit)

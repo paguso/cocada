@@ -210,14 +210,14 @@ static void add_chunk(Vec *chunks, MemChunk ck)
 
 static void write_type(som_t typ, FILE *stream)
 {
-	byte_t btyp = (byte_t) typ;
+	byte btyp = (byte) typ;
 	fwrite(&btyp, 1, 1, stream);
 }
 
 
 static som_t read_type(FILE *stream)
 {
-	byte_t btyp;
+	byte btyp;
 	fread(&btyp, 1, 1, stream);
 	return (som_t)btyp;
 }

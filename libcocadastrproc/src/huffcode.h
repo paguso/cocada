@@ -228,7 +228,7 @@ const hufftnode *hufftnode_right(const hufftnode *node);
  *
  * @warning Do NOT modify or destroy the returned value
  */
-const byte_t *hufftnode_ab_mask(const hufftnode *node);
+const byte *hufftnode_ab_mask(const hufftnode *node);
 
 
 /**

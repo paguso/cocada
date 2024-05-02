@@ -149,7 +149,7 @@ size_t xstr_sizeof_char(const xstr *self);
  * @brief Returns the internal raw byte contents of the xstr.
  * @warning The returned information is not meant to be directly modified.
  */
-const byte_t *xstr_as_bytes(const xstr *self);
+const byte *xstr_as_bytes(const xstr *self);
 
 
 /**

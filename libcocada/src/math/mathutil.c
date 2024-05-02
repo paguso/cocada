@@ -44,7 +44,7 @@
 XX_UNSIGNED_INT(POW2CEIL_IMPL)
 
 
-uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
+uint64 mod_sum(uint64 a, uint64 b, uint64 m)
 {
 	a %= m;
 	b %= m;
@@ -58,9 +58,9 @@ uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
 }
 
 
-uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m)
+uint64 mod_mult(uint64 a, uint64 b, uint64 m)
 {
-	uint64_t ans = 0;
+	uint64 ans = 0;
 	a = a % m;
 	while (b > 0) {
 		if ( IS_ODD(b) ) {
@@ -73,11 +73,11 @@ uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m)
 }
 
 
-uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m)
+uint64 mod_pow(uint64 b, uint64 e, uint64 m)
 {
 	b = b % m;
 	if (b == 0) return 0;
-	uint64_t ans = 1;
+	uint64 ans = 1;
 	while (e) {
 		if ( IS_ODD(e) )
 			ans = mod_mult(ans, b, m); // ans = (ans*b) % m;
@@ -88,10 +88,10 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m)
 }
 
 
-bool is_prime_naive(uint64_t val)
+bool is_prime_naive(uint64 val)
 {
 	if (val < 2) return false;
-	for (uint64_t q = 2; q * q <= val; q++) {
+	for (uint64 q = 2; q * q <= val; q++) {
 		if (val % q == 0) {
 			return false;
 		}
@@ -100,10 +100,10 @@ bool is_prime_naive(uint64_t val)
 }
 
 
-bool is_prime_mr(uint64_t n)
+bool is_prime_mr(uint64 n)
 {
-	uint64_t a[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
-	uint64_t limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615ull};
+	uint64 a[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+	uint64 limits[] = {2046, 1373652, 25326000, 3215031750, 2152302898746, 3474749660382, 341550071728320, 3825123056546413050, 18446744073709551615ull};
 	size_t nwitness[] = {1, 2, 3, 4, 5, 6, 7, 9, 12};
 	if (n < 2) return false;
 	if (n == 2) return true;
@@ -112,8 +112,8 @@ bool is_prime_mr(uint64_t n)
 	size_t nwit = 1;
 	for (size_t j = 0; j < 9 && n >= limits[j]; nwit = nwitness[++j]);
 
-	uint64_t d = n - 1;
-	uint64_t r = 0;
+	uint64 d = n - 1;
+	uint64 r = 0;
 	while (IS_EVEN(d)) {
 		d >>= 1;
 		r += 1;
@@ -122,7 +122,7 @@ bool is_prime_mr(uint64_t n)
 	bool prime = true;
 	for (size_t i = 0; prime && i < nwit; i++) {
 		prime = false;
-		uint64_t x = mod_pow(a[i], d, n); // (a[i]^d) mod n
+		uint64 x = mod_pow(a[i], d, n); // (a[i]^d) mod n
 		if ( x == 1 || x == (n - 1) ) {
 			prime = true;
 			continue;
@@ -139,13 +139,13 @@ bool is_prime_mr(uint64_t n)
 }
 
 
-uint64_t prime_succ(uint64_t n)
+uint64 prime_succ(uint64 n)
 {
-	uint64_t firstfew[] = {2, 2, 2, 3, 5, 5, 7};
+	uint64 firstfew[] = {2, 2, 2, 3, 5, 5, 7};
 	if (n <= 6) return firstfew[n];
-	uint64_t k = (uint64_t) DIVCEIL(n, 6);
+	uint64 k = (uint64) DIVCEIL(n, 6);
 	assert (n <= k * 6);
-	uint64_t ret = 6 * k - 1;
+	uint64 ret = 6 * k - 1;
 	bool pm = true;
 	if (ret < n) {
 		ret += 2;
@@ -165,11 +165,11 @@ uint64_t prime_succ(uint64_t n)
 #define __ulong_max ULONG_MAX
 #define __ullong_max ULLONG_MAX
 #define __size_t_max SIZE_MAX
-#define __uint8_t_max UINT8_MAX
-#define __uint16_t_max UINT16_MAX
-#define __uint32_t_max UINT32_MAX
-#define __uint64_t_max UINT32_MAX
-#define __byte_t_max BYTE_MAX
+#define __uint8_max UINT8_MAX
+#define __uint16_max UINT16_MAX
+#define __uint32_max UINT32_MAX
+#define __uint64_max UINT32_MAX
+#define __byte_max BYTE_MAX
 
 #define AVG_IMPL(TYPE, ...)\
 	double average_##TYPE(TYPE *vals, size_t n)\
@@ -189,10 +189,10 @@ uint64_t prime_succ(uint64_t n)
 
 XX_UNSIGNED_INT(AVG_IMPL)
 
-/*double average_uint64_t(uint64_t *vals, size_t n)
+/*double average_uint64(uint64 *vals, size_t n)
 {
 	double avg = 0;
-	uint64_t acc = 0;
+	uint64 acc = 0;
 	for (size_t i = 0; i < n; i++) {
 		if ((UINT64_MAX - acc) < vals[i]) {
 			avg += (double) acc / (double) n;

@@ -29,7 +29,7 @@
 #define MATHUTIL_H
 
 
-#define UINT64_MAX_PRIME ((uint64_t)18446744073709551557)
+#define UINT64_MAX_PRIME ((uint64)18446744073709551557)
 
 /**
  * @file mathutil.h
@@ -108,39 +108,39 @@ XX_UNSIGNED_INT(POW2CEIL_DECL)
  * @brief Computes (a + b) mod m for 64bit unsigned values.
  * Takes proper care of overflow if a + b > UINT64_MAX.
  */
-uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m);
+uint64 mod_sum(uint64 a, uint64 b, uint64 m);
 
 
 /**
  * @brief Computes (a * b) mod m for 64bit unsigned values.
  * Takes proper care of overflow if a * b > UINT64_MAX.
  */
-uint64_t mod_mult(uint64_t a, uint64_t b, uint64_t m);
+uint64 mod_mult(uint64 a, uint64 b, uint64 m);
 
 
 /**
  * @brief Computes (a^b) mod m for 64bit unsigned values.
  * Takes proper care of overflow if a^b > UINT64_MAX.
  */
-uint64_t mod_pow(uint64_t a, uint64_t b, uint64_t m);
+uint64 mod_pow(uint64 a, uint64 b, uint64 m);
 
 
 /**
  * @brief Naive O(sqrt(n))-time primality testing.
  */
-bool is_prime_naive(uint64_t n);
+bool is_prime_naive(uint64 n);
 
 
 /**
  * @brief Deterministic Miller-Rabin primality testing.
  */
-bool is_prime_mr(uint64_t n);
+bool is_prime_mr(uint64 n);
 
 
 /**
  * @brief Returns the prime sucessor of @p n, i.e. the smallest prime >= @p n.
  */
-uint64_t prime_succ(uint64_t n);
+uint64 prime_succ(uint64 n);
 
 
 /**

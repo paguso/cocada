@@ -57,18 +57,18 @@
  * ---------------------|----------------|--------------------
  * _Bool                | bool           | stdbool.h
  * size_t               | size_t         | stddef.h
- * int8_t               | int8_t         | stdint.h
- * uint8_t              | uint8_t        | stdint.h
- * int16_t              | int16_t        | stdint.h
- * uint16_t             | uint16_t       | stdint.h
- * int32_t              | int32_t        | stdint.h
- * uint32_t             | uint32_t       | stdint.h
- * int64_t              | int64_t        | stdint.h
- * uint64_t             | uint64_t       | stdint.h
+ * int8               | int8         | stdint.h
+ * uint8              | uint8        | stdint.h
+ * int16              | int16        | stdint.h
+ * uint16             | uint16       | stdint.h
+ * int32              | int32        | stdint.h
+ * uint32             | uint32       | stdint.h
+ * int64              | int64        | stdint.h
+ * uint64             | uint64       | stdint.h
  *
  * Custom types         | One-word name  | Defined in
  * ---------------------|----------------|--------------------
- * byte_t               | byte_t         | coretype.h
+ * byte               | byte         | coretype.h
  * void *               | rawptr         | coretype.h
  * char *               | cstr           | coretype.h
  *
@@ -93,12 +93,12 @@
  * ISO Norm IEC 80000-13:2008 (item 13.9 c) suggests that the word "byte"
  * be defined as a synonymm of octet, i.e. a sequence of eight bits.
  *
- * A byte_t type is therefore defined as an alias for unsigned char.
+ * A byte type is therefore defined as an alias for unsigned char.
  * A BYTESIZE constant is defined as a CHAR_BIT synonym, and
  * accordingly a maximum value constant BYTE_MAX is defined as
  * UCHAR_MAX synonym.
  */
-typedef unsigned char byte_t;
+typedef unsigned char byte;
 
 #define BYTESIZE CHAR_BIT
 /*
@@ -106,42 +106,74 @@ typedef unsigned char byte_t;
  * However it has only been tested on such conditions, hence this safeguard.
  */
 #if BYTESIZE!=8
-#error Error: this code requires an 8-bit byte_t type
+#error Error: this code requires an 8-bit byte type
 #endif
 #define BYTE_MAX UCHAR_MAX
 
 
 
 #ifndef uchar
-typedef unsigned char       uchar;
+typedef unsigned char	uchar;
 #endif
 
 #ifndef ushort
-typedef unsigned short      ushort;
+typedef unsigned short	ushort;
 #endif
 
 #ifndef uint
-typedef unsigned int        uint;
+typedef unsigned int	uint;
+#endif
+
+#ifndef uint8
+typedef uint8_t	uint8;
+#endif
+
+#ifndef uint16
+typedef uint16_t	uint16;
+#endif
+
+#ifndef uint32
+typedef uint32_t	uint32;
+#endif
+
+#ifndef uint64
+typedef uint64_t	uint64;
+#endif
+
+#ifndef int8
+typedef int8_t	int8;
+#endif
+
+#ifndef int16
+typedef int16_t	int16;
+#endif
+
+#ifndef int32
+typedef int32_t	int32;
+#endif
+
+#ifndef int64
+typedef int64_t	int64;
 #endif
 
 #ifndef ulong
-typedef unsigned long       ulong;
+typedef unsigned long	ulong;
 #endif
 
 #ifndef llong
-typedef long long           llong;
+typedef long long	llong;
 #endif
 
 #ifndef ullong
-typedef unsigned long long  ullong;
+typedef unsigned long long	ullong;
 #endif
 
 #ifndef ldouble
-typedef long double         ldouble;
+typedef long double	ldouble;
 #endif
 
 #ifndef rawptr
-typedef void               *rawptr;
+typedef void	*rawptr;
 #endif
 
 
@@ -155,17 +187,17 @@ typedef void               *rawptr;
 #define SIGNED_ulong long
 #define SIGNED_llong llong
 #define SIGNED_ullong llong
-#define SIGNED_int8_t int8_t
-#define SIGNED_uint8_t int8_t
-#define SIGNED_int16_t int16_t
-#define SIGNED_uint16_t int16_t
-#define SIGNED_int32_t int32_t
-#define SIGNED_uint32_t int32_t
-#define SIGNED_int64_t int64_t
-#define SIGNED_uint64_t int64_t
-#define SIGNED_bool int8_t
-#define SIGNED__Bool int8_t
-#define SIGNED_byte_t int8_t
+#define SIGNED_int8 int8
+#define SIGNED_uint8 int8
+#define SIGNED_int16 int16
+#define SIGNED_uint16 int16
+#define SIGNED_int32 int32
+#define SIGNED_uint32 int32
+#define SIGNED_int64 int64
+#define SIGNED_uint64 int64
+#define SIGNED_bool int8
+#define SIGNED__Bool int8
+#define SIGNED_byte int8
 #define SIGNED_size_t llong
 #define UNSIGNED_char uchar
 #define UNSIGNED_uchar uchar
@@ -177,17 +209,17 @@ typedef void               *rawptr;
 #define UNSIGNED_ulong ulong
 #define UNSIGNED_llong ullong
 #define UNSIGNED_ullong ullong
-#define UNSIGNED_int8_t uint8_t
-#define UNSIGNED_uint8_t uint8_t
-#define UNSIGNED_int16_t uint16_t
-#define UNSIGNED_uint16_t uint16_t
-#define UNSIGNED_int32_t uint32_t
-#define UNSIGNED_uint32_t uint32_t
-#define UNSIGNED_int64_t uint64_t
-#define UNSIGNED_uint64_t uint64_t
-#define UNSIGNED_bool uint8_t
-#define UNSIGNED__Bool uint8_t
-#define UNSIGNED_byte_t uint8_t
+#define UNSIGNED_int8 uint8
+#define UNSIGNED_uint8 uint8
+#define UNSIGNED_int16 uint16
+#define UNSIGNED_uint16 uint16
+#define UNSIGNED_int32 uint32
+#define UNSIGNED_uint32 uint32
+#define UNSIGNED_int64 uint64
+#define UNSIGNED_uint64 uint64
+#define UNSIGNED_bool uint8
+#define UNSIGNED__Bool uint8
+#define UNSIGNED_byte uint8
 #define UNSIGNED_size_t size_t
 
 #define SIGNED(TYPE) SIGNED_##TYPE
@@ -268,11 +300,11 @@ typedef char *cstr;
 	XX(ulong, __VA_ARGS__) \
 	XX(ullong, __VA_ARGS__) \
 	XX(size_t, __VA_ARGS__) \
-	XX(uint8_t, __VA_ARGS__) \
-	XX(uint16_t, __VA_ARGS__) \
-	XX(uint32_t, __VA_ARGS__) \
-	XX(uint64_t, __VA_ARGS__) \
-	XX(byte_t, __VA_ARGS__)
+	XX(uint8, __VA_ARGS__) \
+	XX(uint16, __VA_ARGS__) \
+	XX(uint32, __VA_ARGS__) \
+	XX(uint64, __VA_ARGS__) \
+	XX(byte, __VA_ARGS__)
 
 #define XX_SIGNED_INT(XX, ...) \
 	XX(char, __VA_ARGS__) \
@@ -281,10 +313,10 @@ typedef char *cstr;
 	XX(long, __VA_ARGS__) \
 	XX(llong, __VA_ARGS__) \
 	XX(bool, __VA_ARGS__) \
-	XX(int8_t, __VA_ARGS__) \
-	XX(int16_t, __VA_ARGS__) \
-	XX(int32_t, __VA_ARGS__) \
-	XX(int64_t, __VA_ARGS__)
+	XX(int8, __VA_ARGS__) \
+	XX(int16, __VA_ARGS__) \
+	XX(int32, __VA_ARGS__) \
+	XX(int64, __VA_ARGS__)
 
 #define XX_INTS( XX, ...) \
 	XX_UNSIGNED_INT(XX, __VA_ARGS__) \

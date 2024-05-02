@@ -28,19 +28,19 @@
 #include "randutil.h"
 #include "range.h"
 
-#define ELT(arr, i, typesize) (((byte_t *)(arr)) + ((i) * (typesize)))
+#define ELT(arr, i, typesize) (((byte *)(arr)) + ((i) * (typesize)))
 #define SWP(a, b, swp, size) memcpy(swp, a, size); memcpy(a, b, size); memcpy(b, swp, size)
 #define IDX_SWP(a, b, swp) swp = a; a = b; b = swp
 
-size_t part(byte_t *arr, size_t typesize, CmpFunc cmp, size_t l, size_t r)
+size_t part(byte *arr, size_t typesize, CmpFunc cmp, size_t l, size_t r)
 {
-	byte_t *left = arr + (l * typesize);
-	byte_t *right = arr + ((r - 1) * typesize);
-	byte_t *swp = (byte_t *)malloc(sizeof(typesize));
+	byte *left = arr + (l * typesize);
+	byte *right = arr + ((r - 1) * typesize);
+	byte *swp = (byte *)malloc(sizeof(typesize));
 
-	byte_t *p = left;
+	byte *p = left;
 	if (r >= l + 3) {
-		byte_t *mid = arr + (typesize * ((l + r) / 2));
+		byte *mid = arr + (typesize * ((l + r) / 2));
 		if ((cmp(left, mid) > 0) ^ (cmp(left, right) > 0)) {
 			p = left;
 		}
@@ -55,8 +55,8 @@ size_t part(byte_t *arr, size_t typesize, CmpFunc cmp, size_t l, size_t r)
 		SWP(left, p, swp, typesize);
 	}
 
-	byte_t *i = left;
-	byte_t *j = right;
+	byte *i = left;
+	byte *j = right;
 	while (i <= j) {
 		while (i <= right && cmp(i, left) <= 0) {
 			i += typesize;
@@ -77,7 +77,7 @@ static void qs(void *arr, size_t typesize, CmpFunc cmp, size_t l, size_t r)
 {
 	if (r <= l + 1)
 		return;
-	size_t p = part((byte_t *)arr, typesize, cmp, l, r);
+	size_t p = part((byte *)arr, typesize, cmp, l, r);
 	qs(arr, typesize, cmp, l, p);
 	qs(arr, typesize, cmp, p + 1, r);
 }
@@ -88,7 +88,7 @@ void quicksort(void *arr, size_t n, size_t typesize, CmpFunc cmp)
 }
 
 
-size_t idx_part(size_t *idx, byte_t *arr, size_t arr_tsz, CmpFunc cmp,
+size_t idx_part(size_t *idx, byte *arr, size_t arr_tsz, CmpFunc cmp,
                 size_t l, size_t r)
 {
 	size_t i = l;
@@ -130,7 +130,7 @@ size_t idx_part(size_t *idx, byte_t *arr, size_t arr_tsz, CmpFunc cmp,
 	return j;
 }
 
-void idx_qs(size_t *idx, byte_t *arr, size_t arr_tsz, CmpFunc cmp, size_t l,
+void idx_qs(size_t *idx, byte *arr, size_t arr_tsz, CmpFunc cmp, size_t l,
             size_t r)
 {
 	if (r <= l + 1)

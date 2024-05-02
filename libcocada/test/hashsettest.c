@@ -29,7 +29,7 @@
 #include "hashset.h"
 #include "mathutil.h"
 
-typedef uint32_t uint;
+typedef uint32 uint;
 
 static size_t _key_fn(const void *elt)
 {

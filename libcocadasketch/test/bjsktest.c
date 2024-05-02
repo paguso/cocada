@@ -31,9 +31,9 @@
 void bjkst_test(CuTest *tc)
 {
 	size_t nbits = 16;
-	uint64_t maxval = 1 << nbits;
+	uint64 maxval = 1 << nbits;
 	size_t ndistinct = maxval >> 3;
-	uint64_t step = maxval / ndistinct;
+	uint64 step = maxval / ndistinct;
 	size_t n = 1 << 20;
 
 	double eps = 0.1;
@@ -41,11 +41,11 @@ void bjkst_test(CuTest *tc)
 	BJKST *counter = bjkst_init(nbits, eps, delta);
 
 	for (int i = 0; i < n; i++) {
-		uint64_t val = rand_range_uint64_t(0, ndistinct) * step;
+		uint64 val = rand_range_uint64(0, ndistinct) * step;
 		bjkst_process(counter, val);
 	}
 
-	uint64_t count = bjkst_qry(counter);
+	uint64 count = bjkst_qry(counter);
 	printf("Counter after %zu values = %"PRIu64"\n", n, count);
 }
 

@@ -35,7 +35,7 @@
 
 struct _BJKST {
 	size_t nbits;      // size of stream elts in bits
-	uint64_t max_val;  // max allowed stream value = 1<<nbits
+	uint64 max_val;  // max allowed stream value = 1<<nbits
 	double eps;        // error
 	double delta;      // error prob
 	TWUHash *g;        // 2-way indep hash function
@@ -67,23 +67,23 @@ BJKST *bjkst_init(size_t nbits, double eps, double delta)
 	ret->buf_size = 0;
 	ret->min_zeros = 0;
 	ARR_FILL(ret->buf, 0, nbits + 1, \
-	         hashset_new(64, ident_hash_uint64_t, eq_uint64_t));
+	         hashset_new(64, ident_hash_uint64, eq_uint64));
 	return ret;
 }
 
 
 
-void bjkst_process(BJKST *counter, uint64_t val)
+void bjkst_process(BJKST *counter, uint64 val)
 {
 	WARN_ASSERT( val < counter->max_val,
 	             "BJKST: Ignoring out-of-range value %"PRIu64"."
 	             " Allowed range is [0,%"PRIu64").", val, counter->max_val);
-	uint64_t hval = twuhash_hash(counter->g, val);
+	uint64 hval = twuhash_hash(counter->g, val);
 	ERROR_ASSERT( hval < counter->max_val, "BJKST: invalid hvalue." );
 	size_t zeros = uint64_lobit(hval);
 	zeros = MIN(zeros, counter->nbits);
 	if ( zeros < counter->min_zeros
-	        || hashset_contains_uint64_t(counter->buf[zeros], hval)) return;
+	        || hashset_contains_uint64(counter->buf[zeros], hval)) return;
 	// make sure free space is available
 	while (counter->buf_size >=
 	        counter->buf_cap ) {//&& counter->min_zeros <= counter->nbits) {
@@ -94,19 +94,19 @@ void bjkst_process(BJKST *counter, uint64_t val)
 	}
 	// insert new element, if possible
 	if ( zeros < counter->min_zeros ) return;
-	hashset_add_uint64_t(counter->buf[zeros], hval);
+	hashset_add_uint64(counter->buf[zeros], hval);
 	counter->buf_size++;
 }
 
 
-uint64_t bjkst_qry(BJKST *counter)
+uint64 bjkst_qry(BJKST *counter)
 {
 	size_t min_nonempty_zeros = counter->min_zeros;
 	while (min_nonempty_zeros < counter->nbits
 	        && hashset_size(counter->buf[min_nonempty_zeros]) == 0 ) {
 		min_nonempty_zeros++;
 	}
-	uint64_t ret = (1 << min_nonempty_zeros);
+	uint64 ret = (1 << min_nonempty_zeros);
 	ret *= counter->buf_size;
 	return ret;
 }

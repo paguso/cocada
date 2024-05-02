@@ -32,7 +32,7 @@
  * @file bitarr.h
  * @author Paulo Fonseca
  *
- * @brief Tight bitarray implemented as a raw byte_t array
+ * @brief Tight bitarray implemented as a raw byte array
  * with read/write operations
  */
 
@@ -42,7 +42,7 @@
  * @warn The actual size will be the minimum number of bytes necessary
  *       to represent @p len bits
  */
-byte_t *bitarr_new(size_t len);
+byte *bitarr_new(size_t len);
 
 /**
  * @brief Creates a new bit array from a 0-1 character string.
@@ -50,7 +50,7 @@ byte_t *bitarr_new(size_t len);
  * @param src (no transfer) The source 0-1 character string
  * @param len The length of the bitarray
  */
-byte_t *bitarr_new_from_str(const char *src, size_t len);
+byte *bitarr_new_from_str(const char *src, size_t len);
 
 
 /**
@@ -60,26 +60,26 @@ byte_t *bitarr_new_from_str(const char *src, size_t len);
  * @param src The source 0-1 character string
  * @param len The length of the bitarray
  */
-void bitarr_parse_str(byte_t *dest, const char *src, size_t len);
+void bitarr_parse_str(byte *dest, const char *src, size_t len);
 
 
 /**
  * @brief Returns the bit at a given position
  */
-bool bitarr_get_bit(const byte_t *ba, size_t pos);
+bool bitarr_get_bit(const byte *ba, size_t pos);
 
 
 /**
  * @brief Sets the bit at a given position
  */
-void bitarr_set_bit(byte_t *ba, size_t pos, bool bit_val);
+void bitarr_set_bit(byte *ba, size_t pos, bool bit_val);
 
 
 /**
  * @brief Prints a representation of a bitarray as text to an output FILE.
  * @return Upon success returns the number of chars printed
  */
-int bitarr_fprint( FILE *stream, const byte_t *ba, size_t nbits,
+int bitarr_fprint( FILE *stream, const byte *ba, size_t nbits,
                    uint bytes_per_line, uint indent);
 
 
@@ -87,7 +87,7 @@ int bitarr_fprint( FILE *stream, const byte_t *ba, size_t nbits,
  * @brief Prints a representation of a bitarray as text to a string.
  * @return Upon success returns the number of chars printed
  */
-int bitarr_sprint( char *str, const byte_t *ba, size_t nbits,
+int bitarr_sprint( char *str, const byte *ba, size_t nbits,
                    uint bytes_per_line, uint indent);
 
 
@@ -95,7 +95,7 @@ int bitarr_sprint( char *str, const byte_t *ba, size_t nbits,
  * @brief Prints a representation of a bitarray as text to a string buffer.
  * @return Upon success returns the number of chars printed
  */
-int bitarr_sbprint(StrBuf *buf, const byte_t *ba, size_t nbits,
+int bitarr_sbprint(StrBuf *buf, const byte *ba, size_t nbits,
                    uint bytes_per_line, uint indent);
 
 
@@ -106,7 +106,7 @@ int bitarr_sbprint(StrBuf *buf, const byte_t *ba, size_t nbits,
  * @param mask (no transfer) The mask bitarray.
  * @param nbits The number of bits to be AND'd.
  */
-void bitarr_and(byte_t *ba, const byte_t *mask, size_t nbits);
+void bitarr_and(byte *ba, const byte *mask, size_t nbits);
 
 
 /**
@@ -116,7 +116,7 @@ void bitarr_and(byte_t *ba, const byte_t *mask, size_t nbits);
  * @param mask (no transfer) The mask bitarray.
  * @param nbits The number of bits to be OR'd.
  */
-void bitarr_or(byte_t *ba, const byte_t *mask, size_t nbits);
+void bitarr_or(byte *ba, const byte *mask, size_t nbits);
 
 
 /**
@@ -124,7 +124,7 @@ void bitarr_or(byte_t *ba, const byte_t *mask, size_t nbits);
  * @param ba The target bitarray.
  * @param nbits The number of bits to be flipped.
  */
-void bitarr_not(byte_t *ba, size_t nbits);
+void bitarr_not(byte *ba, size_t nbits);
 
 
 /**
@@ -138,7 +138,7 @@ void bitarr_not(byte_t *ba, size_t nbits);
  * @param from_bit_src The initial position to be read from the source bitarray
  * @param nbits The number of bits to be written
  */
-void bitarr_write( byte_t *dest, size_t from_bit_dest, const byte_t *src,
+void bitarr_write( byte *dest, size_t from_bit_dest, const byte *src,
                    size_t from_bit_src, size_t nbits );
 
 
@@ -148,7 +148,7 @@ void bitarr_write( byte_t *dest, size_t from_bit_dest, const byte_t *src,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_char( byte_t *dest, size_t from_bit, char val,
+void bitarr_write_char( byte *dest, size_t from_bit, char val,
                         size_t nbits );
 
 
@@ -158,7 +158,7 @@ void bitarr_write_char( byte_t *dest, size_t from_bit, char val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_uchar( byte_t *dest, size_t from_bit, unsigned char val,
+void bitarr_write_uchar( byte *dest, size_t from_bit, unsigned char val,
                          size_t nbits );
 
 
@@ -168,7 +168,7 @@ void bitarr_write_uchar( byte_t *dest, size_t from_bit, unsigned char val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_short( byte_t *dest, size_t from_bit, short val,
+void bitarr_write_short( byte *dest, size_t from_bit, short val,
                          size_t nbits );
 
 
@@ -178,7 +178,7 @@ void bitarr_write_short( byte_t *dest, size_t from_bit, short val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_ushort( byte_t *dest, size_t from_bit,
+void bitarr_write_ushort( byte *dest, size_t from_bit,
                           unsigned short val, size_t nbits );
 
 
@@ -210,7 +210,7 @@ void bitarr_write_ushort( byte_t *dest, size_t from_bit,
  *
  * @see bitarr_read_int
  */
-void bitarr_write_int( byte_t *dest, size_t from_bit, int val,
+void bitarr_write_int( byte *dest, size_t from_bit, int val,
                        size_t nbits );
 
 
@@ -220,7 +220,7 @@ void bitarr_write_int( byte_t *dest, size_t from_bit, int val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_uint( byte_t *dest, size_t from_bit, unsigned int val,
+void bitarr_write_uint( byte *dest, size_t from_bit, unsigned int val,
                         size_t nbits );
 
 
@@ -230,7 +230,7 @@ void bitarr_write_uint( byte_t *dest, size_t from_bit, unsigned int val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_long( byte_t *dest, size_t from_bit, long val,
+void bitarr_write_long( byte *dest, size_t from_bit, long val,
                         size_t nbits );
 
 
@@ -240,7 +240,7 @@ void bitarr_write_long( byte_t *dest, size_t from_bit, long val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_ulong( byte_t *dest, size_t from_bit, unsigned long val,
+void bitarr_write_ulong( byte *dest, size_t from_bit, unsigned long val,
                          size_t nbits);
 
 /**
@@ -249,7 +249,7 @@ void bitarr_write_ulong( byte_t *dest, size_t from_bit, unsigned long val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_llong( byte_t *dest, size_t from_bit, long long val,
+void bitarr_write_llong( byte *dest, size_t from_bit, long long val,
                          size_t nbits );
 
 
@@ -259,18 +259,18 @@ void bitarr_write_llong( byte_t *dest, size_t from_bit, long long val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_ullong( byte_t *dest, size_t from_bit,
+void bitarr_write_ullong( byte *dest, size_t from_bit,
                           unsigned long long val, size_t nbits );
 
 
 /**
- * @brief Writes the @p nbits least significant bits of a byte_t @p val
+ * @brief Writes the @p nbits least significant bits of a byte @p val
  * to a bitarray @p dest.
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_byte_t( byte_t *dest, size_t from_bit, byte_t val,
-                          size_t nbits );
+void bitarr_write_byte( byte *dest, size_t from_bit, byte val,
+                        size_t nbits );
 
 
 /**
@@ -279,7 +279,7 @@ void bitarr_write_byte_t( byte_t *dest, size_t from_bit, byte_t val,
  *
  * @see bitarr_write_int for similar details.
  */
-void bitarr_write_size_t( byte_t *dest, size_t from_bit, size_t val,
+void bitarr_write_size_t( byte *dest, size_t from_bit, size_t val,
                           size_t nbits );
 
 
@@ -288,7 +288,7 @@ void bitarr_write_size_t( byte_t *dest, size_t from_bit, size_t val,
  *
  * @see bitarr_read_int for similar details
  */
-char bitarr_read_char( const byte_t *src, size_t from_bit,
+char bitarr_read_char( const byte *src, size_t from_bit,
                        size_t nbits );
 
 
@@ -297,7 +297,7 @@ char bitarr_read_char( const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-unsigned char bitarr_read_uchar( const byte_t *src, size_t from_bit,
+unsigned char bitarr_read_uchar( const byte *src, size_t from_bit,
                                  size_t nbits );
 
 
@@ -306,7 +306,7 @@ unsigned char bitarr_read_uchar( const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-short bitarr_read_short(const byte_t *src, size_t from_bit,
+short bitarr_read_short(const byte *src, size_t from_bit,
                         size_t nbits);
 
 
@@ -315,7 +315,7 @@ short bitarr_read_short(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-unsigned short bitarr_read_ushort(const byte_t *src, size_t from_bit,
+unsigned short bitarr_read_ushort(const byte *src, size_t from_bit,
                                   size_t nbits);
 
 
@@ -347,7 +347,7 @@ unsigned short bitarr_read_ushort(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_write_int
  */
-int bitarr_read_int(const byte_t *src, size_t from_bit,
+int bitarr_read_int(const byte *src, size_t from_bit,
                     size_t nbits);
 
 
@@ -356,7 +356,7 @@ int bitarr_read_int(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-unsigned int bitarr_read_uint(const byte_t *src, size_t from_bit,
+unsigned int bitarr_read_uint(const byte *src, size_t from_bit,
                               size_t nbits);
 
 
@@ -365,7 +365,7 @@ unsigned int bitarr_read_uint(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-long bitarr_read_long(const byte_t *src, size_t from_bit,
+long bitarr_read_long(const byte *src, size_t from_bit,
                       size_t nbits);
 
 
@@ -374,7 +374,7 @@ long bitarr_read_long(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-unsigned long bitarr_read_ulong(const byte_t *src, size_t from_bit,
+unsigned long bitarr_read_ulong(const byte *src, size_t from_bit,
                                 size_t nbits);
 
 
@@ -383,7 +383,7 @@ unsigned long bitarr_read_ulong(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-long long bitarr_read_llong(const byte_t *src, size_t from_bit,
+long long bitarr_read_llong(const byte *src, size_t from_bit,
                             size_t nbits);
 
 
@@ -392,7 +392,7 @@ long long bitarr_read_llong(const byte_t *src, size_t from_bit,
  *
  * @see bitarr_read_int for similar details
  */
-unsigned long long bitarr_read_ullong(const byte_t *src,
+unsigned long long bitarr_read_ullong(const byte *src,
                                       size_t from_bit, size_t nbits);
 
 
@@ -401,17 +401,17 @@ unsigned long long bitarr_read_ullong(const byte_t *src,
  *
  * @see bitarr_read_int for similar details
  */
-size_t bitarr_read_size_t(const byte_t *src, size_t from_bit,
+size_t bitarr_read_size_t(const byte *src, size_t from_bit,
                           size_t nbits);
 
 
 /**
- * @brief Reads @p src[@p from_bit:@p from_bit+@p nbits] as a byte_t.
+ * @brief Reads @p src[@p from_bit:@p from_bit+@p nbits] as a byte.
  *
  * @see bitarr_read_int for similar details
  */
-byte_t bitarr_read_byte_t(const byte_t *src, size_t from_bit,
-                          size_t nbits);
+byte bitarr_read_byte(const byte *src, size_t from_bit,
+                      size_t nbits);
 
 
 #endif

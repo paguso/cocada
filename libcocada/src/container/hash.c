@@ -25,13 +25,13 @@
 #include "hash.h"
 
 #define IDENT_HASH_IMPL( TYPE, ... ) \
-	uint64_t ident_hash_##TYPE(const void *key) {\
-		return (uint64_t)(*((TYPE *)key));\
+	uint64 ident_hash_##TYPE(const void *key) {\
+		return (uint64)(*((TYPE *)key));\
 	}
 
 XX_PRIMITIVES(IDENT_HASH_IMPL)
 
-uint64_t fib_hash(uint64_t key)
+uint64 fib_hash(uint64 key)
 {
 	return (key * 11400714819323198485llu);
 }
@@ -41,19 +41,19 @@ uint64_t fib_hash(uint64_t key)
  * Simplified 64-bit FNV hashing
  * source: http://www.isthe.com/chongo/tech/comp/fnv
  */
-uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize)
+uint64 fnv1a_64bit_hash(const void *obj, size_t objsize)
 {
-	uint64_t hval = 0;
+	uint64 hval = 0;
 
 	//FNV-1 hash each octet of the buffer
-	for ( byte_t *bp = (byte_t *)obj,
-	        *end = ((byte_t *)obj) + objsize;
+	for ( byte *bp = (byte *)obj,
+	        *end = ((byte *)obj) + objsize;
 	        bp < end; bp++ ) {
 		//xor the bottom with the current octet
-		hval ^= (uint64_t) * bp;
+		hval ^= (uint64) * bp;
 		// multiply by the 64 bit FNV magic prime mod 2^64
 #ifdef NO_FNV_GCC_OPTIMIZATION
-		hval *= ((uint64_t)0x100000001b3ULL);
+		hval *= ((uint64)0x100000001b3ULL);
 #else
 		hval += (hval << 1) + (hval << 4) + (hval << 5) +
 		        (hval << 7) + (hval << 8) + (hval << 40);

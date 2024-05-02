@@ -33,14 +33,14 @@
 #include "mathutil.h"
 #include "memdbg.h"
 
-static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
+static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
 static size_t ba_size;
 
 static void reset_arrays()
 {
 	//printf("reset_arrays\n");
 	size_t i, j, nbytes;
-	nbytes =  (size_t)ceil((double)ba_size / sizeof(byte_t));
+	nbytes =  (size_t)ceil((double)ba_size / sizeof(byte));
 	for (i = 0; i < nbytes; i++) {
 		ba_zeros[i] = 0x0;
 		ba_ones[i] = ~(0x0);
@@ -50,7 +50,7 @@ static void reset_arrays()
 			ba_odd[i] |= ((0x1) << j);
 			ba_even[i] |= ((0x2) << j);
 		}
-		ba_rand[i] = (byte_t)rand();
+		ba_rand[i] = (byte)rand();
 	}
 }
 
@@ -60,7 +60,7 @@ void bitarray_test_setup(CuTest *tc)
 	//printf("bitarray_test_setup\n");
 	size_t nbytes;
 	ba_size = 1000;
-	nbytes =  (size_t)ceil((double)ba_size / sizeof(byte_t));
+	nbytes =  (size_t)ceil((double)ba_size / sizeof(byte));
 	ba_zeros = malloc(nbytes);
 	ba_ones = malloc(nbytes);
 	ba_odd = malloc(nbytes);
@@ -88,7 +88,7 @@ void test_bitarr_new_from_str(CuTest *tc)
 	//printf("test_bitarr_new_from_str\n");
 	size_t max_len = 1024;
 	char *str = cstr_new(max_len);
-	byte_t *ba;
+	byte *ba;
 	for (size_t len = 0; len < max_len; len++) {
 		for (size_t b = 0; b < len; str[b++] = (rand() % 2) ? '1' : '0');
 		ba  = bitarr_new_from_str(str, len);
@@ -109,7 +109,7 @@ void test_bitarr_get_bit(CuTest *tc)
 	//printf("test_bitarr_get_bit\n");
 	size_t i;
 	reset_arrays();
-	//byte_t bit;
+	//byte bit;
 	for (i = 0; i < ba_size; i++) {
 		////printf("i=%zu\n",i);
 		////printf("zero\n");
@@ -487,21 +487,21 @@ void test_bitarr_write_size_t(CuTest *tc)
 	}
 }
 
-void test_bitarr_write_byte_t(CuTest *tc)
+void test_bitarr_write_byte(CuTest *tc)
 {
-	//printf("test_bitarr_write_byte_t\n");
+	//printf("test_bitarr_write_byte\n");
 	size_t ntests, from_bit, bitscrop, i;
-	byte_t written, read;
+	byte written, read;
 	ntests = 10000;
 
 	for (i = 0; i < ntests; i++) {
-		from_bit = rand() % (ba_size - BYTESIZE * sizeof(byte_t));
-		written = (byte_t)(rand());
-		bitscrop = i % (BYTESIZE * sizeof(byte_t) +1);
-		bitarr_write_byte_t(ba_rand, from_bit, written, bitscrop);
-		read = bitarr_read_byte_t(ba_rand, from_bit, bitscrop);
-		written <<= (BYTESIZE * sizeof(byte_t) - bitscrop);
-		written >>= (BYTESIZE * sizeof(byte_t) - bitscrop);
+		from_bit = rand() % (ba_size - BYTESIZE * sizeof(byte));
+		written = (byte)(rand());
+		bitscrop = i % (BYTESIZE * sizeof(byte) + 1);
+		bitarr_write_byte(ba_rand, from_bit, written, bitscrop);
+		read = bitarr_read_byte(ba_rand, from_bit, bitscrop);
+		written <<= (BYTESIZE * sizeof(byte) - bitscrop);
+		written >>= (BYTESIZE * sizeof(byte) - bitscrop);
 		////printf(">>written = %hhx cropped to %zu. read = %hhx\n", written, bitscrop, read);
 		CuAssertTrue(tc, written == read);
 	}
@@ -531,7 +531,7 @@ CuSuite *bitarray_get_test_suite()
 	SUITE_ADD_TEST(suite, test_bitarr_write_longlong);
 	SUITE_ADD_TEST(suite, test_bitarr_write_ulonglong);
 	SUITE_ADD_TEST(suite, test_bitarr_write_size_t);
-	SUITE_ADD_TEST(suite, test_bitarr_write_byte_t);
+	SUITE_ADD_TEST(suite, test_bitarr_write_byte);
 	SUITE_ADD_TEST(suite, bitarray_test_teardown);
 	return suite;
 }

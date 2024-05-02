@@ -39,8 +39,8 @@
 #include "CuTest.h"
 
 static size_t nof_arrays;
-static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
-static byte_t **all_ba;
+static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
+static byte **all_ba;
 static RoaringBitVec *rbv_zeros, *rbv_ones, *rbv_odd, *rbv_even,
        *rbv_rand, *rbv_alt;
 static RoaringBitVec **all_rbv;
@@ -60,7 +60,7 @@ static void reset_arrays()
 			ba_odd[i] |= ((0x1) << j);
 			ba_even[i] |= ((0x2) << j);
 		}
-		ba_rand[i] = (byte_t)rand();
+		ba_rand[i] = (byte)rand();
 		ba_alt[i] = (i % 2) ? (~0x0) : 0x0;
 	}
 }
@@ -83,7 +83,7 @@ void roaringbitvec_test_setup(CuTest *tc)
 	//bitarr_print(ba_odd, ba_size, 4);
 	//ba_print(ba_even, ba_size, 4);
 	//ba_print(ba_rand, ba_size, 4);
-	all_ba = malloc(nof_arrays * sizeof(byte_t *));
+	all_ba = malloc(nof_arrays * sizeof(byte *));
 	all_ba[0] = ba_zeros;
 	all_ba[1] = ba_ones;
 	all_ba[2] = ba_odd;
@@ -134,7 +134,7 @@ void roaringbitvec_test_get(CuTest *tc)
 	memdbg_reset();
 	roaringbitvec_test_setup(tc);
 	for (size_t j = 0; j < nof_arrays; j++) {
-		byte_t *ba = all_ba[j];
+		byte *ba = all_ba[j];
 		RoaringBitVec *rbv = all_rbv[j];
 		for (size_t i = 0; i < ba_size; i++) {
 			bool a = bitarr_get_bit(ba,  i);
@@ -179,7 +179,7 @@ void roaringbitvec_test_memsize(CuTest *tc)
 
 void roaringbitvec_test_rank(CuTest *tc)
 {
-	byte_t bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
+	byte bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
 	memdbg_reset();
 	for (int intbit = 0; intbit < 2; intbit++) {
 		bool bit = (bool)intbit;
@@ -187,19 +187,19 @@ void roaringbitvec_test_rank(CuTest *tc)
 			size_t len = (j < 0) ? 0 : (1 << j) + ((j % 2) * 25);
 			for (int pat = 0; pat < 6; pat++) {
 				printf("rank pat=%d len=%zu bit=%d\n", pat, len, (int)bit);
-				byte_t *ba = bitarr_new(len);
+				byte *ba = bitarr_new(len);
 				memset(ba, bit_patterns[pat], DIVCEIL(len, BYTESIZE));
 				RoaringBitVec *bv = roaringbitvec_new_from_bitarr(ba, len);
-				uint32_t expec_rank = 0;
+				uint32 expec_rank = 0;
 				for (size_t i = 0; i < len; i++) {
-					uint32_t rank = roaringbitvec_rank(bv, bit, i);
+					uint32 rank = roaringbitvec_rank(bv, bit, i);
 					if (rank != expec_rank)
 						CuAssertULlongEquals(tc, expec_rank, rank);
 					expec_rank += (roaringbitvec_get(bv, i) == bit);
 				}
 				CuAssertULongEquals(tc, roaringbitvec_count(bv, bit), expec_rank);
 				for (size_t i = len; i < len + 20; i++) {
-					uint32_t rank = roaringbitvec_rank(bv, bit, i);
+					uint32 rank = roaringbitvec_rank(bv, bit, i);
 					if (rank != expec_rank)
 						CuAssertULlongEquals(tc, expec_rank, rank);
 				}
@@ -214,7 +214,7 @@ void roaringbitvec_test_rank(CuTest *tc)
 
 void roaringbitvec_test_select(CuTest *tc)
 {
-	byte_t bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
+	byte bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
 	memdbg_reset();
 	for (int intbit = 0; intbit < 2; intbit++) {
 		bool bit = (bool)intbit;
@@ -222,7 +222,7 @@ void roaringbitvec_test_select(CuTest *tc)
 			size_t len = (j < 0) ? 0 : (1 << j) + ((j % 2) * 25);
 			for (int i = 0; i < 6; i++) {
 				printf("sel i=%d len=%zu bit=%d\n", i, len, (int)bit);
-				byte_t *ba = bitarr_new(len);
+				byte *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
 				RoaringBitVec *bv = roaringbitvec_new_from_bitarr(ba, len);
 				size_t bitcount = (bit) ? roaringbitvec_card(bv) : len - roaringbitvec_card(bv);

@@ -128,7 +128,7 @@ static void _init_cumul_char_count(BOSSdBG *graph, size_t *cumul_char_count)
 	assert(graph->nedges == cumul_char_count[eabsize]);
 	//ARR_PRINT(cumul_char_count, cumul_char_count, %zu, 0, eabsize, eabsize);
 	size_t l = eabsize + graph->nedges;
-	byte_t *bits = bitarr_new(l);
+	byte *bits = bitarr_new(l);
 	for (size_t i = 0; i < eabsize; i++)
 		bitarr_set_bit(bits, cumul_char_count[i + 1] + i, 1);
 	graph->node_lbl_last_char = csrsbitarr_new(bits, l);
@@ -192,14 +192,14 @@ static BOSSdBG *_dbg_init( Alphabet *ab, StrStream *sst, size_t k,
 	//strbuf_free(kmdstr);
 
 	xstr *edge_labels  = xstr_new_with_capacity( sizeof_ext_char, xstr_len(padstr));
-	byte_t *last_node   = bitarr_new(vec_len(kp1mers));
+	byte *last_node   = bitarr_new(vec_len(kp1mers));
 	size_t *char_count = ARR_NEW(size_t, alphabet_size(ext_ab) + 1);
 	ARR_FILL(char_count, 0, alphabet_size(ext_ab) + 1, 0);
 
 	size_t nnodes = 0; // # of *distinct* nodes (k-mers)
 	size_t nedges = 0; // # of *distinct* edges (k+1-mers)
 
-	byte_t *km1mers_chars = bitarr_new(sizeof_ext_char);
+	byte *km1mers_chars = bitarr_new(sizeof_ext_char);
 	xstr *lastkp1mers[2];
 	lastkp1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k + 1);
 	lastkp1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k + 1);

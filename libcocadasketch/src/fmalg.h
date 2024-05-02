@@ -29,10 +29,10 @@
 typedef struct _FMAlg FMAlg;
 
 
-FMAlg *fmalg_init_single(uint64_t maxval);
+FMAlg *fmalg_init_single(uint64 maxval);
 
 
-FMAlg *fmalg_init(uint64_t maxval, size_t navg, size_t mmedian);
+FMAlg *fmalg_init(uint64 maxval, size_t navg, size_t mmedian);
 
 
 void fmalg_free(FMAlg *fm);
@@ -41,10 +41,10 @@ void fmalg_free(FMAlg *fm);
 void fmalg_reset(FMAlg *fm);
 
 
-void fmalg_process(FMAlg *fm, uint64_t val);
+void fmalg_process(FMAlg *fm, uint64 val);
 
 
-uint64_t fmalg_query(FMAlg *fm);
+uint64 fmalg_query(FMAlg *fm);
 
 
 #endif

@@ -50,7 +50,7 @@ typedef struct _CSRSBitArr CSRSBitArr;
  *       The raw bitarray may be disposed in the r&s bitarray destructor
  *       by setting the free_data parameter to true.
  */
-CSRSBitArr *csrsbitarr_new(byte_t *ba, size_t len);
+CSRSBitArr *csrsbitarr_new(byte *ba, size_t len);
 
 
 /**
@@ -63,7 +63,7 @@ void csrsbitarr_free(CSRSBitArr *ba, bool free_data);
 /**
  * @brief Returns a reference to the internal bit array.
  */
-const byte_t *csrsbitarr_data(CSRSBitArr *ba);
+const byte *csrsbitarr_data(CSRSBitArr *ba);
 
 
 /**

@@ -167,9 +167,9 @@ inline size_t xstr_sizeof_char(const xstr *self)
 }
 
 
-const byte_t *xstr_as_bytes(const xstr *self)
+const byte *xstr_as_bytes(const xstr *self)
 {
-	return (const byte_t *)(self->buf);
+	return (const byte *)(self->buf);
 }
 
 

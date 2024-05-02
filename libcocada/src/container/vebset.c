@@ -31,9 +31,9 @@
 #include "vebset.h"
 
 
-typedef uint16_t vebleaf16_t;
+typedef uint16 vebleaf16_t;
 
-#define MASK1(bit) ((uint16_t)(1<<(bit)))
+#define MASK1(bit) ((uint16)(1<<(bit)))
 #define MASK0(bit) (~(MASK1(bit)))
 
 vebleaf16_t *vebleaf16_new()
@@ -44,7 +44,7 @@ vebleaf16_t *vebleaf16_new()
 }
 
 
-bool vebleaf16_add(vebleaf16_t *leaf, uint32_t x)
+bool vebleaf16_add(vebleaf16_t *leaf, uint32 x)
 {
 	assert(x < 16);
 	if (*leaf & MASK1(x)) { // is bit x set?
@@ -55,7 +55,7 @@ bool vebleaf16_add(vebleaf16_t *leaf, uint32_t x)
 }
 
 
-bool vebleaf16_del(vebleaf16_t *leaf, uint32_t x)
+bool vebleaf16_del(vebleaf16_t *leaf, uint32 x)
 {
 	assert(x < 16);
 	if (*leaf & MASK1(x)) { // is bit x set?
@@ -66,7 +66,7 @@ bool vebleaf16_del(vebleaf16_t *leaf, uint32_t x)
 }
 
 
-bool vebleaf16_contains(vebleaf16_t *leaf, uint32_t x)
+bool vebleaf16_contains(vebleaf16_t *leaf, uint32 x)
 {
 	assert(x < 16);
 	return (bool)(*leaf & MASK1(x));
@@ -79,15 +79,15 @@ bool vebleaf16_empty(vebleaf16_t *leaf)
 }
 
 
-int64_t vebleaf16_min(vebleaf16_t *leaf)
+int64 vebleaf16_min(vebleaf16_t *leaf)
 {
 	return uint16_lobit(*leaf);
 }
 
 
-int64_t vebleaf16_max(vebleaf16_t *leaf)
+int64 vebleaf16_max(vebleaf16_t *leaf)
 {
-	int64_t ret = uint16_hibit(*leaf);
+	int64 ret = uint16_hibit(*leaf);
 	return (ret < 16) ? ret : -1;
 }
 
@@ -98,25 +98,25 @@ size_t vebleaf16_size(vebleaf16_t *leaf)
 }
 
 
-int64_t vebleaf16_pred(vebleaf16_t *leaf, uint32_t x)
+int64 vebleaf16_pred(vebleaf16_t *leaf, uint32 x)
 {
 	assert (x < 16);
-	int64_t ret = uint16_hibit(*leaf & ((uint16_t)0xFFFF >> (16 - x)));
+	int64 ret = uint16_hibit(*leaf & ((uint16)0xFFFF >> (16 - x)));
 	return (ret < 16) ? ret : -1;
 }
 
 
-int64_t vebleaf16_succ(vebleaf16_t *leaf, uint32_t x)
+int64 vebleaf16_succ(vebleaf16_t *leaf, uint32 x)
 {
 	assert (x < 16);
-	uint ret = uint16_lobit(*leaf & ((uint16_t)0xFFFF << (x + 1)));
+	uint ret = uint16_lobit(*leaf & ((uint16)0xFFFF << (x + 1)));
 	return ret;
 }
 
 
-#define UNIV(nbits) ((int64_t)1 << nbits)
+#define UNIV(nbits) ((int64)1 << nbits)
 
-#define SQRTUNIV(nbits) ((int64_t)1 << (nbits/2))
+#define SQRTUNIV(nbits) ((int64)1 << (nbits/2))
 
 #define HIGH(i, nbits) (i / SQRTUNIV(nbits))
 
@@ -128,8 +128,8 @@ int64_t vebleaf16_succ(vebleaf16_t *leaf, uint32_t x)
 
 
 typedef struct _vebnode {
-	int64_t min;
-	int64_t max;
+	int64 min;
+	int64 max;
 	void *summary;
 	AVLMap *clusters;
 } vebnode;
@@ -185,7 +185,7 @@ bool vebnode_empty(void *self, uint nbits)
 }
 
 
-int64_t vebnode_min(void *self, uint nbits)
+int64 vebnode_min(void *self, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -195,7 +195,7 @@ int64_t vebnode_min(void *self, uint nbits)
 }
 
 
-int64_t vebnode_max(void *self, uint nbits)
+int64 vebnode_max(void *self, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -205,7 +205,7 @@ int64_t vebnode_max(void *self, uint nbits)
 }
 
 
-bool vebnode_contains(void *root, uint32_t x, uint nbits)
+bool vebnode_contains(void *root, uint32 x, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -218,10 +218,10 @@ bool vebnode_contains(void *root, uint32_t x, uint nbits)
 	if (x == self->min || x == self->max) {
 		return true;
 	}
-	uint32_t high = HIGH(x, nbits);
+	uint32 high = HIGH(x, nbits);
 	if (avlmap_contains(self->clusters, &high)) {
 		void *cluster = CLUSTER(high);
-		uint32_t low = LOW(x, nbits);
+		uint32 low = LOW(x, nbits);
 		return vebnode_contains(cluster, low, nbits / 2);
 	}
 	else {
@@ -230,7 +230,7 @@ bool vebnode_contains(void *root, uint32_t x, uint nbits)
 }
 
 
-bool vebnode_add(void *root, uint32_t x, uint nbits)
+bool vebnode_add(void *root, uint32 x, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -247,7 +247,7 @@ bool vebnode_add(void *root, uint32_t x, uint nbits)
 		return true;
 	}
 	if (x < self->min) {
-		uint32_t swp = self->min;
+		uint32 swp = self->min;
 		self->min = x;
 		x = swp;
 		ret = true;
@@ -259,10 +259,10 @@ bool vebnode_add(void *root, uint32_t x, uint nbits)
 	// will insert x recursively. summary and cluster needed
 	if (!self->summary) {
 		self->summary = vebnode_new_sized(nbits / 2);
-		self->clusters = avlmap_new(sizeof(uint32_t), sizeof(void *), cmp_uint32_t);
+		self->clusters = avlmap_new(sizeof(uint32), sizeof(void *), cmp_uint32);
 	}
-	uint32_t high = HIGH(x, nbits);
-	uint32_t low = LOW(x, nbits);
+	uint32 high = HIGH(x, nbits);
+	uint32 low = LOW(x, nbits);
 	void *cluster = NULL;
 	if (!avlmap_contains(self->clusters, &high)) {
 		cluster = vebnode_new_sized(nbits / 2);
@@ -279,7 +279,7 @@ bool vebnode_add(void *root, uint32_t x, uint nbits)
 }
 
 
-bool vebnode_del(void *root, uint32_t x, uint nbits)
+bool vebnode_del(void *root, uint32 x, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -300,16 +300,16 @@ bool vebnode_del(void *root, uint32_t x, uint nbits)
 		// there are elements other than the min
 		// pull the second smallest value to substitute if for the min
 		assert(!vebnode_empty(self->summary, nbits / 2));
-		uint32_t high = (uint32_t) vebnode_min(
-		                    self->summary, nbits / 2); // first non-empty-cluster
+		uint32 high = (uint32) vebnode_min(
+		                  self->summary, nbits / 2); // first non-empty-cluster
 		void *cluster = CLUSTER(high);
 		assert(!vebnode_empty(cluster, nbits / 2));
-		uint32_t low = (uint32_t)vebnode_min(cluster, nbits / 2);
+		uint32 low = (uint32)vebnode_min(cluster, nbits / 2);
 		self->min = INDEX(high, low, nbits);
 		x = self->min; // put the min in x to be removed recursively
 	}
-	uint32_t high = HIGH(x, nbits);
-	uint32_t low = LOW(x, nbits);
+	uint32 high = HIGH(x, nbits);
+	uint32 low = LOW(x, nbits);
 	if (!avlmap_contains(self->clusters, &high)) {
 		return false;
 	}
@@ -326,9 +326,9 @@ bool vebnode_del(void *root, uint32_t x, uint nbits)
 		}
 		else {   // set "previous" second to last element as max.
 			// (!) now it is physically the last since x already recursively removed
-			uint32_t high = vebnode_max(self->summary, nbits / 2);
+			uint32 high = vebnode_max(self->summary, nbits / 2);
 			void *cluster = CLUSTER(high);
-			uint32_t low = vebnode_max(cluster, nbits / 2);
+			uint32 low = vebnode_max(cluster, nbits / 2);
 			self->max = INDEX(high, low, nbits);
 		}
 	}
@@ -336,7 +336,7 @@ bool vebnode_del(void *root, uint32_t x, uint nbits)
 }
 
 
-int64_t vebnode_succ(void *root, uint32_t x, uint nbits)
+int64 vebnode_succ(void *root, uint32 x, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -354,8 +354,8 @@ int64_t vebnode_succ(void *root, uint32_t x, uint nbits)
 	}
 	assert(self->summary);
 	assert(self->clusters);
-	uint32_t high = HIGH(x, nbits);
-	uint32_t low = LOW(x, nbits);
+	uint32 high = HIGH(x, nbits);
+	uint32 low = LOW(x, nbits);
 
 	vebnode *cluster = NULL;
 	if (avlmap_contains(self->clusters, &high)) {
@@ -381,7 +381,7 @@ int64_t vebnode_succ(void *root, uint32_t x, uint nbits)
 }
 
 
-int64_t vebnode_pred(void *root, uint32_t x, uint nbits)
+int64 vebnode_pred(void *root, uint32 x, uint nbits)
 {
 	assert (nbits >= 4);
 	if (nbits == 4) {
@@ -402,8 +402,8 @@ int64_t vebnode_pred(void *root, uint32_t x, uint nbits)
 	}
 	assert(self->summary);
 	assert(self->clusters);
-	int64_t high = HIGH(x, nbits);
-	int64_t low = LOW(x, nbits);
+	int64 high = HIGH(x, nbits);
+	int64 low = LOW(x, nbits);
 
 	void *cluster = NULL;
 	if (avlmap_contains(self->clusters, &high)) {
@@ -439,7 +439,7 @@ int64_t vebnode_pred(void *root, uint32_t x, uint nbits)
 			}
 		}
 	}
-	int64_t index =  INDEX(high, low, nbits);
+	int64 index =  INDEX(high, low, nbits);
 	return index;
 }
 
@@ -483,13 +483,13 @@ size_t vebset_size(vebset *self)
 }
 
 
-bool vebset_contains(vebset *self, uint32_t x)
+bool vebset_contains(vebset *self, uint32 x)
 {
 	return vebnode_contains(self->tree, x, self->nbits);
 }
 
 
-bool vebset_add(vebset *self, uint32_t x)
+bool vebset_add(vebset *self, uint32 x)
 {
 	bool ret = vebnode_add(self->tree, x, self->nbits);
 	self->size += ret;
@@ -497,7 +497,7 @@ bool vebset_add(vebset *self, uint32_t x)
 }
 
 
-bool vebset_del(vebset *self, uint32_t x)
+bool vebset_del(vebset *self, uint32 x)
 {
 	bool ret = vebnode_del(self->tree, x, self->nbits);
 	self->size -= ret;
@@ -505,25 +505,25 @@ bool vebset_del(vebset *self, uint32_t x)
 }
 
 
-int64_t vebset_succ(vebset *self, uint32_t x)
+int64 vebset_succ(vebset *self, uint32 x)
 {
 	return vebnode_succ(self->tree, x, self->nbits);
 }
 
 
-int64_t vebset_pred(vebset *self, uint32_t x)
+int64 vebset_pred(vebset *self, uint32 x)
 {
 	return vebnode_pred(self->tree, x, self->nbits);
 }
 
 
-int64_t vebset_min(vebset *self)
+int64 vebset_min(vebset *self)
 {
 	return vebnode_min(self->tree, self->nbits);
 }
 
 
-int64_t vebset_max(vebset *self)
+int64 vebset_max(vebset *self)
 {
 	return vebnode_max(self->tree, self->nbits);
 }

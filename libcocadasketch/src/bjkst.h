@@ -34,9 +34,9 @@ typedef struct _BJKST BJKST;
  */
 BJKST *bjkst_init(size_t nbits, double eps, double delta);
 
-void bjkst_process(BJKST *counter, uint64_t val);
+void bjkst_process(BJKST *counter, uint64 val);
 
-uint64_t bjkst_qry(BJKST *counter);
+uint64 bjkst_qry(BJKST *counter);
 
 
 #endif

@@ -38,13 +38,13 @@
 #define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
 
 typedef struct _AVLNode {
-	int8_t bf; // balance factor
+	int8 bf; // balance factor
 	struct _AVLNode *left;
 	struct _AVLNode *right;
 } AVLNode;
 
 // store node data right after the avlnode header
-#define NODE_DATA(N) ((void *)((byte_t *)(N) + sizeof(AVLNode)))
+#define NODE_DATA(N) ((void *)((byte *)(N) + sizeof(AVLNode)))
 
 
 struct _AVL {
@@ -439,7 +439,7 @@ bool avl_iter_has_next (Iter *it)
 static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
                    stack *next_chd_stack)
 {
-	byte_t nxtchd = stack_peek_byte_t(next_chd_stack);
+	byte nxtchd = stack_peek_byte(next_chd_stack);
 	assert(nxtchd == order);
 	bool read = false;
 	//void *ret == NULL;
@@ -447,28 +447,28 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 		AVLNode *cur = stack_peek_rawptr(node_stack);
 		if (cur == NULL) {
 			stack_pop_rawptr(node_stack);
-			stack_pop_byte_t(next_chd_stack);
+			stack_pop_byte(next_chd_stack);
 			if (!stack_empty(node_stack)) {
-				byte_t nc = stack_pop_byte_t(next_chd_stack);
-				stack_push_byte_t(next_chd_stack, nc + 1);
+				byte nc = stack_pop_byte(next_chd_stack);
+				stack_push_byte(next_chd_stack, nc + 1);
 			}
 			continue;
 		}
-		byte_t nc = stack_peek_byte_t(next_chd_stack);
+		byte nc = stack_peek_byte(next_chd_stack);
 		if (nc == 0) {
 			if (order == PRE_ORDER && read) {
 				return;
 			}
 			read = true;
 			stack_push_rawptr(node_stack, cur->left);
-			stack_push_byte_t(next_chd_stack, 0);
+			stack_push_byte(next_chd_stack, 0);
 		}
 		else if (nc == 1) {
 			if (order == IN_ORDER && read) {
 				return;
 			}
 			read = true;
-			stack_push_byte_t(next_chd_stack, 0);
+			stack_push_byte(next_chd_stack, 0);
 			stack_push_rawptr(node_stack, cur->right);
 		}
 		else {   //nc == 2
@@ -477,10 +477,10 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 			}
 			read = true;
 			stack_pop_rawptr(node_stack);
-			stack_pop_byte_t(next_chd_stack);
+			stack_pop_byte(next_chd_stack);
 			if (!stack_empty(node_stack)) {
-				byte_t nc = stack_pop_byte_t(next_chd_stack);
-				stack_push_byte_t(next_chd_stack, nc + 1);
+				byte nc = stack_pop_byte(next_chd_stack);
+				stack_push_byte(next_chd_stack, nc + 1);
 			}
 		}
 	}
@@ -508,47 +508,47 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 	ret->src = self;
 	ret->order = order;
 	ret->node_stack = stack_new(sizeof(rawptr));
-	ret->next_chd_stack = stack_new(sizeof(byte_t));
+	ret->next_chd_stack = stack_new(sizeof(byte));
 	if (self->root) {
 		AVLNode *cur;
 		switch (order) {
 		case PRE_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
-			stack_push_byte_t(ret->next_chd_stack, 0);
+			stack_push_byte(ret->next_chd_stack, 0);
 			break;
 		case IN_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
-			stack_push_byte_t(ret->next_chd_stack, 0);
+			stack_push_byte(ret->next_chd_stack, 0);
 			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			while (cur->left != NULL) {
 				stack_push_rawptr(ret->node_stack, cur->left);
-				stack_push_byte_t(ret->next_chd_stack, 0);
+				stack_push_byte(ret->next_chd_stack, 0);
 				cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			}
-			stack_pop_byte_t(ret->next_chd_stack);
-			stack_push_byte_t(ret->next_chd_stack, 1);
+			stack_pop_byte(ret->next_chd_stack);
+			stack_push_byte(ret->next_chd_stack, 1);
 			break;
 		case POST_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
-			stack_push_byte_t(ret->next_chd_stack, 0);
+			stack_push_byte(ret->next_chd_stack, 0);
 			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			while ( cur->left != NULL || cur->right != NULL) {
 				if (cur->left != NULL) {
-					//stack_pop_byte_t(ret->next_chd_stack);
-					//stack_push_byte_t(ret->next_chd_stack, 1);
+					//stack_pop_byte(ret->next_chd_stack);
+					//stack_push_byte(ret->next_chd_stack, 1);
 					stack_push_rawptr(ret->node_stack, cur->left);
-					stack_push_byte_t(ret->next_chd_stack, 0);
+					stack_push_byte(ret->next_chd_stack, 0);
 				}
 				else {   // has cur->right
-					//stack_pop_byte_t(ret->next_chd_stack);
-					//stack_push_byte_t(ret->next_chd_stack, 1);
+					//stack_pop_byte(ret->next_chd_stack);
+					//stack_push_byte(ret->next_chd_stack, 1);
 					stack_push_rawptr(ret->node_stack, cur->right);
-					stack_push_byte_t(ret->next_chd_stack, 0);
+					stack_push_byte(ret->next_chd_stack, 0);
 				}
 				cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
 			}
-			stack_pop_byte_t(ret->next_chd_stack);
-			stack_push_byte_t(ret->next_chd_stack, 2);
+			stack_pop_byte(ret->next_chd_stack);
+			stack_push_byte(ret->next_chd_stack, 2);
 			break;
 		default:
 			ERROR("Invalid AVL traversal order");

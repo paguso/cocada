@@ -34,8 +34,8 @@ static size_t MIN_CAPACITY = 128; // HAS TO BE A MULTIPLE OF GROUPSIZE
 static float GROW_BY = 2.0F; // DO NOT TOUCH
 static float MAX_LOAD = 0.75;
 
-static byte_t  ST_EMPTY = 0x80; // empty slot ctrl code   0b10000000
-static byte_t  ST_DEL   = 0xFE; // deleted slot ctrl code 0b11111110
+static byte  ST_EMPTY = 0x80; // empty slot ctrl code   0b10000000
+static byte  ST_DEL   = 0xFE; // deleted slot ctrl code 0b11111110
 
 struct _HashMap {
 	size_t cap;
@@ -47,7 +47,7 @@ struct _HashMap {
 	EqFunc keyeq;
 	HashFunc keyhash;
 	void   *data;
-	byte_t *tally;
+	byte *tally;
 	void   *entries;
 };
 
@@ -75,7 +75,7 @@ static void _reset_data(HashMap *hmap, size_t cap)
 	hmap->occ = 0;
 	hmap->max_occ = MAX_LOAD * cap;
 	hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
-	hmap->tally = (byte_t *) hmap->data;
+	hmap->tally = (byte *) hmap->data;
 	memset(hmap->tally, ST_EMPTY, hmap->cap);
 	hmap->entries = hmap->data + hmap->cap;
 }
@@ -130,20 +130,20 @@ size_t hashmap_sizeof()
 }
 
 
-static inline uint64_t _hash(const HashMap *hmap, const void *key)
+static inline uint64 _hash(const HashMap *hmap, const void *key)
 {
 	// combine hashing with Fibonacci hashing
 	return fib_hash(hmap->keyhash(key));
 }
 
 
-static inline byte_t _h2(uint64_t h)
+static inline byte _h2(uint64 h)
 {
 	return h & 0x7F;
 }
 
 
-static inline uint64_t _h1(uint64_t h)
+static inline uint64 _h1(uint64 h)
 {
 	return h >> 7;
 }
@@ -169,10 +169,10 @@ typedef struct {
 
 
 // Find the target position of the key in the table
-static _find_res _find(const HashMap *hmap, const void *key, uint64_t h)
+static _find_res _find(const HashMap *hmap, const void *key, uint64 h)
 {
-	uint64_t h1 = _h1(h);
-	uint64_t h2 = _h2(h);
+	uint64 h1 = _h1(h);
+	uint64 h2 = _h2(h);
 	_find_res ret = {.found = false, .pos = h1 % hmap->cap};
 	//printf("starting probe at pos %zu\n", ret.pos );
 	while (true) {
@@ -195,26 +195,26 @@ static _find_res _find(const HashMap *hmap, const void *key, uint64_t h)
 #define GROUPSIZE 16
 
 typedef union _g16b {
-    byte_t v[16];
+    byte v[16];
     __m128i r;
 } g16b;
 
 
-static _find_res _find_sse(hashmap *hmap, void *key, uint64_t h)
+static _find_res _find_sse(hashmap *hmap, void *key, uint64 h)
 {
-    uint64_t h1 = _h1(h);
-    uint64_t h2 = _h2(h);
+    uint64 h1 = _h1(h);
+    uint64 h2 = _h2(h);
     //size_t pos = h1 % hmap->cap;
     //printf("starting probe at pos %zu\n", ret.pos );
     _find_res ret = {.found=false, .pos=h1 % hmap->cap};
     size_t group = ret.pos / GROUPSIZE;
     size_t ngroups = (size_t)multceil((double)hmap->cap , ((double)GROUPSIZE));
     size_t tested_groups = 0;
-    uint32_t stamp = 0x00000001;
+    uint32 stamp = 0x00000001;
     ret.pos = group * GROUPSIZE;
     while ( tested_groups < ngroups ) {
         g16b grp_tally = ((g16b *)(hmap->tally+(group*GROUPSIZE)))[0];
-        uint32_t eqmask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_set1_epi8(h2), grp_tally.r));
+        uint32 eqmask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_set1_epi8(h2), grp_tally.r));
         if (eqmask == 0x00) {
             return ret;
         }
@@ -276,7 +276,7 @@ static void _print(const hashmap *hmap)
 	printf("Hashmap at %p\n", hmap);
 	char *c = cstr_new(8);
 	for (size_t i=0; i<hmap->cap; i++) {
-		byte_to_str(hmap->tally[i], c);
+		byteo_str(hmap->tally[i], c);
 		printf("   %zu) %s\n", i, c);
 	}
 	FREE(c);
@@ -285,7 +285,7 @@ static void _print(const hashmap *hmap)
 
 static inline void _set(HashMap *hmap, const void *key, const void *val)
 {
-	uint64_t h = _hash(hmap, key);
+	uint64 h = _hash(hmap, key);
 	_find_res qry = _find(hmap, key, h);
 	if (!qry.found) {
 		memcpy(_key_at(hmap, qry.pos), key, hmap->keysize);
@@ -295,7 +295,7 @@ static inline void _set(HashMap *hmap, const void *key, const void *val)
 	}
 	memcpy(_value_at(hmap, qry.pos), val, hmap->valsize);
 	//char *c = cstr_new(8);
-	//byte_to_str(_h2(h), c);
+	//byteo_str(_h2(h), c);
 	//printf("adding h2 key %s to position %zu\n",c, qry.pos);
 	//FREE(c);
 	//_print(hmap);
@@ -308,7 +308,7 @@ static void _resize(HashMap *hmap, size_t new_cap)
 	size_t old_cap = hmap->cap;
 	size_t old_size = hmap->size;
 	void   *old_data = hmap->data;
-	byte_t *old_tally = (byte_t *) old_data;
+	byte *old_tally = (byte *) old_data;
 	void   *old_entries = old_data + old_cap;
 
 	_reset_data(hmap, new_cap);
@@ -354,7 +354,7 @@ void hashmap_ins(HashMap *hmap, const void *key, const void *val)
 void hashmap_del(HashMap *hmap, const void *key)
 {
 	assert(key != NULL);
-	uint64_t h = _hash(hmap, key);
+	uint64 h = _hash(hmap, key);
 	_find_res qry = _find(hmap, key, h);
 	if (qry.found) {
 		hmap->tally[qry.pos] = ST_DEL;

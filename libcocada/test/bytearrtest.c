@@ -30,7 +30,7 @@
 #include "bytearr.h"
 #include "memdbg.h"
 
-static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
+static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand;
 static size_t ba_size;
 
 static void reset_arrays()
@@ -45,7 +45,7 @@ static void reset_arrays()
 			ba_odd[i] |= ((0x1) << j);
 			ba_even[i] |= ((0x2) << j);
 		}
-		ba_rand[i] = (byte_t)rand();
+		ba_rand[i] = (byte)rand();
 	}
 }
 
@@ -82,16 +82,16 @@ void bytearray_test_teardown(CuTest *tc)
 void test_revert_bytes(CuTest *tc)
 {
 	size_t i;
-	uint32_t a, ainv;
-	byte_t *ap, *ainvp;
+	uint32 a, ainv;
+	byte *ap, *ainvp;
 	a = 0xccddeeff;
-	ap = (byte_t *) &a;
+	ap = (byte *) &a;
 	ainv = a;
-	ainvp = (byte_t *) &ainv;
-	bytearr_reverse((byte_t *)&ainv, sizeof(uint32_t));
-	for (i = 0; i < sizeof(uint32_t); i++) {
-		//printf("a[%zu]=%x ainv[%zu]=%x\n", i, ap[i], sizeof(uint32_t)-i-1, ainvp[sizeof(uint32_t)-i-1]);
-		CuAssertTrue(tc, ap[i] == ainvp[sizeof(uint32_t) - i - 1] );
+	ainvp = (byte *) &ainv;
+	bytearr_reverse((byte *)&ainv, sizeof(uint32));
+	for (i = 0; i < sizeof(uint32); i++) {
+		//printf("a[%zu]=%x ainv[%zu]=%x\n", i, ap[i], sizeof(uint32)-i-1, ainvp[sizeof(uint32)-i-1]);
+		CuAssertTrue(tc, ap[i] == ainvp[sizeof(uint32) - i - 1] );
 	}
 	//printf("inverting bytes of %x gives %x", a, ainv);
 }

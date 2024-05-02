@@ -45,25 +45,25 @@
 /*
  * 8-bit Byte masks:
  */
-static const byte_t _BITMASK[8] = { 0x80, 0x40, 0x20, 0x10,
-                                    0x08, 0x04, 0x02, 0x01
-                                  };
+static const byte _BITMASK[8] = { 0x80, 0x40, 0x20, 0x10,
+                                  0x08, 0x04, 0x02, 0x01
+                                };
 #define BITMASK(I) (_BITMASK[I])
 
 /*
  * Least significant bits masks _LSBMASK[j] = 0^(8-j)1^j
  */
-static const byte_t _LSBMASK[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f,
-                                    0x1f, 0x3f, 0x7f, 0xff
-                                  };
+static const byte _LSBMASK[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f,
+                                  0x1f, 0x3f, 0x7f, 0xff
+                                };
 #define LSBMASK(N)  (_LSBMASK[N])
 
 /*
  * Most significant bits masks _MSBMASK[j]=1^j0^(8-j)
  */
-static const byte_t _MSBMASK[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
-                                    0xf8, 0xfc, 0xfe, 0xff
-                                  };
+static const byte _MSBMASK[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
+                                  0xf8, 0xfc, 0xfe, 0xff
+                                };
 #define MSBMASK(N)  (_MSBMASK[N])
 
 
@@ -88,12 +88,12 @@ enum _cl_processor { x86_32bits, x86_64bits };
 #define PROCESSOR x86_64bits
 #define WORD_BIT 64
 #define BYTEWORDSIZE 8
-typedef uint64_t word_t;
+typedef uint64 word_t;
 #elif defined(__i386) || defined(_M_IX86)
 #define PROCESSOR x86_32bits
 #define WORD_BIT 32
 #define BYTEWORDSIZE 4
-typedef uint32_t word_t;
+typedef uint32 word_t;
 /*
  * You might want to add support for your platform here
  */
@@ -143,7 +143,7 @@ See release notes for porting issues."
 #define GCC_BUILTINS (defined(__GNUC__) && !defined(__clang__))
 
 /**
- * @brief Binary print format specifier for the byte_t type to be used
+ * @brief Binary print format specifier for the byte type to be used
  * in conjunction with BYTESTRB conversion macro.
  * @see BYTESTRB
  */
@@ -153,7 +153,7 @@ See release notes for porting issues."
  * @brief Converts a byte to a binary string for printing. To be used with the PRIbB format.
  * Example
  * ```C
- * byte_t b = 0xaa;
+ * byte b = 0xaa;
  * printf("byte=%"PRIbB"\n", BYTESTRB(b)); // prints "byte=10101010"
  * ```
  * @see PRIbB
@@ -169,7 +169,7 @@ See release notes for porting issues."
 	(byte & 0x01 ? '1' : '0')
 
 /**
- * @brief Hexadecimal print format specifier for the byte_t type to be used
+ * @brief Hexadecimal print format specifier for the byte type to be used
  * in conjunction with BYTESTRX conversion macro.
  * @see BYTESTRX
  */
@@ -181,7 +181,7 @@ See release notes for porting issues."
  * To be used with the PRIbB format.
  * Example
  * ```C
- * byte_t b = 0xaa;
+ * byte b = 0xaa;
  * printf("byte=%"PRIbX"\n", BYTESTRX(b)); // prints "byte=0xaa"
  * ```
  * @see PRIbB
@@ -199,53 +199,53 @@ size_t nbytes(size_t nvalues);
 /**
  * @brief Converts a byte to a binary string.
  */
-void byte_to_str(byte_t b, char *dest);
+void byteo_str(byte b, char *dest);
 
 
 /**
  * @brief Converts a byte to an hexadecimal string.
  */
-void byte_to_strx(byte_t b, char *dest);
+void byteo_strx(byte b, char *dest);
 
 
 /**
  * @brief Reverts the bits of a byte in-place.
  */
-void byte_reverse(byte_t *b);
+void byte_reverse(byte *b);
 
 
 /**
  * @brief Same as byte_bitcount(x, 0)
  * @see byte_bitcount
  */
-uint byte_bitcount0(byte_t x);
+uint byte_bitcount0(byte x);
 
 
 /**
  * @brief Same as byte_bitcount(x, 1)
  * @see byte_bitcount
  */
-uint byte_bitcount1(byte_t x);
+uint byte_bitcount1(byte x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given byte.
  */
-uint byte_bitcount(byte_t x, bool bit);
+uint byte_bitcount(byte x, bool bit);
 
 
 /**
  * @brief Same as byte_rank(@p b, @p pos, 0)
  * @see byte_rank
  */
-uint byte_rank0(byte_t b, uint pos);
+uint byte_rank0(byte b, uint pos);
 
 
 /**
  * @brief Same as byte_rank(@p b, @p pos, 1)
  * @see byte_rank
  */
-uint byte_rank1(byte_t b, uint pos);
+uint byte_rank1(byte b, uint pos);
 
 
 /**
@@ -254,21 +254,21 @@ uint byte_rank1(byte_t b, uint pos);
  * where @p b[j] denotes the jth bit of byte @p b from the left.
  * If i>=BYTESIZE, returns the total number of positions with value == @p bit.
  */
-uint byte_rank(byte_t b, uint pos, bool bit);
+uint byte_rank(byte b, uint pos, bool bit);
 
 
 /**
  * @brief Same as byte_select(@p b, @p rank, 0)
  * @see byte_select
  */
-uint byte_select0(byte_t b, uint rank);
+uint byte_select0(byte b, uint rank);
 
 
 /**
  * @brief Same as byte_select(@p b, @p rank, 1)
  * @see byte_select
  */
-uint byte_select1(byte_t b, uint rank);
+uint byte_select1(byte b, uint rank);
 
 
 /**
@@ -277,67 +277,67 @@ uint byte_select1(byte_t b, uint rank);
  * where @p b[j] denotes the jth bit of byte @p b from the left.
  * If no such position exists, returns BYTESIZE.
  */
-uint byte_select(byte_t b, uint rank, bool bit);
+uint byte_select(byte b, uint rank, bool bit);
 
 
 /**
  * @brief Same as uint16_bitcount(n, 0)
  * @see uint16_bitcount
  */
-uint uint16_bitcount0(uint16_t x);
+uint uint16_bitcount0(uint16 x);
 
 
 /**
  * @brief Same as uint16_bitcount(n, 1)
  * @see uint16_bitcount
  */
-uint uint16_bitcount1(uint16_t x);
+uint uint16_bitcount1(uint16 x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 16-bit uint.
  */
-uint uint16_bitcount(uint16_t x, bool bit);
+uint uint16_bitcount(uint16 x, bool bit);
 
 
 /**
  * @brief Same as uint32_bitcount(x, 0)
  * @see uint32_bitcount
  */
-uint uint32_bitcount0(uint32_t x);
+uint uint32_bitcount0(uint32 x);
 
 
 /**
  * @brief Same as uint32_bitcount(x, 1)
  * @see uint32_bitcount
  */
-uint uint32_bitcount1(uint32_t x);
+uint uint32_bitcount1(uint32 x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 32-bit uint.
  */
-uint uint32_bitcount(uint32_t x, bool bit);
+uint uint32_bitcount(uint32 x, bool bit);
 
 
 /**
  * @brief Same as uint64_bitcount(x, 0)
  * @see uint64_bitcount
  */
-uint uint64_bitcount0(uint64_t x);
+uint uint64_bitcount0(uint64 x);
 
 
 /**
  * @brief Same as uint64_bitcount(n, 1)
  * @see uint64_bitcount
  */
-uint uint64_bitcount1(uint64_t x);
+uint uint64_bitcount1(uint64 x);
 
 
 /**
  * @brief Returns the number of bits with value==@p bit of a given 64-bit uint.
  */
-uint uint64_bitcount(uint64_t x, bool bit);
+uint uint64_bitcount(uint64 x, bool bit);
 
 
 /**
@@ -426,7 +426,7 @@ uint ullong_bitcount(unsigned long long x, bool bit);
  * or, equivalently, the number of leading zeroes in the binary form of @p x.
  * If @p x==0, returns 16.
  */
-uint uint16_hibit(uint16_t x);
+uint uint16_hibit(uint16 x);
 
 
 /**
@@ -434,7 +434,7 @@ uint uint16_hibit(uint16_t x);
  * or, equivalently, the number of trailing zeroes in the binary form of @p x.
  * If @p x==0 returns 16.
  */
-uint uint16_lobit(uint16_t x);
+uint uint16_lobit(uint16 x);
 
 
 /**
@@ -442,7 +442,7 @@ uint uint16_lobit(uint16_t x);
  * or, equivalently, the number of leading zeroes in the binary form of @p x.
  * If @p x==0, returns 32.
  */
-uint uint32_hibit(uint32_t x);
+uint uint32_hibit(uint32 x);
 
 
 /**
@@ -450,7 +450,7 @@ uint uint32_hibit(uint32_t x);
  * or, equivalently, the number of trailing zeroes in the binary form of @p x.
  * If @p x==0 returns 32.
  */
-uint uint32_lobit(uint32_t x);
+uint uint32_lobit(uint32 x);
 
 
 /**
@@ -458,7 +458,7 @@ uint uint32_lobit(uint32_t x);
  * or, equivalently, the number of leading zeroes in the binary form of @p x.
  * If @p x==0 returns 64.
  */
-uint uint64_hibit(uint64_t x);
+uint uint64_hibit(uint64 x);
 
 
 /**
@@ -466,7 +466,7 @@ uint uint64_hibit(uint64_t x);
  * or, equivalently, the number of trailing zeroes in the binary form of @p x.
  * If @p x==0 returns 64.
  */
-uint uint64_lobit(uint64_t x);
+uint uint64_lobit(uint64 x);
 
 
 

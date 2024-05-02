@@ -36,7 +36,7 @@ size_t nbytes(size_t nvalues)
 
 
 #if ENDIANNESS==LITTLE
-static const uint64_t byte_as_uint64_str[256] = {
+static const uint64 byte_as_uint64_str[256] = {
 	0x3030303030303030, 0x3130303030303030, 0x3031303030303030, 0x3131303030303030,
 	0x3030313030303030, 0x3130313030303030, 0x3031313030303030, 0x3131313030303030,
 	0x3030303130303030, 0x3130303130303030, 0x3031303130303030, 0x3131303130303030,
@@ -103,7 +103,7 @@ static const uint64_t byte_as_uint64_str[256] = {
 	0x3030313131313131, 0x3130313131313131, 0x3031313131313131, 0x3131313131313131
 };
 #elif ENDIANNESS==BIG
-static const uint64_t byte_as_uint64_str[256] = {
+static const uint64 byte_as_uint64_str[256] = {
 	0x3030303030303030, 0x3030303030303031, 0x3030303030303130, 0x3030303030303131,
 	0x3030303030313030, 0x3030303030313031, 0x3030303030313130, 0x3030303030313131,
 	0x3030303031303030, 0x3030303031303031, 0x3030303031303130, 0x3030303031303131,
@@ -173,21 +173,21 @@ static const uint64_t byte_as_uint64_str[256] = {
 #error "Little or Big endianness required"
 #endif
 
-void byte_to_str(byte_t b, char *dest)
+void byteo_str(byte b, char *dest)
 {
-	*((uint64_t *)dest) = byte_as_uint64_str[b];
+	*((uint64 *)dest) = byte_as_uint64_str[b];
 	dest[8] = '\0';
 }
 
 
-void byte_to_strx(byte_t b, char *dest)
+void byteo_strx(byte b, char *dest)
 {
 	snprintf(dest, 3, "%"PRIbX, BYTESTRX(b));
 }
 
 
 
-void byte_reverse(byte_t *b)
+void byte_reverse(byte *b)
 {
 	*b = (*b << 4) | (*b >> 4);
 	*b = ((*b << 2) & 0xCC) | ((*b >> 2) & 0x33);
@@ -195,13 +195,13 @@ void byte_reverse(byte_t *b)
 }
 
 
-uint byte_bitcount0(byte_t b)
+uint byte_bitcount0(byte b)
 {
 	return byte_bitcount1(~b);
 }
 
 
-uint byte_bitcount1(byte_t b)
+uint byte_bitcount1(byte b)
 {
 #if GCC_BUILTINS
 	return __builtin_popcount(b);
@@ -214,7 +214,7 @@ uint byte_bitcount1(byte_t b)
 }
 
 
-uint byte_bitcount(byte_t b, bool bit)
+uint byte_bitcount(byte b, bool bit)
 {
 	return bit ?
 	       byte_bitcount1(b) :
@@ -222,19 +222,19 @@ uint byte_bitcount(byte_t b, bool bit)
 }
 
 
-uint byte_rank1(byte_t b, uint pos)
+uint byte_rank1(byte b, uint pos)
 {
 	return byte_bitcount1(b >> (pos < BYTESIZE ? BYTESIZE - pos : 0));
 }
 
 
-uint byte_rank0(byte_t b, uint pos)
+uint byte_rank0(byte b, uint pos)
 {
 	return byte_rank1(~b, pos);
 }
 
 
-uint byte_rank(byte_t b, uint pos, bool bit)
+uint byte_rank(byte b, uint pos, bool bit)
 {
 	return bit ?
 	       byte_rank1(b, pos) :
@@ -242,13 +242,13 @@ uint byte_rank(byte_t b, uint pos, bool bit)
 }
 
 
-uint byte_select0(byte_t b, uint rank)
+uint byte_select0(byte b, uint rank)
 {
 	return byte_select1(~b, rank);
 }
 
 
-uint byte_select1(byte_t b, uint rank)
+uint byte_select1(byte b, uint rank)
 {
 	if (b == 0) return BYTESIZE;
 	uint i = 0;
@@ -274,7 +274,7 @@ uint byte_select1(byte_t b, uint rank)
 }
 
 
-uint byte_select(byte_t b, uint rank, bool bit)
+uint byte_select(byte b, uint rank, bool bit)
 {
 	return bit ?
 	       byte_select1(b, rank) :
@@ -282,13 +282,13 @@ uint byte_select(byte_t b, uint rank, bool bit)
 }
 
 
-uint uint16_bitcount0(uint16_t x)
+uint uint16_bitcount0(uint16 x)
 {
 	return uint16_bitcount1(~x);
 }
 
 
-uint uint16_bitcount1(uint16_t x)
+uint uint16_bitcount1(uint16 x)
 {
 #if GCC_BUILTINS
 	// In C11 uint is at least 16 bits
@@ -303,7 +303,7 @@ uint uint16_bitcount1(uint16_t x)
 }
 
 
-uint uint16_bitcount(uint16_t x, bool bit)
+uint uint16_bitcount(uint16 x, bool bit)
 {
 	return bit ?
 	       uint16_bitcount1(x) :
@@ -311,13 +311,13 @@ uint uint16_bitcount(uint16_t x, bool bit)
 }
 
 
-uint uint32_bitcount0(uint32_t x)
+uint uint32_bitcount0(uint32 x)
 {
 	return uint32_bitcount1(~x);
 }
 
 
-uint uint32_bitcount1(uint32_t x)
+uint uint32_bitcount1(uint32 x)
 {
 #if GCC_BUILTINS
 	return __builtin_popcountl(x);
@@ -332,7 +332,7 @@ uint uint32_bitcount1(uint32_t x)
 }
 
 
-uint uint32_bitcount(uint32_t x, bool bit)
+uint uint32_bitcount(uint32 x, bool bit)
 {
 	if (bit)
 		return uint32_bitcount1(x);
@@ -341,13 +341,13 @@ uint uint32_bitcount(uint32_t x, bool bit)
 }
 
 
-uint uint64_bitcount0(uint64_t x)
+uint uint64_bitcount0(uint64 x)
 {
 	return uint64_bitcount1(~x);
 }
 
 
-uint uint64_bitcount1(uint64_t x)
+uint uint64_bitcount1(uint64 x)
 {
 #if GCC_BUILTINS
 	return __builtin_popcountll(x);
@@ -363,7 +363,7 @@ uint uint64_bitcount1(uint64_t x)
 }
 
 
-uint uint64_bitcount(uint64_t x, bool bit)
+uint uint64_bitcount(uint64 x, bool bit)
 {
 	return bit ?
 	       uint64_bitcount1(x) :
@@ -487,54 +487,54 @@ uint ullong_bitcount(unsigned long long x, bool bit)
 }
 
 
-static const byte_t _uint16_hibit_tbl[19] = {
+static const byte _uint16_hibit_tbl[19] = {
 	16, 0, 12, 1, 15, 13, 5, 2, 7, 16, 11,
 	14, 4, 6, 10, 3, 9, 8, 16
 };
 
 
-uint uint16_hibit(uint16_t x)
+uint uint16_hibit(uint16 x)
 {
 	x |= x >> 1; // first round down to one less than a power of 2
 	x |= x >> 2;
 	x |= x >> 4;
 	x |= x >> 8;
-	return (uint)_uint16_hibit_tbl[(uint16_t)(x % 19)];
+	return (uint)_uint16_hibit_tbl[(uint16)(x % 19)];
 }
 
 
-static const byte_t _uint16_lobit_tbl[19] = {
+static const byte _uint16_lobit_tbl[19] = {
 	16, 0, 1, 13, 2, 16, 14, 6, 3, 8, 16,
 	12, 15, 5, 7, 11, 4, 10, 9
 };
 
 
-uint uint16_lobit(uint16_t x)
+uint uint16_lobit(uint16 x)
 {
-	return (uint)_uint16_lobit_tbl[(uint16_t)((x & -x) % 19)];
+	return (uint)_uint16_lobit_tbl[(uint16)((x & -x) % 19)];
 }
 
 
 
-static const byte_t _uint32_hibit_tbl[37] = {
+static const byte _uint32_hibit_tbl[37] = {
 	32, 0, 25, 1, 22, 26, 31, 2, 15, 23,
 	29, 27, 10, 32, 12, 3, 6, 16, 32, 24,
 	21, 30, 14, 28, 9, 11, 5, 32, 20, 13,
 	8, 4, 19, 7, 18, 17, 32
 };
 
-uint uint32_hibit(uint32_t x)
+uint uint32_hibit(uint32 x)
 {
 	x |= x >> 1; // first round down to one less than a power of 2
 	x |= x >> 2;
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	return (uint)_uint32_hibit_tbl[(uint32_t)(x % 37)];
+	return (uint)_uint32_hibit_tbl[(uint32)(x % 37)];
 }
 
 
-static const byte_t _uint32_lobit_tbl[37] = {
+static const byte _uint32_lobit_tbl[37] = {
 	32, 0, 1, 26, 2, 23, 27, 32, 3, 16,
 	24, 30, 28, 11, 32, 13, 4, 7, 17, 32,
 	25, 22, 31, 15, 29, 10, 12, 6, 32, 21,
@@ -542,13 +542,13 @@ static const byte_t _uint32_lobit_tbl[37] = {
 };
 
 
-uint uint32_lobit(uint32_t x)
+uint uint32_lobit(uint32 x)
 {
-	return (uint)_uint32_lobit_tbl[(uint32_t)((x & -x) % 37)];
+	return (uint)_uint32_lobit_tbl[(uint32)((x & -x) % 37)];
 }
 
 
-static const byte_t _uint64_lobit_tbl[67] = {
+static const byte _uint64_lobit_tbl[67] = {
 	64, 0, 1, 39, 2, 15, 40, 23, 3, 12,
 	16, 59, 41, 19, 24, 54, 4, 128, 13, 10,
 	17, 62, 60, 28, 42, 30, 20, 51, 25, 44,
@@ -568,13 +568,13 @@ static const byte_t _uint64_lobit_tbl[67] = {
  * of w % 67 are all distinct. hence we can determine w,
  * and hence q, from w % 67.
  */
-uint uint64_lobit(uint64_t v)
+uint uint64_lobit(uint64 v)
 {
-	return (uint)_uint64_lobit_tbl[(uint64_t)(v & -v) % 67];
+	return (uint)_uint64_lobit_tbl[(uint64)(v & -v) % 67];
 }
 
 
-static const byte_t _uint64_hibit_tbl[67] =  {
+static const byte _uint64_hibit_tbl[67] =  {
 	64, 0, 1, 39, 2, 15, 40, 23, 3, 12,
 	16, 59, 41, 19, 24, 54, 4, 64, 13, 10,
 	17, 62, 60, 28, 42, 30, 20, 51, 25, 44,
@@ -585,7 +585,7 @@ static const byte_t _uint64_hibit_tbl[67] =  {
 };
 
 
-uint uint64_hibit(uint64_t x)
+uint uint64_hibit(uint64 x)
 {
 	x |= x >> 1;
 	x |= x >> 2;

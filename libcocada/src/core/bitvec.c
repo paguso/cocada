@@ -39,7 +39,7 @@ static const size_t MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
 #define NBYTES(NBITS) ((size_t)DIVCEIL(NBITS, BYTESIZE))
 
 struct _BitVec {
-	byte_t *bits;
+	byte *bits;
 	size_t  len;
 	size_t  cap;
 };
@@ -78,7 +78,7 @@ BitVec *bitvec_new_with_capacity(size_t capacity)
 }
 
 
-BitVec *bitvec_new_from_bitarr(const byte_t *src, size_t len)
+BitVec *bitvec_new_from_bitarr(const byte *src, size_t len)
 {
 	BitVec *bv = bitvec_new_with_capacity(len);
 	memcpy(bv->bits, src, NBYTES(len));
@@ -126,15 +126,15 @@ void bitvec_fit(BitVec *bv)
 }
 
 
-const byte_t *bitvec_as_bytes(const BitVec *bv)
+const byte *bitvec_as_bytes(const BitVec *bv)
 {
 	return bv->bits;
 }
 
 
-byte_t *bitvec_detach(BitVec *bv)
+byte *bitvec_detach(BitVec *bv)
 {
-	byte_t *ret = (byte_t *)bv->bits;
+	byte *ret = (byte *)bv->bits;
 	FREE(bv);
 	return ret;
 }
@@ -227,35 +227,35 @@ size_t bitvec_count_range(const BitVec *bv, bool bit, size_t from, size_t to)
 
 size_t _bitvec_select1(const BitVec *bv, size_t rank)
 {
-	byte_t *cur_byte = bv->bits;
-	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+	byte *cur_byte = bv->bits;
+	byte *last_byte = bv->bits + (bv->len / BYTESIZE);
 	size_t count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
-	while ( (byte_t *)(llarr + 1) <= last_byte &&
+	while ( (byte *)(llarr + 1) <= last_byte &&
 	        count + (partial_count = ullong_bitcount1(*llarr)) <= rank ) {
 		count += partial_count;
 		llarr++;
 	}
 	ulong *larr = (ulong *)llarr;
-	while ( (byte_t *)(larr + 1) <= last_byte &&
+	while ( (byte *)(larr + 1) <= last_byte &&
 	        count + (partial_count = ulong_bitcount1(*larr)) <= rank ) {
 		count += partial_count;
 		larr++;
 	}
 	uint *intarr = (uint *)larr;
-	while ( (byte_t *)(intarr + 1) <= last_byte &&
+	while ( (byte *)(intarr + 1) <= last_byte &&
 	        count + (partial_count = uint_bitcount1(*intarr)) <= rank ) {
 		count += partial_count;
 		intarr++;
 	}
 	ushort *shrtarr = (ushort *)intarr;
-	while ( (byte_t *)(shrtarr + 1) <= last_byte &&
+	while ( (byte *)(shrtarr + 1) <= last_byte &&
 	        count + (partial_count = ushort_bitcount1(*shrtarr)) <= rank ) {
 		count += partial_count;
 		shrtarr++;
 	}
-	cur_byte = (byte_t *)shrtarr;
+	cur_byte = (byte *)shrtarr;
 
 	while ( (cur_byte + 1) <= last_byte &&
 	        count + (partial_count = byte_bitcount1(*cur_byte)) <= rank ) {
@@ -273,35 +273,35 @@ size_t _bitvec_select1(const BitVec *bv, size_t rank)
 
 size_t _bitvec_select0(const BitVec *bv, size_t rank)
 {
-	byte_t *cur_byte = bv->bits;
-	byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+	byte *cur_byte = bv->bits;
+	byte *last_byte = bv->bits + (bv->len / BYTESIZE);
 	size_t count = 0, partial_count = 0;
 
 	ullong *llarr = (ullong *)(bv->bits);
-	while ( (byte_t *)(llarr + 1) <= last_byte &&
+	while ( (byte *)(llarr + 1) <= last_byte &&
 	        count + (partial_count = ullong_bitcount0(*llarr)) <= rank ) {
 		count += partial_count;
 		llarr++;
 	}
 	ulong *larr = (ulong *)llarr;
-	while ( (byte_t *)(larr + 1) <= last_byte &&
+	while ( (byte *)(larr + 1) <= last_byte &&
 	        count + (partial_count = ulong_bitcount0(*larr)) <= rank ) {
 		count += partial_count;
 		larr++;
 	}
 	uint *intarr = (uint *)larr;
-	while ( (byte_t *)(intarr + 1) <= last_byte &&
+	while ( (byte *)(intarr + 1) <= last_byte &&
 	        count + (partial_count = uint_bitcount0(*intarr)) <= rank ) {
 		count += partial_count;
 		intarr++;
 	}
 	ushort *shrtarr = (ushort *)intarr;
-	while ( (byte_t *)(shrtarr + 1) <= last_byte &&
+	while ( (byte *)(shrtarr + 1) <= last_byte &&
 	        count + (partial_count = ushort_bitcount0(*shrtarr)) <= rank ) {
 		count += partial_count;
 		shrtarr++;
 	}
-	cur_byte = (byte_t *)shrtarr;
+	cur_byte = (byte *)shrtarr;
 
 	while ( (cur_byte + 1) <= last_byte &&
 	        count + (partial_count = byte_bitcount0(*cur_byte)) <= rank ) {
@@ -358,8 +358,8 @@ void bitvec_push_n(BitVec *bv, size_t nbits, bool bit)
 	}
 	if (bit) {
 		size_t nleft = nbits;
-		byte_t nxt_bit = bv->len % BYTESIZE;
-		byte_t *last_byte = bv->bits + (bv->len / BYTESIZE);
+		byte nxt_bit = bv->len % BYTESIZE;
+		byte *last_byte = bv->bits + (bv->len / BYTESIZE);
 		size_t m = MIN(nleft, BYTESIZE - nxt_bit);
 		if (m == BYTESIZE)
 			*(last_byte) = BYTE_MAX;

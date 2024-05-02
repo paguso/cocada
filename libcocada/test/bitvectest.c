@@ -73,11 +73,11 @@ void bitvec_test_push(CuTest *tc)
 {
 	memdbg_reset();
 	BitVec *bv = bitvec_new_with_capacity(ba_size);
-	byte_t *array;
-	array = ARR_NEW(byte_t, ba_size);
+	byte *array;
+	array = ARR_NEW(byte, ba_size);
 	bool bit;
 	for (int i = 0; i < ba_size; i++) {
-		bit = ((byte_t)rand() % 2);
+		bit = ((byte)rand() % 2);
 		bitvec_push(bv, bit);
 		array[i] = bit;
 	}
@@ -94,8 +94,8 @@ void bitvec_test_push_n(CuTest *tc)
 {
 	memdbg_reset();
 	BitVec *bv = bitvec_new_with_capacity(0);
-	byte_t *array;
-	array = ARR_NEW(byte_t, ba_size);
+	byte *array;
+	array = ARR_NEW(byte, ba_size);
 	bool bit = false;
 	size_t n = 0, s = 0;
 	while (s < ba_size) {
@@ -123,10 +123,10 @@ void bitvec_test_count(CuTest *tc)
 	memdbg_reset();
 	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
-	byte_t *ba = bitarr_new(ba_size);
+	byte *ba = bitarr_new(ba_size);
 	size_t count1 = 0;
 	for (size_t i = 0; i < ba_size; i++) {
-		bit = ((byte_t)rand() % 2);
+		bit = ((byte)rand() % 2);
 		bitarr_set_bit(ba, i, bit);
 		bitvec_push(bv, bit);
 		count1 += bit;
@@ -152,13 +152,13 @@ void bitvec_test_count(CuTest *tc)
 
 void bitvec_test_select(CuTest *tc)
 {
-	byte_t bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
+	byte bit_patterns[6] = {0x00, 0xFF, 0x0F, 0xF0, 0x55, 0xAA};
 	memdbg_reset();
 	for (int intbit = 0; intbit < 2; intbit++) {
 		bool bit = (bool)intbit;
 		for (size_t len = 0; len < ba_size; len++) {
 			for (int i = 0; i < 6; i++) {
-				byte_t *ba = bitarr_new(len);
+				byte *ba = bitarr_new(len);
 				memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
 				BitVec *bv = bitvec_new_from_bitarr(ba, len);
 				size_t bitcount = bitvec_count(bv, bit);
@@ -193,7 +193,7 @@ void bitvec_test_format(CuTest *tc)
 	BitVec *bv = bitvec_new_with_capacity(0);
 	bool bit;
 	for (size_t i = 0; i < ba_size; i++) {
-		bit = ((byte_t)rand() % 2);
+		bit = ((byte)rand() % 2);
 		bitvec_push(bv, bit);
 	}
 	BitVecFormat *fmt = bitvec_get_format(bv, 4);

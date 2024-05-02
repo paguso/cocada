@@ -48,14 +48,14 @@ static inline void _randinit()
 }
 
 
-static inline uint64_t _rand_next_unchecked()
+static inline uint64 _rand_next_unchecked()
 {
 	return sfmt_genrand_uint64(&_rng);
 }
 
 
 
-void rand_reset(uint32_t seed)
+void rand_reset(uint32 seed)
 {
 	sfmt_init_gen_rand(&_rng, seed);
 	__randinit = true;
@@ -63,7 +63,7 @@ void rand_reset(uint32_t seed)
 }
 
 
-uint64_t rand_next ()
+uint64 rand_next ()
 {
 	_randinit();
 	return _rand_next_unchecked();
@@ -81,7 +81,7 @@ uint64_t rand_next ()
 void shuffle_arr(void *arr, size_t n, size_t typesize)
 {
 	_randinit();
-	byte_t tmp[typesize];
+	byte tmp[typesize];
 	if (n > 1) {
 		for (size_t j, i = n - 1; i > 0; i--) {
 			j = (size_t)_rand_next_unchecked() % (i + 1);

@@ -324,7 +324,7 @@ void vec_rotate_left(Vec *v, size_t npos)
 {
 	if (v->len == 0 || npos % v->len == 0) return;
 	npos = npos % v->len;
-	void *buf = (void *) ( ARR_NEW(byte_t, npos * v->typesize ) );
+	void *buf = (void *) ( ARR_NEW(byte, npos * v->typesize ) );
 	memcpy(buf, v->data, npos * v->typesize);
 	memmove(v->data, v->data + (npos * v->typesize), (v->len - npos) * v->typesize);
 	memcpy(v->data + ((v->len - npos) * v->typesize), buf, npos * v->typesize);

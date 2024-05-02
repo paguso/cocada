@@ -39,16 +39,16 @@ xstrHash *xstrhash_new(Alphabet *ab);
 
 void xstrhash_finalise(void *ptr, const Finaliser *fnr);
 
-uint64_t xstrhash_lex(const xstrHash *self, const xstr *s);
+uint64 xstrhash_lex(const xstrHash *self, const xstr *s);
 
-uint64_t xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                          size_t to);
+uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
+                        size_t to);
 
-uint64_t xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64_t hash,
-                           xchar c);
+uint64 xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64 hash,
+                         xchar c);
 
-uint64_t xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                               size_t to, uint64_t hash, xchar c);
+uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
+                             size_t to, uint64 hash, xchar c);
 
 
 #endif

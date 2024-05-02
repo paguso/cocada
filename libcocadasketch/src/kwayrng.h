@@ -22,8 +22,7 @@
 #ifndef KWAYRNG_H
 #define KWAYRNG_H
 
-#include <stddef.h>
-#include <stdint.h>
+#include "coretype.h"
 
 /**
  * @file kwayrng.h
@@ -62,7 +61,7 @@ KWayRNG *kwayrng_new(size_t k, size_t nbits);
  * Values are considered modulo the appropriate max value
  * p=2^@p nbits.
  */
-KWayRNG *kwayrng_new_with_coefs(size_t k, uint64_t *coefs, size_t nbits);
+KWayRNG *kwayrng_new_with_coefs(size_t k, uint64 *coefs, size_t nbits);
 
 
 /**
@@ -80,7 +79,7 @@ size_t kwayrng_k(KWayRNG *rng);
 /**
  * @brief Returns the k polynomial coefficients of the r.n.g.
  */
-const uint64_t *kwayrng_coefs(KWayRNG *rng);
+const uint64 *kwayrng_coefs(KWayRNG *rng);
 
 
 /**
@@ -89,7 +88,7 @@ const uint64_t *kwayrng_coefs(KWayRNG *rng);
  * @see kwayrng_new
  * @see kwayrng.h
  */
-uint64_t kwayrng_maxval(KWayRNG *rng);
+uint64 kwayrng_maxval(KWayRNG *rng);
 
 
 /**
@@ -101,13 +100,13 @@ void kwayrng_reset(KWayRNG *rng);
 /**
  * @brief Yelds the next random value in the sequence.
  */
-uint64_t kwayrng_next(KWayRNG *rng);
+uint64 kwayrng_next(KWayRNG *rng);
 
 
 /**
  * @brief Yelds the @p ith value of the pseudorandom sequence
  * directly without modifying the internal counter.
  */
-uint64_t kwayrng_val(KWayRNG *rng, uint64_t ith);
+uint64 kwayrng_val(KWayRNG *rng, uint64 ith);
 
 #endif

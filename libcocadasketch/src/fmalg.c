@@ -34,32 +34,32 @@
 struct _FMAlg {
 	size_t n, m;
 	KWayRNG ***rng;
-	uint64_t maxval;
-	uint64_t p2ceil;
-	byte_t **maxlsb;
+	uint64 maxval;
+	uint64 p2ceil;
+	byte **maxlsb;
 	long double *avgs;
 };
 
 
-FMAlg *fmalg_init_single(uint64_t maxval)
+FMAlg *fmalg_init_single(uint64 maxval)
 {
 	return fmalg_init(maxval, 1, 1);
 }
 
 
-FMAlg *fmalg_init(uint64_t maxval, size_t n, size_t m)
+FMAlg *fmalg_init(uint64 maxval, size_t n, size_t m)
 {
 	assert(maxval <= 0x7FFFFFFFFFFFFFFF);
 	FMAlg *ret = NEW(FMAlg);
 	ret->maxval = maxval;
 	ret->n = n;
 	ret->m = m;
-	ret->p2ceil = uint64_lobit( pow2ceil_uint64_t(maxval) );
+	ret->p2ceil = uint64_lobit( pow2ceil_uint64(maxval) );
 	assert (ret->p2ceil <= 63);
 	NEW_MATRIX(rngs, KWayRNG *, m, n);
 	FILL_MATRIX(rngs, m, n, kwayrng_new(2, ret->p2ceil));
 	ret->rng = rngs;
-	NEW_MATRIX_0(lsbs, byte_t, m, n);
+	NEW_MATRIX_0(lsbs, byte, m, n);
 	ret->maxlsb = lsbs;
 	ret->avgs = ARR_OF_0_NEW(long double, m);
 	return ret;
@@ -86,12 +86,12 @@ void fmalg_reset(FMAlg *fm)
 
 
 
-void fmalg_process(FMAlg *fm, uint64_t val)
+void fmalg_process(FMAlg *fm, uint64 val)
 {
 	WARN_ASSERT(val < fm->maxval, "Ignoring invalid FM value %"PRIu64\
 	            ". Max allowed value is %"PRIu64"", val, fm->maxval - 1);
-	uint64_t hashval;
-	byte_t lsb;
+	uint64 hashval;
+	byte lsb;
 	for (size_t i = 0; i < fm->m; i++) {
 		for (size_t j = 0; j < fm->n; j++) {
 			hashval = kwayrng_val(fm->rng[i][j], val);
@@ -104,23 +104,23 @@ void fmalg_process(FMAlg *fm, uint64_t val)
 }
 
 
-static long double pow_avg(byte_t *vals, size_t n)
+static long double pow_avg(byte *vals, size_t n)
 {
 	long double avg = 0;
-	uint64_t acc = 0;
+	uint64 acc = 0;
 	for (size_t i = 0; i < n; i++) {
 		if ((UINT64_MAX - acc) < vals[i]) {
 			avg += (long double) acc / (long double) n;
 			acc = 0;
 		}
-		acc += ( ( (uint64_t) 1 ) << vals[i] );
+		acc += ( ( (uint64) 1 ) << vals[i] );
 	}
 	avg += (long double) acc / (long double) n;
 	return avg;
 }
 
 
-uint64_t fmalg_query(FMAlg *fm)
+uint64 fmalg_query(FMAlg *fm)
 {
 	ARR_FILL(fm->avgs, 0, fm->m, 0);
 	for (size_t i = 0; i < fm->m; i++) {

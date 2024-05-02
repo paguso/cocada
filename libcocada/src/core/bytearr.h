@@ -38,21 +38,21 @@
  * @brief Creates a new bytearray of given length.
  * The array is filled with zeros by default.
  */
-byte_t *bytearr_new(size_t len);
+byte *bytearr_new(size_t len);
 
 
 /**
  * @brief Sets each position  @p ba[j] to @p val, for j in the range
  * @p from <= j < @p to.
  */
-void bytearr_fill(byte_t *ba, size_t from, size_t to, byte_t val);
+void bytearr_fill(byte *ba, size_t from, size_t to, byte val);
 
 /**
  * @brief Flips the bytes of the array @p ba in place, that is, swaps the
  * contents of positions @p ba[j] <--> @p ba[size-j],
  * for 0 <= j < @p size.
  */
-void bytearr_reverse(byte_t *ba, size_t size);
+void bytearr_reverse(byte *ba, size_t size);
 
 
 /**
@@ -72,7 +72,7 @@ byte_format;
  * @param bytes_per_line Number of bytes to be printed per line.
  * @param leftmargin Left margin string to be print at the start of each line.
  */
-void bytearr_print(const byte_t *ba, size_t nbytes, byte_format fmt,
+void bytearr_print(const byte *ba, size_t nbytes, byte_format fmt,
                    size_t bytes_per_line, const char *leftmargin);
 
 
@@ -84,7 +84,7 @@ void bytearr_print(const byte_t *ba, size_t nbytes, byte_format fmt,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_char
  */
-char bytearr_read_char(const byte_t *src, size_t from_byte,
+char bytearr_read_char(const byte *src, size_t from_byte,
                        size_t nbytes);
 
 
@@ -96,7 +96,7 @@ char bytearr_read_char(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_uchar
  */
-unsigned char bytearr_read_uchar(const byte_t *src, size_t from_byte,
+unsigned char bytearr_read_uchar(const byte *src, size_t from_byte,
                                  size_t nbytes);
 
 
@@ -107,7 +107,7 @@ unsigned char bytearr_read_uchar(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_short.
  */
-short bytearr_read_short(const byte_t *src, size_t from_byte,
+short bytearr_read_short(const byte *src, size_t from_byte,
                          size_t nbytes);
 
 
@@ -118,7 +118,7 @@ short bytearr_read_short(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_ushort.
  */
-unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
+unsigned short bytearr_read_ushort(const byte *src, size_t from_byte,
                                    size_t nbytes);
 
 
@@ -140,7 +140,7 @@ unsigned short bytearr_read_ushort(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_int.
  */
-int bytearr_read_int(const byte_t *src, size_t from_byte,
+int bytearr_read_int(const byte *src, size_t from_byte,
                      size_t nbytes);
 
 
@@ -151,7 +151,7 @@ int bytearr_read_int(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_uint.
  */
-unsigned int bytearr_read_uint(const byte_t *src, size_t from_byte,
+unsigned int bytearr_read_uint(const byte *src, size_t from_byte,
                                size_t nbytes);
 
 
@@ -162,7 +162,7 @@ unsigned int bytearr_read_uint(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_long.
  */
-long bytearr_read_long(const byte_t *src, size_t from_byte,
+long bytearr_read_long(const byte *src, size_t from_byte,
                        size_t nbytes);
 
 
@@ -173,7 +173,7 @@ long bytearr_read_long(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_ulong.
  */
-unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
+unsigned long bytearr_read_ulong(const byte *src, size_t from_byte,
                                  size_t nbytes);
 
 
@@ -184,7 +184,7 @@ unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_longlong.
  */
-long long bytearr_read_llong(const byte_t *src, size_t from_byte,
+long long bytearr_read_llong(const byte *src, size_t from_byte,
                              size_t nbytes);
 
 
@@ -195,7 +195,7 @@ long long bytearr_read_llong(const byte_t *src, size_t from_byte,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_ulonglong.
  */
-unsigned long long bytearr_read_ullong(const byte_t *src,
+unsigned long long bytearr_read_ullong(const byte *src,
                                        size_t from_byte, size_t nbytes);
 
 
@@ -205,7 +205,7 @@ unsigned long long bytearr_read_ullong(const byte_t *src,
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
  * @see bytearr_write_size.
  */
-size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
+size_t bytearr_read_size_t(const byte *src, size_t from_byte,
                            size_t nbytes);
 
 
@@ -220,7 +220,7 @@ size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
  * @param from_byte_src The initial position to be read from the source array
  * @param nbytes The number of bytes to be written
  */
-void bytearr_write(byte_t *dest, size_t from_byte_dest, const byte_t *src,
+void bytearr_write(byte *dest, size_t from_byte_dest, const byte *src,
                    size_t from_byte_src, size_t nbytes);
 
 
@@ -231,7 +231,7 @@ void bytearr_write(byte_t *dest, size_t from_byte_dest, const byte_t *src,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_char
  */
-void bytearr_write_char(byte_t *dest, size_t from_byte, char val,
+void bytearr_write_char(byte *dest, size_t from_byte, char val,
                         size_t nbytes);
 
 
@@ -242,7 +242,7 @@ void bytearr_write_char(byte_t *dest, size_t from_byte, char val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_uchar
  */
-void bytearr_write_uchar(byte_t *dest, size_t from_byte,
+void bytearr_write_uchar(byte *dest, size_t from_byte,
                          unsigned char val, size_t nbytes);
 
 
@@ -253,7 +253,7 @@ void bytearr_write_uchar(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_short
  */
-void bytearr_write_short(byte_t *dest, size_t from_byte, short val,
+void bytearr_write_short(byte *dest, size_t from_byte, short val,
                          size_t nbytes);
 
 
@@ -264,7 +264,7 @@ void bytearr_write_short(byte_t *dest, size_t from_byte, short val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ushort
  */
-void bytearr_write_ushort(byte_t *dest, size_t from_byte,
+void bytearr_write_ushort(byte *dest, size_t from_byte,
                           unsigned short val, size_t nbytes);
 
 /**
@@ -287,7 +287,7 @@ void bytearr_write_ushort(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_int
  */
-void bytearr_write_int(byte_t *dest, size_t from_byte, int val,
+void bytearr_write_int(byte *dest, size_t from_byte, int val,
                        size_t nbytes);
 
 
@@ -298,7 +298,7 @@ void bytearr_write_int(byte_t *dest, size_t from_byte, int val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_uint
  */
-void bytearr_write_uint(byte_t *dest, size_t from_byte, unsigned int val,
+void bytearr_write_uint(byte *dest, size_t from_byte, unsigned int val,
                         size_t nbytes);
 
 
@@ -309,7 +309,7 @@ void bytearr_write_uint(byte_t *dest, size_t from_byte, unsigned int val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_long
  */
-void bytearr_write_long(byte_t *dest, size_t from_byte, long val,
+void bytearr_write_long(byte *dest, size_t from_byte, long val,
                         size_t nbytes);
 
 
@@ -320,7 +320,7 @@ void bytearr_write_long(byte_t *dest, size_t from_byte, long val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ulong
  */
-void bytearr_write_ulong(byte_t *dest, size_t from_byte,
+void bytearr_write_ulong(byte *dest, size_t from_byte,
                          unsigned long val, size_t nbytes);
 
 
@@ -331,7 +331,7 @@ void bytearr_write_ulong(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_longlong
  */
-void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
+void bytearr_write_llong(byte *dest, size_t from_byte, long long val,
                          size_t nbytes);
 
 
@@ -342,7 +342,7 @@ void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_ulonglong
  */
-void bytearr_write_ullong(byte_t *dest, size_t from_byte,
+void bytearr_write_ullong(byte *dest, size_t from_byte,
                           unsigned long long val, size_t nbytes);
 
 
@@ -353,7 +353,7 @@ void bytearr_write_ullong(byte_t *dest, size_t from_byte,
  * @see bitarr_write_int for similar remarks about loss of information.
  * @see bytearr_read_size
  */
-void bytearr_write_size_t(byte_t *dest, size_t from_byte, size_t val,
+void bytearr_write_size_t(byte *dest, size_t from_byte, size_t val,
                           size_t nbytes);
 
 #endif

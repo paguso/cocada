@@ -22,10 +22,9 @@
 #ifndef XCHAR_H
 #define XCHAR_H
 
-//#include <limits.h>
-//#include <stddef.h>
-#include <inttypes.h>
 #include <stdio.h>
+
+#include "coretype.h"
 
 /**
  * @file xchar.h
@@ -60,38 +59,38 @@
 
 #warning "Undefined XCHAR_BYTES. Setting to default = 4 (32 bits)"
 #define XCHAR_BYTES 4
-typedef int32_t   xchar;
+typedef int32   xchar;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
-typedef int32_t   xwchar; // xchar wrapper type
+typedef int32   xwchar; // xchar wrapper type
 
 #elif XCHAR_BYTES == 1
 
-typedef int8_t   xchar;
+typedef int8   xchar;
 #define XCHAR_MAX INT8_MAX
 #define XCHAR_FMT PRId8
-typedef int32_t   xwchar; // xchar wrapper type
+typedef int32   xwchar; // xchar wrapper type
 
 #elif XCHAR_BYTES == 2
 
-typedef int16_t  xchar;
+typedef int16  xchar;
 #define XCHAR_MAX INT16_MAX
 #define XCHAR_FMT PRId16
-typedef int32_t   xwchar; // xchar wrapper type
+typedef int32   xwchar; // xchar wrapper type
 
 #elif XCHAR_BYTES == 4
 
-typedef int32_t  xchar;
+typedef int32  xchar;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
-typedef int32_t   xwchar; // xchar wrapper type
+typedef int32   xwchar; // xchar wrapper type
 
 #elif XCHAR_BYTES == 8
 
-typedef int64_t  xchar;
+typedef int64  xchar;
 #define XCHAR_MAX INT64_MAX
 #define XCHAR_FMT PRId64
-typedef int64_t   xwchar; // xchar wrapper type
+typedef int64   xwchar; // xchar wrapper type
 
 #else
 
@@ -99,7 +98,7 @@ typedef int64_t   xwchar; // xchar wrapper type
 #undef XCHAR_BYTES
 #define XCHAR_BYTES 4
 
-typedef int32_t  xchar;
+typedef int32  xchar;
 #define XCHAR_MAX INT32_MAX
 #define XCHAR_FMT PRId32
 

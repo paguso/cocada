@@ -43,14 +43,14 @@ typedef struct _RoaringBitVec RoaringBitVec;
  * @brief Constructs a new roaring bitvector with a given @p length,
  * with all bits initially set to 0.
  */
-RoaringBitVec *roaringbitvec_new(uint32_t length);
+RoaringBitVec *roaringbitvec_new(uint32 length);
 
 
 /**
  * @brief Constructs a new roaring bitvector from a raw bitarray
  * @p src, with given @p length.
  */
-RoaringBitVec *roaringbitvec_new_from_bitarr(byte_t *src, uint32_t length);
+RoaringBitVec *roaringbitvec_new_from_bitarr(byte *src, uint32 length);
 
 
 /**

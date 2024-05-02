@@ -505,7 +505,7 @@ void cliarg_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-static uint64_t _hash_str(const void *ptr)
+static uint64 _hash_str(const void *ptr)
 {
 	char *s = *((char **)ptr);
 	return fnv1a_64bit_hash(s, strlen((char *)s));

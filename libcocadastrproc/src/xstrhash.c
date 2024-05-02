@@ -32,21 +32,21 @@
 struct _xstrHash {
 	Alphabet *ab;
 	size_t max_exp;
-	uint64_t *pow;
+	uint64 *pow;
 };
 
 
 static void _initpow(xstrHash *self)
 {
-	uint64_t base = alphabet_size(self->ab);
+	uint64 base = alphabet_size(self->ab);
 	size_t e = 0;
-	uint64_t p = 1;
-	while ( (uint64_t)(base * p) > p ) {
+	uint64 p = 1;
+	while ( (uint64)(base * p) > p ) {
 		e++;
 		p *= base;
 	}
 	self->max_exp = e;
-	self->pow = ARR_NEW(uint64_t, e);
+	self->pow = ARR_NEW(uint64, e);
 	p = 1;
 	for (size_t i = 0; i < e; i++) {
 		self->pow[i] = p;
@@ -54,9 +54,9 @@ static void _initpow(xstrHash *self)
 	}
 }
 
-static inline uint64_t _pow(const xstrHash *self, size_t exp)
+static inline uint64 _pow(const xstrHash *self, size_t exp)
 {
-	uint64_t ret = 1;
+	uint64 ret = 1;
 	while (exp > self->max_exp) {
 		ret *= self->pow[self->max_exp];
 		exp -= self->max_exp;
@@ -81,16 +81,16 @@ void xstrhash_finalise(void *ptr, const Finaliser *fnr)
 }
 
 
-uint64_t xstrhash_lex(const xstrHash *self, const xstr *s)
+uint64 xstrhash_lex(const xstrHash *self, const xstr *s)
 {
 	return xstrhash_lex_sub(self, s, 0, xstr_len(s));
 }
 
 
-uint64_t xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                          size_t to)
+uint64 xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
+                        size_t to)
 {
-	uint64_t hash = 0;
+	uint64 hash = 0;
 	for (size_t i = from; i < to; i++) {
 		hash *= alphabet_size(self->ab);
 		hash += alphabet_rank(self->ab, xstr_get(s, i));
@@ -99,8 +99,8 @@ uint64_t xstrhash_lex_sub(const xstrHash *self, const xstr *s, size_t from,
 }
 
 
-uint64_t xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64_t hash,
-                           xchar c)
+uint64 xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64 hash,
+                         xchar c)
 {
 	hash -= _pow(self, xstr_len(s) - 1) * alphabet_rank(self->ab, xstr_get(s, 0));
 	hash += alphabet_rank(self->ab, c);
@@ -108,8 +108,8 @@ uint64_t xstrhash_roll_lex(const xstrHash *self, const xstr *s, uint64_t hash,
 }
 
 
-uint64_t xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
-                               size_t to,  uint64_t hash, xchar c)
+uint64 xstrhash_roll_lex_sub(const xstrHash *self, const xstr *s, size_t from,
+                             size_t to,  uint64 hash, xchar c)
 {
 	hash -= _pow(self, to - from - 1) * alphabet_rank(self->ab, xstr_get(s, from));
 	hash *= alphabet_size(self->ab);

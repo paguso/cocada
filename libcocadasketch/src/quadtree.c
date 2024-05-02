@@ -183,7 +183,7 @@ void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
 	Point2D centre = {.x = rect.width / 2, .y = rect.height / 2};
 	uint cur_depth = 0;
 	while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-		QuadPos pos = (((byte_t)(p.y >= centre.y)) << 1) | ((byte_t)(p.x >= centre.x));
+		QuadPos pos = (((byte)(p.y >= centre.y)) << 1) | ((byte)(p.x >= centre.x));
 		if (IS_EAST(pos)) {
 			rect.top_left.x = centre.x;
 			rect.width = SND_HALF(rect.width);
@@ -218,8 +218,8 @@ Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor)
 		Point2D centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
 		uint cur_depth = 0;
 		while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-			QuadPos pos = (((byte_t)(bounds[i].y >= centre.y)) << 1) |
-			              ((byte_t)(bounds[i].x >= centre.x));
+			QuadPos pos = (((byte)(bounds[i].y >= centre.y)) << 1) |
+			              ((byte)(bounds[i].x >= centre.x));
 			if (IS_EAST(pos)) {
 				rect.top_left.x = centre.x;
 				rect.width = SND_HALF(rect.width);

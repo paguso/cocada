@@ -67,7 +67,7 @@ BitVec *bitvec_new_with_len(size_t length);
  * @param src (no transfer) The source bit array
  * @param len Number of bits to be copied
  */
-BitVec *bitvec_new_from_bitarr(const byte_t *src, size_t len);
+BitVec *bitvec_new_from_bitarr(const byte *src, size_t len);
 
 
 /**
@@ -118,7 +118,7 @@ size_t bitvec_memsize(BitVec *bv);
  * @warning The returned representation is not meant to be
  * modified directly.
  */
-const byte_t *bitvec_as_bytes(const BitVec *bv);
+const byte *bitvec_as_bytes(const BitVec *bv);
 
 
 /**
@@ -126,7 +126,7 @@ const byte_t *bitvec_as_bytes(const BitVec *bv);
  * and destroys the bitvector object
  * @param bv (full transfer) The bitvector to be dismantled.
  */
-byte_t *bitvec_detach (BitVec *bv);
+byte *bitvec_detach (BitVec *bv);
 
 
 /**

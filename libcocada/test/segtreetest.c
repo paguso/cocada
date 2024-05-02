@@ -139,19 +139,19 @@ void test_segtree_upd_obj(CuTest *tc)
 void test_segtree_range_qry(CuTest *tc)
 {
 	size_t max_range = 100;
-	uint32_t ZERO32 = 0;
+	uint32 ZERO32 = 0;
 	memdbg_reset();
 	for (size_t range = 0; range < max_range; range++) {
-		SegTree *st = segtree_new(range, sizeof(uint32_t), segtree_merge_sum_uint32_t,
+		SegTree *st = segtree_new(range, sizeof(uint32), segtree_merge_sum_uint32,
 		                          &ZERO32);
-		uint32_t val = UINT32_MAX / MAX(1, range);
+		uint32 val = UINT32_MAX / MAX(1, range);
 		for (size_t i = 0; i < range; i++) {
-			segtree_upd_uint32_t(st, i, val);
+			segtree_upd_uint32(st, i, val);
 		}
 		for (size_t l = 0; l <= range; l++) {
 			for (size_t r = l; r <= range; r++) {
-				uint32_t actual = segtree_range_qry_uint32_t(st, l, r);
-				uint32_t expec = (r - l) * val;
+				uint32 actual = segtree_range_qry_uint32(st, l, r);
+				uint32 expec = (r - l) * val;
 				CuAssertULongEquals(tc, expec, actual);
 			}
 		}

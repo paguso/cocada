@@ -35,7 +35,7 @@ static size_t MIN_RANK_SAMPLE_INTERVAL =
     2 * BYTESIZE; // (!) THIS HAS TO BE A MULTIPLE OF BYTESIZE (!)
 
 struct _CSRSBitArr {
-	byte_t *data;
+	byte *data;
 	size_t len;
 	size_t byte_size;
 	size_t total_bit_count[2];
@@ -44,11 +44,11 @@ struct _CSRSBitArr {
 	size_t rank_samples_count;
 	size_t bytes_per_pos;
 	size_t bytes_per_byte_pos;
-	byte_t *rank_samples;
+	byte *rank_samples;
 	size_t sel_samples_bit_interval[2];
 	size_t sel_samples_count[2];
-	byte_t *byte_sel_samples[2];
-	byte_t *byte_sel_samples_corr[2];
+	byte *byte_sel_samples[2];
+	byte *byte_sel_samples_corr[2];
 };
 
 
@@ -71,24 +71,24 @@ static void init_rank_tables(CSRSBitArr *ba)
 		// read bytes greedily on a per max word basis
 #if BYTEWORDSIZE==8
 		while (byte_pos + 8 < next_group_byte_pos) {
-			cumul_rank += uint64_bitcount1(*((uint64_t *)(ba->data + byte_pos)));
+			cumul_rank += uint64_bitcount1(*((uint64 *)(ba->data + byte_pos)));
 			byte_pos += 8;
 		}
 		while (byte_pos + 4 < next_group_byte_pos) {
-			cumul_rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+			cumul_rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 			byte_pos += 4;
 		}
 		while (byte_pos + 2 < next_group_byte_pos) {
-			cumul_rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+			cumul_rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 			byte_pos += 2;
 		}
 #elif BYTEWORDSIZE==4
 		while (byte_pos + 4 < next_group_byte_pos) {
-			cumul_rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+			cumul_rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 			byte_pos += 4;
 		}
 		while (byte_pos + 2 < next_group_byte_pos) {
-			cumul_rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+			cumul_rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 			byte_pos += 2;
 		}
 #endif
@@ -106,24 +106,24 @@ static void init_rank_tables(CSRSBitArr *ba)
 	if (byte_pos * BYTESIZE < ba->len) {
 #if BYTEWORDSIZE==8
 		while (byte_pos + 8 < ba->byte_size - 1) {
-			cumul_rank += uint64_bitcount1(*((uint64_t *)(ba->data + byte_pos)));
+			cumul_rank += uint64_bitcount1(*((uint64 *)(ba->data + byte_pos)));
 			byte_pos += 8;
 		}
 		while (byte_pos + 4 < ba->byte_size - 1) {
-			cumul_rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+			cumul_rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 			byte_pos += 4;
 		}
 		while (byte_pos + 2 < ba->byte_size - 1) {
-			cumul_rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+			cumul_rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 			byte_pos += 2;
 		}
 #elif BYTEWORDSIZE==4
 		while (byte_pos + 4 < ba->byte_size - 1) {
-			cumul_rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+			cumul_rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 			byte_pos += 4;
 		}
 		while (byte_pos + 2 < ba->byte_size - 1) {
-			cumul_rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+			cumul_rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 			byte_pos += 2;
 		}
 #endif
@@ -165,7 +165,7 @@ static void init_select_tables(CSRSBitArr *ba)
 	ba->byte_sel_samples_corr[0] = bytearr_new(ba->sel_samples_count[0]);
 	ba->byte_sel_samples_corr[1] = bytearr_new(ba->sel_samples_count[1]);
 
-	for (byte_t bit = 0; bit <= 1; bit++) {
+	for (byte bit = 0; bit <= 1; bit++) {
 		byte_pos = 0;
 		group = 0;
 		cumul_rank = 0;
@@ -182,53 +182,53 @@ static void init_select_tables(CSRSBitArr *ba)
 		while (target_rank < ba->total_bit_count[bit]) {
 			// read bytes greedily on a per max word basis
 #if BYTEWORDSIZE==8
-			chunk_rank = uint64_bitcount( *((uint64_t *)(ba->data + byte_pos)),
+			chunk_rank = uint64_bitcount( *((uint64 *)(ba->data + byte_pos)),
 			                              bit );
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 8;
-				chunk_rank = uint64_bitcount(*((uint64_t *)(ba->data + byte_pos)),
+				chunk_rank = uint64_bitcount(*((uint64 *)(ba->data + byte_pos)),
 				                             bit );
 			}
-			chunk_rank = uint32_bitcount( *((uint32_t *)(ba->data + byte_pos)),
+			chunk_rank = uint32_bitcount( *((uint32 *)(ba->data + byte_pos)),
 			                              bit );
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 4;
-				chunk_rank = uint32_bitcount(*((uint32_t *)(ba->data + byte_pos)),
+				chunk_rank = uint32_bitcount(*((uint32 *)(ba->data + byte_pos)),
 				                             bit);
 			}
-			chunk_rank = uint16_bitcount( *((uint16_t *)(ba->data + byte_pos)),
+			chunk_rank = uint16_bitcount( *((uint16 *)(ba->data + byte_pos)),
 			                              bit );
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 2;
-				chunk_rank = uint16_bitcount(*((uint16_t *)(ba->data + byte_pos)),
+				chunk_rank = uint16_bitcount(*((uint16 *)(ba->data + byte_pos)),
 				                             bit);
 			}
 #elif BYTEWORDSIZE==4
-			chunk_rank = uint32_bitcount( *((uint32_t *)(ba->data + byte_pos)),
+			chunk_rank = uint32_bitcount( *((uint32 *)(ba->data + byte_pos)),
 			                              bit );
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 4;
-				chunk_rank = uint32_bitcount(*((uint32_t *)(ba->data + byte_pos)),
+				chunk_rank = uint32_bitcount(*((uint32 *)(ba->data + byte_pos)),
 				                             bit);
 			}
-			chunk_rank = uint16_bitcount( *((uint16_t *)(ba->data + byte_pos)),
+			chunk_rank = uint16_bitcount( *((uint16 *)(ba->data + byte_pos)),
 			                              bit );
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 2;
-				chunk_rank = uint16_bitcount(*((uint16_t *)(ba->data + byte_pos)),
+				chunk_rank = uint16_bitcount(*((uint16 *)(ba->data + byte_pos)),
 				                             bit);
 			}
 #endif
-			chunk_rank = byte_bitcount(*((byte_t *)(ba->data + byte_pos)), bit);
+			chunk_rank = byte_bitcount(*((byte *)(ba->data + byte_pos)), bit);
 			while (cumul_rank + chunk_rank < target_rank) {
 				cumul_rank += chunk_rank;
 				byte_pos += 1;
-				chunk_rank = byte_bitcount( *((byte_t *)(ba->data + byte_pos)),
+				chunk_rank = byte_bitcount( *((byte *)(ba->data + byte_pos)),
 				                            bit );
 			}
 
@@ -237,7 +237,7 @@ static void init_select_tables(CSRSBitArr *ba)
 			                      byte_pos, ba->bytes_per_byte_pos );
 
 			// add select samples corrections
-			ba->byte_sel_samples_corr[bit][group] = (byte_t)(target_rank - cumul_rank);
+			ba->byte_sel_samples_corr[bit][group] = (byte)(target_rank - cumul_rank);
 
 			group++;
 			target_rank += ba->sel_samples_bit_interval[bit];
@@ -246,7 +246,7 @@ static void init_select_tables(CSRSBitArr *ba)
 }
 
 
-CSRSBitArr *csrsbitarr_new(byte_t *ba, size_t len)
+CSRSBitArr *csrsbitarr_new(byte *ba, size_t len)
 {
 	CSRSBitArr *ret;
 	ret = NEW(CSRSBitArr);
@@ -279,7 +279,7 @@ void csrsbitarr_free(CSRSBitArr *ba, bool free_data)
 }
 
 
-const byte_t *csrsbitarr_data(CSRSBitArr *ba)
+const byte *csrsbitarr_data(CSRSBitArr *ba)
 {
 	return ba->data;
 }
@@ -386,24 +386,24 @@ size_t csrsbitarr_rank1(CSRSBitArr *ba, size_t pos)
 	// read bytes greedily on a per max word basis
 #if BYTEWORDSIZE==8
 	while (byte_pos + 8 < last_byte) {
-		rank += uint64_bitcount1(*((uint64_t *)(ba->data + byte_pos)));
+		rank += uint64_bitcount1(*((uint64 *)(ba->data + byte_pos)));
 		byte_pos += 8;
 	}
 	while (byte_pos + 4 < last_byte) {
-		rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+		rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 		byte_pos += 4;
 	}
 	while (byte_pos + 2 < last_byte) {
-		rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+		rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 		byte_pos += 2;
 	}
 #elif BYTEWORDSIZE==4
 	while (byte_pos + 4 < last_byte) {
-		rank += uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos)));
+		rank += uint32_bitcount1(*((uint32 *)(ba->data + byte_pos)));
 		byte_pos += 4;
 	}
 	while (byte_pos + 2 < last_byte) {
-		rank += uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos)));
+		rank += uint16_bitcount1(*((uint16 *)(ba->data + byte_pos)));
 		byte_pos += 2;
 	}
 #endif
@@ -464,21 +464,21 @@ size_t csrsbitarr_select0(CSRSBitArr *ba, size_t rank)
 #if BYTEWORDSIZE==8
 	while ( byte_pos + 8 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint64_bitcount0(*((uint64_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint64_bitcount0(*((uint64 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 8;
 	}
 	while ( byte_pos + 4 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint32_bitcount0(*((uint32_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint32_bitcount0(*((uint32 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 4;
 	}
 	while ( byte_pos + 2 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint16_bitcount0(*((uint16_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint16_bitcount0(*((uint16 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 2;
@@ -486,14 +486,14 @@ size_t csrsbitarr_select0(CSRSBitArr *ba, size_t rank)
 #elif BYTEWORDSIZE==4
 	while ( byte_pos + 4 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint32_bitcount0(*((uint32_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint32_bitcount0(*((uint32 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 4;
 	}
 	while ( byte_pos + 2 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint16_bitcount0(*((uint16_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint16_bitcount0(*((uint16 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 2;
@@ -501,7 +501,7 @@ size_t csrsbitarr_select0(CSRSBitArr *ba, size_t rank)
 #endif
 	while ( byte_pos < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = byte_bitcount0(*((byte_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = byte_bitcount0(*((byte *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 1;
@@ -549,21 +549,21 @@ size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank)
 #if BYTEWORDSIZE==8
 	while ( byte_pos + 8 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint64_bitcount1(*((uint64_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint64_bitcount1(*((uint64 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 8;
 	}
 	while ( byte_pos + 4 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint32_bitcount1(*((uint32 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 4;
 	}
 	while ( byte_pos + 2 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint16_bitcount1(*((uint16 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 2;
@@ -571,14 +571,14 @@ size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank)
 #elif BYTEWORDSIZE==4
 	while ( byte_pos + 4 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint32_bitcount1(*((uint32_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint32_bitcount1(*((uint32 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 4;
 	}
 	while ( byte_pos + 2 < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = uint16_bitcount1(*((uint16_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = uint16_bitcount1(*((uint16 *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 2;
@@ -586,7 +586,7 @@ size_t csrsbitarr_select1(CSRSBitArr *ba, size_t rank)
 #endif
 	while ( byte_pos < last_byte &&
 	        cumul_rank
-	        + (chunk_rank = byte_bitcount1(*((byte_t *)(ba->data + byte_pos))))
+	        + (chunk_rank = byte_bitcount1(*((byte *)(ba->data + byte_pos))))
 	        <= rank ) {
 		cumul_rank += chunk_rank;
 		byte_pos += 1;

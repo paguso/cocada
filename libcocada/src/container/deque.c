@@ -92,14 +92,14 @@ size_t deque_len(const Deque *q)
 const void *deque_get(const Deque *q, size_t pos)
 {
 	assert(pos < q->len);
-	return (byte_t *)q->data + ( ((q->start + pos) % q->cap) * q->typesize );
+	return (byte *)q->data + ( ((q->start + pos) % q->cap) * q->typesize );
 }
 
 
 void deque_get_cpy(const Deque *q, size_t pos, void *dest )
 {
 	assert(pos < q->len);
-	memcpy(dest, (byte_t *)q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
+	memcpy(dest, (byte *)q->data + ( ((q->start + pos) % q->cap) * q->typesize ),
 	       q->typesize);
 }
 
@@ -124,20 +124,20 @@ static void check_and_resize(Deque *q)
 		q->data = realloc(q->data, q->cap * q->typesize);
 		if (q->start == 0) return;
 		offset = q->cap - offset;
-		memmove( (byte_t *)q->data + (q->start + offset) * q->typesize,
-		         (byte_t *)q->data + (q->start * q->typesize),
+		memmove( (byte *)q->data + (q->start + offset) * q->typesize,
+		         (byte *)q->data + (q->start * q->typesize),
 		         (q->len - q->start) * q->typesize );
 		q->start += offset;
 	}
 	else if (q->len < (MIN_LOAD * q->cap)) {
 		if ((q->start + q->len) < q->cap) {
-			memmove(q->data, (byte_t *)q->data + (q->start * q->typesize),
+			memmove(q->data, (byte *)q->data + (q->start * q->typesize),
 			        q->len * q->typesize);
 		}
 		else {
-			memmove( (byte_t *)q->data + (q->cap - q->start) * q->typesize,
-			         (byte_t *)q->data, ((q->start + q->len) % q->cap) * q->typesize );
-			memmove( q->data,  (byte_t *)q->data + (q->start * q->typesize),
+			memmove( (byte *)q->data + (q->cap - q->start) * q->typesize,
+			         (byte *)q->data, ((q->start + q->len) % q->cap) * q->typesize );
+			memmove( q->data,  (byte *)q->data + (q->start * q->typesize),
 			         (q->cap - q->start) * q->typesize );
 		}
 		q->cap = MAX(q->len / MIN_LOAD, MIN_CAPACITY);
@@ -150,7 +150,7 @@ static void check_and_resize(Deque *q)
 void deque_push_back(Deque *q, const void *elt)
 {
 	check_and_resize(q);
-	memcpy((byte_t *)q->data + (((q->start + q->len) % q->cap) * q->typesize), elt,
+	memcpy((byte *)q->data + (((q->start + q->len) % q->cap) * q->typesize), elt,
 	       q->typesize);
 	q->len++;
 }
@@ -160,7 +160,7 @@ void deque_push_front(Deque *q, const void *elt)
 {
 	check_and_resize(q);
 	q->start = (q->start + (q->cap - 1)) % q->cap;
-	memcpy((byte_t *)q->data + (q->start * q->typesize), elt, q->typesize);
+	memcpy((byte *)q->data + (q->start * q->typesize), elt, q->typesize);
 	q->len++;
 }
 
@@ -168,8 +168,8 @@ void deque_push_front(Deque *q, const void *elt)
 void deque_pop_back(Deque *q, void *dest)
 {
 	assert(q->len > 0);
-	memcpy(dest, (byte_t *)q->data + (((q->start + q->len - 1) % q->cap) *
-	                                  q->typesize),
+	memcpy(dest, (byte *)q->data + (((q->start + q->len - 1) % q->cap) *
+	                                q->typesize),
 	       q->typesize);
 	q->len--;
 	check_and_resize(q);
@@ -187,7 +187,7 @@ void deque_del_back(Deque *q)
 void deque_pop_front(Deque *q, void *dest)
 {
 	assert(q->len > 0);
-	memcpy(dest, (byte_t *)q->data + (q->start * q->typesize), q->typesize);
+	memcpy(dest, (byte *)q->data + (q->start * q->typesize), q->typesize);
 	q->len--;
 	q->start = (q->start + 1) % q->cap;
 	check_and_resize(q);

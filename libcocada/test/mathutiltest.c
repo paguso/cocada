@@ -141,7 +141,7 @@ void test_is_prime_mr(CuTest *tc)
 	//bool a = is_prime_mr(18023405708736723011);
 	//bool b = is_prime_naive(18023405708736723011);
 
-	uint64_t val = 1;
+	uint64 val = 1;
 	for (size_t p = 0; p < 63; p++) {
 		for (size_t n = 0; n < 1000; n++) {
 			bool ispr = is_prime_mr(val);
@@ -159,10 +159,10 @@ void test_is_prime_mr(CuTest *tc)
 
 void test_prime_succ(CuTest *tc)
 {
-	for (uint64_t n = 0; n < 100000; n++) {
-		uint64_t psucc = prime_succ(n);
+	for (uint64 n = 0; n < 100000; n++) {
+		uint64 psucc = prime_succ(n);
 		DEBUG("The prime successor of %"PRIu64" is %"PRIu64"\n", n, psucc);
-		for (uint64_t s = n + 1; s < psucc; s++) {
+		for (uint64 s = n + 1; s < psucc; s++) {
 			CuAssert(tc, "Prime successor not minimal", !is_prime_mr(s));
 		}
 		CuAssert(tc, "Prime successor is NOT a prime", is_prime_mr(psucc));

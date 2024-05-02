@@ -37,7 +37,7 @@
  *        for an element. This key is then used internally to determine the
  *        location in which the element will be stored.
  */
-typedef uint64_t (*HashFunc)(const void *);
+typedef uint64 (*HashFunc)(const void *);
 
 
 /**
@@ -51,15 +51,15 @@ typedef bool (*EqualsFunc)(const void *, const void *);
 
 /**
  * @brief Identity hash for integer types that simply returns the value
- * converted to uint64_t
+ * converted to uint64
  * Example
  * ```
- * uint64_t ident_hash_short(const void *key)
+ * uint64 ident_hash_short(const void *key)
  * ```
- * Takes a raw pointer to a short (key) and returns its value as a uint64_t
+ * Takes a raw pointer to a short (key) and returns its value as a uint64
  */
 #define IDENT_HASH_DECL( TYPE, ... ) \
-	uint64_t ident_hash_##TYPE(const void *key);
+	uint64 ident_hash_##TYPE(const void *key);
 
 XX_PRIMITIVES(IDENT_HASH_DECL)
 
@@ -67,13 +67,13 @@ XX_PRIMITIVES(IDENT_HASH_DECL)
  * @brief Fibonacci hashing
  * @see source: https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
  */
-uint64_t fib_hash(uint64_t key);
+uint64 fib_hash(uint64 key);
 
 /**
  * Simplified 64-bit FNV hashing
  * @see source: http://www.isthe.com/chongo/tech/comp/fnv
  */
-uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize);
+uint64 fnv1a_64bit_hash(const void *obj, size_t objsize);
 
 
 #endif

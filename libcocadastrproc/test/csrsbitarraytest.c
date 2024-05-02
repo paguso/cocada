@@ -36,8 +36,8 @@
 #include "CuTest.h"
 
 static size_t nof_arrays;
-static byte_t *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
-static byte_t **all_ba;
+static byte *ba_zeros, *ba_ones, *ba_odd, *ba_even, *ba_rand, *ba_alt;
+static byte **all_ba;
 static CSRSBitArr *csrsba_zeros, *csrsba_ones, *csrsba_odd, *csrsba_even,
        *csrsba_rand, *csrsba_alt;
 static CSRSBitArr **all_srsba;
@@ -57,7 +57,7 @@ static void reset_arrays()
 			ba_odd[i] |= ((0x1) << j);
 			ba_even[i] |= ((0x2) << j);
 		}
-		ba_rand[i] = (byte_t)rand();
+		ba_rand[i] = (byte)rand();
 		ba_alt[i] = (i % 2) ? (~0x0) : 0x0;
 	}
 }
@@ -80,7 +80,7 @@ void csrsbitarr_test_setup(CuTest *tc)
 	//bitarr_print(ba_odd, ba_size, 4);
 	//ba_print(ba_even, ba_size, 4);
 	//ba_print(ba_rand, ba_size, 4);
-	all_ba = malloc(nof_arrays * sizeof(byte_t *));
+	all_ba = malloc(nof_arrays * sizeof(byte *));
 	all_ba[0] = ba_zeros;
 	all_ba[1] = ba_ones;
 	all_ba[2] = ba_odd;
@@ -282,7 +282,7 @@ void test_csrsbitarr_select1(CuTest *tc)
 
 void test_csrsbitarr_pred(CuTest *tc)
 {
-	for (byte_t bit = 0; bit <= 1; bit++) {
+	for (byte bit = 0; bit <= 1; bit++) {
 		for (size_t b = 0; b < nof_arrays; b++) {
 			CSRSBitArr *ba = all_srsba[b];
 
@@ -302,7 +302,7 @@ void test_csrsbitarr_pred(CuTest *tc)
 
 void test_csrsbitarr_succ(CuTest *tc)
 {
-	for (byte_t bit = 0; bit <= 1; bit++) {
+	for (byte bit = 0; bit <= 1; bit++) {
 		for (size_t b = 0; b < nof_arrays; b++) {
 			CSRSBitArr *ba = all_srsba[b];
 
@@ -322,7 +322,7 @@ void test_csrsbitarr_succ(CuTest *tc)
 
 void csrsbitarr_test_empty(CuTest *tc)
 {
-	byte_t *ba_empty = ARR_NEW(byte_t, 0);
+	byte *ba_empty = ARR_NEW(byte, 0);
 	CSRSBitArr *b = csrsbitarr_new(ba_empty, 0);
 	for (size_t i = 0; i < 2; i++) {
 		//csrsbitarr_get(b, i);

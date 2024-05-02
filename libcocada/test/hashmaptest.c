@@ -36,8 +36,8 @@
 void test_hashmap_int(CuTest *tc)
 {
 	memdbg_reset();
-	HashMap *hmap = hashmap_new(sizeof(uint32_t), sizeof(uint32_t),
-	                            ident_hash_uint32_t, eq_uint32_t);
+	HashMap *hmap = hashmap_new(sizeof(uint32), sizeof(uint32),
+	                            ident_hash_uint32, eq_uint32);
 
 	size_t n = 1000000;
 	for (int i = 0; i < n; i++) {
@@ -70,8 +70,8 @@ void test_hashmap_int(CuTest *tc)
 
 
 typedef struct {
-	uint64_t k1;
-	uint64_t k2;
+	uint64 k1;
+	uint64 k2;
 	char *k3;
 } object;
 
@@ -79,12 +79,12 @@ void object_finalise(void *ptr, const Finaliser *fnr)
 {
 }
 
-uint64_t hash_bin_str(const void *key)
+uint64 hash_bin_str(const void *key)
 {
 	char *s = ((char **)key)[0];
 	size_t n = strlen(s);
-	uint64_t h = 0;
-	uint64_t pow = 2;
+	uint64 h = 0;
+	uint64 pow = 2;
 	for (size_t i = 0; i < n; i++) {
 		h = (pow * h) +  (s[i] - '0');
 	}
@@ -104,11 +104,11 @@ void test_hashmap_obj(CuTest *tc)
 	HashMap *hmap = hashmap_new(sizeof(char *), sizeof(object), hash_bin_str,
 	                            bin_str_eq);
 
-	uint64_t n = 100;
-	uint64_t mink = 1;
+	uint64 n = 100;
+	uint64 mink = 1;
 	mink <<= 32;
-	uint64_t maxk = mink + n;
-	for (uint64_t i = mink; i < maxk; i++) {
+	uint64 maxk = mink + n;
+	for (uint64 i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		//printf("%zu => adding %s to hashmap\n", i-mink, k);
@@ -117,7 +117,7 @@ void test_hashmap_obj(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (uint64_t i = mink; i < maxk; i++) {
+	for (uint64 i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &k));
@@ -129,7 +129,7 @@ void test_hashmap_obj(CuTest *tc)
 	}
 	CuAssertSizeTEquals(tc, n, hashmap_size(hmap));
 
-	for (uint64_t i = mink; i < maxk; i += 2) {
+	for (uint64 i = mink; i < maxk; i += 2) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		CuAssert(tc, "map should contain key", hashmap_contains(hmap, &k));
@@ -144,7 +144,7 @@ void test_hashmap_obj(CuTest *tc)
 
 	hashmap_fit(hmap);
 
-	for (uint64_t i = mink; i < maxk; i++) {
+	for (uint64 i = mink; i < maxk; i++) {
 		char *k = cstr_new(64);
 		uint_to_cstr(k, i, 'b');
 		if (i % 2) {

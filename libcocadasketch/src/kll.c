@@ -81,10 +81,10 @@ KLLSumm *kll_new_own_with_cap(size_t typesize, CmpFunc cmp, double err,
 	ret->typesize = typesize;
 	ret->cmp = cmp;
 	ret->buffs = vec_new(sizeof(Vec *));
-	ret->coins = vec_new(sizeof(byte_t));
+	ret->coins = vec_new(sizeof(byte));
 	Vec *buf = vec_new(typesize);
 	vec_push_rawptr(ret->buffs, buf);
-	vec_push_byte_t(ret->coins, 0);
+	vec_push_byte(ret->coins, 0);
 	ret->npts = 0;
 	// adjust parameters
 	double cap = (double) MAX(KLL_DEFAULT_CAP, capacity);
@@ -149,15 +149,15 @@ static void _compress(KLLSumm *self)
 			else {
 				nxtbuf = vec_new(self->typesize);
 				vec_push_rawptr(self->buffs, nxtbuf);
-				vec_push_byte_t(self->coins, 0);
+				vec_push_byte(self->coins, 0);
 			}
-			byte_t coin =  vec_get_byte_t(self->coins, i);
+			byte coin =  vec_get_byte(self->coins, i);
 			if (coin == 0) {
 				coin = rand_next() % 2;
-				vec_set_byte_t(self->coins, i, coin + 1);
+				vec_set_byte(self->coins, i, coin + 1);
 			}
 			else {
-				vec_set_byte_t(self->coins, i, 0);
+				vec_set_byte(self->coins, i, 0);
 			}
 			size_t j = coin;
 			size_t l = vec_len(buf);
@@ -211,11 +211,11 @@ static size_t _rank(Vec *buf, void *val, CmpFunc cmp)
 
 size_t kll_rank(KLLSumm *self, void *val)
 {
-	uint64_t ret = 0,  pow = 1;
+	uint64 ret = 0,  pow = 1;
 	for (size_t i = 0, l = _nlevels(self); i < l; i++) {
 		Vec *buf = (Vec *)vec_get_rawptr(self->buffs, i);
 		//vec_qsort(buf, self->cmp);
-		uint64_t rk = _rank(buf, val, self->cmp);
+		uint64 rk = _rank(buf, val, self->cmp);
 		ret += (rk * pow);
 		pow *= 2;
 	}

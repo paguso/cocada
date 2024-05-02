@@ -33,8 +33,8 @@
 #include "strstream.h"
 
 
-static const byte_t S = 0;
-static const byte_t L = 1;
+static const byte S = 0;
+static const byte L = 1;
 
 
 #define UNSET SIZE_MAX
@@ -85,7 +85,7 @@ static void init_LS( void *str, size_t len, Alphabet *ab,
                      bool add_sentinel, char_at_fn char_at)
 {
 	size_t last = 0;
-	byte_t ls, lastls;
+	byte ls, lastls;
 	int cmp;
 	for (size_t i = 1; i < len; i++) {
 		cmp = alphabet_cmp(ab, char_at(str, i - 1), char_at(str, i));

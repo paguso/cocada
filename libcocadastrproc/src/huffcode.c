@@ -42,13 +42,13 @@
 #include "xstr.h"
 #include "xstrread.h"
 
-static const byte_t LEFT = 0;
-static const byte_t RIGHT = 1;
+static const byte LEFT = 0;
+static const byte RIGHT = 1;
 
 struct _hufftnode {
 	size_t chr_rank;
 	hufftnode *chd[2];
-	byte_t *ab_mask;
+	byte *ab_mask;
 };
 
 struct _huffcode {
@@ -69,7 +69,7 @@ static int nodefreq_cmp(const void *p1, const void *p2)
 }
 
 static void fill_code_table(huffcode *hcode, const hufftnode *node,
-                            size_t code_len, byte_t *code)
+                            size_t code_len, byte *code)
 {
 	if (hufftnode_is_leaf(node)) {
 		hcode->code[node->chr_rank] = bitvec_new_from_bitarr(code, code_len);
@@ -128,7 +128,7 @@ huffcode *huffcode_new(const Alphabet *ab, const size_t freqs[])
 
 	hcode->code = ARR_NEW(BitVec *, hcode->size);
 	if (hcode->size) {
-		byte_t *chrcode = bitarr_new(hcode->size);
+		byte *chrcode = bitarr_new(hcode->size);
 		fill_code_table(hcode, huffcode_tree(hcode), 0, chrcode);
 		FREE(chrcode);
 	}
@@ -350,7 +350,7 @@ const hufftnode *hufftnode_right(const hufftnode *node)
 	return node->chd[RIGHT];
 }
 
-const byte_t *hufftnode_ab_mask(const hufftnode *node)
+const byte *hufftnode_ab_mask(const hufftnode *node)
 {
 	return node->ab_mask;
 }

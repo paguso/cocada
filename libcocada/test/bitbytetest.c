@@ -32,8 +32,8 @@
 
 void test_byte_reverse(CuTest *tc)
 {
-	for (byte_t b = 0; b < BYTE_MAX; b++) {
-		byte_t bc = b;
+	for (byte b = 0; b < BYTE_MAX; b++) {
+		byte bc = b;
 		byte_reverse(&bc);
 		byte_reverse(&bc);
 		CuAssertIntEquals(tc, b, bc);
@@ -41,43 +41,43 @@ void test_byte_reverse(CuTest *tc)
 }
 
 
-void test_byte_to_str(CuTest *tc)
+void test_byteo_str(CuTest *tc)
 {
 	CuAssert(tc, "Tests require BYTESIZE==8", BYTESIZE == 8);
-	byte_t b;
+	byte b;
 	char str[BYTESIZE + 1];
 	b = 0x01;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "00000001", str);
 	b = 0x23;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "00100011", str);
 	b = 0x45;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "01000101", str);
 	b = 0x67;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "01100111", str);
 	b = 0x89;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "10001001", str);
 	b = 0xab;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "10101011", str);
 	b = 0xcd;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "11001101", str);
 	b = 0xef;
-	byte_to_str(b, str);
+	byteo_str(b, str);
 	CuAssertStrEquals(tc, "11101111", str);
 
 	printf("start converting\n");
 	size_t n = 1ll << 8;
 	for (size_t i = 0; i < n; i++) {
-		b = (byte_t) i;
-		byte_to_str(b, str);
+		b = (byte) i;
+		byteo_str(b, str);
 		DEBUG("%"PRIbB" = %s\n", BYTESTRB(b), str);
-		byte_to_strx(b, str);
+		byteo_strx(b, str);
 		DEBUG("%"PRIbX" = %s\n", BYTESTRX(b), str);
 	}
 
@@ -87,9 +87,9 @@ void test_byte_to_str(CuTest *tc)
 
 void test_byte_bitcount(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (byte_t n = 0; n < BYTE_MAX; n++) {
-			byte_t b = n;
+	for (byte bit = 0; bit < 2; bit++) {
+		for (byte n = 0; n < BYTE_MAX; n++) {
+			byte b = n;
 			size_t actual = byte_bitcount(b, bit);
 			size_t expected = 0;
 			for (size_t j = 0; j < BYTESIZE; j++) {
@@ -105,9 +105,9 @@ void test_byte_bitcount(CuTest *tc)
 
 void test_uint16_bitcount(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (uint16_t n = 0; n < UINT16_MAX; n++) {
-			uint16_t b = n;
+	for (byte bit = 0; bit < 2; bit++) {
+		for (uint16 n = 0; n < UINT16_MAX; n++) {
+			uint16 b = n;
 			size_t actual = uint16_bitcount(b, bit);
 			size_t expected = 0;
 			for (size_t j = 0; j < 16; j++) {
@@ -123,9 +123,9 @@ void test_uint16_bitcount(CuTest *tc)
 
 void test_uint32_bitcount(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (uint32_t n = 1; n < UINT32_MAX; n = (n << 1) + 1) {
-			uint32_t b = n;
+	for (byte bit = 0; bit < 2; bit++) {
+		for (uint32 n = 1; n < UINT32_MAX; n = (n << 1) + 1) {
+			uint32 b = n;
 			size_t actual = uint32_bitcount(b, bit);
 			size_t expected = 0;
 			for (size_t j = 0; j < 32; j++) {
@@ -141,9 +141,9 @@ void test_uint32_bitcount(CuTest *tc)
 
 void test_uint64_bitcount(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (uint64_t n = 1; n < UINT64_MAX; n = (n << 1) + 1) {
-			uint64_t b = n;
+	for (byte bit = 0; bit < 2; bit++) {
+		for (uint64 n = 1; n < UINT64_MAX; n = (n << 1) + 1) {
+			uint64 b = n;
 			size_t actual = uint64_bitcount(b, bit);
 			size_t expected = 0;
 			for (size_t j = 0; j < 64; j++) {
@@ -159,11 +159,11 @@ void test_uint64_bitcount(CuTest *tc)
 
 void test_byte_rank(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (byte_t n = 0; n < BYTE_MAX; n++) {
+	for (byte bit = 0; bit < 2; bit++) {
+		for (byte n = 0; n < BYTE_MAX; n++) {
 			for (size_t i = 0; i < BYTESIZE; i++) {
 				size_t rk = byte_rank(n, i, bit);
-				byte_t b = n;
+				byte b = n;
 				byte_reverse(&b);
 				size_t j = 0, cnt = 0;
 				while (j < i) {
@@ -184,13 +184,13 @@ void test_byte_rank(CuTest *tc)
 
 void test_byte_select(CuTest *tc)
 {
-	for (byte_t bit = 0; bit < 2; bit++) {
-		for (byte_t n = 0; n < BYTE_MAX; n++) {
+	for (byte bit = 0; bit < 2; bit++) {
+		for (byte n = 0; n < BYTE_MAX; n++) {
 			size_t s = byte_select(n, BYTESIZE, bit);
 			CuAssertSizeTEquals(tc, BYTESIZE, s);
 			for (size_t rk = 0, c = byte_bitcount(n, bit); rk < c; rk++) {
 				size_t s = byte_select(n, rk, bit);
-				byte_t b = n;
+				byte b = n;
 				byte_reverse(&b);
 				size_t j = 0, cnt = 0;
 				while (cnt <= rk) {
@@ -208,11 +208,11 @@ void test_byte_select(CuTest *tc)
 
 void test_uint16_lohibit(CuTest *tc)
 {
-	for (uint16_t x = 0 ; x < UINT16_MAX; x++) {
+	for (uint16 x = 0 ; x < UINT16_MAX; x++) {
 		uint lb = uint16_lobit(x);
 		uint hb = uint16_hibit(x);
 		int lbbf = -1;
-		uint16_t y = x;
+		uint16 y = x;
 		while ((y > 0)) {
 			lbbf++;
 			if (y % 2 == 1) {
@@ -236,19 +236,19 @@ void test_uint16_lohibit(CuTest *tc)
 
 void test_uint32_lohibit(CuTest *tc)
 {
-	uint32_t y, x = 0;
+	uint32 y, x = 0;
 	int hbbf = 0, hb, lbbf = 0, lb;
-	for (byte_t *b = (byte_t *)&x, *end = (byte_t *)(&x + 1); b < end; b++) {
+	for (byte *b = (byte *)&x, *end = (byte *)(&x + 1); b < end; b++) {
 		for (int v = 0; v < 256; v++) {
 			x = 0;
-			*b = (byte_t)v;
+			*b = (byte)v;
 			lb = uint32_lobit(x);
 			y = x;
-			for (lbbf = 0; lbbf < 32 && (~y & (uint32_t)1) ; y >>= 1, lbbf++);
+			for (lbbf = 0; lbbf < 32 && (~y & (uint32)1) ; y >>= 1, lbbf++);
 			lbbf = lbbf >= 0 ? lbbf : 32;
 			CuAssertUIntEquals(tc, lbbf, lb);
 			x = 0;
-			*b = (byte_t)v;
+			*b = (byte)v;
 			hb = uint32_hibit(x);
 			y = x;
 			for (hbbf = -1; y ; y >>= 1, hbbf++);
@@ -261,18 +261,18 @@ void test_uint32_lohibit(CuTest *tc)
 
 void test_uint64_lohibit(CuTest *tc)
 {
-	uint64_t x = 0;
+	uint64 x = 0;
 	int hbbf = 0, hb, lbbf = 0, lb;
-	for (byte_t *b = (byte_t *)&x, *end = (byte_t *)(&x + 1); b < end; b++) {
+	for (byte *b = (byte *)&x, *end = (byte *)(&x + 1); b < end; b++) {
 		for (int v = 0; v < 256; v++) {
 			x = 0;
-			*b = (byte_t)v;
+			*b = (byte)v;
 			lb = uint64_lobit(x);
-			for (lbbf = 0; lbbf < 64 && (~x & (uint64_t)1) ; x >>= 1, lbbf++);
+			for (lbbf = 0; lbbf < 64 && (~x & (uint64)1) ; x >>= 1, lbbf++);
 			lbbf = lbbf >= 0 ? lbbf : 64;
 			CuAssertUIntEquals(tc, lbbf, lb);
 			x = 0;
-			*b = (byte_t)v;
+			*b = (byte)v;
 			hb = uint64_hibit(x);
 			for (hbbf = -1; x ; x >>= 1, hbbf++);
 			hbbf = hbbf >= 0 ? hbbf : 64;
@@ -287,7 +287,7 @@ CuSuite *bitbyte_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_byte_reverse);
-	SUITE_ADD_TEST(suite, test_byte_to_str);
+	SUITE_ADD_TEST(suite, test_byteo_str);
 	SUITE_ADD_TEST(suite, test_byte_bitcount);
 	SUITE_ADD_TEST(suite, test_uint16_bitcount);
 	SUITE_ADD_TEST(suite, test_uint32_bitcount);
