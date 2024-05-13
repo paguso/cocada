@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "CuTest.h"
-#include "read.h"
+#include "reader.h"
 #include "filereader.h"
 
 static char *filename = "test_strfileread.txt";
@@ -53,17 +53,17 @@ void test_getc(CuTest *tc)
 	usize n = strlen(file_content);
 	char c;
 	for (usize i = 0; i < n; i++) {
-		c = read_getc(FileReader_as_Read(sfr));
+		c = reader_getc(FileReader_as_Reader(sfr));
 		CuAssertCharEquals(tc, file_content[i], c);
 	}
-	c = read_getc(FileReader_as_Read(sfr));
+	c = reader_getc(FileReader_as_Reader(sfr));
 	CuAssertIntEquals(tc, EOF, c);
 	test_teardown();
 }
 
 
 
-CuSuite *strfileread_get_test_suite()
+CuSuite *filereader_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_getc);

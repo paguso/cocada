@@ -29,7 +29,7 @@
 #include "bitbyte.h"
 #include "bitvec.h"
 #include "new.h"
-#include "read.h"
+#include "reader.h"
 #include "xstr.h"
 #include "xstrread.h"
 
@@ -58,13 +58,13 @@
 /**
  * Huffman code type
  */
-typedef struct _huffcode huffcode;
+typedef struct _HuffCode HuffCode;
 
 
 /**
  * Huffman Tree node type
  */
-typedef struct _hufftnode hufftnode;
+typedef struct _HuffTreeNode HuffTreeNode;
 
 
 /**
@@ -72,7 +72,7 @@ typedef struct _hufftnode hufftnode;
  * @param ab (no transfer) The base alphabet.
  * @param freqs (no transfer) Individual letter frequencies in lexycographic order.
  */
-huffcode *huffcode_new(const Alphabet *ab, const usize *freqs);
+HuffCode *huffcode_new(const Alphabet *ab, const usize *freqs);
 
 
 /**
@@ -80,7 +80,7 @@ huffcode *huffcode_new(const Alphabet *ab, const usize *freqs);
  * @param ab (no transfer) The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_str(const Alphabet *ab, const char *src);
+HuffCode *huffcode_new_from_str(const Alphabet *ab, const char *src);
 
 
 /**
@@ -88,7 +88,7 @@ huffcode *huffcode_new_from_str(const Alphabet *ab, const char *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_strread(const Alphabet *ab, Read *src);
+HuffCode *huffcode_new_from_strread(const Alphabet *ab, Reader *src);
 
 
 /**
@@ -96,7 +96,7 @@ huffcode *huffcode_new_from_strread(const Alphabet *ab, Read *src);
  * @param ab (no transfer) The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src);
+HuffCode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src);
 
 
 /**
@@ -104,78 +104,78 @@ huffcode *huffcode_new_from_xstr(const Alphabet *ab, const xstr *src);
  * @param (no transfer) ab The base alphabet.
  * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
  */
-huffcode *huffcode_new_from_xstrread(const Alphabet *ab, xstrRead *src);
+HuffCode *huffcode_new_from_xstrread(const Alphabet *ab, xstrRead *src);
 
 
 
 /**
  * @brief Destructor.
  */
-void huffcode_free(huffcode *hcode);
+void huffcode_free(HuffCode *hcode);
 
 
 /**
  * @brief Prints a string representation of the HC to the std output.
  */
-void huffcode_print(FILE *stream, const huffcode *hcode);
+void huffcode_print(FILE *stream, const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-BitVec *huffcode_encode(const char *src, usize len, const huffcode *code);
+BitVec *huffcode_encode(const char *src, usize len, const HuffCode *code);
 
 
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
 void huffcode_encode_to(BitVec *dest, const char *src, usize len,
-                        const huffcode *hcode);
+                        const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a string @p src of length @p len.
  */
-BitVec *huffcode_encode_xstr(const xstr *src, const huffcode *code);
+BitVec *huffcode_encode_xstr(const xstr *src, const HuffCode *code);
 
 
 /**
  * @brief Encodes a string @p src of length @p len to a given destination.
  */
 void huffcode_encode_xstr_to(BitVec *dest, const xstr *src,
-                             const huffcode *hcode);
+                             const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a source stream into a binary code.
  */
-BitVec *huffcode_encode_strread(Read *src, const huffcode *hcode);
+BitVec *huffcode_encode_strread(Reader *src, const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
-void huffcode_encode_strread_to(BitVec *dest, Read *src,
-                                const huffcode *hcode);
+void huffcode_encode_strread_to(BitVec *dest, Reader *src,
+                                const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a source stream into a binary code.
  */
-BitVec *huffcode_encode_xstrread(xstrRead *src, const huffcode *hcode);
+BitVec *huffcode_encode_xstrread(xstrRead *src, const HuffCode *hcode);
 
 
 /**
  * @brief Encodes a source stream to a given destination.
  */
 void huffcode_encode_xstrread_to(BitVec *dest, xstrRead *src,
-                                 const huffcode *hcode);
+                                 const HuffCode *hcode);
 
 
 /**
  * @brief Decodes a binary code to a string.
  */
-xstr *huffcode_decode(const BitVec *code, const huffcode *hcode);
+xstr *huffcode_decode(const BitVec *code, const HuffCode *hcode);
 
 
 /**
@@ -183,41 +183,41 @@ xstr *huffcode_decode(const BitVec *code, const huffcode *hcode);
  * @param char_rank The rank of the char w.r.t. the code alphabet
  * @warn  Do NOT destroy of modify the returned bitvector.
  */
-const BitVec *huffcode_charcode(const huffcode *hcode, usize char_rank);
+const BitVec *huffcode_charcode(const HuffCode *hcode, usize char_rank);
 
 
 /**
  * @brief Returns the (root of the) Huffman tree corresponding to a given HC.
  * @warning Do NOT modify or destroy the returned value
  */
-const hufftnode *huffcode_tree(const huffcode *hcode);
+const HuffTreeNode *huffcode_tree(const HuffCode *hcode);
 
 
 /**
  * @brief Returns the alphabet from a given HC.
  * @warning Do NOT modify or destroy the returned value
  */
-const Alphabet *huffcode_ab(const huffcode *code);
+const Alphabet *huffcode_ab(const HuffCode *code);
 
 
 /**
  * @brief Checks whether a given HT node is a leaf.
  */
-bool hufftnode_is_leaf(const hufftnode *node);
+bool hufftreenode_is_leaf(const HuffTreeNode *node);
 
 
 /**
  * @brief Returns the left child of a HT node.
  * @warning Do NOT modify or destroy the returned value
  */
-const hufftnode *hufftnode_left(const hufftnode *node);
+const HuffTreeNode *hufftreenode_left(const HuffTreeNode *node);
 
 
 /**
  * @brief Returns the right child of a HT node.
  * @warning Do NOT modify or destroy the returned value
  */
-const hufftnode *hufftnode_right(const hufftnode *node);
+const HuffTreeNode *hufftreenode_right(const HuffTreeNode *node);
 
 
 /**
@@ -228,7 +228,7 @@ const hufftnode *hufftnode_right(const hufftnode *node);
  *
  * @warning Do NOT modify or destroy the returned value
  */
-const byte *hufftnode_ab_mask(const hufftnode *node);
+const byte *hufftreenode_ab_mask(const HuffTreeNode *node);
 
 
 /**
@@ -236,6 +236,6 @@ const byte *hufftnode_ab_mask(const hufftnode *node);
  *        of the corresponding letter in the represented alphabet.
  *        If the given HT @p node is not a leaf, returns the alphabet size.
  */
-usize hufftnode_char_rank(const hufftnode *node);
+usize hufftreenode_char_rank(const HuffTreeNode *node);
 
 #endif

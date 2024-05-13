@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 #include "result.h"
-#include "read.h"
+#include "reader.h"
 
 /**
  * @file fasta.h
@@ -64,7 +64,7 @@ typedef struct {
  */
 typedef struct {
 	char *descr;      	/**< Sequence descriptor */
-	Read *seqrdr;	/**< Sequence contents reader */
+	Reader *seqrdr;	/**< Sequence contents reader */
 	usize descr_offset;	/**< Descriptor offset from the start of the file **/
 	usize seq_offset;		/**< Sequence offset from the start of the file **/
 } FASTARecRdr;

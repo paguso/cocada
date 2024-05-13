@@ -50,7 +50,7 @@ CuSuite *segtree_get_test_suite();
 CuSuite *serialise_get_test_suite();
 CuSuite *sort_get_test_suite();
 CuSuite *stack_get_test_suite();
-CuSuite *strfileread_get_test_suite();
+CuSuite *filereader_get_test_suite();
 //CuSuite *tvec_get_test_suite();
 //CuSuite *twuhash_get_test_suite();
 CuSuite *vec_get_test_suite();

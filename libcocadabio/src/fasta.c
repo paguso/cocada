@@ -30,30 +30,30 @@
 #include "fasta.h"
 #include "new.h"
 #include "result.h"
-#include "read.h"
+#include "reader.h"
 #include "trait.h"
 #include "errlog.h"
 
-typedef struct _fastaread {
-	Read _t_Read;
+typedef struct _FastaReader {
+	Reader _t_Reader;
 	FILE *src;
 	usize file_pos;
-} fastaread;
+} FastaReader;
 
 
-IMPL_TRAIT(fastaread, Read)
+IMPL_TRAIT(FastaReader, Reader)
 
 
-static void _reset(Read *self)
+static void _reset(Reader *self)
 {
-	fastaread *fr = (fastaread *)self->impltor;
+	FastaReader *fr = (FastaReader *)self->impltor;
 	fseek(fr->src, fr->file_pos, SEEK_SET);
 }
 
 
-static int _getc(Read *self)
+static int _getc(Reader *self)
 {
-	fastaread *fr = (fastaread *)self->impltor;
+	FastaReader *fr = (FastaReader *)self->impltor;
 	int c = EOF;
 	while (true) {
 		c = fgetc(fr->src);
@@ -73,9 +73,9 @@ static int _getc(Read *self)
 }
 
 
-static usize _read_str(Read *self, char *dest, usize n)
+static usize _read_str(Reader *self, char *dest, usize n)
 {
-	FILE *src = ((fastaread *)self->impltor)->src;
+	FILE *src = ((FastaReader *)self->impltor)->src;
 	char *origdest = dest;
 	memset(dest, '\0', n + 1);
 	while ( !feof(src) && n > 0 ) {
@@ -96,9 +96,9 @@ static usize _read_str(Read *self, char *dest, usize n)
 }
 
 
-static usize _read_str_until(Read *self, char *dest, char delim)
+static usize _read_str_until(Reader *self, char *dest, char delim)
 {
-	FILE *src = ((fastaread *)self->impltor)->src;
+	FILE *src = ((FastaReader *)self->impltor)->src;
 	usize nread = 0;
 	char c;
 	while ( !feof(src) ) {
@@ -117,7 +117,7 @@ static usize _read_str_until(Read *self, char *dest, char delim)
 }
 
 
-static Read_vt _strread_vt  = {
+static Reader_vt _strread_vt  = {
 	.getc = _getc,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
@@ -125,12 +125,12 @@ static Read_vt _strread_vt  = {
 };
 
 
-static void _fastaread_init(fastaread *fr, FILE *src)
+static void _fastaread_init(FastaReader *fr, FILE *src)
 {
 
 	fr->src = src;
-	fr->_t_Read.impltor = fr;
-	fr->_t_Read.vt = &_strread_vt;
+	fr->_t_Reader.impltor = fr;
+	fr->_t_Reader.vt = &_strread_vt;
 }
 
 
@@ -140,7 +140,7 @@ struct _FASTA {
 	char *src_path;
 	FASTARec cur_rec;
 	usize cur_rec_len[2];
-	fastaread rd;
+	FastaReader rd;
 	FASTARecRdr cur_rec_rd;
 	usize cur_rec_rd_len[2];
 };
@@ -166,7 +166,7 @@ RESULT_OK_ERR(rawptr) fasta_open(const char *filename)
 	f->cur_rec.descr = cstr_new(f->cur_rec_len[0]);
 	f->cur_rec.seq = cstr_new(f->cur_rec_len[1]);
 	f->cur_rec_rd.descr = cstr_new(f->cur_rec_rd_len[0]);
-	f->cur_rec_rd.seqrdr = fastaread_as_Read(&(f->rd));
+	f->cur_rec_rd.seqrdr = FastaReader_as_Reader(&(f->rd));
 	goto SUCCESS;
 ERROR:
 	FREE(f);

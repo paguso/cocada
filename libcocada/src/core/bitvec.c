@@ -465,7 +465,7 @@ static int bitvec_format_sbprint(Format *self, StrBuf *out)
 }
 
 
-format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
+Format_vt bitvec_format_vt = {.fprint = bitvec_format_fprint,
                               .sprint = bitvec_format_sprint,
                               .sbprint = bitvec_format_sbprint
                              };

@@ -40,7 +40,7 @@ void test_huffcode_new(CuTest *tc)
 	usize freqs[5] = {15, 7, 6, 6, 5};
 	Alphabet *ab;
 	ab = alphabet_new(5, letters);
-	huffcode *hc = huffcode_new(ab, freqs);
+	HuffCode *hc = huffcode_new(ab, freqs);
 	//huffcode_print(hc);
 	huffcode_free(hc);
 }
@@ -60,7 +60,7 @@ void test_huffcode_codec(CuTest *tc)
 		Alphabet *ab = alphabet_new(MIN(len, strlen(letters)), letters);
 		char *str = cstr_new(len);
 		_random_str(str, ab, len);
-		huffcode *hc = huffcode_new_from_str(ab, str);
+		HuffCode *hc = huffcode_new_from_str(ab, str);
 		//huffcode_print(hc);
 		BitVec *code = huffcode_encode(str, len, hc);
 		xstr *xsdec = huffcode_decode(code, hc);

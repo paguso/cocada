@@ -70,7 +70,7 @@ static int sbprint_ascii(Format *self, StrBuf *out)
 }
 
 
-static format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint_ascii, .sbprint = sbprint_ascii};
+static Format_vt xstrformat_ascii_vt = {.fprint = fprint_ascii, .sprint = sprint_ascii, .sbprint = sbprint_ascii};
 
 
 #define PRINT_XCHAR(TYPE)\
@@ -109,7 +109,7 @@ static int sbprint_xchar(Format *self, StrBuf *out)
 }
 
 
-static format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar, .sprint = sprint_xchar, .sbprint = sbprint_xchar};
+static Format_vt xstrformat_xchar_vt = {.fprint = fprint_xchar, .sprint = sprint_xchar, .sbprint = sbprint_xchar};
 
 
 xstrFormat *xstrformat_new(const xstr *src)

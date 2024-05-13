@@ -169,7 +169,7 @@ void test_fasta_next_read(CuTest *tc)
 		usize k = 0;
 		char c;
 		usize l = strlen(seq[i]);
-		while ((c = read_getc(rr->seqrdr)) != EOF) {
+		while ((c = reader_getc(rr->seqrdr)) != EOF) {
 			while ( k < l && seq[i][k] == '\n') k++;
 			CuAssert(tc, "fasta read error: read too many chars", k < l);
 			CuAssert(tc, "fasta read error: char mismatch", seq[i][k] == c);

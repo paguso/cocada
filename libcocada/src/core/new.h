@@ -23,7 +23,6 @@
 #ifndef NEW_H
 #define NEW_H
 
-#include <stdlib.h>
 
 
 /**
@@ -448,6 +447,7 @@
  *
  */
 
+#include <stdlib.h>
 #include "coretype.h"
 
 /**

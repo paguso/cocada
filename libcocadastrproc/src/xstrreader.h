@@ -23,7 +23,7 @@
 #ifndef XSTRREADER_H
 #define XSTRREADER_H
 
-#include "read.h"
+#include "reader.h"
 #include "trait.h"
 #include "xstr.h"
 #include "xstrread.h"
@@ -34,7 +34,7 @@ xstrReader *xstrreader_open(xstr *src);
 
 xstrReader *xstrreader_open_str(char *src, usize len);
 
-xstrReader *xstrreader_open_strread(Read *read);
+xstrReader *xstrreader_open_strread(Reader *read);
 
 void xstrreader_close(xstrReader *self);
 

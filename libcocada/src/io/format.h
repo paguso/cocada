@@ -51,11 +51,11 @@ typedef struct {
 	int (*fprint)(Format *, FILE *);
 	int (*sprint)(Format *, char *);
 	int (*sbprint)(Format *, StrBuf *);
-} format_vt;
+} Format_vt;
 
 
 struct _Format {
-	format_vt vt;
+	Format_vt vt;
 	void *impltor;
 };
 

@@ -37,7 +37,7 @@
 #include "new.h"
 #include "stack.h"
 #include "strbuf.h"
-#include "read.h"
+#include "reader.h"
 #include "vec.h"
 #include "wavtree.h"
 #include "xstrread.h"
@@ -121,7 +121,7 @@ typedef struct _tmp_wavtree {
 	Alphabet       *ab;
 	bool            own_alphabet;
 	Vec       *chrcodes;
-	huffcode       *hcode;
+	HuffCode       *hcode;
 	BitVec      *raw_bits;
 	tmp_wtnode     *tmp_root;
 }
@@ -213,13 +213,13 @@ static tmp_wavtree *tmp_wt_init_bal(Alphabet *ab, bool own_ab)
 // Requires: node!=NULL
 //           htnode not a leaf
 static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
-                               const hufftnode *htnode, const huffcode *hcode )
+                               const HuffTreeNode *htnode, const HuffCode *hcode )
 {
 	for (byte dir = LEFT; dir <= RIGHT; dir++) {
-		const hufftnode *chd = ( (dir == LEFT) ? hufftnode_left(htnode) :
-		                         hufftnode_right(htnode) );
-		if (hufftnode_is_leaf(chd)) {
-			usize crk = hufftnode_char_rank(chd);
+		const HuffTreeNode *chd = ( (dir == LEFT) ? hufftreenode_left(htnode) :
+		                            hufftreenode_right(htnode) );
+		if (hufftreenode_is_leaf(chd)) {
+			usize crk = hufftreenode_char_rank(chd);
 			xchar c = alphabet_char(huffcode_ab(hcode), crk);
 			set_charcode( twt->chrcodes, c,
 			              bitvec_clone(huffcode_charcode(hcode, crk)) );
@@ -234,7 +234,7 @@ static void _tmp_wt_init_huff( tmp_wavtree *twt, tmp_wtnode *node,
 
 
 // requires hcode != NULL
-static tmp_wavtree *tmp_wt_init_huff(const huffcode *hcode, bool own_ab)
+static tmp_wavtree *tmp_wt_init_huff(const HuffCode *hcode, bool own_ab)
 {
 	const Alphabet *hc_ab = huffcode_ab(hcode);
 	tmp_wavtree *twt = tmp_wavtree_new(hc_ab, own_ab);
@@ -317,11 +317,11 @@ static void tmp_wt_fill( tmp_wavtree *twt, xstrRead *rdr )
 
 
 // online construction only available for CHAR_TYPE alphabets
-static void tmp_wt_fill_online( tmp_wavtree *twt, Read *src )
+static void tmp_wt_fill_online( tmp_wavtree *twt, Reader *src )
 {
 	StrBuf *ab_chars = strbuf_new();
-	read_reset(src);
-	for (int c; (c = read_getc(src)) != EOF;) {
+	reader_reset(src);
+	for (int c; (c = reader_getc(src)) != EOF;) {
 		BitVec *chcode = (BitVec *) get_charcode(twt->chrcodes, c);
 		if (chcode != NULL_CODE) {
 			tmp_wt_app_char(twt->tmp_root, chcode);
@@ -553,7 +553,7 @@ static WavTree *wt_build( Alphabet *ab, xstrRead *rdr,
 		break;
 	case WT_HUFFMAN:
 		;
-		huffcode *hcode;
+		HuffCode *hcode;
 		hcode = huffcode_new_from_xstrread(ab, rdr);
 		//huffcode_print(hcode);
 		twt = tmp_wt_init_huff(hcode, ab == NULL);
@@ -592,7 +592,7 @@ WavTree *wavtree_new_from_reader( Alphabet *ab, xstrRead *src,
 }
 
 
-WavTree *wavtree_new_online( Read *src )
+WavTree *wavtree_new_online( Reader *src )
 {
 	tmp_wavtree *twt =  tmp_wt_init_bal(NULL, true);
 	tmp_wt_fill_online(twt, src);

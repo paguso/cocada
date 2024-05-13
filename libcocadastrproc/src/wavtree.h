@@ -25,7 +25,7 @@
 #include <stddef.h>
 
 #include "alphabet.h"
-#include "read.h"
+#include "reader.h"
 #include "xstr.h"
 #include "xstrread.h"
 
@@ -97,7 +97,7 @@ WavTree *wavtree_new_from_xstr(Alphabet *ab, xstr *src, WavTreeShape shape);
  * Paulo Fonseca and Israel Silva, *Online Construction of Wavelet Trees*,
  * 16th Int'l Symposium on Experimental Algorithms (SEA 2017), London, UK.
  */
-WavTree *wavtree_new_online(Read *src);
+WavTree *wavtree_new_online(Reader *src);
 
 /**
  * @brief Destructor

@@ -19,48 +19,38 @@
  *
  */
 
-#include "read.h"
+#include "reader.h"
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 
-Read_vt read_vt_new()
-{
-	Read_vt vt;
-	memset(&vt, 0x0, sizeof(Read_vt)); // set all functions to NULL
-	return vt;
-}
-
-
-void read_reset(Read *self)
+void reader_reset(Reader *self)
 {
 	self->vt->reset(self);
 }
 
 
-int read_getc(Read *self)
+int reader_getc(Reader *self)
 {
 	return self->vt->getc(self);
 }
 
 
-int read_ungetc(Read *self)
+int reader_ungetc(Reader *self)
 {
 	return self->vt->ungetc(self);
 }
 
 
-usize read_read_str(Read *self, char *dest, usize n)
+usize reader_read_str(Reader *self, char *dest, usize n)
 {
 	return self->vt->read_str(self, dest, n);
 }
 
 
-usize read_read_str_until(Read *self, char *dest, char delim)
+usize reader_read_str_until(Reader *self, char *dest, char delim)
 {
 	return self->vt->read_str_until(self, dest, delim);
 }

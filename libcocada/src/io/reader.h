@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef STRREAD_H
-#define STRREAD_H
+#ifndef READER_H
+#define READER_H
 
 /**
  * @file strread.h
@@ -37,34 +37,32 @@
 
 #include "coretype.h"
 
-typedef struct _Read Read;
+typedef struct _Reader Reader;
 
 /**
  * @brief String reader virtual table
  */
 typedef struct {
-	void    (*reset) (Read *self);
-	int		(*getc) (Read *self);
-	int		(*ungetc) (Read *self);
-	usize  (*read_str) (Read *self, char *dest, usize n);
-	usize  (*read_str_until) (Read *self, char *dest, char delim);
-}  Read_vt;
+	void    (*reset) (Reader *self);
+	int		(*getc) (Reader *self);
+	int		(*ungetc) (Reader *self);
+	usize  (*read_str) (Reader *self, char *dest, usize n);
+	usize  (*read_str_until) (Reader *self, char *dest, char delim);
+}  Reader_vt;
 
 
-struct _Read {
-	Read_vt *vt;
+struct _Reader {
+	Reader_vt *vt;
 	void *impltor;
 };
 
-
-Read_vt read_vt_new();
 
 
 /**
  * @brief Resets the reader, that is moves cursor to initial position,
  * if supported by the underlying stream.
  */
-void read_reset(Read *self);
+void reader_reset(Reader *self);
 
 
 /**
@@ -73,7 +71,7 @@ void read_reset(Read *self);
  *          reached its end.
  *
  */
-int read_getc(Read *self);
+int reader_getc(Reader *self);
 
 
 /**
@@ -88,7 +86,7 @@ int read_getc(Read *self);
  * @warning Only one char can be put back into the stream. Once a char is put back,
  * a subsequent call to this function will return 0.
  */
-int read_ungetc(Read *self);
+int reader_ungetc(Reader *self);
 
 
 /**
@@ -96,7 +94,7 @@ int read_ungetc(Read *self);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @returns The number of chars actually read.
  */
-usize read_read_str(Read *self, char *dest, usize n);
+usize reader_read_str(Reader *self, char *dest, usize n);
 
 
 /**
@@ -105,7 +103,7 @@ usize read_read_str(Read *self, char *dest, usize n);
  * 		  or the end of the stream is reached.
  * @returns The number of chars actually read.
  */
-usize read_read_str_until(Read *self, char *dest, char delim);
+usize reader_read_str_until(Reader *self, char *dest, char delim);
 
 
 

@@ -21,7 +21,7 @@
 
 #include "CuTest.h"
 #include "memdbg.h"
-#include "read.h"
+#include "reader.h"
 #include "strreader.h"
 #include "xstr.h"
 #include "xstrread.h"
@@ -63,7 +63,7 @@ void test_xstrreader_from_strread(CuTest *tc)
 	memdbg_reset();
 	char *s = "0123456789012345678901234567890123456789";
 	StrReader *srdr = strreader_new(s, 40);
-	xstrReader *xrdr = xstrreader_open_strread(StrReader_as_Read(srdr));
+	xstrReader *xrdr = xstrreader_open_strread(StrReader_as_Reader(srdr));
 	xwchar c;
 	c = xstrread_getc(xstrReader_as_xstrRead(xrdr));
 	CuAssertCharEquals(tc, '0', c);
