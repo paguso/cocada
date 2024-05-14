@@ -24,9 +24,10 @@
 
 #include "coretype.h"
 #include "errlog.h"
-#include "sort.h"
+#include "memdbg.h"
 #include "randutil.h"
 #include "range.h"
+#include "sort.h"
 
 #define ELT(arr, i, typesize) (((byte *)(arr)) + ((i) * (typesize)))
 #define SWP(a, b, swp, size) memcpy(swp, a, size); memcpy(a, b, size); memcpy(b, swp, size)

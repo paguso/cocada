@@ -24,6 +24,7 @@
 
 #include "saarray.h"
 #include "errlog.h"
+#include "memdbg.h"
 
 void *sa_arr_calloc(usize nmemb, usize memb_size)
 {

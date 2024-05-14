@@ -24,6 +24,7 @@
 #include "avl.h"
 #include "avlmap.h"
 #include "coretype.h"
+#include "memdbg.h"
 #include "new.h"
 #include "trait.h"
 #include "iter.h"

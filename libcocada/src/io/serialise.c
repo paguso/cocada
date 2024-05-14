@@ -32,6 +32,7 @@
 #include "hash.h"
 #include "hashmap.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "saarray.h"
 #include "serialise.h"

@@ -296,6 +296,29 @@ typedef char *cstr;
 #define ULLONG_BITS LLONG_BITS
 
 
+#define UINT8_BITS 	8
+#define UINT8_BYTES 1
+#define INT8_BITS 	8
+#define INT8_BYTES 1
+
+#define UINT16_BITS	16
+#define UINT16_BYTES 2
+#define INT16_BITS 	16
+#define INT16_BYTES 2
+
+#define UINT32_BITS	32
+#define UINT32_BYTES 4
+#define INT32_BITS 	32
+#define INT32_BYTES 4
+
+#define UINT64_BITS	64
+#define UINT64_BYTES 8
+#define INT64_BITS 	64
+#define INT64_BYTES 8
+
+
+
+
 #define XX_UNSIGNED_INT(XX, ...) \
 	XX(uchar, __VA_ARGS__) \
 	XX(ushort, __VA_ARGS__) \

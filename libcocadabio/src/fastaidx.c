@@ -32,7 +32,7 @@ struct _FASTAIndex {
 };
 
 
-FASTAIndex *FASTAIndex_new(const char *src_path)
+FASTAIndex *fasta_index_new(const char *src_path)
 {
 	FASTAIndex *ret = NEW(FASTAIndex);
 	ret->path = cstr_clone(src_path);
@@ -42,7 +42,7 @@ FASTAIndex *FASTAIndex_new(const char *src_path)
 }
 
 
-void FASTAIndex_finalise(void *ptr, const Finaliser *fnr)
+void fasta_index_finalise(void *ptr, const Finaliser *fnr)
 {
 	FASTAIndex *self = (FASTAIndex *)ptr;
 	FREE(self->path);
@@ -53,7 +53,7 @@ void FASTAIndex_finalise(void *ptr, const Finaliser *fnr)
 
 void fasta_index_free(FASTAIndex *self)
 {
-	DESTROY_FLAT(self, FASTAIndex);
+	DESTROY_FLAT(self, fasta_index);
 }
 
 

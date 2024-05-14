@@ -25,6 +25,7 @@
 #include "hashmap.h"
 #include "iter.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 #include "order.h"
 #include "string.h"

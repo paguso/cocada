@@ -26,6 +26,7 @@
 #include "avl.h"
 #include "coretype.h"
 #include "errlog.h"
+#include "memdbg.h"
 #include "new.h"
 #include "stack.h"
 #include "order.h"

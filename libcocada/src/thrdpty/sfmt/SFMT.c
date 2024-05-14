@@ -352,7 +352,7 @@ void sfmt_fill_array64(sfmt_t *sfmt, uint64_t *array, int size)
 	sfmt->idx = SFMT_N32;
 
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
-	swap((w128_t *)array, size /2);
+	swap((w128_t *)array, size / 2);
 #endif
 }
 
@@ -397,11 +397,14 @@ void sfmt_init_by_array(sfmt_t *sfmt, uint32_t *init_key, int key_length)
 
 	if (size >= 623) {
 		lag = 11;
-	} else if (size >= 68) {
+	}
+	else if (size >= 68) {
 		lag = 7;
-	} else if (size >= 39) {
+	}
+	else if (size >= 39) {
 		lag = 5;
-	} else {
+	}
+	else {
 		lag = 3;
 	}
 	mid = (size - lag) / 2;
@@ -409,7 +412,8 @@ void sfmt_init_by_array(sfmt_t *sfmt, uint32_t *init_key, int key_length)
 	memset(sfmt, 0x8b, sizeof(sfmt_t));
 	if (key_length + 1 > SFMT_N32) {
 		count = key_length + 1;
-	} else {
+	}
+	else {
 		count = SFMT_N32;
 	}
 	r = func1(psfmt32[idxof(0)] ^ psfmt32[idxof(mid)]

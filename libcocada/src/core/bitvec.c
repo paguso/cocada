@@ -30,6 +30,7 @@
 #include "cstrutil.h"
 #include "format.h"
 #include "mathutil.h"
+#include "memdbg.h"
 #include "new.h"
 
 

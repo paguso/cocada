@@ -447,8 +447,8 @@
  *
  */
 
-#include <stdlib.h>
 #include "coretype.h"
+#include "memdbg.h"
 
 /**
  * Allocates a new non-initialised object of a given @p TYPE in the heap
