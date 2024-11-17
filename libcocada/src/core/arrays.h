@@ -130,7 +130,7 @@
 
 /**
  * @brief Expands into a type name for an array with elements of a
- * given TYPE called TYPEArray (for example int_array, usize_array, etc).
+ * given TYPE called Array_TYPE (for example Array_int, Array_usize, etc).
  * A TYPEArray encapsulates an ordinary C array of TYPE and its
  * length in a struct. This is convenient because we can pass and
  * receive the array and its length to and from functions as a single
@@ -142,7 +142,7 @@
  * ::DECL_ARRAY. By importing this file you get the declaration of
  * TYPEArray for all the core types defined in coretype.h.
  *
- * A TYPEArray object is primarily meant to be created on the stack,
+ * An Array object is primarily meant to be created on the stack,
  * although the encapsulated array will typically be allocated on
  * the heap. Thus we can pass and receive a TYPEArray by value.
  *
@@ -164,7 +164,7 @@
  * }
  * ```
  */
-#define ARRAY(TYPE) TYPE##Array
+#define ARRAY(TYPE) Array_##TYPE
 
 /**
  * @brief Declares a type name for an array with elements of a

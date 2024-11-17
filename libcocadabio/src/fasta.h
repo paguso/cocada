@@ -117,9 +117,9 @@ void fasta_rewind(FASTA *self);
  * -------
  *
  * ```C
- * FASTA *fr = fasta_open("teste.fa");
- * while(fasta_has_next(fr)) {
- *  FASTARecRdr rec = fasta_next_reader(fr);
+ * FASTA *fa = (FASTA*)fasta_open("teste.fa");
+ * while(fasta_has_next(fa)) {
+ *  FASTARecRdr rec = fasta_next_reader(fa);
  *  for (xchar c; (c=strread_getc(rec->seqrdr)) != EOF;) {
  *      //do something with c
  *  }
@@ -140,9 +140,9 @@ const FASTARecRdr *fasta_next_reader(FASTA *self);
  * -------
  *
  * ```C
- * fasta *fr = fasta_open("teste.fa");
- * while(fasta_has_next(fr)) {
- *  fasta_rec rec = fasta_next(fr);
+ * FASTA *fa = fasta_open("teste.fa");
+ * while(fasta_has_next(fa)) {
+ *  FASTARec *rec = fasta_next(fa);
  * 	printf("sequence is %s\n",rec->seq);
  * }
  * ```

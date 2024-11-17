@@ -24,9 +24,6 @@
 
 
 #include <endian.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
 
 #include "coretype.h"
 

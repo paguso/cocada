@@ -73,9 +73,7 @@ char *cstr_reassign(char *dest, const char *src)
 
 void cstr_fill(char *str, usize from, usize to, char c)
 {
-	for (usize i = from; i < to; i++) {
-		str[i] = c;
-	}
+	memset(str + from, c, from - to);
 }
 
 

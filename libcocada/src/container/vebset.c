@@ -127,12 +127,12 @@ int64 vebleaf16_succ(vebleaf16_t *leaf, uint32 x)
 #define CLUSTER(index) avlmap_get_rawptr(self->clusters, &index)
 
 
-typedef struct _vebnode {
+typedef struct {
 	int64 min;
 	int64 max;
 	void *summary;
 	AVLMap *clusters;
-} vebnode;
+} VEBNode;
 
 
 void *vebnode_new_sized(uint nbits)
@@ -140,7 +140,7 @@ void *vebnode_new_sized(uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_new();
 	}
-	vebnode *ret = NEW(vebnode);
+	VEBNode *ret = NEW(VEBNode);
 	ret->min = UNIV(nbits);
 	ret->max = -1;
 	ret->summary = NULL; // initialize summary and clusters on demand
@@ -158,12 +158,12 @@ void vebnode_free(void *ptr, uint nbits)
 		FREE(ptr);
 		return;
 	}
-	vebnode *self = (vebnode *)ptr;
+	VEBNode *self = (VEBNode *)ptr;
 	if (self->summary) {
 		vebnode_free(self->summary, nbits / 2);
 	}
 	if (self->clusters) {
-		AVLMapIter *it = avlmap_get_iter(self->clusters, IN_ORDER);
+		AVLMapIter *it = avlmap_get_iter(self->clusters, AVL_TRAVERSAL_IN_ORDER);
 		FOREACH_IN_ITER(entry, AVLMapEntry, AVLMapIter_as_Iter(it)) {
 			vebnode_free(*((void **)(entry->val)), nbits / 2);
 		}
@@ -181,7 +181,7 @@ bool vebnode_empty(void *self, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_empty(self);
 	}
-	return ((vebnode *)self)->max < 0;
+	return ((VEBNode *)self)->max < 0;
 }
 
 
@@ -191,7 +191,7 @@ int64 vebnode_min(void *self, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_min(self);
 	}
-	return ((vebnode *)self)->min;
+	return ((VEBNode *)self)->min;
 }
 
 
@@ -201,7 +201,7 @@ int64 vebnode_max(void *self, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_max(self);
 	}
-	return ((vebnode *)self)->max;
+	return ((VEBNode *)self)->max;
 }
 
 
@@ -211,7 +211,7 @@ bool vebnode_contains(void *root, uint32 x, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_contains(root, x);
 	}
-	vebnode *self = (vebnode *)root;
+	VEBNode *self = (VEBNode *)root;
 	if (x < self->min || x > self->max) {
 		return false;
 	}
@@ -236,7 +236,7 @@ bool vebnode_add(void *root, uint32 x, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_add(root, x);
 	}
-	vebnode *self = (vebnode *)root;
+	VEBNode *self = (VEBNode *)root;
 	if (x >= UNIV(nbits) || x == self->min || x == self->max) {
 		return false;
 	}
@@ -285,7 +285,7 @@ bool vebnode_del(void *root, uint32 x, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_del(root, x);
 	}
-	vebnode *self = (vebnode *)root;
+	VEBNode *self = (VEBNode *)root;
 	if (x >= UNIV(nbits) || vebnode_empty(self, nbits)) {
 		return false;
 	}
@@ -342,7 +342,7 @@ int64 vebnode_succ(void *root, uint32 x, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_succ(root, x);
 	}
-	vebnode *self = (vebnode *)root;
+	VEBNode *self = (VEBNode *)root;
 	if (x >= self->max) {
 		return UNIV(nbits);
 	}
@@ -357,7 +357,7 @@ int64 vebnode_succ(void *root, uint32 x, uint nbits)
 	uint32 high = HIGH(x, nbits);
 	uint32 low = LOW(x, nbits);
 
-	vebnode *cluster = NULL;
+	VEBNode *cluster = NULL;
 	if (avlmap_contains(self->clusters, &high)) {
 		cluster = CLUSTER(high);
 	}
@@ -387,7 +387,7 @@ int64 vebnode_pred(void *root, uint32 x, uint nbits)
 	if (nbits == 4) {
 		return vebleaf16_pred(root, x);
 	}
-	vebnode *self = (vebnode *)root;
+	VEBNode *self = (VEBNode *)root;
 	//DEBUG("looking for predecessor of %u at @%p nbits = %u\n", x, self, nbits);
 	if (x <= self->min) {
 		//DEBUG("x=%u <= min=%ld. no pred. return -1\n", x, self->min);
@@ -445,16 +445,16 @@ int64 vebnode_pred(void *root, uint32 x, uint nbits)
 
 
 
-struct _vebset {
+struct _VEBSet {
 	usize size;
 	uint nbits;
-	vebnode *tree;
+	VEBNode *tree;
 };
 
 
-vebset *vebset_new()
+VEBSet *vebset_new()
 {
-	vebset *ret = NEW(vebset);
+	VEBSet *ret = NEW(VEBSet);
 	ret->size = 0;
 	ret->nbits = 32;
 	ret->tree = vebnode_new_sized(ret->nbits);
@@ -464,32 +464,32 @@ vebset *vebset_new()
 
 void vebset_finalise(void *ptr, const Finaliser *fnr)
 {
-	vebset *self = (vebset *)ptr;
+	VEBSet *self = (VEBSet *)ptr;
 	vebnode_free(self->tree, self->nbits);
 	FREE(ptr);
 }
 
 
-void vebset_free(vebset *self)
+void vebset_free(VEBSet *self)
 {
 	vebnode_free(self->tree, self->nbits);
 	FREE(self);
 }
 
 
-usize vebset_size(vebset *self)
+usize vebset_size(VEBSet *self)
 {
 	return self->size;
 }
 
 
-bool vebset_contains(vebset *self, uint32 x)
+bool vebset_contains(VEBSet *self, uint32 x)
 {
 	return vebnode_contains(self->tree, x, self->nbits);
 }
 
 
-bool vebset_add(vebset *self, uint32 x)
+bool vebset_add(VEBSet *self, uint32 x)
 {
 	bool ret = vebnode_add(self->tree, x, self->nbits);
 	self->size += ret;
@@ -497,7 +497,7 @@ bool vebset_add(vebset *self, uint32 x)
 }
 
 
-bool vebset_del(vebset *self, uint32 x)
+bool vebset_del(VEBSet *self, uint32 x)
 {
 	bool ret = vebnode_del(self->tree, x, self->nbits);
 	self->size -= ret;
@@ -505,25 +505,25 @@ bool vebset_del(vebset *self, uint32 x)
 }
 
 
-int64 vebset_succ(vebset *self, uint32 x)
+int64 vebset_succ(VEBSet *self, uint32 x)
 {
 	return vebnode_succ(self->tree, x, self->nbits);
 }
 
 
-int64 vebset_pred(vebset *self, uint32 x)
+int64 vebset_pred(VEBSet *self, uint32 x)
 {
 	return vebnode_pred(self->tree, x, self->nbits);
 }
 
 
-int64 vebset_min(vebset *self)
+int64 vebset_min(VEBSet *self)
 {
 	return vebnode_min(self->tree, self->nbits);
 }
 
 
-int64 vebset_max(vebset *self)
+int64 vebset_max(VEBSet *self)
 {
 	return vebnode_max(self->tree, self->nbits);
 }

@@ -36,11 +36,11 @@ typedef struct {
 	xwchar (*getch) (xstrRead *self);
 	usize   (*read) (xstrRead *self, xstr *dest, usize n);
 	usize   (*read_until) (xstrRead *self, xstr *dest, xchar delim);
-} xstrread_vt;
+} xstrRead_vt;
 
 
 struct _xstrRead {
-	xstrread_vt *vt;
+	xstrRead_vt *vt;
 	void *impltor;
 };
 

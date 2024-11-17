@@ -78,7 +78,7 @@ bool quadtree_node_is_leaf(QuadTree *tree, usize node)
 }
 
 
-usize quadtree_node_get_chd(QuadTree *tree, usize node, QuadPos pos)
+usize quadtree_node_get_chd(QuadTree *tree, usize node, Quadrant pos)
 {
 	usize fch = ((QuadTreeNode *) vec_get(tree->nodes, node))->first_chd;
 	return (fch == 0) ? fch : fch + pos;
@@ -86,7 +86,7 @@ usize quadtree_node_get_chd(QuadTree *tree, usize node, QuadPos pos)
 
 
 static usize quadtree_node_get_or_ins_chd(QuadTree *tree, usize node,
-        QuadPos pos)
+        Quadrant pos)
 {
 	usize fchd = ((const QuadTreeNode *)vec_get(tree->nodes, node))->first_chd;
 	if ( fchd == 0 ) {
@@ -168,7 +168,7 @@ static Rectangle rectangle_clip(Rectangle rect, Rectangle viewport)
 
 
 void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
-                  quadtree_node_upd_func upd_func)
+                  QuadTreeNodeUpdFunc upd_func)
 {
 	WARN_ASSERT(p.x < tree->width,
 	            "Quadtree insertion ignored (point.x=%u > width=%u)\n", p.x, tree->width);
@@ -183,7 +183,7 @@ void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
 	Point2D centre = {.x = rect.width / 2, .y = rect.height / 2};
 	uint cur_depth = 0;
 	while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-		QuadPos pos = (((byte)(p.y >= centre.y)) << 1) | ((byte)(p.x >= centre.x));
+		Quadrant pos = (((byte)(p.y >= centre.y)) << 1) | ((byte)(p.x >= centre.x));
 		if (IS_EAST(pos)) {
 			rect.top_left.x = centre.x;
 			rect.width = SND_HALF(rect.width);
@@ -207,7 +207,7 @@ void quadtree_ins(QuadTree *tree, Point2D p, void *payload,
 }
 
 
-Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor)
+Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, Snap anchor)
 {
 	Point2D bounds[2]; // top_left, bot_right
 	bounds[0] = rect.top_left;
@@ -218,8 +218,8 @@ Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor)
 		Point2D centre = {.x = FST_HALF(rect.width), .y = FST_HALF(rect.height)};
 		uint cur_depth = 0;
 		while (cur_depth < tree->depth && (rect.width > 1 || rect.height > 1)) {
-			QuadPos pos = (((byte)(bounds[i].y >= centre.y)) << 1) |
-			              ((byte)(bounds[i].x >= centre.x));
+			Quadrant pos = (((byte)(bounds[i].y >= centre.y)) << 1) |
+			               ((byte)(bounds[i].x >= centre.x));
 			if (IS_EAST(pos)) {
 				rect.top_left.x = centre.x;
 				rect.width = SND_HALF(rect.width);

@@ -87,7 +87,7 @@ usize  _xstr_read_until(xstrRead *t, xstr *dest, xchar delim)
 }
 
 
-static xstrread_vt _xstr_vt = { .reset = _xstr_reset,
+static xstrRead_vt _xstr_vt = { .reset = _xstr_reset,
                                 .getch = _xstr_getc,
                                 .read = _xstr_read,
                                 .read_until = _xstr_read_until
@@ -156,7 +156,7 @@ usize  _str_read_until(xstrRead *t, xstr *dest, xchar delim)
 }
 
 
-static xstrread_vt _str_vt = { .reset = _xstr_reset,
+static xstrRead_vt _str_vt = { .reset = _xstr_reset,
                                .getch = _str_getc,
                                .read = _str_read,
                                .read_until = _str_read_until
@@ -240,7 +240,7 @@ usize  _strread_read_until(xstrRead *t, xstr *dest, xchar delim)
 }
 
 
-static xstrread_vt _strread_vt = { .reset = _strread_reset,
+static xstrRead_vt _strread_vt = { .reset = _strread_reset,
                                    .getch = _strread_getc,
                                    .read = _strread_read,
                                    .read_until = _strread_read_until

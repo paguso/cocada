@@ -65,7 +65,7 @@
  * where the first two phases (1-2) comprise the object *creation*, and the two
  * last (4-5) comprise the object *destruction*.
  *
- * In COCADA, Step 1 is usually done through the macro ::NEW, which allocate heap
+ * In COCADA, Step 1 is usually done through the macro ::NEW, which allocates heap
  * memory for an object of a given type and returns a typed pointer to this position.
  * Object creation (steps 1-2) is normally done with a single call to one of the object
  * constructors `type *type_new(...)`. Ocasionally, these two steps can be done
@@ -155,7 +155,7 @@
  * #define NMAX = 4;
  * struct _A {         +-----------------------------------+
  *     ...             |   A                               |
- *     usize size;    |                                   |
+ *     usize size;     |                                   |
  *     B b[NMAX];      | +------+-------+-------+-------+  |
  *     ...             | | b[0] | b[1]  |  b[2] |  b[3] |  |
  * }                   | |      |       |       |       |  |
@@ -173,8 +173,8 @@
  *
  * struct _A {         +------------+
  *     ...             |   A        |
- *     usize size;    |            |
- *     usize cap;     | b +----+   |     ,...> +------+-------+-   -+----------+
+ *     usize size;     |            |
+ *     usize cap;      | b +----+   |     ,...> +------+-------+-   -+----------+
  *     B *b.           |   |    |   |    .      | b[0] | b[1]  | ... | b[cap-1] |
  * }                   |   | .........../       |      |       |     |          |
  *                     |   +----+   |           +------+-------+-   -+----------+
@@ -199,8 +199,8 @@
  *                                                  .
  * struct _A {         +------------+               .
  *     ...             |   A        |               .
- *     usize size;    |            |               .
- *     usize cap;     | b +----+   |     ,...> +---.--+------+-   -+----------+
+ *     usize size;     |            |               .
+ *     usize cap;      | b +----+   |     ,...> +---.--+------+-   -+----------+
  *     B **b.          |   |    |   |    .      | b[0] | b[1] | ... | b[cap-1] |
  * }                   |   | .........../       +------+--.---+-   -+----------+
  *                     |   +----+   |                     .
@@ -247,7 +247,7 @@
  * object, which would become otherwise unreachable after the object destruction
  * (memory leak). It receives a pointer to the object to be finalised
  * and a finaliser object mirroring its composition.  The finalise function of
- * a `type` is named `type_finalise` (example ::vec_finalise).
+ * a `Type` is named `type_finalise` (example ::vec_finalise).
  *
  * The implementation of a finalise function of a parent type uses the
  * provided finaliser to call the finalise functions of the child (referenced)
@@ -473,23 +473,23 @@ typedef struct _Finaliser Finaliser;
 /**
  * Finaliser function type
  */
-typedef void (*finalise_func) (void *ptr, const Finaliser *fnr);
+typedef void (*FinaliseFunc) (void *ptr, const Finaliser *fnr);
 
 
 /**
  * @brief Creates a new destructor with destructof function.
  */
-Finaliser *finaliser_new(finalise_func fn);
+Finaliser *finaliser_new(FinaliseFunc fn);
 
 
 /**
- * @brief Recursively lones a finaliser
+ * @brief Recursively clones a finaliser
  */
 Finaliser *finaliser_clone(const Finaliser *src);
 
 
 /**
- * @brief Recursively frees a destructor.
+ * @brief Recursively frees a finaliser.
  */
 void finaliser_free(Finaliser *self);
 
@@ -544,15 +544,15 @@ Finaliser *finaliser_new_ptr_to_obj(const Finaliser *chd);
 /**
  * Returns a default finaliser for a given type with no nested destructor.
  */
-#define FNR( TYPE ) finaliser_new(TYPE##_finalise)
+#define FNR( TYPE_PREFIX ) finaliser_new(TYPE_PREFIX##_finalise)
 
 
 /**
  * Returns a default finaliser for a pointer to an object
  * of a given type with no other nested destructor.
- * Same as finaliser_new_ptr_to_obj(FNR(TYPE)).
+ * Same as finaliser_new_ptr_to_obj(FNR(TYPE_PREFIX)).
  */
-#define FNR_PTR_TO_OBJ( TYPE ) finaliser_new_ptr_to_obj(FNR(TYPE))
+#define FNR_PTR_TO_OBJ( TYPE_PREFIX ) finaliser_new_ptr_to_obj(FNR(TYPE_PREFIX))
 
 
 /**
@@ -583,12 +583,12 @@ Finaliser *finaliser_new_ptr_to_obj(const Finaliser *chd);
 #define DESTROY( OBJ, FNR ) \
 	{\
 		void *__OBJ = (void *)(OBJ);\
-		Finaliser *__FNR = (Finaliser *)(FNR);\
 		if ((__OBJ)) {\
+			Finaliser *__FNR = (Finaliser *)(FNR);\
 			finaliser_call((const Finaliser *)(__FNR), __OBJ);\
 			free(__OBJ);\
+			finaliser_free((void *)(__FNR));\
 		}\
-		finaliser_free((void *)(__FNR));\
 	}
 
 

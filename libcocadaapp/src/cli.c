@@ -76,7 +76,7 @@ typedef struct {
 	CLIOptComboType type;
 	usize size;
 	char shortnames[32];
-} optcombo;
+} OptCombo;
 
 
 struct _CLIParser {
@@ -525,7 +525,7 @@ CLIParser *cliparser_new(char *name, char *help)
 	ret->active_subcmd = NULL;
 	ret->options = hashmap_new(sizeof(char), sizeof(CLIOpt *), ident_hash_char,
 	                           eq_char);
-	ret->optcombos = vec_new(sizeof(optcombo));
+	ret->optcombos = vec_new(sizeof(OptCombo));
 	ret->long_to_short = hashmap_new(sizeof(char *), sizeof(char), _hash_str,
 	                                 _str_eq);
 	ret->active_sc_opt = NULL;
@@ -663,7 +663,7 @@ void cliparser_add_option(CLIParser *cmd, CLIOpt *opt)
 void cliparser_add_option_combo(CLIParser *cmd, CLIOptComboType type, usize n,
                                 ...)
 {
-	optcombo c;
+	OptCombo c;
 	c.type = type;
 	c.size = 0;
 	va_list valist;
@@ -925,7 +925,7 @@ static RESULT_OK_ERR(CLIParser) _check_option_combos(CLIParser *cmd)
 	RESULT_OK_ERR(CLIParser) result = {.ok = true, .val.ok = cmd};
 
 	for (usize i = 0, l = vec_len(cmd->optcombos); i < l; i++) {
-		optcombo *c = (optcombo *) vec_get(cmd->optcombos, i);
+		OptCombo *c = (OptCombo *) vec_get(cmd->optcombos, i);
 		usize nused = 0;
 		for (usize j = 0; j < c->size; j++) {
 			char shortname = c->shortnames[j];
@@ -1063,7 +1063,7 @@ static bool _parse_and_add_value(Vec *vals, char *tok, CLIArgType type,
 typedef enum {
 	PS_CMD = 0,
 	PS_VAL = 1,
-} parse_state;
+} ParseState;
 
 
 RESULT_OK_ERR(CLIParser) cliparser_parse(CLIParser *clip, int argc, char **argv,
@@ -1078,7 +1078,7 @@ RESULT_OK_ERR(CLIParser) cliparser_parse(CLIParser *clip, int argc, char **argv,
 	clip->parsed = true;
 
 	int t = 1;
-	parse_state state = PS_CMD;
+	ParseState state = PS_CMD;
 	CLIParser *cur_parse = clip;
 	int cur_opt_pos = -1;
 	CLIOpt *cur_opt = NULL;

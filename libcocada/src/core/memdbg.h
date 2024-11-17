@@ -122,9 +122,9 @@ extern bool memdbg_is_empty();
 typedef struct {
 	bool active;
 	usize size;
-} memdbg_query_t;
+} MemDbgQuery;
 
-extern memdbg_query_t memdbg_query(const void *addr);
+extern MemDbgQuery memdbg_query(const void *addr);
 
 
 #ifdef MEM_DEBUG

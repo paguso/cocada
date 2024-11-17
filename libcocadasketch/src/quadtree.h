@@ -138,7 +138,7 @@ typedef enum {
 	NE, /**< Northeast = top-right */
 	SW, /**< Southwest = bottom-left */
 	SE  /**< Southeast = bottom-right */
-} QuadPos;
+} Quadrant;
 
 
 /**
@@ -150,7 +150,7 @@ typedef struct _QuadTree QuadTree;
 /**
  * @brief Returns the child of a node.
  */
-usize quadtree_node_get_chd(QuadTree *tree, usize node, QuadPos pos);
+usize quadtree_node_get_chd(QuadTree *tree, usize node, Quadrant pos);
 
 
 /**
@@ -168,7 +168,7 @@ void quadtree_node_set_data(QuadTree *tree, usize node, void *data);
 /**
  * @brief Node update callback function type
  */
-typedef void (*quadtree_node_upd_func)(QuadTree *tree, usize node, void *data);
+typedef void (*QuadTreeNodeUpdFunc)(QuadTree *tree, usize node, void *data);
 
 
 /**
@@ -202,7 +202,7 @@ typedef struct {
 typedef enum {
 	SNAP_IN, /**< Snap to inner rectangle **/
 	SNAP_OUT /**< Snap to outer grid rectangle **/
-} snap_t;
+} Snap;
 
 
 /**
@@ -237,7 +237,7 @@ typedef enum {
  *  + - - - + - - - + - - - + - - - +
  * ```
  */
-Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, snap_t anchor);
+Rectangle rectangle_snap_to_grid(QuadTree *tree, Rectangle rect, Snap anchor);
 
 
 /**
@@ -318,7 +318,7 @@ void quadtree_fit(QuadTree *tree);
  * ```
  */
 void quadtree_ins(QuadTree *tree, Point2D pt, void *payload,
-                  quadtree_node_upd_func upd_func);
+                  QuadTreeNodeUpdFunc upd_func);
 
 
 /**

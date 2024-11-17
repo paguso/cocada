@@ -35,7 +35,7 @@ typedef enum {
 	SSTR_FILE  = 1,
 	SSTR_XSTR  = 2,
 	SSTR_XFILE = 3,
-} sstream_type;
+} StrStreamType;
 
 
 struct _StrStream {
@@ -44,7 +44,7 @@ struct _StrStream {
 		char    *str;
 		xstr *xstr;
 	} src;
-	sstream_type type;
+	StrStreamType type;
 	usize bytes_per_char;
 	usize pos;
 	usize slen;

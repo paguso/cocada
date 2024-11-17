@@ -35,20 +35,20 @@
 /**
  * @brief vEB set type
  */
-typedef struct _vebset vebset;
+typedef struct _VEBSet VEBSet;
 
 
 /**
  * @brief Constructor
  */
-vebset *vebset_new();
+VEBSet *vebset_new();
 
 
 /**
  * Destructor. Equivalent to DESTROY_FLAT(self, vebset).
  * @see DESTROY_FLAT
  */
-void vebset_free(vebset *self);
+void vebset_free(VEBSet *self);
 
 
 /**
@@ -60,13 +60,13 @@ void vebset_finalise(void *ptr, const Finaliser *fnr);
 /**
  * @brief Returns the cardinality of the set.
 */
-usize vebset_size(vebset *self);
+usize vebset_size(VEBSet *self);
 
 
 /**
  * @brief Tests whether the set contains a value @p x.
 */
-bool vebset_contains(vebset *self, uint32 x);
+bool vebset_contains(VEBSet *self, uint32 x);
 
 
 /**
@@ -74,7 +74,7 @@ bool vebset_contains(vebset *self, uint32 x);
  * @return true if @p x was added. false if @p x was already in the
  * set or is an invalid value.
 */
-bool vebset_add(vebset *self, uint32 x);
+bool vebset_add(VEBSet *self, uint32 x);
 
 
 /**
@@ -82,35 +82,35 @@ bool vebset_add(vebset *self, uint32 x);
  * @return true if @p x was deleted. false if @p x was not in the
  * set or is an invalid value.
 */
-bool vebset_del(vebset *self, uint32 x);
+bool vebset_del(VEBSet *self, uint32 x);
 
 
 /**
  * @brief Returns the smallest value in the set strictly greater than
  * @p x if it exists. Otherwise, returns 2^32.
 */
-int64 vebset_succ(vebset *self, uint32 x);
+int64 vebset_succ(VEBSet *self, uint32 x);
 
 
 /**
  * @brief Returns the greatest value in the set strictly smaller than
  * @p x if it exists. Otherwise, returns -1.
  */
-int64 vebset_pred(vebset *self, uint32 x);
+int64 vebset_pred(VEBSet *self, uint32 x);
 
 
 /**
  * @brief Returns the minimum of the set, if the set is not empty,
  * or 2^32 otherwise.
 */
-int64 vebset_min(vebset *self);
+int64 vebset_min(VEBSet *self);
 
 
 /**
  * @brief Returns the maximum of the set, if the set is not empty,
  * or -1 otherwise.
 */
-int64 vebset_max(vebset *self);
+int64 vebset_max(VEBSet *self);
 
 
 #endif

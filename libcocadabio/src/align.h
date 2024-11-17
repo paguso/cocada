@@ -36,7 +36,7 @@
 /**
  * @brief Substitution cost function type
  */
-typedef int (*subst_cost_fn)(char a, char b);
+typedef int (*SubstCostFunc)(char a, char b);
 
 
 /**
@@ -88,7 +88,7 @@ int simple_global_align(const char *qry, usize qry_len, const char *tgt,
  */
 int affine_global_align(const char *qry, usize qry_len, const char *tgt,
                         usize tgt_len,
-                        int gap_open, int gap_ext, subst_cost_fn subst, StrBuf *cigar);
+                        int gap_open, int gap_ext, SubstCostFunc subst, StrBuf *cigar);
 
 /**
  * @brief Prints the alignment of two strings to the given file stream.

@@ -98,12 +98,12 @@ typedef struct {
 	xstr  *txt;
 	usize    pos;
 	usize    k;
-} kmer_t;
+} KMer;
 
 
-kmer_t *kmer_new(xstr *txt, usize pos, usize k)
+KMer *kmer_new(xstr *txt, usize pos, usize k)
 {
-	kmer_t *ret = NEW(kmer_t);
+	KMer *ret = NEW(KMer);
 	ret->txt = txt;
 	ret->k = k;
 	ret->pos = pos;
@@ -113,7 +113,7 @@ kmer_t *kmer_new(xstr *txt, usize pos, usize k)
 
 static usize kmer_key_fn(const void *kp, usize d)
 {
-	kmer_t *km = *(kmer_t **)kp;
+	KMer *km = *(KMer **)kp;
 	if ( d == 0 )
 		return xstr_get(km->txt, km->pos + km->k - 1);
 	else
@@ -155,10 +155,10 @@ static BOSSdBG *_dbg_init( Alphabet *ab, StrStream *sst, usize k,
 	//xstr_print(padstr);
 
 	// build list of k+1mers
-	Vec *kp1mers = vec_new(sizeof(kmer_t *));
+	Vec *kp1mers = vec_new(sizeof(KMer *));
 	for (usize i = 0, padslen = xstr_len(padstr), l = padslen - (k + 1); i <= l;
 	        i++) {
-		kmer_t *kmer = kmer_new(padstr, i, k + 1);
+		KMer *kmer = kmer_new(padstr, i, k + 1);
 		vec_push(kp1mers, &kmer);
 	}
 
@@ -207,7 +207,7 @@ static BOSSdBG *_dbg_init( Alphabet *ab, StrStream *sst, usize k,
 	lastkm1mers[0] = xstr_new_with_capacity(sizeof_ext_char, k - 1);
 	lastkm1mers[1] = xstr_new_with_capacity(sizeof_ext_char, k - 1);
 	usize this_line, last_line;
-	kmer_t *kp1mer;
+	KMer *kp1mer;
 	bool new_edge = false;
 	xchar edge_chr;
 
@@ -215,7 +215,7 @@ static BOSSdBG *_dbg_init( Alphabet *ab, StrStream *sst, usize k,
 	for (usize i = 0, nkp1mers = vec_len(kp1mers); i < nkp1mers; i++) {
 		this_line = i % 2;
 		last_line = (i + 1) % 2;
-		kp1mer = *(kmer_t **)vec_get(kp1mers, i);
+		kp1mer = *(KMer **)vec_get(kp1mers, i);
 		xstr_ncpy(lastkp1mers[this_line], 0, kp1mer->txt, kp1mer->pos, k + 1);
 
 		// compare this k+1-mer with the previous

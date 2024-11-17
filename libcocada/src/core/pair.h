@@ -63,6 +63,7 @@
 
 #define PAIR2(TYPE) Pair_##TYPE##_##TYPE
 
+
 #define DECL_PAIRS2(TYPE,...) \
 	DECL_PAIR2(TYPE)
 

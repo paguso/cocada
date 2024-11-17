@@ -208,21 +208,20 @@ static inline usize _bitvec_count0(const BitVec *bv, usize from, usize to)
 }
 
 
-typedef usize (*_bv_cnt_func)(const BitVec *, usize from, usize to);
-
-
-static _bv_cnt_func _bitvec_count_func[2] = {_bitvec_count0, _bitvec_count1};
-
-
 usize bitvec_count(const BitVec *bv, bool bit)
 {
-	return _bitvec_count_func[bit](bv, 0, bv->len);
+	return bitvec_count_range(bv, bit, 0, bv->len);
 }
 
 
 usize bitvec_count_range(const BitVec *bv, bool bit, usize from, usize to)
 {
-	return _bitvec_count_func[bit](bv, from, to);
+	if (bit) {
+		return _bitvec_count1(bv, from, to);
+	}
+	else {
+		return _bitvec_count0(bv, from, to);
+	}
 }
 
 

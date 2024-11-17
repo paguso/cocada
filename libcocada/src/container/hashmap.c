@@ -166,15 +166,15 @@ static inline void *_value_at(const HashMap *hmap, usize pos)
 typedef struct {
 	usize pos;
 	bool found;
-} _find_res;
+} FindResult;
 
 
 // Find the target position of the key in the table
-static _find_res _find(const HashMap *hmap, const void *key, uint64 h)
+static FindResult _find(const HashMap *hmap, const void *key, uint64 h)
 {
 	uint64 h1 = _h1(h);
 	uint64 h2 = _h2(h);
-	_find_res ret = {.found = false, .pos = h1 % hmap->cap};
+	FindResult ret = {.found = false, .pos = h1 % hmap->cap};
 	//printf("starting probe at pos %zu\n", ret.pos );
 	while (true) {
 		//printf("   probing pos %zu\n", ret.pos );
@@ -244,7 +244,7 @@ bool hashmap_contains(const HashMap *hmap, const void *key)
 
 const void *hashmap_get(const HashMap *hmap, const void *key)
 {
-	_find_res qry = _find(hmap, key, _hash(hmap, key));
+	FindResult qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		return _value_at(hmap, qry.pos);
 	}
@@ -256,7 +256,7 @@ const void *hashmap_get(const HashMap *hmap, const void *key)
 
 const HashMapEntry hashmap_get_entry(const HashMap *hmap, const void *key)
 {
-	_find_res qry = _find(hmap, key, _hash(hmap, key));
+	FindResult qry = _find(hmap, key, _hash(hmap, key));
 	HashMapEntry ret = {.key = NULL, .val = NULL};
 	if (qry.found) {
 		ret.key = _key_at(hmap, qry.pos);
@@ -287,7 +287,7 @@ static void _print(const hashmap *hmap)
 static inline void _set(HashMap *hmap, const void *key, const void *val)
 {
 	uint64 h = _hash(hmap, key);
-	_find_res qry = _find(hmap, key, h);
+	FindResult qry = _find(hmap, key, h);
 	if (!qry.found) {
 		memcpy(_key_at(hmap, qry.pos), key, hmap->keysize);
 		hmap->tally[qry.pos] = _h2(h);
@@ -356,7 +356,7 @@ void hashmap_del(HashMap *hmap, const void *key)
 {
 	assert(key != NULL);
 	uint64 h = _hash(hmap, key);
-	_find_res qry = _find(hmap, key, h);
+	FindResult qry = _find(hmap, key, h);
 	if (qry.found) {
 		hmap->tally[qry.pos] = ST_DEL;
 		hmap->size--;
@@ -369,7 +369,7 @@ void hashmap_remv(HashMap *hmap, const void *key, void *dest_key,
                   void *dest_val)
 {
 	assert(key != NULL);
-	_find_res qry = _find(hmap, key, _hash(hmap, key));
+	FindResult qry = _find(hmap, key, _hash(hmap, key));
 	if (qry.found) {
 		memcpy(dest_key, _key_at(hmap, qry.pos), hmap->keysize);
 		memcpy(dest_val, _value_at(hmap, qry.pos), hmap->valsize);

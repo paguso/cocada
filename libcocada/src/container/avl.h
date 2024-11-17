@@ -237,9 +237,9 @@ void avl_print( const AVL *self, FILE *stream,
  * @brief AVL traversal order
  */
 typedef enum {
-	PRE_ORDER  = 0,
-	IN_ORDER   = 1,
-	POST_ORDER = 2,
+	AVL_TRAVERSAL_PRE_ORDER  = 0,
+	AVL_TRAVERSAL_IN_ORDER   = 1,
+	AVL_TRAVERSAL_POST_ORDER = 2,
 } AVLTraversalOrder;
 
 

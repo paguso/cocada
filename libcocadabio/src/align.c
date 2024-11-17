@@ -133,7 +133,7 @@ int simple_global_align(const char *qry, usize qry_len, const char *tgt,
 
 
 static int gotoh_affine_cost(const char *qry, usize qry_len, const char *tgt,
-                             usize tgt_len, int gap_open, int gap_ext, subst_cost_fn subst)
+                             usize tgt_len, int gap_open, int gap_ext, SubstCostFunc subst)
 {
 	usize m = qry_len + 1;
 	usize n = tgt_len + 1;
@@ -200,13 +200,14 @@ static int gotoh_affine_cost(const char *qry, usize qry_len, const char *tgt,
 
 
 typedef enum {
-	FW = 1,
-	BW = -1
-} dir_t;
+	FORWARD = 1,
+	BACKWARD = -1
+} Direction;
 
 static int aff_slice_cost(const char *qry, usize qry_len, const char *tgt,
-                          usize tgt_len, dir_t dir, int gap_open, int initial_del_gap_open, int gap_ext,
-                          subst_cost_fn subst, int *C, int *D)
+                          usize tgt_len, Direction dir, int gap_open, int initial_del_gap_open,
+                          int gap_ext,
+                          SubstCostFunc subst, int *C, int *D)
 {
 	/*strbuf *_q = strbuf_new();
 	strbuf_nappend(_q, qry, qry_len);
@@ -247,8 +248,8 @@ static int aff_slice_cost(const char *qry, usize qry_len, const char *tgt,
 		D[0] = t;
 		I_i_j = t + gap_open;
 		for (usize j = 1; j < n; j++) {
-			int match = (dir == FW) ? subst(qry[i - 1],
-			                                tgt[j - 1])  : subst(qry[qry_len - i], tgt[tgt_len - j]);
+			int match = (dir == FORWARD) ? subst(qry[i - 1],
+			                                     tgt[j - 1])  : subst(qry[qry_len - i], tgt[tgt_len - j]);
 			I_i_j = MIN(C[j - 1] + gap_open, I_i_j) + gap_ext; // C[j-1] contains C[i][j-1]
 			D[j] = MIN(C[j] + gap_open, D[j]) + gap_ext; // C[j] contains C[i-1][j]
 			C_iminus1_j =
@@ -270,7 +271,7 @@ static int aff_slice_cost(const char *qry, usize qry_len, const char *tgt,
 typedef enum {
 	CAT_JOIN = 0,
 	DEL_JOIN = 1
-} join_t;
+} Join;
 
 static inline int gap(usize len, int gap_open, int gap_ext)
 {
@@ -279,7 +280,7 @@ static inline int gap(usize len, int gap_open, int gap_ext)
 
 static int aff_slice_aln(const char *qry, usize from_qry, usize to_qry,
                          const char *tgt, usize from_tgt, usize to_tgt, int gap_open,
-                         int gap_open_begin, int gap_open_end, int gap_ext, subst_cost_fn subst,
+                         int gap_open_begin, int gap_open_end, int gap_ext, SubstCostFunc subst,
                          StrBuf *cigar, int *C1, int *D1, int *C2, int *D2)
 {
 	usize m = to_qry - from_qry;
@@ -347,14 +348,16 @@ static int aff_slice_aln(const char *qry, usize from_qry, usize to_qry,
 		usize bot_len = to_qry - mid_qry;
 		usize tgt_len = to_tgt - from_tgt;
 
-		aff_slice_cost(&qry[from_qry], top_len, &tgt[from_tgt], tgt_len, FW, gap_open,
+		aff_slice_cost(&qry[from_qry], top_len, &tgt[from_tgt], tgt_len, FORWARD,
+		               gap_open,
 		               gap_open_begin, gap_ext, subst, C1, D1);
-		aff_slice_cost(&qry[mid_qry], bot_len, &tgt[from_tgt], tgt_len, BW, gap_open,
+		aff_slice_cost(&qry[mid_qry], bot_len, &tgt[from_tgt], tgt_len, BACKWARD,
+		               gap_open,
 		               gap_open_end, gap_ext, subst, C2, D2);
 
 		int min_cost = INT_MAX;
 		usize mid_tgt = 0;
-		join_t join = CAT_JOIN;
+		Join join = CAT_JOIN;
 		for (usize j = 0; j <= n; j++) {
 			if ((C1[j] + C2[n - j]) < min_cost) {
 				mid_tgt = from_tgt + j;
@@ -392,7 +395,7 @@ static int aff_slice_aln(const char *qry, usize from_qry, usize to_qry,
 
 int affine_global_align(const char *qry, usize qry_len, const char *tgt,
                         usize tgt_len,
-                        int gap_open, int gap_ext, subst_cost_fn subst, StrBuf *cigar)
+                        int gap_open, int gap_ext, SubstCostFunc subst, StrBuf *cigar)
 {
 	if (cigar) {
 		int *C1, *D1, *C2, *D2;

@@ -80,8 +80,6 @@ BinHeap *binheap_new(usize typesize, CmpFunc cmp);
  */
 void binheap_finalise(void *ptr, const Finaliser *fnr);
 
-void _BinHeap(void *ptr, const Finaliser *fnr);
-
 
 /**
  * @brief Returns the number of elements stored in the heap.

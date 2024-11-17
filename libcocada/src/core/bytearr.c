@@ -58,7 +58,7 @@ void bytearr_reverse(byte *src, usize size)
 }
 
 
-void bytearr_print (const byte *ba, usize nbytes, byte_format fmt,
+void bytearr_print (const byte *ba, usize nbytes, BytePrintFormat fmt,
                     usize bytes_per_line, const char *left_margin)
 {
 	usize i, line_label_width;

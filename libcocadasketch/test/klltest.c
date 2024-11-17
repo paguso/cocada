@@ -77,13 +77,13 @@ void test_kll_upd(CuTest *tc)
 typedef struct _kll_obj {
 	int key;
 	double dkey;
-} kll_obj;
+} KLLObj;
 
 
 int cmp_kll_obj(const void *l, const void *r)
 {
-	kll_obj *lo = *((kll_obj **)l);
-	kll_obj *ro = *((kll_obj **)r);
+	KLLObj *lo = *((KLLObj **)l);
+	KLLObj *ro = *((KLLObj **)r);
 	if (lo->key < ro->key) return -1;
 	else if (lo->key > ro->key) return +1;
 	else return 0;
@@ -98,12 +98,12 @@ void test_kll_upd_obj (CuTest *tc)
 	KLLSumm *summ = kll_new(sizeof(KLLSumm *), cmp_kll_obj, err);
 	for (int i = 0; i < n; i++) {
 		int k = rand_range_int(0, univ);
-		kll_obj *obj = NEW(kll_obj);
+		KLLObj *obj = NEW(KLLObj);
 		obj->key = k;
 		obj->dkey = 2.0 * k;
 		kll_upd(summ, &obj);
 	}
-	kll_obj *val = NEW(kll_obj);
+	KLLObj *val = NEW(KLLObj);
 	for (int i = 0; i < univ; i++) {
 		val->key = i;
 		usize r = kll_rank(summ, &val);

@@ -34,7 +34,7 @@
 typedef struct {
 	usize qty;
 	usize delta;
-} gk_qty ;
+} GKQuantity ;
 
 
 struct _GKSumm {
@@ -50,12 +50,12 @@ GKSumm *gk_new(usize typesize, CmpFunc cmp, double err)
 {
 	GKSumm *ret = NEW(GKSumm);
 	ret->vals = vec_new(typesize);
-	ret->qtys = vec_new(sizeof(gk_qty));
+	ret->qtys = vec_new(sizeof(GKQuantity));
 	void *inf = malloc(typesize);
 	memset(inf, ~0, typesize);
 	vec_push(ret->vals, inf);
 	FREE(inf);
-	gk_qty inf_qty = {.qty = 1, .delta = 0};
+	GKQuantity inf_qty = {.qty = 1, .delta = 0};
 	vec_push(ret->qtys, &inf_qty);
 	ret->err = err;
 	ret->cmp = cmp;
@@ -91,20 +91,20 @@ void gk_upd(GKSumm *self, const void *val)
 {
 	self->total_qty++;
 	usize succ_pos = succ(self->vals, self->cmp, val);
-	gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
+	GKQuantity *succ_qty = (GKQuantity *) vec_get(self->qtys, succ_pos);
 	const usize qty_thres = ceil(2.0 * self->err * self->total_qty);
 	if ( succ_qty->qty + succ_qty->delta + 1 < qty_thres ) {
 		succ_qty->qty++;
 	}
 	else {
 		vec_ins(self->vals, succ_pos, val);
-		gk_qty new_qty = {.qty = 1, .delta = succ_qty->qty + succ_qty->delta - 1};
+		GKQuantity new_qty = {.qty = 1, .delta = succ_qty->qty + succ_qty->delta - 1};
 		vec_ins(self->qtys, succ_pos, &new_qty);
 
-		gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, 0);
-		gk_qty *iplus1th_qty;
+		GKQuantity *ith_qty = (GKQuantity *) vec_get(self->qtys, 0);
+		GKQuantity *iplus1th_qty;
 		for (usize i = 0, l = vec_len(self->vals); i < l - 1; i++ ) {
-			iplus1th_qty = (gk_qty *) vec_get(self->qtys, i + 1);
+			iplus1th_qty = (GKQuantity *) vec_get(self->qtys, i + 1);
 			if (ith_qty->qty + iplus1th_qty->qty + iplus1th_qty->delta < qty_thres) {
 				iplus1th_qty->qty += ith_qty->qty;
 				vec_del(self->vals, i);
@@ -124,22 +124,22 @@ void gk_merge(GKSumm *self, const GKSumm *other)
 	              && vec_typesize(self->vals) == vec_typesize(other->vals),
 	              "Incompatible GK sketches." );
 	usize i = 0, j = 0;
-	gk_qty *i_qty = (gk_qty *) vec_get(self->qtys, i);
-	gk_qty *j_qty = (gk_qty *) vec_get(other->qtys, j);
+	GKQuantity *i_qty = (GKQuantity *) vec_get(self->qtys, i);
+	GKQuantity *j_qty = (GKQuantity *) vec_get(other->qtys, j);
 	while (i < ( vec_len(self->vals) - 1 ) && j < ( vec_len(other->vals) - 1 ) ) {
 		if ( self->cmp(vec_get(self->vals, i), vec_get(other->vals, j)) <= 0 ) {
 			i_qty->delta += (j_qty->qty + j_qty->delta - 1 );
 			i++;
-			i_qty = (gk_qty *) vec_get(self->qtys, i);
+			i_qty = (GKQuantity *) vec_get(self->qtys, i);
 		}
 		else {
 			vec_ins(self->vals, i, vec_get(other->vals, j));
-			gk_qty new_qty = {.qty = j_qty->qty, .delta = (j_qty->delta + i_qty->qty + i_qty->delta - 1)};
+			GKQuantity new_qty = {.qty = j_qty->qty, .delta = (j_qty->delta + i_qty->qty + i_qty->delta - 1)};
 			vec_ins(self->qtys, i, &new_qty);
 			i++;
-			i_qty = (gk_qty *) vec_get(self->qtys, i);
+			i_qty = (GKQuantity *) vec_get(self->qtys, i);
 			j++;
-			j_qty = (gk_qty *) vec_get(other->qtys, j);
+			j_qty = (GKQuantity *) vec_get(other->qtys, j);
 		}
 	}
 	while (j < ( vec_len(other->vals) - 1 )) {
@@ -147,14 +147,14 @@ void gk_merge(GKSumm *self, const GKSumm *other)
 		vec_ins(self->qtys, i, j_qty);
 		i++;
 		j++;
-		j_qty = (gk_qty *) vec_get(other->qtys, j);
+		j_qty = (GKQuantity *) vec_get(other->qtys, j);
 	}
 	self->total_qty += other->total_qty;
 	const usize qty_thres = ceil(2.0 * self->err * self->total_qty);
 	i = 0;
 	while ( i < vec_len(self->vals) - 1 ) {
-		gk_qty *ith_qty = (gk_qty *) vec_get(self->qtys, i);
-		gk_qty *iplus1th_qty = (gk_qty *) vec_get(self->qtys, i + 1);
+		GKQuantity *ith_qty = (GKQuantity *) vec_get(self->qtys, i);
+		GKQuantity *iplus1th_qty = (GKQuantity *) vec_get(self->qtys, i + 1);
 		if (ith_qty->qty + iplus1th_qty->qty + iplus1th_qty->delta < qty_thres) {
 			iplus1th_qty->qty += ith_qty->qty;
 			vec_del(self->vals, i);
@@ -173,10 +173,10 @@ usize gk_rank(GKSumm *self, const void *val)
 		return 0;
 	}
 	usize succ_pos = succ(self->vals, self->cmp, val);
-	gk_qty *succ_qty = (gk_qty *) vec_get(self->qtys, succ_pos);
+	GKQuantity *succ_qty = (GKQuantity *) vec_get(self->qtys, succ_pos);
 	usize ret = 0;
 	for (usize i = 0; i < succ_pos; i++) {
-		ret += ((gk_qty *)vec_get(self->qtys, i))->qty;
+		ret += ((GKQuantity *)vec_get(self->qtys, i))->qty;
 	}
 	return ret - 1 + (succ_qty->qty + succ_qty->delta) / 2;
 }
@@ -190,9 +190,9 @@ void gk_print(GKSumm *self, FILE *stream, void (*print_val)(FILE *,
 		fprintf(stream, "(");
 		print_val(stream, vec_get(self->vals, i));
 		fprintf(stream, ", ");
-		gk_qty *q = (gk_qty *) vec_get(self->qtys, i);
+		GKQuantity *q = (GKQuantity *) vec_get(self->qtys, i);
 		fprintf(stream, "%zu, %zu) ", q->qty, q->delta);
 	}
-	gk_qty *q = (gk_qty *) vec_get(self->qtys, l - 1);
+	GKQuantity *q = (GKQuantity *) vec_get(self->qtys, l - 1);
 	fprintf(stream, "(INF, %zu, %zu)", q->qty, q->delta);
 }

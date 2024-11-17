@@ -155,13 +155,13 @@ typedef struct {
 	bool ok;
 	AVLNode *new_root;
 	bool height_chgd;
-} indel_result;
+} InDelResult;
 
 
-static indel_result __avl_ins(AVL *self, AVLNode *root, void *val)
+static InDelResult __avl_ins(AVL *self, AVLNode *root, void *val)
 {
 	if (root == NULL) {
-		indel_result ret;
+		InDelResult ret;
 		ret.ok = true;
 		ret.new_root = malloc(sizeof(AVLNode) + self->typesize);
 		ret.new_root->bf = 0;
@@ -172,7 +172,7 @@ static indel_result __avl_ins(AVL *self, AVLNode *root, void *val)
 		return ret;
 	}
 	int where = self->cmp(val, NODE_DATA(root));
-	indel_result ret;
+	InDelResult ret;
 	if (where == 0) { // duplicate value
 		ret.ok = false;
 		ret.new_root = root;
@@ -228,7 +228,7 @@ static indel_result __avl_ins(AVL *self, AVLNode *root, void *val)
 
 bool avl_ins(AVL *self, void *val)
 {
-	indel_result ret = __avl_ins(self, self->root, val);
+	InDelResult ret = __avl_ins(self, self->root, val);
 	self->root = ret.new_root;
 	return ret.ok;
 }
@@ -247,18 +247,18 @@ typedef struct {
 	bool height_chgd;
 	AVLNode *root;
 	AVLNode *remvd_node;
-} remv_min_result;
+} RemvMinResult;
 
 
-remv_min_result __avl_remv_min(AVLNode *root)
+RemvMinResult __avl_remv_min(AVLNode *root)
 {
 	assert(root != NULL);
 	if (root->left == NULL) { //root is the min node
-		remv_min_result ret = {.height_chgd = true, .root = root->right, .remvd_node = root};
+		RemvMinResult ret = {.height_chgd = true, .root = root->right, .remvd_node = root};
 		return ret;
 	}
 	else {
-		remv_min_result ret = __avl_remv_min(root->left);
+		RemvMinResult ret = __avl_remv_min(root->left);
 		root->left = ret.root;
 		root->bf += ret.height_chgd;
 		assert(!ret.height_chgd || (0 <= root->bf && root->bf <= 2));
@@ -289,14 +289,14 @@ remv_min_result __avl_remv_min(AVLNode *root)
 }
 
 
-indel_result __avl_remv(AVL *self, AVLNode *root, void *val, void *dest)
+InDelResult __avl_remv(AVL *self, AVLNode *root, void *val, void *dest)
 {
 	if (root == NULL) {
-		indel_result ret = {.ok = false, .height_chgd = 0, .new_root = NULL};
+		InDelResult ret = {.ok = false, .height_chgd = 0, .new_root = NULL};
 		return ret;
 	}
 	int where = self->cmp(val, NODE_DATA(root));
-	indel_result ret = {.ok = false};
+	InDelResult ret = {.ok = false};
 	if (where < 0) {
 		ret = __avl_remv(self, root->left, val, dest);
 		root->left = ret.new_root;
@@ -325,7 +325,7 @@ indel_result __avl_remv(AVL *self, AVLNode *root, void *val, void *dest)
 			return ret;
 		}
 		else {   // has two children
-			remv_min_result rmin_res = __avl_remv_min(root->right);
+			RemvMinResult rmin_res = __avl_remv_min(root->right);
 			root->right = rmin_res.root;
 			memcpy(NODE_DATA(root), NODE_DATA(rmin_res.remvd_node), self->typesize);
 			free(rmin_res.remvd_node);
@@ -373,7 +373,7 @@ indel_result __avl_remv(AVL *self, AVLNode *root, void *val, void *dest)
 
 bool avl_remv(AVL *self, void *val, void *dest)
 {
-	indel_result res = __avl_remv(self, self->root, val, dest);
+	InDelResult res = __avl_remv(self, self->root, val, dest);
 	self->root = res.new_root;
 	return res.ok;
 }
@@ -457,7 +457,7 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 		}
 		byte nc = stack_peek_byte(next_chd_stack);
 		if (nc == 0) {
-			if (order == PRE_ORDER && read) {
+			if (order == AVL_TRAVERSAL_PRE_ORDER && read) {
 				return;
 			}
 			read = true;
@@ -465,7 +465,7 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 			stack_push_byte(next_chd_stack, 0);
 		}
 		else if (nc == 1) {
-			if (order == IN_ORDER && read) {
+			if (order == AVL_TRAVERSAL_IN_ORDER && read) {
 				return;
 			}
 			read = true;
@@ -473,7 +473,7 @@ static void __next(AVL *tree, AVLTraversalOrder order, stack *node_stack,
 			stack_push_rawptr(node_stack, cur->right);
 		}
 		else {   //nc == 2
-			if (order == POST_ORDER && read) {
+			if (order == AVL_TRAVERSAL_POST_ORDER && read) {
 				return;
 			}
 			read = true;
@@ -513,11 +513,11 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 	if (self->root) {
 		AVLNode *cur;
 		switch (order) {
-		case PRE_ORDER:
+		case AVL_TRAVERSAL_PRE_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
 			stack_push_byte(ret->next_chd_stack, 0);
 			break;
-		case IN_ORDER:
+		case AVL_TRAVERSAL_IN_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
 			stack_push_byte(ret->next_chd_stack, 0);
 			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);
@@ -529,7 +529,7 @@ AVLIter *avl_get_iter(AVL *self, AVLTraversalOrder order)
 			stack_pop_byte(ret->next_chd_stack);
 			stack_push_byte(ret->next_chd_stack, 1);
 			break;
-		case POST_ORDER:
+		case AVL_TRAVERSAL_POST_ORDER:
 			stack_push_rawptr(ret->node_stack, self->root);
 			stack_push_byte(ret->next_chd_stack, 0);
 			cur = (AVLNode *)stack_peek_rawptr(ret->node_stack);

@@ -534,6 +534,7 @@ static Iter_vt _vec_iter_vt = {_vec_iter_has_next, _vec_iter_next};
 
 
 VecIter *vec_get_iter(const Vec *v)
+
 {
 	VecIter *ret = NEW(VecIter);
 	ret->_t_Iter.impltor = ret;

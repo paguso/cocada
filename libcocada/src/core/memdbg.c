@@ -32,20 +32,20 @@
 //  Implement the tally as a linear probing closed hashtable
 //  with Fibonacci hashing
 
-// hashtable entry status flag type
+// hashtable entry status type
 typedef enum {
 	FREE, // must be zero
 	ACTIVE,
 	DELETED
-} flag_t;
+} Status;
 
 // memory chunk table entry
 typedef struct {
 	usize alloc_no;	// entry sequential id
 	void *addr;			// block start address
 	usize size;		// block size (in bytes)
-	flag_t flag;		// entry status flag
-} memchunk;
+	Status status;		// entry status
+} MemChunk;
 
 // implement a linear probing hashtable
 // with memory addresses as keys
@@ -55,25 +55,25 @@ typedef struct {
 	usize ndel;		// nb of deleted entries
 	usize cap;			// table capacity
 	usize total;		// total memory size (in bytes) accounted for
-	memchunk *data;		// memory chunks table
-} memtable;
+	MemChunk *data;		// memory chunks table
+} MemTable;
 
 static const usize MIN_CAP = 128;
 static const double GROW_BY = 1.62;
 static const double MAX_LOAD = 0.66;
 static const double MIN_LOAD = 0.25;
 
-static memtable tally = {.count = 0, .nact = 0, .ndel = 0, .cap = 0, .data = NULL};
 
+static MemTable tally = {.count = 0, .nact = 0, .ndel = 0, .cap = 0, .data = NULL};
 
-static void memtable_init(memtable *tally)
+static void memtable_init(MemTable *tally)
 {
 	if (tally->cap) return;
 	tally->count = 0;
 	tally->nact = 0;
 	tally->ndel = 0;
 	tally->cap = MIN_CAP;
-	tally->data = calloc(tally->cap, sizeof(memchunk));
+	tally->data = calloc(tally->cap, sizeof(MemChunk));
 	tally->total = 0;
 }
 
@@ -86,7 +86,7 @@ static usize hash(const void *addr, usize capacity)
 }
 
 /* Ok but unused
-static memchunk memtable_get(memtable *tally, void *addr)
+static MemChunk memtable_get(MemTable *tally, void *addr)
 {
 	memtable_init(tally);
 	usize pos = hash(addr, tally->cap);
@@ -101,7 +101,7 @@ static memchunk memtable_get(memtable *tally, void *addr)
 }
 */
 
-static void memtable_check_and_resize(memtable *tally)
+static void memtable_check_and_resize(MemTable *tally)
 {
 	double load = (double)( tally->nact + tally->ndel ) / (double)(tally->cap);
 	usize newcap = tally->cap;
@@ -113,11 +113,11 @@ static void memtable_check_and_resize(memtable *tally)
 		newcap = tally->cap * GROW_BY;
 	}
 	if (newcap != tally->cap) {
-		memchunk *newdata = (memchunk *)calloc(newcap, sizeof(memchunk));
+		MemChunk *newdata = (MemChunk *)calloc(newcap, sizeof(MemChunk));
 		for (usize i = 0; i < tally->cap; i++) {
-			if (tally->data[i].flag == ACTIVE) {
+			if (tally->data[i].status == ACTIVE) {
 				usize pos = hash(tally->data[i].addr, newcap);
-				for (; newdata[pos].flag != FREE; pos = (pos + 1) % newcap);
+				for (; newdata[pos].status != FREE; pos = (pos + 1) % newcap);
 				newdata[pos] = tally->data[i];
 			}
 		}
@@ -129,15 +129,15 @@ static void memtable_check_and_resize(memtable *tally)
 }
 
 
-static usize memtable_set(memtable *tally, void *addr, usize size)
+static usize memtable_set(MemTable *tally, void *addr, usize size)
 {
 #ifndef MEM_DEBUG
 	return 0;
 #endif
 	memtable_init(tally);
 	usize pos = hash(addr, tally->cap);
-	while (tally->data[pos].flag != FREE) {
-		if (tally->data[pos].flag == ACTIVE &&
+	while (tally->data[pos].status != FREE) {
+		if (tally->data[pos].status == ACTIVE &&
 		        tally->data[pos].addr == addr) {
 			tally->total += (size - tally->data[pos].size);
 			tally->data[pos].size = size;
@@ -150,7 +150,7 @@ static usize memtable_set(memtable *tally, void *addr, usize size)
 	tally->count++;
 	tally->data[pos].addr = addr;
 	tally->data[pos].size = size;
-	tally->data[pos].flag = ACTIVE;
+	tally->data[pos].status = ACTIVE;
 	tally->total += size;
 	tally->nact++;
 	memtable_check_and_resize(tally);
@@ -158,17 +158,17 @@ static usize memtable_set(memtable *tally, void *addr, usize size)
 }
 
 
-static void memtable_unset(memtable *tally, void *addr)
+static void memtable_unset(MemTable *tally, void *addr)
 {
 #ifndef MEM_DEBUG
 	return;
 #endif
 	memtable_init(tally);
 	usize pos = hash(addr, tally->cap);
-	while (tally->data[pos].flag != FREE) {
-		if (tally->data[pos].flag == ACTIVE &&
+	while (tally->data[pos].status != FREE) {
+		if (tally->data[pos].status == ACTIVE &&
 		        tally->data[pos].addr == addr) {
-			tally->data[pos].flag = DELETED;
+			tally->data[pos].status = DELETED;
 			tally->ndel++;
 			tally->nact--;
 			tally->total -= tally->data[pos].size;
@@ -180,7 +180,7 @@ static void memtable_unset(memtable *tally, void *addr)
 }
 
 
-static memdbg_query_t memtable_get(memtable *tally, const void *addr)
+static MemDebugQuery memtable_get(MemTable *tally, const void *addr)
 {
 #ifndef MEM_DEBUG
 	return (memdbg_query_t) {
@@ -188,17 +188,17 @@ static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 	};
 #endif
 	usize pos = hash(addr, tally->cap);
-	while (tally->data[pos].flag != FREE) {
-		if (tally->data[pos].flag == ACTIVE &&
+	while (tally->data[pos].status != FREE) {
+		if (tally->data[pos].status == ACTIVE &&
 		        tally->data[pos].addr == addr) {
-			return (memdbg_query_t) {
+			return (MemDebugQuery) {
 				.active = true, .size = tally->data[pos].size
 			};
 		}
 		pos = (pos + 1) % tally->cap;
 	}
-	assert(tally->data[pos].flag == FREE);
-	return (memdbg_query_t) {
+	assert(tally->data[pos].status == FREE);
+	return (MemDebugQuery) {
 		.active = false, .size = 0
 	};
 }
@@ -206,6 +206,7 @@ static memdbg_query_t memtable_get(memtable *tally, const void *addr)
 
 
 static const char *prefixes[7] = {"", "Kilo", "Mega", "Giga", "Tera", "Peta", "Exa"};
+
 
 typedef struct {
 	double size;
@@ -227,19 +228,19 @@ static hr_t human_readable(usize size)
 
 typedef struct {
 	usize no, pos;
-} pair;
+} pair_t;
 
 static int cmp_pair(const void *l, const void *r)
 {
-	if ( ((pair *)l)->no == ((pair *)r)->no )
+	if ( ((pair_t *)l)->no == ((pair_t *)r)->no )
 		return 0;
-	else if ( ((pair *)l)->no < ((pair *)r)->no )
+	else if ( ((pair_t *)l)->no < ((pair_t *)r)->no )
 		return -1;
 	else
 		return +1;
 }
 
-static void memtable_print_stats(FILE *stream, memtable *tally,
+static void memtable_print_stats(FILE *stream, MemTable *tally,
                                  bool print_chunks)
 {
 	fprintf(stream,
@@ -250,16 +251,16 @@ static void memtable_print_stats(FILE *stream, memtable *tally,
 		        "--------------------------------------------------------------------------------\n");
 		fprintf(stream, "Chunks in chronological order of allocation\n\n");
 		usize n = tally->nact, k = 0;
-		pair *pairs = (pair *)malloc(n * sizeof(pair));
+		pair_t *pairs = (pair_t *)malloc(n * sizeof(pair_t));
 		for (usize i = 0; i < tally->cap; i++) {
-			if (tally->data[i].flag == ACTIVE) {
+			if (tally->data[i].status == ACTIVE) {
 				pairs[k].no = tally->data[i].alloc_no;
 				pairs[k].pos = i;
 				k++;
 			}
 		}
 		assert(k == n);
-		qsort(pairs, n, sizeof(pair), cmp_pair);
+		qsort(pairs, n, sizeof(pair_t), cmp_pair);
 		for (usize i = 0; i < n; i++) {
 			usize pos = pairs[i].pos;
 			fprintf(stream, "#%zu:  %zu bytes @%p\n",
@@ -316,7 +317,7 @@ bool memdbg_is_empty()
 }
 
 
-memdbg_query_t memdbg_query(const void *addr)
+MemDebugQuery memdbg_query(const void *addr)
 {
 	return memtable_get(&tally, addr);
 }
@@ -372,7 +373,7 @@ void *memdbg_realloc(void *ptr, usize size, char *file, int line)
 
 void memdbg_free(void *ptr, char *file, int line)
 {
-	memdbg_query_t q = memtable_get(&tally, ptr);
+	MemDebugQuery q = memtable_get(&tally, ptr);
 	ERROR_ASSERT(q.active == true,
 	             "ERROR: invalid or double free detected @%p [%s:%d]\n",
 	             ptr, file, line);

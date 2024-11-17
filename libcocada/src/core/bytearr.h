@@ -62,7 +62,7 @@ typedef enum {
 	BIN = 0, /**< binaray */
 	HEX = 1  /**< Hexadecimal */
 }
-byte_format;
+BytePrintFormat;
 
 
 /**
@@ -72,7 +72,7 @@ byte_format;
  * @param bytes_per_line Number of bytes to be printed per line.
  * @param leftmargin Left margin string to be print at the start of each line.
  */
-void bytearr_print(const byte *ba, usize nbytes, byte_format fmt,
+void bytearr_print(const byte *ba, usize nbytes, BytePrintFormat fmt,
                    usize bytes_per_line, const char *leftmargin);
 
 

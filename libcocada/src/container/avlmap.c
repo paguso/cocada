@@ -56,7 +56,7 @@ AVLMap *avlmap_new(usize keysize, usize valsize, CmpFunc keycmp)
 void avlmap_finalise(void *ptr, const Finaliser *fnr)
 {
 	AVLMap *self = (AVLMap *)ptr;
-	AVLMapIter *it = avlmap_get_iter(self, POST_ORDER);
+	AVLMapIter *it = avlmap_get_iter(self, AVL_TRAVERSAL_POST_ORDER);
 	const Finaliser *key_fnr = (finaliser_nchd(fnr) > 0) ? finaliser_chd(fnr,
 	                           0) : NULL;
 	const Finaliser *val_fnr = (finaliser_nchd(fnr) > 1) ? finaliser_chd(fnr,

@@ -55,11 +55,11 @@ static inline llong usize_char_at(void *str, usize i)
 	return (llong)(((usize *)str)[i]);
 }
 
-typedef llong (*char_at_fn)(void *, usize);
+typedef llong (*CharAtFunc)(void *, usize);
 
 
 void build_sarr( void *str, usize len, Alphabet *ab, usize *sarr,
-                 bool add_sentinel, char_at_fn char_at );
+                 bool add_sentinel, CharAtFunc char_at );
 
 
 static void get_bkt_start( usize *bkts, usize *dest, usize l)
@@ -82,7 +82,7 @@ static void get_bkt_end( usize *bkts, usize *dest, usize l)
 
 static void init_LS( void *str, usize len, Alphabet *ab,
                      BitVec *lsvec, BitVec *lmsvec, usize *bkts,
-                     bool add_sentinel, char_at_fn char_at)
+                     bool add_sentinel, CharAtFunc char_at)
 {
 	usize last = 0;
 	byte ls, lastls;
@@ -117,7 +117,7 @@ static void init_LS( void *str, usize len, Alphabet *ab,
 static void induce_L( void *str, Alphabet *ab,
                       usize *sarr, BitVec *ls,
                       usize *bkts, usize *offsets,
-                      bool add_sentinel, char_at_fn char_at)
+                      bool add_sentinel, CharAtFunc char_at)
 {
 	usize l = alphabet_size(ab) + add_sentinel;
 	get_bkt_start(bkts, offsets, l);
@@ -135,7 +135,7 @@ static void induce_L( void *str, Alphabet *ab,
 static void induce_S( void *str, Alphabet *ab,
                       usize *sarr, BitVec *ls,
                       usize *bkts, usize *offsets,
-                      bool add_sentinel, char_at_fn char_at)
+                      bool add_sentinel, CharAtFunc char_at)
 {
 	usize l = alphabet_size(ab) + add_sentinel;
 	get_bkt_end(bkts, offsets, l);
@@ -153,7 +153,7 @@ static void induce_S( void *str, Alphabet *ab,
 static void sort_LMS( void *str, Alphabet *ab,
                       usize *sarr, BitVec *ls, BitVec *lms,
                       usize *bkts, usize *offsets,
-                      bool add_sentinel, char_at_fn char_at)
+                      bool add_sentinel, CharAtFunc char_at)
 {
 	//assert(char_at != usize_char_at || add_sentinel == false);
 	usize n = bitvec_len(ls);
@@ -306,7 +306,7 @@ static void sort_LMS( void *str, Alphabet *ab,
  * exactly once at the end of the string.
  */
 void build_sarr( void *str, usize len, Alphabet *ab, usize *sarr,
-                 bool add_sentinel, char_at_fn char_at)
+                 bool add_sentinel, CharAtFunc char_at)
 {
 	usize ab_sz = alphabet_size(ab);
 

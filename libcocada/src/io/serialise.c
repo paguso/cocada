@@ -40,17 +40,19 @@
 extern int errno;
 
 
-#define SOM_T(TYPE,...) som_##TYPE,
+#define SOM_T(TYPE,...) SOM_##TYPE
+
+#define SOM_ENUM_FIELD(TYPE,...) SOM_T(TYPE),
 
 typedef enum {
-	//SOM_T(error) // should be first = 0
-	XX_PRIMITIVES(SOM_T)
-	SOM_T(rawptr)
-	SOM_T(arr)
-	SOM_T(cstr)
-	SOM_T(struct)
-	SOM_T(proxy)
-} som_t;
+	//SOM_ENUM_FIELD(error) // should be first = 0
+	XX_PRIMITIVES(SOM_ENUM_FIELD)
+	SOM_ENUM_FIELD(rawptr)
+	SOM_ENUM_FIELD(arr)
+	SOM_ENUM_FIELD(cstr)
+	SOM_ENUM_FIELD(struct)
+	SOM_ENUM_FIELD(proxy)
+} SOMType;
 
 
 typedef struct _SubSOM {
@@ -60,7 +62,7 @@ typedef struct _SubSOM {
 
 
 struct _SOM {
-	som_t  type;
+	SOMType  type;
 	GetSOMFunc get_som;
 	usize size;
 	usize nchd;
@@ -68,7 +70,7 @@ struct _SOM {
 };
 
 
-static SOM *_som_new(som_t type, usize size, GetSOMFunc get_som)
+static SOM *_som_new(SOMType type, usize size, GetSOMFunc get_som)
 {
 	SOM *ret = NEW(SOM);
 	ret->type = type;
@@ -85,8 +87,8 @@ static SOM *_som_new(som_t type, usize size, GetSOMFunc get_som)
 	static SOM* _som_##TYPE = NULL;\
 	\
 	SOM *get_som_##TYPE() {\
-		if (_som_##TYPE==NULL) {\
-			_som_##TYPE = _som_new(som_##TYPE, sizeof(TYPE), NULL);\
+		if (_som_##TYPE == NULL) {\
+			_som_##TYPE = _som_new(SOM_T(TYPE), sizeof(TYPE), NULL);\
 		}\
 		return _som_##TYPE;\
 	}
@@ -98,25 +100,25 @@ GET_SOM_IMPL(cstr)
 
 SOM *som_arr_new()
 {
-	return _som_new(som_arr, 0, NULL);
+	return _som_new(SOM_T(arr), 0, NULL);
 }
 
 
 SOM *som_ptr_new()
 {
-	return _som_new(som_rawptr, sizeof(rawptr), NULL);
+	return _som_new(SOM_T(rawptr), sizeof(rawptr), NULL);
 }
 
 
 SOM *som_struct_new(usize size, GetSOMFunc get_som)
 {
-	return _som_new(som_struct, size, get_som);
+	return _som_new(SOM_T(struct), size, get_som);
 }
 
 
 SOM *som_proxy_new(GetSOMFunc get_som)
 {
-	return _som_new(som_proxy, 0, get_som);
+	return _som_new(SOM_T(proxy), 0, get_som);
 }
 
 
@@ -209,18 +211,18 @@ static void add_chunk(Vec *chunks, MemChunk ck)
 
 
 
-static void write_type(som_t typ, FILE *stream)
+static void write_type(SOMType typ, FILE *stream)
 {
 	byte btyp = (byte) typ;
 	fwrite(&btyp, 1, 1, stream);
 }
 
 
-static som_t read_type(FILE *stream)
+static SOMType read_type(FILE *stream)
 {
 	byte btyp;
 	fread(&btyp, 1, 1, stream);
-	return (som_t)btyp;
+	return (SOMType)btyp;
 }
 
 
@@ -295,7 +297,7 @@ static void read_prim(SOM *model, void *dest, FILE *stream, Vec *read,
 
 void write_rawptr(SOM *model, void *ptr, FILE *stream, Deque *dq, Vec *written)
 {
-	write_type(som_rawptr, stream);
+	write_type(SOM_T(rawptr), stream);
 	write_addr(ptr, stream);
 	write_size(sizeof(rawptr), stream);
 	fwrite(ptr, sizeof(rawptr), 1, stream);
@@ -354,11 +356,11 @@ void read_rawptr(SOM *model, void *ptr, FILE *stream, Deque *dq, Vec *read,
 	}
 	if (som_nchd(model) > 0) {
 		SOM *pointee_model = som_chd(model, 0).chd;
-		while (pointee_model->type == som_proxy) {
+		while (pointee_model->type == SOM_T(proxy)) {
 			pointee_model = pointee_model->get_som();
 		}
 		void *new_obj = NULL;
-		if (pointee_model->type == som_arr || pointee_model->type == som_cstr) {
+		if (pointee_model->type == SOM_T(arr) || pointee_model->type == SOM_T(cstr)) {
 			new_obj = ptr;
 		}
 		else {
@@ -373,7 +375,7 @@ void read_rawptr(SOM *model, void *ptr, FILE *stream, Deque *dq, Vec *read,
 
 void write_struct(SOM *model, void *obj, FILE *stream, Deque *dq, Vec *written)
 {
-	write_type(som_struct, stream);
+	write_type(SOM_T(struct), stream);
 	write_addr(obj, stream);
 	write_size(model->size, stream);
 	MemChunk chunk = {.start = (usize) obj, .size = model->size};
@@ -420,7 +422,7 @@ static void write_blob(void *ptr, usize size, FILE *stream)
 void write_arr(SOM *model, void *arr, FILE *stream, Deque *dq, Vec *written)
 {
 	ERROR_ASSERT(som_nchd(model) == 1, "Array SOM requires one nested child.\n");
-	write_type(som_arr, stream);
+	write_type(SOM_T(arr), stream);
 	write_addr(arr, stream);
 	usize size = sa_arr_sizeof(arr);
 	write_size(size, stream);
@@ -430,18 +432,18 @@ void write_arr(SOM *model, void *arr, FILE *stream, Deque *dq, Vec *written)
 	SOM *elt_som = som_chd(model, 0).chd;
 	usize elt_size = elt_som->size;
 	switch (elt_som->type) {
-	case som_arr:
+	case SOM_T(arr):
 		ERROR("Unsupported array of array serialisation. See module documentation.\n");
 		break;
-	case som_cstr:
+	case SOM_T(cstr):
 		ERROR("Unsupported array of string serialisation. See module documentation.\n");
 		break;
-	case som_rawptr:
+	case SOM_T(rawptr):
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
 			write_rawptr(elt_som, elt, stream, dq, written);
 		}
 		break;
-	case som_struct:
+	case SOM_T(struct):
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
 			write_struct(elt_som, elt, stream, dq, written);
 		}
@@ -490,7 +492,7 @@ void read_arr(SOM *model, void *ptr_addr, FILE *stream, Deque *dq, Vec *read,
 
 	SOM *elt_som = som_chd(model, 0).chd;
 	usize elt_size = elt_som->size;
-	while (elt_som->type == som_proxy) {
+	while (elt_som->type == SOM_T(proxy)) {
 		elt_som = elt_som->get_som();
 	}
 	WARN_ASSERT((size % elt_som->size) == 0,
@@ -501,18 +503,18 @@ void read_arr(SOM *model, void *ptr_addr, FILE *stream, Deque *dq, Vec *read,
 	*((rawptr *)ptr_addr) = arr;
 
 	switch (elt_som->type) {
-	case som_arr:
+	case SOM_T(arr):
 		ERROR("Unsupported array of array serialisation. See module documentation.\n");
 		break;
-	case som_cstr:
+	case SOM_T(cstr):
 		ERROR("Unsupported array of cstr serialisation. See module documentation.\n");
 		break;
-	case som_rawptr:
+	case SOM_T(rawptr):
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
 			read_rawptr(elt_som, elt, stream, dq, read, mem_map);
 		}
 		break;
-	case som_struct:
+	case SOM_T(struct):
 		for (void *elt = arr; elt < arr + size; elt += elt_size) {
 			read_struct(elt_som, elt, stream, dq, read, mem_map);
 		}
@@ -548,23 +550,23 @@ void read_string(SOM *model, void *ptr_addr, FILE *stream, Deque *dq, Vec *read,
 static void write_obj(SOM *model, void *obj, FILE *stream, Deque *dq,
                       Vec *written, bool check_if_written)
 {
-	while (model->type == som_proxy) {
+	while (model->type == SOM_T(proxy)) {
 		model = model->get_som();
 	}
 	if (check_if_written && contains_addr(written, (usize)obj)) {
 		return;
 	}
 	switch (model->type) {
-	case som_rawptr:
+	case SOM_T(rawptr):
 		write_rawptr(model, obj, stream, dq, written);
 		break;
-	case som_arr:
+	case SOM_T(arr):
 		write_arr(model, obj, stream, dq, written);
 		break;
-	case som_cstr:
+	case SOM_T(cstr):
 		write_string(model, obj, stream, dq, written);
 		break;
-	case som_struct:
+	case SOM_T(struct):
 		write_struct(model, obj, stream, dq, written);
 		break;
 	default:
@@ -577,20 +579,20 @@ static void write_obj(SOM *model, void *obj, FILE *stream, Deque *dq,
 static void read_obj(SOM *model, void *dest, FILE *stream, Deque *dq, Vec *read,
                      HashMap *mem_map)
 {
-	while (model->type == som_proxy) {
+	while (model->type == SOM_T(proxy)) {
 		model = model->get_som();
 	}
 	switch (model->type) {
-	case som_rawptr:
+	case SOM_T(rawptr):
 		read_rawptr(model, dest, stream, dq, read, mem_map);
 		break;
-	case som_arr:
+	case SOM_T(arr):
 		read_arr(model, dest, stream, dq, read, mem_map);
 		break;
-	case som_cstr:
+	case SOM_T(cstr):
 		read_string(model, dest, stream, dq, read, mem_map);
 		break;
-	case som_struct:
+	case SOM_T(struct):
 		read_struct(model, dest, stream, dq, read, mem_map);
 		break;
 	default:
@@ -631,7 +633,7 @@ static void *bfs_read(SOM *model, FILE *stream)
 	Deque *dq = deque_new(sizeof(ObjModel));
 
 	rawptr *ptr = NEW(rawptr);
-	*ptr = (model->type == som_arr) ? ptr : malloc(model->size);
+	*ptr = (model->type == SOM_T(arr)) ? ptr : malloc(model->size);
 	ObjModel om = {.model = model, .obj = *ptr};
 	deque_push_back(dq, &om);
 	while (!deque_empty(dq)) {

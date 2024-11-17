@@ -47,7 +47,7 @@ void vebset_test_add(CuTest *tc)
 	vec_ins_uint32(vec_vals, 0, 0);
 	vec_push_uint32(vec_vals,  UINT32_MAX);
 
-	vebset *vset = vebset_new();
+	VEBSet *vset = vebset_new();
 	for (usize i = 0; i < vec_len(vec_vals); i++) {
 		uint32 x = vec_get_uint32(vec_vals, i);
 		CuAssert(tc, "vset contains non-added element", !vebset_contains(vset, x));
@@ -88,7 +88,7 @@ void vebset_test_del(CuTest *tc)
 	vec_push_uint32(vec_vals, 0);
 	vec_push_uint32(vec_vals,  UINT32_MAX);
 
-	vebset *vset = vebset_new();
+	VEBSet *vset = vebset_new();
 	usize size = 0;
 	for (usize i = 0; i < vec_len(vec_vals); i++) {
 		uint32 x = vec_get_uint32(vec_vals, i);
@@ -129,7 +129,7 @@ void vebset_test_succ(CuTest *tc)
 
 	uint n = 1000;
 	Vec *vec_vals = vec_new_uint32();
-	vebset *vset = vebset_new();
+	VEBSet *vset = vebset_new();
 
 	for (uint i = 0; i < n; i++) {
 		uint32 x = rand_next() % UINT32_MAX;
@@ -175,7 +175,7 @@ void vebset_test_pred(CuTest *tc)
 
 	uint n = 1000;
 	Vec *vec_vals = vec_new_uint32();
-	vebset *vset = vebset_new();
+	VEBSet *vset = vebset_new();
 
 	for (uint i = 0; i < n; i++) {
 		uint32 x = rand_next() % UINT32_MAX;
@@ -221,7 +221,7 @@ void vebset_test_memory(CuTest *tc)
 	setbuf(stdout, NULL);
 
 	uint n = 40000;
-	vebset *vset = vebset_new();
+	VEBSet *vset = vebset_new();
 	usize size = 0;
 	for (uint i = 0; i < n; i++) {
 		uint32 x = rand_next() % UINT32_MAX;

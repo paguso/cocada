@@ -27,13 +27,13 @@
 
 
 struct _Finaliser {
-	finalise_func fn;
+	FinaliseFunc fn;
 	usize nchd;
 	struct _Finaliser **chd;
 };
 
 
-Finaliser *finaliser_new( finalise_func fn )
+Finaliser *finaliser_new( FinaliseFunc fn )
 {
 	Finaliser *fnr = NEW(Finaliser);
 	fnr->fn = fn;
@@ -135,3 +135,4 @@ Finaliser *finaliser_new_ptr_to_obj(const Finaliser *chd)
 {
 	return finaliser_cons(finaliser_new_ptr(), chd);
 }
+

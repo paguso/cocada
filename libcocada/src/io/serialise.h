@@ -202,9 +202,9 @@
  * linked list node object would be defined as
  *
  * ```C
- * typedef struct _node {
+ * typedef struct _Node {
  * 		int val;
- * 		struct _node *next; // recursive reference
+ * 		struct _Node *next; // recursive reference
  * }
  * ```
  *

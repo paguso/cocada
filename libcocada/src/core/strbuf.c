@@ -43,7 +43,7 @@ typedef struct _StrBuf {
 StrBuf;
 
 
-static void _reusizeo(StrBuf *self, usize min_cap)
+static void _resize(StrBuf *self, usize min_cap)
 {
 	min_cap = MAX(min_cap, self->len); // losing data not allowed
 	usize cap;
@@ -117,7 +117,7 @@ usize strbuf_capacity(StrBuf *self)
 
 void strbuf_fit(StrBuf *self)
 {
-	_reusizeo(self, self->len);
+	_resize(self, self->len);
 }
 
 
@@ -149,7 +149,7 @@ void strbuf_set(StrBuf *self, usize pos, char c)
 
 void strbuf_nappend(StrBuf *self, const char *other, usize len)
 {
-	_reusizeo(self, self->len + len);
+	_resize(self, self->len + len);
 	strncpy(self->str + self->len, other, len);
 	self->len += len;
 	self->str[self->len] = '\0';
@@ -177,7 +177,7 @@ void strbuf_cat(StrBuf *dest, const StrBuf *other)
 
 void strbuf_append_char(StrBuf *self, char c)
 {
-	_reusizeo(self, self->len + 1);
+	_resize(self, self->len + 1);
 	self->str[self->len] = c;
 	self->len++;
 	self->str[self->len] = '\0';
@@ -214,7 +214,7 @@ char *strbuf_detach(StrBuf *self)
 void strbuf_ins(StrBuf *self, usize pos, const char *str, usize len)
 {
 	assert(pos <= self->len);
-	_reusizeo(self, self->len + len);
+	_resize(self, self->len + len);
 	memmove(self->str + ((pos + len) * sizeof(char)),
 	        self->str + (pos * sizeof(char)),
 	        (self->len - pos) * sizeof(char));
@@ -266,20 +266,20 @@ void strbuf_clip(StrBuf *self, usize from, usize to)
 typedef struct {
 	int n;
 	int *delta[256];
-} fsm;
+} FSM;
 
 
-static void fsm_free(fsm *f)
+static void fsm_free(FSM *f)
 {
 	for (usize i = 0; i < 256; free(f->delta[i++]));
 	free(f);
 }
 
 
-static fsm *build_fsm(const char *pat, int len)
+static FSM *build_fsm(const char *pat, int len)
 {
 	assert( 0 <= len );
-	fsm *ret = NEW(fsm);
+	FSM *ret = NEW(FSM);
 	ret->n = len + 1;
 	int fail = 0;
 	int m = 256; // 1-byte char assumed
@@ -307,7 +307,7 @@ usize strbuf_find_n(StrBuf *self, const char *old, usize n, usize from_pos,
 	if (n == 0 || from_pos + patlen > self->len) {
 		return 0;
 	}
-	fsm *matcher = build_fsm(old, patlen);
+	FSM *matcher = build_fsm(old, patlen);
 	usize ret = 0;
 	if (patlen == 0 && n > 0) {
 		dest[ret++] = from_pos;
@@ -330,7 +330,7 @@ usize strbuf_replace_n(StrBuf *self, const char *old_str, const char *new_str,
 	if (from > self->len) return 0;
 	usize patlen = strlen(old_str);
 	usize repllen = strlen(new_str);
-	fsm *matcher = build_fsm(old_str, patlen);
+	FSM *matcher = build_fsm(old_str, patlen);
 	stack *occ = stack_new(sizeof(usize));
 	uint occ_count = 0;
 	if (patlen == 0 && occ_count < n ) {
@@ -395,7 +395,7 @@ int sbprintf(StrBuf *self, const char *fmt, ...)
 	usize fmt_len = strlen(fmt);
 	usize avail = self->capacity - self->len;
 	if (avail < fmt_len) {
-		_reusizeo(self, self->len + (2 * fmt_len));
+		_resize(self, self->len + (2 * fmt_len));
 	}
 	avail = self->capacity - self->len;
 	char *dest = self->str + self->len;
@@ -404,7 +404,7 @@ int sbprintf(StrBuf *self, const char *fmt, ...)
 	int written = vsnprintf(dest, avail, fmt, valist);
 	va_end(valist);
 	if (written >= avail) {
-		_reusizeo(self, self->len + written + 1);
+		_resize(self, self->len + written + 1);
 		dest = self->str + self->len;
 		avail = self->capacity - self->len;
 		va_start(valist, fmt);

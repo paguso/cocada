@@ -32,19 +32,6 @@
  * @file vec.h
  * @brief Vector, a.k.a dynamic array.
  * @author Paulo Fonseca
- *
- * A vector (a.k.a. dynamic array) is a linear dynamic
- * collection of elements of the same type and fixed size.
- * It contains the usual access/insert/deletion operations for
- * individual elements at arbitrary positions, plus other
- * convenience functions.
- *
- * It is implemented as a heap allocated array with a given limited
- * capacity, which gets reallocated on demand.
- *
- * This is a **flat** vector (see ::new.h module documentation),
- * meaning the values are directly copied into the buffer, as
- * opposed to storing only references to elements located elsewhere.
  */
 
 

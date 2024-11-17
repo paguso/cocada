@@ -68,7 +68,7 @@ typedef struct _Alphabet Alphabet;
 /*
  * @brief char rank function type
  */
-typedef usize (*char_rank_func)(xchar c);
+typedef usize (*CharRankFunc)(xchar c);
 
 
 /**

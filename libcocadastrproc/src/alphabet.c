@@ -43,17 +43,17 @@
 typedef enum {
 	ARRAY = 0,
 	FUNC  = 1
-} rankmode;
+} RankMode;
 
 
 struct _Alphabet {
 	AlphabetType  type;
-	rankmode rank_mode;
+	RankMode rank_mode;
 	usize   size;
 	char    *letters;
 	union {
 		usize        *arr;
-		char_rank_func func;
+		CharRankFunc func;
 	} ranks;
 };
 

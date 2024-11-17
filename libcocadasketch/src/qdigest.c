@@ -27,14 +27,15 @@
 #include "errlog.h"
 #include "mathutil.h"
 #include "new.h"
+#include "pair.h"
 #include "qdigest.h"
 
 
-typedef struct _qdnode {
+typedef struct _QDigestNode {
 	usize qty;
-	struct _qdnode *chd[2];
+	struct _QDigestNode *chd[2];
 }
-qdnode;
+QDigestNode;
 
 
 #define LEFT 0
@@ -48,7 +49,7 @@ struct _QDigest {
 	usize next_compress_cap;
 	double errlogrange; // err / log(range) constant
 	usize total_qty;
-	qdnode *root;
+	QDigestNode *root;
 };
 
 
@@ -61,7 +62,7 @@ QDigest *qdigest_new(usize range, double err)
 	ret->next_compress_cap = 2;
 	ret->errlogrange = err / log10(range);
 	ret->err = err;
-	ret->root = NEW(qdnode);
+	ret->root = NEW(QDigestNode);
 	ret->root->chd[LEFT] = ret->root->chd[RIGHT] = NULL;
 	ret->root->qty = 0;
 	return ret;
@@ -74,43 +75,37 @@ static inline usize qdigest_cap(QDigest *self)
 }
 
 
-typedef struct qdigest {
-	usize fst;
-	usize snd;
-} size_pair;
+static const PAIR2(usize) zeropair = {.first = 0, .second = 0};
 
-
-static const size_pair zeropair = {.fst = 0, .snd = 0};
-
-
-static size_pair tree_size (qdnode *root)
+static PAIR2(usize) tree_size (QDigestNode *root)
 {
 	if (root == NULL) {
 		return zeropair;
 	}
 	else {
-		size_pair ret = {.fst = 0, .snd = 0};
-		size_pair l = tree_size(root->chd[LEFT]);
-		size_pair r = tree_size(root->chd[RIGHT]);
-		ret.fst = 1 + l.fst + r.fst;
-		ret.snd = 1 + MAX(l.snd, r.snd);
+		PAIR2(usize) ret = {.first = 0, .second = 0};
+		PAIR2(usize) l = tree_size(root->chd[LEFT]);
+		PAIR2(usize) r = tree_size(root->chd[RIGHT]);
+		ret.first = 1 + l.first + r.first;
+		ret.second = 1 + MAX(l.second, r.second);
 		return ret;
 	}
 }
 
 
 typedef struct {
-	qdnode *new_root;
+	QDigestNode *new_root;
 	usize move_up;
-} comp_pair;
+} CompressionPair;
 
 
-static comp_pair __qdigest_compress(qdnode *root, usize cap, usize spare_up)
+static CompressionPair __qdigest_compress(QDigestNode *root, usize cap,
+        usize spare_up)
 {
 
 	assert(root != NULL);
 	assert(root->qty > 0);
-	comp_pair cp;
+	CompressionPair cp;
 	usize move_up = 0, spare_here, put_here;
 	if ( HAS_CHD(root) ) { //non-leaf
 		for (int dir = LEFT; dir <= RIGHT; dir++)  {
@@ -159,12 +154,12 @@ void qdigest_upd(QDigest *self, usize val, usize qty)
 	self->total_qty += qty;
 	usize cap = qdigest_cap(self);
 	assert(self->root != NULL);
-	qdnode *par = self->root, *cur = self->root;
+	QDigestNode *par = self->root, *cur = self->root;
 	int dir;
 	usize l = 0, r = self->range, m;
 	while ( qty ) {
 		if (cur == NULL) {
-			cur = NEW(qdnode);
+			cur = NEW(QDigestNode);
 			cur->qty = 0;
 			cur->chd[0] = cur->chd[1] = NULL;
 			par->chd[dir] = cur;
@@ -196,18 +191,18 @@ void qdigest_upd(QDigest *self, usize val, usize qty)
 		self->next_compress_cap *= 2;
 		DEBUG("Before compress:\n");
 		DEBUG_EXEC(qdigest_print(self, stdout));
-		size_pair nh = tree_size(self->root);
-		DEBUG("#nodes=%zu  height=%zu\n", nh.fst, nh.snd);
+		PAIR2(usize) nh = tree_size(self->root);
+		DEBUG("#nodes=%zu  height=%zu\n", nh.first, nh.second);
 		qdigest_compress(self);
 		DEBUG("After compress:\n");
 		DEBUG_EXEC(qdigest_print(self, stdout));
 		nh = tree_size(self->root);
-		DEBUG("#nodes=%zu  height=%zu\n\n", nh.fst, nh.snd);
+		DEBUG("#nodes=%zu  height=%zu\n\n", nh.first, nh.second);
 	}
 }
 
 
-usize _sum_tree(qdnode *root)
+usize _sum_tree(QDigestNode *root)
 {
 	return (root) ?
 	       root->qty + _sum_tree(root->chd[0]) + _sum_tree(root->chd[1]) : 0;
@@ -216,7 +211,7 @@ usize _sum_tree(qdnode *root)
 
 usize qdigest_rank(QDigest *self, usize val)
 {
-	qdnode *cur = self->root;
+	QDigestNode *cur = self->root;
 	usize l = 0, r = self->range, m;
 	usize ret = 0;
 	while ( cur != NULL && HAS_CHD(cur) ) {
@@ -235,7 +230,8 @@ usize qdigest_rank(QDigest *self, usize val)
 }
 
 
-static void _print(FILE *stream, qdnode *root, usize l, usize r, usize level)
+static void _print(FILE *stream, QDigestNode *root, usize l, usize r,
+                   usize level)
 {
 	if (root == NULL ) return;
 	for (int i = 0; i < level; i++)  {

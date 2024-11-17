@@ -61,7 +61,7 @@ struct _HuffCode {
 typedef struct {
 	usize freq; // must come first
 	usize node;
-} nodefreq;
+} NodeFreq;
 
 static int nodefreq_cmp(const void *p1, const void *p2)
 {
@@ -101,14 +101,14 @@ HuffCode *huffcode_new(const Alphabet *ab, const usize freqs[])
 		bitarr_set_bit(hcode->tree[i].ab_mask, i, 1);
 	}
 
-	BinHeap *nfheap = binheap_new(sizeof(nodefreq), nodefreq_cmp);
+	BinHeap *nfheap = binheap_new(sizeof(NodeFreq), nodefreq_cmp);
 	for (usize i = 0; i < hcode->size; i++) {
-		nodefreq nf = {.node = i, .freq = freqs[i]};
+		NodeFreq nf = {.node = i, .freq = freqs[i]};
 		binheap_ins(nfheap, &nf);
 	}
 	usize next = hcode->size;
 	while (binheap_size(nfheap) > 1) {
-		nodefreq smallest, snd_smallest, new_nf;
+		NodeFreq smallest, snd_smallest, new_nf;
 		binheap_remv(nfheap, &smallest);
 		binheap_remv(nfheap, &snd_smallest);
 		new_nf.node = next;
