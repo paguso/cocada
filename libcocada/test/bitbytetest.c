@@ -41,44 +41,44 @@ void test_byte_reverse(CuTest *tc)
 }
 
 
-void test_byteo_str(CuTest *tc)
+void test_byte_to_str(CuTest *tc)
 {
 	CuAssert(tc, "Tests require BYTESIZE==8", BYTESIZE == 8);
 	byte b;
 	char str[BYTESIZE + 1];
 	b = 0x01;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "00000001", str);
 	b = 0x23;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "00100011", str);
 	b = 0x45;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "01000101", str);
 	b = 0x67;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "01100111", str);
 	b = 0x89;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "10001001", str);
 	b = 0xab;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "10101011", str);
 	b = 0xcd;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "11001101", str);
 	b = 0xef;
-	byteo_str(b, str);
+	byte_to_str_bin(b, str);
 	CuAssertStrEquals(tc, "11101111", str);
 
 	printf("start converting\n");
 	usize n = 1ll << 8;
 	for (usize i = 0; i < n; i++) {
 		b = (byte) i;
-		byteo_str(b, str);
-		DEBUG("%"PRIbB" = %s\n", BYTESTRB(b), str);
-		byteo_strx(b, str);
-		DEBUG("%"PRIbX" = %s\n", BYTESTRX(b), str);
+		byte_to_str_bin(b, str);
+		DEBUG("%b = %s\n", b, str);
+		byte_to_str_hex(b, str);
+		DEBUG("%b = %s\n", b, str);
 	}
 
 	printf("Done converting %zu bytes\n", n);
@@ -287,7 +287,7 @@ CuSuite *bitbyte_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_byte_reverse);
-	SUITE_ADD_TEST(suite, test_byteo_str);
+	SUITE_ADD_TEST(suite, test_byte_to_str);
 	SUITE_ADD_TEST(suite, test_byte_bitcount);
 	SUITE_ADD_TEST(suite, test_uint16_bitcount);
 	SUITE_ADD_TEST(suite, test_uint32_bitcount);

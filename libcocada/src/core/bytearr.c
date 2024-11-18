@@ -70,7 +70,7 @@ void bytearr_print (const byte *ba, usize nbytes, BytePrintFormat fmt,
 			if (i) printf("\n");
 			printf("%s%*zu:", left_margin, (int)line_label_width, i);
 		}
-		byteo_str(ba[i], bytestr);
+		byte_to_str_bin(ba[i], bytestr);
 		printf(" %s", bytestr);
 	}
 	printf("\n");

@@ -139,52 +139,6 @@ See release notes for porting issues."
 
 #define GCC_BUILTINS (defined(__GNUC__) && !defined(__clang__))
 
-/**
- * @brief Binary print format specifier for the byte type to be used
- * in conjunction with BYTESTRB conversion macro.
- * @see BYTESTRB
- */
-#define PRIbB "c%c%c%c%c%c%c%c"
-
-/**
- * @brief Converts a byte to a binary string for printing. To be used with the PRIbB format.
- * Example
- * ```C
- * byte b = 0xaa;
- * printf("byte=%"PRIbB"\n", BYTESTRB(b)); // prints "byte=10101010"
- * ```
- * @see PRIbB
- */
-#define BYTESTRB(byte)  \
-	(byte & 0x80 ? '1' : '0'), \
-	(byte & 0x40 ? '1' : '0'), \
-	(byte & 0x20 ? '1' : '0'), \
-	(byte & 0x10 ? '1' : '0'), \
-	(byte & 0x08 ? '1' : '0'), \
-	(byte & 0x04 ? '1' : '0'), \
-	(byte & 0x02 ? '1' : '0'), \
-	(byte & 0x01 ? '1' : '0')
-
-/**
- * @brief Hexadecimal print format specifier for the byte type to be used
- * in conjunction with BYTESTRX conversion macro.
- * @see BYTESTRX
- */
-#define PRIbX "02x"
-
-
-/**
- * @brief Converts a byte to an hexadecimal string for printing.
- * To be used with the PRIbB format.
- * Example
- * ```C
- * byte b = 0xaa;
- * printf("byte=%"PRIbX"\n", BYTESTRX(b)); // prints "byte=0xaa"
- * ```
- * @see PRIbB
- */
-#define BYTESTRX(byte) ((int)byte)
-
 
 /**
  * @brief returns the minimal number of bytes required to represent @p nvalues
@@ -196,13 +150,13 @@ usize nbytes(usize nvalues);
 /**
  * @brief Converts a byte to a binary string.
  */
-void byteo_str(byte b, char *dest);
+void byte_to_str_bin(byte b, char *dest);
 
 
 /**
  * @brief Converts a byte to an hexadecimal string.
  */
-void byteo_strx(byte b, char *dest);
+void byte_to_str_hex(byte b, char *dest);
 
 
 /**

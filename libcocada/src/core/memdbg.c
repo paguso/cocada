@@ -179,11 +179,10 @@ static void memtable_unset(MemTable *tally, void *addr)
 	memtable_check_and_resize(tally);
 }
 
-
-static MemDebugQuery memtable_get(MemTable *tally, const void *addr)
+static MemDbgQuery memtable_get(MemTable *tally, const void *addr)
 {
 #ifndef MEM_DEBUG
-	return (memdbg_query_t) {
+	return (MemDbgQuery) {
 		.active = false, .size = 0
 	};
 #endif
@@ -191,14 +190,14 @@ static MemDebugQuery memtable_get(MemTable *tally, const void *addr)
 	while (tally->data[pos].status != FREE) {
 		if (tally->data[pos].status == ACTIVE &&
 		        tally->data[pos].addr == addr) {
-			return (MemDebugQuery) {
+			return (MemDbgQuery) {
 				.active = true, .size = tally->data[pos].size
 			};
 		}
 		pos = (pos + 1) % tally->cap;
 	}
 	assert(tally->data[pos].status == FREE);
-	return (MemDebugQuery) {
+	return (MemDbgQuery) {
 		.active = false, .size = 0
 	};
 }
@@ -317,7 +316,7 @@ bool memdbg_is_empty()
 }
 
 
-MemDebugQuery memdbg_query(const void *addr)
+MemDbgQuery memdbg_query(const void *addr)
 {
 	return memtable_get(&tally, addr);
 }
@@ -373,7 +372,7 @@ void *memdbg_realloc(void *ptr, usize size, char *file, int line)
 
 void memdbg_free(void *ptr, char *file, int line)
 {
-	MemDebugQuery q = memtable_get(&tally, ptr);
+	MemDbgQuery q = memtable_get(&tally, ptr);
 	ERROR_ASSERT(q.active == true,
 	             "ERROR: invalid or double free detected @%p [%s:%d]\n",
 	             ptr, file, line);
