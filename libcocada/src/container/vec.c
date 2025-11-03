@@ -59,7 +59,7 @@ size_t vec_memsize(vec *self)
 
 vec *vec_new(size_t typesize)
 {
-	return vec_new_with_capacity(typesize, MIN_CAPACITY);
+	return vec_new_with_capacity(typesize, vec_min_capacity());
 }
 
 
@@ -74,10 +74,9 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 	vec *ret;
 	ret = NEW(vec);
 	ret->typesize = typesize;
-	ret->capacity = MAX(MIN_CAPACITY, init_capacity);
+	ret->capacity = MAX(vec_min_capacity(), init_capacity);
 	ret->len = 0;
-	ret->data = malloc((ret->capacity + 1) *
-	                   ret->typesize); // +1 position used for swap
+	ret->data = malloc(ret->capacity * ret->typesize); 
 	return ret;
 }
 
@@ -90,27 +89,25 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize)
 	ret->len = len;
 	ret->data = buf;
 	ret->capacity = ret->len;
-	ret->data = realloc(ret->data, (ret->capacity + 1) * ret->typesize);
+	ret->data = realloc(ret->data, ret->capacity  * ret->typesize);
 	return ret;
 }
 
 
 vec *vec_new_from_arr_cpy(const void *buf, size_t len, size_t typesize)
 {
-	vec *ret = NEW(vec);
-	ret->typesize = typesize;
+	vec *ret = vec_new_with_capacity(typesize, len);
+	memcpy(ret->data, buf, ret->len * ret->typesize);
 	ret->len = len;
 	ret->capacity = ret->len;
-	ret->data = malloc((ret->capacity + 1) * ret->typesize);
-	memcpy(ret->data, buf, ret->len * ret->typesize);
 	return ret;
 }
 
 
 void vec_fit(vec *v)
 {
-	v->capacity = v->len;
-	v->data = realloc(v->data, (v->capacity + 1) * v->typesize);
+	v->capacity = MAX(vec_min_capacity(), v->len);
+	v->data = realloc(v->data, v->capacity * v->typesize);
 }
 
 
@@ -118,7 +115,7 @@ void vec_fit(vec *v)
 static void _resize_to(vec *v, size_t cap)
 {
 	v->capacity = MAX3(MIN_CAPACITY, v->len, cap);
-	v->data = realloc(v->data, (v->capacity + 1) * v->typesize);
+	v->data = realloc(v->data, v->capacity * v->typesize);
 }
 
 
@@ -153,6 +150,18 @@ size_t vec_len(const vec *v)
 }
 
 
+size_t vec_capacity(const vec *v)
+{
+	return v->capacity;
+}
+
+
+size_t vec_min_capacity()
+{
+	return MIN_CAPACITY;
+}
+
+
 size_t vec_typesize(const vec *v)
 {
 	return v->typesize;
@@ -174,9 +183,9 @@ const void *vec_as_array(vec *v)
 void *vec_detach(vec *v)
 {
 	vec_fit(v);
-	void *data = realloc(v->data, v->len * v->typesize);
+	void *arr = v->data;
 	FREE(v);
-	return data;
+	return arr;
 }
 
 
@@ -229,13 +238,21 @@ void vec_set(vec *v, size_t pos, const void *src)
 }
 
 
-void vec_swap(vec *v, size_t i, size_t j)
+static void _vec_swap(vec *v, size_t i, size_t j, void *swp)
 {
-	void *swp = v->data + (v->capacity * v->typesize);
 	if (i == j) return;
 	memcpy(swp, v->data + (i * v->typesize), v->typesize);
 	memcpy(v->data + (i * v->typesize), v->data + (j * v->typesize), v->typesize);
 	memcpy(v->data + (j * v->typesize), swp, v->typesize);
+}
+
+
+void vec_swap(vec *v, size_t i, size_t j)
+{
+	if (i == j) return;
+	void *swp = malloc(sizeof(v->typesize));
+	_vec_swap(v, i, j, swp);
+	FREE(swp);
 }
 
 
@@ -314,9 +331,11 @@ void vec_clip(vec *v, size_t from, size_t to)
 void vec_reverse(vec *v)
 {
 	size_t l = 0, r = v->len - 1;
+	void *swp = malloc(v->typesize);
 	while (l < r) {
-		vec_swap(v, l++, r--);
+		_vec_swap(v, l++, r--, swp);
 	}
+	free(swp);
 }
 
 

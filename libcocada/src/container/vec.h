@@ -42,7 +42,7 @@
  * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand.
  *
- * This is a **flat** vector (see ::new.h module documentation),
+ * This is a **flat** container (see ::new.h module documentation),
  * meaning the values are directly copied into the buffer, as
  * opposed to storing only references to elements located elsewhere.
  */
@@ -52,6 +52,7 @@
  * @brief Vector type (opaque).
  */
 typedef struct _vec vec;
+
 
 /**
  * @brief Vector constructor.
@@ -127,6 +128,17 @@ size_t vec_memsize(vec *self);
  */
 size_t vec_len(const vec *v);
 
+
+/**
+ * @brief Returns the capacity of the vector.
+ */
+size_t vec_capacity(const vec *v);
+
+
+/**
+ * @brief Returns the minimum capacity (number of elements) of the vector implementation.
+ */
+size_t vec_min_capacity();
 
 /**
  * @brief Returns the individual size of stored elements (in bytes).
