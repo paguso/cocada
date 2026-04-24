@@ -59,41 +59,37 @@ CuSuite *vebset_get_test_suite();
 
 void run_all_tests(void)
 {
-	CuString *output = CuStringNew();
-	CuSuite *suite = CuSuiteNew();
-	//CuSuiteAddSuite(suite, arrays_get_test_suite());
-	//CuSuiteAddSuite(suite, avl_get_test_suite());
-	//CuSuiteAddSuite(suite, avlmap_get_test_suite());
-	//CuSuiteAddSuite(suite, binheap_get_test_suite());
-	//CuSuiteAddSuite(suite, bitarray_get_test_suite());
-	//CuSuiteAddSuite(suite, bitbyte_get_test_suite());
-	//CuSuiteAddSuite(suite, bitvec_get_test_suite());
-	//CuSuiteAddSuite(suite, bytearray_get_test_suite());
-	//CuSuiteAddSuite(suite, csrsbitarr_get_test_suite());
-	//CuSuiteAddSuite(suite, cstrutil_get_test_suite());
-	//CuSuiteAddSuite(suite, cli_get_test_suite());
-	//CuSuiteAddSuite(suite, deque_get_test_suite());
-	//CuSuiteAddSuite(suite, hashmap_get_test_suite());
-	//CuSuiteAddSuite(suite, hashset_get_test_suite());
-	//CuSuiteAddSuite(suite, mathutil_get_test_suite());
-	//CuSuiteAddSuite(suite, minqueue_get_test_suite());
-	//CuSuiteAddSuite(suite, randutil_get_test_suite());
-	// CuSuiteAddSuite(suite, range_get_test_suite());
-	//CuSuiteAddSuite(suite, serialise_get_test_suite());
-	//CuSuiteAddSuite(suite, segtree_get_test_suite());
-	//CuSuiteAddSuite(suite, sort_get_test_suite());
-	//CuSuiteAddSuite(suite, stack_get_test_suite());
-	//CuSuiteAddSuite(suite, strbuf_get_test_suite());
-	//CuSuiteAddSuite(suite, strfileread_get_test_suite());
-	//CuSuiteAddSuite(suite, strstream_get_test_suite());
-	//CuSuiteAddSuite(suite, tvec_get_test_suite());
-	//CuSuiteAddSuite(suite, vebset_get_test_suite());
-	CuSuiteAddSuite(suite, vec_get_test_suite());
+    CuString *output = CuStringNew();
+    CuSuite *suite = CuSuiteNew();
+    CuSuiteAddSuite(suite, arrays_get_test_suite());
+    CuSuiteAddSuite(suite, avl_get_test_suite());
+    CuSuiteAddSuite(suite, avlmap_get_test_suite());
+    CuSuiteAddSuite(suite, binheap_get_test_suite());
+    CuSuiteAddSuite(suite, bitarray_get_test_suite());
+    CuSuiteAddSuite(suite, bitbyte_get_test_suite());
+    CuSuiteAddSuite(suite, bitvec_get_test_suite());
+    CuSuiteAddSuite(suite, bytearray_get_test_suite());
+    CuSuiteAddSuite(suite, cstrutil_get_test_suite());
+    CuSuiteAddSuite(suite, deque_get_test_suite());
+    CuSuiteAddSuite(suite, hashmap_get_test_suite());
+    CuSuiteAddSuite(suite, hashset_get_test_suite());
+    CuSuiteAddSuite(suite, mathutil_get_test_suite());
+    CuSuiteAddSuite(suite, minqueue_get_test_suite());
+    CuSuiteAddSuite(suite, randutil_get_test_suite());
+    CuSuiteAddSuite(suite, range_get_test_suite());
+    CuSuiteAddSuite(suite, serialise_get_test_suite());
+    CuSuiteAddSuite(suite, segtree_get_test_suite());
+    CuSuiteAddSuite(suite, sort_get_test_suite());
+    CuSuiteAddSuite(suite, stack_get_test_suite());
+    CuSuiteAddSuite(suite, strbuf_get_test_suite());
+    CuSuiteAddSuite(suite, strfileread_get_test_suite());
+    CuSuiteAddSuite(suite, vebset_get_test_suite());
+    CuSuiteAddSuite(suite, vec_get_test_suite());
 
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
+    CuSuiteRun(suite);
+    CuSuiteSummary(suite, output);
+    CuSuiteDetails(suite, output);
+    printf("%s\n", output->buffer);
 }
 
 
@@ -102,6 +98,6 @@ void print_count() ;
 
 int main(void)
 {
-	run_all_tests();
-	return 0;
+    run_all_tests();
+    return 0;
 }
