@@ -114,7 +114,7 @@ void kll_finalise(void *ptr, const finaliser *fnr)
 	if (finaliser_nchd(fnr)) {
 		DESTROY(self->buffs, finaliser_cons(FNR(vec),
 		                                    finaliser_cons(finaliser_new_ptr(),
-		                                            finaliser_cons(FNR(vec), finaliser_chd(fnr, 0)))));
+		                                            finaliser_cons(FNR(vec), finaliser_clone(finaliser_chd(fnr, 0))))));
 	}
 	else {
 		DESTROY(self->buffs, finaliser_cons(FNR(vec), FNR(vec)));
