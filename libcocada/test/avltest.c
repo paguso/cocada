@@ -114,22 +114,24 @@ void test_avl_ins(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
-	vec *buf = vec_new(sizeof(obj_t));
+	// NB: plain array, not a vec, since a vec may relocate its backing
+	// storage on push, which would invalidate pointers already held
+	// by the tree
+	obj_t *buf = malloc(half_univ * sizeof(obj_t));
 	tree = avl_new(sizeof(obj_t *), cmp_obj_t_refs);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);
-		obj_t obj = {.key = key, .value = (double)key};
-		vec_push(buf, &obj);
+		buf[i] = (obj_t) {.key = key, .value = (double)key};
 		DEBUG("\n\nInsert non-owned obj %d\n", key);
-		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)vec_get(buf, i)));
+		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, (void *)&buf[i]));
 		CuAssert(tc, "Wrongly well-succeeded AVL push", !avl_ins_rawptr(tree,
-		         (void *)vec_get(buf, i)));
+		         (void *)&buf[i]));
 		DEBUG_EXEC(avl_print(tree, stderr, print_obj_t_ref));
 	}
 	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t_ref));
 	DEBUG("\n\n\n");
 	DESTROY_FLAT(tree, avl);
-	DESTROY_FLAT(buf, vec);
+	free(buf);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// owned references
@@ -193,13 +195,15 @@ void test_avl_get(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// non-owned references with rawptr method
-	vec *buf = vec_new(sizeof(obj_t));
+	// NB: plain array, not a vec, since a vec may relocate its backing
+	// storage on push, which would invalidate pointers already held
+	// by the tree
+	obj_t *buf = malloc(half_univ * sizeof(obj_t));
 	tree = avl_new(sizeof(obj_t *), cmp_obj_t_refs);
 	for (int i = 0; i < half_univ; i++) {
 		int key = half_univ + ((i % 2) ? i : -i);
-		obj_t obj = {.key = key, .value = (double)key};
-		vec_push(buf, &obj);
-		obj_t *obj_ref = (obj_t *)vec_get(buf, i);
+		buf[i] = (obj_t) {.key = key, .value = (double)key};
+		obj_t *obj_ref = &buf[i];
 		DEBUG("\n\nInsert non-owned obj %d\n", key);
 		CuAssert(tc, "AVL Get error", avl_get(tree, &obj_ref) == NULL);
 		CuAssert(tc, "Failed AVL push", avl_ins_rawptr(tree, obj_ref));
@@ -209,7 +213,7 @@ void test_avl_get(CuTest *tc)
 	DEBUG_EXEC(avl_print(tree, stderr, print_obj_t_ref));
 	DEBUG("\n\n\n");
 	DESTROY_FLAT(tree, avl);
-	DESTROY_FLAT(buf, vec);
+	free(buf);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// owned references
@@ -276,7 +280,7 @@ void test_avl_remv(CuTest *tc)
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 
 	// owned references
-	tree = avl_new(sizeof(obj_t), cmp_obj_t_refs);
+	tree = avl_new(sizeof(obj_t *), cmp_obj_t_refs);
 	for (int i = 0; i < half_univ; i++) {
 		int val = half_univ + ((i % 2) ? i : -i);
 		//DEBUG("Insert %d\n", val);
