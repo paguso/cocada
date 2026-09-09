@@ -25,29 +25,29 @@
 #include "CuTest.h"
 
 
-//CuSuite *bjkst_get_test_suite();
-//CuSuite *fmalg_get_test_suite();
-//CuSuite *gk_get_test_suite();
-//CuSuite *kll_get_test_suite();
+CuSuite *bjkst_get_test_suite();
+CuSuite *fmalg_get_test_suite();
+CuSuite *gk_get_test_suite();
+CuSuite *kll_get_test_suite();
 CuSuite *quadtree_get_test_suite();
-//CuSuite *qdigest_get_test_suite();
+CuSuite *qdigest_get_test_suite();
 
 
 void run_all_tests(void)
 {
-	CuString *output = CuStringNew();
-	CuSuite *suite = CuSuiteNew();
-	//CuSuiteAddSuite(suite, bjkst_get_test_suite());
-	//CuSuiteAddSuite(suite, fmalg_get_test_suite());
-	//CuSuiteAddSuite(suite, gk_get_test_suite());
-	//CuSuiteAddSuite(suite, kll_get_test_suite());
-	//CuSuiteAddSuite(suite, qdigest_get_test_suite());
-	CuSuiteAddSuite(suite, quadtree_get_test_suite());
+    CuString *output = CuStringNew();
+    CuSuite *suite = CuSuiteNew();
+    CuSuiteAddSuite(suite, bjkst_get_test_suite());
+    CuSuiteAddSuite(suite, fmalg_get_test_suite());
+    CuSuiteAddSuite(suite, gk_get_test_suite());
+    CuSuiteAddSuite(suite, kll_get_test_suite());
+    CuSuiteAddSuite(suite, qdigest_get_test_suite());
+    CuSuiteAddSuite(suite, quadtree_get_test_suite());
 
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
+    CuSuiteRun(suite);
+    CuSuiteSummary(suite, output);
+    CuSuiteDetails(suite, output);
+    printf("%s\n", output->buffer);
 }
 
 
@@ -56,6 +56,6 @@ void print_count() ;
 
 int main(void)
 {
-	run_all_tests();
-	return 0;
+    run_all_tests();
+    return 0;
 }
