@@ -30,47 +30,47 @@
 
 void test_stack_push_pop(CuTest *tc)
 {
-	size_t len = 100;
-	stack *q = stack_new(sizeof(double));
-	CuAssertTrue(tc, stack_empty(q));
+    size_t len = 100;
+    stack *q = stack_new(sizeof(double));
+    CuAssertTrue(tc, stack_empty(q));
 
-	for (size_t i = 0; i < len; i++) {
-		double d = (double)(i);
-		//printf("pushing %f\n", d);
-		stack_push(q, &d);
-	}
+    for (size_t i = 0; i < len; i++) {
+        double d = (double)(i);
+        //printf("pushing %f\n", d);
+        stack_push(q, &d);
+    }
 
-	for (size_t i = len; i >= 1; i--) {
-		double d;
-		stack_pop(q, &d);
-		//printf("popping %f\n", *d);
-		CuAssertDblEquals(tc, (double)(i - 1), d, 0.2);
-	}
+    for (size_t i = len; i >= 1; i--) {
+        double d;
+        stack_pop(q, &d);
+        //printf("popping %f\n", *d);
+        CuAssertDblEquals(tc, (double)(i - 1), d, 0.2);
+    }
 
-	CuAssertTrue(tc, stack_empty(q));
+    CuAssertTrue(tc, stack_empty(q));
 
 }
 
 
 void test_stack_push_pop_int(CuTest *tc)
 {
-	size_t len = 100;
-	stack *q = stack_new(sizeof(int));
-	CuAssertTrue(tc, stack_empty(q));
+    size_t len = 100;
+    stack *q = stack_new(sizeof(int));
+    CuAssertTrue(tc, stack_empty(q));
 
-	for (size_t i = 0; i < len; i++) {
-		int d = i;
-		//printf("pushing %d\n", d);
-		stack_push_int(q, d);
-	}
+    for (size_t i = 0; i < len; i++) {
+        int d = i;
+        //printf("pushing %d\n", d);
+        stack_push_int(q, d);
+    }
 
-	for (size_t i = len; i >= 1; i--) {
-		int d = stack_pop_int(q);
-		//printf("popping %d\n", d);
-		CuAssertIntEquals(tc, i - 1, d);
-	}
+    for (size_t i = len; i >= 1; i--) {
+        int d = stack_pop_int(q);
+        //printf("popping %d\n", d);
+        CuAssertIntEquals(tc, i - 1, d);
+    }
 
-	CuAssertTrue(tc, stack_empty(q));
+    CuAssertTrue(tc, stack_empty(q));
 
 }
 
@@ -78,8 +78,8 @@ void test_stack_push_pop_int(CuTest *tc)
 
 CuSuite *stack_get_test_suite()
 {
-	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_stack_push_pop);
-	SUITE_ADD_TEST(suite, test_stack_push_pop_int);
-	return suite;
+    CuSuite *suite = CuSuiteNew("stack");
+    SUITE_ADD_TEST(suite, test_stack_push_pop);
+    SUITE_ADD_TEST(suite, test_stack_push_pop_int);
+    return suite;
 }

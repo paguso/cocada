@@ -30,9 +30,9 @@ char *CuStrCopy(const char *old);
 #define STRING_INC		256
 
 typedef struct {
-	int length;
-	int size;
-	char *buffer;
+    int length;
+    int size;
+    char *buffer;
 } CuString;
 
 void CuStringInit(CuString *str);
@@ -52,12 +52,12 @@ typedef struct CuTest CuTest;
 typedef void (*TestFunction)(CuTest *);
 
 struct CuTest {
-	char *name;
-	TestFunction function;
-	int failed;
-	int ran;
-	const char *message;
-	jmp_buf *jumpBuf;
+    char *name;
+    TestFunction function;
+    int failed;
+    int ran;
+    const char *message;
+    jmp_buf *jumpBuf;
 };
 
 void CuTestInit(CuTest *t, const char *name, TestFunction function);
@@ -80,11 +80,11 @@ void CuAssertIntEquals_LineMsg(CuTest *tc,
                                const char *file, int line, const char *message,
                                int expected, int actual);
 void CuAssertUIntEquals_LineMsg(CuTest *tc,
-                               const char *file, int line, const char *message,
-                               unsigned int expected, unsigned int actual);
+                                const char *file, int line, const char *message,
+                                unsigned int expected, unsigned int actual);
 void CuAssertLongEquals_LineMsg(CuTest *tc,
-                                 const char *file, int line, const char *message,
-                                 long expected, long actual);
+                                const char *file, int line, const char *message,
+                                long expected, long actual);
 void CuAssertULongEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
                                  unsigned long expected, unsigned long actual);
@@ -92,8 +92,8 @@ void CuAssertLlongEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
                                  long long expected, long long actual);
 void CuAssertULlongEquals_LineMsg(CuTest *tc,
-                                 const char *file, int line, const char *message,
-                                 unsigned long long expected, unsigned long long actual);
+                                  const char *file, int line, const char *message,
+                                  unsigned long long expected, unsigned long long actual);
 void CuAssertSizeTEquals_LineMsg(CuTest *tc,
                                  const char *file, int line, const char *message,
                                  size_t expected, size_t actual);
@@ -140,23 +140,28 @@ void CuAssertPtrEquals_LineMsg(CuTest *tc,
 
 #define MAX_TEST_CASES	1024
 
-#define SUITE_ADD_TEST(SUITE,TEST)	CuSuiteAdd(SUITE, CuTestNew(#TEST, TEST))
+#define SUITE_ADD_TEST(SUITE,TEST)	CuSuiteAdd(SUITE, CuTestNew(#TEST, TEST), NULL)
 
 typedef struct {
-	int count;
-	CuTest *list[MAX_TEST_CASES];
-	int failCount;
+    char *name;
+    int count;
+    char *qualifiedTestNames[MAX_TEST_CASES];
+    CuTest *list[MAX_TEST_CASES];
+    int okCount;
+    int failCount;
 
 } CuSuite;
 
 
-void CuSuiteInit(CuSuite *testSuite);
-CuSuite *CuSuiteNew(void);
+void CuSuiteInit(CuSuite *testSuite, const char *suiteName);
+CuSuite *CuSuiteNew(const char *suiteName);
 void CuSuiteDelete(CuSuite *testSuite);
-void CuSuiteAdd(CuSuite *testSuite, CuTest *testCase);
+void CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char *qualifiedName);
 void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2);
 void CuSuiteRun(CuSuite *testSuite);
+void CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary);
 void CuSuiteDetails(CuSuite *testSuite, CuString *details);
+void CuSuitePrintTests(CuSuite *testSuite);
 
 #endif /* CU_TEST_H */

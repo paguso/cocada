@@ -512,7 +512,7 @@ void test_bitarr_write_byte_t(CuTest *tc)
 
 CuSuite *bitarray_get_test_suite()
 {
-    CuSuite *suite = CuSuiteNew();
+    CuSuite *suite = CuSuiteNew("bitarr");
     SUITE_ADD_TEST(suite, bitarray_test_setup);
     SUITE_ADD_TEST(suite, test_bitarr_new_from_str);
     SUITE_ADD_TEST(suite, test_bitarr_get_bit);

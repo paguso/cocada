@@ -1,0 +1,28 @@
+[
+  {
+    "file": "./src/kll.c",
+    "arguments": [
+      "/usr/bin/cc",
+      "-c",
+      "-I./src/",
+      "-I../libcocada/./src/container/",
+      "-I../libcocada/./src/core/",
+      "-I../libcocada/./src/io/",
+      "-I../libcocada/./src/math/",
+      "-I../libcocada/./src/thrdpty/cutest/",
+      "-I../libcocada/./src/thrdpty/ltqnorm/",
+      "-I../libcocada/./src/thrdpty/sfmt/",
+      "-I../libcocadasketch/./src/",
+      "-Wall",
+      "-g3",
+      "-DDEBUG_LVL=3",
+      "-DMEM_DEBUG",
+      "-DXCHAR_BYTES=4",
+      "./src/kll.c",
+      "-o",
+      "build/debug/kll.o"
+    ],
+    "directory": "/home/paulo/Documents/work/claude/cocada/libcocadasketch",
+    "output": "build/debug/kll.o"
+  }
+]

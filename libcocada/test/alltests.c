@@ -56,11 +56,9 @@ CuSuite *strfileread_get_test_suite();
 CuSuite *vec_get_test_suite();
 CuSuite *vebset_get_test_suite();
 
-
-void run_all_tests(void)
+CuSuite* create_test_suite()
 {
-    CuString *output = CuStringNew();
-    CuSuite *suite = CuSuiteNew();
+    CuSuite *suite = CuSuiteNew("all");
     CuSuiteAddSuite(suite, arrays_get_test_suite());
     CuSuiteAddSuite(suite, avl_get_test_suite());
     CuSuiteAddSuite(suite, avlmap_get_test_suite());
@@ -86,18 +84,38 @@ void run_all_tests(void)
     CuSuiteAddSuite(suite, vebset_get_test_suite());
     CuSuiteAddSuite(suite, vec_get_test_suite());
 
-    CuSuiteRun(suite);
-    CuSuiteSummary(suite, output);
-    CuSuiteDetails(suite, output);
+    CuSuitePrintTests(suite);
+    return suite;
+}
+
+void run_all_tests(CuSuite *rootSuite)
+{
+    CuString *output = CuStringNew();
+    CuSuiteRun(rootSuite);
+    CuSuiteSummary(rootSuite, output);
+    CuSuiteDetails(rootSuite, output);
     printf("%s\n", output->buffer);
 }
 
-
-void print_count() ;
-
-
-int main(void)
+void run_suite_tests(CuSuite *rootSuite, int nsuites, char **suiteNames)
 {
-    run_all_tests();
+    CuString *output = CuStringNew();
+    for (int i = 0; i < nsuites; i++) {
+        fprintf(stdout, "Running suite %s tests...\n", suiteNames[i]);
+        CuSuiteRunSuite(rootSuite, suiteNames[i]);
+    }
+    CuSuiteSummary(rootSuite, output);
+    CuSuiteDetails(rootSuite, output);
+    printf("%s\n", output->buffer);
+}
+
+int main(int argc, char **argv)
+{
+    CuSuite *rootSuite = create_test_suite();
+    if (argc == 1) {
+        run_all_tests(rootSuite);
+    } else {
+        run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
+    }
     return 0;
 }

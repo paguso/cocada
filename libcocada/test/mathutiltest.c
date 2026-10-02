@@ -67,7 +67,7 @@ void test_prime_succ(CuTest *tc)
 
 CuSuite *mathutil_get_test_suite()
 {
-    CuSuite *suite = CuSuiteNew();
+    CuSuite *suite = CuSuiteNew("mathutil");
     //SUITE_ADD_TEST(suite, test_is_prime_mr);
     SUITE_ADD_TEST(suite, test_prime_succ);
     return suite;
