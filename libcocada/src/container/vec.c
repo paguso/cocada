@@ -191,7 +191,7 @@ void *vec_detach(vec *v)
 
 const void *vec_get(const vec *v, size_t pos)
 {
-	return v->data + ( pos * v->typesize );
+	return (byte_t *)v->data + ( pos * v->typesize );
 }
 
 
@@ -209,7 +209,7 @@ const void *vec_last(const vec *v)
 
 void *vec_get_mut(const vec *v, size_t pos)
 {
-	return v->data + ( pos * v->typesize );
+	return (byte_t *)v->data + ( pos * v->typesize );
 }
 
 
@@ -227,23 +227,23 @@ void *vec_last_mut(const vec *v)
 
 void vec_get_cpy(const vec *v, size_t pos, void *dest)
 {
-	memcpy(dest, v->data + (pos * v->typesize), v->typesize);
+	memcpy(dest, (byte_t *)v->data + (pos * v->typesize), v->typesize);
 }
 
 
 void vec_set(vec *v, size_t pos, const void *src)
 {
 	_check_and_resize(v);
-	memcpy(v->data + (pos * v->typesize), src, v->typesize);
+	memcpy((byte_t *)v->data + (pos * v->typesize), src, v->typesize);
 }
 
 
 static void _vec_swap(vec *v, size_t i, size_t j, void *swp)
 {
 	if (i == j) return;
-	memcpy(swp, v->data + (i * v->typesize), v->typesize);
-	memcpy(v->data + (i * v->typesize), v->data + (j * v->typesize), v->typesize);
-	memcpy(v->data + (j * v->typesize), swp, v->typesize);
+	memcpy(swp, (byte_t *)v->data + (i * v->typesize), v->typesize);
+	memcpy((byte_t *)v->data + (i * v->typesize), (byte_t *)v->data + (j * v->typesize), v->typesize);
+	memcpy((byte_t *)v->data + (j * v->typesize), swp, v->typesize);
 }
 
 
@@ -259,7 +259,7 @@ void vec_swap(vec *v, size_t i, size_t j)
 void vec_push(vec *v, const void *src)
 {
 	_check_and_resize(v);
-	memcpy(v->data + (v->len * v->typesize), src, v->typesize);
+	memcpy((byte_t *)v->data + (v->len * v->typesize), src, v->typesize);
 	v->len++;
 }
 
@@ -268,8 +268,8 @@ void vec_push_n(vec *v, const void *src, size_t n)
 {
 	if (n == 0) return;
 	_resize_to(v, v->len + n);
-	void *begin = v->data + (v->len * v->typesize);
-	void *end = begin;
+	byte_t *begin = (byte_t *)v->data + (v->len * v->typesize);
+	byte_t *end = begin;
 	memcpy(begin, src, v->typesize);
 	end += v->typesize;
 	size_t k;
@@ -286,9 +286,9 @@ void vec_ins(vec *v, size_t pos, const void *src)
 {
 	_check_and_resize(v);
 	pos = MIN(pos, v->len);
-	memmove( v->data + ((pos + 1) * v->typesize), v->data + (pos * v->typesize),
+	memmove( (byte_t *)v->data + ((pos + 1) * v->typesize), (byte_t *)v->data + (pos * v->typesize),
 	         (v->len - pos) * v->typesize );
-	memcpy(v->data + (pos * v->typesize), src, v->typesize);
+	memcpy((byte_t *)v->data + (pos * v->typesize), src, v->typesize);
 	v->len++;
 }
 
@@ -296,7 +296,7 @@ void vec_ins(vec *v, size_t pos, const void *src)
 void vec_cat(vec *dest, const vec *src)
 {
 	_resize_to(dest, dest->len + src->len);
-	memcpy(dest->data + (dest->len * dest->typesize), src->data,
+	memcpy((byte_t *)dest->data + (dest->len * dest->typesize), src->data,
 	       src->len * src->typesize);
 	dest->len += src->len;
 }
@@ -305,7 +305,7 @@ void vec_cat(vec *dest, const vec *src)
 void vec_pop(vec *v, size_t pos, void *dest)
 {
 	vec_get_cpy(v, pos, dest);
-	memmove( v->data + (pos * v->typesize), v->data + ((pos + 1) * v->typesize),
+	memmove( (byte_t *)v->data + (pos * v->typesize), (byte_t *)v->data + ((pos + 1) * v->typesize),
 	         (v->len - pos - 1) * v->typesize );
 	v->len--;
 	_check_and_resize(v);
@@ -314,7 +314,7 @@ void vec_pop(vec *v, size_t pos, void *dest)
 
 void vec_del(vec *v, size_t pos)
 {
-	memmove( v->data + (pos * v->typesize), v->data + ((pos + 1) * v->typesize),
+	memmove( (byte_t *)v->data + (pos * v->typesize), (byte_t *)v->data + ((pos + 1) * v->typesize),
 	         (v->len - pos - 1) * v->typesize );
 	v->len--;
 	_check_and_resize(v);
@@ -323,7 +323,7 @@ void vec_del(vec *v, size_t pos)
 
 void vec_clip(vec *v, size_t from, size_t to)
 {
-	memmove( v->data, v->data + (from * v->typesize), (to - from) * v->typesize );
+	memmove( v->data, (byte_t *)v->data + (from * v->typesize), (to - from) * v->typesize );
 	v->len = (to - from);
 }
 
@@ -345,8 +345,8 @@ void vec_rotate_left(vec *v, size_t npos)
 	npos = npos % v->len;
 	void *buf = (void *) ( ARR_NEW(byte_t, npos * v->typesize ) );
 	memcpy(buf, v->data, npos * v->typesize);
-	memmove(v->data, v->data + (npos * v->typesize), (v->len - npos) * v->typesize);
-	memcpy(v->data + ((v->len - npos) * v->typesize), buf, npos * v->typesize);
+	memmove(v->data, (byte_t *)v->data + (npos * v->typesize), (v->len - npos) * v->typesize);
+	memcpy((byte_t *)v->data + ((v->len - npos) * v->typesize), buf, npos * v->typesize);
 	FREE(buf);
 }
 
@@ -452,7 +452,7 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 		for (i = n; i > 0; i--) {
 			k = key_fn(vec_get(v, i - 1), d);
 			count[k]--;
-			vec_get_cpy(v, i - 1, vcpy + (count[k]*v->typesize));
+			vec_get_cpy(v, i - 1, (byte_t *)vcpy + (count[k]*v->typesize));
 		}
 		memcpy(v->data, vcpy, n * (v->typesize));
 	}

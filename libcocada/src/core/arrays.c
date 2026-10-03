@@ -31,29 +31,29 @@ void *sa_arr_calloc(size_t nmemb, size_t memb_size)
 	size_t size = nmemb * memb_size;
 	void *ret = malloc(size + sizeof(size_t));
 	*((size_t *)ret) = size;
-	return ret + sizeof(size_t);
+	return (byte_t *)ret + sizeof(size_t);
 }
 
 
 void *sa_arr_realloc(void *arr, size_t nmemb, size_t memb_size)
 {
 	size_t size = nmemb * memb_size;
-	arr -= sizeof(size_t);
+	arr = (byte_t *)arr - sizeof(size_t);
 	arr = realloc(arr, size + sizeof(size_t));
 	*((size_t *)arr) = size;
-	return arr + sizeof(size_t);
+	return (byte_t *)arr + sizeof(size_t);
 }
 
 
 size_t sa_arr_sizeof(void *arr)
 {
-	return *((size_t *)(arr - sizeof(size_t)));
+	return *((size_t *)((byte_t *)arr - sizeof(size_t)));
 }
 
 
 void sa_arr_free(void *arr)
 {
-	free (arr - sizeof(size_t));
+	free ((byte_t *)arr - sizeof(size_t));
 }
 
 

@@ -35,7 +35,7 @@ static bool _arr_iter_has_next(iter *it)
 static const void *_arr_iter_next(iter *it)
 {
 	arr_iter *ait = (arr_iter *)it->impltor;
-	return ait->src + (ait->typesize * ait->index++);
+	return (const byte_t *)ait->src + (ait->typesize * ait->index++);
 }
 
 static iter_vt _arr_iter_vt = {_arr_iter_has_next, _arr_iter_next};

@@ -81,7 +81,7 @@ static void _reset_data(hashmap *hmap, size_t cap)
     hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
     hmap->tally = (byte_t *) hmap->data;
     memset(hmap->tally, ST_EMPTY, hmap->cap);
-    hmap->entries = hmap->data + hmap->cap;
+    hmap->entries = (byte_t *)hmap->data + hmap->cap;
 }
 
 
@@ -155,13 +155,13 @@ static inline uint64_t _h1(uint64_t h)
 
 static inline void *_key_at(const hashmap *hmap, size_t pos)
 {
-    return hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
+    return (byte_t *)hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
 }
 
 
 static inline void *_value_at(const hashmap *hmap, size_t pos)
 {
-    return hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) +
+    return (byte_t *)hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) +
                              hmap->keysize);
 }
 
@@ -313,7 +313,7 @@ static void _resize(hashmap *hmap, size_t new_cap)
     size_t old_size = hmap->size;
     void   *old_data = hmap->data;
     byte_t *old_tally = (byte_t *) old_data;
-    void   *old_entries = old_data + old_cap;
+    void   *old_entries = (byte_t *)old_data + old_cap;
 
     _reset_data(hmap, new_cap);
     //_print(hmap);
@@ -324,8 +324,8 @@ static void _resize(hashmap *hmap, size_t new_cap)
             //rehash_attempts += 1;
             //printf("rehashing element at pos %zu\n",i);
             _set( hmap,
-                  old_entries + ( i * ( hmap->keysize + hmap->valsize ) ),
-                  old_entries + ( i * ( hmap->keysize + hmap->valsize ) ) + hmap->keysize );
+                  (byte_t *)old_entries + ( i * ( hmap->keysize + hmap->valsize ) ),
+                  (byte_t *)old_entries + ( i * ( hmap->keysize + hmap->valsize ) ) + hmap->keysize );
             //_print(hmap);
             //if (rehash_attempts!=hmap->size) {
             //    printf("failed to rehash pos %zu\n",i );

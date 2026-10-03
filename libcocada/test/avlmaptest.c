@@ -98,7 +98,7 @@ void avlmap_test_ins(CuTest *tc)
 void prt_map_entry(FILE *stream, void *entry)
 {
     int **k = entry;
-    double **v = entry + sizeof(int *);
+    double **v = (void *)((byte_t *)entry + sizeof(int *));
     fprintf(stream, "[KEY=%d VAL=%lf]", **k, **v);
 }
 

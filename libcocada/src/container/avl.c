@@ -44,7 +44,7 @@ typedef struct _avlnode {
 } avlnode;
 
 // store node data right after the avlnode header
-#define NODE_DATA(N) ((void *)((void *)(N) + sizeof(avlnode)))
+#define NODE_DATA(N) ((void *)((byte_t *)(N) + sizeof(avlnode)))
 
 
 struct _avl {

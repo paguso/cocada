@@ -56,7 +56,7 @@ static void check_and_resize_by(xstr *self, size_t n)
 	}
 	if (new_cap != self->cap) {
 		self->buf = realloc(self->buf, new_cap * self->sizeof_char);
-		memset( self->buf + (self->cap * self->sizeof_char), '\0',
+		memset( (byte_t *)self->buf + (self->cap * self->sizeof_char), '\0',
 		        (new_cap - self->cap) * self->sizeof_char );
 		self->cap = new_cap;
 	}
@@ -123,7 +123,7 @@ xchar_t xstr_get(const xstr *self, size_t pos)
 {
 	xchar_t ret = 0;
 #if ENDIANNESS==LITTLE
-	memcpy(&ret, self->buf + (pos * self->sizeof_char), self->sizeof_char);
+	memcpy(&ret, (byte_t *)self->buf + (pos * self->sizeof_char), self->sizeof_char);
 #elif ENDIANNESS==BIG
 	memcpy(&ret + (XCHAR_BYTES - self->sizeof_char),
 	       self->buf + (pos * self->sizeof_char), self->sizeof_char);
@@ -135,7 +135,7 @@ xchar_t xstr_get(const xstr *self, size_t pos)
 void xstr_set(xstr *self, size_t pos, xchar_t val)
 {
 #if ENDIANNESS==LITTLE
-	memcpy(self->buf + (pos * self->sizeof_char), &val, self->sizeof_char);
+	memcpy((byte_t *)self->buf + (pos * self->sizeof_char), &val, self->sizeof_char);
 #elif ENDIANNESS==BIG
 	memcpy(self->buf + (pos * self->sizeof_char),
 	       &val + (XCHAR_BYTES - self->sizeof_char));
@@ -188,7 +188,7 @@ void xstr_push(xstr *self, xchar_t c)
 void xstr_push_n(xstr *self, xchar_t c, size_t n)
 {
 	check_and_resize_by(self, n);
-	void *last = self->buf + (self->len * self->sizeof_char);
+	byte_t *last = (byte_t *)self->buf + (self->len * self->sizeof_char);
 	for (size_t i = 0; i < n; i++, last += self->sizeof_char) {
 #if ENDIANNESS==LITTLE
 		memcpy(last, &c, self->sizeof_char);
@@ -203,7 +203,7 @@ void xstr_push_n(xstr *self, xchar_t c, size_t n)
 void xstr_cat(xstr *self, const xstr *src)
 {
 	check_and_resize_by(self, src->len);
-	memcpy(	self->buf + (self->len * self->sizeof_char), src->buf,
+	memcpy(	(byte_t *)self->buf + (self->len * self->sizeof_char), src->buf,
 	        src->len * src->sizeof_char );
 	self->len += src->len;
 }
@@ -237,9 +237,9 @@ void xstr_fit(xstr *self)
 
 void xstr_clip(xstr *self, size_t from, size_t to)
 {
-	memmove( self->buf, self->buf + (from * self->sizeof_char),
+	memmove( self->buf, (byte_t *)self->buf + (from * self->sizeof_char),
 	         (to - from) * self->sizeof_char );
-	memset( self->buf + ((to - from) * self->sizeof_char), '\0',
+	memset( (byte_t *)self->buf + ((to - from) * self->sizeof_char), '\0',
 	        (self->len - (to - from)) * self->sizeof_char );
 	self->len = to - from;
 }
@@ -252,8 +252,8 @@ void xstr_rot_left(xstr *self, size_t npos)
 	if (h) {
 		void *tmp = malloc(h * self->sizeof_char);
 		memcpy(tmp, self->buf, h * self->sizeof_char);
-		memcpy(self->buf, self->buf + (h * self->sizeof_char), t * self->sizeof_char);
-		memcpy(self->buf + (t * self->sizeof_char), tmp, h * self->sizeof_char);
+		memcpy(self->buf, (byte_t *)self->buf + (h * self->sizeof_char), t * self->sizeof_char);
+		memcpy((byte_t *)self->buf + (t * self->sizeof_char), tmp, h * self->sizeof_char);
 		FREE(tmp);
 	}
 }

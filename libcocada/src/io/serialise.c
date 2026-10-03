@@ -325,7 +325,7 @@ void *map_addr(hashmap *mem_map, vec *read, void *addr)
     ERROR_ASSERT(hashmap_contains(mem_map, &base),
                  "Cannot map already read address %p.\n", base);
     base = hashmap_get_rawptr(mem_map, &base);
-    return base + off;
+    return (byte_t *)base + off;
 }
 
 
@@ -381,7 +381,7 @@ void write_struct(som *model, void *obj, FILE *stream, deque *dq, vec *written)
     for (size_t i = 0; i < som_nchd(model); i++) {
         sub_som field_som_chd = som_chd(model, i);
         som *field_som = field_som_chd.chd;
-        write_obj(field_som, obj + field_som_chd.off, stream, dq, written, false);
+        write_obj(field_som, (byte_t *)obj + field_som_chd.off, stream, dq, written, false);
     }
 }
 
@@ -405,7 +405,7 @@ void read_struct(som *model, void *dest, FILE *stream, deque *dq, vec *read,
     for (size_t i = 0; i < som_nchd(model); i++) {
         sub_som field_som_chd = som_chd(model, i);
         som *field_som = field_som_chd.chd;
-        read_obj(field_som, dest + field_som_chd.off, stream, dq, read, mem_map);
+        read_obj(field_som, (byte_t *)dest + field_som_chd.off, stream, dq, read, mem_map);
     }
 }
 
@@ -436,12 +436,12 @@ void write_arr(som *model, void *arr, FILE *stream, deque *dq, vec *written)
         ERROR("Unsupported array of string serialisation. See module documentation.\n");
         break;
     case som_rawptr:
-        for (void *elt = arr; elt < arr + size; elt += elt_size) {
+        for (byte_t *elt = arr; elt < (byte_t *)arr + size; elt += elt_size) {
             write_rawptr(elt_som, elt, stream, dq, written);
         }
         break;
     case som_struct:
-        for (void *elt = arr; elt < arr + size; elt += elt_size) {
+        for (byte_t *elt = arr; elt < (byte_t *)arr + size; elt += elt_size) {
             write_struct(elt_som, elt, stream, dq, written);
         }
         break;
@@ -507,12 +507,12 @@ void read_arr(som *model, void *ptr_addr, FILE *stream, deque *dq, vec *read,
         ERROR("Unsupported array of cstr serialisation. See module documentation.\n");
         break;
     case som_rawptr:
-        for (void *elt = arr; elt < arr + size; elt += elt_size) {
+        for (byte_t *elt = arr; elt < (byte_t *)arr + size; elt += elt_size) {
             read_rawptr(elt_som, elt, stream, dq, read, mem_map);
         }
         break;
     case som_struct:
-        for (void *elt = arr; elt < arr + size; elt += elt_size) {
+        for (byte_t *elt = arr; elt < (byte_t *)arr + size; elt += elt_size) {
             read_struct(elt_som, elt, stream, dq, read, mem_map);
         }
         break;
