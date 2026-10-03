@@ -26,12 +26,14 @@
 
 
 CuSuite *cdlexer_get_test_suite();
+CuSuite *cddecl_get_test_suite();
 
 
 CuSuite* create_test_suite()
 {
     CuSuite *suite = CuSuiteNew("all");
     CuSuiteAddSuite(suite, cdlexer_get_test_suite());
+    CuSuiteAddSuite(suite, cddecl_get_test_suite());
 
     CuSuitePrintTests(suite);
     return suite;

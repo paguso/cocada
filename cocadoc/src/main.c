@@ -20,8 +20,11 @@
  */
 
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "cddecl.h"
 #include "cdlexer.h"
 #include "cli.h"
 #include "new.h"
@@ -32,9 +35,19 @@ cliparser *create_cli_parser()
 	cliparser *clip = cliparser_new("cocadoc", "COCADA source code documentation");
 	cliparser_add_option(clip, cliopt_new_defaults('t', "tokens",
 	                     "Dump the token stream of each input file (debug)"));
+	cliparser_add_option(clip, cliopt_new_defaults('d', "decls",
+	                     "Dump the documented declarations of each input file (debug)"));
 	cliparser_add_pos_arg(clip, cliarg_new_multi("files", "C source/header files",
 	                      ARG_FILE));
 	return clip;
+}
+
+
+// Whether a valueless switch option was used in the call
+static bool switch_on(const cliparser *clip, char shortname)
+{
+	const vec *v = cliparser_opt_val_from_shortname(clip, shortname);
+	return v && vec_len(v) > 0 && vec_get_bool(v, 0);
 }
 
 
@@ -72,12 +85,63 @@ static void dump_tokens(const char *path, const char *src, size_t len)
 }
 
 
+// First line of the brief text of a doc comment, for compact dumps
+static void print_doc_head(const char *doc)
+{
+	if (!doc) {
+		printf("-");
+		return;
+	}
+	const char *s = doc + 3; // skip "/**"
+	if (*s == '<') {
+		s++;
+	}
+	while (*s && (isspace((unsigned char)*s) || *s == '*')) {
+		s++;
+	}
+	if (strncmp(s, "@brief", 6) == 0) {
+		s += 6;
+		while (*s == ' ' || *s == '\t') {
+			s++;
+		}
+	}
+	int n = 0;
+	while (s[n] && s[n] != '\n' && !(s[n] == '*' && s[n + 1] == '/') && n < 60) {
+		n++;
+	}
+	printf("%.*s", n, s);
+}
+
+
+static void dump_decls(const char *path, const char *src, size_t len)
+{
+	vec *toks = cdlex_all(src, len);
+	vec *decls = cddecl_match(src, toks);
+	for (size_t i = 0, n = vec_len(decls); i < n; i++) {
+		const cddecl *d = vec_get(decls, i);
+		printf("%s:%zu\t%-9s %s\n\t\tsig: %s\n\t\tdoc: ", path, d->line,
+		       cddecl_kind_name(d->kind), d->name, d->sig);
+		print_doc_head(d->doc);
+		printf("\n");
+		for (size_t j = 0, m = d->members ? vec_len(d->members) : 0; j < m; j++) {
+			const cddecl *mb = vec_get(d->members, j);
+			printf("\t\t. %-20s | %-30s | ", mb->name, mb->sig);
+			print_doc_head(mb->doc);
+			printf("\n");
+		}
+	}
+	cddecl_vec_free(decls);
+	DESTROY_FLAT(toks, vec);
+}
+
+
 int main(int argc, char **argv)
 {
 	cliparser *clip = create_cli_parser();
 	cliparser_parse(clip, argc, argv, true);
 
-	bool tokens = cliparser_opt_val_from_shortname(clip, 't') != NULL;
+	bool tokens = switch_on(clip, 't');
+	bool decls = switch_on(clip, 'd');
 	const vec *files = cliparser_arg_val_from_pos(clip, 0);
 
 	int ret = EXIT_SUCCESS;
@@ -92,6 +156,9 @@ int main(int argc, char **argv)
 		}
 		if (tokens) {
 			dump_tokens(path, src, len);
+		}
+		if (decls) {
+			dump_decls(path, src, len);
 		}
 		FREE(src);
 	}
