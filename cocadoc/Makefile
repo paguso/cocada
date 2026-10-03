@@ -31,12 +31,13 @@ VPATH += $(test_src_dirs)
 
 build_dir = ./build
 debug_build_dir = $(build_dir)/debug
+test_build_dir = $(build_dir)/test
 release_build_dir = $(build_dir)/release
 
 
 # Make directory targets
 
-$(debug_build_dir) $(release_build_dir):
+$(debug_build_dir) $(test_build_dir) $(release_build_dir):
 	mkdir -p $@ 
 
 # 
@@ -55,14 +56,36 @@ $(debug_build_dir)/%.o: %.c
 	$(CC) -c $(INCLUDE_CFLAGS) $(debug_cflags) $< -o $@
 
 
-debug_srcs = $(cocada_srcs) $(srcs) $(test_srcs)
+debug_srcs = $(cocada_srcs) $(srcs)
 debug_objs = $(patsubst %.c,$(debug_build_dir)/%.o,$(debug_srcs))
 
 .PHONY: build
 build: $(debug_build_dir) $(debug_objs) 
-	$(CC) $(debug_build_dir)/*.o -lm -o $(debug_build_dir)/debug
+	$(CC) $(debug_objs) -lm -o $(debug_build_dir)/cocadoc
+
+
+#
+# Unit tests: cocada + cocadoc sources (minus main.c) + tests
+#
+
+test_cflags = -Wall -g
+test_cflags += -DDEBUG_LVL=3
+test_cflags += -DMEM_DEBUG
+test_cflags += -DXCHAR_BYTES=4
+
+$(test_build_dir)/%.o: %.c
+	$(CC) -c $(INCLUDE_CFLAGS) $(test_cflags) $(CFLAGS) $< -o $@
+
+test_all_srcs = $(cocada_srcs) $(filter-out main.c, $(srcs)) $(test_srcs)
+test_objs = $(patsubst %.c,$(test_build_dir)/%.o,$(test_all_srcs))
+
+$(test_objs): | $(test_build_dir)
+
+.PHONY: test
+test: $(test_objs)
+	$(CC) $(test_objs) -lm -o $(test_build_dir)/test
 
 .PHONY: clean
 clean: 
-	rm -rf $(debug_build_dir)/*
+	rm -rf $(debug_build_dir)/* $(test_build_dir)/*
 
