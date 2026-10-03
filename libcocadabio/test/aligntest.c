@@ -87,7 +87,7 @@ char *random_str(size_t n)
 
 static int read_number_(strbuf *cigar, size_t pos, int *nb)
 {
-    char *s = strbuf_as_str(cigar);
+    const char *s = strbuf_as_str(cigar);
     s = &s[pos];
     *nb = 0;
     int p = 0;

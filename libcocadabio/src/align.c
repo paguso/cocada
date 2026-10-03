@@ -35,7 +35,7 @@ int unit_subst(char a, char b)
 }
 
 
-static int read_number_(char *cigar, size_t pos, int *nb)
+static int read_number_(const char *cigar, size_t pos, int *nb)
 {
 	//const char *s = strbuf_as_str(cigar);
 	//s = &s[pos];
