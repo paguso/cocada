@@ -464,6 +464,7 @@ cliarg *cliarg_new(char *name, char *help, cliargtype type)
     ret->help = (help) ? cstr_clone(help) : cstr_new(0);
     ret->type = type;
     ret->single_val = true;
+    ret->choices = NULL;
     ret->values = _vals_vec_new(false, ret->type);
     return ret;
 }
