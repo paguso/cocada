@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# COCADA build outputs
+build/
+
+# Generated API docs (doxygen)
+/doc/api/
+
+# Editor / tooling
+.vscode/
+compile_commands.json
