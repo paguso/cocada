@@ -25,7 +25,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "hashmap.h"
 #include "vec.h"
 #include "new.h"
 #include "result.h"
@@ -127,7 +126,7 @@
  *
  * The required inputs to a program are given as a list of positional
  * arguments, usually at the end of the program call. Arguments are typed
- * with the same ::cliargtype types as option values. Argument are validated
+ * with the same ::cliargtype types as option values. Arguments are validated
  * during the parsing of the program call.  In general, every argument
  * has a single value, however some programs may accept an unbounded
  * list of inputs. So we allow the last positional argument to
@@ -236,17 +235,17 @@
  *  ARG_CHOICE       | Finite set of string alternatives               | char * (heap)
  */
 typedef enum {
-	ARG_NONE = 0,  /* No type, used for valueless options */
-	ARG_BOOL = 1,  /* Boolean type */
-	ARG_CHAR = 2,  /* Single character */
-	ARG_INT = 3,   /* Integer type, stored as long */
-	ARG_FLOAT = 4, /* Floating point type, stored as double */
-	ARG_STR = 5,   /* Free-form string literal type */
-	ARG_FILE = 6,  /* File type (no validation, used for
+    ARG_NONE = 0,  /* No type, used for valueless options */
+    ARG_BOOL = 1,  /* Boolean type */
+    ARG_CHAR = 2,  /* Single character */
+    ARG_INT = 3,   /* Integer type, stored as long */
+    ARG_FLOAT = 4, /* Floating point type, stored as double */
+    ARG_STR = 5,   /* Free-form string literal type */
+    ARG_FILE = 6,  /* File type (no validation, used for
 						descriptive/documentation purposes) */
-	ARG_DIR = 7,   /* Directory type (no validation, used for
+    ARG_DIR = 7,   /* Directory type (no validation, used for
 						descriptive/documentation purposes) */
-	ARG_CHOICE = 8 /* Finite set of string alternatives */
+    ARG_CHOICE = 8 /* Finite set of string alternatives */
 } cliargtype;
 
 
@@ -254,8 +253,8 @@ typedef enum {
  * @brief Does a CLI option need to bee used on each call?
  */
 typedef enum {
-	OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
-	OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
+    OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
+    OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
 } clioptneed;
 
 
@@ -263,8 +262,8 @@ typedef enum {
  * @brief How many times can an option be used on a single call?
  */
 typedef enum {
-	OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
-	OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
+    OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
+    OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
 } clioptmultiplicity;
 
 
@@ -285,10 +284,10 @@ typedef struct _cliopt cliopt;
  * options should be used together.
  */
 typedef enum {
-	ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
-	ALL_OF,		/**< All of the options in the combo should be used. **/
-	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
-	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
+    ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
+    ALL_OF,		/**< All of the options in the combo should be used. **/
+    ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
+    ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
 } clioptcombotype;
 
 
@@ -331,7 +330,7 @@ typedef struct _cliparser cliparser;
  * The following validations will be performed:
  *
  * - @p shortname is an alphabetical character (<letter> in the CLI grammar)
- * - @p longname ia a valid <id> according to the CLI grammar (a letter followed by
+ * - @p longname is a valid <id> according to the CLI grammar (a letter followed by
  *   a string of alphanumeric chars, dash '-' or underscores '_')
  * - @p min_val_no <= @p max_val_no
  * - If @p max_val_no == 0 then @p type == ARG_NONE and vice versa (iff)
@@ -513,17 +512,17 @@ void cliparser_print_help(const cliparser *cmd);
  * @brief CLI parse error codes
  */
 typedef enum {
-	UNPARSED,
-	INVALID_OPTION,
-	INVALID_MULT_OPTION,
-	INVALID_OPT_VAL_NO,
-	MISSING_REQ_OPT,
-	INVALID_OPT_COMBO,
-	INVALID_SUBCMD,
-	UNEXPECTED_TK,
-	INVALID_ARG_VAL,
-	INVALID_ARG_VAL_NO,
-	UNDEF_ERR
+    UNPARSED,
+    INVALID_OPTION,
+    INVALID_MULT_OPTION,
+    INVALID_OPT_VAL_NO,
+    MISSING_REQ_OPT,
+    INVALID_OPT_COMBO,
+    INVALID_SUBCMD,
+    UNEXPECTED_TK,
+    INVALID_ARG_VAL,
+    INVALID_ARG_VAL_NO,
+    UNDEF_ERR
 } cliparse_err_code;
 
 #define CLIPARSE_ERROR_BUFSZ 128
@@ -532,8 +531,8 @@ typedef enum {
  * CLI parse error result type.
  */
 typedef struct {
-	cliparse_err_code code;
-	char msg[CLIPARSE_ERROR_BUFSZ];
+    cliparse_err_code code;
+    char msg[CLIPARSE_ERROR_BUFSZ];
 } cliparse_error;
 
 
@@ -569,10 +568,10 @@ DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
  * ```
  * command 4 5 -a 1 2 3
  * ```
- * but let us suppose the the first form has been entered.
+ * but let us suppose that the first form has been entered.
  *
  * This function handles option values as follows. When an option name is
- * found at position `i`, it then tries to greedily collect as many values as
+ * found at position `i`, it then tries to *greedily* collect as many values as
  * possible from positions `i+1`, `i+2` ,... until
  * - The end of @p argv, OR
  * - The maximum number of allowed values are successfully parsed, OR
@@ -623,8 +622,8 @@ const cliopt *cliparser_active_sc_option(const cliparser *cmd);
  * If the option is found, returns its values.
  * The physical type/size of the values will depend on the ::cliargtype type of
  * the option.
- * If the option can be declared multiple types (parameter `multi==OPT_MULTIPLE` of
- * ::cliopt_new_valued ), then the returned vector is a two-level vector of vectors,
+ * If the option can be used multiple times (parameter `multiplicity==OPT_MULTIPLE`
+ * of ::cliopt_new), then the returned vector is a two-level vector of vectors,
  * with child vectors containing the values of each declaration of the option.
  * For example if we call
  * ```

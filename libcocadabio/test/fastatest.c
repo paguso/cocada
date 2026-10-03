@@ -30,8 +30,8 @@
 static char *filename = "test_fasta.fa";
 static size_t nseq = 4;
 static char *seq[4] = {
-	"aaaaaaaaaa",
-	"ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
+    "aaaaaaaaaa",
+    "ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
@@ -39,8 +39,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n\
 cccccccccccccccccccccccccccccccccccccccc",
-	"ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
-	"t\n\
+    "ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+    "t\n\
 tt\n\
 tttt\n\
 tttttttt\n\
@@ -51,149 +51,149 @@ tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
 tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
 };
 static char *desc[4] = {
-	"",
-	"seq1",
-	"seq2 short description",
-	"seq3 a very very very very a very very very very a very very very very a very very very very a very very very very a very very very very long sequence"
+    "",
+    "seq1",
+    "seq2 short description",
+    "seq3 a very very very very a very very very very a very very very very a very very very very a very very very very a very very very very long sequence"
 };
 static size_t desc_offsets[4] = {-1, -1, -1, -1};
 static size_t seq_offsets[4] = {-1, -1, -1, -1};
 
 static void test_setup()
 {
-	FILE *file = fopen(filename, "w");
-	size_t offset = 0;
-	for (size_t i = 0; i < nseq; i++) {
-		desc_offsets[i] = offset;
-		fputc('>', file);
-		offset += 1;
-		fputs(desc[i], file);
-		offset += strlen(desc[i]);
-		fputc('\n', file);
-		offset += 1;
-		seq_offsets[i] = offset;
-		fputs(seq[i], file);
-		offset += strlen(seq[i]);
-		fputc('\n', file);
-		offset += 1;
-	}
-	fclose(file);
+    FILE *file = fopen(filename, "w");
+    size_t offset = 0;
+    for (size_t i = 0; i < nseq; i++) {
+        desc_offsets[i] = offset;
+        fputc('>', file);
+        offset += 1;
+        fputs(desc[i], file);
+        offset += strlen(desc[i]);
+        fputc('\n', file);
+        offset += 1;
+        seq_offsets[i] = offset;
+        fputs(seq[i], file);
+        offset += strlen(seq[i]);
+        fputc('\n', file);
+        offset += 1;
+    }
+    fclose(file);
 }
 
 
 static void test_teardown()
 {
-	remove(filename);
+    remove(filename);
 }
 
 void test_fasta_goto(CuTest *tc)
 {
-	memdbg_reset();
-	test_setup();
+    memdbg_reset();
+    test_setup();
 
-	rawptr_ok_err_res result = fasta_open(filename);
-	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
-	for (size_t i = 0; i < nseq; i++) {
-		CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
-		CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
-	}
+    rawptr_ok_err_res result = fasta_open(filename);
+    CuAssert(tc, "Error opening fasta", result.ok);
+    fasta *f = result.val.ok;
+    for (size_t i = 0; i < nseq; i++) {
+        CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
+        CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
+    }
 
-	CuAssert(tc, "should not have found a record\n", fasta_goto(f,
-	         desc_offsets[nseq - 1] + 1) == false);
+    CuAssert(tc, "should not have found a record\n", fasta_goto(f,
+            desc_offsets[nseq - 1] + 1) == false);
 
-	for (int i = nseq - 1; i >= 0; i--) {
-		CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
-		CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
-	}
+    for (int i = nseq - 1; i >= 0; i--) {
+        CuAssertTrue(tc, fasta_goto(f, desc_offsets[i]));
+        CuAssertStrEquals(tc, desc[i], fasta_next(f)->descr);
+    }
 
-	fasta_close(f);
+    fasta_close(f);
 
 
-	test_teardown();
-	if (!memdbg_is_empty()) {
-		CuAssert(tc, "Memory leak!", memdbg_is_empty());
-	}
+    test_teardown();
+    if (!memdbg_is_empty()) {
+        CuAssert(tc, "Memory leak!", memdbg_is_empty());
+    }
 }
 
 
 void test_fasta_next(CuTest *tc)
 {
-	memdbg_reset();
-	test_setup();
+    memdbg_reset();
+    test_setup();
 
-	rawptr_ok_err_res result = fasta_open(filename);
-	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
-	size_t i = 0;
-	for (i = 0; fasta_has_next(f); i++) {
-		const fasta_rec *rr = fasta_next(f);
-		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
-		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
-		CuAssertStrEquals(tc, desc[i], rr->descr);
-		size_t seq_i_len = strlen(seq[i]);
-		size_t k = 0;
-		for (size_t j = 0, rl = strlen(rr->seq); j < rl; j++) {
-			while ( k < seq_i_len && seq[i][k] == '\n') k++;
-			CuAssert(tc, "fasta read error: read too many chars", k < seq_i_len);
-			CuAssert(tc, "fasta read error: char mismatch", seq[i][k] == rr->seq[j]);
-			k++;
-		}
-		CuAssert(tc, "fasta read error: premature end of sequence", k == seq_i_len);
-	}
-	CuAssertSizeTEquals(tc, nseq, i);
-	fasta_close(f);
+    rawptr_ok_err_res result = fasta_open(filename);
+    CuAssert(tc, "Error opening fasta", result.ok);
+    fasta *f = result.val.ok;
+    size_t i = 0;
+    for (i = 0; fasta_has_next(f); i++) {
+        const fasta_rec *rr = fasta_next(f);
+        CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
+        CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
+        CuAssertStrEquals(tc, desc[i], rr->descr);
+        size_t seq_i_len = strlen(seq[i]);
+        size_t k = 0;
+        for (size_t j = 0, rl = strlen(rr->seq); j < rl; j++) {
+            while ( k < seq_i_len && seq[i][k] == '\n') k++;
+            CuAssert(tc, "fasta read error: read too many chars", k < seq_i_len);
+            CuAssert(tc, "fasta read error: char mismatch", seq[i][k] == rr->seq[j]);
+            k++;
+        }
+        CuAssert(tc, "fasta read error: premature end of sequence", k == seq_i_len);
+    }
+    CuAssertSizeTEquals(tc, nseq, i);
+    fasta_close(f);
 
-	test_teardown();
-	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
-	}
-	CuAssert(tc, "Memory leak!", memdbg_is_empty());
+    test_teardown();
+    if (!memdbg_is_empty()) {
+        memdbg_print_stats(stdout, true);
+    }
+    CuAssert(tc, "Memory leak!", memdbg_is_empty());
 }
 
 
 void test_fasta_next_read(CuTest *tc)
 {
-	memdbg_reset();
-	test_setup();
+    memdbg_reset();
+    test_setup();
 
-	rawptr_ok_err_res result = fasta_open(filename);
-	CuAssert(tc, "Error opening fasta", result.ok);
-	fasta *f = result.val.ok;
-	size_t i = 0;
-	for (i = 0; fasta_has_next(f); i++) {
-		const fasta_rec_rdr *rr = fasta_next_reader(f);
-		CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
-		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
-		CuAssertStrEquals(tc, desc[i], rr->descr);
-		size_t k = 0;
-		char c;
-		size_t l = strlen(seq[i]);
-		while ((c = strread_getc(rr->seqrdr)) != EOF) {
-			while ( k < l && seq[i][k] == '\n') k++;
-			CuAssert(tc, "fasta read error: read too many chars", k < l);
-			CuAssert(tc, "fasta read error: char mismatch", seq[i][k] == c);
-			k++;
-		}
-		CuAssert(tc, "fasta read error: premature end of sequence", k == l);
-	}
-	CuAssertSizeTEquals(tc, nseq, i);
-	fasta_close(f);
+    rawptr_ok_err_res result = fasta_open(filename);
+    CuAssert(tc, "Error opening fasta", result.ok);
+    fasta *f = result.val.ok;
+    size_t i = 0;
+    for (i = 0; fasta_has_next(f); i++) {
+        const fasta_rec_rdr *rr = fasta_next_reader(f);
+        CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
+        CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
+        CuAssertStrEquals(tc, desc[i], rr->descr);
+        size_t k = 0;
+        char c;
+        size_t l = strlen(seq[i]);
+        while ((c = strread_getc(rr->seqrdr)) != EOF) {
+            while ( k < l && seq[i][k] == '\n') k++;
+            CuAssert(tc, "fasta read error: read too many chars", k < l);
+            CuAssert(tc, "fasta read error: char mismatch", seq[i][k] == c);
+            k++;
+        }
+        CuAssert(tc, "fasta read error: premature end of sequence", k == l);
+    }
+    CuAssertSizeTEquals(tc, nseq, i);
+    fasta_close(f);
 
-	test_teardown();
-	if (!memdbg_is_empty()) {
-		memdbg_print_stats(stdout, true);
-	}
-	CuAssert(tc, "Memory leak!", memdbg_is_empty());
+    test_teardown();
+    if (!memdbg_is_empty()) {
+        memdbg_print_stats(stdout, true);
+    }
+    CuAssert(tc, "Memory leak!", memdbg_is_empty());
 }
 
 
 
 CuSuite *fasta_get_test_suite()
 {
-	CuSuite *suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, test_fasta_next);
-	SUITE_ADD_TEST(suite, test_fasta_next_read);
-	SUITE_ADD_TEST(suite, test_fasta_goto);
-	return suite;
+    CuSuite *suite = CuSuiteNew("fasta");
+    SUITE_ADD_TEST(suite, test_fasta_next);
+    SUITE_ADD_TEST(suite, test_fasta_next_read);
+    SUITE_ADD_TEST(suite, test_fasta_goto);
+    return suite;
 }

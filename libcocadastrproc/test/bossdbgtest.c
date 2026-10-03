@@ -361,7 +361,7 @@ void test_dbgraph_child(CuTest *tc)
 
 CuSuite *dbgraph_get_test_suite()
 {
-    CuSuite *suite = CuSuiteNew();
+    CuSuite *suite = CuSuiteNew("bossdbg");
     SUITE_ADD_TEST(suite, test_dbgraph_new);
     SUITE_ADD_TEST(suite, test_dbgraph_outdeg);
     SUITE_ADD_TEST(suite, test_bossdbg_lbl_outdeg);

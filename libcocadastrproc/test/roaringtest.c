@@ -291,7 +291,7 @@ void test_roaringbitvec_speed_rank(CuTest *tc)
 CuSuite *roaringbitvec_get_test_suite()
 {
     CuSuite *suite;
-    suite = CuSuiteNew();
+    suite = CuSuiteNew("roaring");
     SUITE_ADD_TEST(suite, roaringbitvec_test_memsize);
     SUITE_ADD_TEST(suite, roaringbitvec_test_get);
     SUITE_ADD_TEST(suite, roaringbitvec_test_rank);

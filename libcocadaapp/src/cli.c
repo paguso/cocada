@@ -1267,7 +1267,7 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
                     cur_vals = NULL;
                     break;
                 case OPT_MULTIPLE:
-                    vec_push_rawptr(cur_opt->values, &cur_vals);
+                    vec_push_rawptr(cur_opt->values, cur_vals);
                     cur_vals = NULL;
                     break;
                 }
