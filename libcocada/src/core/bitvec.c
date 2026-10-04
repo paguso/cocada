@@ -39,7 +39,8 @@
 static const float GROW_BY = 1.61803398875f;
 static const size_t MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
 
-#define NBYTES(NBITS) ((size_t)DIVCEIL(NBITS, BYTESIZE))
+// number of bytes needed to store NBITS bits
+#define NBYTES(NBITS) divceil_size_t(NBITS, BYTESIZE)
 
 /*
  * Reads a TYPE word from an arbitrary (possibly unaligned) position of

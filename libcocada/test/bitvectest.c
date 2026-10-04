@@ -159,7 +159,7 @@ void bitvec_test_select(CuTest *tc)
         for (size_t len = 0; len < ba_size; len++) {
             for (int i = 0; i < 6; i++) {
                 byte_t *ba = bitarr_new(len);
-                memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
+                memset(ba, bit_patterns[i], divceil_size_t(len, BYTESIZE));
                 bitvec *bv = bitvec_new_from_bitarr(ba, len);
                 size_t bitcount = bitvec_count(bv, bit);
                 size_t rank = 0;

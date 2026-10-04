@@ -262,7 +262,7 @@ roaringbitvec *roaringbitvec_new(uint32_t n)
 {
 	roaringbitvec *ret = NEW(roaringbitvec);
 	ret->len = n;
-	ret->ncntrs = (size_t)DIVCEIL(n, BITVEC_SIZE);
+	ret->ncntrs = divceil_uint32_t(n, BITVEC_SIZE);
 	ret->ctnrs = calloc(ret->ncntrs, sizeof(ctnr_t));
 	for (size_t i = 0; i < ret->ncntrs; i++) {
 		ret->ctnrs[i] = (ctnr_t) {
