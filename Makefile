@@ -114,7 +114,7 @@ $(foreach tgt,$(filter-out help doc clean_doc fmt,$(all_valid_targets)), $(eval 
 
 head_license_cmd := sh headlicense.sh
 fmt_cmd := astyle
-fmt_options := --style=kr --indent=tab -n #--recursive
+fmt_options := --options=.astylerc -n #--recursive
 
 all_src_files = $(foreach l,$(informed_libs),$(shell find lib$(l)/src -name '*.[c|h]'))
 all_src_files += $(foreach l,$(informed_libs),$(shell find lib$(l)/test -name '*.[c|h]'))
