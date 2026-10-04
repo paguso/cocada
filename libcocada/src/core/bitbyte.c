@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "bitbyte.h"
 #include "coretype.h"
@@ -175,7 +176,7 @@ static const uint64_t byte_as_uint64_str[256] = {
 
 void byte_to_str(byte_t b, char *dest)
 {
-	*((uint64_t *)dest) = byte_as_uint64_str[b];
+	memcpy(dest, &byte_as_uint64_str[b], sizeof(uint64_t)); // dest may be unaligned
 	dest[8] = '\0';
 }
 

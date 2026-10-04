@@ -41,6 +41,23 @@ static const size_t MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
 
 #define NBYTES(NBITS) ((size_t)DIVCEIL(NBITS, BYTESIZE))
 
+/*
+ * Reads a TYPE word from an arbitrary (possibly unaligned) position of
+ * the bit buffer. memcpy compiles to a single load where the hardware
+ * allows unaligned access, and is correct everywhere else.
+ */
+#define LOAD_WORD_IMPL(TYPE) \
+	static inline TYPE _load_##TYPE(const byte_t *src) { \
+		TYPE w; \
+		memcpy(&w, src, sizeof(TYPE)); \
+		return w; \
+	}
+
+LOAD_WORD_IMPL(ullong)
+LOAD_WORD_IMPL(ulong)
+LOAD_WORD_IMPL(uint)
+LOAD_WORD_IMPL(ushort)
+
 struct _bitvec {
 	byte_t *bits;
 	size_t  len;
@@ -177,19 +194,19 @@ static inline size_t _bitvec_count1(const bitvec *bv, size_t from, size_t to)
 	byte_pos++;
 
 	while (byte_pos + ULLONG_BYTES < last_byte) {
-		ret += ullong_bitcount1(*((ullong *)(bv->bits + byte_pos)));
+		ret += ullong_bitcount1(_load_ullong(bv->bits + byte_pos));
 		byte_pos += ULLONG_BYTES;
 	}
 	while (byte_pos + ULONG_BYTES < last_byte) {
-		ret += ulong_bitcount1(*((ulong *)(bv->bits + byte_pos)));
+		ret += ulong_bitcount1(_load_ulong(bv->bits + byte_pos));
 		byte_pos += ULONG_BYTES;
 	}
 	while (byte_pos + UINT_BYTES < last_byte) {
-		ret += uint_bitcount1(*((uint *)(bv->bits + byte_pos)));
+		ret += uint_bitcount1(_load_uint(bv->bits + byte_pos));
 		byte_pos += UINT_BYTES;
 	}
 	while (byte_pos + USHRT_BYTES < last_byte) {
-		ret += ushort_bitcount1(*((ushort *)(bv->bits + byte_pos)));
+		ret += ushort_bitcount1(_load_ushort(bv->bits + byte_pos));
 		byte_pos += USHRT_BYTES;
 	}
 	while (byte_pos < last_byte) {
@@ -197,8 +214,11 @@ static inline size_t _bitvec_count1(const bitvec *bv, size_t from, size_t to)
 		byte_pos++;
 	}
 
-	// last byte
-	ret += byte_bitcount1(bv->bits[last_byte] & MSBMASK(to % BYTESIZE));
+	// last (partial) byte. If to is a multiple of BYTESIZE there is none,
+	// and bits[last_byte] may be past the end of the buffer.
+	if (to % BYTESIZE) {
+		ret += byte_bitcount1(bv->bits[last_byte] & MSBMASK(to % BYTESIZE));
+	}
 
 	return ret;
 }
@@ -267,6 +287,9 @@ size_t _bitvec_select1(const bitvec *bv, size_t rank)
 	}
 	// cur_byte is the rightmost byte with rank < desired rank
 	// selected position has to be within cur_byte if it exists
+	if (cur_byte == last_byte && bv->len % BYTESIZE == 0) {
+		return bv->len; // no partial last byte: rank not found
+	}
 	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) +
 	             byte_select1(*cur_byte, MIN(BYTESIZE, rank - count));
 
@@ -313,6 +336,9 @@ size_t _bitvec_select0(const bitvec *bv, size_t rank)
 	}
 	// cur_byte is the rightmost byte with rank < desired rank
 	// selected position has to be within cur_byte if it exists
+	if (cur_byte == last_byte && bv->len % BYTESIZE == 0) {
+		return bv->len; // no partial last byte: rank not found
+	}
 	size_t ret = ((size_t)(cur_byte - bv->bits) * BYTESIZE) +
 	             byte_select0(*cur_byte, MIN(BYTESIZE, rank - count));
 
