@@ -215,6 +215,13 @@ void test_cli_parse(CuTest *tc)
 
 	CuAssert(tc, "Used option not detected", cliparser_opt_used_from_shortname(cmd, 'd'));
 	CuAssert(tc, "Non-used option detected", !cliparser_opt_used_from_shortname(cmd, 'z'));
+	// -c is declared and has default values, so its value vector is not empty
+	CuAssert(tc, "Declared, unused option with defaults detected as used",
+	         !cliparser_opt_used_from_shortname(cmd, 'c'));
+	CuAssert(tc, "Used option not detected by long name",
+	         cliparser_opt_used_from_longname(cmd, "ddd"));
+	CuAssert(tc, "Unused option detected by long name",
+	         !cliparser_opt_used_from_longname(cmd, "ccc"));
 
 	freeargv(argc, argv);
 

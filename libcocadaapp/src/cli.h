@@ -671,19 +671,6 @@ const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
 
 
 /**
- * @brief Gets the values of an option from its long name.
- *
- * @param cmd The (sub)command parser
- * @param longname The long (`--`) name of the option.
- *
- * @see cliparser_opt_val_from_shortname
- *
- */
-const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
-        char *longname);
-
-
-/**
  * @brief Gets the values of a positional argument from its position.
  *
  * @param cmd The (sub)command parser
