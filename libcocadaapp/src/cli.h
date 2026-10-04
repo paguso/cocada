@@ -235,17 +235,17 @@
  *  ARG_CHOICE       | Finite set of string alternatives               | char * (heap)
  */
 typedef enum {
-    ARG_NONE = 0,  /* No type, used for valueless options */
-    ARG_BOOL = 1,  /* Boolean type */
-    ARG_CHAR = 2,  /* Single character */
-    ARG_INT = 3,   /* Integer type, stored as long */
-    ARG_FLOAT = 4, /* Floating point type, stored as double */
-    ARG_STR = 5,   /* Free-form string literal type */
-    ARG_FILE = 6,  /* File type (no validation, used for
+	ARG_NONE = 0,  /* No type, used for valueless options */
+	ARG_BOOL = 1,  /* Boolean type */
+	ARG_CHAR = 2,  /* Single character */
+	ARG_INT = 3,   /* Integer type, stored as long */
+	ARG_FLOAT = 4, /* Floating point type, stored as double */
+	ARG_STR = 5,   /* Free-form string literal type */
+	ARG_FILE = 6,  /* File type (no validation, used for
 						descriptive/documentation purposes) */
-    ARG_DIR = 7,   /* Directory type (no validation, used for
+	ARG_DIR = 7,   /* Directory type (no validation, used for
 						descriptive/documentation purposes) */
-    ARG_CHOICE = 8 /* Finite set of string alternatives */
+	ARG_CHOICE = 8 /* Finite set of string alternatives */
 } cliargtype;
 
 
@@ -253,8 +253,8 @@ typedef enum {
  * @brief Does a CLI option need to bee used on each call?
  */
 typedef enum {
-    OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
-    OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
+	OPT_OPTIONAL  =  0, /**< Option may or may not be used on a program call */
+	OPT_REQUIRED  =  1  /**< Option MUST be used on every call */
 } clioptneed;
 
 
@@ -262,8 +262,8 @@ typedef enum {
  * @brief How many times can an option be used on a single call?
  */
 typedef enum {
-    OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
-    OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
+	OPT_SINGLE   = 0,	/**< Option can be used at most once per call */
+	OPT_MULTIPLE = 1	/**< Option can be used multiple times on a call */
 } clioptmultiplicity;
 
 
@@ -284,10 +284,10 @@ typedef struct _cliopt cliopt;
  * options should be used together.
  */
 typedef enum {
-    ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
-    ALL_OF,		/**< All of the options in the combo should be used. **/
-    ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
-    ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
+	ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
+	ALL_OF,		/**< All of the options in the combo should be used. **/
+	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
+	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
 } clioptcombotype;
 
 
@@ -512,17 +512,17 @@ void cliparser_print_help(const cliparser *cmd);
  * @brief CLI parse error codes
  */
 typedef enum {
-    UNPARSED,
-    INVALID_OPTION,
-    INVALID_MULT_OPTION,
-    INVALID_OPT_VAL_NO,
-    MISSING_REQ_OPT,
-    INVALID_OPT_COMBO,
-    INVALID_SUBCMD,
-    UNEXPECTED_TK,
-    INVALID_ARG_VAL,
-    INVALID_ARG_VAL_NO,
-    UNDEF_ERR
+	UNPARSED,
+	INVALID_OPTION,
+	INVALID_MULT_OPTION,
+	INVALID_OPT_VAL_NO,
+	MISSING_REQ_OPT,
+	INVALID_OPT_COMBO,
+	INVALID_SUBCMD,
+	UNEXPECTED_TK,
+	INVALID_ARG_VAL,
+	INVALID_ARG_VAL_NO,
+	UNDEF_ERR
 } cliparse_err_code;
 
 #define CLIPARSE_ERROR_BUFSZ 128
@@ -531,8 +531,8 @@ typedef enum {
  * CLI parse error result type.
  */
 typedef struct {
-    cliparse_err_code code;
-    char msg[CLIPARSE_ERROR_BUFSZ];
+	cliparse_err_code code;
+	char msg[CLIPARSE_ERROR_BUFSZ];
 } cliparse_error;
 
 
@@ -613,6 +613,26 @@ const cliopt *cliparser_active_sc_option(const cliparser *cmd);
 
 
 /**
+ * @brief Tells whether an option was used/parsed from its short name.
+ *
+ * @param cmd The (sub)command parser
+ * @param shortname The short (`-`) name of the option.
+ */
+bool cliparser_opt_used_from_shortname(const cliparser *cmd,
+                                       char shortname);
+
+
+/**
+ * @brief Tells whether an option was used/parsed from its long name.
+ *
+ * @param cmd The (sub)command parser
+ * @param longname The long (`--`) name of the option.
+ */
+bool cliparser_opt_used_from_longname(const cliparser *cmd,
+                                      char *longname);
+
+
+/**
  * @brief Gets the values of an option from its short name.
  *
  * @param cmd The (sub)command parser
@@ -636,6 +656,18 @@ const cliopt *cliparser_active_sc_option(const cliparser *cmd);
  */
 const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
         char shortname);
+
+/**
+ * @brief Gets the values of an option from its long name.
+ *
+ * @param cmd The (sub)command parser
+ * @param longname The long (`--`) name of the option.
+ *
+ * @see cliparser_opt_val_from_shortname
+ *
+ */
+const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
+        char *longname);
 
 
 /**
