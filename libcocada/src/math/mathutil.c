@@ -34,6 +34,22 @@
 
 
 
+#define DIVFLOOR_IMPL( TYPE , ...)\
+	TYPE divfloor_##TYPE(TYPE num, TYPE den) {\
+		return num / den;\
+	}
+
+XX_UNSIGNED_INT(DIVFLOOR_IMPL)
+
+
+#define DIVCEIL_IMPL( TYPE , ...)\
+	TYPE divceil_##TYPE(TYPE num, TYPE den) {\
+		return (num == 0) ? 0 : 1 + ((num - 1) / den);\
+	}
+
+XX_UNSIGNED_INT(DIVCEIL_IMPL)
+
+
 #define POW2CEIL_IMPL( TYPE, ... )\
 	TYPE pow2ceil_##TYPE( TYPE val ) {\
 		TYPE pow = 1;\
@@ -143,7 +159,7 @@ uint64_t prime_succ(uint64_t n)
 {
 	uint64_t firstfew[] = {2, 2, 2, 3, 5, 5, 7};
 	if (n <= 6) return firstfew[n];
-	uint64_t k = (uint64_t) DIVCEIL(n, 6);
+	uint64_t k = divceil_uint64_t(n, 6);
 	assert (n <= k * 6);
 	uint64_t ret = 6 * k - 1;
 	bool pm = true;

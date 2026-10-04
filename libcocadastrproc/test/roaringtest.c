@@ -50,7 +50,7 @@ static size_t ba_size = (1 << 18) + 725;
 static void reset_arrays()
 {
     size_t i, j, ba_byte_size;
-    ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
+    ba_byte_size =  divceil_size_t(ba_size, BYTESIZE);
     for (i = 0; i < ba_byte_size; i++) {
         ba_zeros[i] = 0x0;
         ba_ones[i] = ~(0x0);
@@ -69,7 +69,7 @@ static void reset_arrays()
 void roaringbitvec_test_setup(CuTest *tc)
 {
     size_t ba_byte_size;
-    ba_byte_size =  (size_t)DIVCEIL(ba_size, BYTESIZE);
+    ba_byte_size =  divceil_size_t(ba_size, BYTESIZE);
     nof_arrays = 6;
     ba_zeros = malloc(ba_byte_size);
     ba_ones = malloc(ba_byte_size);
@@ -188,7 +188,7 @@ void roaringbitvec_test_rank(CuTest *tc)
             for (int pat = 0; pat < 6; pat++) {
                 printf("rank pat=%d len=%zu bit=%d\n", pat, len, (int)bit);
                 byte_t *ba = bitarr_new(len);
-                memset(ba, bit_patterns[pat], DIVCEIL(len, BYTESIZE));
+                memset(ba, bit_patterns[pat], divceil_size_t(len, BYTESIZE));
                 roaringbitvec *bv = roaringbitvec_new_from_bitarr(ba, len);
                 uint32_t expec_rank = 0;
                 for (size_t i = 0; i < len; i++) {
@@ -223,7 +223,7 @@ void roaringbitvec_test_select(CuTest *tc)
             for (int i = 0; i < 6; i++) {
                 printf("sel i=%d len=%zu bit=%d\n", i, len, (int)bit);
                 byte_t *ba = bitarr_new(len);
-                memset(ba, bit_patterns[i], DIVCEIL(len, BYTESIZE));
+                memset(ba, bit_patterns[i], divceil_size_t(len, BYTESIZE));
                 roaringbitvec *bv = roaringbitvec_new_from_bitarr(ba, len);
                 size_t bitcount = (bit) ? roaringbitvec_count(bv, 1) : len - roaringbitvec_count(bv, 1);
                 size_t rank = 0;

@@ -75,22 +75,27 @@
 
 
 /**
- * @brief Computes floor(value/base) as double values
+ * Computes floor(num/den) for unsigned integer types.
  */
-#define DIVFLOOR(NUM, DEN) (floor(((double)(NUM))/((double)(DEN))))
+#define DIVFLOOR_DECL( TYPE , ...)\
+	TYPE divfloor_##TYPE(TYPE num, TYPE den);
+
+XX_UNSIGNED_INT(DIVFLOOR_DECL)
 
 
 /**
- * @brief Computes ceil(value/base) as double values
+ * Computes ceil(num/den) for unsigned integer types.
  */
-#define DIVCEIL(NUM, DEN) (ceil(((double)(NUM))/((double)(DEN))))
+#define DIVCEIL_DECL( TYPE , ...)\
+	TYPE divceil_##TYPE(TYPE num, TYPE den);
+
+XX_UNSIGNED_INT(DIVCEIL_DECL)
 
 
 /**
  * @brief Tests whether an unsigned int is a power or two
  */
 #define IS_POW2(UNS_INT) (UNS_INT && !(UNS_INT & (UNS_INT - 1)))
-
 
 /**
  * @brief Computes the smallest power of 2 greater or equal to @p val

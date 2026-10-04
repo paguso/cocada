@@ -59,7 +59,7 @@ static void init_rank_tables(csrsbitarr *ba)
 	                                     ( ((size_t)(pow(log2(ba->len), 2)
 	                                             / BYTESIZE)) * BYTESIZE ) );
 	ba->rank_samples_byte_interval = ba->rank_samples_bit_interval / BYTESIZE;
-	ba->rank_samples_count = MAX( (size_t) DIVCEIL(ba->len,
+	ba->rank_samples_count = MAX( divceil_size_t(ba->len,
 	                              ba->rank_samples_bit_interval), 1 );
 	ba->rank_samples = bytearr_new(ba->rank_samples_count * ba->bytes_per_pos);
 
@@ -152,10 +152,10 @@ static void init_select_tables(csrsbitarr *ba)
 	    MAX( MIN_RANK_SAMPLE_INTERVAL,
 	         (((size_t)(pow(log2(ba->total_bit_count[1]), 2) / BYTESIZE))
 	          * BYTESIZE) );
-	ba->sel_samples_count[0] = MAX( DIVCEIL(ba->total_bit_count[0],
+	ba->sel_samples_count[0] = MAX( divceil_size_t(ba->total_bit_count[0],
 	                                        ba->sel_samples_bit_interval[0]),
 	                                1 );
-	ba->sel_samples_count[1] = MAX( DIVCEIL( ba->total_bit_count[1],
+	ba->sel_samples_count[1] = MAX( divceil_size_t( ba->total_bit_count[1],
 	                                ba->sel_samples_bit_interval[1]),
 	                                1 );
 	ba->byte_sel_samples[0] = bytearr_new( ba->sel_samples_count[0]
@@ -252,12 +252,10 @@ csrsbitarr *csrsbitarr_new(byte_t *ba, size_t len)
 	ret = NEW(csrsbitarr);
 	ret->data = ba;
 	ret->len = len;
-	ret->byte_size = DIVCEIL(ret->len, BYTESIZE);
+	ret->byte_size = divceil_size_t(ret->len, BYTESIZE);
 	// use the minimum number of "bytes" per bit and byte position
-	ret->bytes_per_pos = (size_t) DIVCEIL((size_t) ceil(log2(ret->len + 1)),
-	                                      BYTESIZE);
-	ret->bytes_per_byte_pos = (size_t) DIVCEIL((size_t) ceil(log2(
-	                              ret->byte_size + 1)), BYTESIZE);
+	ret->bytes_per_pos = nbytes(ret->len+1);
+	ret->bytes_per_byte_pos = nbytes(ret->byte_size + 1);
 
 	init_rank_tables(ret);
 	init_select_tables(ret);

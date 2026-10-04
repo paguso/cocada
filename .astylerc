@@ -1,0 +1,4 @@
+# COCADA code style for astyle.
+# Used by `make fmt` and by editors that pass --options=<this file>.
+--style=kr
+--indent=tab

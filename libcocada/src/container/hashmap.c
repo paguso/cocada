@@ -52,9 +52,20 @@ struct _hashmap {
     hash_func keyhash;
     void   *data;
     byte_t *tally;
-    void   *entries;
+    void   *keys;
+    void   *vals;
 };
 
+/*
+ * Buffer layout: data = [ tally: cap ][ keys: cap*keysize ][ vals: cap*valsize ]
+ *
+ * Keys and values are kept in separate arrays, so that each one is laid out
+ * like a C array of its own type and every slot is suitably aligned.
+ * (Interleaving them with stride keysize+valsize would misalign values
+ * e.g. for 1-byte keys and pointer values.) Since cap is a power of 2
+ * >= MIN_CAPACITY, both arrays start at multiples of cap from the
+ * malloc'ed (max-aligned) base, and are therefore max-aligned as well.
+ */
 
 
 void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
@@ -81,7 +92,8 @@ static void _reset_data(hashmap *hmap, size_t cap)
     hmap->data = malloc(hmap->cap * (1 + hmap->keysize + hmap->valsize ));
     hmap->tally = (byte_t *) hmap->data;
     memset(hmap->tally, ST_EMPTY, hmap->cap);
-    hmap->entries = (byte_t *)hmap->data + hmap->cap;
+    hmap->keys = (byte_t *)hmap->data + hmap->cap;
+    hmap->vals = (byte_t *)hmap->keys + (hmap->cap * hmap->keysize);
 }
 
 
@@ -155,14 +167,13 @@ static inline uint64_t _h1(uint64_t h)
 
 static inline void *_key_at(const hashmap *hmap, size_t pos)
 {
-    return (byte_t *)hmap->entries + ( pos * (hmap->keysize + hmap->valsize) );
+    return (byte_t *)hmap->keys + ( pos * hmap->keysize );
 }
 
 
 static inline void *_value_at(const hashmap *hmap, size_t pos)
 {
-    return (byte_t *)hmap->entries + ( ( pos * (hmap->keysize + hmap->valsize) ) +
-                             hmap->keysize);
+    return (byte_t *)hmap->vals + ( pos * hmap->valsize );
 }
 
 
@@ -313,7 +324,8 @@ static void _resize(hashmap *hmap, size_t new_cap)
     size_t old_size = hmap->size;
     void   *old_data = hmap->data;
     byte_t *old_tally = (byte_t *) old_data;
-    void   *old_entries = (byte_t *)old_data + old_cap;
+    byte_t *old_keys = (byte_t *)old_data + old_cap;
+    byte_t *old_vals = old_keys + ( old_cap * hmap->keysize );
 
     _reset_data(hmap, new_cap);
     //_print(hmap);
@@ -324,8 +336,8 @@ static void _resize(hashmap *hmap, size_t new_cap)
             //rehash_attempts += 1;
             //printf("rehashing element at pos %zu\n",i);
             _set( hmap,
-                  (byte_t *)old_entries + ( i * ( hmap->keysize + hmap->valsize ) ),
-                  (byte_t *)old_entries + ( i * ( hmap->keysize + hmap->valsize ) ) + hmap->keysize );
+                  old_keys + ( i * hmap->keysize ),
+                  old_vals + ( i * hmap->valsize ) );
             //_print(hmap);
             //if (rehash_attempts!=hmap->size) {
             //    printf("failed to rehash pos %zu\n",i );

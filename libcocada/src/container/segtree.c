@@ -50,73 +50,73 @@ XX_PRIMITIVES(SEGTREE_MERGE_IMPL)
 
 
 struct __segtree {
-	size_t range;
-	size_t typesize;
-	merge_func merge;
-	void *init_val;
-	vec *tree;
+    size_t range;
+    size_t typesize;
+    merge_func merge;
+    void *init_val;
+    vec *tree;
 };
 
 
 static void segtree_reset(segtree *self)
 {
-	vec_push_n(self->tree, self->init_val, 2 * self->range);
+    vec_push_n(self->tree, self->init_val, 2 * self->range);
 }
 
 
 segtree *segtree_new(size_t range, size_t typesize, merge_func merge,
                      const void *init_val)
 {
-	segtree *ret = NEW(segtree);
-	ret->range = range;
-	ret->typesize = typesize;
-	ret->merge = merge;
-	ret->init_val = malloc(sizeof(typesize));
-	memcpy(ret->init_val, init_val, typesize);
-	ret->tree = vec_new_with_capacity(typesize, 2 * range);
-	segtree_reset(ret);
-	return ret;
+    segtree *ret = NEW(segtree);
+    ret->range = range;
+    ret->typesize = typesize;
+    ret->merge = merge;
+    ret->init_val = malloc(typesize);
+    memcpy(ret->init_val, init_val, typesize);
+    ret->tree = vec_new_with_capacity(typesize, 2 * range);
+    segtree_reset(ret);
+    return ret;
 }
 
 
 void segtree_free(segtree *self)
 {
-	DESTROY_FLAT(self->tree, vec);
-	FREE(self->init_val);
-	FREE(self);
+    DESTROY_FLAT(self->tree, vec);
+    FREE(self->init_val);
+    FREE(self);
 }
 
 
 void segtree_upd(segtree *self, size_t pos, const void *val)
 {
-	pos += self->range;
-	vec_set(self->tree, pos, val);
-	for (pos /= 2 ; pos > 0; pos /= 2) {
-		self->merge( vec_get(self->tree, 2 * pos),
-		             vec_get(self->tree, 2 * pos + 1),
-		             vec_get_mut(self->tree, pos) );
-	}
+    pos += self->range;
+    vec_set(self->tree, pos, val);
+    for (pos /= 2 ; pos > 0; pos /= 2) {
+        self->merge( vec_get(self->tree, 2 * pos),
+                     vec_get(self->tree, 2 * pos + 1),
+                     vec_get_mut(self->tree, pos) );
+    }
 }
 
 
 const void *segtree_qry(segtree *self, size_t pos)
 {
-	return vec_get(self->tree, pos + self->range);
+    return vec_get(self->tree, pos + self->range);
 }
 
 
 void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 {
-	memcpy(dest, self->init_val, self->typesize);
-	for (left += self->range, right += self->range; left < right;
-	        left /= 2, right /= 2) {
-		if (IS_ODD(left)) {
-			self->merge(vec_get(self->tree, left++), (const void *)dest, dest);
-		}
-		if (IS_ODD(right)) {
-			self->merge((const void *)dest, vec_get(self->tree, --right), dest);
-		}
-	}
+    memcpy(dest, self->init_val, self->typesize);
+    for (left += self->range, right += self->range; left < right;
+            left /= 2, right /= 2) {
+        if (IS_ODD(left)) {
+            self->merge(vec_get(self->tree, left++), (const void *)dest, dest);
+        }
+        if (IS_ODD(right)) {
+            self->merge((const void *)dest, vec_get(self->tree, --right), dest);
+        }
+    }
 }
 
 

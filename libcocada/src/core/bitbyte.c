@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "bitbyte.h"
 #include "coretype.h"
@@ -28,10 +29,26 @@
 #include "mathutil.h"
 
 
-size_t nbytes(size_t nvalues)
+#include <stdint.h>
+
+#if defined(__has_builtin)
+#  if __has_builtin(__builtin_clzll)
+#    define HAVE_CLZLL 1
+#  endif
+#elif defined(__GNUC__)            /* GCC < 10 has no __has_builtin */
+#  define HAVE_CLZLL 1
+#endif
+
+inline size_t nbytes(size_t nvalues)   /* n >= 1, result >= 1 */
 {
-	return (nvalues < 2) ? nvalues : (size_t)(DIVCEIL(log2((double)nvalues),
-	        BYTESIZE));
+#ifdef HAVE_CLZLL
+	return nvalues < 2 ? 1 : (64 - __builtin_clzll(nvalues - 1) + 7) / 8;
+#else
+	return (1u + ((nvalues) > 1ULL << 8)  + ((nvalues) > 1ULL << 16) \
+			+ ((nvalues) > 1ULL << 24) + ((nvalues) > 1ULL << 32) \
+			+ ((nvalues) > 1ULL << 40) + ((nvalues) > 1ULL << 48) \
+			+ ((nvalues) > 1ULL << 56));
+#endif
 }
 
 
@@ -175,7 +192,7 @@ static const uint64_t byte_as_uint64_str[256] = {
 
 void byte_to_str(byte_t b, char *dest)
 {
-	*((uint64_t *)dest) = byte_as_uint64_str[b];
+	memcpy(dest, &byte_as_uint64_str[b], sizeof(uint64_t)); // dest may be unaligned
 	dest[8] = '\0';
 }
 
