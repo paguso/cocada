@@ -43,14 +43,6 @@ cliparser *create_cli_parser()
 }
 
 
-// Whether a valueless switch option was used in the call
-static bool switch_on(const cliparser *clip, char shortname)
-{
-	const vec *v = cliparser_opt_val_from_shortname(clip, shortname);
-	return v && vec_len(v) > 0 && vec_get_bool(v, 0);
-}
-
-
 // Reads a whole file into a heap allocated buffer. Returns NULL on error.
 static char *slurp(const char *path, size_t *len)
 {
@@ -140,8 +132,8 @@ int main(int argc, char **argv)
 	cliparser *clip = create_cli_parser();
 	cliparser_parse(clip, argc, argv, true);
 
-	bool tokens = switch_on(clip, 't');
-	bool decls = switch_on(clip, 'd');
+	bool tokens = cliparser_opt_used_from_shortname(clip, 't');
+	bool decls = cliparser_opt_used_from_shortname(clip, 'd');
 	const vec *files = cliparser_arg_val_from_pos(clip, 0);
 
 	int ret = EXIT_SUCCESS;
