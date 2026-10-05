@@ -133,7 +133,9 @@
  * have multiple values, with the same restriction as the option
  * values that they must be of the same type. This is useful,
  * for example, for dealing with wildcard file name expasions made
- * by the shell.
+ * by the shell. The last argument may also be optional, taking zero or
+ * more values (see #cliarg_new_multi_optional), e.g. for a program that
+ * processes some default input when no files are given.
  *
  * ## Example
  * ```
@@ -427,6 +429,21 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
 
 
 /**
+ * @brief Creates a new optional multi-valued positional argument.
+ *
+ * The argument takes zero or more values. Only the last positional
+ * argument can be multi-valued.
+ *
+ * @param name The name of the argument, for documentation purposes only.
+ * @param help A short description of the argument, for help messages.
+ * @param type The type of the argument.
+ * @return @move The argument.
+ * @see cliarg_new_multi
+ */
+cliarg *cliarg_new_multi_optional(char *name, char *help, cliargtype type);
+
+
+/**
  * @brief Creates a new (sub)program CLI parser.
  * @param name	(**no transfer**) The name of the (sub)program.
  * @param help	(**no transfer**) A short description of the (sub)program
@@ -656,19 +673,6 @@ bool cliparser_opt_used_from_longname(const cliparser *cmd,
  */
 const vec *cliparser_opt_val_from_shortname(const cliparser *cmd,
         char shortname);
-
-/**
- * @brief Gets the values of an option from its long name.
- *
- * @param cmd The (sub)command parser
- * @param longname The long (`--`) name of the option.
- *
- * @see cliparser_opt_val_from_shortname
- *
- */
-const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
-        char *longname);
-
 
 /**
  * @brief Gets the values of an option from its long name.
