@@ -242,16 +242,16 @@ DECL_TRAIT(hashmap_iter, iter);
 
 
 
-#define HASHMAP_GET_DECL( TYPE ) \
+#define DECL_HASHMAP_GET( TYPE ) \
 	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key);
 
-#define HASHMAP_SET_DECL( TYPE ) \
+#define DECL_HASHMAP_SET( TYPE ) \
 	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val);
 
-#define HASHMAP_ALL_DECL( TYPE , ...) \
-	HASHMAP_GET_DECL(TYPE) \
-	HASHMAP_SET_DECL(TYPE)
+#define DECL_HASHMAP_ALL( TYPE , ...) \
+	DECL_HASHMAP_GET(TYPE) \
+	DECL_HASHMAP_SET(TYPE)
 
-XX_CORETYPES(HASHMAP_ALL_DECL)
+XX_CORETYPES(DECL_HASHMAP_ALL)
 
 #endif

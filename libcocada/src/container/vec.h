@@ -413,50 +413,50 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 
-#define VEC_NEW_DECL( TYPE ) \
+#define DECL_VEC_NEW( TYPE ) \
 	/** @brief Creates a new TYPE vector @see coretype.h */ \
 	vec *vec_new_##TYPE();
 
-#define VEC_GET_DECL( TYPE ) \
+#define DECL_VEC_GET( TYPE ) \
 	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
 	TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
-#define VEC_FIRST_DECL( TYPE ) \
+#define DECL_VEC_FIRST( TYPE ) \
 	/** @brief Returns TYPE copy of the first element @see coretype.h */ \
 	TYPE vec_first_##TYPE(const vec *v);
 
-#define VEC_LAST_DECL( TYPE ) \
+#define DECL_VEC_LAST( TYPE ) \
 	/** @brief Returns TYPE copy of the last element @see coretype.h */ \
 	TYPE vec_last_##TYPE(const vec *v);
 
-#define VEC_SET_DECL( TYPE ) \
+#define DECL_VEC_SET( TYPE ) \
 	/** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
 	void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
-#define VEC_PUSH_DECL( TYPE ) \
+#define DECL_VEC_PUSH( TYPE ) \
 	/** @brief Appends a TYPE copy of @p val @see coretype.h */ \
 	void vec_push_##TYPE(vec *v, TYPE val);
 
-#define VEC_INS_DECL( TYPE ) \
+#define DECL_VEC_INS( TYPE ) \
 	/** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
 	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
-#define VEC_POP_DECL( TYPE ) \
+#define DECL_VEC_POP( TYPE ) \
 	/** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
 	TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
 
-#define TYPED_VEC_DECL( TYPE , ...) \
-	VEC_NEW_DECL(TYPE) \
-	VEC_GET_DECL(TYPE) \
-	VEC_FIRST_DECL(TYPE) \
-	VEC_LAST_DECL(TYPE) \
-	VEC_SET_DECL(TYPE) \
-	VEC_PUSH_DECL(TYPE) \
-	VEC_INS_DECL(TYPE) \
-	VEC_POP_DECL(TYPE)
+#define DECL_TYPED_VEC( TYPE , ...) \
+	DECL_VEC_NEW(TYPE) \
+	DECL_VEC_GET(TYPE) \
+	DECL_VEC_FIRST(TYPE) \
+	DECL_VEC_LAST(TYPE) \
+	DECL_VEC_SET(TYPE) \
+	DECL_VEC_PUSH(TYPE) \
+	DECL_VEC_INS(TYPE) \
+	DECL_VEC_POP(TYPE)
 
-XX_CORETYPES(TYPED_VEC_DECL)
+XX_CORETYPES(DECL_TYPED_VEC)
 
 
 /**

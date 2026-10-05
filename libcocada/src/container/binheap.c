@@ -120,18 +120,18 @@ void binheap_remv(binheap *heap, void *dest)
 }
 
 
-#define BINHEAP_PUSH_IMPL( TYPE )\
+#define IMPL_BINHEAP_PUSH( TYPE )\
 	void binheap_ins_##TYPE(binheap *heap, TYPE val)\
 	{   binheap_ins(heap, &val);   }
 
 
-#define BINHEAP_POP_IMPL( TYPE )\
+#define IMPL_BINHEAP_POP( TYPE )\
 	TYPE binheap_remv_##TYPE(binheap *heap)\
 	{   TYPE s; binheap_remv(heap, &s); return s; }
 
 
-#define BINHEAP_ALL_IMPL( TYPE , ...)\
-	BINHEAP_PUSH_IMPL(TYPE)\
-	BINHEAP_POP_IMPL(TYPE)
+#define IMPL_BINHEAP_ALL( TYPE , ...)\
+	IMPL_BINHEAP_PUSH(TYPE)\
+	IMPL_BINHEAP_POP(TYPE)
 
-XX_CORETYPES(BINHEAP_ALL_IMPL)
+XX_CORETYPES(IMPL_BINHEAP_ALL)

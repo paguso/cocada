@@ -57,7 +57,7 @@ void sa_arr_free(void *arr)
 }
 
 
-#define SA_ARR_IMPL(TYPE, ...)\
+#define IMPL_SA_ARR(TYPE, ...)\
 	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb)\
 	{\
 		return (TYPE *)sa_arr_calloc(nmemb, sizeof(TYPE));\
@@ -75,4 +75,4 @@ void sa_arr_free(void *arr)
 		return sa_arr_sizeof(arr) / sizeof(TYPE);\
 	}
 
-XX_CORETYPES(SA_ARR_IMPL)
+XX_CORETYPES(IMPL_SA_ARR)

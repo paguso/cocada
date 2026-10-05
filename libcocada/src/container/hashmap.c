@@ -468,22 +468,22 @@ hashmap_iter *hashmap_get_iter(const hashmap *src)
 IMPL_TRAIT(hashmap_iter, iter);
 
 
-#define HASHMAP_GET_IMPL( TYPE )\
+#define IMPL_HASHMAP_GET( TYPE )\
 	TYPE hashmap_get_##TYPE(hashmap *hmap, const void *key) {\
 		const void *v = hashmap_get(hmap, key);\
 		return v ? ((TYPE *)v)[0] : (TYPE)0;\
 	}
 
 
-#define HASHMAP_SET_IMPL( TYPE )\
+#define IMPL_HASHMAP_SET( TYPE )\
 	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val) {\
 		hashmap_ins(hmap, key, &val);\
 	}
 
 
-#define HASHMAP_ALL_IMPL( TYPE, ... )\
-	HASHMAP_GET_IMPL(TYPE)\
-	HASHMAP_SET_IMPL(TYPE)
+#define IMPL_HASHMAP_ALL( TYPE, ... )\
+	IMPL_HASHMAP_GET(TYPE)\
+	IMPL_HASHMAP_SET(TYPE)
 
 
-XX_CORETYPES(HASHMAP_ALL_IMPL)
+XX_CORETYPES(IMPL_HASHMAP_ALL)

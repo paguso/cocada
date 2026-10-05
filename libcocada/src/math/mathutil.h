@@ -77,19 +77,19 @@
 /**
  * Computes floor(num/den) for unsigned integer types.
  */
-#define DIVFLOOR_DECL( TYPE , ...)\
+#define DECL_DIVFLOOR( TYPE , ...)\
 	TYPE divfloor_##TYPE(TYPE num, TYPE den);
 
-XX_UNSIGNED_INT(DIVFLOOR_DECL)
+XX_UNSIGNED_INT(DECL_DIVFLOOR)
 
 
 /**
  * Computes ceil(num/den) for unsigned integer types.
  */
-#define DIVCEIL_DECL( TYPE , ...)\
+#define DECL_DIVCEIL( TYPE , ...)\
 	TYPE divceil_##TYPE(TYPE num, TYPE den);
 
-XX_UNSIGNED_INT(DIVCEIL_DECL)
+XX_UNSIGNED_INT(DECL_DIVCEIL)
 
 
 /**
@@ -100,13 +100,13 @@ XX_UNSIGNED_INT(DIVCEIL_DECL)
 /**
  * @brief Computes the smallest power of 2 greater or equal to @p val
  */
-#define POW2CEIL_DECL( TYPE , ...)\
+#define DECL_POW2CEIL( TYPE , ...)\
 	TYPE pow2ceil_##TYPE( TYPE val );
 
 
 #define MEAN(A, B) (((A) + (B)) / 2);
 
-XX_UNSIGNED_INT(POW2CEIL_DECL)
+XX_UNSIGNED_INT(DECL_POW2CEIL)
 
 
 /**
@@ -152,10 +152,10 @@ uint64_t prime_succ(uint64_t n);
  * @brief Computes the average of an array of an unsigned int type.
  * @warning This function is slow because it takes care of overflows.
  */
-#define AVG_DECL(TYPE, ...)\
+#define DECL_AVG(TYPE, ...)\
 	double average_##TYPE(TYPE *vals, size_t n);
 
-XX_UNSIGNED_INT(AVG_DECL)
+XX_UNSIGNED_INT(DECL_AVG)
 
 
 /**
@@ -163,10 +163,10 @@ XX_UNSIGNED_INT(AVG_DECL)
  * @param dirty If true, the original array may be reordered in the process.
  * Else, a copy is first created and @p v is left intact.
  */
-#define KTH_SMALLEST_DECL(TYPE, ...)\
+#define DECL_KTH_SMALLEST(TYPE, ...)\
 	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty);
 
-XX_PRIMITIVES(KTH_SMALLEST_DECL)
+XX_PRIMITIVES(DECL_KTH_SMALLEST)
 
 
 /**
@@ -174,10 +174,10 @@ XX_PRIMITIVES(KTH_SMALLEST_DECL)
  * @param dirty If true, the original array may be reordered in the process.
  * Else, a copy is first created and @p v is left intact.
  */
-#define MEDIAN_DECL(TYPE, ...)\
+#define DECL_MEDIAN(TYPE, ...)\
 	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);
 
-XX_PRIMITIVES(MEDIAN_DECL)
+XX_PRIMITIVES(DECL_MEDIAN)
 
 
 

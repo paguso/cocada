@@ -104,19 +104,19 @@ void binheap_remv(binheap *heap, void *dest);
 
 
 
-#define BINHEAP_PUSH_DECL( TYPE )\
+#define DECL_BINHEAP_PUSH( TYPE )\
 	void binheap_ins_##TYPE(binheap *heap, TYPE val);
 
 
-#define BINHEAP_POP_DECL( TYPE )\
+#define DECL_BINHEAP_POP( TYPE )\
 	TYPE binheap_remv_##TYPE(binheap *heap);
 
 
-#define BINHEAP_ALL_DECL( TYPE, ... )\
-	BINHEAP_PUSH_DECL(TYPE)\
-	BINHEAP_POP_DECL(TYPE)
+#define DECL_BINHEAP_ALL( TYPE, ... )\
+	DECL_BINHEAP_PUSH(TYPE)\
+	DECL_BINHEAP_POP(TYPE)
 
-XX_CORETYPES(BINHEAP_ALL_DECL)
+XX_CORETYPES(DECL_BINHEAP_ALL)
 
 
 

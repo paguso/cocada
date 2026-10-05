@@ -121,14 +121,14 @@ const void *minqueue_min(const minqueue *queue);
 void minqueue_min_cpy(const minqueue *queue, void *dest);
 
 
-#define MINQUEUE_ALL_DECL( TYPE , ...)\
+#define DECL_MINQUEUE_ALL( TYPE , ...)\
 	void minqueue_push_##TYPE(minqueue *queue, TYPE val);\
 	TYPE minqueue_pop_##TYPE(minqueue *queue);\
 	TYPE minqueue_front_##TYPE(const minqueue *queue);\
 	TYPE minqueue_back_##TYPE(const minqueue *queue);\
 	TYPE minqueue_min_##TYPE(const minqueue *queue);
 
-XX_CORETYPES(MINQUEUE_ALL_DECL)
+XX_CORETYPES(DECL_MINQUEUE_ALL)
 
 
 /**

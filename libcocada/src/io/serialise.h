@@ -317,11 +317,11 @@ typedef som *(*get_som_func) ();
 
 
 
-#define GET_SOM_DECL(TYPE, ...) \
+#define DECL_GET_SOM(TYPE, ...) \
 	som* get_som_##TYPE();
 
-XX_PRIMITIVES(GET_SOM_DECL)
-GET_SOM_DECL(cstr)
+XX_PRIMITIVES(DECL_GET_SOM)
+DECL_GET_SOM(cstr)
 
 
 

@@ -461,35 +461,35 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 }
 
 
-#define VEC_NEW_IMPL( TYPE ) \
+#define IMPL_VEC_NEW( TYPE ) \
 	vec *vec_new_##TYPE() \
 	{ return vec_new(sizeof(TYPE)); }
 
 
-#define VEC_GET_IMPL( TYPE ) \
+#define IMPL_VEC_GET( TYPE ) \
 	TYPE vec_get_##TYPE(const vec *v, size_t pos)\
 	{ return ((TYPE *)v->data)[pos]; }
 
 
-#define VEC_FIRST_IMPL( TYPE ) \
+#define IMPL_VEC_FIRST( TYPE ) \
 	TYPE vec_first_##TYPE(const vec *v)\
 	{ return ((TYPE *)v->data)[0]; }
 
 
-#define VEC_LAST_IMPL( TYPE ) \
+#define IMPL_VEC_LAST( TYPE ) \
 	TYPE vec_last_##TYPE(const vec *v)\
 	{ return ((TYPE *)v->data)[v->len - 1]; }
 
 
 
-#define VEC_SET_IMPL( TYPE ) \
+#define IMPL_VEC_SET( TYPE ) \
 	void vec_set_##TYPE(vec *v, size_t pos, TYPE val)\
 	{\
 		((TYPE *)v->data)[pos] = val;\
 	}
 
 
-#define VEC_PUSH_IMPL( TYPE ) \
+#define IMPL_VEC_PUSH( TYPE ) \
 	void vec_push_##TYPE(vec *v, TYPE val)\
 	{\
 		_check_and_resize(v);\
@@ -497,14 +497,14 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 	}
 
 
-#define VEC_INS_IMPL( TYPE ) \
+#define IMPL_VEC_INS( TYPE ) \
 	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val)\
 	{\
 		vec_ins(v, pos, &val);\
 	}
 
 
-#define VEC_POP_IMPL( TYPE ) \
+#define IMPL_VEC_POP( TYPE ) \
 	TYPE vec_pop_##TYPE(vec *v, size_t pos)\
 	{\
 		TYPE r;\
@@ -513,18 +513,18 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 	}
 
 
-#define TYPED_VEC_IMPL( TYPE , ...)\
-	VEC_NEW_IMPL(TYPE) \
-	VEC_GET_IMPL(TYPE)\
-	VEC_FIRST_IMPL(TYPE)\
-	VEC_LAST_IMPL(TYPE)\
-	VEC_SET_IMPL(TYPE)\
-	VEC_PUSH_IMPL(TYPE)\
-	VEC_INS_IMPL(TYPE)\
-	VEC_POP_IMPL(TYPE)
+#define IMPL_TYPED_VEC( TYPE , ...)\
+	IMPL_VEC_NEW(TYPE) \
+	IMPL_VEC_GET(TYPE)\
+	IMPL_VEC_FIRST(TYPE)\
+	IMPL_VEC_LAST(TYPE)\
+	IMPL_VEC_SET(TYPE)\
+	IMPL_VEC_PUSH(TYPE)\
+	IMPL_VEC_INS(TYPE)\
+	IMPL_VEC_POP(TYPE)
 
 
-XX_CORETYPES(TYPED_VEC_IMPL)
+XX_CORETYPES(IMPL_TYPED_VEC)
 
 
 

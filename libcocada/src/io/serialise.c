@@ -80,7 +80,7 @@ static som *_som_new(som_t type, size_t size, get_som_func get_som)
 }
 
 
-#define GET_SOM_IMPL(TYPE, ...)\
+#define IMPL_GET_SOM(TYPE, ...)\
 	\
 	static som* _som_##TYPE = NULL;\
 	\
@@ -91,8 +91,8 @@ static som *_som_new(som_t type, size_t size, get_som_func get_som)
 		return _som_##TYPE;\
 	}
 
-XX_PRIMITIVES(GET_SOM_IMPL)
-GET_SOM_IMPL(cstr)
+XX_PRIMITIVES(IMPL_GET_SOM)
+IMPL_GET_SOM(cstr)
 
 
 

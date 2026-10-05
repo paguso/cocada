@@ -122,11 +122,11 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key,
                  void *dest_val);
 
 
-#define AVLMAP_DECL(TYPE, ...)\
+#define DECL_AVLMAP(TYPE, ...)\
 	TYPE avlmap_get_##TYPE(avlmap *self, const void *key);\
 	void avlmap_ins_##TYPE(avlmap *self, const void *key, TYPE val);\
 
-XX_CORETYPES(AVLMAP_DECL)
+XX_CORETYPES(DECL_AVLMAP)
 
 
 
