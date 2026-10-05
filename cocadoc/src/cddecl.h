@@ -22,6 +22,7 @@
 #ifndef CDDECL_H
 #define CDDECL_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "new.h"
@@ -104,6 +105,40 @@ vec *cddecl_match(const char *src, const vec *toks);
  * @param @move decls The vector.
  */
 void cddecl_vec_free(vec *decls);
+
+
+/**
+ * @brief Returns the parameter names of a declaration.
+ *
+ * Works for functions, function-like macros and function pointer
+ * typedefs. Variadic parameters are named "...".
+ *
+ * @param d The declaration.
+ * @param named Set to false if some parameter has no name.
+ * @return @move The names (vec of heap char *), or NULL if @p d has no
+ *         parameter list.
+ */
+vec *cddecl_params(const cddecl *d, bool *named);
+
+
+/**
+ * @brief Tells whether a function returns a value (is not `void`).
+ * @param d The function declaration.
+ * @return Whether @p d returns a value.
+ */
+bool cddecl_returns_value(const cddecl *d);
+
+
+/**
+ * @brief Tells whether a macro is a generator of a typed function family.
+ *
+ * By convention, generator macros are named `*_DECL` or `*_IMPL`. Their
+ * docs describe the generated functions, not the macro (DC14).
+ *
+ * @param d The declaration.
+ * @return Whether @p d is a generator macro.
+ */
+bool cddecl_is_generator(const cddecl *d);
 
 
 /**

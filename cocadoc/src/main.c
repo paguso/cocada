@@ -19,19 +19,24 @@
  *
  */
 
-#include <stdio.h>
 #include <ctype.h>
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "cddecl.h"
 #include "cddoc.h"
 #include "cdfile.h"
 #include "cdlexer.h"
 #include "cdlint.h"
+#include "cdmd.h"
 #include "cdsym.h"
 #include "cli.h"
+#include "cstrutil.h"
 #include "new.h"
+#include "strbuf.h"
 
 
 cliparser *create_cli_parser()
@@ -41,6 +46,9 @@ cliparser *create_cli_parser()
 	                     "Dump the token stream of each input file (debug)"));
 	cliparser_add_option(clip, cliopt_new_defaults('d', "decls",
 	                     "Dump the documented declarations of each input file (debug)"));
+	cliparser_add_option(clip, cliopt_new('o', "output",
+	                                      "Write Markdown documentation pages to this directory",
+	                                      OPT_OPTIONAL, OPT_SINGLE, ARG_DIR, 1, 1, NULL, NULL));
 	cliparser_add_option(clip, cliopt_new_defaults('l', "lint",
 	                     "Check the documentation comments against the COCADA style"));
 	cliparser_add_option(clip, cliopt_new_defaults('s', "symbols",
@@ -231,6 +239,71 @@ static void dump_symbols(const cdsymtab *tab)
 }
 
 
+// Creates a directory and its parents, if needed. Returns false on error.
+static bool make_dirs(const char *path)
+{
+	char *p = cstr_clone(path);
+	bool ok = true;
+	for (char *c = p + 1; ok; c++) {
+		if (*c == '/' || *c == '\0') {
+			char saved = *c;
+			*c = '\0';
+			ok = mkdir(p, 0755) == 0 || errno == EEXIST;
+			*c = saved;
+			if (saved == '\0') {
+				break;
+			}
+		}
+	}
+	FREE(p);
+	return ok;
+}
+
+
+static bool write_file(const char *dir, const char *name, const char *text)
+{
+	strbuf *path = strbuf_new();
+	strbuf_append(path, dir);
+	strbuf_append_char(path, '/');
+	strbuf_append(path, name);
+	FILE *f = fopen(strbuf_as_str(path), "w");
+	bool ok = f != NULL;
+	if (f) {
+		ok = fputs(text, f) >= 0 && fputc('\n', f) != EOF;
+		ok = (fclose(f) == 0) && ok;
+	}
+	if (!ok) {
+		fprintf(stderr, "cocadoc: cannot write %s\n", strbuf_as_str(path));
+	}
+	strbuf_free(path);
+	return ok;
+}
+
+
+// Writes the pages of all files and the index to dir
+static bool write_docs(const char *dir, const vec *files, const cdsymtab *tab)
+{
+	if (!make_dirs(dir)) {
+		fprintf(stderr, "cocadoc: cannot create directory %s\n", dir);
+		return false;
+	}
+	bool ok = true;
+	for (size_t i = 0, n = vec_len(files); i < n; i++) {
+		const cdfile *f = vec_get_rawptr(files, i);
+		char *name = cdmd_page_name(f);
+		char *page = cdmd_page(f, tab);
+		ok = write_file(dir, name, page) && ok;
+		FREE(page);
+		FREE(name);
+	}
+	char *index = cdmd_index(files);
+	ok = write_file(dir, "index.md", index) && ok;
+	FREE(index);
+	fprintf(stderr, "cocadoc: wrote %zu pages and index.md to %s\n", vec_len(files), dir);
+	return ok;
+}
+
+
 int main(int argc, char **argv)
 {
 	cliparser *clip = create_cli_parser();
@@ -272,7 +345,14 @@ int main(int argc, char **argv)
 		}
 	}
 
-	cdsymtab *tab = (lint || symbols) ? cdsymtab_new(loaded) : NULL;
+	const char *outdir = NULL;
+	if (cliparser_opt_used_from_shortname(clip, 'o')) {
+		outdir = vec_get_rawptr(cliparser_opt_val_from_shortname(clip, 'o'), 0);
+	}
+	cdsymtab *tab = (lint || symbols || outdir) ? cdsymtab_new(loaded) : NULL;
+	if (outdir && !write_docs(outdir, loaded, tab)) {
+		ret = EXIT_FAILURE;
+	}
 	if (symbols) {
 		dump_symbols(tab);
 	}
