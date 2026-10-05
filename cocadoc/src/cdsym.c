@@ -43,9 +43,18 @@ typedef struct {
 } entry;
 
 
+typedef struct {
+	const cdfile *file;
+	vec *families;  // vec of cdfamily
+	vec *warns;     // vec of cdmacrowarn
+} file_gen;
+
+
 struct _cdsymtab {
 	vec *entries;   // vec of entry
 	hashmap *index; // name (char *) -> position of its first entry (size_t)
+	cdmacrotab *macros;
+	vec *gens;      // vec of file_gen, one per file
 };
 
 
@@ -64,10 +73,13 @@ static bool eq_str(const void *a, const void *b)
 
 // Takes ownership of name
 static void add(cdsymtab *t, char *name, cddecl_kind kind, const cdfile *file,
-                const cddecl *decl, const cddecl *parent)
+                const cddecl *decl, const cddecl *parent, const cdfamily *family)
 {
 	entry e = {
-		.sym = {.name = name, .kind = kind, .file = file, .decl = decl, .parent = parent},
+		.sym = {
+			.name = name, .kind = kind, .file = file, .decl = decl, .parent = parent,
+			.family = family
+		},
 		.next = NONE
 	};
 	size_t pos = vec_len(t->entries);
@@ -106,14 +118,14 @@ static void add_file(cdsymtab *t, const cdfile *f)
 			file_doc = d;
 		}
 	}
-	add(t, cstr_clone(f->name), CDD_FILE, f, file_doc, NULL);
+	add(t, cstr_clone(f->name), CDD_FILE, f, file_doc, NULL, NULL);
 
 	for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
 		const cddecl *d = vec_get(f->decls, i);
 		if (d->kind == CDD_FILE || d->kind == CDD_MACROCALL || d->name[0] == '\0') {
 			continue;
 		}
-		add(t, cstr_clone(d->name), d->kind, f, d, NULL);
+		add(t, cstr_clone(d->name), d->kind, f, d, NULL, NULL);
 		bool is_enum = d->sig && (strstr(d->sig, "enum ") == d->sig
 		                          || strncmp(d->sig, "typedef enum", 12) == 0);
 		for (size_t j = 0, m = d->members ? vec_len(d->members) : 0; j < m; j++) {
@@ -121,9 +133,9 @@ static void add_file(cdsymtab *t, const cdfile *f)
 			if (mb->name[0] == '\0') {
 				continue;
 			}
-			add(t, qualified(d->name, mb->name), CDD_MEMBER, f, mb, d);
+			add(t, qualified(d->name, mb->name), CDD_MEMBER, f, mb, d, NULL);
 			if (is_enum) {
-				add(t, cstr_clone(mb->name), CDD_MEMBER, f, mb, d);
+				add(t, cstr_clone(mb->name), CDD_MEMBER, f, mb, d, NULL);
 			}
 		}
 	}
@@ -138,6 +150,25 @@ cdsymtab *cdsymtab_new(const vec *files)
 	for (size_t i = 0, n = vec_len(files); i < n; i++) {
 		add_file(ret, vec_get_rawptr(files, i));
 	}
+	// macro-generated declarations
+	ret->macros = cdmacrotab_new(files);
+	ret->gens = vec_new(sizeof(file_gen));
+	for (size_t i = 0, n = vec_len(files); i < n; i++) {
+		file_gen g = {.file = vec_get_rawptr(files, i), .warns = vec_new(sizeof(cdmacrowarn))};
+		g.families = cdmacro_families(ret->macros, g.file, g.warns);
+		vec_push(ret->gens, &g);
+		for (size_t k = 0, kn = vec_len(g.families); k < kn; k++) {
+			const cdfamily *fam = vec_get(g.families, k);
+			if (fam->pattern && vec_len(fam->instances) > 1) {
+				add(ret, cstr_clone(fam->pattern->name), fam->pattern->kind, g.file,
+				    fam->pattern, NULL, fam);
+			}
+			for (size_t j = 0, jn = vec_len(fam->instances); j < jn; j++) {
+				const cdinstance *in = vec_get(fam->instances, j);
+				add(ret, cstr_clone(in->decl->name), in->decl->kind, g.file, in->decl, NULL, fam);
+			}
+		}
+	}
 	return ret;
 }
 
@@ -148,6 +179,13 @@ void cdsymtab_free(cdsymtab *self)
 		return;
 	}
 	DESTROY_FLAT(self->index, hashmap);
+	for (size_t i = 0, n = vec_len(self->gens); i < n; i++) {
+		file_gen *g = vec_get_mut(self->gens, i);
+		cdfamily_vec_free(g->families);
+		cdmacrowarn_vec_free(g->warns);
+	}
+	DESTROY_FLAT(self->gens, vec);
+	cdmacrotab_free(self->macros);
 	for (size_t i = 0, n = vec_len(self->entries); i < n; i++) {
 		entry *e = vec_get_mut(self->entries, i);
 		FREE(e->sym.name);
@@ -189,6 +227,38 @@ const cdsym *cdsymtab_resolve(const cdsymtab *self, const char *name,
 		}
 	}
 	return ret;
+}
+
+
+static const file_gen *gen_of(const cdsymtab *self, const cdfile *f)
+{
+	for (size_t i = 0, n = vec_len(self->gens); i < n; i++) {
+		const file_gen *g = vec_get(self->gens, i);
+		if (g->file == f) {
+			return g;
+		}
+	}
+	return NULL;
+}
+
+
+const vec *cdsymtab_families(const cdsymtab *self, const cdfile *f)
+{
+	const file_gen *g = gen_of(self, f);
+	return g ? g->families : NULL;
+}
+
+
+const vec *cdsymtab_macro_warnings(const cdsymtab *self, const cdfile *f)
+{
+	const file_gen *g = gen_of(self, f);
+	return g ? g->warns : NULL;
+}
+
+
+const cdmacrotab *cdsymtab_macros(const cdsymtab *self)
+{
+	return self->macros;
 }
 
 

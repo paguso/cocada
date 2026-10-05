@@ -270,21 +270,16 @@ static char *declarator_name(const ctx *c, size_t from, size_t to)
 static cddecl new_decl(cddecl_kind kind, size_t line, char *doc, size_t doc_line)
 {
 	cddecl d = {.kind = kind, .name = NULL, .sig = NULL, .doc = doc,
-	            .line = line, .doc_line = doc ? doc_line : 0, .members = NULL
+	            .line = line, .doc_line = doc ? doc_line : 0, .members = NULL,
+	            .def = NULL
 	           };
 	return d;
 }
 
 
-// Undocumented macro invocations are dropped: macro-generated APIs are
-// not handled yet.
 static void push_decl(vec *out, cddecl *d)
 {
-	if (d->kind == CDD_MACROCALL && !d->doc) {
-		cddecl_finalise(d, NULL);
-	} else {
-		vec_push(out, d);
-	}
+	vec_push(out, d);
 }
 
 
@@ -388,6 +383,7 @@ static size_t match_decl(const ctx *c, size_t j, char *doc, size_t doc_line,
 		while (i < len && (isalnum((unsigned char)s[i]) || s[i] == '_')) i++;
 		d.kind = CDD_MACRO;
 		d.name = cstr_clone_len(s + nm, i - nm);
+		d.def = cstr_clone_len(s, len);
 		if (i < len && s[i] == '(') {
 			while (i < len && s[i] != ')') i++;
 			d.sig = pp_normalise(s, len, i + 1);
@@ -769,6 +765,7 @@ void cddecl_finalise(void *ptr, const finaliser *fnr)
 	FREE(d->name);
 	FREE(d->sig);
 	FREE(d->doc);
+	FREE(d->def);
 	if (d->members) {
 		cddecl_vec_free(d->members);
 	}

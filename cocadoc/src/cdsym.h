@@ -26,6 +26,7 @@
 
 #include "cddecl.h"
 #include "cdfile.h"
+#include "cdmacro.h"
 #include "vec.h"
 
 /**
@@ -40,7 +41,9 @@
  * - struct and union fields as `type.field`;
  * - enum constants both as `type.CONSTANT` and as `CONSTANT` (in C, enum
  *   constants are global names);
- * - files by their file name, e.g. `vec.h`.
+ * - files by their file name, e.g. `vec.h`;
+ * - macro-generated declarations (see cdmacro.h), e.g. `vec_push_int`, and
+ *   the patterns of families with several instances, e.g. `vec_push_TYPE`.
  *
  * A name may be declared more than once (in different files). References
  * are then resolved to the declaration in the referring file, if any.
@@ -56,6 +59,7 @@ typedef struct {
 	const cdfile *file;    /**< Declaring file */
 	const cddecl *decl;    /**< The declaration (for #CDD_FILE, the file comment, or NULL) */
 	const cddecl *parent;  /**< For members, the declaration of their type; else NULL */
+	const cdfamily *family;/**< For macro-generated declarations, their family; else NULL */
 } cdsym;
 
 
@@ -94,6 +98,34 @@ void cdsymtab_free(cdsymtab *self);
  */
 const cdsym *cdsymtab_resolve(const cdsymtab *self, const char *name,
                               const cdfile *from, size_t *ncands);
+
+
+/**
+ * @brief Returns the macro-generated families of a file.
+ * @param self The table.
+ * @param f The file.
+ * @return The families (vec of #cdfamily), or NULL if @p f is not one of
+ *         the files the table was built from.
+ */
+const vec *cdsymtab_families(const cdsymtab *self, const cdfile *f);
+
+
+/**
+ * @brief Returns the problems found expanding the macro invocations of a file.
+ * @param self The table.
+ * @param f The file.
+ * @return The problems (vec of #cdmacrowarn), or NULL if @p f is not one
+ *         of the files the table was built from.
+ */
+const vec *cdsymtab_macro_warnings(const cdsymtab *self, const cdfile *f);
+
+
+/**
+ * @brief Returns the macro table of the files.
+ * @param self The table.
+ * @return The macro table.
+ */
+const cdmacrotab *cdsymtab_macros(const cdsymtab *self);
 
 
 /**

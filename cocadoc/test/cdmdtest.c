@@ -73,7 +73,15 @@ static const char *SRC_A =
 static const char *SRC_B =
     "/**\n * @file b.h\n * @author B\n * @brief Module B.\n */\n"
     "/**\n * @brief B func.\n */\nvoid b_func(void);\n"
-    "/**\n * @brief B type.\n */\ntypedef struct {\n\tint x; /**< The x */\n} b_t;\n";
+    "/**\n * @brief B type.\n */\ntypedef struct {\n\tint x; /**< The x */\n} b_t;\n"
+    "/**\n * @brief Pushes a TYPE.\n */\n"
+    "#define DECL_PUSH(TYPE) void push_##TYPE(vec *v, TYPE val);\n"
+    "/**\n * @brief A list of two types.\n */\n"
+    "#define XX_TWO(XX, ...) XX(int, __VA_ARGS__) XX(char, __VA_ARGS__)\n"
+    "XX_TWO(DECL_PUSH)\n"
+    "/**\n * @brief Uses #push_char.\n */\nvoid user(void);\n"
+    "/**\n * @brief A lone T.\n */\n"
+    "#define DECL_LONE(T) int lone_##T(void);\n";
 
 
 void test_cdmd_page(CuTest *tc)
@@ -128,6 +136,19 @@ void test_cdmd_page(CuTest *tc)
 	page = cdmd_page(b, tab);
 	ASSERT_HAS(page, "[Back to module index](index.md#lib)");
 	ASSERT_LACKS(page, "AI involvement"); // no @ai: human, no note
+	// macro-generated functions: contents, entry, links; generator hidden
+	ASSERT_HAS(page, "**Macro-generated functions**\n\n- [push_TYPE](#push_type): Pushes a TYPE.");
+	ASSERT_HAS(page, "## Macro-generated functions\n\n### push_TYPE\n\n```c\n"
+	           "void push_TYPE(vec *v, TYPE val);\n```\n\nPushes a TYPE.");
+	ASSERT_HAS(page, "**Generated** by `XX_TWO(DECL_PUSH)`: `push_int`, `push_char`.");
+	ASSERT_HAS(page, "Uses [push_char](#push_type).");
+	ASSERT_HAS(page, "### XX_TWO");
+	ASSERT_LACKS(page, "### DECL_PUSH"); // used by XX_TWO(DECL_PUSH) only
+	// not used by any macro: listed, with what it declares
+	ASSERT_HAS(page, "### DECL_LONE\n\n```c\n#define DECL_LONE(T)\n```\n\nA lone T.");
+	ASSERT_HAS(page, "**Declares:** `int lone_T(void)`");
+	CuAssertTrue(tc, strstr(page, "## Functions") < strstr(page, "## Macro-generated functions"));
+	CuAssertTrue(tc, strstr(page, "## Macro-generated functions") < strstr(page, "## Macros"));
 	FREE(page);
 
 	char *index = cdmd_index(files, "X 1.0 API Reference");

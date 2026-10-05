@@ -227,6 +227,7 @@ void test_cddecl_undocumented(CuTest *tc)
 	    "#endif\n";
 	exp_decl exp[] = {
 		{CDD_MACRO, "MAX", "#define MAX(A, B)", false},
+		{CDD_MACROCALL, "XX_CORETYPES", "XX_CORETYPES(DECL_TYPED_VEC)", false},
 		{CDD_VAR, "_MASK", "static const byte_t _MASK[2] = {...}", false},
 		{CDD_MACROCALL, "DECL_TRAIT", "DECL_TRAIT(vec_iter, iter)", true},
 	};

@@ -46,8 +46,9 @@
  * documentation, if any. Members are recorded whether documented or not.
  *
  * All file-scope declarations are returned, documented or not (#cddecl.doc
- * is NULL for undocumented ones), except include guards and undocumented
- * macro invocations (macro-generated APIs are not handled yet).
+ * is NULL for undocumented ones), except include guards. File-scope macro
+ * invocations (e.g. `XX_CORETYPES(DECL_TYPED_VEC)`) are returned as
+ * #CDD_MACROCALL, to be expanded by cdmacro.h.
  */
 
 /**
@@ -79,6 +80,7 @@ typedef struct {
 	size_t line;      /**< 1-based line of the declaration */
 	size_t doc_line;  /**< 1-based line where the doc comment starts (0 if none) */
 	vec *members;     /**< Members of aggregates (vec of #cddecl), or NULL */
+	char *def;        /**< For macros, the whole `#define` directive as written (heap); else NULL */
 } cddecl;
 
 

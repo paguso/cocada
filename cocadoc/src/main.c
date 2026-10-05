@@ -221,7 +221,7 @@ static void dump_docs(const char *path, const char *src, size_t len)
 }
 
 
-#define NRULES 15
+#define NRULES 16 // DC1..DC15
 
 // Prints the style warnings of a file. Counts them per rule in counts.
 static size_t lint_file(const cdfile *f, const cdsymtab *tab, size_t counts[NRULES])
