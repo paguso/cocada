@@ -29,6 +29,7 @@ CuSuite *cdlexer_get_test_suite();
 CuSuite *cddecl_get_test_suite();
 CuSuite *cddoc_get_test_suite();
 CuSuite *cdlint_get_test_suite();
+CuSuite *cdsym_get_test_suite();
 
 
 CuSuite* create_test_suite()
@@ -38,6 +39,7 @@ CuSuite* create_test_suite()
     CuSuiteAddSuite(suite, cddecl_get_test_suite());
     CuSuiteAddSuite(suite, cddoc_get_test_suite());
     CuSuiteAddSuite(suite, cdlint_get_test_suite());
+    CuSuiteAddSuite(suite, cdsym_get_test_suite());
 
     CuSuitePrintTests(suite);
     return suite;

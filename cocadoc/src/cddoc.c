@@ -324,6 +324,7 @@ typedef struct {
 	sec_kind cur_kind;
 	fence_kind fence;
 	vec *diags;
+	vec *refs;
 	size_t line;       // current line in the comment
 	bool member;       // a member doc /**< ... */
 	bool file;         // a file comment (has @file)
@@ -350,6 +351,14 @@ static inline char last_char(strbuf *sb)
 {
 	size_t l = strbuf_len(sb);
 	return l ? strbuf_get(sb, l - 1) : '\0';
+}
+
+
+static void add_ref(pstate *st, cdref_kind kind, const char *target, size_t len,
+                    size_t line)
+{
+	cdref r = {.kind = kind, .target = cstr_clone_len(target, len), .line = line};
+	vec_push(st->refs, &r);
 }
 
 
@@ -549,6 +558,33 @@ static void scan_line(pstate *st, const char *line)
 					}
 				}
 			}
+		} else if (c == '#' && (isalpha((unsigned char)line[i + 1]) || line[i + 1] == '_')
+		           && (i == 0 || (!is_ident_char(line[i - 1]) && line[i - 1] != '&'))) {
+			// #name, #type.member
+			size_t b = i + 1, e = b;
+			while (is_ident_char(line[e])) e++;
+			if (line[e] == '.' && (isalpha((unsigned char)line[e + 1]) || line[e + 1] == '_')) {
+				size_t f = e + 1;
+				while (is_ident_char(line[f])) f++;
+				if (f - e - 1 == 1 && line[e + 1] == 'h') {
+					diag(st, "DC11", st->line, "#%.*s: write %.*s (headers take no #)",
+					     (int)(f - b), line + b, (int)(f - b), line + b);
+				}
+				e = f;
+			}
+			add_ref(st, CDR_SYMBOL, line + b, e - b, st->line);
+			i = e - 1;
+		} else if (c == '@' && line[i + 1] == 'p' && isspace((unsigned char)line[i + 2])
+		           && (i == 0 || isspace((unsigned char)line[i - 1]))) {
+			// @p name
+			size_t b = i + 2;
+			while (line[b] == ' ' || line[b] == '\t') b++;
+			size_t e = b;
+			while (is_ident_char(line[e])) e++;
+			if (e > b) {
+				add_ref(st, CDR_PARAM, line + b, e - b, st->line);
+			}
+			i = e > b ? e - 1 : i;
 		} else if (c == '@' && starts_with_word(line + i + 1, "move")
 		           && (i == 0 || isspace((unsigned char)line[i - 1]))) {
 			// must follow "@param" or "@return" ("@param NAME @move" is
@@ -924,6 +960,9 @@ static void check_see(pstate *st, const char *text, size_t line)
 			     "separated by commas (found \"%.*s\")", (int)((e - b) > 40 ? 40 : (e - b)), s + b);
 			return;
 		}
+		size_t hb = (s[b] == '#') ? b + 1 : b;
+		while (e > hb && s[e - 1] == '.') e--; // end of sentence
+		add_ref(st, CDR_SEE, s + hb, e - hb, line);
 		s += n + (s[n] == ',');
 	}
 }
@@ -990,6 +1029,12 @@ static void cddiag_finalise(void *ptr, const finaliser *fnr)
 }
 
 
+static void cdref_finalise(void *ptr, const finaliser *fnr)
+{
+	FREE(((cdref *)ptr)->target);
+}
+
+
 static vec *new_str_vec()
 {
 	return vec_new(sizeof(char *));
@@ -1025,6 +1070,7 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 		.secs = vec_new(sizeof(section)),
 		.fence = FENCE_NONE,
 		.diags = vec_new(sizeof(cddiag)),
+		.refs = vec_new(sizeof(cdref)),
 		.member = len >= 4 && strncmp(raw, "/**<", 4) == 0,
 		.file = has_file_cmd(raw, len),
 		.last_rank = -1,
@@ -1144,6 +1190,7 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 		}
 	}
 	doc->diags = st.diags;
+	doc->refs = st.refs;
 	return doc;
 }
 
@@ -1163,5 +1210,6 @@ void cddoc_free(cddoc *self)
 	FREE(self->deprecated);
 	free_str_vec(self->authors);
 	DESTROY(self->diags, finaliser_cons(FNR(vec), finaliser_new(cddiag_finalise)));
+	DESTROY(self->refs, finaliser_cons(FNR(vec), finaliser_new(cdref_finalise)));
 	FREE(self);
 }

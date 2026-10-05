@@ -26,8 +26,10 @@
 
 #include "cddecl.h"
 #include "cddoc.h"
+#include "cdfile.h"
 #include "cdlexer.h"
 #include "cdlint.h"
+#include "cdsym.h"
 #include "cli.h"
 #include "new.h"
 
@@ -41,29 +43,13 @@ cliparser *create_cli_parser()
 	                     "Dump the documented declarations of each input file (debug)"));
 	cliparser_add_option(clip, cliopt_new_defaults('l', "lint",
 	                     "Check the documentation comments against the COCADA style"));
+	cliparser_add_option(clip, cliopt_new_defaults('s', "symbols",
+	                     "Dump the symbol table of all input files (debug)"));
 	cliparser_add_option(clip, cliopt_new_defaults('D', "docs",
 	                     "Dump the parsed documentation of each declaration (debug)"));
 	cliparser_add_pos_arg(clip, cliarg_new_multi("files", "C source/header files",
 	                      ARG_FILE));
 	return clip;
-}
-
-
-// Reads a whole file into a heap allocated buffer. Returns NULL on error.
-static char *slurp(const char *path, size_t *len)
-{
-	FILE *f = fopen(path, "rb");
-	if (!f) {
-		return NULL;
-	}
-	fseek(f, 0, SEEK_END);
-	long sz = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	char *buf = malloc(sz + 1);
-	*len = fread(buf, 1, sz, f);
-	buf[*len] = '\0';
-	fclose(f);
-	return buf;
 }
 
 
@@ -214,10 +200,10 @@ static void dump_docs(const char *path, const char *src, size_t len)
 #define NRULES 15
 
 // Prints the style warnings of a file. Counts them per rule in counts.
-static size_t lint_file(const char *path, const char *src, size_t len,
-                        size_t counts[NRULES])
+static size_t lint_file(const cdfile *f, const cdsymtab *tab, size_t counts[NRULES])
 {
-	vec *warns = cdlint(path, src, len);
+	const char *path = f->path;
+	vec *warns = cdlint(f, tab);
 	size_t n = vec_len(warns);
 	for (size_t i = 0; i < n; i++) {
 		const cdwarn *w = vec_get(warns, i);
@@ -229,6 +215,19 @@ static size_t lint_file(const char *path, const char *src, size_t len,
 	}
 	cdwarn_vec_free(warns);
 	return n;
+}
+
+
+static void dump_symbols(const cdsymtab *tab)
+{
+	for (size_t i = 0, n = cdsymtab_size(tab); i < n; i++) {
+		const cdsym *s = cdsymtab_get(tab, i);
+		size_t ncands;
+		cdsymtab_resolve(tab, s->name, NULL, &ncands);
+		printf("%-40s %-9s %s:%zu%s%s\n", s->name, cddecl_kind_name(s->kind), s->file->path,
+		       s->decl ? s->decl->line : 1, (s->decl && s->decl->doc) ? "" : "  (undocumented)",
+		       ncands > 1 ? "  (ambiguous)" : "");
+	}
 }
 
 
@@ -244,30 +243,45 @@ int main(int argc, char **argv)
 	size_t nwarns = 0, counts[NRULES] = {0};
 	const vec *files = cliparser_arg_val_from_pos(clip, 0);
 
+	bool symbols = cliparser_opt_used_from_shortname(clip, 's');
+
+	// load all files: references may point to any of them
 	int ret = EXIT_SUCCESS;
+	vec *loaded = vec_new(sizeof(cdfile *));
 	for (size_t i = 0, n = files ? vec_len(files) : 0; i < n; i++) {
 		const char *path = vec_get_rawptr(files, i);
-		size_t len;
-		char *src = slurp(path, &len);
-		if (!src) {
+		cdfile *f = cdfile_load(path);
+		if (!f) {
 			fprintf(stderr, "cocadoc: cannot read %s\n", path);
 			ret = EXIT_FAILURE;
 			continue;
 		}
+		vec_push_rawptr(loaded, f);
+	}
+
+	for (size_t i = 0, n = vec_len(loaded); i < n; i++) {
+		const cdfile *f = vec_get_rawptr(loaded, i);
 		if (tokens) {
-			dump_tokens(path, src, len);
+			dump_tokens(f->path, f->src, f->len);
 		}
 		if (decls) {
-			dump_decls(path, src, len);
+			dump_decls(f->path, f->src, f->len);
 		}
 		if (docs) {
-			dump_docs(path, src, len);
+			dump_docs(f->path, f->src, f->len);
 		}
-		if (lint) {
-			nwarns += lint_file(path, src, len, counts);
-		}
-		FREE(src);
 	}
+
+	cdsymtab *tab = (lint || symbols) ? cdsymtab_new(loaded) : NULL;
+	if (symbols) {
+		dump_symbols(tab);
+	}
+	if (lint) {
+		for (size_t i = 0, n = vec_len(loaded); i < n; i++) {
+			nwarns += lint_file(vec_get_rawptr(loaded, i), tab, counts);
+		}
+	}
+	cdsymtab_free(tab);
 
 	if (lint) {
 		fprintf(stderr, "%zu warning%s", nwarns, nwarns == 1 ? "" : "s");
@@ -281,6 +295,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, "%s\n", nwarns ? ")" : "");
 	}
 
+	for (size_t i = 0, n = vec_len(loaded); i < n; i++) {
+		cdfile_free(vec_get_rawptr(loaded, i));
+	}
+	DESTROY_FLAT(loaded, vec);
 	DESTROY_FLAT(clip, cliparser);
 	return ret;
 }

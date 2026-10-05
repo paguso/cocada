@@ -29,6 +29,7 @@
 #include "cddoc.h"
 #include "cdlexer.h"
 #include "cdlint.h"
+#include "cdsym.h"
 #include "cstrutil.h"
 #include "new.h"
 
@@ -85,6 +86,17 @@ static const char *kind_word(cddecl_kind k)
 static inline bool is_ident_char(char c)
 {
 	return isalnum((unsigned char)c) || c == '_';
+}
+
+
+// Generator macros (named *_DECL or *_IMPL by convention) declare or
+// define typed function families. Their docs describe the generated
+// functions, so their parameters are not checked (DC14, not handled yet).
+static bool is_generator(const cddecl *d)
+{
+	size_t n = strlen(d->name);
+	return d->kind == CDD_MACRO && n > 5
+	       && (strcmp(d->name + n - 5, "_DECL") == 0 || strcmp(d->name + n - 5, "_IMPL") == 0);
 }
 
 
@@ -177,6 +189,15 @@ static vec *sig_params(const cddecl *d, bool *named)
 			return NULL;
 		}
 		open += strlen(d->name);
+	} else if (d->kind == CDD_TYPEDEF) {
+		// function pointer type: typedef T (*name)(params)
+		char pat[256];
+		snprintf(pat, sizeof(pat), "(*%s)(", d->name);
+		const char *p = strstr(sig, pat);
+		if (!p) {
+			return NULL;
+		}
+		open = (p - sig) + strlen(pat) - 1;
 	} else if (macro) {
 		size_t k = strlen("#define ") + strlen(d->name);
 		if (strncmp(sig, "#define ", 8) != 0 || strlen(sig) <= k || sig[k] != '(') {
@@ -274,7 +295,10 @@ static bool str_in(const vec *v, const char *s, size_t *pos)
 static void check_signature(vec *out, const cddecl *d, const cddoc *doc)
 {
 	bool named;
-	vec *sp = sig_params(d, &named);
+	// (function pointer types have parameters too, but documenting them
+	// is not required)
+	vec *sp = ((d->kind == CDD_FUNC || d->kind == CDD_MACRO) && !is_generator(d))
+	          ? sig_params(d, &named) : NULL;
 	if (sp && named) {
 		vec *documented = vec_new(sizeof(char *));
 		for (size_t i = 0, n = vec_len(doc->params); i < n; i++) {
@@ -336,6 +360,54 @@ static void add_doc_diags(vec *out, const cddoc *doc, size_t doc_line,
 }
 
 
+// DC10, DC11: references
+// d is the documented declaration (NULL for the file comment), whose
+// comment starts at doc_line.
+static void check_refs(vec *out, const cdfile *f, const cdsymtab *tab,
+                       const cddecl *d, size_t doc_line, const cddoc *doc,
+                       const char *name)
+{
+	bool named = false;
+	vec *params = (d && d->kind != CDD_MEMBER) ? sig_params(d, &named) : NULL;
+	for (size_t i = 0, n = vec_len(doc->refs); i < n; i++) {
+		const cdref *r = vec_get(doc->refs, i);
+		size_t line = doc_line + r->line;
+		if (r->kind == CDR_PARAM) {
+			if (d && is_generator(d)) {
+				continue;
+			}
+			if (!params) {
+				bool sym = tab && cdsymtab_resolve(tab, r->target, f, NULL);
+				warn(out, line, name, "DC11", "@p %s: %s has no parameters%s%s%s", r->target, name,
+				     sym ? " (did you mean #" : "", sym ? r->target : "", sym ? "?)" : "");
+			} else if (named && !str_in(params, r->target, NULL)) {
+				bool sym = tab && cdsymtab_resolve(tab, r->target, f, NULL);
+				warn(out, line, name, "DC11", "@p %s is not a parameter of %s%s%s%s", r->target, name,
+				     sym ? " (did you mean #" : "", sym ? r->target : "", sym ? "?)" : "");
+			}
+			continue;
+		}
+		if (!tab) {
+			continue;
+		}
+		size_t ncands;
+		const cdsym *s = cdsymtab_resolve(tab, r->target, f, &ncands);
+		const char *what = (r->kind == CDR_SEE) ? "@see" : "reference";
+		const char *rule = (r->kind == CDR_SEE) ? "DC10" : "DC11";
+		const char *hash = (r->kind == CDR_SEE) ? "" : "#";
+		if (!s) {
+			warn(out, line, name, rule, "unknown %s %s%s", what, hash, r->target);
+		} else if (ncands > 1 && s->file != f) {
+			warn(out, line, name, rule, "ambiguous %s %s%s (declared %zu times)",
+			     what, hash, r->target, ncands);
+		}
+	}
+	if (params) {
+		DESTROY(params, finaliser_cons(FNR(vec), finaliser_new_ptr()));
+	}
+}
+
+
 static int cmp_warn(const void *a, const void *b)
 {
 	const seqwarn *x = a, *y = b;
@@ -346,13 +418,11 @@ static int cmp_warn(const void *a, const void *b)
 }
 
 
-vec *cdlint(const char *path, const char *src, size_t len)
+vec *cdlint(const cdfile *file, const cdsymtab *tab)
 {
 	vec *out = vec_new(sizeof(seqwarn));
-	vec *toks = cdlex_all(src, len);
-	vec *decls = cddecl_match(src, toks);
-	const char *base = strrchr(path, '/');
-	base = base ? base + 1 : path;
+	const vec *decls = file->decls;
+	const char *base = file->name;
 
 	bool has_file = false;
 	for (size_t i = 0, n = vec_len(decls); i < n; i++) {
@@ -371,6 +441,7 @@ vec *cdlint(const char *path, const char *src, size_t len)
 				warn(out, d->line, base, "DC3", "no @author in the file comment");
 			}
 			add_doc_diags(out, doc, d->doc_line, base);
+			check_refs(out, file, tab, NULL, d->doc_line, doc, base);
 			cddoc_free(doc);
 			continue;
 		}
@@ -382,6 +453,7 @@ vec *cdlint(const char *path, const char *src, size_t len)
 			cddoc *doc = cddoc_parse(d->doc, strlen(d->doc));
 			add_doc_diags(out, doc, d->doc_line, d->name);
 			check_signature(out, d, doc);
+			check_refs(out, file, tab, d, d->doc_line, doc, d->name);
 			cddoc_free(doc);
 		}
 
@@ -399,15 +471,13 @@ vec *cdlint(const char *path, const char *src, size_t len)
 			}
 			cddoc *doc = cddoc_parse(mb->doc, strlen(mb->doc));
 			add_doc_diags(out, doc, mb->doc_line, name);
+			check_refs(out, file, tab, mb, mb->doc_line, doc, name);
 			cddoc_free(doc);
 		}
 	}
 	if (!has_file) {
 		warn(out, 1, base, "DC3", "no file comment (@file, @author, @brief)");
 	}
-
-	cddecl_vec_free(decls);
-	DESTROY_FLAT(toks, vec);
 
 	vec_qsort(out, cmp_warn);
 	vec *ret = vec_new(sizeof(cdwarn));

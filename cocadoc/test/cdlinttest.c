@@ -22,7 +22,9 @@
 #include <string.h>
 
 #include "CuTest.h"
+#include "cdfile.h"
 #include "cdlint.h"
+#include "cdsym.h"
 #include "memdbg.h"
 #include "new.h"
 
@@ -94,7 +96,8 @@ static const char *SRC =
 void test_cdlint_decls(CuTest *tc)
 {
 	memdbg_reset();
-	vec *warns = cdlint("dir/t.h", SRC, strlen(SRC));
+	cdfile *f = cdfile_new_from_str("dir/t.h", SRC, strlen(SRC));
+	vec *warns = cdlint(f, NULL);
 	ASSERT_WARN(12, "DC8", "add", "@param c is not a parameter of add");
 	ASSERT_WARN(9, "DC8", "add", "parameter b is not documented");
 	ASSERT_WARN(9, "DC8", "add", "return value is not documented");
@@ -107,6 +110,7 @@ void test_cdlint_decls(CuTest *tc)
 	// get, X, the file comment and _private are fine
 	CuAssertSizeTEquals(tc, 9, vec_len(warns));
 	cdwarn_vec_free(warns);
+	cdfile_free(f);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
@@ -114,21 +118,85 @@ void test_cdlint_decls(CuTest *tc)
 void test_cdlint_file(CuTest *tc)
 {
 	memdbg_reset();
-	vec *warns = cdlint("other.h", SRC, strlen(SRC));
+	cdfile *f = cdfile_new_from_str("other.h", SRC, strlen(SRC));
+	vec *warns = cdlint(f, NULL);
 	ASSERT_WARN(3, "DC3", "other.h", "@file t.h does not match the file name other.h");
 	cdwarn_vec_free(warns);
+	cdfile_free(f);
 
 	const char *src = "/**\n * @brief F.\n */\nvoid f(void);\n";
-	warns = cdlint("f.h", src, strlen(src));
+	f = cdfile_new_from_str("f.h", src, strlen(src));
+	warns = cdlint(f, NULL);
 	ASSERT_WARN(1, "DC3", "f.h", "no file comment");
 	CuAssertSizeTEquals(tc, 1, vec_len(warns));
 	cdwarn_vec_free(warns);
+	cdfile_free(f);
 
 	src = "/**\n * @file g.h\n * @brief G.\n */\n";
-	warns = cdlint("g.h", src, strlen(src));
+	f = cdfile_new_from_str("g.h", src, strlen(src));
+	warns = cdlint(f, NULL);
 	ASSERT_WARN(1, "DC3", "g.h", "no @author");
 	CuAssertSizeTEquals(tc, 1, vec_len(warns));
 	cdwarn_vec_free(warns);
+	cdfile_free(f);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+static const char *SRC_A =
+    "/**\n"                                      // 1
+    " * @file a.h\n"                             // 2
+    " * @author A\n"                             // 3
+    " * @brief A.\n"                             // 4
+    " *\n"                                       // 5
+    " * Uses #b_func, #b_t.x, #B_ONE and #missing.\n" // 6
+    " */\n"                                      // 7
+    "/**\n"                                      // 8
+    " * @brief Does @p n things to @p m.\n"      // 9
+    " * @param n The n.\n"                       // 10
+    " * @see b_func, b.h, nothing, #shared\n"    // 11
+    " */\n"                                      // 12
+    "void a_func(int n);\n"                      // 13
+    "/**\n"                                      // 14
+    " * @brief Shared, like #shared.\n"           // 15
+    " */\n"                                      // 16
+    "void shared(void);\n";                      // 17
+
+static const char *SRC_B =
+    "/**\n * @file b.h\n * @author B\n * @brief B.\n */\n"
+    "/**\n * @brief B func.\n */\nvoid b_func(void);\n"
+    "/**\n * @brief B type.\n */\ntypedef struct {\n\tint x; /**< The x */\n} b_t;\n"
+    "/**\n * @brief B enum.\n */\ntypedef enum {\n\tB_ONE /**< One */\n} b_e;\n"
+    "/**\n * @brief Shared.\n */\nvoid shared(void);\n";
+
+
+void test_cdlint_refs(CuTest *tc)
+{
+	memdbg_reset();
+	cdfile *a = cdfile_new_from_str("dir/a.h", SRC_A, strlen(SRC_A));
+	cdfile *b = cdfile_new_from_str("b.h", SRC_B, strlen(SRC_B));
+	vec *files = vec_new(sizeof(cdfile *));
+	vec_push_rawptr(files, a);
+	vec_push_rawptr(files, b);
+	cdsymtab *tab = cdsymtab_new(files);
+
+	vec *warns = cdlint(a, tab);
+	ASSERT_WARN(6, "DC11", "a.h", "unknown reference #missing");
+	ASSERT_WARN(9, "DC11", "a_func", "@p m is not a parameter of a_func");
+	ASSERT_WARN(11, "DC10", "a_func", "unknown @see nothing");
+	// #shared and @see shared from a.h resolve to a.h's own shared: no warning
+	CuAssertSizeTEquals(tc, 3, vec_len(warns));
+	cdwarn_vec_free(warns);
+
+	// from b.h, shared is declared in b.h too: still not ambiguous
+	warns = cdlint(b, tab);
+	CuAssertSizeTEquals(tc, 0, vec_len(warns));
+	cdwarn_vec_free(warns);
+
+	cdsymtab_free(tab);
+	DESTROY_FLAT(files, vec);
+	cdfile_free(a);
+	cdfile_free(b);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
@@ -138,5 +206,6 @@ CuSuite *cdlint_get_test_suite()
 	CuSuite *suite = CuSuiteNew("cdlint");
 	SUITE_ADD_TEST(suite, test_cdlint_decls);
 	SUITE_ADD_TEST(suite, test_cdlint_file);
+	SUITE_ADD_TEST(suite, test_cdlint_refs);
 	return suite;
 }

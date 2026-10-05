@@ -24,6 +24,8 @@
 
 #include <stddef.h>
 
+#include "cdfile.h"
+#include "cdsym.h"
 #include "vec.h"
 
 /**
@@ -34,8 +36,9 @@
  * The rules are described in `doc/comment-style.md`. All deviations are
  * warnings. Checks on the text of each comment are done by #cddoc_parse;
  * this module adds the checks that need the declarations: file comments
- * (DC3), undocumented declarations and members (DC4), and `@param` and
- * `@return` against the actual parameters and return type (DC8).
+ * (DC3), undocumented declarations and members (DC4), `@param` and
+ * `@return` against the actual parameters and return type (DC8), and the
+ * targets of `@see` (DC10), `#name` and `@p name` (DC11).
  */
 
 
@@ -52,13 +55,13 @@ typedef struct {
 
 /**
  * @brief Checks the documentation comments of a header.
- * @param path The file path, used for the DC3 file name check.
- * @param src The file contents.
- * @param len The length of @p src.
+ * @param file The header.
+ * @param tab The symbol table to resolve references with, or NULL to skip
+ *        the reference checks.
  * @return @move The warnings (vec of #cdwarn), ordered by line.
  *         Destroy with #cdwarn_vec_free.
  */
-vec *cdlint(const char *path, const char *src, size_t len);
+vec *cdlint(const cdfile *file, const cdsymtab *tab);
 
 
 /**

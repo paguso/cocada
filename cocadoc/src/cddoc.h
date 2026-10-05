@@ -87,6 +87,27 @@ typedef struct {
 
 
 /**
+ * @brief Kinds of references in a comment.
+ */
+typedef enum {
+	CDR_SYMBOL = 0, /**< `#name` or `#type.member` in the text */
+	CDR_PARAM,      /**< `@p name` */
+	CDR_SEE         /**< An entry of a `@see` list */
+} cdref_kind;
+
+
+/**
+ * @brief A reference found in a comment, to be resolved against the
+ * declarations.
+ */
+typedef struct {
+	cdref_kind kind;     /**< Kind of reference */
+	char *target;        /**< Referenced name, without `#` (heap) */
+	size_t line;         /**< 0-based line in the comment */
+} cdref;
+
+
+/**
  * @brief A parsed documentation comment.
  *
  * All strings are heap-allocated Markdown and never NULL, except
@@ -103,6 +124,7 @@ typedef struct {
 	vec  *notes;       /**< Notes (vec of char *) */
 	char *deprecated;  /**< Deprecation text ("" if no text), or NULL */
 	vec  *authors;     /**< Authors (vec of char *) */
+	vec  *refs;        /**< References, in order (vec of #cdref) */
 	vec  *diags;       /**< Style deviations (vec of #cddiag) */
 } cddoc;
 

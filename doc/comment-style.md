@@ -326,6 +326,11 @@ Since a macro body is a single line, these comments are the exception to
 DC1. Not handled yet: macro invocations such as `XX_CORETYPES(...)` are
 currently ignored.
 
+Generator macros are named `*_DECL` (declaring a family) or `*_IMPL`
+(defining it). A doc comment placed before a generator macro describes the
+generated functions, so its `@param`s and `@p`s are not checked against the
+macro's own parameters.
+
 ---
 
 ## 10. Documentation pages
