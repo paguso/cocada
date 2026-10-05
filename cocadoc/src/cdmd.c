@@ -28,6 +28,7 @@
 #include "cddecl.h"
 #include "cddoc.h"
 #include "cdmd.h"
+#include "cdversion.h"
 #include "cstrutil.h"
 #include "new.h"
 #include "strbuf.h"
@@ -345,16 +346,21 @@ static void append_see(strbuf *out, const char *see, const cdfile *f, const cdsy
 }
 
 
-// The documentation of a declaration (or file comment, if d is NULL)
-static void append_doc(strbuf *out, const cddecl *d, const cddoc *doc, const cdfile *f,
-                       const cdsymtab *tab, int shift)
+static void append_brief(strbuf *out, const cddoc *doc, const cdfile *f, const cdsymtab *tab)
 {
 	if (doc && doc->brief[0]) {
 		append_text(out, doc->brief, f, tab, 0, "");
-		strbuf_append(out, "\n\n");
 	} else {
-		strbuf_append(out, "*Undocumented.*\n\n");
+		strbuf_append(out, "*Undocumented.*");
 	}
+}
+
+
+// The documentation of a declaration (or file comment, if d is NULL),
+// except its brief
+static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cdfile *f,
+                        const cdsymtab *tab, int shift)
+{
 	if (!doc) {
 		return;
 	}
@@ -493,6 +499,81 @@ static bool shown(const cddecl *d, const vec *decls, size_t pos)
 }
 
 
+void cdmd_module_of(const char *path, char **module, char **rel)
+{
+	const char *src = NULL;
+	if (strncmp(path, "src/", 4) == 0) {
+		src = path;
+	} else {
+		const char *p = strstr(path, "/src/");
+		src = p ? p + 1 : NULL;
+	}
+	if (src) {
+		// the module is the last directory before src/
+		const char *end = (src > path) ? src - 1 : src;
+		const char *b = end;
+		while (b > path && b[-1] != '/') b--;
+		*module = (end > b) ? cstr_clone_len(b, end - b) : cstr_clone(".");
+		*rel = cstr_clone(src + 4);
+	} else {
+		const char *slash = strrchr(path, '/');
+		*module = slash ? cstr_clone_len(path, slash - path) : cstr_clone(".");
+		*rel = cstr_clone(slash ? slash + 1 : path);
+	}
+}
+
+
+static const char *PART_TITLES[] = {"Types and constants", "Functions", "Macros"};
+
+
+static const cddecl *file_comment(const cdfile *f)
+{
+	for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
+		const cddecl *d = vec_get(f->decls, i);
+		if (d->kind == CDD_FILE) {
+			return d;
+		}
+	}
+	return NULL;
+}
+
+
+static void append_contents(strbuf *out, const cdfile *f, const cdsymtab *tab)
+{
+	strbuf_append(out, "## Contents\n\n");
+	bool any = false;
+	for (part p = PART_TYPES; p < PART_NONE; p++) {
+		bool titled = false;
+		for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
+			const cddecl *d = vec_get(f->decls, i);
+			if (part_of(d) != p || !shown(d, f->decls, i)) {
+				continue;
+			}
+			if (!titled) {
+				strbuf_append(out, any ? "\n**" : "**");
+				strbuf_append(out, PART_TITLES[p]);
+				strbuf_append(out, "**\n\n");
+				titled = any = true;
+			}
+			strbuf_append(out, "- [");
+			strbuf_append(out, d->name);
+			strbuf_append(out, "](#");
+			append_anchor(out, d->name);
+			strbuf_append(out, "): ");
+			cddoc *doc = d->doc ? cddoc_parse(d->doc, strlen(d->doc)) : NULL;
+			if (doc && doc->brief[0]) {
+				append_text(out, doc->brief, f, tab, 0, "  ");
+			} else {
+				strbuf_append(out, "*undocumented*");
+			}
+			cddoc_free(doc);
+			strbuf_append_char(out, '\n');
+		}
+	}
+	strbuf_append(out, any ? "\n" : "*Empty.*\n\n");
+}
+
+
 char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 {
 	strbuf *out = strbuf_new();
@@ -500,16 +581,11 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 	strbuf_append(out, f->name);
 	strbuf_append(out, "\n\n");
 
-	// 1. module documentation
-	const cddecl *file_doc = NULL;
-	for (size_t i = 0, n = vec_len(f->decls); i < n && !file_doc; i++) {
-		const cddecl *d = vec_get(f->decls, i);
-		if (d->kind == CDD_FILE) {
-			file_doc = d;
-		}
-	}
+	// title, brief, authors, navigation
+	const cddecl *file_doc = file_comment(f);
 	cddoc *doc = file_doc ? cddoc_parse(file_doc->doc, strlen(file_doc->doc)) : NULL;
-	append_doc(out, NULL, doc, f, tab, 1);
+	append_brief(out, doc, f, tab);
+	strbuf_append(out, "\n\n");
 	if (doc && vec_len(doc->authors) > 0) {
 		strbuf_append(out, "**Author");
 		strbuf_append(out, vec_len(doc->authors) > 1 ? "s:** " : ":** ");
@@ -519,10 +595,34 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 		}
 		strbuf_append(out, "\n\n");
 	}
+	char *module, *rel;
+	cdmd_module_of(f->path, &module, &rel);
+	strbuf_append(out, "[Description](#description) · [Contents](#contents) · "
+	              "[Back to module index](index.md");
+	strbuf *anchor = strbuf_new();
+	append_anchor(anchor, module);
+	if (strbuf_len(anchor) > 0) {
+		strbuf_append_char(out, '#');
+		strbuf_append(out, strbuf_as_str(anchor));
+	}
+	strbuf_free(anchor);
+	strbuf_append(out, ")\n\n");
+	FREE(module);
+	FREE(rel);
+
+	// 1. description
+	strbuf_append(out, "## Description\n\n");
+	size_t before = strbuf_len(out);
+	append_body(out, NULL, doc, f, tab, 1);
+	if (strbuf_len(out) == before) {
+		strbuf_append(out, "*No description.*\n\n");
+	}
 	cddoc_free(doc);
 
+	// contents
+	append_contents(out, f, tab);
+
 	// 2-4. types and constants, functions, macros
-	static const char *TITLES[] = {"Types and constants", "Functions", "Macros"};
 	for (part p = PART_TYPES; p < PART_NONE; p++) {
 		bool titled = false;
 		for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
@@ -532,7 +632,7 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 			}
 			if (!titled) {
 				strbuf_append(out, "## ");
-				strbuf_append(out, TITLES[p]);
+				strbuf_append(out, PART_TITLES[p]);
 				strbuf_append(out, "\n\n");
 				titled = true;
 			}
@@ -541,17 +641,17 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 			strbuf_append(out, "\n\n");
 			append_code(out, d);
 			cddoc *ddoc = d->doc ? cddoc_parse(d->doc, strlen(d->doc)) : NULL;
-			append_doc(out, d, ddoc, f, tab, 3);
+			append_brief(out, ddoc, f, tab);
+			strbuf_append(out, "\n\n");
+			append_body(out, d, ddoc, f, tab, 3);
 			cddoc_free(ddoc);
 			append_members(out, d, f, tab);
+			strbuf_append(out, "[Back to contents](#contents)\n\n");
 		}
 	}
 
-	// no trailing blank lines
-	while (strbuf_len(out) > 1 && strbuf_get(out, strbuf_len(out) - 1) == '\n'
-	        && strbuf_get(out, strbuf_len(out) - 2) == '\n') {
-		strbuf_cut(out, strbuf_len(out) - 1, 1, NULL);
-	}
+	strbuf_append(out, "---\n\nGenerated by [cocadoc](https://github.com/paguso/cocada) ");
+	strbuf_append(out, cocadoc_version_str());
 	return strbuf_detach(out);
 }
 
@@ -560,65 +660,133 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
  * Index
  */
 
-static int cmp_path(const void *a, const void *b)
+typedef struct {
+	const cdfile *file;
+	char *module;
+	char *rel;
+} index_entry;
+
+
+static int cmp_entry(const void *a, const void *b)
 {
-	const cdfile *x = *(const cdfile **)a, *y = *(const cdfile **)b;
-	return strcmp(x->path, y->path);
+	const index_entry *x = a, *y = b;
+	return strcmp(x->rel, y->rel);
 }
 
 
-static size_t dir_len(const char *path)
+// Number of leading directory components shared by two relative paths
+static size_t common_dirs(const char *a, const char *b)
 {
-	const char *slash = strrchr(path, '/');
-	return slash ? (size_t)(slash - path) : 0;
-}
-
-
-char *cdmd_index(const vec *files)
-{
-	size_t n = vec_len(files);
-	const cdfile **sorted = malloc(n * sizeof(cdfile *));
-	for (size_t i = 0; i < n; i++) {
-		sorted[i] = vec_get_rawptr(files, i);
-	}
-	qsort(sorted, n, sizeof(cdfile *), cmp_path);
-
-	strbuf *out = strbuf_new();
-	strbuf_append(out, "# API reference\n");
-	for (size_t i = 0; i < n; i++) {
-		const cdfile *f = sorted[i];
-		size_t dl = dir_len(f->path);
-		if (i == 0 || dl != dir_len(sorted[i - 1]->path)
-		        || strncmp(f->path, sorted[i - 1]->path, dl) != 0) {
-			strbuf_append(out, "\n## ");
-			if (dl) {
-				strbuf_nappend(out, f->path, dl);
-			} else {
-				strbuf_append(out, ".");
-			}
-			strbuf_append(out, "\n\n");
+	size_t n = 0;
+	for (;;) {
+		const char *sa = strchr(a, '/'), *sb = strchr(b, '/');
+		if (!sa || !sb || sa - a != sb - b || strncmp(a, b, sa - a) != 0) {
+			return n;
 		}
-		char *page = cdmd_page_name(f);
+		n++;
+		a = sa + 1;
+		b = sb + 1;
+	}
+}
+
+
+static void append_indent(strbuf *out, size_t depth)
+{
+	for (size_t i = 0; i < depth; i++) {
+		strbuf_append(out, "  ");
+	}
+}
+
+
+static void append_module(strbuf *out, const char *module, vec *entries)
+{
+	strbuf_append(out, "\n## ");
+	strbuf_append(out, module);
+	strbuf_append(out, "\n\n");
+	vec_qsort(entries, cmp_entry);
+	const char *prev = "";
+	for (size_t i = 0, n = vec_len(entries); i < n; i++) {
+		const index_entry *e = vec_get(entries, i);
+		// open the directories not shared with the previous file
+		size_t depth = common_dirs(prev, e->rel);
+		const char *dir = e->rel;
+		for (size_t k = 0; k < depth; k++) {
+			dir = strchr(dir, '/') + 1;
+		}
+		for (const char *sl = strchr(dir, '/'); sl; sl = strchr(dir, '/')) {
+			append_indent(out, depth);
+			strbuf_append(out, "- ");
+			strbuf_nappend(out, dir, sl - dir + 1);
+			strbuf_append_char(out, '\n');
+			depth++;
+			dir = sl + 1;
+		}
+		append_indent(out, depth);
+		char *page = cdmd_page_name(e->file);
 		strbuf_append(out, "- [");
-		strbuf_append(out, f->name);
+		strbuf_append(out, e->file->name);
 		strbuf_append(out, "](");
 		strbuf_append(out, page);
 		strbuf_append(out, ")");
 		FREE(page);
-		for (size_t j = 0, m = vec_len(f->decls); j < m; j++) {
-			const cddecl *d = vec_get(f->decls, j);
-			if (d->kind == CDD_FILE) {
-				cddoc *doc = cddoc_parse(d->doc, strlen(d->doc));
-				if (doc->brief[0]) {
-					strbuf_append(out, ": ");
-					append_text(out, doc->brief, f, NULL, 0, "  ");
-				}
-				cddoc_free(doc);
-				break;
+		const cddecl *fc = file_comment(e->file);
+		if (fc) {
+			cddoc *doc = cddoc_parse(fc->doc, strlen(fc->doc));
+			if (doc->brief[0]) {
+				strbuf_append(out, ": ");
+				append_text(out, doc->brief, e->file, NULL, 0, "  ");
 			}
+			cddoc_free(doc);
 		}
 		strbuf_append_char(out, '\n');
+		prev = e->rel;
 	}
-	FREE(sorted);
+}
+
+
+char *cdmd_index(const vec *files, const char *title)
+{
+	// modules in order of first appearance
+	vec *modules = vec_new(sizeof(char *));
+	vec *entries = vec_new(sizeof(index_entry));
+	for (size_t i = 0, n = vec_len(files); i < n; i++) {
+		index_entry e = {.file = vec_get_rawptr(files, i)};
+		cdmd_module_of(e.file->path, &e.module, &e.rel);
+		vec_push(entries, &e);
+		bool seen = false;
+		for (size_t j = 0, m = vec_len(modules); j < m && !seen; j++) {
+			seen = strcmp(vec_get_rawptr(modules, j), e.module) == 0;
+		}
+		if (!seen) {
+			vec_push_rawptr(modules, e.module);
+		}
+	}
+
+	strbuf *out = strbuf_new();
+	strbuf_append(out, "# ");
+	strbuf_append(out, title);
+	strbuf_append_char(out, '\n');
+	for (size_t j = 0, m = vec_len(modules); j < m; j++) {
+		const char *module = vec_get_rawptr(modules, j);
+		vec *mine = vec_new(sizeof(index_entry));
+		for (size_t i = 0, n = vec_len(entries); i < n; i++) {
+			const index_entry *e = vec_get(entries, i);
+			if (strcmp(e->module, module) == 0) {
+				vec_push(mine, e);
+			}
+		}
+		append_module(out, module, mine);
+		DESTROY_FLAT(mine, vec);
+	}
+	strbuf_append(out, "\n---\n\nGenerated by [cocadoc](https://github.com/paguso/cocada) ");
+	strbuf_append(out, cocadoc_version_str());
+
+	for (size_t i = 0, n = vec_len(entries); i < n; i++) {
+		index_entry *e = vec_get_mut(entries, i);
+		FREE(e->module);
+		FREE(e->rel);
+	}
+	DESTROY_FLAT(entries, vec);
+	DESTROY_FLAT(modules, vec);
 	return strbuf_detach(out);
 }
