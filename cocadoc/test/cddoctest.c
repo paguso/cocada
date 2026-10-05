@@ -39,15 +39,20 @@ static const char *str_at(const vec *v, size_t i)
 }
 
 
-static bool has_diag(const cddoc *doc, const char *substr)
+// Number of diagnostics of a rule whose message contains substr
+static size_t count_diag(const cddoc *doc, const char *rule, const char *substr)
 {
+	size_t n = 0;
 	for (size_t i = 0; i < vec_len(doc->diags); i++) {
-		if (strstr(str_at(doc->diags, i), substr)) {
-			return true;
-		}
+		const cddiag *d = vec_get(doc->diags, i);
+		n += strcmp(d->rule, rule) == 0 && strstr(d->msg, substr) != NULL;
 	}
-	return false;
+	return n;
 }
+
+
+#define ASSERT_DIAG(DOC, RULE, SUBSTR) \
+	CuAssert(tc, "missing " RULE " diagnostic: " SUBSTR, count_diag(DOC, RULE, SUBSTR) == 1)
 
 
 void test_cddoc_strip(CuTest *tc)
@@ -59,7 +64,7 @@ void test_cddoc_strip(CuTest *tc)
 	    " *\n"
 	    " *  - item\n"
 	    " *     indented\n"
-	    " **/";
+	    " */";
 	vec *lines = cddoc_strip(src, strlen(src));
 	CuAssertSizeTEquals(tc, 4, vec_len(lines));
 	CuAssertStrEquals(tc, "First line.", str_at(lines, 0));
@@ -85,23 +90,33 @@ void test_cddoc_brief(CuTest *tc)
 	cddoc *doc = parse("/**\n * @brief Pushes a value\n *        to the end.\n *\n * More text.\n */");
 	CuAssertStrEquals(tc, "Pushes a value to the end.", doc->brief);
 	CuAssertStrEquals(tc, "More text.", doc->details);
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
 	cddoc_free(doc);
 
-	// autobrief: first sentence; abbreviations do not end it
-	doc = parse("/** A vector, e.g. a dynamic array. It grows.\n * Second line. */");
-	CuAssertStrEquals(tc, "A vector, e.g. a dynamic array.", doc->brief);
-	CuAssertStrEquals(tc, "It grows.\nSecond line.", doc->details);
-	cddoc_free(doc);
-
+	// member docs: the first sentence is the brief
 	doc = parse("/**< Option MUST be used on every call */");
 	CuAssertStrEquals(tc, "Option MUST be used on every call", doc->brief);
-	CuAssertStrEquals(tc, "", doc->details);
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
 	cddoc_free(doc);
 
-	// a list is not a brief
+	// no @brief: the first sentence is used, with a warning
+	doc = parse("/**\n * A vector, e.g. a dynamic array. It grows.\n */");
+	CuAssertStrEquals(tc, "A vector, e.g. a dynamic array.", doc->brief);
+	CuAssertStrEquals(tc, "It grows.", doc->details);
+	ASSERT_DIAG(doc, "DC5", "no @brief");
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @brief One. Two.\n */");
+	ASSERT_DIAG(doc, "DC5", "more than one sentence");
+	cddoc_free(doc);
+
 	doc = parse("/**\n * - a\n * - b\n */");
 	CuAssertStrEquals(tc, "", doc->brief);
-	CuAssertTrue(tc, has_diag(doc, "no brief"));
+	ASSERT_DIAG(doc, "DC5", "no brief description");
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @brief\n */");
+	ASSERT_DIAG(doc, "DC5", "empty @brief");
 	cddoc_free(doc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
@@ -113,32 +128,62 @@ void test_cddoc_params(CuTest *tc)
 	cddoc *doc = parse(
 	                 "/**\n"
 	                 " * @brief Moves.\n"
-	                 " * @param buf (**move**) The buffer\n"
+	                 " * @param @move buf The buffer\n"
 	                 " *            continued.\n"
-	                 " * @param name\t(*no transfer*) The name.\n"
-	                 " * @param ab (move) alphabet\n"
-	                 " * @param x, The x.\n"
-	                 " * @param n The size, (see below).\n"
-	                 " * @return The vector\n"
+	                 " * @param name The name.\n"
+	                 " * @return @move The vector\n"
 	                 " */");
-	CuAssertSizeTEquals(tc, 5, vec_len(doc->params));
+	CuAssertSizeTEquals(tc, 2, vec_len(doc->params));
 	const cdparam *p = vec_get(doc->params, 0);
 	CuAssertStrEquals(tc, "buf", p->name);
-	CuAssertIntEquals(tc, CDO_MOVE, p->own);
+	CuAssertTrue(tc, p->move);
 	CuAssertStrEquals(tc, "The buffer\ncontinued.", p->desc);
+	CuAssertSizeTEquals(tc, 2, p->line);
 	p = vec_get(doc->params, 1);
 	CuAssertStrEquals(tc, "name", p->name);
-	CuAssertIntEquals(tc, CDO_NO_TRANSFER, p->own);
+	CuAssertTrue(tc, !p->move);
+	CuAssertStrEquals(tc, "The vector", doc->ret);
+	CuAssertTrue(tc, doc->ret_move);
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
+	cddoc_free(doc);
+
+	// deprecated forms: accepted, with warnings
+	doc = parse(
+	          "/**\n"
+	          " * @brief Moves.\n"
+	          " * @param ab (move) alphabet\n"
+	          " * @param name (**no transfer**) The name.\n"
+	          " * @param (no transfer) src Source.\n"
+	          " * @param x, The x.\n"
+	          " * @param y @move The y.\n"
+	          " * @param [in] z The z.\n"
+	          " * @return (**transfer**) The result\n"
+	          " */");
+	CuAssertSizeTEquals(tc, 6, vec_len(doc->params));
+	p = vec_get(doc->params, 0);
+	CuAssertTrue(tc, p->move);
+	CuAssertStrEquals(tc, "alphabet", p->desc);
+	ASSERT_DIAG(doc, "DC9", "write @param @move ab instead of (move)");
+	p = vec_get(doc->params, 1);
+	CuAssertTrue(tc, !p->move);
 	CuAssertStrEquals(tc, "The name.", p->desc);
+	CuAssertSizeTEquals(tc, 2, count_diag(doc, "DC9", "not moving is the default"));
 	p = vec_get(doc->params, 2);
-	CuAssertIntEquals(tc, CDO_MOVE, p->own);
+	CuAssertStrEquals(tc, "src", p->name);
+	CuAssertStrEquals(tc, "Source.", p->desc);
 	p = vec_get(doc->params, 3);
 	CuAssertStrEquals(tc, "x", p->name);
-	CuAssertIntEquals(tc, CDO_UNSPECIFIED, p->own);
+	ASSERT_DIAG(doc, "DC8", "punctuation after the parameter name");
 	p = vec_get(doc->params, 4);
-	CuAssertStrEquals(tc, "The size, (see below).", p->desc);
-	CuAssertStrEquals(tc, "The vector", doc->ret);
-	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
+	CuAssertTrue(tc, p->move);
+	CuAssertStrEquals(tc, "The y.", p->desc);
+	ASSERT_DIAG(doc, "DC9", "@move goes before the parameter name");
+	p = vec_get(doc->params, 5);
+	CuAssertStrEquals(tc, "z", p->name);
+	ASSERT_DIAG(doc, "DC8", "direction annotations");
+	CuAssertTrue(tc, doc->ret_move);
+	CuAssertStrEquals(tc, "The result", doc->ret);
+	ASSERT_DIAG(doc, "DC9", "write @return @move instead of (**transfer**)");
 	cddoc_free(doc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
@@ -147,34 +192,38 @@ void test_cddoc_params(CuTest *tc)
 void test_cddoc_sections(CuTest *tc)
 {
 	memdbg_reset();
-	// block commands in mid line, as in the vec.h macro docs
-	cddoc *doc = parse("/** @brief Creates a TYPE vector @see coretype.h */");
-	CuAssertStrEquals(tc, "Creates a TYPE vector", doc->brief);
-	CuAssertSizeTEquals(tc, 1, vec_len(doc->see));
-	CuAssertStrEquals(tc, "coretype.h", str_at(doc->see, 0));
-	cddoc_free(doc);
-
-	doc = parse(
-	          "/**\n"
-	          " * @brief B.\n"
-	          " * @warning\n"
-	          " * - one\n"
-	          " * - two\n"
-	          " *\n"
-	          " * Back in details, with @p x.\n"
-	          " * @warn Second.\n"
-	          " * @note A note.\n"
-	          " * @deprecated\n"
-	          " * @author Paulo Fonseca\n"
-	          " */");
+	cddoc *doc = parse(
+	                 "/**\n"
+	                 " * @brief B.\n"
+	                 " * @param x The x.\n"
+	                 " * @warning\n"
+	                 " * - one\n"
+	                 " * - two\n"
+	                 " *\n"
+	                 " * Back in details, with @p x.\n"
+	                 " * @warn Second.\n"
+	                 " * @note A note.\n"
+	                 " * @deprecated\n"
+	                 " * @see a_sym, file.h\n"
+	                 " */");
 	CuAssertSizeTEquals(tc, 2, vec_len(doc->warnings));
 	CuAssertStrEquals(tc, "- one\n- two", str_at(doc->warnings, 0));
 	CuAssertStrEquals(tc, "Second.", str_at(doc->warnings, 1));
 	CuAssertStrEquals(tc, "Back in details, with @p x.", doc->details);
 	CuAssertStrEquals(tc, "A note.", str_at(doc->notes, 0));
 	CuAssertStrEquals(tc, "", doc->deprecated);
-	CuAssertStrEquals(tc, "Paulo Fonseca", str_at(doc->authors, 0));
+	CuAssertStrEquals(tc, "a_sym, file.h", str_at(doc->see, 0));
 	CuAssertTrue(tc, doc->ret == NULL);
+	ASSERT_DIAG(doc, "DC7", "details after @warning");
+	ASSERT_DIAG(doc, "DC6", "@warn is not allowed; use @warning");
+	CuAssertSizeTEquals(tc, 2, vec_len(doc->diags));
+	cddoc_free(doc);
+
+	// block commands in mid line
+	doc = parse("/**\n * @brief Creates a TYPE vector @see coretype.h\n */");
+	CuAssertStrEquals(tc, "Creates a TYPE vector", doc->brief);
+	CuAssertStrEquals(tc, "coretype.h", str_at(doc->see, 0));
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
 	cddoc_free(doc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
@@ -194,9 +243,9 @@ void test_cddoc_code(CuTest *tc)
 	                 " *     indented\n"
 	                 " * @endcode\n"
 	                 " * ```\n"
-	                 " * @see not a command\n"
+	                 " * @see not a command, <tt>not html</tt>\n"
 	                 " * ```\n"
-	                 " * Use `@return` literally.\n"
+	                 " * Use `@return` and `f()` literally.\n"
 	                 " */");
 	CuAssertStrEquals(tc,
 	                  "Example:\n"
@@ -206,41 +255,92 @@ void test_cddoc_code(CuTest *tc)
 	                  "    indented\n"
 	                  "```\n"
 	                  "```\n"
-	                  "@see not a command\n"
+	                  "@see not a command, <tt>not html</tt>\n"
 	                  "```\n"
-	                  "Use `@return` literally.", doc->details);
+	                  "Use `@return` and `f()` literally.", doc->details);
 	CuAssertSizeTEquals(tc, 0, vec_len(doc->params));
 	CuAssertSizeTEquals(tc, 0, vec_len(doc->see));
-	CuAssertTrue(tc, doc->ret == NULL);
+	ASSERT_DIAG(doc, "DC12", "@code is not allowed");
+	CuAssertSizeTEquals(tc, 1, vec_len(doc->diags));
 	cddoc_free(doc);
 
-	doc = parse("/** @brief B.\n * @code\n * never closed */");
-	CuAssertTrue(tc, has_diag(doc, "unterminated"));
+	doc = parse("/**\n * @brief B.\n * ```\n * never closed\n */");
+	ASSERT_DIAG(doc, "DC12", "unterminated");
 	cddoc_free(doc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
 
 
-void test_cddoc_diags(CuTest *tc)
+void test_cddoc_text_rules(CuTest *tc)
 {
 	memdbg_reset();
 	cddoc *doc = parse(
 	                 "/**\n"
 	                 " * @brief From a source string @src.\n"
-	                 " * @par par The parent SOM\n"
+	                 " *\n"
+	                 " * See ::other and other_func() and <tt>x</tt> and cddoc::brief.\n"
+	                 " * ## Heading\n"
+	                 " * Ownership @move here is misplaced.\n"
 	                 " * Mail paguso@cin.ufpe.br is fine.\n"
-	                 " * @param\n"
+	                 " * @par par The parent SOM\n"
+	                 " * @returns R\n"
+	                 " * \\note Backslash form.\n"
+	                 " * @see foo for details\n"
 	                 " */");
-	CuAssertTrue(tc, has_diag(doc, "unknown command @src (did you mean @p src?)"));
-	CuAssertTrue(tc, has_diag(doc, "did you mean @param"));
-	CuAssertTrue(tc, has_diag(doc, "@param without a name"));
-	CuAssertSizeTEquals(tc, 3, vec_len(doc->diags));
+	ASSERT_DIAG(doc, "DC6", "unknown command @src (did you mean @p src?)");
+	ASSERT_DIAG(doc, "DC11", "::other: write #other");
+	ASSERT_DIAG(doc, "DC11", "other_func(): write #other_func");
+	ASSERT_DIAG(doc, "DC11", "cddoc::brief: write #cddoc.brief");
+	ASSERT_DIAG(doc, "DC12", "HTML tag <tt>");
+	ASSERT_DIAG(doc, "DC12", "heading outside a file comment");
+	ASSERT_DIAG(doc, "DC9", "@move must come right after");
+	ASSERT_DIAG(doc, "DC6", "did you mean @param or @p?");
+	ASSERT_DIAG(doc, "DC6", "@returns is not allowed; use @return");
+	ASSERT_DIAG(doc, "DC6", "\\note: write @note");
+	ASSERT_DIAG(doc, "DC10", "found \"foo for details\"");
+	// line numbers are relative to the opening /**
+	for (size_t i = 0; i < vec_len(doc->diags); i++) {
+		const cddiag *d = vec_get(doc->diags, i);
+		if (strstr(d->msg, "@returns")) {
+			CuAssertSizeTEquals(tc, 8, d->line);
+		}
+	}
 	cddoc_free(doc);
 
-	// a proper @par: titled paragraph in the details, no diagnostic
-	doc = parse("/**\n * @brief B.\n * @par Example\n * Some text.\n */");
-	CuAssertStrEquals(tc, "**Example**\n\nSome text.", doc->details);
+	// headings are fine in file comments
+	doc = parse("/**\n * @file x.h\n * @author A\n * @brief X.\n *\n * # Usage\n */");
 	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
+	cddoc_free(doc);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+void test_cddoc_form(CuTest *tc)
+{
+	memdbg_reset();
+	cddoc *doc = parse("/** @brief One line. */");
+	ASSERT_DIAG(doc, "DC1", "one-line doc comment");
+	cddoc_free(doc);
+
+	doc = parse("/** @brief Opening.\n * More.\n **/");
+	ASSERT_DIAG(doc, "DC1", "text on the opening");
+	ASSERT_DIAG(doc, "DC1", "close with */, not **/");
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @brief Closing.\n * text */");
+	ASSERT_DIAG(doc, "DC1", "text on the closing");
+	cddoc_free(doc);
+
+	doc = parse("/**< A member\n     on two lines */");
+	ASSERT_DIAG(doc, "DC2", "single line");
+	cddoc_free(doc);
+
+	doc = parse("/**< A member **/");
+	ASSERT_DIAG(doc, "DC1", "close with */, not **/");
+	cddoc_free(doc);
+
+	doc = parse("/**< A member @see x */");
+	ASSERT_DIAG(doc, "DC2", "no block commands");
 	cddoc_free(doc);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
 }
@@ -254,6 +354,7 @@ CuSuite *cddoc_get_test_suite()
 	SUITE_ADD_TEST(suite, test_cddoc_params);
 	SUITE_ADD_TEST(suite, test_cddoc_sections);
 	SUITE_ADD_TEST(suite, test_cddoc_code);
-	SUITE_ADD_TEST(suite, test_cddoc_diags);
+	SUITE_ADD_TEST(suite, test_cddoc_text_rules);
+	SUITE_ADD_TEST(suite, test_cddoc_form);
 	return suite;
 }

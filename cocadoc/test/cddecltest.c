@@ -80,6 +80,7 @@ void test_cddecl_func(CuTest *tc)
 	exp_decl exp[] = {
 		{CDD_FILE, "foo.h", "", true},
 		{CDD_FUNC, "vec_new", "vec *vec_new(size_t typesize)", true},
+		{CDD_FUNC, "undocumented", "int undocumented(void)", false},
 		{CDD_FUNC, "node_next", "struct node *node_next(const struct node *n, ...)", true},
 		{CDD_FUNC, "sq", "static inline int sq(int x)", true},
 		{CDD_FUNC, "f", "const char **f(char a[], int (*cmp)(const void *, const void *))", true},
@@ -198,6 +199,30 @@ void test_cddecl_orphans(CuTest *tc)
 	    "/** at end */\n";
 	exp_decl exp[] = {
 		{CDD_FUNC, "f", "int f(void)", true},
+		{CDD_FUNC, "g", "void g(void)", false},
+	};
+	CHECK(src, exp);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
+void test_cddecl_undocumented(CuTest *tc)
+{
+	memdbg_reset();
+	const char *src =
+	    "#ifndef T_H\n"
+	    "#define T_H\n"
+	    "#include \"x.h\"\n"
+	    "#define MAX(A, B) ((A) > (B) ? (A) : (B))\n"
+	    "XX_CORETYPES(TYPED_VEC_DECL)\n"
+	    "static const byte_t _MASK[2] = { 0x80, 0x40 };\n"
+	    "/** a */\n"
+	    "DECL_TRAIT(vec_iter, iter)\n"
+	    "#endif\n";
+	exp_decl exp[] = {
+		{CDD_MACRO, "MAX", "#define MAX(A, B)", false},
+		{CDD_VAR, "_MASK", "static const byte_t _MASK[2] = {...}", false},
+		{CDD_MACROCALL, "DECL_TRAIT", "DECL_TRAIT(vec_iter, iter)", true},
 	};
 	CHECK(src, exp);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
@@ -211,5 +236,6 @@ CuSuite *cddecl_get_test_suite()
 	SUITE_ADD_TEST(suite, test_cddecl_types);
 	SUITE_ADD_TEST(suite, test_cddecl_macros);
 	SUITE_ADD_TEST(suite, test_cddecl_orphans);
+	SUITE_ADD_TEST(suite, test_cddecl_undocumented);
 	return suite;
 }

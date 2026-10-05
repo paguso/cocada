@@ -81,7 +81,10 @@ static size_t indent_of(const char *s)
 }
 
 
-vec *cddoc_strip(const char *raw, size_t len)
+// Splits the comment into lines without the comment syntax. *first is
+// set to the number of leading blank lines dropped, so that line i of the
+// result is line (*first + i) of the comment.
+static vec *strip_lines(const char *raw, size_t len, size_t *first)
 {
 	// delimiters: "/**" or "/**<" ... "*/", also "**/"
 	size_t b = 0, e = len;
@@ -168,81 +171,129 @@ vec *cddoc_strip(const char *raw, size_t len)
 		char *l = vec_pop_rawptr(lines, vec_len(lines) - 1);
 		FREE(l);
 	}
+	*first = 0;
 	while (vec_len(lines) > 0 && is_blank_str(vec_first_rawptr(lines))) {
 		char *l = vec_pop_rawptr(lines, 0);
 		FREE(l);
+		(*first)++;
 	}
 	return lines;
 }
 
 
+vec *cddoc_strip(const char *raw, size_t len)
+{
+	size_t first;
+	return strip_lines(raw, len, &first);
+}
+
+
 /*
- * Block commands
+ * Commands
  */
 
 typedef enum {
-	SEC_DETAILS = 0,
-	SEC_BRIEF,
+	SEC_BRIEF = 0,
+	SEC_DETAILS,
 	SEC_PARAM,
 	SEC_RETURN,
-	SEC_SEE,
 	SEC_WARNING,
 	SEC_NOTE,
 	SEC_DEPRECATED,
+	SEC_SEE,
 	SEC_AUTHOR,
-	SEC_PAR,
 	SEC_FILE,
+	SEC_PAR,
 	SEC_NONE // not a block command
 } sec_kind;
+
+
+// Position of each section in the prescribed order (DC7), or -1 if any
+static int sec_rank(sec_kind k)
+{
+	return (k <= SEC_SEE) ? (int)k : -1;
+}
+
+
+static const char *sec_label(sec_kind k)
+{
+	static const char *LABELS[] = {"@brief", "details", "@param", "@return",
+	                               "@warning", "@note", "@deprecated", "@see"
+	                              };
+	return (k <= SEC_SEE) ? LABELS[k] : "?";
+}
 
 
 typedef struct {
 	const char *name;
 	sec_kind kind;
+	const char *use; // NULL if allowed, else what to use instead
 } cmd_def;
 
 
 static const cmd_def BLOCK_CMDS[] = {
-	{"brief", SEC_BRIEF}, {"short", SEC_BRIEF},
-	{"param", SEC_PARAM},
-	{"return", SEC_RETURN}, {"returns", SEC_RETURN}, {"result", SEC_RETURN},
-	{"see", SEC_SEE}, {"sa", SEC_SEE},
-	{"warning", SEC_WARNING}, {"warn", SEC_WARNING}, {"attention", SEC_WARNING},
-	{"note", SEC_NOTE}, {"remark", SEC_NOTE}, {"remarks", SEC_NOTE},
-	{"deprecated", SEC_DEPRECATED},
-	{"author", SEC_AUTHOR}, {"authors", SEC_AUTHOR},
-	{"par", SEC_PAR},
-	{"file", SEC_FILE},
+	{"brief", SEC_BRIEF, NULL},
+	{"param", SEC_PARAM, NULL},
+	{"return", SEC_RETURN, NULL},
+	{"see", SEC_SEE, NULL},
+	{"warning", SEC_WARNING, NULL},
+	{"note", SEC_NOTE, NULL},
+	{"deprecated", SEC_DEPRECATED, NULL},
+	{"author", SEC_AUTHOR, NULL},
+	{"file", SEC_FILE, NULL},
+	// accepted, but not allowed by the style
+	{"short", SEC_BRIEF, "@brief"},
+	{"returns", SEC_RETURN, "@return"},
+	{"result", SEC_RETURN, "@return"},
+	{"sa", SEC_SEE, "@see"},
+	{"warn", SEC_WARNING, "@warning"},
+	{"attention", SEC_WARNING, "@warning"},
+	{"remark", SEC_NOTE, "@note"},
+	{"remarks", SEC_NOTE, "@note"},
+	{"authors", SEC_AUTHOR, "@author"},
+	{"par", SEC_PAR, "a Markdown heading or **bold** text"},
 };
 
 
-// Commands that are known but are not block commands
-static const char *OTHER_CMDS[] = {
-	"p", "a", "c", "e", "b", "em", "ref", "link", "endlink", "n",
-	"code", "endcode", "verbatim", "endverbatim",
+// Inline Doxygen commands that are not allowed (Markdown is used instead)
+static const char *INLINE_CMDS[] = {
+	"a", "c", "e", "b", "em", "ref", "link", "endlink", "n",
 };
 
 
-static sec_kind block_cmd(const char *w, size_t len)
+static const cmd_def *find_block_cmd(const char *w, size_t len)
 {
 	for (size_t i = 0; i < sizeof(BLOCK_CMDS) / sizeof(BLOCK_CMDS[0]); i++) {
 		if (strlen(BLOCK_CMDS[i].name) == len
 		        && strncmp(BLOCK_CMDS[i].name, w, len) == 0) {
-			return BLOCK_CMDS[i].kind;
+			return &BLOCK_CMDS[i];
 		}
 	}
-	return SEC_NONE;
+	return NULL;
 }
 
 
-static bool other_cmd(const char *w, size_t len)
+static bool word_in(const char *w, size_t len, const char **list, size_t n)
 {
-	for (size_t i = 0; i < sizeof(OTHER_CMDS) / sizeof(OTHER_CMDS[0]); i++) {
-		if (strlen(OTHER_CMDS[i]) == len && strncmp(OTHER_CMDS[i], w, len) == 0) {
+	for (size_t i = 0; i < n; i++) {
+		if (strlen(list[i]) == len && strncmp(list[i], w, len) == 0) {
 			return true;
 		}
 	}
 	return false;
+}
+
+
+static bool starts_with_word(const char *s, const char *w)
+{
+	size_t n = strlen(w);
+	return strncmp(s, w, n) == 0 && !isalnum((unsigned char)s[n]) && s[n] != '_';
+}
+
+
+static inline bool is_ident_char(char c)
+{
+	return isalnum((unsigned char)c) || c == '_';
 }
 
 
@@ -262,6 +313,7 @@ typedef enum {
 typedef struct {
 	sec_kind kind;
 	strbuf *text;
+	size_t line;
 } section;
 
 
@@ -272,17 +324,25 @@ typedef struct {
 	sec_kind cur_kind;
 	fence_kind fence;
 	vec *diags;
+	size_t line;       // current line in the comment
+	bool member;       // a member doc /**< ... */
+	bool file;         // a file comment (has @file)
+	int last_rank;     // for DC7
+	sec_kind last_ranked;
+	bool order_warned;
+	bool member_warned;
 } pstate;
 
 
-static void diag(pstate *st, const char *fmt, ...)
+static void diag(pstate *st, const char *rule, size_t line, const char *fmt, ...)
 {
 	char buf[256];
 	va_list args;
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
-	vec_push_rawptr(st->diags, cstr_clone(buf));
+	cddiag d = {.rule = rule, .line = line, .msg = cstr_clone(buf)};
+	vec_push(st->diags, &d);
 }
 
 
@@ -336,8 +396,32 @@ static void back_to_details(pstate *st)
 }
 
 
+// DC7: sections in the prescribed order
+static void check_order(pstate *st, sec_kind k)
+{
+	int r = sec_rank(k);
+	if (r < 0) {
+		return;
+	}
+	if (r < st->last_rank && !st->order_warned) {
+		diag(st, "DC7", st->line, "%s after %s; the order is @brief, details, "
+		     "@param, @return, @warning, @note, @deprecated, @see",
+		     sec_label(k), sec_label(st->last_ranked));
+		st->order_warned = true;
+	}
+	if (r > st->last_rank) {
+		st->last_rank = r;
+		st->last_ranked = k;
+	}
+}
+
+
 static void open_section(pstate *st, sec_kind kind)
 {
+	if (st->member && !st->member_warned) {
+		diag(st, "DC2", st->line, "member docs have no block commands");
+		st->member_warned = true;
+	}
 	if (kind == SEC_PAR) {
 		// a titled paragraph of the details
 		back_to_details(st);
@@ -345,7 +429,8 @@ static void open_section(pstate *st, sec_kind kind)
 		st->cur_kind = SEC_PAR;
 		return;
 	}
-	section s = {.kind = kind, .text = strbuf_new()};
+	check_order(st, kind);
+	section s = {.kind = kind, .text = strbuf_new(), .line = st->line};
 	vec_push(st->secs, &s);
 	st->cur = s.text;
 	st->cur_kind = kind;
@@ -365,8 +450,11 @@ static void add_text(pstate *st, const char *text, size_t len, bool first)
 			len--;
 		}
 		if (len > 0 && islower((unsigned char)text[0])) {
-			diag(st, "@par makes a titled paragraph (here titled \"%.*s\"); "
-			     "did you mean @param or @p?", (int)(len > 60 ? 60 : len), text);
+			diag(st, "DC6", st->line, "@par is not allowed; did you mean @param or @p? "
+			     "(@par makes a paragraph titled \"%.*s\")", (int)(len > 40 ? 40 : len), text);
+		} else {
+			diag(st, "DC6", st->line,
+			     "@par is not allowed; use a Markdown heading or **bold** text");
 		}
 		if (len > 0) {
 			strbuf_append(st->details, "**");
@@ -390,7 +478,98 @@ static void add_text(pstate *st, const char *text, size_t len, bool first)
 	if (len == 0) {
 		return;
 	}
+	if (st->cur_kind == SEC_DETAILS) {
+		check_order(st, SEC_DETAILS);
+	}
 	append_line(st->cur, text, len);
+}
+
+
+static const char *HTML_TAGS[] = {
+	"tt", "b", "i", "em", "strong", "code", "br", "p", "ul", "ol", "li", "pre",
+	"sup", "sub", "a", "table", "tr", "td", "th", "div", "span", "hr", "u",
+};
+
+
+// Checks a line of text (not code) for DC9, DC11 and DC12 problems
+static void scan_line(pstate *st, const char *line)
+{
+	size_t len = strlen(line);
+	const char *t = line + indent_of(line);
+	if (!st->file && t[0] == '#') {
+		size_t h = strspn(t, "#");
+		if (t[h] == ' ') {
+			diag(st, "DC12", st->line, "Markdown heading outside a file comment");
+		}
+	}
+	bool in_span = false;
+	for (size_t i = 0; i < len; i++) {
+		char c = line[i];
+		if (c == '`') {
+			in_span = !in_span;
+			continue;
+		}
+		if (in_span) {
+			continue;
+		}
+		if (c == ':' && line[i + 1] == ':' && (isalpha((unsigned char)line[i + 2])
+		                                       || line[i + 2] == '_')) {
+			size_t e = i + 2;
+			while (is_ident_char(line[e])) e++;
+			size_t b = i; // type::member
+			while (b > 0 && is_ident_char(line[b - 1])) b--;
+			if (b < i) {
+				diag(st, "DC11", st->line, "%.*s: write #%.*s.%.*s", (int)(e - b), line + b,
+				     (int)(i - b), line + b, (int)(e - i - 2), line + i + 2);
+			} else {
+				diag(st, "DC11", st->line, "::%.*s: write #%.*s", (int)(e - i - 2), line + i + 2,
+				     (int)(e - i - 2), line + i + 2);
+			}
+			i = e - 1;
+		} else if ((isalpha((unsigned char)c) || c == '_')
+		           && (i == 0 || (!is_ident_char(line[i - 1]) && line[i - 1] != '#'
+		                          && line[i - 1] != '@' && line[i - 1] != ':'))) {
+			size_t e = i;
+			while (is_ident_char(line[e])) e++;
+			if (line[e] == '(' && line[e + 1] == ')') {
+				diag(st, "DC11", st->line, "%.*s(): write #%.*s", (int)(e - i), line + i,
+				     (int)(e - i), line + i);
+			}
+			i = e - 1;
+		} else if (c == '<') {
+			size_t k = i + 1 + (line[i + 1] == '/');
+			size_t e = k;
+			while (isalpha((unsigned char)line[e])) e++;
+			if (e > k && (line[e] == '>' || line[e] == ' ' || (line[e] == '/' && line[e + 1] == '>'))) {
+				for (size_t h = 0; h < sizeof(HTML_TAGS) / sizeof(HTML_TAGS[0]); h++) {
+					if (strlen(HTML_TAGS[h]) == e - k && strncasecmp(HTML_TAGS[h], line + k, e - k) == 0) {
+						diag(st, "DC12", st->line, "HTML tag <%.*s>: use Markdown",
+						     (int)(e - i - 1), line + i + 1);
+						break;
+					}
+				}
+			}
+		} else if (c == '@' && starts_with_word(line + i + 1, "move")
+		           && (i == 0 || isspace((unsigned char)line[i - 1]))) {
+			// must follow "@param" or "@return" ("@param NAME @move" is
+			// reported when the @param is parsed)
+			size_t p = i;
+			while (p > 0 && isspace((unsigned char)line[p - 1])) p--;
+			size_t w = p;
+			while (w > 0 && !isspace((unsigned char)line[w - 1])) w--;
+			size_t w2 = w;
+			while (w2 > 0 && isspace((unsigned char)line[w2 - 1])) w2--;
+			size_t w1 = w2;
+			while (w1 > 0 && !isspace((unsigned char)line[w1 - 1])) w1--;
+			bool after_cmd = (p - w == 6 && strncmp(line + w, "@param", 6) == 0)
+			                 || (p - w == 7 && strncmp(line + w, "@return", 7) == 0)
+			                 || (p - w == 8 && strncmp(line + w, "@returns", 8) == 0);
+			bool after_name = w2 - w1 == 6 && strncmp(line + w1, "@param", 6) == 0;
+			if (!after_cmd && !after_name) {
+				diag(st, "DC9", st->line, "@move must come right after @param or @return");
+			}
+		}
+	}
 }
 
 
@@ -418,16 +597,27 @@ static void parse_line(pstate *st, const char *line)
 		if (wend == w) {
 			continue;
 		}
-		sec_kind kind = block_cmd(line + w, wend - w);
-		if (kind == SEC_NONE) {
-			if (c == '@' && !other_cmd(line + w, wend - w)) {
-				diag(st, "unknown command @%.*s (did you mean @p %.*s?)",
-				     (int)(wend - w), line + w, (int)(wend - w), line + w);
+		const cmd_def *cmd = find_block_cmd(line + w, wend - w);
+		if (!cmd) {
+			if (c == '@' && !(wend - w == 1 && line[w] == 'p')
+			        && !(wend - w == 4 && strncmp(line + w, "move", 4) == 0)) {
+				if (word_in(line + w, wend - w, INLINE_CMDS, sizeof(INLINE_CMDS) / sizeof(INLINE_CMDS[0]))) {
+					diag(st, "DC6", st->line, "@%.*s is not allowed; use Markdown "
+					     "(`code`, *emphasis*, **bold**) or #name", (int)(wend - w), line + w);
+				} else {
+					diag(st, "DC6", st->line, "unknown command @%.*s (did you mean @p %.*s?)",
+					     (int)(wend - w), line + w, (int)(wend - w), line + w);
+				}
 			}
 			continue;
 		}
+		if (c == '\\') {
+			diag(st, "DC6", st->line, "\\%s: write @%s", cmd->name, cmd->name);
+		} else if (cmd->use && cmd->kind != SEC_PAR) {
+			diag(st, "DC6", st->line, "@%s is not allowed; use %s", cmd->name, cmd->use);
+		}
 		add_text(st, line + seg, i - seg, seg_first);
-		open_section(st, kind);
+		open_section(st, cmd->kind);
 		seg = wend;
 		seg_first = true;
 		i = wend - 1;
@@ -436,18 +626,12 @@ static void parse_line(pstate *st, const char *line)
 }
 
 
-static bool starts_with_word(const char *s, const char *w)
-{
-	size_t n = strlen(w);
-	return strncmp(s, w, n) == 0 && !isalnum((unsigned char)s[n]);
-}
-
-
-static void parse_lines(pstate *st, const vec *lines)
+static void parse_lines(pstate *st, const vec *lines, size_t first)
 {
 	for (size_t i = 0, n = vec_len(lines); i < n; i++) {
 		const char *line = vec_get_rawptr(lines, i);
 		const char *t = line + indent_of(line);
+		st->line = first + i;
 
 		if (st->fence != FENCE_NONE) {
 			bool closes =
@@ -468,6 +652,7 @@ static void parse_lines(pstate *st, const vec *lines)
 			st->fence = (*t == '`') ? FENCE_BACKTICK : FENCE_TILDE;
 			append_line(st->cur, t, strlen(t));
 		} else if (starts_with_word(t, "@code")) {
+			diag(st, "DC12", st->line, "@code is not allowed; use a ```c fence");
 			st->fence = FENCE_CODE;
 			const char *lang = "c";
 			size_t llen = 1;
@@ -478,6 +663,7 @@ static void parse_lines(pstate *st, const vec *lines)
 			append_line(st->cur, "```", 3);
 			strbuf_nappend(st->cur, lang, llen);
 		} else if (starts_with_word(t, "@verbatim")) {
+			diag(st, "DC12", st->line, "@verbatim is not allowed; use a ``` fence");
 			st->fence = FENCE_VERBATIM;
 			append_line(st->cur, "```", 3);
 		} else if (*t == '\0') {
@@ -485,11 +671,12 @@ static void parse_lines(pstate *st, const vec *lines)
 			back_to_details(st);
 			para_break(st->details);
 		} else {
+			scan_line(st, line);
 			parse_line(st, line);
 		}
 	}
 	if (st->fence != FENCE_NONE) {
-		diag(st, "unterminated code block");
+		diag(st, "DC12", st->line, "unterminated code block");
 		append_line(st->cur, "```", 3);
 	}
 }
@@ -523,7 +710,7 @@ static void unwrap(strbuf *dest, const char *s)
 
 static bool is_abbrev_end(const char *text, size_t dot)
 {
-	static const char *ABBREVS[] = {"e.g", "i.e", "etc", "a.k.a", "vs", "cf"};
+	static const char *ABBREVS[] = {"e.g", "i.e", "etc", "a.k.a", "vs", "cf", "s.t"};
 	for (size_t i = 0; i < sizeof(ABBREVS) / sizeof(ABBREVS[0]); i++) {
 		size_t n = strlen(ABBREVS[i]);
 		if (dot >= n && strncasecmp(text + dot - n, ABBREVS[i], n) == 0
@@ -532,6 +719,22 @@ static bool is_abbrev_end(const char *text, size_t dot)
 		}
 	}
 	return false;
+}
+
+
+// End (exclusive) of the first sentence of s[0:len], or len
+static size_t sentence_end(const char *s, size_t len)
+{
+	bool in_span = false;
+	for (size_t i = 0; i < len; i++) {
+		if (s[i] == '`') {
+			in_span = !in_span;
+		} else if (s[i] == '.' && !in_span && (i + 1 == len || isspace((unsigned char)s[i + 1]))
+		           && !is_abbrev_end(s, i)) {
+			return i + 1;
+		}
+	}
+	return len;
 }
 
 
@@ -553,8 +756,8 @@ static bool starts_plain_text(const char *d)
 }
 
 
-// JAVADOC_AUTOBRIEF: the first sentence of the first paragraph of the
-// details becomes the brief, and is removed from the details.
+// The first sentence of the first paragraph of the details becomes the
+// brief, and is removed from the details.
 static void auto_brief(char **brief, char **details)
 {
 	const char *d = *details;
@@ -563,17 +766,7 @@ static void auto_brief(char **brief, char **details)
 	if (par_end == 0 || !starts_plain_text(d)) {
 		return;
 	}
-	size_t end = par_end; // exclusive
-	bool in_span = false;
-	for (size_t i = 0; i < par_end; i++) {
-		if (d[i] == '`') {
-			in_span = !in_span;
-		} else if (d[i] == '.' && !in_span && (i + 1 == par_end || isspace((unsigned char)d[i + 1]))
-		           && !is_abbrev_end(d, i)) {
-			end = i + 1;
-			break;
-		}
-	}
+	size_t end = sentence_end(d, par_end);
 	strbuf *sb = strbuf_new();
 	char *head = cstr_clone_len(d, end);
 	unwrap(sb, head);
@@ -588,69 +781,198 @@ static void auto_brief(char **brief, char **details)
 }
 
 
-static cdownership parse_ownership(char **desc)
+typedef enum {
+	LEGACY_NONE = 0,
+	LEGACY_BORROW, // (**no transfer**), ...
+	LEGACY_MOVE    // (**move**), (**transfer**), ...
+} legacy_own;
+
+
+// Recognises and removes a legacy ownership annotation at the start of
+// *text, e.g. "(**move**)". The annotation is copied to found.
+static legacy_own strip_legacy_ownership(char **text, char *found, size_t found_sz)
 {
-	// (**move**), (*no transfer*), (move), ...
-	const char *s = *desc;
+	const char *s = *text;
 	if (*s != '(') {
-		return CDO_UNSPECIFIED;
+		return LEGACY_NONE;
 	}
 	const char *p = s + 1;
 	while (*p == ' ') p++;
 	size_t stars = strspn(p, "*");
 	if (stars > 2) {
-		return CDO_UNSPECIFIED;
+		return LEGACY_NONE;
 	}
 	const char *w = p + stars;
 	size_t wlen = strcspn(w, "*)");
 	const char *q = w + wlen;
 	if (strspn(q, "*") != stars) {
-		return CDO_UNSPECIFIED;
+		return LEGACY_NONE;
 	}
 	q += stars;
 	while (*q == ' ') q++;
 	if (*q != ')') {
-		return CDO_UNSPECIFIED;
+		return LEGACY_NONE;
 	}
-	cdownership own = CDO_UNSPECIFIED;
+	legacy_own own = LEGACY_NONE;
 	if (wlen == 11 && strncasecmp(w, "no transfer", 11) == 0) {
-		own = CDO_NO_TRANSFER;
+		own = LEGACY_BORROW;
 	} else if ((wlen == 8 && strncasecmp(w, "transfer", 8) == 0)
-	           || (wlen == 13 && strncasecmp(w, "full transfer", 13) == 0)) {
-		own = CDO_TRANSFER;
-	} else if (wlen == 4 && strncasecmp(w, "move", 4) == 0) {
-		own = CDO_MOVE;
+	           || (wlen == 13 && strncasecmp(w, "full transfer", 13) == 0)
+	           || (wlen == 4 && strncasecmp(w, "move", 4) == 0)) {
+		own = LEGACY_MOVE;
 	}
-	if (own != CDO_UNSPECIFIED) {
+	if (own != LEGACY_NONE) {
+		snprintf(found, found_sz, "%.*s", (int)(q + 1 - s), s);
 		char *rest = trimmed_copy(q + 1);
-		FREE(*desc);
-		*desc = rest;
+		FREE(*text);
+		*text = rest;
 	}
 	return own;
 }
 
 
-static cdparam parse_param(pstate *st, const char *text)
+static void check_legacy(pstate *st, size_t line, char **text, bool *move,
+                         const char *cmd, const char *name)
 {
-	cdparam prm = {.name = NULL, .own = CDO_UNSPECIFIED, .desc = NULL};
+	char found[64];
+	legacy_own own = strip_legacy_ownership(text, found, sizeof(found));
+	if (own == LEGACY_MOVE) {
+		*move = true;
+		diag(st, "DC9", line, "write %s @move%s%s instead of %s", cmd,
+		     name ? " " : "", name ? name : "", found);
+	} else if (own == LEGACY_BORROW) {
+		diag(st, "DC9", line, "%s: not moving is the default; remove it", found);
+	}
+}
+
+
+static cdparam parse_param(pstate *st, const char *text, size_t line)
+{
+	cdparam prm = {.name = NULL, .move = false, .desc = NULL, .line = line};
 	const char *s = text;
+	if (starts_with_word(s, "@move")) {
+		prm.move = true;
+		s += 5;
+		while (isspace((unsigned char)*s)) s++;
+	}
+	if (*s == '(') { // legacy annotation before the name: @param (move) x
+		char *rest = cstr_clone(s);
+		char found[64];
+		legacy_own own = strip_legacy_ownership(&rest, found, sizeof(found));
+		if (own != LEGACY_NONE) {
+			size_t nl = strcspn(rest, " \t\n");
+			if (own == LEGACY_MOVE) {
+				prm.move = true;
+				diag(st, "DC9", line, "write @param @move %.*s instead of %s", (int)nl, rest, found);
+			} else {
+				diag(st, "DC9", line, "%s: not moving is the default; remove it", found);
+			}
+			s = text + (strlen(text) - strlen(rest));
+		}
+		FREE(rest);
+	}
 	if (*s == '[') { // direction, e.g. [in,out]
+		diag(st, "DC8", line, "direction annotations like %.*s are not used",
+		     (int)(strcspn(s, "]") + 1), s);
 		s += strcspn(s, "]");
 		if (*s) s++;
 		while (isspace((unsigned char)*s)) s++;
 	}
 	size_t nlen = strcspn(s, " \t\n");
-	while (nlen > 0 && (s[nlen - 1] == ',' || s[nlen - 1] == ':')) {
-		nlen--;
+	size_t clean = nlen;
+	while (clean > 0 && (s[clean - 1] == ',' || s[clean - 1] == ':')) {
+		clean--;
 	}
-	prm.name = cstr_clone_len(s, nlen);
-	if (nlen == 0) {
-		diag(st, "@param without a name");
+	if (clean < nlen) {
+		diag(st, "DC8", line, "punctuation after the parameter name in \"@param %.*s\"",
+		     (int)nlen, s);
 	}
-	s += strcspn(s, " \t\n");
+	prm.name = cstr_clone_len(s, clean);
+	if (clean == 0) {
+		diag(st, "DC8", line, "@param without a name");
+	}
+	s += nlen;
 	prm.desc = trimmed_copy(s);
-	prm.own = parse_ownership(&prm.desc);
+	if (starts_with_word(prm.desc, "@move")) {
+		diag(st, "DC9", line, "@move goes before the parameter name: @param @move %s",
+		     prm.name);
+		prm.move = true;
+		char *rest = trimmed_copy(prm.desc + 5);
+		FREE(prm.desc);
+		prm.desc = rest;
+	}
+	check_legacy(st, line, &prm.desc, &prm.move, "@param", prm.name);
 	return prm;
+}
+
+
+// DC10: @see lists symbol and file names, separated by commas
+static void check_see(pstate *st, const char *text, size_t line)
+{
+	const char *s = text;
+	while (*s) {
+		size_t n = strcspn(s, ",");
+		size_t b = 0, e = n;
+		while (b < e && isspace((unsigned char)s[b])) b++;
+		while (e > b && isspace((unsigned char)s[e - 1])) e--;
+		bool ok = e > b;
+		for (size_t i = b; i < e && ok; i++) {
+			ok = is_ident_char(s[i]) || s[i] == '.' || (i == b && s[i] == '#');
+		}
+		if (!ok) {
+			diag(st, "DC10", line, "@see lists only symbol and file names, "
+			     "separated by commas (found \"%.*s\")", (int)((e - b) > 40 ? 40 : (e - b)), s + b);
+			return;
+		}
+		s += n + (s[n] == ',');
+	}
+}
+
+
+// DC1 (block form) and DC2 (single-line member docs), on the raw comment
+static void check_form(pstate *st, const char *raw, size_t len)
+{
+	const char *nl = memchr(raw, '\n', len);
+	size_t last_line = 0;
+	for (size_t i = 0; i < len; i++) {
+		last_line += (raw[i] == '\n');
+	}
+	if (st->member) {
+		if (nl) {
+			diag(st, "DC2", 0, "member docs are a single line");
+		}
+		if (len >= 3 && strncmp(raw + len - 3, "**/", 3) == 0) {
+			diag(st, "DC1", last_line, "close with */, not **/");
+		}
+		return;
+	}
+	if (!nl) {
+		diag(st, "DC1", 0, "one-line doc comment; put /** and */ on their own lines");
+		return;
+	}
+	for (const char *p = raw + 3; p < nl; p++) {
+		if (!isspace((unsigned char)*p)) {
+			diag(st, "DC1", 0, "text on the opening /** line");
+			break;
+		}
+	}
+	const char *last = raw + len;
+	while (last > raw && last[-1] != '\n') last--;
+	size_t ll = raw + len - last;
+	bool double_star = len >= 3 && strncmp(raw + len - 3, "**/", 3) == 0;
+	if (double_star) {
+		diag(st, "DC1", last_line, "close with */, not **/");
+	}
+	// text before the closing */ on its line
+	const char *p = last;
+	while (p < raw + len && isspace((unsigned char)*p)) p++;
+	if (p < raw + len && *p == '*' && p + 1 < raw + len && p[1] != '/') {
+		p++; // star column
+	}
+	while (p < raw + len && isspace((unsigned char)*p)) p++;
+	if (ll > 0 && p < raw + len - 2 - double_star) {
+		diag(st, "DC1", last_line, "text on the closing */ line");
+	}
 }
 
 
@@ -659,6 +981,12 @@ static void cdparam_finalise(void *ptr, const finaliser *fnr)
 	cdparam *p = (cdparam *)ptr;
 	FREE(p->name);
 	FREE(p->desc);
+}
+
+
+static void cddiag_finalise(void *ptr, const finaliser *fnr)
+{
+	FREE(((cddiag *)ptr)->msg);
 }
 
 
@@ -674,23 +1002,43 @@ static void free_str_vec(vec *v)
 }
 
 
+static bool has_file_cmd(const char *raw, size_t len)
+{
+	for (size_t i = 0; i + 5 <= len; i++) {
+		if (raw[i] == '@' && strncmp(raw + i + 1, "file", 4) == 0
+		        && (i + 5 == len || !isalnum((unsigned char)raw[i + 5]))
+		        && (i == 0 || isspace((unsigned char)raw[i - 1]))) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 cddoc *cddoc_parse(const char *raw, size_t len)
 {
-	vec *lines = cddoc_strip(raw, len);
+	size_t first;
+	vec *lines = strip_lines(raw, len, &first);
 
 	pstate st = {
 		.details = strbuf_new(),
 		.secs = vec_new(sizeof(section)),
 		.fence = FENCE_NONE,
-		.diags = new_str_vec()
+		.diags = vec_new(sizeof(cddiag)),
+		.member = len >= 4 && strncmp(raw, "/**<", 4) == 0,
+		.file = has_file_cmd(raw, len),
+		.last_rank = -1,
+		.last_ranked = SEC_BRIEF,
 	};
 	back_to_details(&st);
-	parse_lines(&st, lines);
+	check_form(&st, raw, len);
+	parse_lines(&st, lines, first);
 	free_str_vec(lines);
 
 	cddoc *doc = NEW(cddoc);
 	doc->params = vec_new(sizeof(cdparam));
 	doc->ret = NULL;
+	doc->ret_move = false;
 	doc->see = new_str_vec();
 	doc->warnings = new_str_vec();
 	doc->notes = new_str_vec();
@@ -698,6 +1046,8 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 	doc->authors = new_str_vec();
 
 	strbuf *brief = strbuf_new();
+	bool brief_cmd = false;
+	size_t brief_line = 0;
 	strbuf *ret = NULL;
 	for (size_t i = 0, n = vec_len(st.secs); i < n; i++) {
 		section *s = vec_get_mut(st.secs, i);
@@ -705,19 +1055,36 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 		strbuf_free(s->text);
 		switch (s->kind) {
 		case SEC_BRIEF:
-			if (strbuf_len(brief) > 0) {
+			if (text[0] == '\0') {
+				diag(&st, "DC5", s->line, "empty @brief");
+			}
+			if (!brief_cmd) {
+				brief_line = s->line;
+			}
+			brief_cmd = true;
+			if (strbuf_len(brief) > 0 && text[0]) {
 				strbuf_append_char(brief, ' ');
 			}
 			unwrap(brief, text);
 			FREE(text);
 			break;
 		case SEC_PARAM: {
-			cdparam p = parse_param(&st, text);
+			cdparam p = parse_param(&st, text, s->line);
 			vec_push(doc->params, &p);
 			FREE(text);
 			break;
 		}
 		case SEC_RETURN:
+			if (starts_with_word(text, "@move")) {
+				doc->ret_move = true;
+				char *rest = trimmed_copy(text + 5);
+				FREE(text);
+				text = rest;
+			}
+			check_legacy(&st, s->line, &text, &doc->ret_move, "@return", NULL);
+			if (text[0] == '\0') {
+				diag(&st, "DC8", s->line, "empty @return");
+			}
 			if (!ret) {
 				ret = strbuf_new();
 			} else {
@@ -727,6 +1094,7 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 			FREE(text);
 			break;
 		case SEC_SEE:
+			check_see(&st, text, s->line);
 			vec_push_rawptr(doc->see, text);
 			break;
 		case SEC_WARNING:
@@ -754,11 +1122,26 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 	doc->ret = ret ? strbuf_detach(ret) : NULL;
 	doc->details = trimmed_copy(strbuf_as_str(st.details));
 	strbuf_free(st.details);
+
+	// DC5: brief
 	if (doc->brief[0] == '\0') {
 		auto_brief(&doc->brief, &doc->details);
-	}
-	if (doc->brief[0] == '\0') {
-		diag(&st, "no brief description");
+		if (!st.member) {
+			if (doc->brief[0] == '\0') {
+				if (!brief_cmd) {
+					diag(&st, "DC5", 0, "no brief description");
+				}
+			} else if (!brief_cmd) {
+				diag(&st, "DC5", first, "no @brief (the first sentence is used)");
+			}
+		}
+	} else {
+		size_t bl = strlen(doc->brief);
+		size_t se = sentence_end(doc->brief, bl);
+		if (se < bl) {
+			diag(&st, "DC5", brief_line, "the brief has more than one sentence; "
+			     "move the rest to the details");
+		}
 	}
 	doc->diags = st.diags;
 	return doc;
@@ -779,22 +1162,6 @@ void cddoc_free(cddoc *self)
 	free_str_vec(self->notes);
 	FREE(self->deprecated);
 	free_str_vec(self->authors);
-	free_str_vec(self->diags);
+	DESTROY(self->diags, finaliser_cons(FNR(vec), finaliser_new(cddiag_finalise)));
 	FREE(self);
-}
-
-
-const char *cdownership_name(cdownership own)
-{
-	switch (own) {
-	case CDO_UNSPECIFIED:
-		return "unspecified";
-	case CDO_NO_TRANSFER:
-		return "no transfer";
-	case CDO_TRANSFER:
-		return "transfer";
-	case CDO_MOVE:
-		return "move";
-	}
-	return "?";
 }

@@ -82,35 +82,43 @@ typedef struct _cdlexer cdlexer;
 
 /**
  * @brief Creates a lexer over @p src.
- * @param src (**no transfer**) The source buffer. Must outlive the lexer
- *        and all tokens produced by it.
+ * @param src The source buffer. Must outlive the lexer and all tokens
+ *        produced by it.
  * @param len The length of @p src.
+ * @return @move The lexer.
  */
 cdlexer *cdlexer_new(const char *src, size_t len);
 
 
 /**
  * @brief Destructor.
+ * @param @move self The lexer.
  */
 void cdlexer_free(cdlexer *self);
 
 
 /**
- * @brief Returns the next token. After the end of input, returns
- *        #CDT_EOF tokens indefinitely.
+ * @brief Returns the next token.
+ * @param self The lexer.
+ * @return The next token. After the end of input, #CDT_EOF tokens are
+ *         returned indefinitely.
  */
 cdtoken cdlexer_next(cdlexer *self);
 
 
 /**
  * @brief Tokenizes the whole buffer @p src.
- * @return A vector of ::cdtoken, not including the final #CDT_EOF.
+ * @param src The source buffer. Must outlive the tokens.
+ * @param len The length of @p src.
+ * @return @move A vector of #cdtoken, not including the final #CDT_EOF.
  */
 vec *cdlex_all(const char *src, size_t len);
 
 
 /**
  * @brief Returns the name of a token type, for debugging.
+ * @param type The token type.
+ * @return The name (static string).
  */
 const char *cdtoken_type_name(cdtoken_type type);
 

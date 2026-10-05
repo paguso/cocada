@@ -46,6 +46,10 @@ $(debug_build_dir) $(test_build_dir) $(release_build_dir):
 
 INCLUDE_CFLAGS = $(addprefix -I, $(cocada_hdr_dirs) $(hdr_dirs) $(test_hdr_dirs)) 
 
+# generate header dependencies (.d files), so that objects are rebuilt
+# when a header they include changes
+DEP_CFLAGS = -MMD -MP
+
 debug_cflags =  -O3
 debug_cflags += -DDEBUG_LVL=1 
 debug_cflags += -DXCHAR_BYTES=4
@@ -53,7 +57,7 @@ debug_cflags += -fpic
 
 
 $(debug_build_dir)/%.o: %.c
-	$(CC) -c $(INCLUDE_CFLAGS) $(debug_cflags) $< -o $@
+	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(debug_cflags) $< -o $@
 
 
 debug_srcs = $(cocada_srcs) $(srcs)
@@ -74,7 +78,7 @@ test_cflags += -DMEM_DEBUG
 test_cflags += -DXCHAR_BYTES=4
 
 $(test_build_dir)/%.o: %.c
-	$(CC) -c $(INCLUDE_CFLAGS) $(test_cflags) $(CFLAGS) $< -o $@
+	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(test_cflags) $(CFLAGS) $< -o $@
 
 test_all_srcs = $(cocada_srcs) $(filter-out main.c, $(srcs)) $(test_srcs)
 test_objs = $(patsubst %.c,$(test_build_dir)/%.o,$(test_all_srcs))
@@ -84,6 +88,8 @@ $(test_objs): | $(test_build_dir)
 .PHONY: test
 test: $(test_objs)
 	$(CC) $(test_objs) -lm -o $(test_build_dir)/test
+
+-include $(debug_objs:.o=.d) $(test_objs:.o=.d)
 
 .PHONY: clean
 clean: 

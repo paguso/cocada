@@ -32,7 +32,7 @@
  * @author Paulo Fonseca
  * @brief Pairs documentation comments with the declarations they document.
  *
- * The matcher walks the token stream produced by ::cdlex_all and, for
+ * The matcher walks the token stream produced by #cdlex_all and, for
  * every documentation comment found at file scope, collects the
  * declaration that immediately follows it. It does not parse C: it only
  * balances brackets and looks at a few landmarks (`typedef`, aggregate
@@ -43,8 +43,9 @@
  * members, each with its own leading `/ ** * /` or trailing `/ **< * /`
  * documentation, if any. Members are recorded whether documented or not.
  *
- * Only documented declarations are returned, as with Doxygen's
- * `EXTRACT_ALL = NO`.
+ * All file-scope declarations are returned, documented or not (#cddecl.doc
+ * is NULL for undocumented ones), except include guards and undocumented
+ * macro invocations (macro-generated APIs are not handled yet).
  */
 
 /**
@@ -66,44 +67,49 @@ typedef enum {
 
 
 /**
- * @brief A documented declaration.
+ * @brief A declaration and its documentation comment.
  */
 typedef struct {
 	cddecl_kind kind; /**< Declaration kind */
 	char *name;       /**< Declared name (heap). For #CDD_FILE, the file name. */
-	char *sig;        /**< Declaration text, whitespace-normalised, aggregate
-	                       bodies elided as `{...}` (heap, may be empty) */
+	char *sig;        /**< Declaration text, with bodies elided as `{...}` (heap) */
 	char *doc;        /**< Raw documentation comment text (heap) or NULL */
 	size_t line;      /**< 1-based line of the declaration */
-	vec *members;     /**< Members of aggregates (vec of ::cddecl), or NULL */
+	size_t doc_line;  /**< 1-based line where the doc comment starts (0 if none) */
+	vec *members;     /**< Members of aggregates (vec of #cddecl), or NULL */
 } cddecl;
 
 
 /**
- * @brief Finaliser. Frees the strings and members of a ::cddecl.
+ * @brief Finaliser: frees the strings and members of a #cddecl.
+ * @param ptr The declaration.
+ * @param fnr Not used.
  * @see new.h
  */
 void cddecl_finalise(void *ptr, const finaliser *fnr);
 
 
 /**
- * @brief Finds the documented declarations in a source buffer.
- * @param src (**no transfer**) The source buffer.
- * @param toks (**no transfer**) The tokens of @p src, as returned by ::cdlex_all.
- * @return A vector of ::cddecl in source order. Destroy with
- *         ::cddecl_vec_free.
+ * @brief Finds the declarations in a source buffer.
+ * @param src The source buffer.
+ * @param toks The tokens of @p src, as returned by #cdlex_all.
+ * @return @move A vector of #cddecl in source order. Destroy with
+ *         #cddecl_vec_free.
  */
 vec *cddecl_match(const char *src, const vec *toks);
 
 
 /**
- * @brief Destroys a vector returned by ::cddecl_match.
+ * @brief Destroys a vector returned by #cddecl_match.
+ * @param @move decls The vector.
  */
 void cddecl_vec_free(vec *decls);
 
 
 /**
  * @brief Returns the name of a declaration kind.
+ * @param kind The kind.
+ * @return The name (static string).
  */
 const char *cddecl_kind_name(cddecl_kind kind);
 

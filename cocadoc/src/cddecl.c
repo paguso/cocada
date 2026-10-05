@@ -261,12 +261,24 @@ static char *declarator_name(const ctx *c, size_t from, size_t to)
 }
 
 
-static cddecl new_decl(cddecl_kind kind, size_t line, char *doc)
+static cddecl new_decl(cddecl_kind kind, size_t line, char *doc, size_t doc_line)
 {
 	cddecl d = {.kind = kind, .name = NULL, .sig = NULL, .doc = doc,
-	            .line = line, .members = NULL
+	            .line = line, .doc_line = doc ? doc_line : 0, .members = NULL
 	           };
 	return d;
+}
+
+
+// Undocumented macro invocations are dropped: macro-generated APIs are
+// not handled yet.
+static void push_decl(vec *out, cddecl *d)
+{
+	if (d->kind == CDD_MACROCALL && !d->doc) {
+		cddecl_finalise(d, NULL);
+	} else {
+		vec_push(out, d);
+	}
 }
 
 
@@ -280,12 +292,14 @@ static void match_members(const ctx *c, size_t bopen, size_t bclose,
 	agg->members = vec_new(sizeof(cddecl));
 	char sep = is_enum ? ',' : ';';
 	char *pending = NULL;
+	size_t pending_line = 0;
 	size_t k = bopen + 1;
 	while (k < bclose) {
 		const cdtoken *t = T(c, k);
 		if (t->type == CDT_DOC) {
 			FREE(pending);
 			pending = tok_str(c, k);
+			pending_line = t->line;
 			k++;
 			continue;
 		}
@@ -295,6 +309,7 @@ static void match_members(const ctx *c, size_t bopen, size_t bclose,
 			cddecl *last = nm ? vec_get_mut(agg->members, nm - 1) : NULL;
 			if (last && !last->doc) {
 				last->doc = tok_str(c, k);
+				last->doc_line = t->line;
 			}
 			k++;
 			continue;
@@ -306,22 +321,25 @@ static void match_members(const ctx *c, size_t bopen, size_t bclose,
 
 		size_t start = k, end = k;
 		char *post = NULL;
+		size_t post_line = 0;
 		while (k < bclose && !is_punct(c, k, sep)) {
 			if (T(c, k)->type == CDT_DOC_POST && !post) {
 				post = tok_str(c, k);
+				post_line = T(c, k)->line;
 			} else if (!is_doc(c, k)) {
 				end = is_open(c, k) ? match_close(c, k) : k;
 			}
 			k = next_top(c, k);
 		}
 
-		cddecl m = new_decl(CDD_MEMBER, T(c, start)->line, pending);
+		cddecl m = new_decl(CDD_MEMBER, T(c, start)->line, pending, pending_line);
 		pending = NULL;
 		if (post) {
 			if (m.doc) {
 				FREE(post);
 			} else {
 				m.doc = post;
+				m.doc_line = post_line;
 			}
 		}
 		m.name = is_enum ? tok_str(c, start) : declarator_name(c, start, end);
@@ -336,12 +354,14 @@ static void match_members(const ctx *c, size_t bopen, size_t bclose,
  * Declarations
  */
 
-// Matches the declaration starting at j documented by doc (moved).
-// Pushes the result to out. Returns the index after the declaration.
-static size_t match_decl(const ctx *c, size_t j, char *doc, vec *out)
+// Matches the declaration starting at j, documented by doc (moved, may be
+// NULL) starting at doc_line. Pushes the result to out. Returns the index
+// after the declaration.
+static size_t match_decl(const ctx *c, size_t j, char *doc, size_t doc_line,
+                         vec *out)
 {
 	const cdtoken *first = T(c, j);
-	cddecl d = new_decl(CDD_UNKNOWN, first->line, doc);
+	cddecl d = new_decl(CDD_UNKNOWN, first->line, doc, doc_line);
 
 	// #define
 	if (first->type == CDT_PP) {
@@ -350,7 +370,7 @@ static size_t match_decl(const ctx *c, size_t j, char *doc, vec *out)
 		while (i < len && isblank((unsigned char)s[i])) i++;
 		if (strncmp(s + i, "if", 2) == 0 && j + 1 < c->n) {
 			// guard, e.g. #ifndef X / #define X: document what follows
-			return match_decl(c, j + 1, doc, out);
+			return match_decl(c, j + 1, doc, doc_line, out);
 		}
 		if (strncmp(s + i, "define", 6) != 0) {
 			FREE(doc); // documents some other directive: ignore
@@ -368,7 +388,7 @@ static size_t match_decl(const ctx *c, size_t j, char *doc, vec *out)
 		} else {
 			d.sig = pp_normalise(s, len, NONE);
 		}
-		vec_push(out, &d);
+		push_decl(out, &d);
 		return j + 1;
 	}
 
@@ -378,7 +398,7 @@ static size_t match_decl(const ctx *c, size_t j, char *doc, vec *out)
 		d.kind = CDD_MACROCALL;
 		d.name = tok_str(c, j);
 		d.sig = join(c, j, close, NONE, NONE);
-		vec_push(out, &d);
+		push_decl(out, &d);
 		return (close + 1 < c->n && is_punct(c, close + 1, ';')) ? close + 2 : close + 1;
 	}
 
@@ -442,13 +462,16 @@ static size_t match_decl(const ctx *c, size_t j, char *doc, vec *out)
 		d.name = tok_str(c, paren - 1);
 	} else {
 		d.kind = CDD_VAR;
-		d.name = declarator_name(c, has_body ? bclose + 1 : j, end);
+		// the name is before an initializer `= {...}`, or after a body
+		bool init = eq != NONE && (!has_body || eq < bopen);
+		d.name = declarator_name(c, (has_body && !init) ? bclose + 1 : j,
+		                         init ? eq - 1 : end);
 	}
 	d.sig = join(c, j, end, has_body ? bopen : NONE, bclose);
 	if (has_body && agg_kw != NONE && agg_kw < bopen) {
 		match_members(c, bopen, bclose, is_word(c, agg_kw, "enum"), &d);
 	}
-	vec_push(out, &d);
+	push_decl(out, &d);
 	return next;
 }
 
@@ -471,37 +494,75 @@ static char *file_tag(const char *s, size_t len)
 }
 
 
+// For a preprocessor directive token, checks whether it is `#dir` and
+// returns the identifier that follows (heap, NULL if none).
+static char *pp_name(const ctx *c, size_t i, const char *dir)
+{
+	const char *s = c->src + T(c, i)->pos;
+	size_t len = T(c, i)->len, k = 1, dl = strlen(dir);
+	while (k < len && isblank((unsigned char)s[k])) k++;
+	if (k + dl > len || strncmp(s + k, dir, dl) != 0
+	        || (k + dl < len && (isalnum((unsigned char)s[k + dl]) || s[k + dl] == '_'))) {
+		return NULL;
+	}
+	k += dl;
+	while (k < len && isblank((unsigned char)s[k])) k++;
+	size_t nm = k;
+	while (k < len && (isalnum((unsigned char)s[k]) || s[k] == '_')) k++;
+	return (k > nm) ? cstr_clone_len(s + nm, k - nm) : NULL;
+}
+
+
 vec *cddecl_match(const char *src, const vec *toks)
 {
 	ctx c = {.src = src, .toks = toks, .n = vec_len(toks)};
 	vec *out = vec_new(sizeof(cddecl));
-	int depth = 0;
+	char *guard = NULL; // name of the last #ifndef, for include guards
 	size_t i = 0;
 	while (i < c.n) {
 		const cdtoken *t = T(&c, i);
-		if (t->type == CDT_DOC && depth == 0) {
+		if (t->type == CDT_DOC) {
 			char *fname = file_tag(src + t->pos, t->len);
 			if (fname) {
-				cddecl d = new_decl(CDD_FILE, t->line, tok_str(&c, i));
+				cddecl d = new_decl(CDD_FILE, t->line, tok_str(&c, i), t->line);
 				d.name = fname;
 				d.sig = cstr_new(0);
 				vec_push(out, &d);
 				i++;
 			} else if (i + 1 < c.n && T(&c, i + 1)->type != CDT_DOC
 			           && !is_close(&c, i + 1)) {
-				i = match_decl(&c, i + 1, tok_str(&c, i), out);
+				i = match_decl(&c, i + 1, tok_str(&c, i), t->line, out);
 			} else {
 				i++; // orphan doc comment
 			}
 			continue;
 		}
-		if (is_punct(&c, i, '{')) {
-			depth++;
-		} else if (is_punct(&c, i, '}') && depth > 0) {
-			depth--;
+		if (t->type == CDT_PP) {
+			char *name = pp_name(&c, i, "ifndef");
+			if (name) {
+				FREE(guard);
+				guard = name;
+				i++;
+				continue;
+			}
+			name = pp_name(&c, i, "define");
+			bool is_guard = name && guard && strcmp(name, guard) == 0;
+			if (name && !is_guard) {
+				match_decl(&c, i, NULL, 0, out);
+			}
+			FREE(name);
+			i++;
+			continue;
 		}
-		i++;
+		if (t->type == CDT_DOC_POST || is_punct(&c, i, ';') || is_close(&c, i)) {
+			i++;
+			continue;
+		}
+		// undocumented declaration (function bodies are skipped by match_decl)
+		size_t next = match_decl(&c, i, NULL, 0, out);
+		i = (next > i) ? next : i + 1;
 	}
+	FREE(guard);
 	return out;
 }
 

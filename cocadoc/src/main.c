@@ -27,6 +27,7 @@
 #include "cddecl.h"
 #include "cddoc.h"
 #include "cdlexer.h"
+#include "cdlint.h"
 #include "cli.h"
 #include "new.h"
 
@@ -38,6 +39,8 @@ cliparser *create_cli_parser()
 	                     "Dump the token stream of each input file (debug)"));
 	cliparser_add_option(clip, cliopt_new_defaults('d', "decls",
 	                     "Dump the documented declarations of each input file (debug)"));
+	cliparser_add_option(clip, cliopt_new_defaults('l', "lint",
+	                     "Check the documentation comments against the COCADA style"));
 	cliparser_add_option(clip, cliopt_new_defaults('D', "docs",
 	                     "Dump the parsed documentation of each declaration (debug)"));
 	cliparser_add_pos_arg(clip, cliarg_new_multi("files", "C source/header files",
@@ -167,13 +170,12 @@ static void print_doc(const char *path, const cddecl *d, bool member)
 	for (size_t i = 0, n = vec_len(doc->params); i < n; i++) {
 		const cdparam *p = vec_get(doc->params, i);
 		char label[64];
-		snprintf(label, sizeof(label), "param %s%s%s%s:", p->name,
-		         p->own ? " (" : "", p->own ? cdownership_name(p->own) : "", p->own ? ")" : "");
+		snprintf(label, sizeof(label), "param %s%s:", p->move ? "@move " : "", p->name);
 		printf("\t\t%s\n", label);
 		print_field("", p->desc);
 	}
 	if (doc->ret) {
-		print_field("return:", doc->ret);
+		print_field(doc->ret_move ? "return @move:" : "return:", doc->ret);
 	}
 	print_str_vec("see:", doc->see);
 	print_str_vec("warning:", doc->warnings);
@@ -186,9 +188,8 @@ static void print_doc(const char *path, const cddecl *d, bool member)
 		print_field("details:", doc->details);
 	}
 	for (size_t i = 0, n = vec_len(doc->diags); i < n; i++) {
-		fprintf(stderr, "%s:%zu: %s: %s\n", path, d->line, d->name,
-		        (const char *)vec_get_rawptr(doc->diags, i));
-		print_field("DIAG:", vec_get_rawptr(doc->diags, i));
+		const cddiag *dg = vec_get(doc->diags, i);
+		printf("\t\t[%s] line %zu: %s\n", dg->rule, d->doc_line + dg->line, dg->msg);
 	}
 	cddoc_free(doc);
 }
@@ -210,6 +211,27 @@ static void dump_docs(const char *path, const char *src, size_t len)
 }
 
 
+#define NRULES 15
+
+// Prints the style warnings of a file. Counts them per rule in counts.
+static size_t lint_file(const char *path, const char *src, size_t len,
+                        size_t counts[NRULES])
+{
+	vec *warns = cdlint(path, src, len);
+	size_t n = vec_len(warns);
+	for (size_t i = 0; i < n; i++) {
+		const cdwarn *w = vec_get(warns, i);
+		printf("%s:%zu: warning: [%s] %s: %s\n", path, w->line, w->rule, w->name, w->msg);
+		int r = atoi(w->rule + 2);
+		if (r > 0 && r < NRULES) {
+			counts[r]++;
+		}
+	}
+	cdwarn_vec_free(warns);
+	return n;
+}
+
+
 int main(int argc, char **argv)
 {
 	cliparser *clip = create_cli_parser();
@@ -218,6 +240,8 @@ int main(int argc, char **argv)
 	bool tokens = cliparser_opt_used_from_shortname(clip, 't');
 	bool decls = cliparser_opt_used_from_shortname(clip, 'd');
 	bool docs = cliparser_opt_used_from_shortname(clip, 'D');
+	bool lint = cliparser_opt_used_from_shortname(clip, 'l');
+	size_t nwarns = 0, counts[NRULES] = {0};
 	const vec *files = cliparser_arg_val_from_pos(clip, 0);
 
 	int ret = EXIT_SUCCESS;
@@ -239,7 +263,22 @@ int main(int argc, char **argv)
 		if (docs) {
 			dump_docs(path, src, len);
 		}
+		if (lint) {
+			nwarns += lint_file(path, src, len, counts);
+		}
 		FREE(src);
+	}
+
+	if (lint) {
+		fprintf(stderr, "%zu warning%s", nwarns, nwarns == 1 ? "" : "s");
+		const char *sep = " (";
+		for (int r = 1; r < NRULES; r++) {
+			if (counts[r]) {
+				fprintf(stderr, "%sDC%d: %zu", sep, r, counts[r]);
+				sep = ", ";
+			}
+		}
+		fprintf(stderr, "%s\n", nwarns ? ")" : "");
 	}
 
 	DESTROY_FLAT(clip, cliparser);

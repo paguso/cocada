@@ -22,6 +22,7 @@
 #ifndef CDDOC_H
 #define CDDOC_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "vec.h"
@@ -32,47 +33,36 @@
  * @brief Parser for documentation comments.
  *
  * Turns the raw text of a `/ ** ... * /` (or `/ **< ... * /`) comment into
- * a structured ::cddoc. The comment syntax (delimiters and the leading
+ * a structured #cddoc. The comment syntax (delimiters and the leading
  * `*` column) is removed, and Doxygen-style block commands are split into
  * fields:
  *
  * command                     | field
  * ----------------------------|----------------------------------
- * `@brief`                    | cddoc::brief
- * `@param`                    | cddoc::params
- * `@return`, `@returns`       | cddoc::ret
- * `@see`                      | cddoc::see
- * `@warning`, `@warn`         | cddoc::warnings
- * `@note`                     | cddoc::notes
- * `@deprecated`               | cddoc::deprecated
- * `@author`                   | cddoc::authors
- * `@par title`                | a bold title in cddoc::details
- * `@code`/`@endcode`          | a fenced code block
+ * `@brief`                    | #cddoc.brief
+ * `@param [@move] name text`  | #cddoc.params
+ * `@return [@move] text`      | #cddoc.ret
+ * `@see`                      | #cddoc.see
+ * `@warning`                  | #cddoc.warnings
+ * `@note`                     | #cddoc.notes
+ * `@deprecated`               | #cddoc.deprecated
+ * `@author`                   | #cddoc.authors
  *
- * As in Doxygen, a block command extends until a blank line or the next
- * block command, and may also start in the middle of a line. Text outside
- * block commands goes to cddoc::details. Without `@brief`, the first
- * sentence of the details is the brief (Doxygen's `JAVADOC_AUTOBRIEF`).
+ * A block command extends until a blank line or the next block command,
+ * and may also start in the middle of a line. Text outside block commands
+ * goes to #cddoc.details. Member docs (`/ **< ... * /`) have no block
+ * commands: their first sentence is the brief.
  *
- * All text is kept as Markdown. Inline commands (`@p x`, `#sym`, `::sym`)
- * are left as they are, to be resolved later. Nothing inside code spans
- * or code blocks is interpreted.
+ * All text is kept as Markdown. Inline references (`@p x`, `#sym`) are
+ * left as they are, to be resolved later. Nothing inside code spans or
+ * code blocks is interpreted.
  *
- * Problems found in the comment (unknown commands, likely misuse of
- * `@par`, `@param` without a name) are reported in cddoc::diags.
+ * The comment is also checked against the COCADA documentation comment
+ * style (`doc/comment-style.md`). Deviations are reported in
+ * #cddoc.diags, tagged with the rule they break (e.g. `DC6`). The parser
+ * still accepts the deprecated forms it reports (e.g. `@returns`,
+ * `(**move**)`), so that the documentation is complete in the meantime.
  */
-
-
-/**
- * @brief Ownership of a parameter, as annotated in its description,
- * e.g. `@param buf (**move**) The buffer`.
- */
-typedef enum {
-	CDO_UNSPECIFIED = 0, /**< No annotation */
-	CDO_NO_TRANSFER,     /**< `(**no transfer**)` */
-	CDO_TRANSFER,        /**< `(**transfer**)` */
-	CDO_MOVE             /**< `(**move**)` */
-} cdownership;
 
 
 /**
@@ -80,9 +70,20 @@ typedef enum {
  */
 typedef struct {
 	char *name;          /**< Parameter name (heap) */
-	cdownership own;     /**< Ownership annotation */
-	char *desc;          /**< Description, without the annotation (heap) */
+	bool move;           /**< Ownership moves to the function (`@param @move`) */
+	char *desc;          /**< Description (heap) */
+	size_t line;         /**< 0-based line of the `@param` in the comment */
 } cdparam;
+
+
+/**
+ * @brief A deviation from the documentation comment style.
+ */
+typedef struct {
+	const char *rule;    /**< Rule ID, e.g. "DC6" (static) */
+	size_t line;         /**< 0-based line in the comment */
+	char *msg;           /**< Message (heap) */
+} cddiag;
 
 
 /**
@@ -94,28 +95,31 @@ typedef struct {
 typedef struct {
 	char *brief;       /**< Brief description ("" if none) */
 	char *details;     /**< Detailed description ("" if none) */
-	vec  *params;      /**< Parameters (vec of ::cdparam) */
+	vec  *params;      /**< Parameters (vec of #cdparam) */
 	char *ret;         /**< Return value description, or NULL */
+	bool ret_move;     /**< Ownership of the return value moves to the caller */
 	vec  *see;         /**< `@see` entries (vec of char *) */
 	vec  *warnings;    /**< Warnings (vec of char *) */
 	vec  *notes;       /**< Notes (vec of char *) */
 	char *deprecated;  /**< Deprecation text ("" if no text), or NULL */
 	vec  *authors;     /**< Authors (vec of char *) */
-	vec  *diags;       /**< Problems found in the comment (vec of char *) */
+	vec  *diags;       /**< Style deviations (vec of #cddiag) */
 } cddoc;
 
 
 /**
  * @brief Parses a documentation comment.
- * @param raw (**no transfer**) The comment text, including its
- *        delimiters, e.g. as stored in ::cddecl.
+ * @param raw The comment text, including its delimiters, e.g. as stored
+ *        in #cddecl.
  * @param len The length of @p raw.
+ * @return @move The parsed comment.
  */
 cddoc *cddoc_parse(const char *raw, size_t len);
 
 
 /**
  * @brief Destructor.
+ * @param @move self The parsed comment.
  */
 void cddoc_free(cddoc *self);
 
@@ -123,17 +127,13 @@ void cddoc_free(cddoc *self);
 /**
  * @brief Returns the comment text with the comment syntax removed: the
  * delimiters, the leading `*` column and the common indentation.
- * @param raw (**no transfer**) The comment text.
+ * @param raw The comment text.
  * @param len The length of @p raw.
- * @return A vector of lines (vec of heap char *), with no leading or
+ * @return @move A vector of lines (vec of heap char *), with no leading or
  *         trailing blank lines.
  */
 vec *cddoc_strip(const char *raw, size_t len);
 
 
-/**
- * @brief Returns the name of an ownership annotation, e.g. "move".
- */
-const char *cdownership_name(cdownership own);
 
 #endif
