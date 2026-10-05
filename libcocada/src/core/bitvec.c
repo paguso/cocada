@@ -47,17 +47,17 @@ static const size_t MIN_CAP = BYTESIZE; // Must be a multiple of BYTESIZE
  * the bit buffer. memcpy compiles to a single load where the hardware
  * allows unaligned access, and is correct everywhere else.
  */
-#define LOAD_WORD_IMPL(TYPE) \
+#define IMPL_LOAD_WORD(TYPE) \
 	static inline TYPE _load_##TYPE(const byte_t *src) { \
 		TYPE w; \
 		memcpy(&w, src, sizeof(TYPE)); \
 		return w; \
 	}
 
-LOAD_WORD_IMPL(ullong)
-LOAD_WORD_IMPL(ulong)
-LOAD_WORD_IMPL(uint)
-LOAD_WORD_IMPL(ushort)
+IMPL_LOAD_WORD(ullong)
+IMPL_LOAD_WORD(ulong)
+IMPL_LOAD_WORD(uint)
+IMPL_LOAD_WORD(ushort)
 
 struct _bitvec {
 	byte_t *bits;

@@ -34,30 +34,30 @@
 
 
 
-#define DIVFLOOR_IMPL( TYPE , ...)\
+#define IMPL_DIVFLOOR( TYPE , ...)\
 	TYPE divfloor_##TYPE(TYPE num, TYPE den) {\
 		return num / den;\
 	}
 
-XX_UNSIGNED_INT(DIVFLOOR_IMPL)
+XX_UNSIGNED_INT(IMPL_DIVFLOOR)
 
 
-#define DIVCEIL_IMPL( TYPE , ...)\
+#define IMPL_DIVCEIL( TYPE , ...)\
 	TYPE divceil_##TYPE(TYPE num, TYPE den) {\
 		return (num == 0) ? 0 : 1 + ((num - 1) / den);\
 	}
 
-XX_UNSIGNED_INT(DIVCEIL_IMPL)
+XX_UNSIGNED_INT(IMPL_DIVCEIL)
 
 
-#define POW2CEIL_IMPL( TYPE, ... )\
+#define IMPL_POW2CEIL( TYPE, ... )\
 	TYPE pow2ceil_##TYPE( TYPE val ) {\
 		TYPE pow = 1;\
 		while (pow < val) pow *= 2;\
 		return pow;\
 	}
 
-XX_UNSIGNED_INT(POW2CEIL_IMPL)
+XX_UNSIGNED_INT(IMPL_POW2CEIL)
 
 
 uint64_t mod_sum(uint64_t a, uint64_t b, uint64_t m)
@@ -187,7 +187,7 @@ uint64_t prime_succ(uint64_t n)
 #define __uint64_t_max UINT32_MAX
 #define __byte_t_max BYTE_MAX
 
-#define AVG_IMPL(TYPE, ...)\
+#define IMPL_AVG(TYPE, ...)\
 	double average_##TYPE(TYPE *vals, size_t n)\
 	{\
 		double avg = 0;\
@@ -203,7 +203,7 @@ uint64_t prime_succ(uint64_t n)
 		return avg;\
 	}
 
-XX_UNSIGNED_INT(AVG_IMPL)
+XX_UNSIGNED_INT(IMPL_AVG)
 
 /*double average_uint64_t(uint64_t *vals, size_t n)
 {
@@ -225,7 +225,7 @@ XX_UNSIGNED_INT(AVG_IMPL)
 	{ TMP = X; X = Y; Y = TMP;}
 
 
-#define _PARTITION(TYPE, ...)\
+#define IMPL__PARTITION(TYPE, ...)\
 	static size_t _partition_##TYPE(TYPE *v, size_t l, size_t r) {\
 		assert(l < r);\
 		TYPE tmp;\
@@ -245,10 +245,10 @@ XX_UNSIGNED_INT(AVG_IMPL)
 		return j;\
 	}
 
-XX_PRIMITIVES(_PARTITION)
+XX_PRIMITIVES(IMPL__PARTITION)
 
 
-#define KTH_SMALLEST_IMPL(TYPE, ...)\
+#define IMPL_KTH_SMALLEST(TYPE, ...)\
 	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty)\
 	{\
 		assert(k < len);\
@@ -275,15 +275,15 @@ XX_PRIMITIVES(_PARTITION)
 		return ret;\
 	}
 
-XX_PRIMITIVES(KTH_SMALLEST_IMPL)
+XX_PRIMITIVES(IMPL_KTH_SMALLEST)
 
 
-#define MEDIAN_IMPL(TYPE, ...)\
+#define IMPL_MEDIAN(TYPE, ...)\
 	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty)\
 	{\
 		return kth_smallest_##TYPE(v, len, len/2, dirty);\
 	}
 
-XX_PRIMITIVES(MEDIAN_IMPL)
+XX_PRIMITIVES(IMPL_MEDIAN)
 
 

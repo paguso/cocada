@@ -79,21 +79,21 @@ void stack_pop(stack *s, void *dest);
 void stack_peek(stack *s, void *dest);
 
 
-#define STACK_PUSH_DECL( TYPE ) \
+#define DECL_STACK_PUSH( TYPE ) \
 	void stack_push_##TYPE(stack *s, TYPE val);
 
-#define STACK_POP_DECL( TYPE ) \
+#define DECL_STACK_POP( TYPE ) \
 	TYPE stack_pop_##TYPE(stack *q);
 
-#define STACK_PEEK_DECL( TYPE ) \
+#define DECL_STACK_PEEK( TYPE ) \
 	TYPE stack_peek_##TYPE(stack *q);
 
-#define STACK_ALL_DECL( TYPE , ...) \
-	STACK_PUSH_DECL(TYPE) \
-	STACK_POP_DECL(TYPE)\
-	STACK_PEEK_DECL(TYPE)
+#define DECL_STACK_ALL( TYPE , ...) \
+	DECL_STACK_PUSH(TYPE) \
+	DECL_STACK_POP(TYPE)\
+	DECL_STACK_PEEK(TYPE)
 
-XX_CORETYPES(STACK_ALL_DECL)
+XX_CORETYPES(DECL_STACK_ALL)
 
 
 #endif

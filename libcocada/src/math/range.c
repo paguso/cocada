@@ -28,7 +28,7 @@
 
 
 
-#define RANGE_ARR_IMPL(TYPE, ...)\
+#define IMPL_RANGE_ARR(TYPE, ...)\
 	size_t range_arr_len_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step)\
 	{\
 		if (from == to) {\
@@ -69,4 +69,4 @@
 		return (range_##TYPE){.n = n, .arr = arr};\
 	}\
 
-XX_INTS(RANGE_ARR_IMPL)
+XX_INTS(IMPL_RANGE_ARR)

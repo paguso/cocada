@@ -193,13 +193,13 @@ bool avl_del(avl *self, void *key);
 
 
 
-#define AVL_DECLARE_ALL(TYPE, ...)\
+#define DECL_AVL_ALL(TYPE, ...)\
 	bool avl_contains_##TYPE(const avl *self, TYPE val);\
 	bool avl_ins_##TYPE(avl *self, TYPE val);\
 	bool avl_del_##TYPE(avl *self, TYPE val);
 
 
-XX_CORETYPES(AVL_DECLARE_ALL)
+XX_CORETYPES(DECL_AVL_ALL)
 
 
 /**

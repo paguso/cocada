@@ -141,30 +141,30 @@ void minqueue_min_cpy(const minqueue *queue, void *dest)
 }
 
 
-#define MINQUEUE_PUSH_IMPL( TYPE )\
+#define IMPL_MINQUEUE_PUSH( TYPE )\
 	void minqueue_push_##TYPE(minqueue *queue, TYPE val) {\
 		minqueue_push(queue, &val);\
 	}
 
 
-#define MINQUEUE_POP_IMPL( TYPE )\
+#define IMPL_MINQUEUE_POP( TYPE )\
 	TYPE minqueue_pop_##TYPE(minqueue *queue) {\
 		TYPE ret;\
 		minqueue_pop(queue, &ret);\
 		return ret;\
 	}
 
-#define MINQUEUE_FRONT_IMPL( TYPE )\
+#define IMPL_MINQUEUE_FRONT( TYPE )\
 	TYPE minqueue_front_##TYPE(const minqueue *queue) {\
 		return deque_front_##TYPE(queue->elts);\
 	}
 
-#define MINQUEUE_BACK_IMPL( TYPE )\
+#define IMPL_MINQUEUE_BACK( TYPE )\
 	TYPE minqueue_back_##TYPE(const minqueue *queue) {\
 		return deque_back_##TYPE(queue->elts);\
 	}
 
-#define MINQUEUE_MIN_IMPL( TYPE )\
+#define IMPL_MINQUEUE_MIN( TYPE )\
 	TYPE minqueue_min_##TYPE(const minqueue *queue){\
 		return ((TYPE *)minqueue_min(queue))[0];\
 	}
@@ -172,14 +172,14 @@ void minqueue_min_cpy(const minqueue *queue, void *dest)
 
 
 
-#define MINQUEUE_ALL_IMPL( TYPE , ... )\
-	MINQUEUE_PUSH_IMPL(TYPE)\
-	MINQUEUE_POP_IMPL(TYPE)\
-	MINQUEUE_FRONT_IMPL(TYPE)\
-	MINQUEUE_BACK_IMPL(TYPE)\
-	MINQUEUE_MIN_IMPL(TYPE)
+#define IMPL_MINQUEUE_ALL( TYPE , ... )\
+	IMPL_MINQUEUE_PUSH(TYPE)\
+	IMPL_MINQUEUE_POP(TYPE)\
+	IMPL_MINQUEUE_FRONT(TYPE)\
+	IMPL_MINQUEUE_BACK(TYPE)\
+	IMPL_MINQUEUE_MIN(TYPE)
 
-XX_CORETYPES(MINQUEUE_ALL_IMPL)
+XX_CORETYPES(IMPL_MINQUEUE_ALL)
 
 /*
 struct _minqueue_iter

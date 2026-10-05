@@ -25,7 +25,7 @@
 
 #include "order.h"
 
-#define CMP_IMPL( TYPE )\
+#define IMPL_CMP( TYPE )\
 	int cmp_##TYPE(const void *pl, const void *pr) {\
 		TYPE l = *((TYPE *)pl);\
 		TYPE r = *((TYPE *)pr);\
@@ -33,15 +33,15 @@
 		else if (l < r) return -1;\
 		else return +1;}
 
-#define EQ_IMPL( TYPE )\
+#define IMPL_EQ( TYPE )\
 	bool eq_##TYPE(const void *pl, const void *pr)\
 	{ return   *((TYPE *)pl) == *((TYPE *)pr); }
 
 
-#define CMPEQ_IMPL( TYPE , ...)\
-	CMP_IMPL( TYPE )\
-	EQ_IMPL( TYPE )
+#define IMPL_CMPEQ( TYPE , ...)\
+	IMPL_CMP( TYPE )\
+	IMPL_EQ( TYPE )
 
-XX_PRIMITIVES(CMPEQ_IMPL)
+XX_PRIMITIVES(IMPL_CMPEQ)
 
-EQ_IMPL(rawptr)
+IMPL_EQ(rawptr)

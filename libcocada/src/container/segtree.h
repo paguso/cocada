@@ -95,12 +95,12 @@ typedef struct __segtree segtree;
 typedef void (*merge_func)(const void *left, const void *right, void *dest);
 
 
-#define SEGTREE_MERGE_DECL(TYPE,...)\
+#define DECL_SEGTREE_MERGE(TYPE,...)\
 	void segtree_merge_sum_##TYPE(const void *left, const void *right, void *dest);\
 	void segtree_merge_min_##TYPE(const void *left, const void *right, void *dest);\
 	void segtree_merge_max_##TYPE(const void *left, const void *right, void *dest);
 
-XX_PRIMITIVES(SEGTREE_MERGE_DECL)
+XX_PRIMITIVES(DECL_SEGTREE_MERGE)
 
 /**
  * @brief Generic constructor
@@ -138,7 +138,7 @@ const void *segtree_qry(segtree *self, size_t pos);
 void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest);
 
 
-#define SEGTREE_OPS_DECL(TYPE, ...)\
+#define DECL_SEGTREE_OPS(TYPE, ...)\
 	void segtree_upd_##TYPE(segtree *self, size_t pos, TYPE val);\
 	\
 	TYPE segtree_qry_##TYPE(segtree *self, size_t pos);\
@@ -146,6 +146,6 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest);
 	TYPE segtree_range_qry_##TYPE(segtree *self, size_t left, size_t right);\
 
 
-XX_CORETYPES(SEGTREE_OPS_DECL)
+XX_CORETYPES(DECL_SEGTREE_OPS)
 
 #endif

@@ -93,24 +93,24 @@ void hashset_del(hashset *set, const void *elt);
 
 
 
-#define HASHSET_CONTAINS_DECL( TYPE ) \
+#define DECL_HASHSET_CONTAINS( TYPE ) \
 	bool hashset_contains_##TYPE(hashset *set, TYPE elt );
 
 
-#define HASHSET_ADD_DECL( TYPE ) \
+#define DECL_HASHSET_ADD( TYPE ) \
 	void hashset_add_##TYPE(hashset *set, TYPE elt );
 
 
-#define HASHSET_DEL_DECL( TYPE ) \
+#define DECL_HASHSET_DEL( TYPE ) \
 	void hashset_del_##TYPE(hashset *set, TYPE elt );
 
 
-#define HASHSET_ALL_DECL( TYPE, ... )\
-	HASHSET_CONTAINS_DECL(TYPE)\
-	HASHSET_ADD_DECL(TYPE)\
-	HASHSET_DEL_DECL(TYPE)
+#define DECL_HASHSET_ALL( TYPE, ... )\
+	DECL_HASHSET_CONTAINS(TYPE)\
+	DECL_HASHSET_ADD(TYPE)\
+	DECL_HASHSET_DEL(TYPE)
 
-XX_CORETYPES(HASHSET_ALL_DECL)
+XX_CORETYPES(DECL_HASHSET_ALL)
 
 typedef struct _hashset_iter hashset_iter;
 

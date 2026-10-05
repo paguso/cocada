@@ -35,7 +35,7 @@
 #define RIGHT 1
 
 
-#define AVL_FIELD_DECL( TYPE, ... ) TYPE TYPE##_val;
+#define DECL_AVL_FIELD( TYPE, ... ) TYPE TYPE##_val;
 
 typedef struct _avlnode {
 	int8_t bf; // balance factor
@@ -117,13 +117,13 @@ const void *avl_get(const avl *self, const void *key)
 }
 
 
-#define AVL_CONTAINS_IMPL(TYPE,...)\
+#define IMPL_AVL_CONTAINS(TYPE,...)\
 	bool avl_contains_##TYPE (const avl *self, TYPE key)\
 	{\
 		return avl_get(self, &key) != NULL;\
 	}
 
-XX_CORETYPES(AVL_CONTAINS_IMPL)
+XX_CORETYPES(IMPL_AVL_CONTAINS)
 
 
 static avlnode *__rotate_left(avlnode *root)
@@ -233,14 +233,14 @@ bool avl_ins(avl *self, void *val)
 }
 
 
-#define AVL_INS_IMPL(TYPE, ...)\
+#define IMPL_AVL_INS(TYPE, ...)\
 	bool avl_ins_##TYPE(avl *self, TYPE val)\
 	{\
 		return avl_ins(self, &val);\
 	}\
 
 
-XX_CORETYPES(AVL_INS_IMPL)
+XX_CORETYPES(IMPL_AVL_INS)
 
 typedef struct {
 	bool height_chgd;
@@ -384,13 +384,13 @@ bool avl_del(avl *self, void *key)
 }
 
 
-#define AVL_DEL_IMPL(TYPE, ...) \
+#define IMPL_AVL_DEL(TYPE, ...) \
 	bool avl_del_##TYPE(avl *self, TYPE val) \
 	{\
 		return avl_del(self, &val);\
 	}
 
-XX_CORETYPES(AVL_DEL_IMPL)
+XX_CORETYPES(IMPL_AVL_DEL)
 
 
 

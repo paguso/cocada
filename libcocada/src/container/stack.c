@@ -64,24 +64,24 @@ void stack_peek(stack *s, void *dest)
 }
 
 
-#define STACK_PUSH_IMPL( TYPE ) \
+#define IMPL_STACK_PUSH( TYPE ) \
 	void stack_push_##TYPE(stack *s, TYPE val)\
 	{ stack_push(s, &val); }
 
 
-#define STACK_POP_IMPL( TYPE ) \
+#define IMPL_STACK_POP( TYPE ) \
 	TYPE stack_pop_##TYPE(stack *q)\
 	{ TYPE val; stack_pop(q, &val); return val;}
 
 
-#define STACK_PEEK_IMPL( TYPE ) \
+#define IMPL_STACK_PEEK( TYPE ) \
 	TYPE stack_peek_##TYPE(stack *q)\
 	{ TYPE val; stack_peek(q, &val); return val;}
 
 
-#define STACK_ALL_IMPL( TYPE , ...) \
-	STACK_PUSH_IMPL(TYPE) \
-	STACK_POP_IMPL(TYPE) \
-	STACK_PEEK_IMPL(TYPE)
+#define IMPL_STACK_ALL( TYPE , ...) \
+	IMPL_STACK_PUSH(TYPE) \
+	IMPL_STACK_POP(TYPE) \
+	IMPL_STACK_PEEK(TYPE)
 
-XX_CORETYPES(STACK_ALL_IMPL)
+XX_CORETYPES(IMPL_STACK_ALL)

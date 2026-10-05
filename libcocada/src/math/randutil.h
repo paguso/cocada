@@ -49,7 +49,7 @@ uint64_t rand_next ();
 /*
  * Generic rand_range declaration
  */
-#define RAND_RANGE_DECL(TYPE)\
+#define DECL_RAND_RANGE(TYPE)\
 	/** Returns a uniformly picked TYPE random number in the range @p min to @p max-1*/\
 	TYPE rand_range_##TYPE(TYPE min, TYPE max);
 
@@ -64,16 +64,16 @@ void shuffle_arr(void *arr, size_t n, size_t typesize);
 /*
  * Generic shuffle_arr declaration
  */
-#define SHUFFLE_ARR_DECL(TYPE)\
+#define DECL_SHUFFLE_ARR(TYPE)\
 	/** Suffles an array of @p n TYPE elements in place */\
 	void shuffle_arr_##TYPE(TYPE *arr, size_t n);
 
 
-#define RAND_ALL_DECL(TYPE, ...)\
-	SHUFFLE_ARR_DECL(TYPE)\
-	RAND_RANGE_DECL(TYPE)
+#define DECL_RAND_ALL(TYPE, ...)\
+	DECL_SHUFFLE_ARR(TYPE)\
+	DECL_RAND_RANGE(TYPE)
 
-XX_INTS(RAND_ALL_DECL)
+XX_INTS(DECL_RAND_ALL)
 
 
 double rand_norm();

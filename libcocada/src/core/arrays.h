@@ -132,12 +132,12 @@ size_t sa_arr_sizeof(void *arr);
 void sa_arr_free(void *arr);
 
 
-#define SA_ARR_DECL(TYPE, ...)\
+#define DECL_SA_ARR(TYPE, ...)\
 	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb);\
 	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb);\
 	size_t sa_arr_##TYPE##_len(TYPE *arr);
 
-XX_CORETYPES(SA_ARR_DECL)
+XX_CORETYPES(DECL_SA_ARR)
 
 /**
  * @brief Allocates a new array of N elements of a given TYPE.

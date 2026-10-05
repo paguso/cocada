@@ -165,7 +165,7 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
 }
 
 
-#define AVLMAP_IMPL(TYPE, ...)\
+#define IMPL_AVLMAP(TYPE, ...)\
 	TYPE avlmap_get_##TYPE(avlmap *self, const void *key){\
 		const void *v = avlmap_get(self, key);\
 		return v ? ((TYPE *)v)[0] : (TYPE)0;\
@@ -175,7 +175,7 @@ void avlmap_remv(avlmap *self, void *key, void *dest_key, void *dest_val)
 		avlmap_ins(self, key, &val);\
 	}\
 
-XX_CORETYPES(AVLMAP_IMPL)
+XX_CORETYPES(IMPL_AVLMAP)
 
 struct _avlmap_iter {
     iter _t_iter;

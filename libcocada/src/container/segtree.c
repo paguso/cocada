@@ -32,7 +32,7 @@
 
 
 
-#define SEGTREE_MERGE_IMPL(TYPE,...)\
+#define IMPL_SEGTREE_MERGE(TYPE,...)\
 	void segtree_merge_sum_##TYPE(const void *left, const void *right, void *dest) {\
 		*((TYPE *)dest) = *((TYPE *)left) + *((TYPE *)right);\
 	}\
@@ -45,7 +45,7 @@
 		*((TYPE *)dest) = MAX(*((TYPE *)left), *((TYPE *)right));\
 	}
 
-XX_PRIMITIVES(SEGTREE_MERGE_IMPL)
+XX_PRIMITIVES(IMPL_SEGTREE_MERGE)
 
 
 
@@ -120,19 +120,19 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 }
 
 
-#define SEGTREE_UPD_IMPL(TYPE)\
+#define IMPL_SEGTREE_UPD(TYPE)\
 	void segtree_upd_##TYPE(segtree *self, size_t pos, TYPE val) {\
 		segtree_upd(self, pos, &val);\
 	}
 
 
-#define SEGTREE_QRY_IMPL(TYPE)\
+#define IMPL_SEGTREE_QRY(TYPE)\
 	TYPE segtree_qry_##TYPE(segtree *self, size_t pos) {\
 		return *((TYPE *)segtree_qry(self, pos));\
 	}
 
 
-#define SEGTREE_RANGE_QRY_IMPL(TYPE)\
+#define IMPL_SEGTREE_RANGE_QRY(TYPE)\
 	TYPE segtree_range_qry_##TYPE(segtree *self, size_t left, size_t right) {\
 		TYPE ret;\
 		segtree_range_qry(self, left, right, &ret);\
@@ -140,10 +140,10 @@ void segtree_range_qry(segtree *self, size_t left, size_t right, void *dest)
 	}
 
 
-#define SEGTREE_ALL_IMPL(TYPE, ...)\
-	SEGTREE_UPD_IMPL(TYPE)\
-	SEGTREE_QRY_IMPL(TYPE)\
-	SEGTREE_RANGE_QRY_IMPL(TYPE)
+#define IMPL_SEGTREE_ALL(TYPE, ...)\
+	IMPL_SEGTREE_UPD(TYPE)\
+	IMPL_SEGTREE_QRY(TYPE)\
+	IMPL_SEGTREE_RANGE_QRY(TYPE)
 
 
-XX_PRIMITIVES(SEGTREE_ALL_IMPL)
+XX_PRIMITIVES(IMPL_SEGTREE_ALL)

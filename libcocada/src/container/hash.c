@@ -24,12 +24,12 @@
 
 #include "hash.h"
 
-#define IDENT_HASH_IMPL( TYPE, ... ) \
+#define IMPL_IDENT_HASH( TYPE, ... ) \
 	uint64_t ident_hash_##TYPE(const void *key) {\
 		return (uint64_t)(*((TYPE *)key));\
 	}
 
-XX_PRIMITIVES(IDENT_HASH_IMPL)
+XX_PRIMITIVES(IMPL_IDENT_HASH)
 
 uint64_t fib_hash(uint64_t key)
 {

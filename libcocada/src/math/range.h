@@ -24,7 +24,7 @@
 
 #include "coretype.h"
 
-#define RANGE_ARR_DECL(TYPE,...)\
+#define DECL_RANGE_ARR(TYPE,...)\
 	typedef struct {\
 		size_t n;\
 		TYPE *arr;\
@@ -35,6 +35,6 @@
 	range_##TYPE range_arr_new_##TYPE(TYPE from, TYPE to, SIGNED(TYPE) step);
 
 
-XX_INTS(RANGE_ARR_DECL)
+XX_INTS(DECL_RANGE_ARR)
 
 #endif

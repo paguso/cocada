@@ -71,7 +71,7 @@ typedef bool (*eq_func)(const void *left, const void *right);
  * containing values of the intended type, which are compared
  * in the usual (compiler-defined) sense.
  */
-#define CMP_DECL( TYPE )\
+#define DECL_CMP( TYPE )\
 	int cmp_##TYPE(const void *left, const void *right);
 
 
@@ -82,18 +82,18 @@ typedef bool (*eq_func)(const void *left, const void *right);
  * containing values of the intended type, which are compared
  * in the usual (compiler-defined) sense.
  */
-#define EQ_DECL( TYPE )\
+#define DECL_EQ( TYPE )\
 	bool eq_##TYPE(const void *left, const void *right);
 
 
 ///@cond
-#define CMPEQ_DECL( TYPE , ...)\
-	CMP_DECL( TYPE )\
-	EQ_DECL( TYPE )
+#define DECL_CMPEQ( TYPE , ...)\
+	DECL_CMP( TYPE )\
+	DECL_EQ( TYPE )
 
-XX_PRIMITIVES(CMPEQ_DECL)
+XX_PRIMITIVES(DECL_CMPEQ)
 
-EQ_DECL(rawptr)
+DECL_EQ(rawptr)
 ////@endcond
 
 

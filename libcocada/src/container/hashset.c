@@ -73,30 +73,30 @@ void hashset_del(hashset *set, const void *elt)
 	hashmap_del(set, elt);
 }
 
-#define HASHSET_CONTAINS_IMPL( TYPE ) \
+#define IMPL_HASHSET_CONTAINS( TYPE ) \
 	bool hashset_contains_##TYPE(hashset *set, TYPE elt ) {\
 		return hashset_contains(set, &elt);\
 	}
 
 
-#define HASHSET_ADD_IMPL( TYPE ) \
+#define IMPL_HASHSET_ADD( TYPE ) \
 	void hashset_add_##TYPE(hashset *set, TYPE elt ) {\
 		hashset_add(set, &elt);\
 	}
 
 
-#define HASHSET_DEL_IMPL( TYPE ) \
+#define IMPL_HASHSET_DEL( TYPE ) \
 	void hashset_del_##TYPE(hashset *set, TYPE elt ) {\
 		hashset_del(set, &elt);\
 	}
 
 
-#define HASHSET_ALL_IMPL( TYPE, ... )\
-	HASHSET_CONTAINS_IMPL(TYPE)\
-	HASHSET_ADD_IMPL(TYPE)\
-	HASHSET_DEL_IMPL(TYPE)
+#define IMPL_HASHSET_ALL( TYPE, ... )\
+	IMPL_HASHSET_CONTAINS(TYPE)\
+	IMPL_HASHSET_ADD(TYPE)\
+	IMPL_HASHSET_DEL(TYPE)
 
-XX_CORETYPES(HASHSET_ALL_IMPL)
+XX_CORETYPES(IMPL_HASHSET_ALL)
 
 
 
