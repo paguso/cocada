@@ -29,6 +29,7 @@
 /**
  * @file cdconfig.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief The configuration file, `cocadoc.config`.
  *
  * A configuration file has one `KEY = value` per line. Text after `//` is

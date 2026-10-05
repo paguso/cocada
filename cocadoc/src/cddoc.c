@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cddoc.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -204,6 +210,7 @@ typedef enum {
 	SEC_AUTHOR,
 	SEC_FILE,
 	SEC_PAR,
+	SEC_AI,
 	SEC_NONE // not a block command
 } sec_kind;
 
@@ -241,6 +248,7 @@ static const cmd_def BLOCK_CMDS[] = {
 	{"deprecated", SEC_DEPRECATED, NULL},
 	{"author", SEC_AUTHOR, NULL},
 	{"file", SEC_FILE, NULL},
+	{"ai", SEC_AI, NULL},
 	// accepted, but not allowed by the style
 	{"short", SEC_BRIEF, "@brief"},
 	{"returns", SEC_RETURN, "@return"},
@@ -1015,6 +1023,56 @@ static void check_form(pstate *st, const char *raw, size_t len)
 }
 
 
+// AI involvement levels (DC15) and their titles
+static const char *AI_LEVELS[][2] = {
+	{"human", "Human"},
+	{"ai-informed", "AI-informed"},
+	{"ai-assisted", "AI-assisted"},
+	{"ai-generated", "AI-generated, human-directed"},
+	{"ai-autonomous", "AI-autonomous"},
+};
+
+
+const char *cdai_level_title(const char *level)
+{
+	for (size_t i = 0; i < sizeof(AI_LEVELS) / sizeof(AI_LEVELS[0]); i++) {
+		if (strcmp(AI_LEVELS[i][0], level) == 0) {
+			return AI_LEVELS[i][1];
+		}
+	}
+	return NULL;
+}
+
+
+// DC15: @ai level, agent
+static cdai parse_ai(pstate *st, const char *text, size_t line)
+{
+	size_t n = strcspn(text, ",");
+	char *lv = cstr_clone_len(text, n);
+	cdai ai = {.level = trimmed_copy(lv), .agent = trimmed_copy(text[n] ? text + n + 1 : "")};
+	FREE(lv);
+	if (!st->file) {
+		diag(st, "DC15", line, "@ai is only used in file comments");
+	}
+	if (!cdai_level_title(ai.level)) {
+		diag(st, "DC15", line, "unknown AI level \"%s\" (one of human, ai-informed, "
+		     "ai-assisted, ai-generated, ai-autonomous)", ai.level);
+	} else if (ai.agent[0] == '\0' && strcmp(ai.level, "human") != 0) {
+		diag(st, "DC15", line, "@ai %s without the AI used, e.g. @ai %s, Claude (Anthropic)",
+		     ai.level, ai.level);
+	}
+	return ai;
+}
+
+
+static void cdai_finalise(void *ptr, const finaliser *fnr)
+{
+	cdai *a = (cdai *)ptr;
+	FREE(a->level);
+	FREE(a->agent);
+}
+
+
 static void cdparam_finalise(void *ptr, const finaliser *fnr)
 {
 	cdparam *p = (cdparam *)ptr;
@@ -1090,6 +1148,7 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 	doc->notes = new_str_vec();
 	doc->deprecated = NULL;
 	doc->authors = new_str_vec();
+	doc->ai = vec_new(sizeof(cdai));
 
 	strbuf *brief = strbuf_new();
 	bool brief_cmd = false;
@@ -1156,6 +1215,12 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 		case SEC_AUTHOR:
 			vec_push_rawptr(doc->authors, text);
 			break;
+		case SEC_AI: {
+			cdai ai = parse_ai(&st, text, s->line);
+			vec_push(doc->ai, &ai);
+			FREE(text);
+			break;
+		}
 		default: // @file: the declaration matcher takes care of it
 			FREE(text);
 			break;
@@ -1209,6 +1274,7 @@ void cddoc_free(cddoc *self)
 	free_str_vec(self->notes);
 	FREE(self->deprecated);
 	free_str_vec(self->authors);
+	DESTROY(self->ai, finaliser_cons(FNR(vec), finaliser_new(cdai_finalise)));
 	DESTROY(self->diags, finaliser_cons(FNR(vec), finaliser_new(cddiag_finalise)));
 	DESTROY(self->refs, finaliser_cons(FNR(vec), finaliser_new(cdref_finalise)));
 	FREE(self);

@@ -31,6 +31,7 @@
 /**
  * @file cdsym.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Symbol table: what the documented names refer to.
  *
  * Indexes the declarations of a set of files by name:

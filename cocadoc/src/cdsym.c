@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cdsym.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <stdint.h>
 #include <string.h>
 

@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cddecl.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>

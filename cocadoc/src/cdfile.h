@@ -29,6 +29,7 @@
 /**
  * @file cdfile.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief A source file loaded for documentation.
  *
  * Holds the contents of a file together with its tokens (#cdlex_all) and

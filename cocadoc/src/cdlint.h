@@ -31,6 +31,7 @@
 /**
  * @file cdlint.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Checks a header against the COCADA documentation comment style.
  *
  * The rules are described in `doc/comment-style.md`. All deviations are

@@ -31,6 +31,7 @@
 /**
  * @file cddecl.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Pairs documentation comments with the declarations they document.
  *
  * The matcher walks the token stream produced by #cdlex_all and, for

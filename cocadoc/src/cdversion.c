@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cdversion.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include "cdversion.h"
 
 

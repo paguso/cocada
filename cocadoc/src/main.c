@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file main.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -310,7 +316,11 @@ static bool write_docs(const char *dir, const vec *files, const cdsymtab *tab,
 	char *index = cdmd_index(files, title);
 	ok = write_file(dir, "index.md", index) && ok;
 	FREE(index);
-	fprintf(stderr, "cocadoc: wrote %zu pages and index.md to %s\n", vec_len(files), dir);
+	char *levels = cdmd_ai_levels_page();
+	ok = write_file(dir, "ai-levels.md", levels) && ok;
+	FREE(levels);
+	fprintf(stderr, "cocadoc: wrote %zu pages, index.md and ai-levels.md to %s\n",
+	        vec_len(files), dir);
 	return ok;
 }
 

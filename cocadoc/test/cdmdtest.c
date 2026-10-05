@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cdmdtest.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <string.h>
 
 #include "CuTest.h"
@@ -39,6 +45,7 @@ static const char *SRC_A =
     "/**\n"
     " * @file a.h\n"
     " * @author A\n"
+    " * @ai ai-generated, Claude (Anthropic)\n"
     " * @brief Module A.\n"
     " *\n"
     " * # Usage\n"
@@ -86,6 +93,8 @@ void test_cdmd_page(CuTest *tc)
 	char *page = cdmd_page(a, tab);
 	// header, navigation, description, contents
 	ASSERT_HAS(page, "# a.h\n\nModule A.\n\n**Author:** A\n\n"
+	           "**AI involvement:** [AI-generated, human-directed](ai-levels.md#ai-generated) "
+	           "(Claude (Anthropic))\n\n"
 	           "[Description](#description) · [Contents](#contents) · "
 	           "[Back to module index](index.md#lib)\n\n## Description\n\n## Usage\n");
 	ASSERT_HAS(page, "## Contents\n\n**Types and constants**\n\n- [point](#point): A point.\n\n"
@@ -123,7 +132,15 @@ void test_cdmd_page(CuTest *tc)
 	char *index = cdmd_index(files, "X 1.0 API Reference");
 	ASSERT_HAS(index, "# X 1.0 API Reference\n\n## lib\n\n- [a.h](a.md): Module A.\n"
 	           "- sub/\n  - [b.h](b.md): Module B.\n");
+	ASSERT_HAS(index, "[AI involvement levels](ai-levels.md)");
 	FREE(index);
+
+	char *levels = cdmd_ai_levels_page();
+	ASSERT_HAS(levels, "# AI involvement levels\n");
+	ASSERT_HAS(levels, "## ai-generated\n\n**AI-generated, human-directed.** Mostly or entirely");
+	ASSERT_HAS(levels, "## human\n");
+	ASSERT_HAS(levels, "## ai-autonomous\n");
+	FREE(levels);
 
 	cdsymtab_free(tab);
 	DESTROY_FLAT(files, vec);

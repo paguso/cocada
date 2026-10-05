@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cdconfig.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <ctype.h>
 #include <dirent.h>
 #include <fnmatch.h>

@@ -29,12 +29,14 @@
 /**
  * @file cdmd.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Markdown documentation pages.
  *
  * Each header gets a page, named after it (`vec.h` → `vec.md`), with:
  *
- * - the header name, brief, authors, and links to the description, the
- *   contents and the module's entry in the index;
+ * - the header name, brief, authors, AI involvement (linking to the page
+ *   explaining the levels, #cdmd_ai_levels_page), and links to the
+ *   description, the contents and the module's entry in the index;
  * - a description section (the module documentation, from the file
  *   comment);
  * - a contents section, listing the types and constants, functions and
@@ -80,6 +82,14 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab);
  * @return @move The page (Markdown).
  */
 char *cdmd_index(const vec *files, const char *title);
+
+
+/**
+ * @brief Generates the page explaining the AI involvement levels
+ * (`ai-levels.md`), which the pages and the index link to.
+ * @return @move The page (Markdown).
+ */
+char *cdmd_ai_levels_page();
 
 
 /**

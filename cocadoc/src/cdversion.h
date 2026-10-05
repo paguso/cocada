@@ -27,6 +27,7 @@
 /**
  * @file cdversion.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief The version of cocadoc.
  */
 

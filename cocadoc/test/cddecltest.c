@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cddecltest.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <string.h>
 
 #include "CuTest.h"

@@ -91,6 +91,44 @@ file comment with, in this order:
 - `@brief` is one sentence describing the module.
 - The rest is the module documentation, shown at the top of the module's
   page (section 10).
+- If AI was involved in writing the file, the file comment also declares it
+  with `@ai` (DC15), after the `@author`s.
+
+### DC15. AI involvement
+
+The file comment declares how much AI was involved in writing the file, with
+one `@ai` line per AI used:
+
+```c
+/**
+ * @file cdlexer.h
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ * @brief Lightweight C tokenizer for cocadoc.
+ */
+```
+
+The level is one of:
+
+| level | meaning |
+|---|---|
+| `human` | Written by humans. AI was not used, or only like a search engine. |
+| `ai-informed` | Written by humans. AI explained, reviewed or suggested approaches, but wrote none of the code. |
+| `ai-assisted` | Mostly written by humans. AI wrote parts (fixes, functions, tests) that a human reviewed and integrated. |
+| `ai-generated` | Mostly or entirely written by AI, directed by a human: the human set the requirements and design decisions, and reviewed and approved the result. |
+| `ai-autonomous` | Written by AI with little or no human direction or review. |
+
+The level is about who wrote the code and who directed and checked it, not
+about the share of lines, which cannot be measured reliably. When parts of a
+file are at different levels, the level describes the bulk of it. In every
+case, the human who commits the file is responsible for it.
+
+After the level comes the AI used, e.g. `Claude (Anthropic)` (not needed for
+`human`). `@ai` is only used in file comments: the level applies to the
+whole file.
+
+The generated documentation shows the AI involvement of each header, with a
+link to a page explaining the levels (`ai-levels.md`).
 
 ---
 
@@ -145,6 +183,7 @@ Only these block commands are used:
 |---|---|---|
 | `@file name` | file comment | DC3 |
 | `@author name` | file comment | DC3 |
+| `@ai level, agent` | file comment | DC15 |
 | `@brief text` | every comment | DC5 |
 | `@param [@move] name text` | functions and function-like macros | DC8, DC9 |
 | `@return [@move] text` | functions returning a value | DC8, DC9 |
@@ -335,7 +374,8 @@ macro's own parameters.
 
 ## 10. Documentation pages
 
-Each header gets one documentation page, with these sections:
+Each header gets one documentation page, which shows its authors and AI
+involvement (DC15), with these sections:
 
 1. The module documentation (the file comment).
 2. Types, enums, unions and constants.
@@ -353,6 +393,7 @@ Each header gets one documentation page, with these sections:
 | DC1 | one-line comments; text on the `/**` or `*/` line; `**/` |
 | DC2 | member docs on several lines, with block commands, or not as a trailing `/**<` |
 | DC3 | no file comment; `@file` name different from the file name; no `@author` |
+| DC15 | unknown `@ai` level; no AI named; `@ai` outside a file comment |
 | DC4 | undocumented public declarations and members |
 | DC5 | missing or empty `@brief`; briefs with more than one sentence |
 | DC6 | commands other than those of DC6, including typos like `@src` |

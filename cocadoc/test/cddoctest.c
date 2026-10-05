@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cddoctest.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <string.h>
 
 #include "CuTest.h"
@@ -346,6 +352,49 @@ void test_cddoc_form(CuTest *tc)
 }
 
 
+void test_cddoc_ai(CuTest *tc)
+{
+	memdbg_reset();
+	cddoc *doc = parse(
+	                 "/**\n"
+	                 " * @file x.h\n"
+	                 " * @author A\n"
+	                 " * @ai ai-generated, Claude (Anthropic)\n"
+	                 " * @ai ai-assisted,Other AI\n"
+	                 " * @brief X.\n"
+	                 " */");
+	CuAssertSizeTEquals(tc, 2, vec_len(doc->ai));
+	const cdai *ai = vec_get(doc->ai, 0);
+	CuAssertStrEquals(tc, "ai-generated", ai->level);
+	CuAssertStrEquals(tc, "Claude (Anthropic)", ai->agent);
+	ai = vec_get(doc->ai, 1);
+	CuAssertStrEquals(tc, "ai-assisted", ai->level);
+	CuAssertStrEquals(tc, "Other AI", ai->agent);
+	CuAssertStrEquals(tc, "X.", doc->brief);
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @file x.h\n * @author A\n * @ai human\n * @brief X.\n */");
+	CuAssertStrEquals(tc, "", ((cdai *)vec_get(doc->ai, 0))->agent);
+	CuAssertSizeTEquals(tc, 0, vec_len(doc->diags));
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @file x.h\n * @author A\n * @ai ai-written, Claude\n"
+	            " * @ai ai-assisted\n * @brief X.\n */");
+	ASSERT_DIAG(doc, "DC15", "unknown AI level \"ai-written\"");
+	ASSERT_DIAG(doc, "DC15", "@ai ai-assisted without the AI used");
+	cddoc_free(doc);
+
+	doc = parse("/**\n * @brief F.\n * @ai ai-generated, Claude (Anthropic)\n */");
+	ASSERT_DIAG(doc, "DC15", "only used in file comments");
+	cddoc_free(doc);
+
+	CuAssertStrEquals(tc, "AI-generated, human-directed", cdai_level_title("ai-generated"));
+	CuAssertTrue(tc, cdai_level_title("nonsense") == NULL);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
 CuSuite *cddoc_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("cddoc");
@@ -356,5 +405,6 @@ CuSuite *cddoc_get_test_suite()
 	SUITE_ADD_TEST(suite, test_cddoc_code);
 	SUITE_ADD_TEST(suite, test_cddoc_text_rules);
 	SUITE_ADD_TEST(suite, test_cddoc_form);
+	SUITE_ADD_TEST(suite, test_cddoc_ai);
 	return suite;
 }

@@ -29,6 +29,7 @@
 /**
  * @file cdlexer.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Lightweight C tokenizer for cocadoc.
  *
  * This is not a full C lexer. It splits a C source buffer into

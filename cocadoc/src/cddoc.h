@@ -30,6 +30,7 @@
 /**
  * @file cddoc.h
  * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
  * @brief Parser for documentation comments.
  *
  * Turns the raw text of a `/ ** ... * /` (or `/ **< ... * /`) comment into
@@ -47,6 +48,7 @@
  * `@note`                     | #cddoc.notes
  * `@deprecated`               | #cddoc.deprecated
  * `@author`                   | #cddoc.authors
+ * `@ai level, agent`          | #cddoc.ai
  *
  * A block command extends until a blank line or the next block command,
  * and may also start in the middle of a line. Text outside block commands
@@ -87,6 +89,15 @@ typedef struct {
 
 
 /**
+ * @brief A declared AI involvement, `@ai level, agent` (DC15).
+ */
+typedef struct {
+	char *level;         /**< Level, e.g. "ai-generated" (heap) */
+	char *agent;         /**< The AI, e.g. "Claude (Anthropic)" (heap, may be empty) */
+} cdai;
+
+
+/**
  * @brief Kinds of references in a comment.
  */
 typedef enum {
@@ -124,6 +135,7 @@ typedef struct {
 	vec  *notes;       /**< Notes (vec of char *) */
 	char *deprecated;  /**< Deprecation text ("" if no text), or NULL */
 	vec  *authors;     /**< Authors (vec of char *) */
+	vec  *ai;          /**< AI involvement (vec of #cdai) */
 	vec  *refs;        /**< References, in order (vec of #cdref) */
 	vec  *diags;       /**< Style deviations (vec of #cddiag) */
 } cddoc;
@@ -144,6 +156,15 @@ cddoc *cddoc_parse(const char *raw, size_t len);
  * @param @move self The parsed comment.
  */
 void cddoc_free(cddoc *self);
+
+
+/**
+ * @brief Returns the title of an AI involvement level.
+ * @param level A level, e.g. "ai-generated".
+ * @return The title, e.g. "AI-generated, human-directed" (static string),
+ *         or NULL if @p level is not a level.
+ */
+const char *cdai_level_title(const char *level);
 
 
 /**

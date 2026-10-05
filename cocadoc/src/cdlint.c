@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file cdlint.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>

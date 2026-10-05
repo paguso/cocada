@@ -19,6 +19,12 @@
  *
  */
 
+/**
+ * @file alltests.c
+ * @author Paulo Fonseca
+ * @ai ai-generated, Claude (Anthropic)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
