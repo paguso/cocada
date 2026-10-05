@@ -4,7 +4,12 @@ Documentation generator for COCADA, written with COCADA.
 
 It reads C headers, pairs each documentation comment with the declaration
 that follows it, checks the comments against the COCADA documentation comment
-style (`../doc/comment-style.md`), and writes one Markdown page per header.
+style, and writes one Markdown page per header.
+
+**How to write documentation comments** for cocadoc is described in
+[comment-style.md](comment-style.md): the comment form, the allowed commands,
+ownership (`@move`), references, AI involvement (`@ai`), and the rules that
+`cocadoc -l` checks.
 
 ## Build
 
@@ -100,7 +105,8 @@ struct fields and enum constants link to their type.
 Each file declares in its file comment how much AI was involved in writing
 it, with `@ai level, agent`, e.g. `@ai ai-generated, Claude (Anthropic)`. The
 levels are `human`, `ai-informed`, `ai-assisted`, `ai-generated` and
-`ai-autonomous`; they are defined in `../doc/comment-style.md` (DC15).
+`ai-autonomous`; they are defined in [comment-style.md](comment-style.md)
+(DC15).
 cocadoc itself is `ai-generated`: written by Claude (Anthropic), directed,
 reviewed and approved by Paulo Fonseca.
 

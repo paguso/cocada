@@ -34,7 +34,7 @@
  * @ai ai-generated, Claude (Anthropic)
  * @brief Checks a header against the COCADA documentation comment style.
  *
- * The rules are described in `doc/comment-style.md`. All deviations are
+ * The rules are described in `cocadoc/comment-style.md`. All deviations are
  * warnings. Checks on the text of each comment are done by #cddoc_parse;
  * this module adds the checks that need the declarations: file comments
  * (DC3), undocumented declarations and members (DC4), `@param` and

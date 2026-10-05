@@ -60,7 +60,7 @@
  * code blocks is interpreted.
  *
  * The comment is also checked against the COCADA documentation comment
- * style (`doc/comment-style.md`). Deviations are reported in
+ * style (`cocadoc/comment-style.md`). Deviations are reported in
  * #cddoc.diags, tagged with the rule they break (e.g. `DC6`). The parser
  * still accepts the deprecated forms it reports (e.g. `@returns`,
  * `(**move**)`), so that the documentation is complete in the meantime.
