@@ -102,7 +102,7 @@
 
 
 /**
- * @brief Declares a @p NAME_res result type with success and error values.
+ * @brief A @p NAME_res result type with success and error values.
  */
 #define DECL_RESULT_OK_ERR(NAME, OK_RES_TYPE, ERR_RES_TYPE) \
 	typedef struct {\
