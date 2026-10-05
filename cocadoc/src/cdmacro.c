@@ -92,14 +92,16 @@ static inline bool is_p(const vec *v, size_t i, const char *s)
 }
 
 
-// Tokens of a C text, without comments
+// Tokens of a C text, without comments except trailing member docs
+// (/**< ... */), which are kept: in a generated struct or enum, the macro
+// body is the only place for them
 static vec *lex(const char *text)
 {
 	vec *ret = toks_new();
 	vec *cts = cdlex_all(text, strlen(text));
 	for (size_t i = 0, n = vec_len(cts); i < n; i++) {
 		const cdtoken *ct = vec_get(cts, i);
-		if (ct->type == CDT_DOC || ct->type == CDT_DOC_POST || ct->type == CDT_PP) {
+		if (ct->type == CDT_DOC || ct->type == CDT_PP) {
 			continue;
 		}
 		toks_push(ret, text + ct->pos, ct->len, ct->type == CDT_IDENT);
@@ -523,7 +525,7 @@ static vec *expand(xstate *x, const vec *v, vec *dis, int depth)
 static bool only_calls(const cdmacrotab *t, const vec *v)
 {
 	for (size_t i = 0, n = vec_len(v); i < n; i++) {
-		if (is_p(v, i, ";") || is_p(v, i, ",")) {
+		if (is_p(v, i, ";") || is_p(v, i, ",") || strncmp(T(v, i)->s, "/**<", 4) == 0) {
 			continue;
 		}
 		size_t close;

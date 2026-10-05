@@ -43,7 +43,8 @@ static const char *SRC_LIB =
     "#define DECL_TRAIT(TYPE, TRAIT)\\\n"
     "\tTRAIT * TYPE##_as_##TRAIT( TYPE *self );\n"
     "#define DECL_RESULT_OK(NAME, T) \\\n"
-    "\ttypedef struct {\\\n\t\tbool ok;\\\n\t\tT val;\\\n\t} NAME##_res;\n";
+    "\ttypedef struct {\\\n\t\tbool ok; /**< Success */\\\n\t\tT val; /**< The value */\\\n"
+    "\t} NAME##_res;\n";
 
 static const char *SRC_VEC =
     "/**\n * @brief Appends a TYPE copy of @p val.\n */\n"
@@ -126,6 +127,12 @@ void test_cdmacro_families(CuTest *tc)
 	CuAssertStrEquals(tc, "semver_res", cdfamily_name(res));
 	CuAssertIntEquals(tc, CDD_TYPEDEF, res->pattern->kind);
 	CuAssertStrEquals(tc, "NAME_res", res->pattern->name);
+	// trailing member docs in the macro body are kept
+	const cddecl *inst = ((const cdinstance *)vec_get(res->instances, 0))->decl;
+	CuAssertSizeTEquals(tc, 2, vec_len(inst->members));
+	CuAssertStrEquals(tc, "/**< Success */", ((cddecl *)vec_get(inst->members, 0))->doc);
+	CuAssertStrEquals(tc, "/**< The value */", ((cddecl *)vec_get(inst->members, 1))->doc);
+	CuAssertStrEquals(tc, "/**< The value */", ((cddecl *)vec_get(res->pattern->members, 1))->doc);
 
 	// generators
 	const vec *pats;
