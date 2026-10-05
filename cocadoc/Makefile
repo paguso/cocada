@@ -50,8 +50,8 @@ INCLUDE_CFLAGS = $(addprefix -I, $(cocada_hdr_dirs) $(hdr_dirs) $(test_hdr_dirs)
 # when a header they include changes
 DEP_CFLAGS = -MMD -MP
 
-debug_cflags =  -O3
-debug_cflags += -DDEBUG_LVL=1 
+debug_cflags = -Wall -g
+debug_cflags += -DDEBUG_LVL=3 
 debug_cflags += -DXCHAR_BYTES=4
 debug_cflags += -fpic
 
@@ -63,8 +63,8 @@ $(debug_build_dir)/%.o: %.c
 debug_srcs = $(cocada_srcs) $(srcs)
 debug_objs = $(patsubst %.c,$(debug_build_dir)/%.o,$(debug_srcs))
 
-.PHONY: build
-build: $(debug_build_dir) $(debug_objs) 
+.PHONY: build_debug
+build_debug: $(debug_build_dir) $(debug_objs) 
 	$(CC) $(debug_objs) -lm -o $(debug_build_dir)/cocadoc
 
 
@@ -89,9 +89,29 @@ $(test_objs): | $(test_build_dir)
 test: $(test_objs)
 	$(CC) $(test_objs) -lm -o $(test_build_dir)/test
 
--include $(debug_objs:.o=.d) $(test_objs:.o=.d)
+#
+# Release build
+#
+#
+
+release_cflags = -Wall -g
+release_cflags += -DDEBUG_LVL=1
+release_cflags += -DXCHAR_BYTES=4
+release_cflags += -O3
+
+$(release_build_dir)/%.o: %.c
+	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(release_cflags) $< -o $@
+
+release_srcs = $(cocada_srcs) $(srcs)
+release_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(release_srcs))
+
+.PHONY: build
+build: $(release_build_dir) $(release_objs) 
+	$(CC) $(release_objs) -lm -o $(release_build_dir)/cocadoc
+
+-include $(release_objs:.o=.d) $(test_objs:.o=.d)
 
 .PHONY: clean
 clean: 
-	rm -rf $(debug_build_dir)/* $(test_build_dir)/*
+	rm -rf $(debug_build_dir)/* $(test_build_dir)/* $(release_build_dir)/*
 
