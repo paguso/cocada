@@ -29,6 +29,19 @@
 #include "new.h"
 #include "xstr.h"
 
+
+/**
+ * @file xstrhash.h
+ * @author Paulo Fonseca
+ * @brief Lexicographic hash values of xstrings.
+ *
+ * The hash of an xstring over an alphabet of size s is its value as a number
+ * in base s, each character standing for its rank in the alphabet
+ * (#xstrhash_lex). Hash values wrap around modulo 2^64. The rolling versions
+ * (#xstrhash_roll_lex) compute the hash of the next window of a string from
+ * the previous one in constant time.
+ */
+
 typedef struct _xstrhash xstrhash;
 
 

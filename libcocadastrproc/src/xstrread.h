@@ -28,6 +28,20 @@
 #include "xstr.h"
 
 
+/**
+ * @file xstrread.h
+ * @author Paulo Fonseca
+ * @brief Xstring Read trait.
+ *
+ * The Xstring Read trait allows for reading xchars and xstrings from a source
+ * stream, as the String Read trait (strread.h) does for chars and C strings.
+ * Implementors of this trait, such as #xstrreader, are called Xstring
+ * Readers.
+ *
+ * @see trait.h
+ */
+
+
 typedef struct _xstrread xstrread;
 
 

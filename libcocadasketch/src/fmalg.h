@@ -25,6 +25,18 @@
 #include <inttypes.h>
 
 
+/**
+ * @file fmalg.h
+ * @author Paulo Fonseca
+ * @brief Approximate number of distinct values in a stream (Flajolet-Martin algorithm).
+ *
+ * Estimates the number of distinct values in a stream of integers up to a
+ * given maximum value. #fmalg_init combines several independent estimators
+ * to improve the accuracy: it takes the median of `mmedian` averages of
+ * `navg` estimators each. #fmalg_init_single uses a single estimator.
+ */
+
+
 typedef struct _fmalg fmalg;
 
 

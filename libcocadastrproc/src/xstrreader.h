@@ -28,6 +28,17 @@
 #include "xstr.h"
 #include "xstrread.h"
 
+
+/**
+ * @file xstrreader.h
+ * @author Paulo Fonseca
+ * @brief Xstring reader over an xstring, a C string or a String Reader.
+ *
+ * Implements the #xstrread trait over an xstring (#xstrreader_open), a C
+ * string (#xstrreader_open_str), or any String Reader
+ * (#xstrreader_open_strread).
+ */
+
 typedef struct _xstrreader xstrreader;
 
 xstrreader *xstrreader_open(xstr *src);

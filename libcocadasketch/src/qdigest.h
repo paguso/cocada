@@ -22,6 +22,18 @@
 #ifndef QDIGEST_H
 #define QDIGEST_H
 
+
+/**
+ * @file qdigest.h
+ * @author Paulo Fonseca
+ * @brief Approximate quantiles of a stream of integers (q-digest).
+ *
+ * A q-digest summarises a stream of integers in a given range, each with a
+ * quantity (#qdigest_upd), and estimates the rank of a value (#qdigest_rank)
+ * within an error controlled by `err`, using memory that grows with the
+ * logarithm of the range.
+ */
+
 typedef struct _qdigest qdigest;
 
 qdigest *qdigest_new(size_t range, double err);

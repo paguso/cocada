@@ -24,12 +24,26 @@
 
 #include <stdint.h>
 
+
+/**
+ * @file bjkst.h
+ * @author Paulo Fonseca
+ * @brief Approximate number of distinct values in a stream (BJKST algorithm).
+ *
+ * Implements the algorithm of Bar-Yossef, Jayram, Kumar, Sivakumar and
+ * Trevisan (BJKST) to estimate the number of distinct values in a stream of
+ * integers of a given number of bits. The accuracy is set by an error
+ * parameter `eps` and a failure probability `delta` (see #bjkst_init); the
+ * memory used grows as 1/`eps`^2.
+ */
+
 typedef struct _bjkst bjkst;
 
 
 /**
  * @param nbits Number of bits of elements in the stream
- * @param eps Error parameter s.t. Pr[ |estimate - real|<=eps*]
+ * @param eps Error parameter
+ * @param delta Error probability parameter s.t. Pr[ |estimate - real|>=eps] < delta
  */
 bjkst *bjkst_init(size_t nbits, double eps, double delta);
 

@@ -24,6 +24,18 @@
 
 #include "alphabet.h"
 
+
+/**
+ * @file dna.h
+ * @author Paulo Fonseca
+ * @brief The DNA alphabet.
+ */
+
+
+/**
+ * @brief creates the alphabet of the nucleotides `A`, `C`, `G` and `T`,
+ * in which lowercase letters are equivalent to uppercase ones.
+ */
 alphabet *dna_ab_new();
 
 

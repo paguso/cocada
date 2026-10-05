@@ -28,6 +28,18 @@
 #include "order.h"
 
 
+/**
+ * @file gk.h
+ * @author Paulo Fonseca
+ * @brief Approximate quantiles of a stream (Greenwald-Khanna summary).
+ *
+ * A Greenwald-Khanna summary keeps a small sample of the values of a stream,
+ * of any type with an order (#cmp_func), from which the rank of a value can
+ * be estimated within `err` times the number of values seen (#gk_rank).
+ * Summaries with the same parameters can be merged (#gk_merge).
+ */
+
+
 typedef struct __gksumm gksumm;
 
 gksumm *gk_new(size_t typesize, cmp_func cmp, double err);

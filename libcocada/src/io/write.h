@@ -27,6 +27,17 @@
 #include "trait.h"
 
 
+/**
+ * @file write.h
+ * @author Paulo Fonseca
+ * @brief Write trait.
+ *
+ * The Write trait allows for writing data to a destination.
+ *
+ * @see trait.h
+ */
+
+
 typedef struct _write write;
 
 /**

@@ -24,6 +24,21 @@
 
 #include "result.h"
 
+
+/**
+ * @file semver.h
+ * @author Paulo Fonseca
+ * @brief Semantic version numbers.
+ *
+ * Parses and prints version numbers of the form `MAJOR.MINOR.PATCH`,
+ * optionally followed by a pre-release identifier (e.g. `-beta`) and build
+ * metadata (e.g. `+exp.sha.5114f85`), as specified by Semantic Versioning
+ * (https://semver.org).
+ */
+
+/**
+ * @brief SEMVER type.
+ */
 typedef struct {
 	int major;
 	int minor;
