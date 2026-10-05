@@ -51,7 +51,7 @@
  * 4. Strings:  A null-terminated '\0' char string.
  * 5. Structs: Any user-defined struct.
  *
- * The serialise()/deserialise() function writes/reads an object, and
+ * The #serialise/#deserialise function writes/reads an object, and
  * other objects directly and indirectly referred to by this first object
  * to/from a binary stream. In order to do so, these functions require an
  * object model, named **Serialisable Object Model - SOM** which
@@ -74,13 +74,13 @@
  *
  * ### Pointer SOMs
  *
- * A rawptr SOM can be obtained via a call to som_ptr_new().
+ * A rawptr SOM can be obtained via a call to #som_ptr_new.
  * Serialising a pointer value simply causes the corresponding
  * memory address (the value of the pointer) to be written to
  * the stream. However, we often are also interested in
  * saving the pointed memory contents. We signal this
  * situation in the library by composing SOMs with the aid
- * of the som_cons() function.
+ * of the #som_cons function.
  *
  * #### Example
  * Suppose we have a pointer to an integer and
@@ -99,7 +99,7 @@
  *
  * ### Array SOMs
  *
- * An array SOM can be built with the som_arr_new() function.
+ * An array SOM can be built with the #som_arr_new function.
  * This SOM is used to describe an array, i.e., a contiguous
  * memory chunk containing some data. However, we have here
  * an important limitation. Because the underlying mechanism
@@ -114,7 +114,7 @@
  * Notice also that the array SOM describes the array object
  * that is, the region of the memory where the data is stored.
  * A heap-allocated array, such as those created by the
- * sa_arr_calloc() functions of arrays.h is usually represented
+ * #sa_arr_calloc functions of arrays.h is usually represented
  * by a pointer which points to the start of the array.
  * Thus this situation must be modelled as a pointer SOM
  * containing an array SOM.
@@ -272,7 +272,7 @@
  * Therefore the serialisation/deserialisation is not portable and
  * is actually a *very unsafe memory operation*.
  *
- * <b>Be warned and use it at your own risk!</b>
+ * **Be warned and use it at your own risk!**
  *
  * However, by default COCADA writes the object sizes and checks whether
  * they are compatible during deserialisation and issues a **warning**
@@ -305,7 +305,7 @@
 typedef struct _sub_som sub_som;
 
 /**
- * SOM object type
+ * @brief SOM object type
  */
 typedef struct _som som;
 
@@ -365,10 +365,10 @@ som *som_proxy_new(get_som_func get_som);
 /**
  * @brief Composes the SOM or a parent object with the SOM of
  * one of its members.
- * @par par The parent SOM
- * @par offset The memory offset of the child member, relative
+ * @param par The parent SOM
+ * @param offset The memory offset of the child member, relative
  * to the start position of the parent object.
- * @par chd The child SOM, i.e. the model of the object member.
+ * @param chd The child SOM, i.e. the model of the object member.
  * @warning If the parent is but a struct SOM, the @p offset is ignored.
  */
 som *som_cons(som *par, size_t offset, som *chd);
@@ -400,7 +400,7 @@ void serialise(void *obj, som *model, FILE *stream);
  * directly and indirectly referred objects, according to a SOM
  * @p model, from a binary @p stream.
  *
- * @returns A pointer to a heap allocated copy of the
+ * @return A pointer to a heap allocated copy of the
  * deserialised object (and the objects referred by it).
  *
  * @see serialise

@@ -53,7 +53,7 @@ void xstrread_reset(xstrread *trait);
 
 /**
  * @brief Reads the next xchar_t from a stream.
- * @returns The next character as an xchar_wt, or XEOF if the stream has
+ * @return The next character as an xchar_wt, or XEOF if the stream has
  *          reached its end.
  */
 xchar_wt xstrread_getc(xstrread *trait);
@@ -64,7 +64,7 @@ xchar_wt xstrread_getc(xstrread *trait);
  *        Less than @p n characters can be read if the stream reaches its end.
  * @param dest The destination xstring. If @p dest is NULL, the data are read from the reader and then ignored.
  * @param n The number of chars to attempt reading.
- * @returns The number of chars actually read (and possibly discarded if @p dest is NULL).
+ * @return The number of chars actually read (and possibly discarded if @p dest is NULL).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
 size_t xstrread_read(xstrread *trait, xstr *dest, size_t n);
@@ -76,7 +76,7 @@ size_t xstrread_read(xstrread *trait, xstr *dest, size_t n);
  *        consumed.
  * @param dest The destination xstring. If @p dest is NULL, the data are read from the reader and then ignored.
  * @param n The number of chars to attempt reading.
- * @returns The number of chars actually read (excluding the delimiter).
+ * @return The number of chars actually read (excluding the delimiter).
  * @warning The @p dest xstr xchar size should be the same as that of the source stream.
  */
 size_t xstrread_read_until(xstrread *trait, xstr *dest, xchar_t delim);

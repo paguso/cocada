@@ -68,7 +68,7 @@
  * where the first two phases (1-2) comprise the object *creation*, and the two
  * last (4-5) comprise the object *destruction*.
  *
- * In COCADA, Step 1 is usually done through the macro ::NEW, which allocate heap
+ * In COCADA, Step 1 is usually done through the macro #NEW, which allocate heap
  * memory for an object of a given type and returns a typed pointer to this position.
  * Object creation (steps 1-2) is normally done with a single call to one of the object
  * constructors `type *type_new(...)`. Ocasionally, these two steps can be done
@@ -106,7 +106,7 @@
  *
  * Although we do not have native language support, in COCADA we struggle to
  * maintain a simpler object dependency structure, trying to make clear
- * <b>in the documentation</b> when the ownership of an object is transferred to
+ * **in the documentation** when the ownership of an object is transferred to
  * another. Likewise, the documentation of the destructors (see below) should
  * indicate which child objects should be destroyed. **As a rule of thumb, we
  * should destroy a referenced object as part of the destruction of its parent
@@ -239,18 +239,18 @@
  * hierarchies of nested objects. COCADA provides some infrastructure for
  * dealing with the proper disposal of  complex hierarchies of objects.
  *
- * The basic concept is that of a **finaliser** (::finaliser) which encapsulates and
- * provides a way of nesting **finalise functions** (::finalise_func) used for
+ * The basic concept is that of a **finaliser** (#finaliser) which encapsulates and
+ * provides a way of nesting **finalise functions** (#finalise_func) used for
  * finalising object hierarchies. A finaliser is a  *closure* object
  * composed of
- * - A reference to a *finalise function* ::finalise_func; and
+ * - A reference to a *finalise function* #finalise_func; and
  * - An array of child finalisers.
  *
  * A *finalise function* is a function used to dispose of the memory used by an
  * object, which would become otherwise unreachable after the object destruction
  * (memory leak). It receives a pointer to the object to be finalised
  * and a finaliser object mirroring its composition.  The finalise function of
- * a `type` is named `type_finalise` (example ::vec_finalise).
+ * a `type` is named `type_finalise` (example #vec_finalise).
  *
  * The implementation of a finalise function of a parent type uses the
  * provided finaliser to call the finalise functions of the child (referenced)
@@ -309,13 +309,13 @@
  * Hence, if `C` and `B` were reference containers in our running example
  * we'd have that
  *
- * <b>C</b> has **Pointers** to **B** which has **Pointers** to **A**.
+ * **C** has **Pointers** to **B** which has **Pointers** to **A**.
  *
  * So, the `C` finaliser should not have a `B` finaliser as child, but
  * rather a *pointer finaliser*, which then will have a `B` finaliser
  * as child. The difference is subtle but crucial.
  *
- * COCADA provides a function for obtaining a pointer finaliser ::ptr_finaliser.
+ * COCADA provides a function for obtaining a pointer finaliser #ptr_finaliser.
  * The corresponding finalise function will call the nested finaliser in the
  * pointed object and then free the memory pointed to. If the pointed type is
  * a simple type with no further external references, then we can simply use a
@@ -340,12 +340,12 @@
  * be rather tedious. Instead, COCADA provides a more ergonomic way to construct
  * finaliser hierarchies as follows.
  *
- * - The macro ::FNR is used to return a basic finaliser to a given type.
+ * - The macro #FNR is used to return a basic finaliser to a given type.
  * That is `FNR(type)` returns a finaliser with finalise function
  * `type_finalise` (which must be provided for each particular type), and
  * whith no nested finalisers (yet);
  *
- * - Existing finalisers can be composed via the ::finaliser_cons function. This
+ * - Existing finalisers can be composed via the #finaliser_cons function. This
  * function takes a pointer to a parent finaliser `par` and a child finaliser
  * `chd`. It appends `chd` to the list of child finalisers of `par`, and returns the
  * reference to the modified `par`. This can be used to create arbitrary tree-like
@@ -373,7 +373,7 @@
  * In the last example above, it could be that we did not wish to destroy the `B`-type
  * child objects. For instance, they could be shared objects whose deletion would cause
  * dangling pointer problems.
- * An *empty finaliser* obtained via ::finaliser_new_empty can be used in such cases to
+ * An *empty finaliser* obtained via #finaliser_new_empty can be used in such cases to
  * signal that the  corresponding child  objects should not be destroyed.
  * In this case, all the objects downstream the empty finaliser point are also
  * left untouched.
@@ -381,13 +381,13 @@
  *
  * ## Finalising and destroying objects
  *
- * An object can be *finalised* (Step 4 *only*)  via the ::FINALISE macro.
+ * An object can be *finalised* (Step 4 *only*)  via the #FINALISE macro.
  * This will not deallocate the object, and is typically what would be used from
  * whithin a flat container destructor to clean memory used by its elements. It is also
  * used to finalise stack objects. The finaliser object is also not destroyed
  * in the process.
  *
- * An object can be completely destroyed (Steps 4-5) with the ::DESTROY macro.
+ * An object can be completely destroyed (Steps 4-5) with the #DESTROY macro.
  * In addition to finalising the object, it also deallocates its memory **and**
  * consumes the finaliser. If the default, childless finaliser is to be used,
  * we can simply use `DESTROY_FLAT(obj, type)` which is equivalent, but slightly more
@@ -452,27 +452,27 @@
 
 
 /**
- * Allocates a new non-initialised object of a given @p TYPE in the heap
+ * @brief Allocates a new non-initialised object of a given @p TYPE in the heap
  * and returns a pointer to it.
  */
 #define NEW( TYPE ) ((TYPE*)(malloc(sizeof(TYPE))))
 
 
 /**
- * The maximum value of a pointer
+ * @brief The maximum value of a pointer
  */
 #define PTR_MAX SIZE_MAX
 
 
 /**
- * Finaliser type
+ * @brief Finaliser type
  * @see _finaliser
  */
 typedef struct _finaliser finaliser;
 
 
 /**
- * Finaliser function type
+ * @brief Finaliser function type
  */
 typedef void (*finalise_func) (void *ptr, const finaliser *fnr);
 
@@ -536,29 +536,31 @@ finaliser *finaliser_new_ptr();
 
 /**
  * @brief Shortcut for creating frequently-used finalisers for object references
- * (pointers). Same as finaliser_cons(finaliser_new_ptr(), chd).
+ * (pointers). Same as finaliser_cons(#finaliser_new_ptr, chd).
  * @param chd Pointed object finaliser
  */
 finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
 
 
 /**
- * Returns a default finaliser for a given type with no nested destructor.
+ * @brief Returns a default finaliser for a given type with no nested destructor.
  */
 #define FNR( TYPE ) finaliser_new(TYPE##_finalise)
 
 
 /**
- * Returns a default finaliser for a pointer to an object
+ * @brief Returns a default finaliser for a pointer to an object
  * of a given type with no other nested destructor.
+ *
  * Same as finaliser_new_ptr_to_obj(FNR(TYPE)).
  */
 #define FNR_PTR_TO_OBJ( TYPE ) finaliser_new_ptr_to_obj(FNR(TYPE))
 
 
 /**
- * Finalises an object @p OBJ (and its referenced objects) based on a given
+ * @brief Finalises an object @p OBJ (and its referenced objects) based on a given
  * finaliser @p FNR.
+ *
  * The object is not deallocated, and neither is the finaliser object destroyed.
  */
 #define FINALISE( OBJ, FNR ) \
@@ -570,15 +572,18 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
 
 
 /**
- * Finalises an object @p OBJ with the default plain typed finaliser
- * TYPE_finalise(). Same as FINALISE(OBJ, FNR(TYPE)).
+ * @brief Finalises an object @p OBJ with the default plain typed finaliser
+ * TYPE_finalise().
+ *
+ * Same as FINALISE(OBJ, FNR(TYPE)).
  */
 #define FINALISE_FLAT( OBJ, TYPE ) FINALISE(OBJ, FNR(TYPE))
 
 
 /**
- * Destroys an object @p OBJ, that is finalises it (and its referenced objects)
+ * @brief Destroys an object @p OBJ, that is finalises it (and its referenced objects)
  * based on a given finaliser @p FNR **and** deallocates its memory.
+ *
  * The finaliser @p FNR is **also** destroyed.
  */
 #define DESTROY( OBJ, FNR ) \
@@ -594,15 +599,17 @@ finaliser *finaliser_new_ptr_to_obj(const finaliser *chd);
 
 
 /**
- * Destroys an object @p OBJ with the default plain typed finaliser
- * TYPE_finalise(). Same as DESTROY(OBJ, FNR(TYPE)).
+ * @brief Destroys an object @p OBJ with the default plain typed finaliser
+ * TYPE_finalise().
+ *
+ * Same as DESTROY(OBJ, FNR(TYPE)).
  */
 #define DESTROY_FLAT( OBJ, TYPE ) DESTROY(OBJ, FNR(TYPE))
 
 
 
 /**
- * Deallocates an object @p OBJ after checking that it is non-null
+ * @brief Deallocates an object @p OBJ after checking that it is non-null
  * by calling `stdlib free()`
  */
 #define FREE( OBJ ) if((OBJ)) free((void *)(OBJ))

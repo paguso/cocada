@@ -68,7 +68,7 @@ xstr *xstr_new_with_capacity(size_t sizeof_char, size_t cap);
  * @brief Converts a raw byte array into an xstr. The source array is
  * moved into the xstr, meaning that, after the conversion,
  * the @p src array **should be no longer used from outside the xstr**.
- * @param src (**move**) The raw source array.
+ * @param @move src The raw source array.
  * @param len The length of the created xstr.
  * @param sizeof_char The size of the extended char in bytes.
  * @warning
@@ -167,8 +167,8 @@ xchar_t xstr_get(const xstr *self, size_t pos);
 
 /**
  * @brief Sets the char at a specified position.
- * @warn  No out-of-bounds verification is assumed.
- * @warn  May result in information loss if the internal representation uses a
+ * @warning  No out-of-bounds verification is assumed.
+ * @warning  May result in information loss if the internal representation uses a
  *        smaller number of bytes for each position than sizeof(xchar_t).
  */
 void xstr_set(xstr *self, size_t pos, xchar_t val);
@@ -207,7 +207,7 @@ void xstr_cat(xstr *self, const xstr *src);
 
 
 /**
- * @brief Same as <code>xstr_ncpy(self, 0, src, 0, xstr_len(self))</code>.
+ * @brief Same as `xstr_ncpy(self, 0, src, 0, xstr_len(self))`.
  * @see xstr_ncpy
  * @see xstr_len
  */

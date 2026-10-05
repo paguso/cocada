@@ -343,14 +343,14 @@ uint uint64_bitcount(uint64_t x, bool bit);
 
 /**
  * @brief Same as ushort_bitcount(x, 1)
- * @see ushort_bitcount()
+ * @see #ushort_bitcount
  */
 uint ushort_bitcount1(unsigned short x);
 
 
 /**
  * @brief Same as ushort_bitcount(x, 0)
- * @see ushort_bitcount()
+ * @see #ushort_bitcount
  */
 uint ushort_bitcount0(unsigned short x);
 
@@ -363,14 +363,14 @@ uint ushort_bitcount(unsigned short x, bool bit);
 
 /**
  * @brief Same as uint_bitcount(x, 1)
- * @see uint_bitcount()
+ * @see #uint_bitcount
  */
 uint uint_bitcount1(unsigned int x);
 
 
 /**
  * @brief Same as uint_bitcount(x, 0)
- * @see uint_bitcount()
+ * @see #uint_bitcount
  */
 uint uint_bitcount0(unsigned int x);
 
@@ -383,14 +383,14 @@ uint uint_bitcount(unsigned int x, bool bit);
 
 /**
  * @brief Same as ulong_bitcount(x, 1)
- * @see ulong_bitcount()
+ * @see #ulong_bitcount
  */
 uint ulong_bitcount1(unsigned long x);
 
 
 /**
  * @brief Same as ulong_bitcount(x, 0)
- * @see ulong_bitcount()
+ * @see #ulong_bitcount
  */
 uint ulong_bitcount0(unsigned long x);
 
@@ -403,14 +403,14 @@ uint ulong_bitcount(unsigned long x, bool bit);
 
 /**
  * @brief Same as ullong_bitcount(x, 1)
- * @see ushort_bitcount()
+ * @see #ushort_bitcount
  */
 uint ullong_bitcount1(unsigned long long x);
 
 
 /**
  * @brief Same as ullong_bitcount(x, 0)
- * @see ullong_bitcount()
+ * @see #ullong_bitcount
  */
 uint ullong_bitcount0(unsigned long long x);
 

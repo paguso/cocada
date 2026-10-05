@@ -62,7 +62,7 @@ void strbuf_free(strbuf *self);
 
 
 /**
- * @brief Creates a new string buffer from a source static string @src.
+ * @brief Creates a new string buffer from a source static string @p src.
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
  * @param src The source string **NO TRANSFER OF OWNERSHIP**.
@@ -175,7 +175,7 @@ void strbuf_clip(strbuf *self, size_t from, size_t to);
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p self,
  *        separating each of these strings by @p sep
- * # Example
+ * **Example**
  * ```C
  * strbuf *self = str_buf_new_from_str("Four seasons: ");
  * char *seasons[4] = {"Spring", "Summer", "Autumn", "Winter"};
@@ -217,7 +217,7 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
  * of the substring @p old_str in the string buffer @p self, with the substring @p new_str
  * starting from position @p from_pos.
  *
- * # Example
+ * **Example**
  * ```
  * strbuf *self = strbuf_new_from_str("macaca", 6, 0);
  * strbuf_replace_n(self, "ca", "na", 2);

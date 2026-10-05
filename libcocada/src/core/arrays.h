@@ -78,7 +78,7 @@
  * the useful area is initialised with 0's, and a pointer to the start
  * location of the useful area of the array  is returned, as illustrated in
  * the diagram below. This makes the array size readily available via
- * the ::sa_arr_sizeof function, without having to store this information separately.
+ * the #sa_arr_sizeof function, without having to store this information separately.
  *
  * ```
  *
@@ -96,7 +96,7 @@
  *
  * @warning Although it can be seamlessly accessed through the  returned pointer,
  * this array should be only reallocated or freed via the companion functions
- * ::sa_arr_realloc and ::sa_arr_free.
+ * #sa_arr_realloc and #sa_arr_free.
  *
  * @see sa_arr_realloc
  * @see sa_arr_free
@@ -217,7 +217,7 @@ XX_CORETYPES(DECL_SA_ARR)
 	}
 
 /**
- * @brief Frees a matrix created with ::NEW_MATRIX or ::NEW_MATRIX_0.
+ * @brief Frees a matrix created with #NEW_MATRIX or #NEW_MATRIX_0.
  */
 #define FREE_MATRIX(ID) free(ID)
 
@@ -242,7 +242,7 @@ XX_CORETYPES(DECL_SA_ARR)
  * casts and other type conversions.
  *
  * Prior to being used, a TYPE_array must be declared with the macro
- * ::DECL_ARRAY. By importing this file you get the declaration of
+ * #DECL_ARRAY. By importing this file you get the declaration of
  * TYPE_array for all the core types defined in coretype.h.
  *
  * A TYPE_array object is primarily meant to be created on the stack,
@@ -289,8 +289,8 @@ XX_CORETYPES(DECL_ARRAY)
  * on the stack.
  * The encapsulated array is allocated on the heap and is left
  * uninitialized.
- * This array can be freed with ::ARRAY_FREE.
- * @see See example in ::ARRAY
+ * This array can be freed with #ARRAY_FREE.
+ * @see See example in #ARRAY
  */
 #define ARRAY_NEW(TYPE, LEN) ((ARRAY(TYPE)){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
 

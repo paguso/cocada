@@ -99,14 +99,14 @@ bool roaringbitvec_get(roaringbitvec *self, size_t pos);
 
 /**
  * @brief Same as roaringbitvec_rank(self, 0, pos)
- * @see roaringbitvec_rank()
+ * @see #roaringbitvec_rank
  */
 size_t roaringbitvec_rank0(roaringbitvec *self, size_t pos);
 
 
 /**
  * @brief Same as roaringbitvec_rank(self, 1, pos)
- * @see roaringbitvec_rank()
+ * @see #roaringbitvec_rank
  */
 size_t roaringbitvec_rank1(roaringbitvec *self, size_t pos);
 
@@ -121,14 +121,14 @@ size_t roaringbitvec_rank(roaringbitvec *self, bool bit, size_t pos);
 
 /**
  * @brief Same as roaringbitvec_select(self, 0, rank)
- * @see roaringbitvec_select()
+ * @see #roaringbitvec_select
  */
 size_t roaringbitvec_select0(roaringbitvec *self, size_t rank);
 
 
 /**
  * @brief Same as roaringbitvec_select(self, 1, rank)
- * @see roaringbitvec_select()
+ * @see #roaringbitvec_select
  */
 size_t roaringbitvec_select1(roaringbitvec *self, size_t rank);
 

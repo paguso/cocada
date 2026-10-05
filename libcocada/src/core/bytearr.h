@@ -184,7 +184,7 @@ unsigned long bytearr_read_ulong(const byte_t *src, size_t from_byte,
  *        signed long long int.
  *
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
- * @see bytearr_write_longlong.
+ * @see bytearr_write_llong.
  */
 long long bytearr_read_llong(const byte_t *src, size_t from_byte,
                              size_t nbytes);
@@ -195,7 +195,7 @@ long long bytearr_read_llong(const byte_t *src, size_t from_byte,
  *        unsigned long long int.
  *
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
- * @see bytearr_write_ulonglong.
+ * @see bytearr_write_ullong.
  */
 unsigned long long bytearr_read_ullong(const byte_t *src,
                                        size_t from_byte, size_t nbytes);
@@ -205,7 +205,7 @@ unsigned long long bytearr_read_ullong(const byte_t *src,
  * @brief Reads @p src[@p from_byte:@p from_bit+@p nbytes] as a size_t.
  *
  * @see bitarr_read_int for silimar remarks concerning the loss of information.
- * @see bytearr_write_size.
+ * @see bytearr_write_size_t.
  */
 size_t bytearr_read_size_t(const byte_t *src, size_t from_byte,
                            size_t nbytes);
@@ -331,7 +331,7 @@ void bytearr_write_ulong(byte_t *dest, size_t from_byte,
  * long long int @p val to a bytearray @p dest.
  *
  * @see bitarr_write_int for similar remarks about loss of information.
- * @see bytearr_read_longlong
+ * @see bytearr_read_llong
  */
 void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
                          size_t nbytes);
@@ -342,7 +342,7 @@ void bytearr_write_llong(byte_t *dest, size_t from_byte, long long val,
  * unsigned long long int @p val to a bytearray @p dest.
  *
  * @see bitarr_write_int for similar remarks about loss of information.
- * @see bytearr_read_ulonglong
+ * @see bytearr_read_ullong
  */
 void bytearr_write_ullong(byte_t *dest, size_t from_byte,
                           unsigned long long val, size_t nbytes);
@@ -353,7 +353,7 @@ void bytearr_write_ullong(byte_t *dest, size_t from_byte,
  *        size_t @p val to a bytearray @p dest.
  *
  * @see bitarr_write_int for similar remarks about loss of information.
- * @see bytearr_read_size
+ * @see bytearr_read_size_t
  */
 void bytearr_write_size_t(byte_t *dest, size_t from_byte, size_t val,
                           size_t nbytes);

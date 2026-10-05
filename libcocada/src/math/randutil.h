@@ -35,13 +35,13 @@
 
 
 /**
- * Resets the RNG to with a given seed
+ * @brief Resets the RNG to with a given seed
  */
 void rand_reset(uint32_t seed);
 
 
 /**
- * Returns a randomly generated 64-bit unsigned integer
+ * @brief Returns a randomly generated 64-bit unsigned integer
  */
 uint64_t rand_next ();
 
@@ -55,7 +55,7 @@ uint64_t rand_next ();
 
 
 /**
- * Shuffle in-place the elements of array @p arr containing @p n elements
+ * @brief Shuffle in-place the elements of array @p arr containing @p n elements
  * of size @p typesize
  */
 void shuffle_arr(void *arr, size_t n, size_t typesize);

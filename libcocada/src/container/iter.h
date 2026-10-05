@@ -47,7 +47,7 @@
  * FREE(cit);
  * ```
  *
- * or, alternatively, with the ::FOREACH_IN_ITER macro.
+ * or, alternatively, with the #FOREACH_IN_ITER macro.
  *
  * @see trait.h
  */
@@ -112,7 +112,7 @@ const void *iter_next(iter *it);
  *
  * @param ELT_NAME The variable identifier for the elements returned in the iteration (local)
  * @param ELT_TYPE The base type of the elements. The iteration returns pointers to ELT_TYPE
- * @param ITER 		An initialised pointer to an ::iter
+ * @param ITER 		An initialised pointer to an #iter
  */
 #define FOREACH_IN_ITER(ELT_NAME, ELT_TYPE, ITER) \
 	for (iter* __it = (iter *) (ITER); __it ; __it = NULL) \

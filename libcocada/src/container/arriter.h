@@ -54,7 +54,7 @@ typedef struct {
 
 /**
  * @brief Gets an iterator for an array
- * @param arr (*no transfer*) the source array
+ * @param arr the source array
  * @param len the source array length
  * @param typesize the size of the elements stored in the source array in bytes
  */

@@ -123,7 +123,7 @@
 
 
 /**
- * Opaque AVL type
+ * @brief Opaque AVL type
  */
 typedef struct _avl avl;
 
@@ -178,7 +178,7 @@ bool avl_ins(avl *self, void *val);
  * If however @p dest is NULL, the node is just deleted.
  * If no node matching the @p key is found, the operation
  * has no effect and the function returns false.
- * @returns A boolean indicating whether the removal was
+ * @return A boolean indicating whether the removal was
  * successful.
  * @warning After the operation, the tree has no longer a
  * reference to the removed value.
@@ -205,11 +205,11 @@ XX_CORETYPES(DECL_AVL_ALL)
 /**
  * @brief Prints the AVL tree in the given output @p stream.
  *
- * @par prt_val is the function used to print the stored values.
+ * @param prt_val The function used to print the stored values.
  * Similarly to the comparator function, the @p prt_val
  * function receives a pointer to whatever is stored in the
  * tree nodes.
- * ## Example
+ * **Example**
  * If the node stores references to objects of type `obj_t`
  * ```C
  * typedef struct {

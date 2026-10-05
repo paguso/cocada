@@ -195,7 +195,7 @@ typedef void               *rawptr;
 
 
 /**
- * NULL pointer constant.
+ * @brief NULL pointer constant.
  */
 #ifndef NULL
 #define NULL ((void *)0)

@@ -70,7 +70,7 @@ void strread_reset(strread *self);
 
 /**
  * @brief Reads the next char from a stream.
- * @returns The next character as an int, or EOF if the stream has
+ * @return The next character as an int, or EOF if the stream has
  *          reached its end.
  *
  */
@@ -84,7 +84,7 @@ int strread_getc(strread *self);
  * or if no char has been read from the stream, the function returns 0.
  * Otherwise, it returns 1
  *
- * @returns int 0 if the operation is not supported or no char has been read,
+ * @return int 0 if the operation is not supported or no char has been read,
  * 		   1 otherwise.
  * @warning Only one char can be put back into the stream. Once a char is put back,
  * a subsequent call to this function will return 0.
@@ -95,7 +95,7 @@ int strread_ungetc(strread *self);
 /**
  * @brief Attempts to read the next @p n chars into @p dest.
  *        Less than @p n characters can be read if the stream reaches its end.
- * @returns The number of chars actually read.
+ * @return The number of chars actually read.
  */
 size_t strread_read_str(strread *self, char *dest, size_t n);
 
@@ -104,7 +104,7 @@ size_t strread_read_str(strread *self, char *dest, size_t n);
  * @brief Attempts to read the next chars into the @p dest until
  * 		  the next occurrence of the delimiter @p delim is found,
  * 		  or the end of the stream is reached.
- * @returns The number of chars actually read.
+ * @return The number of chars actually read.
  */
 size_t strread_read_str_until(strread *self, char *dest, char delim);
 

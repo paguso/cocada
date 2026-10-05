@@ -33,7 +33,7 @@ typedef struct _xstrhash xstrhash;
 
 
 /**
- * @param ab (move) alphabet
+ * @param @move ab alphabet
  */
 xstrhash *xstrhash_new(alphabet *ab);
 

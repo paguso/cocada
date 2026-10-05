@@ -37,7 +37,7 @@
  * corresponding wrapper functions that keep a tally of the allocated
  * memory chunks along with other debug info.
  *
- * <b>This change only takes place if the MEM_DEBUG macro is defined</b>.
+ * **This change only takes place if the MEM_DEBUG macro is defined**.
  * This can be done locally in the code, but most likely this is
  * done via a compiler option. For example, in gcc
  *
@@ -111,7 +111,7 @@ extern size_t memdbg_nchunks();
 
 /**
  * @brief Returns true if the memory tally is empty, and false otherwise.
- * @warn If true, it doesn't mean that no memory is allocated, but only
+ * @warning If true, it doesn't mean that no memory is allocated, but only
  * that none is accounted for in the tally.
  */
 extern bool memdbg_is_empty();

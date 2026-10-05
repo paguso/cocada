@@ -37,7 +37,7 @@
 
 
 /**
- * Stack type
+ * @brief Stack type
  */
 typedef vec stack;
 

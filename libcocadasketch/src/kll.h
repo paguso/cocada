@@ -145,7 +145,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
 
 
 /**
- * Creates a new KLL summary with no a priori space constraints
+ * @brief Creates a new KLL summary with no a priori space constraints
  * for *NON-OWNED* data.
  *
  * @param typesize the size of the stored elements in bytes
@@ -161,7 +161,7 @@ static const double KLL_MIN_K_BIG_OH_CONST = 2.0;
  * @warning This constructor *SHOULD NOT* be used if the summary
  * is supposed to contain *onwed* object references. If such is the
  * case, use kll_new_own or kll_new_onw_with_cap. This is equivalent
- * to kll_new_own(typesize, cmp, err, finaliser_new_empty())
+ * to kll_new_own(typesize, cmp, err, #finaliser_new_empty)
  *
  * @see order.h
  * @see kll_new_own
@@ -177,7 +177,7 @@ kllsumm *kll_new(size_t typesize, cmp_func cmp, double err);
  * @param typesize the size of the stored elements in bytes
  * @param cmp comparison function
  * @param err The desired error level (see header file comments)
- * @param chd_fr (**move**) A destructor for the stored child objects
+ * @param @move chd_fr A destructor for the stored child objects
  *
  * The KLL summary stores the added data in internal containers.
  * If owned references are stored in the summary, then it needs to
@@ -237,7 +237,7 @@ kllsumm *kll_new_own(size_t typesize, cmp_func cmp, double err,
  * @warning This constructor *SHOULD NOT* be used if the summary
  * is supposed to contain *onwed* object references. If such is the
  * case, use  kll_new_onw_with_cap. This is equivalent
- * to kll_new_own_with_cap(typesize, cmp, err, finaliser_new_empty())
+ * to kll_new_own_with_cap(typesize, cmp, err, #finaliser_new_empty)
  *
  * @see errlog.h
  */

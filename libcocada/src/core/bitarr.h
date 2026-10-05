@@ -42,7 +42,7 @@
 
 /**
  * @brief Creates a new raw bitarray with all bits set to zero
- * @warn The actual size will be the minimum number of bytes necessary
+ * @warning The actual size will be the minimum number of bytes necessary
  *       to represent @p len bits
  */
 byte_t *bitarr_new(size_t len);
@@ -50,7 +50,7 @@ byte_t *bitarr_new(size_t len);
 /**
  * @brief Creates a new bit array from a 0-1 character string.
  * If the string contains characters other than {0,1} the result is undefined.
- * @param src (no transfer) The source 0-1 character string
+ * @param src The source 0-1 character string
  * @param len The length of the bitarray
  */
 byte_t *bitarr_new_from_str(const char *src, size_t len);
@@ -105,8 +105,8 @@ int bitarr_sbprint(strbuf *buf, const byte_t *ba, size_t nbits,
 /**
  * @brief ANDs a given number of bits of a bitarray with those of a given mask,
  * that is, ba[0:nbits] &= mask[0:nbits].
- * @param ba (no transfer) The target bitarray.
- * @param mask (no transfer) The mask bitarray.
+ * @param ba The target bitarray.
+ * @param mask The mask bitarray.
  * @param nbits The number of bits to be AND'd.
  */
 void bitarr_and(byte_t *ba, const byte_t *mask, size_t nbits);
@@ -115,8 +115,8 @@ void bitarr_and(byte_t *ba, const byte_t *mask, size_t nbits);
 /**
  * @brief ORs a given number of bits of a bitarray with those of a given mask,
  * that is, ba[0:nbits] |= mask[0:nbits].
- * @param ba (no transfer) The target bitarray.
- * @param mask (no transfer) The mask bitarray.
+ * @param ba The target bitarray.
+ * @param mask The mask bitarray.
  * @param nbits The number of bits to be OR'd.
  */
 void bitarr_or(byte_t *ba, const byte_t *mask, size_t nbits);
@@ -194,16 +194,16 @@ void bitarr_write_ushort( byte_t *dest, size_t from_bit,
  *
  * @warning If not enough bits are written, information may be lost concerning
  * the magnitude and/or signal of @p val.
- * For example, the value <tt>15</tt> is represented
- * as <tt>00001111</tt> in binary two's-complement form is many architectures.
+ * For example, the value `15` is represented
+ * as `00001111` in binary two's-complement form is many architectures.
  * Writing only the 4 LSBs and subsequently reading them would result
- * <tt>1111</tt>, whose decimal value is <tt>-1</tt>.
- * @code
+ * `1111`, whose decimal value is `-1`.
+ * ```c
  * int x = 15;
  * bitarr_write_int(dest, 0, x, 4);
  * x = bitarr_read_int(dest, 0, x, 4);
  * printf("x = %d", x); // prints: x = -1
- * @endcode
+ * ```
  *
  * @param dest The destination bitarray
  * @param from_bit The initial position to be (over)written in the
@@ -330,19 +330,19 @@ unsigned short bitarr_read_ushort(const byte_t *src, size_t from_bit,
  *
  * @warning If not enough bits are written, information may be lost concerning
  * the magnitude and/or signal of the value previously written.
- * For example, the decimal value <tt>26</tt> is represented
- * as <tt>00011010</tt> and so, only the <tt>5</tt> LSBs are sufficient for
- * representing its magnitude. However, the <b>signed</b> 5-bit int
- * <tt>11010</tt> corresponds to the decimal value <tt>-6</tt> in binary
+ * For example, the decimal value `26` is represented
+ * as `00011010` and so, only the `5` LSBs are sufficient for
+ * representing its magnitude. However, the **signed** 5-bit int
+ * `11010` corresponds to the decimal value `-6` in binary
  * two's-complement form.
- * <b>The default implementation of this function assumes two's-complement
- * representation</b>.
- * @code
+ * **The default implementation of this function assumes two's-complement
+ * representation**.
+ * ```c
  * int x = 26;
  * bitarr_write_int(dest, 0, 5);
  * x = bitarr_read_int(dest, 0, 5);
  * printf("x = %d", x); // prints: x = -6
- * @endcode
+ * ```
  *
  * @param src The source bitarray.
  * @param from_bit The position at which read begins.

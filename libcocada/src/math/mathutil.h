@@ -75,7 +75,7 @@
 
 
 /**
- * Computes floor(num/den) for unsigned integer types.
+ * @brief Computes floor(num/den) for unsigned integer types.
  */
 #define DECL_DIVFLOOR( TYPE , ...)\
 	TYPE divfloor_##TYPE(TYPE num, TYPE den);
@@ -84,7 +84,7 @@ XX_UNSIGNED_INT(DECL_DIVFLOOR)
 
 
 /**
- * Computes ceil(num/den) for unsigned integer types.
+ * @brief Computes ceil(num/den) for unsigned integer types.
  */
 #define DECL_DIVCEIL( TYPE , ...)\
 	TYPE divceil_##TYPE(TYPE num, TYPE den);

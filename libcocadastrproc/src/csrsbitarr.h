@@ -43,7 +43,7 @@ typedef struct _csrsbitarr csrsbitarr;
  * @brief Creates a new r&s bitarray with an attached raw bitarray.
  * @param ba The raw bitarray
  * @param len The array length in bits.
- * @warn The source bitarray is attached to the internal representation
+ * @warning The source bitarray is attached to the internal representation
  *       of the created r&s bitarray, i.e. a pointer to @p ba is kept
  *       within the r&s bitarray. The proper functioning of the
  *       r&s bitarray will depend on @p ba being left untouched thereafter.
@@ -100,7 +100,7 @@ size_t csrsbitarr_rank1(csrsbitarr *ba, size_t pos);
 
 /**
  * @brief Computes rank_@p bit(@p ba, @p pos) = # positions j<@p pos
- * s.t. @p ba[j]==@p bit, for 0 <= @p pos < @p ba.len. If @pos>= @ba.len
+ * s.t. @p ba[j]==@p bit, for 0 <= @p pos < @p ba.len. If @p pos>= @p ba.len
  * returns the total number of positions with value == @p bit.
  */
 size_t csrsbitarr_rank(csrsbitarr *ba, size_t pos, bool bit);

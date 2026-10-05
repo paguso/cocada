@@ -40,7 +40,7 @@
 
 
 /**
- * Opaque deque type
+ * @brief Opaque deque type
  */
 typedef struct _deque deque;
 

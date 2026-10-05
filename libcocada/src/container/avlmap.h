@@ -109,7 +109,7 @@ void avlmap_del(avlmap *self, void *key);
  * by copying them to @p dest_key and @p dest_val respectively.
  *
  * This is particularly useful when the key/value is an owned reference to
- * a heap-allocated object. Neither this method nor the ::hashmap_del method
+ * a heap-allocated object. Neither this method nor the #hashmap_del method
  * destroy the dissociated key or value, which may cause a memory leak.
  * The copies returned via @p dest_key and
  * @p dest_val can be used by the caller to explicitly destroy those objects

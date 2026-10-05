@@ -45,8 +45,8 @@ typedef struct _kwayrng kwayrng;
  * @brief Creates a new k-way independent r.n.g. for generating values
  * of @p nbits bits, i.e. the r.n.g will generate a pseudorandom
  * k-way independent sequence of values in Z/pZ where p=2^@p nbits.
- * Each call to kwayrng_next() yields the next value of the sequence.
- * A call to kwayrng_reset() restarts the sequence.
+ * Each call to #kwayrng_next yields the next value of the sequence.
+ * A call to #kwayrng_reset restarts the sequence.
  *
  * @param k The order of independence.
  * @param nbits The size of the generated values in bits. This value
@@ -58,7 +58,7 @@ kwayrng *kwayrng_new(size_t k, size_t nbits);
 /**
  * @brief Creates a k-way independent r.n.g. with given polynomial
  * coefficients.
- * @param (**NO TRANSFER**) coefs The polynomial coefficients.
+ * @param coefs The polynomial coefficients.
  * Values are considered modulo the appropriate max value
  * p=2^@p nbits.
  */

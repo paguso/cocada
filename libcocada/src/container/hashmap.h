@@ -33,11 +33,11 @@
  * @file hashmap.h
  * @author Paulo Fonseca
  *
- * @brief Generic N:1 key->val map (for <b>non-null</b> keys) implemented as a hash table.
+ * @brief Generic N:1 key->val map (for **non-null** keys) implemented as a hash table.
  */
 
 /**
- * Hashmap type
+ * @brief Hashmap type
  */
 typedef struct _hashmap hashmap;
 
@@ -75,7 +75,7 @@ hashmap *hashmap_new(size_t keysize, size_t valsize, hash_func keyhash,
 
 /**
  * @brief Initialiser for an already allocated hashmap
- * Analogous to ::hashmap_new
+ * Analogous to #hashmap_new
  * @see hashmap_new
  */
 void hashmap_init(hashmap *map, size_t keysize, size_t valsize,
@@ -94,7 +94,7 @@ hashmap *hashmap_new_with_capacity(size_t keysize, size_t valsize,
 
 /**
  * @brief Initialiser for an already allocated hashmap.
- * Analogous to ::hashmap_new_with_capacit
+ * Analogous to #hashmap_new_with_capacity
  * @see hashmap_new_with_capacity
  */
 void hashmap_init_with_capacity(hashmap *map, size_t keysize, size_t valsize,
@@ -179,13 +179,13 @@ void hashmap_del(hashmap *hmap, const void *key);
  * by copying them to @p dest_key and @p dest_val respectively.
  *
  * This is particularly useful when the key/value is an owned reference to
- * a heap-allocated object. Neither this method nor the ::hashmap_del method
+ * a heap-allocated object. Neither this method nor the #hashmap_del method
  * destroy the dissociated key or value, which may cause a memory leak.
  * The copies returned via @p dest_key and
  * @p dest_val can be used by the caller to explicitly destroy those objects
  * after removal from the hashmap.
  *
- * ## Example
+ * **Example**
  * ```C
  * keyobj *key1 = keyobj_new("key1");
  * valobj *val1 = valobj_new("val1");
@@ -224,7 +224,7 @@ size_t hashmap_size(const hashmap *hmap);
 
 
 /**
- * Hashmap iterator type
+ * @brief Hashmap iterator type
  */
 typedef struct _hashmap_iter hashmap_iter;
 
@@ -232,7 +232,7 @@ typedef struct _hashmap_iter hashmap_iter;
 /**
  * @brief Returns a new iterator for the given @p map.
  * Implements iter trait.
- * The ::iter_next method returns a pointer to a ::hashmap_entry.
+ * The #iter_next method returns a pointer to a #hashmap_entry.
  * @see iter
  */
 hashmap_iter *hashmap_get_iter(const hashmap *hmap);

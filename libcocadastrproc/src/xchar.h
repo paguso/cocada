@@ -32,7 +32,7 @@
  * @author Paulo Fonseca
  * @brief eXtended char
  *
- * According to the C standard, the <b>char</b> type is a standard signed
+ * According to the C standard, the **char** type is a standard signed
  * integer type, "large enough to store any member of the basic execution
  * character set". Its is often implemented as a single byte (octet) and
  * thus capable of representing 255 distinct symbols, frequently associated

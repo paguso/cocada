@@ -49,8 +49,8 @@
 
 
 /**
- * @brief Alphabet types returned by the ab_type() function.
- * @see ab_type()
+ * @brief Alphabet types returned by the #ab_type function.
+ * @see #ab_type
  */
 typedef enum {
 	CHAR_TYPE = 0, /**< Character alphabet type */
@@ -74,7 +74,7 @@ typedef size_t (*char_rank_func)(xchar_t c);
  * @brief Creates a char alphabet from a string with letters in
  *        lexicographic order.
  * @param size Number of letters.
- * @param letters (no transfer) String with letters in lexicographic order.
+ * @param letters String with letters in lexicographic order.
  */
 alphabet *alphabet_new(size_t size, const char *letters);
 
@@ -97,7 +97,7 @@ alphabet *alphabet_new(size_t size, const char *letters);
  * to be assigned rank `i`. Once a char in @p letters[i] is assigned a rank,
  * further appearences of the same char in @p letters[j] with `j>i` will be
  * ignored. If multiple equivalent chars are assigned to rank `r`,
- * calling ::ab_char(ab, `r`) will return the first of them.
+ * calling #ab_char(ab, `r`) will return the first of them.
  *
  *
  * @param size The size of the alphabet
@@ -147,7 +147,7 @@ size_t ab_size(const alphabet *ab);
 
 
 /**
- * @brief Indicates whether alphabet @p ab contains the character @c.
+ * @brief Indicates whether alphabet @p ab contains the character @p c.
  */
 bool ab_contains(const alphabet *ab, xchar_t c);
 

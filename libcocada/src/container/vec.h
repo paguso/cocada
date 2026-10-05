@@ -42,7 +42,7 @@
  * It is implemented as a heap allocated array with a given limited
  * capacity, which gets reallocated on demand.
  *
- * This is a **flat** container (see ::new.h module documentation),
+ * This is a **flat** container (see new.h module documentation),
  * meaning the values are directly copied into the buffer, as
  * opposed to storing only references to elements located elsewhere.
  */
@@ -75,7 +75,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity);
  *        its internal buffer.
  *        To create an vector from a **copy** of a raw buffer, which is
  *        not moved, see #vec_new_from_arr_cpy
- * @param buf (**move**) The buffer containing the vector data.
+ * @param @move buf The buffer containing the vector data.
  * @param len The lenght of the vector.
  * @param typesize The size in bytes of each vector element.
  * @warning
@@ -96,7 +96,7 @@ vec *vec_new_from_arr(void *buf, size_t len, size_t typesize);
  *        to the vector.
  *        To turn @p buf into a dynamic array without duplicating its
  *        values see #vec_new_from_arr.
- * @param buf (**no transfer**) The buffer containing the vector data.
+ * @param buf The buffer containing the vector data.
  * @param len The lenght of the vector.
  * @param typesize The  size in bytes of each vector element.
  * @see vec_new_from_arr
@@ -325,7 +325,7 @@ size_t vec_find(const vec *v, const void *val, eq_func eq);
 
 /**
  * @brief Performs a binary search for @p val in @p v
- * @returns The first position of @p val in @p v if it exists, else
+ * @return The first position of @p val in @p v if it exists, else
  * returns the length of @p v.
  * @param cmp Comparison function
  * @see order.h
@@ -355,7 +355,7 @@ size_t vec_max(const vec *v, cmp_func cmp);
  * The @p cmp function should compare elements of the type stored in the vector,
  * so it receives pointers to locations containing such values.
  *
- * ## Example
+ * **Example**
  *
  * ```C
  * typedef struct {
@@ -464,7 +464,7 @@ XX_CORETYPES(DECL_TYPED_VEC)
 
 
 /**
- * @brief Vector iterator type (opaque). Implements the ::iter trait.
+ * @brief Vector iterator type (opaque). Implements the #iter trait.
  * @see iter.h
  */
 typedef struct _vec_iter vec_iter;

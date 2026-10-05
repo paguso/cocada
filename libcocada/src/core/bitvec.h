@@ -63,7 +63,7 @@ bitvec *bitvec_new_with_len(size_t length);
 /**
  * @brief Constructs a new bitvector from a source bitarray.
  *        Source bits are copied internally
- * @param src (no transfer) The source bit array
+ * @param src The source bit array
  * @param len Number of bits to be copied
  */
 bitvec *bitvec_new_from_bitarr(const byte_t *src, size_t len);
@@ -84,14 +84,14 @@ void bitvec_free(bitvec *bv);
 
 /**
  * @brief Clones a bitvector
- * @param src (no transfer) The source bitvector
+ * @param src The source bitvector
  */
 bitvec *bitvec_clone(const bitvec *src);
 
 
 /**
  * @brief Clones the first @p nbits of @p src to a new bitvector
- * @param src (no transfer) The source bitvector
+ * @param src The source bitvector
  * @param nbits Number of bits to be copied
  */
 bitvec *bitvec_cropped_clone(const bitvec *src, size_t nbits);
@@ -123,7 +123,7 @@ const byte_t *bitvec_as_bytes(const bitvec *bv);
 /**
  * @brief Detaches and returns the internal raw byte array
  * and destroys the bitvector object
- * @param bv (full transfer) The bitvector to be dismantled.
+ * @param @move bv The bitvector to be dismantled.
  */
 byte_t *bitvec_detach (bitvec *bv);
 
@@ -177,8 +177,8 @@ void bitvec_push_n (bitvec *bv, size_t n, bool bit);
 
 /**
  * @brief Concatenates the contents of @p src to @p bv.
- * @param bv (no transfer) The target bitvector
- * @param src (no transfer) The source bitvector
+ * @param bv The target bitvector
+ * @param src The source bitvector
  */
 void bitvec_cat (bitvec *bv, const bitvec *src);
 
@@ -189,7 +189,7 @@ void bitvec_cat (bitvec *bv, const bitvec *src);
  * @param bytes_per_line Number of bytes per row. Use SIZE_MAX to write
  *        as a single line.
  * @deprecated Use the bitvec_format interface
- * @see bitvec_get_format()
+ * @see #bitvec_get_format
  */
 void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
 
@@ -198,7 +198,7 @@ void bitvec_to_string ( const bitvec *bv, strbuf *dest, size_t bytes_per_row);
  * @brief Prints the bitvector do std output.
  * @param bytes_per_row Number of bytes per row
  * @deprecated Use the bitvec_format interface
- * @see bitvec_get_format()
+ * @see #bitvec_get_format
  */
 void bitvec_print(FILE *stream, const bitvec *bv, size_t bytes_per_row);
 

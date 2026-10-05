@@ -66,7 +66,7 @@ char *cstr_clone_len(const char *src, size_t len);
  * is not large enough to hold the new value @p src. Make sure to use it
  * as "`dest = cstr_reassign(dest, src)`" to avoid pointer inconsistence.
  *
- * # Example
+ * **Example**
  * ```C
  * char *s = "foo";
  * printf("%s\n", s); // prints "foo"
@@ -123,7 +123,7 @@ char *cstr_crop_len(char *str, size_t len);
 /**
  * @brief Removes unwanted chars from both ends of the string
  *
- * # Example
+ * **Example**
  *
  * ```C
  * char *s = "<!-- some nice comment -->";
@@ -155,7 +155,7 @@ char *cstr_resize(char *str, size_t len);
  * ```
  * If @p from >= @p to This operation has no effect.
  * The operation does not reallocate the string. To adjust the physiscal
- * array size to the new string size, use cstr_resize()
+ * array size to the new string size, use #cstr_resize
  * new size
  * @warning No bound checks are performed.
  */
@@ -197,7 +197,7 @@ bool cstr_equals_ignore_case(const char *left, const char *right);
  * @brief Joins @p n strings into a single string,
  * intercalating them with a given separator @p sep.
  *
- * #Example
+ * **Example**
  * ```C
  * char *lifecicle = cstr_join("-", 3, "code", "test", "repeat");
  * printf("%s\n",lifecicle);// prints "code-test-repeat"

@@ -40,14 +40,14 @@
 
 
 /**
- * String dBG type.
+ * @brief String dBG type.
  */
 typedef struct _dbgraph dbgraph;
 
 
 /**
  * @brief Creates a dBG from a source string. The string is padded to the
- *        left with @par k sentinel chars ($), and to the right with a
+ *        left with @p k sentinel chars ($), and to the right with a
  *        finishing $. The sentinel is considered to be lexicographically
  *        smaller than all the other symbols of the input alphabet.
  * @param ab Input alphabet.
@@ -61,7 +61,7 @@ dbgraph *bossbossdbg_new_from_str(alphabet *ab, char *txt, size_t k,
 
 /**
  * @brief Creates a dBG from a source stream.
- * @see bossbossdbg_new_from_string
+ * @see bossbossdbg_new_from_str
  */
 dbgraph *bossbossdbg_new_from_stream( alphabet *ab, strstream *sst, size_t k,
                                       bool multigraph );

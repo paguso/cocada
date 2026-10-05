@@ -56,28 +56,28 @@
 
 
 /**
- * Huffman code type
+ * @brief Huffman code type
  */
 typedef struct _huffcode huffcode;
 
 
 /**
- * Huffman Tree node type
+ * @brief Huffman Tree node type
  */
 typedef struct _hufftnode hufftnode;
 
 
 /**
  * @brief Creates a HC for an alphabet with associated letter frequencies.
- * @param ab (no transfer) The base alphabet.
- * @param freqs (no transfer) Individual letter frequencies in lexycographic order.
+ * @param ab The base alphabet.
+ * @param freqs Individual letter frequencies in lexycographic order.
  */
 huffcode *huffcode_new(const alphabet *ab, const size_t *freqs);
 
 
 /**
  * @brief Creates a HC for an alphabet from a source string.
- * @param ab (no transfer) The base alphabet.
+ * @param ab The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
 huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
@@ -85,15 +85,15 @@ huffcode *huffcode_new_from_str(const alphabet *ab, const char *src);
 
 /**
  * @brief Creates a HC for an alphabet from a source stream.
- * @param (no transfer) ab The base alphabet.
- * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
+ * @param ab The base alphabet.
+ * @param src Source stream from which letter frequencies are to be estimated.
  */
 huffcode *huffcode_new_from_strread(const alphabet *ab, strread *src);
 
 
 /**
  * @brief Creates a HC for an alphabet from a source string.
- * @param ab (no transfer) The base alphabet.
+ * @param ab The base alphabet.
  * @param src (no transfer( Source string from which letter frequencies are to be estimated.
  */
 huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src);
@@ -101,8 +101,8 @@ huffcode *huffcode_new_from_xstr(const alphabet *ab, const xstr *src);
 
 /**
  * @brief Creates a HC for an alphabet from a source stream.
- * @param (no transfer) ab The base alphabet.
- * @param (no transfer) src Source stream from which letter frequencies are to be estimated.
+ * @param ab The base alphabet.
+ * @param src Source stream from which letter frequencies are to be estimated.
  */
 huffcode *huffcode_new_from_xstrread(const alphabet *ab, xstrread *src);
 
@@ -181,7 +181,7 @@ xstr *huffcode_decode(const bitvec *code, const huffcode *hcode);
 /**
  * @brief Returns the code of a char
  * @param char_rank The rank of the char w.r.t. the code alphabet
- * @warn  Do NOT destroy of modify the returned bitvector.
+ * @warning  Do NOT destroy of modify the returned bitvector.
  */
 const bitvec *huffcode_charcode(const huffcode *hcode, size_t char_rank);
 

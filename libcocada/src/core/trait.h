@@ -188,7 +188,7 @@
  * ```C
  * dimension dc = get_dimension( AS_TRAIT(c, circle, shape) );
  * ```
- * using the general ::AS_TRAIT macro.
+ * using the general #AS_TRAIT macro.
  * Alternatively, we could define a function
  * ```C
  * shape *circle_as_shape(circle *c);
@@ -197,8 +197,8 @@
  * ```C
  * dimension dc = get_dimension( circle_as_shape(c) );
  * ```
- * This method is declared via the ::DECL_TRAIT macro in `circle.h`
- * and its implementation is generated via the ::IMPL_TRAIT macro in `circle.c`.
+ * This method is declared via the #DECL_TRAIT macro in `circle.h`
+ * and its implementation is generated via the #IMPL_TRAIT macro in `circle.c`.
  *
  */
 
@@ -221,13 +221,14 @@
 
 
 /**
- * Expands into the definition of the method
+ * @brief Expands into the definition of the method
  * ```C
  * TRAIT *TYPE_as_TRAIT(TYPE *t) {
  *    return t->_t_TRAIT;
  * }
  * ```
  * to get the trait representation of a type.
+ *
  * You should include this in the implementation of the type.
  *
  * @see DECL_TRAIT
@@ -240,7 +241,7 @@
 
 
 /**
- * Gets the trait representation of an implementor object.
+ * @brief Gets the trait representation of an implementor object.
  * @param IMPLTOR A pointer to the implementor object
  * @param TYPE The concrete type of the implementor object
  * @param TRAIT The name of the trait

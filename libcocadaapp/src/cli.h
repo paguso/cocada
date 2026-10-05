@@ -87,7 +87,7 @@
  * Setting nmin=nmax enforces an exact number of values.
  *
  * Some validation can be performed on option values by setting types
- * to these values. Option types are chosen from the enum type ::cliargtype.
+ * to these values. Option types are chosen from the enum type #cliargtype.
  *
  * An option can either be *required*, when it must be declared in the
  * program call, or *optional*, when it may be left unspecified.
@@ -119,14 +119,14 @@
  * Sometimes there can be dependencies between options. For example,
  * there can be a situation in which if an option is used, then a
  * complementary option should also be used. COCADA lets such dependencies
- * be specified via "option combos" ::clioptcombotype.
+ * be specified via "option combos" #clioptcombotype.
  *
  *
  * # Positional arguments
  *
  * The required inputs to a program are given as a list of positional
  * arguments, usually at the end of the program call. Arguments are typed
- * with the same ::cliargtype types as option values. Arguments are validated
+ * with the same #cliargtype types as option values. Arguments are validated
  * during the parsing of the program call.  In general, every argument
  * has a single value, however some programs may accept an unbounded
  * list of inputs. So we allow the last positional argument to
@@ -286,10 +286,10 @@ typedef struct _cliopt cliopt;
  * options should be used together.
  */
 typedef enum {
-	ONE_OF,		/**< Exactly one of the options in the combo should be used. **/
-	ALL_OF,		/**< All of the options in the combo should be used. **/
-	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. **/
-	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. **/
+	ONE_OF,		/**< Exactly one of the options in the combo should be used. */
+	ALL_OF,		/**< All of the options in the combo should be used. */
+	ONE_IF_ANY,	/**< At most one of the option int the combo should be used. */
+	ALL_IF_ANY	/**< All or nono of the options in the combo should be used. */
 } clioptcombotype;
 
 
@@ -315,9 +315,9 @@ typedef struct _cliparser cliparser;
 /**
  * @brief Creates a new non-sc option.
  *
- * @param shortname		(**no transfer**) The one-character distinct name
- * @param longname		(**no transfer**) The multi-character distinct name
- * @param help			(**no transfer**) A short description of the option
+ * @param shortname		The one-character distinct name
+ * @param longname		The multi-character distinct name
+ * @param help			A short description of the option
  * 						used for help messages.
  * @param need			Is the option use mandatory?
  * @param multiplicity	Can the option be declared multiple times?
@@ -326,8 +326,8 @@ typedef struct _cliparser cliparser;
  * @param max_val_no	The maximum number of option values.
  * 						Required: @p min_val_no <= @p max_val_no.
  * 						Use ARGNO_UNLIMITED for an unlimited number ofvalues.
- * @param choices		(**transfer**) Possible choices if @p type = ARG_CHOICE
- * @param defaults		(**transfer**) Default values
+ * @param @move choices		Possible choices if @p type = ARG_CHOICE
+ * @param @move defaults		Default values
  *
  * The following validations will be performed:
  *
@@ -370,9 +370,9 @@ cliopt *cliopt_new(char shortname,  char *longname, char *help,
  * - Single usage (can appear at most once per program call)
  * - No associated value (boolean switch).
  *
- * @param shortname (**no transfer**) The one-character distinct name
- * @param longname  (**no transfer**) The multi-character distinct name
- * @param help      (**no transfer**) A short description of the option
+ * @param shortname The one-character distinct name
+ * @param longname  The multi-character distinct name
+ * @param help      A short description of the option
  *                  used for help messages.
  *
  * This is equivalent to
@@ -407,9 +407,9 @@ const char cliopt_shortname(const cliopt *opt);
 
 /**
  * @brief Creates a new single-valued positional argument.
- * @param name	(**no transfer**) The name of the argument used for
+ * @param name	The name of the argument used for
  * 				descritptive/documentation purposes only.
- * @param help	(**no transfer**) A short description of the argument
+ * @param help	A short description of the argument
  * 				used for help messages.
  * @param type	The type of the argument.
  */
@@ -419,9 +419,9 @@ cliarg *cliarg_new(char *name, char *help, cliargtype type);
 /**
  * @brief Creates a new multi-valued positional argument.
  * 		  Only the last positional argument can be multi-valued.
- * @param name	(**no transfer**) The name of the argument used for
+ * @param name	The name of the argument used for
  * 				descritptive/documentation purposes only.
- * @param help	(**no transfer**) A short description of the argument
+ * @param help	A short description of the argument
  * 				used for help messages.
  * @param type	The type of the argument.
  */
@@ -445,8 +445,8 @@ cliarg *cliarg_new_multi_optional(char *name, char *help, cliargtype type);
 
 /**
  * @brief Creates a new (sub)program CLI parser.
- * @param name	(**no transfer**) The name of the (sub)program.
- * @param help	(**no transfer**) A short description of the (sub)program
+ * @param name	The name of the (sub)program.
+ * @param help	A short description of the (sub)program
  * 				used for help messages.
  */
 cliparser *cliparser_new(char *name, char *help);
@@ -503,7 +503,7 @@ void cliparser_add_option(cliparser *cmd, cliopt *opt);
  * list of  @p n cliopt  references should be passed as arguments.
  *
  * @warning The combo specifies the dependencies between the options only,
- * and they must be independently added via ::cliparser_add_option.
+ * and they must be independently added via #cliparser_add_option.
  */
 void cliparser_add_option_combo(cliparser *cmd, clioptcombotype type, size_t n,
                                 ...);
@@ -545,7 +545,7 @@ typedef enum {
 #define CLIPARSE_ERROR_BUFSZ 128
 
 /**
- * CLI parse error result type.
+ * @brief CLI parse error result type.
  */
 typedef struct {
 	cliparse_err_code code;
@@ -566,7 +566,7 @@ DECL_RESULT_OK_ERR(cliparse, cliparser *, cliparse_error)
  * is printed to stderr and the program exits.
  *
  * @param argc The number of tokens (normally received by main())
- * @param argv (*no transfer*) The program call tokens (also received by main())
+ * @param argv The program call tokens (also received by main())
  * @param exit_on_error Indicates whether the program should exit if a parse error is found.
  *
  * The parser assumes @p argv to contain the tokens of a program call to be
@@ -613,7 +613,7 @@ cliparse_res cliparser_parse(cliparser *cmd, int argc, char **argv,
 
 /**
  * @brief Returns the invoked subcommand of a command, if any.
- * @return Prior to parsing a call with ::cliparser_parse (cmd), returns NULL.
+ * @return Prior to parsing a call with #cliparser_parse (cmd), returns NULL.
  * After parsing a call, if a subcommand was called, returns the
  * corresponding (populated) parser, else returns NULL.
  */
@@ -622,7 +622,7 @@ const cliparser *cliparser_active_subcommand(const cliparser *cmd);
 
 /**
  * @brief Returns the declared sc option of a (sub)command, if any.
- * @return Prior to parsing a call with ::cliparser_parse(cmd), returns NULL.
+ * @return Prior to parsing a call with #cliparser_parse(cmd), returns NULL.
  * After parsing a call, if an sc option was declared, returns the
  * corresponding (populated) cliopt, else returns NULL.
  */
@@ -657,10 +657,10 @@ bool cliparser_opt_used_from_longname(const cliparser *cmd,
  *
  * @return If the option is not found, returns NULL.
  * If the option is found, returns its values.
- * The physical type/size of the values will depend on the ::cliargtype type of
+ * The physical type/size of the values will depend on the #cliargtype type of
  * the option.
  * If the option can be used multiple times (parameter `multiplicity==OPT_MULTIPLE`
- * of ::cliopt_new), then the returned vector is a two-level vector of vectors,
+ * of #cliopt_new), then the returned vector is a two-level vector of vectors,
  * with child vectors containing the values of each declaration of the option.
  * For example if we call
  * ```
@@ -693,9 +693,9 @@ const vec *cliparser_opt_val_from_longname(const cliparser *cmd,
  * @param cmd The (sub)command parser
  * @param pos The position (0-based) of the argument.
  *
- * @returns A vector with the values of argument #@p pos.
+ * @return A vector with the values of argument #@p pos.
  * The physical type/size of  the vector elements is defined by the
- * ::cliargtype type of the argument.
+ * #cliargtype type of the argument.
  * If @p pos is >= the number of arguments, returns NULL.
  *
  */

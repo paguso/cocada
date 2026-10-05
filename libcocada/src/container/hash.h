@@ -75,7 +75,7 @@ XX_PRIMITIVES(DECL_IDENT_HASH)
 uint64_t fib_hash(uint64_t key);
 
 /**
- * Simplified 64-bit FNV hashing
+ * @brief Simplified 64-bit FNV hashing
  * @see source: http://www.isthe.com/chongo/tech/comp/fnv
  */
 uint64_t fnv1a_64bit_hash(const void *obj, size_t objsize);

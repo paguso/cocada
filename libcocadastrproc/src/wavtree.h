@@ -121,7 +121,7 @@ size_t wavtree_rank_pos(wavtree *wt, size_t pos);
 
 
 /**
- * @brief Computes the @pos c-rank of a given position @p pos, defined as
+ * @brief Computes the @p pos c-rank of a given position @p pos, defined as
  *        the # of positions 0<=j<@p pos s.t. str[j]==@p c, where
  *        str is string represented by the WT.
  */
@@ -158,7 +158,7 @@ size_t wavtree_succ(wavtree *wt, size_t pos, xchar_t c);
 
 /**
  * @brief Returns the char at position @p pos in the string represented by
- *        the WT. Notice that the WT does <b>not</b> explicitly store
+ *        the WT. Notice that the WT does **not** explicitly store
  *        the string.
  */
 xchar_t wavtree_char(wavtree *wt, size_t pos);

@@ -117,7 +117,7 @@
  * ## Node data (payload)
  *
  * Each node has associated data accessible via the public interface methods
- * ::quadtree_node_get_data and ::quadtree_node_set_data. Whether this
+ * #quadtree_node_get_data and #quadtree_node_set_data. Whether this
  * data is owned or not is left to the user. If the data is owned,
  * the finaliser should be defined accordingly with a nested finaliser
  * to a pointer to the owned type. For instance, if the data contains
@@ -196,25 +196,25 @@ typedef struct {
 
 
 /**
- * @brief Anchor type to be used with the ::rectangle_snap_to_grid method.
+ * @brief Anchor type to be used with the #rectangle_snap_to_grid method.
  */
 typedef enum {
-	SNAP_IN, /**< Snap to inner rectangle **/
-	SNAP_OUT /**< Snap to outer grid rectangle **/
+	SNAP_IN, /**< Snap to inner rectangle */
+	SNAP_OUT /**< Snap to outer grid rectangle */
 } snap_t;
 
 
 /**
  * @brief Snaps the rectangle to the grid implied by the quadtree.
- * If @p anchor is ::SNAP_OUT, returns the smallest rectangle with corners
- * in the grid containing @p rect. If @p anchor is ::SNAP_IN, returns
+ * If @p anchor is #SNAP_OUT, returns the smallest rectangle with corners
+ * in the grid containing @p rect. If @p anchor is #SNAP_IN, returns
  * the largest rectangle with corners in the grid contained by @p rect.
  *
- * ## Example
+ * **Example**
  * Consider the diagram below. If this method is called with the
- * highligthed rectangle (*) and @p anchor = ::SNAP_IN, the
+ * highligthed rectangle (*) and @p anchor = #SNAP_IN, the
  * rectangle corresponding to `BJL` is returned, where `B=FGHI`.
- * If @p anchor = ::SNAP_OUT, then `BCNORS` area is returned.
+ * If @p anchor = #SNAP_OUT, then `BCNORS` area is returned.
  *
  * ```
  *  ****************************- - +
@@ -258,7 +258,7 @@ quadtree *quadtree_new(uint width, uint height, uint depth);
  * ```C
  * finaliser_cons(FNR(quadtree), finaliser_cons(finaliser_new_ptr(), FNR(T)))
  * ```
- * Most likely this will be called via the ::DESTROY or ::FINALISE macros
+ * Most likely this will be called via the #DESTROY or #FINALISE macros
  *
  * @see new.h
  */
@@ -278,9 +278,9 @@ void quadtree_fit(quadtree *tree);
  * the header documentation. The provided callback update function @p upd_func
  * is called on each node in this path from the root to the leaf. This may be used to
  * update the node data via the public interface methods
- * ::quadtree_node_get_data and ::quadtree_node_set_data.
+ * #quadtree_node_get_data and #quadtree_node_set_data.
  *
- * ## Example
+ * **Example**
  *
  * ```
  *  + - - - + - - - + - - - + - - - +
@@ -326,7 +326,7 @@ void quadtree_ins(quadtree *tree, point2d pt, void *payload,
  * the quadree nodes, and collects information to update the query result
  * from all nodes completely contained in the selected area.
  *
- * ## Example
+ * **Example**
  * In the diagram below, the highlighted area
  * (inside the *) encompasses all the `B` top-left quadrant, plus
  * sub-quadrants `J` and `L`, and partially overlaps with `K`, `M`, `N`,

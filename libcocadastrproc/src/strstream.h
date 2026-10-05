@@ -39,7 +39,7 @@
 
 
 /**
- * String stream type
+ * @brief String stream type
  */
 typedef struct _strstream strstream;
 
@@ -85,16 +85,16 @@ bool strstream_end(strstream *sst);
 
 /**
  * @brief Reads the next char from a stream.
- * @returns The next character as an int, or EOF if the stream has
+ * @return The next character as an int, or EOF if the stream has
  *          reached its end.
  *
  * Example of usage:
- * @code
+ * ```c
  * strstream *fsst = strstream_open_file(filename);
  * for (int c; (c=strstream_getc(fsst)) != EOF;)
  *     printf ("Read c=%c\n", (char)c);
  * strstream_close(fsst);
- * @endcode
+ * ```
  */
 xchar_t strstream_getc(strstream *sst);
 
@@ -102,7 +102,7 @@ xchar_t strstream_getc(strstream *sst);
 /**
  * @brief Attempts to read the next @p n chars into the string *dest.
  *        Less than @p n characters can be read if the stream reaches its end.
- * @returns The number of chars actually read.
+ * @return The number of chars actually read.
  */
 size_t strstream_reads(strstream *sst, char *dest, size_t n);
 
@@ -110,7 +110,7 @@ size_t strstream_reads(strstream *sst, char *dest, size_t n);
 /**
  * @brief Attempts to read the next @p n chars into the string *dest.
  *        Less than @p n characters can be read if the stream reaches its end.
- * @returns The number of chars actually read.
+ * @return The number of chars actually read.
  */
 size_t strstream_reads_until(strstream *sst, char *dest, char delim);
 
@@ -118,7 +118,7 @@ size_t strstream_reads_until(strstream *sst, char *dest, char delim);
 /**
  * @brief Attempts to read the next @p n xchars into the xstr *dest.
  *        Less than @p n xchars can be read if the stream reaches its end.
- * @returns The number of xchars actually read.
+ * @return The number of xchars actually read.
  */
 size_t strstream_readxs(strstream *sst, xstr *xstr, size_t n);
 
@@ -126,7 +126,7 @@ size_t strstream_readxs(strstream *sst, xstr *xstr, size_t n);
 /**
  * @brief Attempts to read the next @p n xchars into the xstr *dest.
  *        Less than @p n xchars can be read if the stream reaches its end.
- * @returns The number of xchars actually read.
+ * @return The number of xchars actually read.
  */
 size_t strstream_readxs_until(strstream *sst, xstr *xstr, xchar_t delim);
 

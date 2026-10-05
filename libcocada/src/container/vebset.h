@@ -45,7 +45,9 @@ vebset *vebset_new();
 
 
 /**
- * Destructor. Equivalent to DESTROY_FLAT(self, vebset).
+ * @brief Destructor.
+ *
+ * Equivalent to DESTROY_FLAT(self, vebset).
  * @see DESTROY_FLAT
  */
 void vebset_free(vebset *self);

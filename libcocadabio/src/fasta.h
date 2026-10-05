@@ -37,7 +37,7 @@
  * defined in a FASTA-format file.
  * During the iteration, each sequence can *either* be entirely loaded to
  * memory as a string, or be treated as a char input stream with a
- * buffered string reader (::strread), which avoids having to load
+ * buffered string reader (#strread), which avoids having to load
  * potentially large sequences fully into memory.
  */
 
@@ -54,8 +54,8 @@ typedef struct _fasta fasta;
 typedef struct {
 	char *descr;	/**< Sequence descriptor (does not include the `>`) */
 	char *seq;   	/**< In-memory sequence content */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
-	size_t seq_offset;		/**< Sequence offset from the start of the file **/
+	size_t descr_offset;	/**< Descriptor offset from the start of the file */
+	size_t seq_offset;		/**< Sequence offset from the start of the file */
 } fasta_rec;
 
 
@@ -65,8 +65,8 @@ typedef struct {
 typedef struct {
 	char *descr;      	/**< Sequence descriptor */
 	strread *seqrdr;	/**< Sequence contents reader */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file **/
-	size_t seq_offset;		/**< Sequence offset from the start of the file **/
+	size_t descr_offset;	/**< Descriptor offset from the start of the file */
+	size_t seq_offset;		/**< Sequence offset from the start of the file */
 } fasta_rec_rdr;
 
 
