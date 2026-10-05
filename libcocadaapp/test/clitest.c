@@ -229,10 +229,47 @@ void test_cli_parse(CuTest *tc)
 }
 
 
+// Parses call with a parser for "prog <first> [<rest...>]" (or just
+// "prog [<rest...>]" if !with_first). Returns the number of values of
+// rest, or -1 on a parse error.
+static int parse_optional_args(char *call, bool with_first)
+{
+	cliparser *prog = cliparser_new("prog", "Test program");
+	if (with_first) {
+		cliparser_add_pos_arg(prog, cliarg_new("first", "first argument", ARG_STR));
+	}
+	cliparser_add_pos_arg(prog, cliarg_new_multi_optional("rest", "other arguments",
+	                      ARG_FILE));
+	int argc;
+	char **argv = make_argv(call, &argc);
+	cliparse_res result = cliparser_parse(prog, argc, argv, false);
+	int ret = -1;
+	if (result.ok) {
+		ret = (int)vec_len(cliparser_arg_val_from_pos(prog, with_first ? 1 : 0));
+	}
+	freeargv(argc, argv);
+	DESTROY_FLAT(prog, cliparser);
+	return ret;
+}
+
+
+void test_cli_optional_args(CuTest *tc)
+{
+	char none[] = "prog", one[] = "prog x", three[] = "prog x a.c b.c";
+	char none2[] = "prog", two[] = "prog a.c b.c";
+	CuAssertIntEquals(tc, -1, parse_optional_args(none, true)); // <first> missing
+	CuAssertIntEquals(tc, 0, parse_optional_args(one, true));
+	CuAssertIntEquals(tc, 2, parse_optional_args(three, true));
+	CuAssertIntEquals(tc, 0, parse_optional_args(none2, false));
+	CuAssertIntEquals(tc, 2, parse_optional_args(two, false));
+}
+
+
 CuSuite *cli_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("cli");
 	SUITE_ADD_TEST(suite, test_cli_parse);
+	SUITE_ADD_TEST(suite, test_cli_optional_args);
 	return suite;
 }
 

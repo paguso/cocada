@@ -67,6 +67,7 @@ struct _cliarg {
 	char *help;			/* help message */
 	cliargtype type;	/* value type */
 	bool single_val;	/* true=one single value; false=multiple */
+	bool optional;		/* true=may have no values (only if multiple) */
 	vec *choices;		/* value choices if type=ARG_CHOICE */
 	vec *values;		/* Actual parsed value(s) */
 };
@@ -466,6 +467,7 @@ cliarg *cliarg_new(char *name, char *help, cliargtype type)
 	ret->help = (help) ? cstr_clone(help) : cstr_new(0);
 	ret->type = type;
 	ret->single_val = true;
+	ret->optional = false;
 	ret->choices = NULL;
 	ret->values = _vals_vec_new(false, ret->type);
 	return ret;
@@ -476,6 +478,14 @@ cliarg *cliarg_new_multi(char *name, char *help, cliargtype type)
 {
 	cliarg *ret = cliarg_new(name, help, type);
 	ret->single_val = false;
+	return ret;
+}
+
+
+cliarg *cliarg_new_multi_optional(char *name, char *help, cliargtype type)
+{
+	cliarg *ret = cliarg_new_multi(name, help, type);
+	ret->optional = true;
 	return ret;
 }
 
@@ -779,7 +789,8 @@ void cliparser_print_help(const cliparser *cmd)
 	}
 	for (size_t i = 0, l = vec_len(cmd->args); i < l; i++) {
 		cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-		printf(" <%s%s>", arg->name, (arg->single_val) ? "" : "...");
+		printf(" %s<%s%s>%s", (arg->optional) ? "[" : "", arg->name,
+		       (arg->single_val) ? "" : "...", (arg->optional) ? "]" : "");
 	}
 	printf("\n");
 	if (has_subcmds) {
@@ -809,9 +820,9 @@ void cliparser_print_help(const cliparser *cmd)
 		printf("\nArguments:\n\n");
 		for (size_t i = 0, l = vec_len(cmd->args); i < l; i++) {
 			cliarg *arg = (cliarg *)vec_get_rawptr(cmd->args, i);
-			printf("  %s%s\t%s\t(%s%s)\n", arg->name, (arg->single_val) ? "" : "...",
+			printf("  %s%s\t%s\t(%s%s%s)\n", arg->name, (arg->single_val) ? "" : "...",
 			       (arg->help) ? arg->help : "", type_lbl[arg->type],
-			       (arg->single_val) ? "" : "...");
+			       (arg->single_val) ? "" : "...", (arg->optional) ? ", optional" : "");
 		}
 	}
 	if (has_subcmds) {
@@ -1280,10 +1291,14 @@ cliparse_res cliparser_parse(cliparser *clip, int argc, char **argv,
 			goto cleanup;
 		}
 	}
-	// check if some arguments undefined
+	// check if some arguments undefined (the last one may be multi-valued,
+	// and if optional, it may have no values)
+	cliarg *last_arg = vec_len(cur_parse->args) ? (cliarg *)vec_last_rawptr(
+	                       cur_parse->args) : NULL;
+	bool last_arg_ok = last_arg && (vec_len(last_arg->values) > 0 || last_arg->optional);
 	if ( (cur_arg_no != vec_len(cur_parse->args)) &&
 	        ( vec_len(cur_parse->args) == 0 || cur_arg_no != vec_len(cur_parse->args) - 1
-	          || vec_len(((cliarg *)vec_last_rawptr(cur_parse->args))->values) == 0 ) ) {
+	          || !last_arg_ok ) ) {
 		result.ok = false;
 		result.val.err.code = INVALID_ARG_VAL_NO;
 		snprintf(result.val.err.msg, CLIPARSE_ERROR_BUFSZ,

@@ -133,7 +133,9 @@
  * have multiple values, with the same restriction as the option
  * values that they must be of the same type. This is useful,
  * for example, for dealing with wildcard file name expasions made
- * by the shell.
+ * by the shell. The last argument may also be optional, taking zero or
+ * more values (see #cliarg_new_multi_optional), e.g. for a program that
+ * processes some default input when no files are given.
  *
  * ## Example
  * ```
@@ -424,6 +426,21 @@ cliarg *cliarg_new(char *name, char *help, cliargtype type);
  * @param type	The type of the argument.
  */
 cliarg *cliarg_new_multi(char *name, char *help, cliargtype type);
+
+
+/**
+ * @brief Creates a new optional multi-valued positional argument.
+ *
+ * The argument takes zero or more values. Only the last positional
+ * argument can be multi-valued.
+ *
+ * @param name The name of the argument, for documentation purposes only.
+ * @param help A short description of the argument, for help messages.
+ * @param type The type of the argument.
+ * @return @move The argument.
+ * @see cliarg_new_multi
+ */
+cliarg *cliarg_new_multi_optional(char *name, char *help, cliargtype type);
 
 
 /**
