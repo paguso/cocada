@@ -584,9 +584,8 @@ static inline bool p_ident_char(char c)
 
 bool cddecl_is_generator(const cddecl *d)
 {
-	size_t n = strlen(d->name);
-	return d->kind == CDD_MACRO && n > 5
-	       && (strcmp(d->name + n - 5, "_DECL") == 0 || strcmp(d->name + n - 5, "_IMPL") == 0);
+	return d->kind == CDD_MACRO
+	       && (strncmp(d->name, "DECL_", 5) == 0 || strncmp(d->name, "IMPL_", 5) == 0);
 }
 
 

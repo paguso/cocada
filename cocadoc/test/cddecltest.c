@@ -175,7 +175,7 @@ void test_cddecl_macros(CuTest *tc)
 	    "/** d */\n"
 	    "DECL_TRAIT(vec_iter, iter)\n"
 	    "/** e */\n"
-	    "XX_CORETYPES(TYPED_VEC_DECL);\n"
+	    "XX_CORETYPES(DECL_TYPED_VEC);\n"
 	    "/** f */\n"
 	    "#include \"x.h\"\n";
 	exp_decl exp[] = {
@@ -183,7 +183,7 @@ void test_cddecl_macros(CuTest *tc)
 		{CDD_MACRO, "FREE", "#define FREE( OBJ )", true},
 		{CDD_MACRO, "NULL", "#define NULL ((void *)0)", true},
 		{CDD_MACROCALL, "DECL_TRAIT", "DECL_TRAIT(vec_iter, iter)", true},
-		{CDD_MACROCALL, "XX_CORETYPES", "XX_CORETYPES(TYPED_VEC_DECL)", true},
+		{CDD_MACROCALL, "XX_CORETYPES", "XX_CORETYPES(DECL_TYPED_VEC)", true},
 	};
 	CHECK(src, exp);
 	CuAssert(tc, "Memory leak.", memdbg_is_empty());
@@ -220,7 +220,7 @@ void test_cddecl_undocumented(CuTest *tc)
 	    "#define T_H\n"
 	    "#include \"x.h\"\n"
 	    "#define MAX(A, B) ((A) > (B) ? (A) : (B))\n"
-	    "XX_CORETYPES(TYPED_VEC_DECL)\n"
+	    "XX_CORETYPES(DECL_TYPED_VEC)\n"
 	    "static const byte_t _MASK[2] = { 0x80, 0x40 };\n"
 	    "/** a */\n"
 	    "DECL_TRAIT(vec_iter, iter)\n"
@@ -235,6 +235,28 @@ void test_cddecl_undocumented(CuTest *tc)
 }
 
 
+void test_cddecl_is_generator(CuTest *tc)
+{
+	memdbg_reset();
+	const char *src =
+	    "#define DECL_VEC_PUSH(TYPE) void vec_push_##TYPE(vec *v, TYPE val);\n"
+	    "#define IMPL_VEC_PUSH(TYPE) void vec_push_##TYPE(vec *v, TYPE val) {}\n"
+	    "#define VEC_PUSH_DECL(TYPE) void vec_push_##TYPE(vec *v, TYPE val);\n"
+	    "#define MAX(A, B) ((A) > (B) ? (A) : (B))\n"
+	    "int DECL_func(void);\n";
+	vec *toks = cdlex_all(src, strlen(src));
+	vec *decls = cddecl_match(src, toks);
+	CuAssertSizeTEquals(tc, 5, vec_len(decls));
+	bool expected[] = {true, true, false, false, false}; // prefix, and only macros
+	for (size_t i = 0; i < 5; i++) {
+		CuAssertTrue(tc, cddecl_is_generator(vec_get(decls, i)) == expected[i]);
+	}
+	cddecl_vec_free(decls);
+	DESTROY_FLAT(toks, vec);
+	CuAssert(tc, "Memory leak.", memdbg_is_empty());
+}
+
+
 CuSuite *cddecl_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("cddecl");
@@ -243,5 +265,6 @@ CuSuite *cddecl_get_test_suite()
 	SUITE_ADD_TEST(suite, test_cddecl_macros);
 	SUITE_ADD_TEST(suite, test_cddecl_orphans);
 	SUITE_ADD_TEST(suite, test_cddecl_undocumented);
+	SUITE_ADD_TEST(suite, test_cddecl_is_generator);
 	return suite;
 }

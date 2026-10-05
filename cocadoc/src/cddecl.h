@@ -133,7 +133,8 @@ bool cddecl_returns_value(const cddecl *d);
 /**
  * @brief Tells whether a macro is a generator of a typed function family.
  *
- * By convention, generator macros are named `*_DECL` or `*_IMPL`. Their
+ * By convention, generator macros are named `DECL_*` (declaring) or
+ * `IMPL_*` (defining), e.g. `DECL_HASHMAP_GET`, `IMPL_HASHMAP_GET`. Their
  * docs describe the generated functions, not the macro (DC14).
  *
  * @param d The declaration.
