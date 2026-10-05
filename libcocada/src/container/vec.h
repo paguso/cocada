@@ -417,8 +417,12 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 	/** @brief Creates a new TYPE vector @see coretype.h */ \
 	vec *vec_new_##TYPE();
 
+/**
+ * @brief Gets the value at position @p pos as the appropriate @p TYPE.
+ * @param v
+ * @param pos
+ */
 #define DECL_VEC_GET( TYPE ) \
-	/** @brief Returns TYPE copy of the element at position @p pos @see coretype.h */ \
 	TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
 #define DECL_VEC_FIRST( TYPE ) \
