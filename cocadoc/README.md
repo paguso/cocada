@@ -14,9 +14,14 @@ ownership (`@move`), references, AI involvement (`@ai`), and the rules that
 ## Build
 
 ```
-make build    # build/debug/cocadoc
-make test     # build/test/test (unit tests)
+make build          # build/release/cocadoc (optimised)
+make build_debug    # build/debug/cocadoc (debug info, no optimisation)
+make test           # build/test/test (unit tests)
 ```
+
+From the root of the repository, `make doc` builds cocadoc and generates the
+COCADA documentation (with `cocadoc.config`), and `make clean_doc` deletes
+`doc/`, which holds generated documentation only.
 
 ## Use
 
@@ -43,9 +48,9 @@ match a pattern of `EXCLUDE_FILES`.
 From the root of the repository:
 
 ```
-cocadoc/build/debug/cocadoc         # write the pages to OUTPUT_DIRECTORY
-cocadoc/build/debug/cocadoc -l      # only check the comments against the style
-cocadoc/build/debug/cocadoc -c path/to/other.config
+cocadoc/build/release/cocadoc         # write the pages to OUTPUT_DIRECTORY
+cocadoc/build/release/cocadoc -l      # only check the comments against the style
+cocadoc/build/release/cocadoc -c path/to/other.config
 ```
 
 Headers can also be given explicitly, instead of those listed by the
@@ -53,7 +58,7 @@ configuration. All references between headers (`#name`, `@see`, `name.h`)
 are resolved among the files documented together, so give them all at once:
 
 ```
-cocadoc/build/debug/cocadoc -o /tmp/docs libcocada/src/container/vec.h libcocada/src/core/new.h
+cocadoc/build/release/cocadoc -o /tmp/docs libcocada/src/container/vec.h libcocada/src/core/new.h
 ```
 
 Options:

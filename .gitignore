@@ -54,8 +54,8 @@ dkms.conf
 # COCADA build outputs
 build/
 
-# Generated API docs (doxygen)
-/doc/api/
+# Generated documentation (cocadoc, make doc)
+/doc/
 
 # Editor / tooling
 .vscode/

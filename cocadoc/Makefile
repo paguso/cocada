@@ -109,7 +109,7 @@ release_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(release_srcs))
 build: $(release_build_dir) $(release_objs) 
 	$(CC) $(release_objs) -lm -o $(release_build_dir)/cocadoc
 
--include $(release_objs:.o=.d) $(test_objs:.o=.d)
+-include $(debug_objs:.o=.d) $(release_objs:.o=.d) $(test_objs:.o=.d)
 
 .PHONY: clean
 clean: 
