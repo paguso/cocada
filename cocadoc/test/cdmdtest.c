@@ -127,6 +127,7 @@ void test_cdmd_page(CuTest *tc)
 	FREE(page);
 	page = cdmd_page(b, tab);
 	ASSERT_HAS(page, "[Back to module index](index.md#lib)");
+	ASSERT_LACKS(page, "AI involvement"); // no @ai: human, no note
 	FREE(page);
 
 	char *index = cdmd_index(files, "X 1.0 API Reference");
@@ -139,6 +140,7 @@ void test_cdmd_page(CuTest *tc)
 	ASSERT_HAS(levels, "# AI involvement levels\n");
 	ASSERT_HAS(levels, "## ai-generated\n\n**AI-generated, human-directed.** Mostly or entirely");
 	ASSERT_HAS(levels, "## human\n");
+	ASSERT_HAS(levels, "Headers that declare no AI involvement are `human`");
 	ASSERT_HAS(levels, "## ai-autonomous\n");
 	FREE(levels);
 

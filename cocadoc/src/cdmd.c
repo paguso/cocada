@@ -847,6 +847,8 @@ char *cdmd_ai_levels_page()
 	              "lines, which cannot be measured reliably. When parts of a file are at "
 	              "different levels, the level describes the bulk of it. In every case, the human who commits the file is "
 	              "responsible for it.\n\n"
+	              "Headers that declare no AI involvement are `human`, and their pages show no "
+	              "note about it.\n\n"
 	              "[Back to the index](index.md)\n");
 	for (size_t i = 0; i < sizeof(LEVELS) / sizeof(LEVELS[0]); i++) {
 		strbuf_append(out, "\n## ");

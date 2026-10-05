@@ -127,6 +127,9 @@ After the level comes the AI used, e.g. `Claude (Anthropic)` (not needed for
 `human`). `@ai` is only used in file comments: the level applies to the
 whole file.
 
+`@ai` is optional. A file without it is `human`, and its documentation shows
+no AI involvement note.
+
 The generated documentation shows the AI involvement of each header, with a
 link to a page explaining the levels (`ai-levels.md`).
 
