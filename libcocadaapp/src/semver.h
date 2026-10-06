@@ -47,9 +47,17 @@ typedef struct {
 	char *build;
 } semver;
 
-
+/*
+ * OK-Result for SEMVER parse operation
+ */
 DECL_RESULT_OK(semver, semver *);
 
+/**
+ * @brief Parses a string into a #semver type.
+ * @param src The source string.
+ * @return A OK-result type with the parsed #semver.
+ * @see result.h
+ */
 semver_res semver_new_from_str(const char *src);
 
 void semver_free(semver *sver);
