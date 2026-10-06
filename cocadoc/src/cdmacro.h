@@ -70,6 +70,11 @@
  *     void vec_push_##TYPE(vec *v, TYPE val);
  * ```
  *
+ * In the doc comments of a body, the generator's parameters are replaced
+ * by the arguments, like in the code: the instances of `DECL_TRAIT(vec_iter,
+ * iter)` read "the `iter` of a `vec_iter`" where the body says "the `TRAIT`
+ * of a `TYPE`", while the pattern keeps the placeholders.
+ *
  * The doc comment above the `#define` documents the macro itself.
  */
 
@@ -94,7 +99,7 @@ typedef struct {
 	vec *instances;          /**< The instances (vec of #cdinstance) */
 	vec *via;                /**< The invocations that generate them (vec of heap char *) */
 	size_t line;             /**< Line of the first of these invocations */
-	const cddecl *doc_decl;  /**< The declaration whose doc comment documents the family, or NULL */
+	const cddecl *doc_decl;  /**< The declaration whose doc comment documents the family (the pattern, or the single instance), or NULL */
 	bool hidden;             /**< Whether that doc comment has `@hide` */
 } cdfamily;
 

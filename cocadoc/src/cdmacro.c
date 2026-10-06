@@ -439,7 +439,39 @@ static const vec *arg_of(const macro *m, const vec *args, const char *name, cons
 }
 
 
-// The body of m with its parameters replaced by args, and ## pasted
+// A doc comment of the body of m with the whole-word occurrences of its
+// parameters replaced by args, e.g. "a `TYPE`" -> "a `int`"
+static char *substitute_doc(const macro *m, const vec *args, const char *doc)
+{
+	strbuf *sb = strbuf_new();
+	for (const char *p = doc; *p;) {
+		if (!(isalnum((unsigned char)*p) || *p == '_')) {
+			strbuf_append_char(sb, *p++);
+			continue;
+		}
+		const char *b = p;
+		while (isalnum((unsigned char)*p) || *p == '_') p++;
+		size_t len = p - b;
+		bool done = false;
+		for (size_t k = 0, n = vec_len(m->params); k < n && k < vec_len(args) && !done; k++) {
+			const char *name = vec_get_rawptr(m->params, k);
+			if (strlen(name) == len && strncmp(name, b, len) == 0) {
+				char *arg = render(vec_get_rawptr(args, k));
+				strbuf_append(sb, arg);
+				FREE(arg);
+				done = true;
+			}
+		}
+		if (!done) {
+			strbuf_nappend(sb, b, len);
+		}
+	}
+	return strbuf_detach(sb);
+}
+
+
+// The body of m with its parameters replaced by args, and ## pasted.
+// In doc comments, the parameters are replaced too (see substitute_doc)
 static vec *substitute(const macro *m, const vec *args)
 {
 	// __VA_ARGS__: the arguments after the named ones, separated by commas
@@ -461,6 +493,13 @@ static vec *substitute(const macro *m, const vec *args)
 		if (is_p(b, k, "#") && is_p(b, k + 1, "#")) {
 			paste = vec_len(out) > 0;
 			k++;
+			continue;
+		}
+		if (is_doc(T(b, k))) {
+			char *doc = substitute_doc(m, args, T(b, k)->s);
+			tok t = {.s = doc, .ident = false};
+			emit(out, &t, &paste);
+			FREE(doc);
 			continue;
 		}
 		const vec *rep = T(b, k)->ident ? arg_of(m, args, T(b, k)->s, va, empty) : NULL;
@@ -783,6 +822,11 @@ vec *cdmacro_families(const cdmacrotab *self, const cdfile *f, vec *warns)
 	}
 	for (size_t i = 0, n = vec_len(fams); i < n; i++) {
 		cdfamily *fam = vec_get_mut(fams, i);
+		// a single instance is shown as itself, with its own doc (where the
+		// generator's parameters are replaced by the arguments)
+		if (fam->doc_decl && vec_len(fam->instances) == 1) {
+			fam->doc_decl = ((cdinstance *)vec_get(fam->instances, 0))->decl;
+		}
 		fam->hidden = fam->doc_decl && cddoc_hidden(fam->doc_decl->doc);
 	}
 	return fams;

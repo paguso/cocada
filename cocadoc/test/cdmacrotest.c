@@ -44,7 +44,7 @@ static const char *SRC_LIB =
     "\t/** @brief The TRAIT trait of a TYPE. */\\\n"
     "\tTRAIT * TYPE##_as_##TRAIT( TYPE *self );\n"
     "#define DECL_RESULT_OK(NAME, T) \\\n"
-    "\ttypedef struct {\\\n\t\tbool ok; /**< Success */\\\n\t\tT val; /**< The value */\\\n"
+    "\ttypedef struct {\\\n\t\tbool ok; /**< Success */\\\n\t\tT val; /**< The T value */\\\n"
     "\t} NAME##_res;\n";
 
 static const char *SRC_VEC =
@@ -129,7 +129,11 @@ void test_cdmacro_families(CuTest *tc)
 	CuAssertStrEquals(tc, "iter *vec_iter_as_iter(vec_iter *self)",
 	                  ((const cdinstance *)vec_get(trait->instances, 0))->decl->sig);
 	CuAssertTrue(tc, trait->gen_file == lib);
-	CuAssertTrue(tc, trait->doc_decl == trait->pattern);
+	// a single instance has its own doc, with the parameters replaced
+	const cddecl *tinst = ((const cdinstance *)vec_get(trait->instances, 0))->decl;
+	CuAssertTrue(tc, trait->doc_decl == tinst);
+	CuAssertStrEquals(tc, "/** @brief The iter trait of a vec_iter. */", tinst->doc);
+	CuAssertStrEquals(tc, "/** @brief The TRAIT trait of a TYPE. */", trait->pattern->doc);
 
 	const cdfamily *res = vec_get(fams, 5);
 	CuAssertStrEquals(tc, "semver_res", cdfamily_name(res));
@@ -139,8 +143,8 @@ void test_cdmacro_families(CuTest *tc)
 	const cddecl *inst = ((const cdinstance *)vec_get(res->instances, 0))->decl;
 	CuAssertSizeTEquals(tc, 2, vec_len(inst->members));
 	CuAssertStrEquals(tc, "/**< Success */", ((cddecl *)vec_get(inst->members, 0))->doc);
-	CuAssertStrEquals(tc, "/**< The value */", ((cddecl *)vec_get(inst->members, 1))->doc);
-	CuAssertStrEquals(tc, "/**< The value */", ((cddecl *)vec_get(res->pattern->members, 1))->doc);
+	CuAssertStrEquals(tc, "/**< The semver * value */", ((cddecl *)vec_get(inst->members, 1))->doc);
+	CuAssertStrEquals(tc, "/**< The T value */", ((cddecl *)vec_get(res->pattern->members, 1))->doc);
 
 	// generators
 	const vec *pats;

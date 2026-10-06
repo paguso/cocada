@@ -437,7 +437,12 @@ the invocation:
   and the list of generated names (`vec_push_uchar`, `vec_push_ushort`,
   ...);
 - a family with a single declaration (e.g. `semver_res`, from
-  `DECL_RESULT_OK(semver, semver *)`) is shown as an ordinary item;
+  `DECL_RESULT_OK(semver, semver *)`) is shown as an ordinary item, and
+  the generator's parameters in its doc are replaced by the arguments:
+  "Returns the `TRAIT` representation of a `TYPE`" in the body of
+  `DECL_TRAIT` reads "Returns the `iter` representation of a `vec_iter`"
+  for `DECL_TRAIT(vec_iter, iter)`. (Any word equal to a parameter name is
+  replaced, which is one more reason to name parameters in capitals.);
 - references to generated names (`#vec_push_int`) link to their family;
 - the generator macros are listed in the *Macros* section of the page of
   the header that defines them, with what they declare, unless hidden with
