@@ -30,7 +30,7 @@
 
 static const semver VERSION = {
 	.major = 0,
-	.minor = 2,
+	.minor = 3,
 	.patch = 0,
 	.pre_rel = NULL,
 	.build = NULL
