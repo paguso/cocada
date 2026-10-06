@@ -274,12 +274,16 @@ XX_CORETYPES(DECL_SA_ARR)
  * given TYPE called TYPE_array (for example int_array, size_t_array, etc).
  * By importing this file you get the declaration of
  * TYPE_array for all the core types defined in coretype.h.
+ * @param TYPE The type of the elements.
  * @see ARRAY
  */
 #define DECL_ARRAY(TYPE, ...)\
+	/**\
+	 * @brief An array of `TYPE` elements, with its length.\
+	 */\
 	typedef struct {\
-		TYPE *arr;\
-		size_t len;\
+		TYPE *arr; /**< The elements */ \
+		size_t len; /**< The number of elements */ \
 	} ARRAY(TYPE);
 
 XX_CORETYPES(DECL_ARRAY)

@@ -75,18 +75,26 @@
 
 
 /**
- * @brief Computes floor(num/den) for unsigned integer types.
+ * @brief Declares `divfloor_TYPE`.
+ * @param TYPE An unsigned integer type.
  */
 #define DECL_DIVFLOOR( TYPE , ...)\
+	/**\
+	 * @brief Computes floor(num/den) for unsigned integer types.\
+	 */\
 	TYPE divfloor_##TYPE(TYPE num, TYPE den);
 
 XX_UNSIGNED_INT(DECL_DIVFLOOR)
 
 
 /**
- * @brief Computes ceil(num/den) for unsigned integer types.
+ * @brief Declares `divceil_TYPE`.
+ * @param TYPE An unsigned integer type.
  */
 #define DECL_DIVCEIL( TYPE , ...)\
+	/**\
+	 * @brief Computes ceil(num/den) for unsigned integer types.\
+	 */\
 	TYPE divceil_##TYPE(TYPE num, TYPE den);
 
 XX_UNSIGNED_INT(DECL_DIVCEIL)
@@ -98,9 +106,13 @@ XX_UNSIGNED_INT(DECL_DIVCEIL)
 #define IS_POW2(UNS_INT) (UNS_INT && !(UNS_INT & (UNS_INT - 1)))
 
 /**
- * @brief Computes the smallest power of 2 greater or equal to @p val
+ * @brief Declares `pow2ceil_TYPE`.
+ * @param TYPE An unsigned integer type.
  */
 #define DECL_POW2CEIL( TYPE , ...)\
+	/**\
+	 * @brief Computes the smallest power of 2 greater or equal to @p val\
+	 */\
 	TYPE pow2ceil_##TYPE( TYPE val );
 
 
@@ -149,32 +161,44 @@ uint64_t prime_succ(uint64_t n);
 
 
 /**
- * @brief Computes the average of an array of an unsigned int type.
- * @warning This function is slow because it takes care of overflows.
+ * @brief Declares `average_TYPE`.
+ * @param TYPE An unsigned integer type.
  */
 #define DECL_AVG(TYPE, ...)\
+	/**\
+	 * @brief Computes the average of an array of an unsigned int type.\
+	 * @warning This function is slow because it takes care of overflows.\
+	 */\
 	double average_##TYPE(TYPE *vals, size_t n);
 
 XX_UNSIGNED_INT(DECL_AVG)
 
 
 /**
- * @brief Returns the @p kth element of the array @p v of length @p len.
- * @param dirty If true, the original array may be reordered in the process.
- * Else, a copy is first created and @p v is left intact.
+ * @brief Declares `kth_smallest_TYPE`.
+ * @param TYPE The type of the values.
  */
 #define DECL_KTH_SMALLEST(TYPE, ...)\
+	/**\
+	 * @brief Returns the @p kth element of the array @p v of length @p len.\
+	 * @param dirty If true, the original array may be reordered in the process.\
+	 * Else, a copy is first created and @p v is left intact.\
+	 */\
 	TYPE kth_smallest_##TYPE(TYPE *v, size_t len, size_t k, bool dirty);
 
 XX_PRIMITIVES(DECL_KTH_SMALLEST)
 
 
 /**
- * @brief Returns the median of the array @p v of length @p len.
- * @param dirty If true, the original array may be reordered in the process.
- * Else, a copy is first created and @p v is left intact.
+ * @brief Declares `median_TYPE`.
+ * @param TYPE The type of the values.
  */
 #define DECL_MEDIAN(TYPE, ...)\
+	/**\
+	 * @brief Returns the median of the array @p v of length @p len.\
+	 * @param dirty If true, the original array may be reordered in the process.\
+	 * Else, a copy is first created and @p v is left intact.\
+	 */\
 	TYPE median_##TYPE(TYPE *v, size_t len, bool dirty);
 
 XX_PRIMITIVES(DECL_MEDIAN)

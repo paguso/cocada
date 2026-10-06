@@ -177,6 +177,9 @@ void deque_del_front(deque *q);
 #define DECL_DEQUE_REMV_FRONT( TYPE )\
 	TYPE deque_del_front_##TYPE(deque *q);
 
+/**
+ * @hide
+ */
 #define DECL_DEQUE_ALL( TYPE, ... )\
 	DECL_DEQUE_NEW(TYPE)\
 	DECL_DEQUE_GET(TYPE)\

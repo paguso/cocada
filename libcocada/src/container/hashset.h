@@ -105,6 +105,9 @@ void hashset_del(hashset *set, const void *elt);
 	void hashset_del_##TYPE(hashset *set, TYPE elt );
 
 
+/**
+ * @hide
+ */
 #define DECL_HASHSET_ALL( TYPE, ... )\
 	DECL_HASHSET_CONTAINS(TYPE)\
 	DECL_HASHSET_ADD(TYPE)\
