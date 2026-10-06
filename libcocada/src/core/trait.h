@@ -213,10 +213,17 @@
  * ```
  * to get the trait representation of a type.
  *
+ * @param TYPE The implementing type.
+ * @param TRAIT The trait.
  * @see IMPL_TRAIT
  * @see Module documentation
  */
 #define DECL_TRAIT(TYPE, TRAIT)\
+	/**\
+	 * @brief Returns the `TRAIT` representation of a `TYPE`.\
+	 * @param self The object.\
+	 * @return The trait representation of @p self.\
+	 */\
 	TRAIT * TYPE##_as_##TRAIT( TYPE *self );
 
 

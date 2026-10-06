@@ -55,15 +55,19 @@ typedef bool (*equals_func)(const void *, const void *);
 
 
 /**
- * @brief Identity hash for integer types that simply returns the value
- * converted to uint64_t
- * Example
- * ```
- * uint64_t ident_hash_short(const void *key)
- * ```
- * Takes a raw pointer to a short (key) and returns its value as a uint64_t
+ * @brief Declares `ident_hash_TYPE`.
+ * @param TYPE An integer type.
  */
 #define DECL_IDENT_HASH( TYPE, ... ) \
+	/**\
+	 * @brief Identity hash for integer types that simply returns the value\
+	 * converted to uint64_t\
+	 * Example\
+	 * ```\
+	 * uint64_t ident_hash_short(const void *key)\
+	 * ```\
+	 * Takes a raw pointer to a short (key) and returns its value as a uint64_t\
+	 */\
 	uint64_t ident_hash_##TYPE(const void *key);
 
 XX_PRIMITIVES(DECL_IDENT_HASH)

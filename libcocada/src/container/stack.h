@@ -88,6 +88,9 @@ void stack_peek(stack *s, void *dest);
 #define DECL_STACK_PEEK( TYPE ) \
 	TYPE stack_peek_##TYPE(stack *q);
 
+/**
+ * @hide
+ */
 #define DECL_STACK_ALL( TYPE , ...) \
 	DECL_STACK_PUSH(TYPE) \
 	DECL_STACK_POP(TYPE)\

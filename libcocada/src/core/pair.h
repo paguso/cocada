@@ -34,15 +34,23 @@
  * @brief Declares a pair of given types.
  * By importing this file "pair.h", homogenous pairs are declared for all core types,
  * ex. pair_int_int, pair_double_double, etc.
+ * @param type1 The type of the first element.
+ * @param type2 The type of the second element.
  * @see coretype.h
  */
 #define DECL_PAIR(type1, type2, ...) \
+	/**\
+	 * @brief A pair of a `type1` and a `type2`.\
+	 */\
 	typedef struct pair_##type1##_##type2 { \
-		type1 first; \
-		type2 second; \
+		type1 first; /**< The first element */ \
+		type2 second; /**< The second element */ \
 	} pair_##type1##_##type2;
 
 
+/**
+ * @hide
+ */
 #define DECL_PAIR2(TYPE, ...) DECL_PAIR(TYPE, TYPE)
 
 /**
@@ -63,6 +71,9 @@
 
 #define PAIR2(TYPE) pair_##TYPE##_##TYPE
 
+/**
+ * @hide
+ */
 #define DECL_PAIRS2(TYPE,...) \
 	DECL_PAIR2(TYPE)
 

@@ -65,31 +65,42 @@ typedef bool (*eq_func)(const void *left, const void *right);
 
 
 /**
- * @brief Provides type-specific order comparison functions,
- * e.g. cmp_float, cmp_uin64_t, etc.
- * @p leff and @p right are assumed to point to memory locations
- * containing values of the intended type, which are compared
- * in the usual (compiler-defined) sense.
+ * @brief Declares `cmp_TYPE`, the order comparison function of a given type.
+ * @param TYPE The type.
  */
 #define DECL_CMP( TYPE )\
+	/**\
+	 * @brief Provides type-specific order comparison functions,\
+	 * e.g. cmp_float, cmp_uin64_t, etc.\
+	 * @p left and @p right are assumed to point to memory locations\
+	 * containing values of the intended type, which are compared\
+	 * in the usual (compiler-defined) sense.\
+	 */\
 	int cmp_##TYPE(const void *left, const void *right);
 
 
 /**
- * @brief Type-specific equality comparison functions,
- * e.g. eq_float, eq_uin64_t, etc.
- * @p leff and @p right are assumed to point to memory locations
- * containing values of the intended type, which are compared
- * in the usual (compiler-defined) sense.
- *
- * @param left pointer to lhs comparison operand
- * @param right pointer to rhs comparison operand
+ * @brief Declares `eq_TYPE`, the equality comparison function of a given type.
+ * @param TYPE The type.
  */
 #define DECL_EQ( TYPE )\
+	/**\
+	 * @brief Type-specific equality comparison functions,\
+	 * e.g. eq_float, eq_uin64_t, etc.\
+	 * @p left and @p right are assumed to point to memory locations\
+	 * containing values of the intended type, which are compared\
+	 * in the usual (compiler-defined) sense.\
+	 *\
+	 * @param left pointer to lhs comparison operand\
+	 * @param right pointer to rhs comparison operand\
+	 */\
 	bool eq_##TYPE(const void *left, const void *right);
 
 
 ///@cond
+/**
+ * @hide
+ */
 #define DECL_CMPEQ( TYPE , ...)\
 	DECL_CMP( TYPE )\
 	DECL_EQ( TYPE )

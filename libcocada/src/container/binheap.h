@@ -112,6 +112,9 @@ void binheap_remv(binheap *heap, void *dest);
 	TYPE binheap_remv_##TYPE(binheap *heap);
 
 
+/**
+ * @hide
+ */
 #define DECL_BINHEAP_ALL( TYPE, ... )\
 	DECL_BINHEAP_PUSH(TYPE)\
 	DECL_BINHEAP_POP(TYPE)

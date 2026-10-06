@@ -69,21 +69,29 @@
 #include "coretype.h"
 
 /**
- * @brief Declares an OK-Result @p NAME_res.
+ * @brief Declares an OK-Result `NAME_res`.
+ * @param NAME The type name prefix.
+ * @param OK_TYPE The type of the successful operation result value.
  */
 #define DECL_RESULT_OK(NAME, OK_TYPE) \
+	/**\
+	 * @brief OK-Result type.\
+	 */\
 	typedef struct {\
 		bool ok;        	/**< Success/fail indicator */  \
 		OK_TYPE val;	/**< Successful result value. */\
 	} NAME##_res;
 
 /**
- * @brief Declares an OK-Error, Result @p NAME_res.
- * @param NAME Type name prefix
- * @param OK_TYPE Type of the sucessful operation result value.
- * @param ERR_TYPE Type of the unsucessful operation result value.
+ * @brief Declares an OK-Error-Result `NAME_res`.
+ * @param NAME The type name prefix.
+ * @param OK_TYPE The type of the successful operation result value.
+ * @param ERR_TYPE The type of the unsuccessful operation result value.
  */
 #define DECL_RESULT_OK_ERR(NAME, OK_TYPE, ERR_TYPE) \
+	/**\
+	 * @brief OK-Error-Result type.\
+	 */\
 	typedef struct {\
 		bool ok;        	/**< Success/fail indicator */  \
 		union {\

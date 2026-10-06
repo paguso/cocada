@@ -414,42 +414,70 @@ void vec_radixsort(vec *v, size_t (*key_fn)(const void *, size_t),
 
 
 #define DECL_VEC_NEW( TYPE ) \
-	/** @brief Creates a new TYPE vector @see coretype.h */ \
+	/**\
+	 * @brief Creates a new TYPE vector.\
+	 * @see coretype.h\
+	 */\
 	vec *vec_new_##TYPE();
 
 /**
- * @brief Gets the value at position @p pos as the appropriate @p TYPE.
- * @param v
- * @param pos
+ * @brief Declares `vec_get_TYPE`.
+ * @param TYPE The type of the elements.
  */
 #define DECL_VEC_GET( TYPE ) \
+	/**\
+	 * @brief Gets the value at position @p pos as the appropriate `TYPE`.\
+	 * @param v\
+	 * @param pos\
+	 */\
 	TYPE vec_get_##TYPE(const vec *v, size_t pos);
 
 #define DECL_VEC_FIRST( TYPE ) \
-	/** @brief Returns TYPE copy of the first element @see coretype.h */ \
+	/**\
+	 * @brief Returns TYPE copy of the first element.\
+	 * @see coretype.h\
+	 */\
 	TYPE vec_first_##TYPE(const vec *v);
 
 #define DECL_VEC_LAST( TYPE ) \
-	/** @brief Returns TYPE copy of the last element @see coretype.h */ \
+	/**\
+	 * @brief Returns TYPE copy of the last element.\
+	 * @see coretype.h\
+	 */\
 	TYPE vec_last_##TYPE(const vec *v);
 
 #define DECL_VEC_SET( TYPE ) \
-	/** @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val @see coretype.h */ \
+	/**\
+	 * @brief Sets (overwrites) the element at position @p pos to be a TYPE copy of @p val.\
+	 * @see coretype.h\
+	 */\
 	void vec_set_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define DECL_VEC_PUSH( TYPE ) \
-	/** @brief Appends a TYPE copy of @p val @see coretype.h */ \
+	/**\
+	 * @brief Appends a TYPE copy of @p val.\
+	 * @see coretype.h\
+	 */\
 	void vec_push_##TYPE(vec *v, TYPE val);
 
 #define DECL_VEC_INS( TYPE ) \
-	/** @brief Inserts a TYPE copy of @p val at position @p pos  @see coretype.h */ \
+	/**\
+	 * @brief Inserts a TYPE copy of @p val at position @p pos.\
+	 * @see coretype.h\
+	 */\
 	void vec_ins_##TYPE(vec *v, size_t pos, TYPE val);
 
 #define DECL_VEC_POP( TYPE ) \
-	/** @brief Removes and returns a TYPE copy of the element at position @p pos  @see coretype.h */ \
+	/**\
+	 * @brief Removes and returns a TYPE copy of the element at position @p pos.\
+	 * @see coretype.h\
+	 */\
 	TYPE vec_pop_##TYPE(vec *v, size_t pos);
 
 
+/**
+ * @hide
+ */
 #define DECL_TYPED_VEC( TYPE , ...) \
 	DECL_VEC_NEW(TYPE) \
 	DECL_VEC_GET(TYPE) \

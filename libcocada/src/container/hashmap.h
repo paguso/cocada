@@ -248,6 +248,9 @@ DECL_TRAIT(hashmap_iter, iter);
 #define DECL_HASHMAP_SET( TYPE ) \
 	void hashmap_ins_##TYPE(hashmap *hmap, const void *key, TYPE val);
 
+/**
+ * @hide
+ */
 #define DECL_HASHMAP_ALL( TYPE , ...) \
 	DECL_HASHMAP_GET(TYPE) \
 	DECL_HASHMAP_SET(TYPE)
