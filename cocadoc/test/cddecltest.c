@@ -236,28 +236,6 @@ void test_cddecl_undocumented(CuTest *tc)
 }
 
 
-void test_cddecl_is_generator(CuTest *tc)
-{
-	memdbg_reset();
-	const char *src =
-	    "#define DECL_VEC_PUSH(TYPE) void vec_push_##TYPE(vec *v, TYPE val);\n"
-	    "#define IMPL_VEC_PUSH(TYPE) void vec_push_##TYPE(vec *v, TYPE val) {}\n"
-	    "#define VEC_PUSH_DECL(TYPE) void vec_push_##TYPE(vec *v, TYPE val);\n"
-	    "#define MAX(A, B) ((A) > (B) ? (A) : (B))\n"
-	    "int DECL_func(void);\n";
-	vec *toks = cdlex_all(src, strlen(src));
-	vec *decls = cddecl_match(src, toks);
-	CuAssertSizeTEquals(tc, 5, vec_len(decls));
-	bool expected[] = {true, true, false, false, false}; // prefix, and only macros
-	for (size_t i = 0; i < 5; i++) {
-		CuAssertTrue(tc, cddecl_is_generator(vec_get(decls, i)) == expected[i]);
-	}
-	cddecl_vec_free(decls);
-	DESTROY_FLAT(toks, vec);
-	CuAssert(tc, "Memory leak.", memdbg_is_empty());
-}
-
-
 CuSuite *cddecl_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("cddecl");
@@ -266,6 +244,5 @@ CuSuite *cddecl_get_test_suite()
 	SUITE_ADD_TEST(suite, test_cddecl_macros);
 	SUITE_ADD_TEST(suite, test_cddecl_orphans);
 	SUITE_ADD_TEST(suite, test_cddecl_undocumented);
-	SUITE_ADD_TEST(suite, test_cddecl_is_generator);
 	return suite;
 }

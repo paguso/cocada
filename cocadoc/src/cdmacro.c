@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "cddecl.h"
+#include "cddoc.h"
 #include "cdlexer.h"
 #include "cdmacro.h"
 #include "cstrutil.h"
@@ -92,22 +93,27 @@ static inline bool is_p(const vec *v, size_t i, const char *s)
 }
 
 
-// Tokens of a C text, without comments except trailing member docs
-// (/**< ... */), which are kept: in a generated struct or enum, the macro
-// body is the only place for them
+// Tokens of a C text, without plain comments. Doc comments are kept: in a
+// macro body, they document the generated declarations (DC14)
 static vec *lex(const char *text)
 {
 	vec *ret = toks_new();
 	vec *cts = cdlex_all(text, strlen(text));
 	for (size_t i = 0, n = vec_len(cts); i < n; i++) {
 		const cdtoken *ct = vec_get(cts, i);
-		if (ct->type == CDT_DOC || ct->type == CDT_PP) {
+		if (ct->type == CDT_PP) {
 			continue;
 		}
 		toks_push(ret, text + ct->pos, ct->len, ct->type == CDT_IDENT);
 	}
 	DESTROY_FLAT(cts, vec);
 	return ret;
+}
+
+
+static inline bool is_doc(const tok *t)
+{
+	return !t->ident && strncmp(t->s, "/**", 3) == 0;
 }
 
 
@@ -138,15 +144,21 @@ typedef struct {
 	bool analysed;
 	cdgen_kind kind;
 	vec *patterns;       // vec of cddecl
+	vec *docs;           // doc comments of the body (vec of bodydoc)
 } macro;
+
+
+// A doc comment in a macro body, and its line relative to the #define
+typedef struct {
+	char *text;
+	size_t line;
+} bodydoc;
 
 
 struct _cdmacrotab {
 	vec *macros;         // vec of macro
 	hashmap *index;      // name (char *) -> position in macros (size_t)
-	hashmap *invoked;    // names of macros invoked at file scope (char *) -> 0
-	hashmap *used;       // identifiers in macro bodies and invocation arguments -> 0
-	vec *names;          // the keys of index and invoked (vec of heap char *)
+	vec *names;          // the keys of index (vec of heap char *)
 };
 
 
@@ -194,17 +206,46 @@ static bool parse_def(const char *def, macro *m)
 		if (*s == ',') s++;
 	}
 	if (*s == ')') s++;
-	// body, without line continuations
+	// body, without line continuations: in comments, they become new lines,
+	// so that doc comments keep their lines
+	size_t line = 0;
+	for (const char *p = def; p < s; p++) {
+		line += (*p == '\n');
+	}
 	strbuf *body = strbuf_new();
+	vec *lines = vec_new(sizeof(size_t)); // line of each char of body
+	bool comment = false;
 	for (; *s; s++) {
 		if (*s == '\\' && (s[1] == '\n' || (s[1] == '\r' && s[2] == '\n'))) {
 			s += (s[1] == '\r') ? 2 : 1;
-			strbuf_append_char(body, ' ');
-		} else {
-			strbuf_append_char(body, *s);
+			strbuf_append_char(body, comment ? '\n' : ' ');
+			vec_push_size_t(lines, line++);
+			continue;
+		}
+		if (!comment && s[0] == '/' && s[1] == '*') {
+			comment = true;
+		} else if (comment && s[0] == '*' && s[1] == '/') {
+			comment = false;
+		}
+		strbuf_append_char(body, *s);
+		vec_push_size_t(lines, line);
+		line += (*s == '\n');
+	}
+	const char *text = strbuf_as_str(body);
+	m->body = lex(text);
+	m->docs = vec_new(sizeof(bodydoc));
+	vec *cts = cdlex_all(text, strlen(text));
+	for (size_t i = 0, n = vec_len(cts); i < n; i++) {
+		const cdtoken *ct = vec_get(cts, i);
+		if (ct->type == CDT_DOC) {
+			bodydoc bd = {.text = cstr_clone_len(text + ct->pos, ct->len),
+			              .line = vec_get_size_t(lines, ct->pos)
+			             };
+			vec_push(m->docs, &bd);
 		}
 	}
-	m->body = lex(strbuf_as_str(body));
+	DESTROY_FLAT(cts, vec);
+	DESTROY_FLAT(lines, vec);
 	strbuf_free(body);
 	return true;
 }
@@ -219,41 +260,21 @@ static const macro *find_macro(const cdmacrotab *t, const char *name)
 }
 
 
-static void mark_used(cdmacrotab *t, const vec *v, size_t from)
-{
-	for (size_t i = from, n = vec_len(v); i < n; i++) {
-		const tok *k = vec_get(v, i);
-		if (k->ident && !hashmap_contains(t->used, &k->s)) {
-			char *name = cstr_clone(k->s);
-			vec_push_rawptr(t->names, name);
-			hashmap_ins_size_t(t->used, &name, 0);
-		}
-	}
-}
-
-
 cdmacrotab *cdmacrotab_new(const vec *files)
 {
 	cdmacrotab *t = NEW(cdmacrotab);
 	t->macros = vec_new(sizeof(macro));
 	t->index = hashmap_new(sizeof(char *), sizeof(size_t), hash_str, eq_str);
-	t->invoked = hashmap_new(sizeof(char *), sizeof(size_t), hash_str, eq_str);
-	t->used = hashmap_new(sizeof(char *), sizeof(size_t), hash_str, eq_str);
 	t->names = vec_new(sizeof(char *));
 	for (size_t i = 0, n = vec_len(files); i < n; i++) {
 		const cdfile *f = vec_get_rawptr(files, i);
 		for (size_t j = 0, m = vec_len(f->decls); j < m; j++) {
 			const cddecl *d = vec_get(f->decls, j);
-			if (d->kind == CDD_MACROCALL && !hashmap_contains(t->invoked, &d->name)) {
-				char *name = cstr_clone(d->name);
-				vec_push_rawptr(t->names, name);
-				hashmap_ins_size_t(t->invoked, &name, 0);
-			}
 			if (d->kind != CDD_MACRO || !d->def || hashmap_contains(t->index, &d->name)) {
 				continue; // (the first definition is used)
 			}
 			macro mc = {.decl = d, .file = f, .params = NULL, .body = NULL,
-			            .analysed = false, .kind = CDG_NONE, .patterns = NULL
+			            .analysed = false, .kind = CDG_NONE, .patterns = NULL, .docs = NULL
 			           };
 			if (!parse_def(d->def, &mc)) {
 				if (mc.params) {
@@ -265,22 +286,6 @@ cdmacrotab *cdmacrotab_new(const vec *files)
 			vec_push_rawptr(t->names, name);
 			hashmap_ins_size_t(t->index, &name, vec_len(t->macros));
 			vec_push(t->macros, &mc);
-		}
-	}
-	// identifiers used by macros: in bodies, and in invocation arguments
-	for (size_t i = 0, n = vec_len(t->macros); i < n; i++) {
-		const macro *m = vec_get(t->macros, i);
-		mark_used(t, m->body, 0);
-	}
-	for (size_t i = 0, n = vec_len(files); i < n; i++) {
-		const cdfile *f = vec_get_rawptr(files, i);
-		for (size_t j = 0, m = vec_len(f->decls); j < m; j++) {
-			const cddecl *d = vec_get(f->decls, j);
-			if (d->kind == CDD_MACROCALL) {
-				vec *v = lex(d->sig);
-				mark_used(t, v, 1); // (not the invoked macro itself)
-				toks_free(v);
-			}
 		}
 	}
 	return t;
@@ -299,25 +304,15 @@ void cdmacrotab_free(cdmacrotab *self)
 		if (m->patterns) {
 			cddecl_vec_free(m->patterns);
 		}
+		for (size_t k = 0, kn = vec_len(m->docs); k < kn; k++) {
+			FREE(((bodydoc *)vec_get_mut(m->docs, k))->text);
+		}
+		DESTROY_FLAT(m->docs, vec);
 	}
 	DESTROY_FLAT(self->macros, vec);
 	DESTROY_FLAT(self->index, hashmap);
-	DESTROY_FLAT(self->invoked, hashmap);
-	DESTROY_FLAT(self->used, hashmap);
 	DESTROY(self->names, finaliser_cons(FNR(vec), finaliser_new_ptr()));
 	FREE(self);
-}
-
-
-bool cdmacro_used_by_macros(const cdmacrotab *self, const char *name)
-{
-	return hashmap_contains(self->used, &name);
-}
-
-
-bool cdmacro_invoked(const cdmacrotab *self, const char *name)
-{
-	return hashmap_contains(self->invoked, &name);
 }
 
 
@@ -525,7 +520,7 @@ static vec *expand(xstate *x, const vec *v, vec *dis, int depth)
 static bool only_calls(const cdmacrotab *t, const vec *v)
 {
 	for (size_t i = 0, n = vec_len(v); i < n; i++) {
-		if (is_p(v, i, ";") || is_p(v, i, ",") || strncmp(T(v, i)->s, "/**<", 4) == 0) {
+		if (is_p(v, i, ";") || is_p(v, i, ",") || is_doc(T(v, i))) {
 			continue;
 		}
 		size_t close;
@@ -757,13 +752,15 @@ vec *cdmacro_families(const cdmacrotab *self, const cdfile *f, vec *warns)
 						           ? vec_get(gm->patterns, k) : NULL,
 						.instances = vec_new(sizeof(cdinstance)),
 						.via = vec_new(sizeof(char *)), .line = call->line,
-						.doc_decl = NULL
+						.doc_decl = NULL, .hidden = false
 					};
-					// the doc above the generator documents its single declaration
-					if (gm->decl->doc && gm->patterns && vec_len(gm->patterns) == 1) {
-						nf.doc_decl = gm->decl;
-					} else if (call->doc) {
-						nf.doc_decl = call; // (used only if a single instance)
+					// documented by the doc comment before the declaration, in
+					// the generator's body
+					const cddecl *dd = vec_get(decls, k);
+					if (nf.pattern && nf.pattern->doc) {
+						nf.doc_decl = nf.pattern;
+					} else if (dd->doc) {
+						nf.doc_decl = gm->decl; // (replaced by the instance below)
 					}
 					vec_push(fams, &nf);
 					fam = vec_get_mut(fams, vec_len(fams) - 1);
@@ -771,6 +768,9 @@ vec *cdmacro_families(const cdmacrotab *self, const cdfile *f, vec *warns)
 				cdinstance in = {.args = cstr_clone(lf->args), .decl = NEW(cddecl)};
 				*in.decl = *(cddecl *)vec_get(decls, k); // moved
 				vec_push(fam->instances, &in);
+				if (fam->doc_decl == gm->decl) {
+					fam->doc_decl = in.decl;
+				}
 				add_via(fam, call->sig);
 			}
 			DESTROY_FLAT(decls, vec); // (the declarations were moved)
@@ -781,13 +781,9 @@ vec *cdmacro_families(const cdmacrotab *self, const cdfile *f, vec *warns)
 		DESTROY_FLAT(dis, vec);
 		toks_free(v);
 	}
-	// a doc above an invocation documents a family only if it has one instance
 	for (size_t i = 0, n = vec_len(fams); i < n; i++) {
 		cdfamily *fam = vec_get_mut(fams, i);
-		if (fam->doc_decl && fam->doc_decl->kind == CDD_MACROCALL
-		        && vec_len(fam->instances) != 1) {
-			fam->doc_decl = NULL;
-		}
+		fam->hidden = fam->doc_decl && cddoc_hidden(fam->doc_decl->doc);
 	}
 	return fams;
 }
@@ -822,6 +818,19 @@ void cdmacrowarn_vec_free(vec *warns)
 		FREE(((cdmacrowarn *)vec_get_mut(warns, i))->msg);
 	}
 	DESTROY_FLAT(warns, vec);
+}
+
+
+size_t cdmacro_doc_line(const cdmacrotab *self, const cddecl *gen, const char *doc)
+{
+	const macro *m = find_macro(self, gen->name);
+	for (size_t i = 0, n = (m && m->decl == gen) ? vec_len(m->docs) : 0; i < n; i++) {
+		const bodydoc *bd = vec_get(m->docs, i);
+		if (doc && strcmp(bd->text, doc) == 0) {
+			return gen->line + bd->line;
+		}
+	}
+	return gen->line;
 }
 
 

@@ -116,8 +116,7 @@ static void check_signature(vec *out, const cddecl *d, const cddoc *doc)
 	bool named;
 	// (function pointer types have parameters too, but documenting them
 	// is not required)
-	vec *sp = ((d->kind == CDD_FUNC || d->kind == CDD_MACRO) && !cddecl_is_generator(d))
-	          ? cddecl_params(d, &named) : NULL;
+	vec *sp = (d->kind == CDD_FUNC || d->kind == CDD_MACRO) ? cddecl_params(d, &named) : NULL;
 	if (sp && named) {
 		vec *documented = vec_new(sizeof(char *));
 		for (size_t i = 0, n = vec_len(doc->params); i < n; i++) {
@@ -192,9 +191,6 @@ static void check_refs(vec *out, const cdfile *f, const cdsymtab *tab,
 		const cdref *r = vec_get(doc->refs, i);
 		size_t line = doc_line + r->line;
 		if (r->kind == CDR_PARAM) {
-			if (d && cddecl_is_generator(d)) {
-				continue;
-			}
 			if (!params) {
 				bool sym = tab && cdsymtab_resolve(tab, r->target, f, NULL);
 				warn(out, line, name, "DC11", "@p %s: %s has no parameters%s%s%s", r->target, name,
@@ -227,62 +223,64 @@ static void check_refs(vec *out, const cdfile *f, const cdsymtab *tab,
 }
 
 
-// The family documented by the doc comment of an invocation, if any
-static const cdfamily *documented_by(const cdsymtab *tab, const cdfile *f, const cddecl *call)
+// Checks the members of a type
+static void check_members(vec *out, const cdfile *f, const cdsymtab *tab, const cddecl *d,
+                          size_t undoc_line)
 {
-	const vec *fams = tab ? cdsymtab_families(tab, f) : NULL;
-	for (size_t i = 0, n = fams ? vec_len(fams) : 0; i < n; i++) {
-		const cdfamily *fam = vec_get(fams, i);
-		if (fam->doc_decl == call) {
-			return fam;
+	for (size_t j = 0, m = d->members ? vec_len(d->members) : 0; j < m; j++) {
+		const cddecl *mb = vec_get(d->members, j);
+		char name[256];
+		snprintf(name, sizeof(name), "%s.%s", d->name, mb->name);
+		size_t line = undoc_line ? undoc_line : mb->line;
+		if (!mb->doc) {
+			warn(out, line, name, "DC4", "undocumented member");
+			continue;
 		}
+		if (strncmp(mb->doc, "/**<", 4) != 0) {
+			warn(out, undoc_line ? undoc_line : mb->doc_line, name, "DC2",
+			     "document members with a trailing /**< comment");
+		}
+		cddoc *doc = cddoc_parse(mb->doc, strlen(mb->doc));
+		add_doc_diags(out, doc, undoc_line ? undoc_line : mb->doc_line, name);
+		check_refs(out, f, tab, mb, undoc_line ? undoc_line : mb->doc_line, doc, name);
+		cddoc_free(doc);
 	}
-	return NULL;
 }
 
 
-// A doc comment of a macro: a generator's documents the declaration it
-// generates (DC14), an invocation's documents its single generated one
-static void check_macro_doc(vec *out, const cdfile *f, const cdsymtab *tab, const cddecl *d,
-                            const cddoc *doc)
+// The declarations of a generator's body, documented by the doc comments
+// before them in the body (DC14). (IMPL_ generators define what DECL_ ones
+// declare: their docs are not required.)
+static void check_generated(vec *out, const cdfile *f, const cdsymtab *tab, const cddecl *gen)
 {
-	if (!tab) {
+	const vec *pats = NULL;
+	if (!tab || strncmp(gen->name, "IMPL_", 5) == 0
+	        || cdmacro_generator(cdsymtab_macros(tab), gen, &pats) != CDG_LEAF || !pats) {
 		return;
 	}
-	const cddecl *target = NULL;
-	if (d->kind == CDD_MACROCALL) {
-		const cdfamily *fam = documented_by(tab, f, d);
-		if (!fam) {
-			warn(out, d->doc_line, d->name, "DC14", "the doc comment of %s is not used: "
-			     "an invocation is documented only if it generates a single declaration",
-			     d->sig);
-			return;
+	for (size_t k = 0, n = vec_len(pats); k < n; k++) {
+		const cddecl *p = vec_get(pats, k);
+		if (!p->doc) {
+			warn(out, gen->line, p->name, "DC4", "undocumented macro-generated %s (document "
+			     "it in the body of #define %s, before the declaration)", kind_word(p->kind),
+			     gen->name);
+			check_members(out, f, tab, p, gen->line);
+			continue;
 		}
-		target = ((const cdinstance *)vec_get(fam->instances, 0))->decl;
-	} else {
-		const vec *pats = NULL;
-		cdgen_kind k = cdmacro_generator(cdsymtab_macros(tab), d, &pats);
-		if (k == CDG_COMPOSITE) {
-			warn(out, d->doc_line, d->name, "DC14", "the doc comment of %s is not used: "
-			     "it only invokes other generators; document those", d->name);
-			return;
+		if (cddoc_hidden(p->doc)) {
+			continue;
 		}
-		if (k != CDG_LEAF || !pats) {
-			return;
-		}
-		if (vec_len(pats) > 1) {
-			warn(out, d->doc_line, d->name, "DC14", "the doc comment of %s is not used: "
-			     "it declares %zu things; document each in its own generator", d->name,
-			     vec_len(pats));
-			return;
-		}
-		target = vec_get(pats, 0);
+		size_t line = cdmacro_doc_line(cdsymtab_macros(tab), gen, p->doc);
+		cddecl view = *p;
+		view.doc_line = line;
+		cddoc *doc = cddoc_parse(p->doc, strlen(p->doc));
+		add_doc_diags(out, doc, line, p->name);
+		check_signature(out, &view, doc);
+		check_refs(out, f, tab, &view, line, doc, p->name);
+		cddoc_free(doc);
+		// (members: the lines of the body are not known)
+		check_members(out, f, tab, p, line);
 	}
-	// check the doc against the generated declaration
-	cddecl view = *target;
-	view.doc_line = d->doc_line;
-	check_signature(out, &view, doc);
-	check_refs(out, f, tab, &view, d->doc_line, doc, view.name);
 }
 
 
@@ -324,56 +322,38 @@ vec *cdlint(const cdfile *file, const cdsymtab *tab)
 			continue;
 		}
 
-		// generators and invocations are documented through their families
-		bool generator = d->kind == CDD_MACROCALL || cddecl_is_generator(d);
+		if (d->kind == CDD_MACRO) {
+			check_generated(out, file, tab, d);
+		}
+		if (d->kind == CDD_MACROCALL) {
+			// the generated declarations are documented in the generators
+			if (d->doc) {
+				warn(out, d->doc_line, d->name, "DC14", "the doc comment of %s is not used: "
+				     "document the generated declarations in the body of the generator",
+				     d->sig);
+			}
+			continue;
+		}
+		if (cddoc_hidden(d->doc)) {
+			continue; // @hide: not on the pages, not checked
+		}
 		// names starting with '_' are private by convention
-		if (!d->doc && d->name[0] != '_' && !generator) {
+		if (!d->doc && d->name[0] != '_') {
 			warn(out, d->line, d->name, "DC4", "undocumented %s", kind_word(d->kind));
 		} else if (d->doc) {
 			cddoc *doc = cddoc_parse(d->doc, strlen(d->doc));
 			add_doc_diags(out, doc, d->doc_line, d->name);
-			if (generator) {
-				check_macro_doc(out, file, tab, d, doc);
-			} else {
-				check_signature(out, d, doc);
-				check_refs(out, file, tab, d, d->doc_line, doc, d->name);
-			}
+			check_signature(out, d, doc);
+			check_refs(out, file, tab, d, d->doc_line, doc, d->name);
 			cddoc_free(doc);
 		}
-
-		for (size_t j = 0, m = d->members ? vec_len(d->members) : 0; j < m; j++) {
-			const cddecl *mb = vec_get(d->members, j);
-			char name[256];
-			snprintf(name, sizeof(name), "%s.%s", d->name, mb->name);
-			if (!mb->doc) {
-				warn(out, mb->line, name, "DC4", "undocumented member");
-				continue;
-			}
-			if (strncmp(mb->doc, "/**<", 4) != 0) {
-				warn(out, mb->doc_line, name, "DC2",
-				     "document members with a trailing /**< comment");
-			}
-			cddoc *doc = cddoc_parse(mb->doc, strlen(mb->doc));
-			add_doc_diags(out, doc, mb->doc_line, name);
-			check_refs(out, file, tab, mb, mb->doc_line, doc, name);
-			cddoc_free(doc);
-		}
+		check_members(out, file, tab, d, 0);
 	}
 	if (!has_file) {
 		warn(out, 1, base, "DC3", "no file comment (@file, @author, @brief)");
 	}
 
-	// macro-generated declarations (DC14)
-	const vec *fams = tab ? cdsymtab_families(tab, file) : NULL;
-	for (size_t i = 0, n = fams ? vec_len(fams) : 0; i < n; i++) {
-		const cdfamily *fam = vec_get(fams, i);
-		if (!fam->doc_decl) {
-			const cddecl *d = ((const cdinstance *)vec_get(fam->instances, 0))->decl;
-			warn(out, fam->line, cdfamily_name(fam), "DC4",
-			     "undocumented macro-generated %s (generated by %s; document it above "
-			     "#define %s)", kind_word(d->kind), fam->gen->name, fam->gen->name);
-		}
-	}
+	// problems expanding the macro invocations (DC14)
 	const vec *mwarns = tab ? cdsymtab_macro_warnings(tab, file) : NULL;
 	for (size_t i = 0, n = mwarns ? vec_len(mwarns) : 0; i < n; i++) {
 		const cdmacrowarn *w = vec_get(mwarns, i);

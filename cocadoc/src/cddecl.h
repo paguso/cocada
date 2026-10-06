@@ -114,7 +114,8 @@ void cddecl_vec_free(vec *decls);
  * @brief Returns the parameter names of a declaration.
  *
  * Works for functions, function-like macros and function pointer
- * typedefs. Variadic parameters are named "...".
+ * typedefs. Variadic parameters are named "...", except those of macros
+ * that do not use `__VA_ARGS__`, which are left out.
  *
  * @param d The declaration.
  * @param named Set to false if some parameter has no name.
@@ -130,19 +131,6 @@ vec *cddecl_params(const cddecl *d, bool *named);
  * @return Whether @p d returns a value.
  */
 bool cddecl_returns_value(const cddecl *d);
-
-
-/**
- * @brief Tells whether a macro is a generator of a typed function family.
- *
- * By convention, generator macros are named `DECL_*` (declaring) or
- * `IMPL_*` (defining), e.g. `DECL_HASHMAP_GET`, `IMPL_HASHMAP_GET`. Their
- * docs describe the generated functions, not the macro (DC14).
- *
- * @param d The declaration.
- * @return Whether @p d is a generator macro.
- */
-bool cddecl_is_generator(const cddecl *d);
 
 
 /**

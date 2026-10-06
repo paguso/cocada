@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "cddoc.h"
 #include "cdsym.h"
 #include "cstrutil.h"
 #include "hash.h"
@@ -73,12 +74,13 @@ static bool eq_str(const void *a, const void *b)
 
 // Takes ownership of name
 static void add(cdsymtab *t, char *name, cddecl_kind kind, const cdfile *file,
-                const cddecl *decl, const cddecl *parent, const cdfamily *family)
+                const cddecl *decl, const cddecl *parent, const cdfamily *family,
+                bool hidden)
 {
 	entry e = {
 		.sym = {
 			.name = name, .kind = kind, .file = file, .decl = decl, .parent = parent,
-			.family = family
+			.family = family, .hidden = hidden
 		},
 		.next = NONE
 	};
@@ -118,14 +120,15 @@ static void add_file(cdsymtab *t, const cdfile *f)
 			file_doc = d;
 		}
 	}
-	add(t, cstr_clone(f->name), CDD_FILE, f, file_doc, NULL, NULL);
+	add(t, cstr_clone(f->name), CDD_FILE, f, file_doc, NULL, NULL, false);
 
 	for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
 		const cddecl *d = vec_get(f->decls, i);
 		if (d->kind == CDD_FILE || d->kind == CDD_MACROCALL || d->name[0] == '\0') {
 			continue;
 		}
-		add(t, cstr_clone(d->name), d->kind, f, d, NULL, NULL);
+		bool hidden = cddoc_hidden(d->doc);
+		add(t, cstr_clone(d->name), d->kind, f, d, NULL, NULL, hidden);
 		bool is_enum = d->sig && (strstr(d->sig, "enum ") == d->sig
 		                          || strncmp(d->sig, "typedef enum", 12) == 0);
 		for (size_t j = 0, m = d->members ? vec_len(d->members) : 0; j < m; j++) {
@@ -133,9 +136,9 @@ static void add_file(cdsymtab *t, const cdfile *f)
 			if (mb->name[0] == '\0') {
 				continue;
 			}
-			add(t, qualified(d->name, mb->name), CDD_MEMBER, f, mb, d, NULL);
+			add(t, qualified(d->name, mb->name), CDD_MEMBER, f, mb, d, NULL, hidden);
 			if (is_enum) {
-				add(t, cstr_clone(mb->name), CDD_MEMBER, f, mb, d, NULL);
+				add(t, cstr_clone(mb->name), CDD_MEMBER, f, mb, d, NULL, hidden);
 			}
 		}
 	}
@@ -161,11 +164,12 @@ cdsymtab *cdsymtab_new(const vec *files)
 			const cdfamily *fam = vec_get(g.families, k);
 			if (fam->pattern && vec_len(fam->instances) > 1) {
 				add(ret, cstr_clone(fam->pattern->name), fam->pattern->kind, g.file,
-				    fam->pattern, NULL, fam);
+				    fam->pattern, NULL, fam, fam->hidden);
 			}
 			for (size_t j = 0, jn = vec_len(fam->instances); j < jn; j++) {
 				const cdinstance *in = vec_get(fam->instances, j);
-				add(ret, cstr_clone(in->decl->name), in->decl->kind, g.file, in->decl, NULL, fam);
+				add(ret, cstr_clone(in->decl->name), in->decl->kind, g.file, in->decl, NULL, fam,
+				    fam->hidden);
 			}
 		}
 	}

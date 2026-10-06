@@ -578,13 +578,6 @@ static inline bool p_ident_char(char c)
 	return isalnum((unsigned char)c) || c == '_';
 }
 
-bool cddecl_is_generator(const cddecl *d)
-{
-	return d->kind == CDD_MACRO
-	       && (strncmp(d->name, "DECL_", 5) == 0 || strncmp(d->name, "IMPL_", 5) == 0);
-}
-
-
 /*
  * Parameters from the signature
  */
@@ -705,7 +698,11 @@ vec *cddecl_params(const cddecl *d, bool *named)
 			while (e > s && isspace((unsigned char)sig[e - 1])) e--;
 			char *name = NULL;
 			if (e - s == 3 && strncmp(sig + s, "...", 3) == 0) {
-				name = cstr_clone("...");
+				// (a macro's unused variadic parameter, as in the generators
+				// of type lists, DECL_X(TYPE, ...), is not a parameter to document)
+				if (!macro || !d->def || strstr(d->def, "__VA_ARGS__")) {
+					name = cstr_clone("...");
+				}
 			} else if (e > s && macro) {
 				name = cstr_clone_len(sig + s, e - s);
 			} else if (e > s && !(e - s == 4 && strncmp(sig + s, "void", 4) == 0)) {

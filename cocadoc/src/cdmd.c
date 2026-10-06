@@ -100,16 +100,13 @@ static void append_link(strbuf *out, const char *text, size_t tlen, const cdsym 
 }
 
 
-static bool hidden_generator(const cddecl *d, const cdsymtab *tab);
-
-
 // Appends name as a link if it resolves, else as code
 static void append_ref(strbuf *out, const char *name, size_t len, const cdfile *f,
                        const cdsymtab *tab)
 {
 	char *key = cstr_clone_len(name, len);
 	const cdsym *s = tab ? cdsymtab_resolve(tab, key, f, NULL) : NULL;
-	if (s && s->decl && hidden_generator(s->decl, tab)) {
+	if (s && s->hidden) {
 		s = NULL; // not on any page
 	}
 	if (s) {
@@ -387,7 +384,7 @@ static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cd
 
 	// parameters, in declaration order
 	bool named = false;
-	vec *params = (d && !cddecl_is_generator(d)) ? cddecl_params(d, &named) : NULL;
+	vec *params = d ? cddecl_params(d, &named) : NULL;
 	if (params && named) {
 		if (vec_len(params) > 0) {
 			strbuf_append(out, "**Parameters**\n\n");
@@ -501,24 +498,14 @@ static part part_of(const cddecl *d)
 }
 
 
-// A generator macro used only to generate families: by other macros, and
-// never invoked directly (DC14). Such macros are not listed on the pages.
-static bool hidden_generator(const cddecl *d, const cdsymtab *tab)
-{
-	return tab && d->kind == CDD_MACRO && cddecl_is_generator(d)
-	       && cdmacro_used_by_macros(cdsymtab_macros(tab), d->name)
-	       && !cdmacro_invoked(cdsymtab_macros(tab), d->name);
-}
-
-
 // Whether d is shown: named, not private-and-undocumented, first of its
-// name, and not a hidden generator
-static bool shown(const cddecl *d, const vec *decls, size_t pos, const cdsymtab *tab)
+// name, and not hidden by @hide
+static bool shown(const cddecl *d, const vec *decls, size_t pos)
 {
 	if (d->name[0] == '\0' || (d->name[0] == '_' && !d->doc)) {
 		return false;
 	}
-	if (hidden_generator(d, tab)) {
+	if (cddoc_hidden(d->doc)) {
 		return false;
 	}
 	for (size_t i = 0; i < pos; i++) {
@@ -601,7 +588,7 @@ static vec *items_of(const cdfile *f, const cdsymtab *tab, part p)
 			const cdfamily *fam = vec_get(fams, i);
 			const cddecl *d = family_decl(fam);
 			part fp = (d->kind == CDD_FUNC) ? PART_GEN_FUNCTIONS : PART_GEN_TYPES;
-			if (fp == p) {
+			if (fp == p && !fam->hidden) {
 				item it = {.decl = d, .fam = fam};
 				vec_push(ret, &it);
 			}
@@ -610,7 +597,7 @@ static vec *items_of(const cdfile *f, const cdsymtab *tab, part p)
 	}
 	for (size_t i = 0, n = vec_len(f->decls); i < n; i++) {
 		const cddecl *d = vec_get(f->decls, i);
-		if (part_of(d) == p && shown(d, f->decls, i, tab)) {
+		if (part_of(d) == p && shown(d, f->decls, i)) {
 			item it = {.decl = d, .fam = NULL};
 			vec_push(ret, &it);
 		}
@@ -647,14 +634,19 @@ static void append_declares(strbuf *out, const cddecl *d, const cdsymtab *tab)
 	        || cdmacro_generator(cdsymtab_macros(tab), d, &pats) != CDG_LEAF || !pats) {
 		return;
 	}
-	strbuf_append(out, "**Declares:** ");
+	size_t count = 0;
 	for (size_t i = 0, n = vec_len(pats); i < n; i++) {
 		const cddecl *p = vec_get(pats, i);
-		strbuf_append(out, i ? ", `" : "`");
+		if (cddoc_hidden(p->doc)) {
+			continue;
+		}
+		strbuf_append(out, count++ ? ", `" : "**Declares:** `");
 		strbuf_append(out, p->sig);
 		strbuf_append(out, "`");
 	}
-	strbuf_append(out, "\n\n");
+	if (count) {
+		strbuf_append(out, "\n\n");
+	}
 }
 
 

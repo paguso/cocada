@@ -60,6 +60,7 @@ typedef struct {
 	const cddecl *decl;    /**< The declaration (for #CDD_FILE, the file comment, or NULL) */
 	const cddecl *parent;  /**< For members, the declaration of their type; else NULL */
 	const cdfamily *family;/**< For macro-generated declarations, their family; else NULL */
+	bool hidden;           /**< Left out of the pages by `@hide` (for members, their type's) */
 } cdsym;
 
 

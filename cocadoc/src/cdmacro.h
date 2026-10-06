@@ -58,10 +58,19 @@
  * declaration with the generator's parameters as placeholders
  * (`void vec_push_TYPE(vec *v, TYPE val);`).
  *
- * The doc comment of a family is the one above the `#define` of its
- * generator, if the generator declares a single type or function. A family
- * with a single instance may also be documented by a doc comment above the
- * invocation.
+ * A family is documented by the doc comment before its declaration in the
+ * generator's body, with line continuations:
+ *
+ * ```c
+ * #define DECL_VEC_PUSH( TYPE ) \
+ *     / **\
+ *      * @brief Appends a copy of @p val to @p v.\
+ *      ...\
+ *      * /\
+ *     void vec_push_##TYPE(vec *v, TYPE val);
+ * ```
+ *
+ * The doc comment above the `#define` documents the macro itself.
  */
 
 
@@ -86,6 +95,7 @@ typedef struct {
 	vec *via;                /**< The invocations that generate them (vec of heap char *) */
 	size_t line;             /**< Line of the first of these invocations */
 	const cddecl *doc_decl;  /**< The declaration whose doc comment documents the family, or NULL */
+	bool hidden;             /**< Whether that doc comment has `@hide` */
 } cdfamily;
 
 
@@ -167,25 +177,14 @@ cdgen_kind cdmacro_generator(const cdmacrotab *self, const cddecl *macro,
 
 
 /**
- * @brief Tells whether a macro is invoked directly at file scope in some
- * file (e.g. `DECL_TRAIT(vec_iter, iter)`), rather than only by other
- * macros.
+ * @brief Finds the line of a doc comment of a macro body.
  * @param self The macro table.
- * @param name The macro name.
- * @return Whether it is.
+ * @param gen A macro declaration.
+ * @param doc The text of a doc comment of its body (e.g. #cdfamily.doc_decl's).
+ * @return The 1-based line of @p doc in the file, or the line of @p gen if
+ *         @p doc is not in its body.
  */
-bool cdmacro_invoked(const cdmacrotab *self, const char *name);
-
-
-/**
- * @brief Tells whether a name is used by macros: in the body of a macro, or
- * in the arguments of a file-scope invocation (e.g. `DECL_ARRAY` in
- * `XX_CORETYPES(DECL_ARRAY)`).
- * @param self The macro table.
- * @param name The name.
- * @return Whether it is.
- */
-bool cdmacro_used_by_macros(const cdmacrotab *self, const char *name);
+size_t cdmacro_doc_line(const cdmacrotab *self, const cddecl *gen, const char *doc);
 
 
 /**

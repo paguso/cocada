@@ -49,6 +49,7 @@
  * `@deprecated`               | #cddoc.deprecated
  * `@author`                   | #cddoc.authors
  * `@ai level, agent`          | #cddoc.ai
+ * `@hide`                     | #cddoc.hide
  *
  * A block command extends until a blank line or the next block command,
  * and may also start in the middle of a line. Text outside block commands
@@ -136,6 +137,7 @@ typedef struct {
 	char *deprecated;  /**< Deprecation text ("" if no text), or NULL */
 	vec  *authors;     /**< Authors (vec of char *) */
 	vec  *ai;          /**< AI involvement (vec of #cdai) */
+	bool hide;         /**< `@hide`: the declaration is left out of the pages */
 	vec  *refs;        /**< References, in order (vec of #cdref) */
 	vec  *diags;       /**< Style deviations (vec of #cddiag) */
 } cddoc;
@@ -156,6 +158,14 @@ cddoc *cddoc_parse(const char *raw, size_t len);
  * @param @move self The parsed comment.
  */
 void cddoc_free(cddoc *self);
+
+
+/**
+ * @brief Tells whether a documentation comment has `@hide`.
+ * @param raw The comment text, or NULL.
+ * @return Whether the documented declaration is hidden.
+ */
+bool cddoc_hidden(const char *raw);
 
 
 /**

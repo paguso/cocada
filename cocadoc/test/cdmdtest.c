@@ -76,12 +76,18 @@ static const char *SRC_B =
     "/**\n * @file b.h\n * @author B\n * @brief Module B.\n */\n"
     "/**\n * @brief B func.\n */\nvoid b_func(void);\n"
     "/**\n * @brief B type.\n */\ntypedef struct {\n\tint x; /**< The x */\n} b_t;\n"
-    "/**\n * @brief Pushes a TYPE.\n */\n"
-    "#define DECL_PUSH(TYPE) void push_##TYPE(vec *v, TYPE val);\n"
+    "/**\n * @brief Declares push_TYPE.\n * @param TYPE The type.\n */\n"
+    "#define DECL_PUSH(TYPE, ...) \\\n"
+    "\t/**\\\n\t * @brief Pushes a TYPE.\\\n\t */\\\n"
+    "\tvoid push_##TYPE(vec *v, TYPE val);\n"
     "/**\n * @brief A list of two types.\n */\n"
     "#define XX_TWO(XX, ...) XX(int, __VA_ARGS__) XX(char, __VA_ARGS__)\n"
-    "XX_TWO(DECL_PUSH)\n"
-    "/**\n * @brief Uses #push_char.\n */\nvoid user(void);\n"
+    "/**\n * @hide\n */\n"
+    "#define DECL_ALL(TYPE, ...) DECL_PUSH(TYPE) DECL_HID(TYPE)\n"
+    "#define DECL_HID(TYPE) /** @hide */ void hid_##TYPE(void);\n"
+    "XX_TWO(DECL_ALL)\n"
+    "/**\n * @brief Uses #push_char, #DECL_ALL and #hid_int.\n */\nvoid user(void);\n"
+    "/**\n * @hide\n */\nvoid hidden(void);\n"
     "/**\n * @brief A lone T.\n */\n"
     "#define DECL_LONE(T) int lone_##T(void);\n";
 
@@ -145,10 +151,21 @@ void test_cdmd_page(CuTest *tc)
 	ASSERT_HAS(page, "**Macro-generated functions**\n\n- [push_TYPE](#push_type): Pushes a TYPE.");
 	ASSERT_HAS(page, "## Macro-generated functions\n\n### push_TYPE\n\n```c\n"
 	           "void push_TYPE(vec *v, TYPE val);\n```\n\nPushes a TYPE.");
-	ASSERT_HAS(page, "**Generated** by `XX_TWO(DECL_PUSH)`: `push_int`, `push_char`.");
-	ASSERT_HAS(page, "Uses [push_char](#push_type).");
+	ASSERT_HAS(page, "**Generated** by `XX_TWO(DECL_ALL)`: `push_int`, `push_char`.");
+	ASSERT_HAS(page, "Uses [push_char](#push_type), `DECL_ALL` and `hid_int`.");
 	ASSERT_HAS(page, "### XX_TWO");
-	ASSERT_LACKS(page, "### DECL_PUSH"); // used by XX_TWO(DECL_PUSH) only
+	// generators are macros, documented by the doc above the #define
+	ASSERT_HAS(page, "### DECL_PUSH\n\n```c\n#define DECL_PUSH(TYPE, ...)\n```\n\n"
+	           "Declares push_TYPE.\n\n**Parameters**\n\n- `TYPE`: The type.\n\n"
+	           "**Declares:** `void push_TYPE(vec *v, TYPE val)`");
+	ASSERT_HAS(page, "- [DECL_PUSH](#decl_push): Declares push_TYPE.");
+	// @hide
+	ASSERT_LACKS(page, "DECL_ALL]");
+	ASSERT_LACKS(page, "### DECL_ALL");
+	ASSERT_LACKS(page, "hid_TYPE");
+	ASSERT_LACKS(page, "### hidden");
+	ASSERT_LACKS(page, "[hidden]");
+	ASSERT_HAS(page, "### DECL_HID"); // (only what it declares is hidden)
 	// not used by any macro: listed, with what it declares
 	ASSERT_HAS(page, "### DECL_LONE\n\n```c\n#define DECL_LONE(T)\n```\n\nA lone T.");
 	ASSERT_HAS(page, "**Declares:** `int lone_T(void)`");

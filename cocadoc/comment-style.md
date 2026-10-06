@@ -52,7 +52,8 @@ size_t vec_len(const vec *v);
 - text on the closing `*/` line;
 - `**/` closers (also in member docs).
 
-(Doc comments inside macro bodies are ignored, see DC14.)
+Doc comments inside macro bodies (DC14) have the same form, with each line
+ended by the `\` line continuation.
 
 ### DC2. Member comments
 
@@ -146,7 +147,25 @@ except include guards and names starting with `_`.
 
 Public macros (e.g. `MIN` and `MAX` in `mathutil.h`) follow the same rules
 as functions: `@brief`, one `@param` per macro argument, and `@return` if the
-macro is an expression with a meaningful value.
+macro is an expression with a meaningful value. This includes the macros
+that generate declarations (DC14). A variadic `...` that the macro does not
+use (no `__VA_ARGS__` in its body) is not documented.
+
+**`@hide`** leaves a declaration out of the documentation pages, whatever
+else its comment says, e.g. a composite generator (DC14) that is an
+implementation detail:
+
+```c
+/**
+ * @hide
+ */
+#define DECL_HASHMAP_ALL( TYPE , ...) \
+	DECL_HASHMAP_GET(TYPE) \
+	DECL_HASHMAP_SET(TYPE)
+```
+
+A hidden declaration is not listed in the contents, and references to it
+are shown as code, not links. `cocadoc` does not check its comment.
 
 ### DC5. Explicit, short brief
 
@@ -194,6 +213,7 @@ Only these block commands are used:
 | `@warning text` | misuse that leads to bugs | may contain a list |
 | `@note text` | remarks | |
 | `@deprecated text` | deprecated API | say what to use instead |
+| `@hide` | declarations left out of the pages | DC4 |
 
 The only inline command is `@p name`, for parameters of the documented
 function (DC11). It saves writing the parameter name in full markup, and
@@ -370,34 +390,42 @@ XX_CORETYPES(DECL_TYPED_VEC)   // vec_push_int, vec_push_double, ...
 - Macros that generate declarations are named `DECL_*`, and those that
   generate definitions (in `.c` files) `IMPL_*`, e.g. `DECL_HASHMAP_GET`
   and `IMPL_HASHMAP_GET`.
-- A **leaf generator** declares a single type or function (like
+- A **leaf generator** declares types or functions (like
   `DECL_VEC_PUSH`). A **composite generator** only invokes other
   generators (like `DECL_TYPED_VEC`). A type list such as `XX_CORETYPES`
   invokes a generator for each type.
 
-**Each leaf generator is documented above its `#define`, as the type or
-function it generates**, with the usual block comment and the usual rules:
-`@param`s for the parameters of the generated function, `@p`, `@return`,
-and so on. The generator's own parameters (`TYPE`) can be mentioned as
-placeholders.
+**The doc comment above a generator's `#define` documents the macro**, like
+any other macro (DC4): `@param`s for the macro's own parameters. **The
+generated declarations are documented inside the body**, each by a doc
+comment before it, with the usual form and rules (`@param`s for the
+parameters of the generated function, `@p`, `@return`, member docs, and so
+on). Each line of a doc comment in a body ends with the `\` continuation, as
+the other lines of the body. The generator's parameters (`TYPE`) can be
+mentioned as placeholders.
 
 ```c
 /**
- * @brief Appends a TYPE copy of @p val to the vector.
- * @param v The vector.
- * @param val The value.
+ * @brief Declares an OK-Result type `NAME_res`.
+ * @param NAME The type name prefix.
+ * @param OK_TYPE The type of the result value.
  */
-#define DECL_VEC_PUSH( TYPE ) \
-	void vec_push_##TYPE(vec *v, TYPE val);
+#define DECL_RESULT_OK(NAME, OK_TYPE) \
+	/**\
+	 * @brief OK-Result type.\
+	 */\
+	typedef struct {\
+		bool ok;      /**< Success/fail indicator */\
+		OK_TYPE val;  /**< Successful result value */\
+	} NAME##_res;
 ```
 
-- Doc comments inside macro bodies are ignored.
-- The doc comment of a composite generator, or of a generator that
-  declares several things, is not used: document the leaf generators, one
-  declaration each.
-- A doc comment above an invocation (e.g. `DECL_TRAIT(vec_iter, iter)`)
-  documents the generated declaration if there is only one, and otherwise
-  is not used.
+- A composite generator has no declarations of its own to document; it is
+  documented as a macro, or hidden with `@hide`.
+- A doc comment above an invocation (e.g. `DECL_TRAIT(vec_iter, iter)`) is
+  not used: the generated declarations are documented in the generator.
+- `IMPL_*` generators define what `DECL_*` generators declare: only the
+  macro is documented.
 
 `cocadoc` expands the file-scope invocations of the documented headers, and
 documents each **family** once, in the sections *Macro-generated types and
@@ -408,15 +436,13 @@ the invocation:
   (`void vec_push_TYPE(vec *v, TYPE val);`), followed by the invocation
   and the list of generated names (`vec_push_uchar`, `vec_push_ushort`,
   ...);
-- a family with a single declaration (e.g. `vec_iter_as_iter`, from
-  `DECL_TRAIT(vec_iter, iter)`) is shown as an ordinary item;
+- a family with a single declaration (e.g. `semver_res`, from
+  `DECL_RESULT_OK(semver, semver *)`) is shown as an ordinary item;
 - references to generated names (`#vec_push_int`) link to their family;
-- generator macros used only to generate families (by other macros, like
-  `DECL_VEC_PUSH`, or as the argument of a type list, like `DECL_ARRAY` in
-  `XX_CORETYPES(DECL_ARRAY)`) are not listed in the *Macros* section.
-  Those invoked directly (like `DECL_TRAIT`) or not used by other macros
-  (like `IMPL_TRAIT`, which is used in `.c` files) are listed, with what
-  they declare.
+- the generator macros are listed in the *Macros* section of the page of
+  the header that defines them, with what they declare, unless hidden with
+  `@hide`. A `@hide` in the body hides the generated declaration that
+  follows it.
 
 The expansion handles parameters, `__VA_ARGS__`, token pasting (`##`) and
 nested macro calls. It does not evaluate `#if`, and uses the first
@@ -446,7 +472,7 @@ involvement (DC15), with these sections:
 | DC2 | member docs on several lines, with block commands, or not as a trailing `/**<` |
 | DC3 | no file comment; `@file` name different from the file name; no `@author` |
 | DC15 | unknown `@ai` level; no AI named; `@ai` outside a file comment |
-| DC4 | undocumented public declarations, members and macro-generated families |
+| DC4 | undocumented public declarations, members and macro-generated declarations |
 | DC5 | missing or empty `@brief`; briefs with more than one sentence |
 | DC6 | commands other than those of DC6, including typos like `@src` |
 | DC7 | sections out of order |
@@ -455,7 +481,7 @@ involvement (DC15), with these sections:
 | DC10 | anything but names in `@see` |
 | DC11 | `::name` and `name()` references |
 | DC12 | HTML tags; headings outside file comments; `@code`; unterminated code blocks |
-| DC14 | docs of generators or invocations that are not used; invocations that cannot be expanded |
+| DC14 | docs of invocations (not used); invocations that cannot be expanded |
 
 Warnings in the current code, over the 68 public headers (2026-10-05):
 

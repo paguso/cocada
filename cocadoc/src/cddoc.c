@@ -211,6 +211,7 @@ typedef enum {
 	SEC_FILE,
 	SEC_PAR,
 	SEC_AI,
+	SEC_HIDE,
 	SEC_NONE // not a block command
 } sec_kind;
 
@@ -249,6 +250,7 @@ static const cmd_def BLOCK_CMDS[] = {
 	{"author", SEC_AUTHOR, NULL},
 	{"file", SEC_FILE, NULL},
 	{"ai", SEC_AI, NULL},
+	{"hide", SEC_HIDE, NULL},
 	// accepted, but not allowed by the style
 	{"short", SEC_BRIEF, "@brief"},
 	{"returns", SEC_RETURN, "@return"},
@@ -1033,6 +1035,18 @@ static const char *AI_LEVELS[][2] = {
 };
 
 
+bool cddoc_hidden(const char *raw)
+{
+	if (!raw) {
+		return false;
+	}
+	cddoc *doc = cddoc_parse(raw, strlen(raw));
+	bool ret = doc->hide;
+	cddoc_free(doc);
+	return ret;
+}
+
+
 const char *cdai_level_title(const char *level)
 {
 	for (size_t i = 0; i < sizeof(AI_LEVELS) / sizeof(AI_LEVELS[0]); i++) {
@@ -1149,6 +1163,7 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 	doc->deprecated = NULL;
 	doc->authors = new_str_vec();
 	doc->ai = vec_new(sizeof(cdai));
+	doc->hide = false;
 
 	strbuf *brief = strbuf_new();
 	bool brief_cmd = false;
@@ -1221,6 +1236,10 @@ cddoc *cddoc_parse(const char *raw, size_t len)
 			FREE(text);
 			break;
 		}
+		case SEC_HIDE:
+			doc->hide = true;
+			FREE(text);
+			break;
 		default: // @file: the declaration matcher takes care of it
 			FREE(text);
 			break;

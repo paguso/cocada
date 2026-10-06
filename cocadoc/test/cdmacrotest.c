@@ -39,17 +39,20 @@ static const char *SRC_LIB =
     "#define XX_LIST(XX, ...) \\\n"
     "\tXX(int, __VA_ARGS__) \\\n"
     "\tXX(double, __VA_ARGS__)\n"
-    "/**\n * @brief T trait of a TYPE.\n */\n"
+    "/**\n * @brief Declares a trait.\n */\n"
     "#define DECL_TRAIT(TYPE, TRAIT)\\\n"
+    "\t/** @brief The TRAIT trait of a TYPE. */\\\n"
     "\tTRAIT * TYPE##_as_##TRAIT( TYPE *self );\n"
     "#define DECL_RESULT_OK(NAME, T) \\\n"
     "\ttypedef struct {\\\n\t\tbool ok; /**< Success */\\\n\t\tT val; /**< The value */\\\n"
     "\t} NAME##_res;\n";
 
 static const char *SRC_VEC =
-    "/**\n * @brief Appends a TYPE copy of @p val.\n */\n"
+    "/**\n * @brief Declares vec_push_TYPE.\n */\n"
     "#define DECL_VEC_PUSH( TYPE ) \\\n"
-    "\t/** @brief ignored doc in the body */ \\\n"
+    "\t/**\\\n"
+    "\t * @brief Appends a TYPE copy of @p val.\\\n"
+    "\t */\\\n"
     "\tvoid vec_push_##TYPE(vec *v, TYPE val);\n"
     "#define DECL_VEC_GET( TYPE ) \\\n"
     "\tTYPE vec_get_##TYPE(const vec *v, size_t pos);\n"
@@ -57,8 +60,7 @@ static const char *SRC_VEC =
     "#define DECL_TYPED_VEC( TYPE , ...) \\\n"
     "\tDECL_VEC_PUSH(TYPE) \\\n"
     "\tDECL_VEC_GET(TYPE)\n"
-    "/**\n * @brief Not used: two declarations.\n */\n"
-    "#define DECL_TWO(TYPE) int one_##TYPE(void); int two_##TYPE(void);\n"
+    "#define DECL_TWO(TYPE) int one_##TYPE(void); /** @hide */ int two_##TYPE(void);\n"
     "#define REC(X) REC(X)\n"
     "XX_LIST(DECL_TYPED_VEC)\n"
     "XX_LIST(DECL_TWO)\n"
@@ -85,10 +87,6 @@ void test_cdmacro_families(CuTest *tc)
 	vec_push_rawptr(files, vf);
 	cdmacrotab *tab = cdmacrotab_new(files);
 
-	CuAssertTrue(tc, cdmacro_invoked(tab, "XX_LIST"));
-	CuAssertTrue(tc, cdmacro_invoked(tab, "DECL_TRAIT"));
-	CuAssertTrue(tc, !cdmacro_invoked(tab, "DECL_VEC_PUSH"));
-
 	vec *warns = vec_new(sizeof(cdmacrowarn));
 	vec *fams = cdmacro_families(tab, vf, warns);
 	// vec_push, vec_get, one, two, as_trait, result
@@ -104,7 +102,14 @@ void test_cdmacro_families(CuTest *tc)
 	CuAssertStrEquals(tc, "vec_push_double", inst_name(push, 1));
 	CuAssertStrEquals(tc, "int", ((const cdinstance *)vec_get(push->instances, 0))->args);
 	CuAssertStrEquals(tc, "XX_LIST(DECL_TYPED_VEC)", (char *)vec_get_rawptr(push->via, 0));
-	CuAssertTrue(tc, push->doc_decl == push->gen); // the doc above #define DECL_VEC_PUSH
+	// documented by the doc in the body, not by the one above the #define
+	CuAssertTrue(tc, push->doc_decl == push->pattern);
+	CuAssertStrEquals(tc, "/**\n\t * @brief Appends a TYPE copy of @p val.\n\t */",
+	                  push->doc_decl->doc);
+	CuAssertTrue(tc, ((const cdinstance *)vec_get(push->instances, 0))->decl->doc != NULL);
+	CuAssertSizeTEquals(tc, 5, cdmacro_doc_line(tab, push->gen, push->doc_decl->doc));
+	CuAssertSizeTEquals(tc, 4, cdmacro_doc_line(tab, push->gen, "/** other */"));
+	CuAssertTrue(tc, !push->hidden);
 
 	const cdfamily *get = vec_get(fams, 1);
 	CuAssertStrEquals(tc, "vec_get_TYPE", get->pattern->name);
@@ -112,8 +117,11 @@ void test_cdmacro_families(CuTest *tc)
 
 	const cdfamily *one = vec_get(fams, 2);
 	CuAssertStrEquals(tc, "one_TYPE", one->pattern->name);
-	CuAssertTrue(tc, one->doc_decl == NULL); // its generator declares two things
-	CuAssertStrEquals(tc, "two_TYPE", ((const cdfamily *)vec_get(fams, 3))->pattern->name);
+	CuAssertTrue(tc, one->doc_decl == NULL);
+	const cdfamily *two = vec_get(fams, 3);
+	CuAssertStrEquals(tc, "two_TYPE", two->pattern->name);
+	CuAssertTrue(tc, two->doc_decl == two->pattern);
+	CuAssertTrue(tc, two->hidden);
 
 	const cdfamily *trait = vec_get(fams, 4);
 	CuAssertStrEquals(tc, "TYPE_as_TRAIT", trait->pattern->name);
@@ -121,7 +129,7 @@ void test_cdmacro_families(CuTest *tc)
 	CuAssertStrEquals(tc, "iter *vec_iter_as_iter(vec_iter *self)",
 	                  ((const cdinstance *)vec_get(trait->instances, 0))->decl->sig);
 	CuAssertTrue(tc, trait->gen_file == lib);
-	CuAssertTrue(tc, trait->doc_decl == trait->gen);
+	CuAssertTrue(tc, trait->doc_decl == trait->pattern);
 
 	const cdfamily *res = vec_get(fams, 5);
 	CuAssertStrEquals(tc, "semver_res", cdfamily_name(res));
