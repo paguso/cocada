@@ -32,99 +32,65 @@
  * The type encapsulates both possible results of such operations,
  * the successful result and the error result.
  *
- * For example, suppose that a function reads a serialised object of type `T`
- * from a file whose path is given as input. A possible prototype for
- * this function could be.
+ * There are thwo kinds or results:
+ * 1. OK-Result
+ * 2. OK-Error-Result
+ *
+ * An *OK-Result* encapsulates a boolean indicating if the operation was
+ * successful and a result value of a given type `T` if the operation succeeds.
  *
  * ```C
- * T* read_T_from_file(char *path);
- * ```
- *
- * However, this process may incur in a IO runtime error. In this case, we
- * could have this error be represented by a custom error type E which contains
- * a code and a message.
- *
- * ```C
- * typedef struct {
- *  int code;
- *  char *msg;
- * } E;
- * ```
- *
- * By using the macro `DECL_RESULT_OK_ERR(R, T*, E*) a type named `R_res` which could
- * be used as follows.
- *
- * ```C
- * DECL_RESULT_OK(R, T*, E*);
- *
- * R_res read_T_from_file(char *path) {
- *  R_res result;
- *  T *read_obj;
- *  // try to read the object from file into read_obj
- *  // if an error occurs at some point, goto FAIL
- *  result.ok = true;
- *  result.res.ok = read_obj;
- *  goto SUCCESS;
- * FAIL:
- *  result.ok = false;
- *  result.val.err.code = //set error code;
- *  result.val.err.msg  = //set error message;
- * SUCCESS:
- *  // free resources
- *  return result;
+ * T_result res = do_something(...);
+ * if (res.ok) {
+ * 		T val = res.val;
+ * 		consume res.val ...
+ * } else {
+ * 		handle failure...
  * }
- *
  * ```
  *
+ * An *OK-Error-Result* encapsulates a boolean indicating if the operation was
+ * successful and one of two result values for when the operation succees of fails.
+ *
+ * ```C
+ * T_E_result res = do_something(...);
+ * if (res.ok) {
+ * 		T ok_val = res.val.ok;
+ * 		consume res.val.ok ...
+ * } else {
+ * 		E err_val = res.value.err;
+ * 		consume res.val.err ...
+ * 		handle failure...
+ * }
+ * ```
  */
 
 
 #include "coretype.h"
 
 /**
- * @brief Declares a @p NAME_res result type with success value only.
+ * @brief Declares an OK-Result @p NAME_res.
  */
-#define DECL_RESULT_OK(NAME, OK_RES_TYPE) \
+#define DECL_RESULT_OK(NAME, OK_TYPE) \
 	typedef struct {\
-		bool ok;\
-		OK_RES_TYPE val;\
+		bool ok;        	/**< Success/fail indicator */  \
+		OK_TYPE val;	/**< Successful result value. */\
 	} NAME##_res;
 
-
 /**
- * @brief Declares a @p NAME_res result type with error value only.
+ * @brief Declares an OK-Error, Result @p NAME_res.
+ * @param NAME Type name prefix
+ * @param OK_TYPE Type of the sucessful operation result value.
+ * @param ERR_TYPE Type of the unsucessful operation result value.
  */
-#define DECL_RESULT_ERR(NAME, ERR_RES_TYPE) \
+#define DECL_RESULT_OK_ERR(NAME, OK_TYPE, ERR_TYPE) \
 	typedef struct {\
-		bool ok;\
-		ERR_RES_TYPE err;\
-	} NAME##_res;
-
-
-/**
- * @brief A @p NAME_res result type with success and error values.
- */
-#define DECL_RESULT_OK_ERR(NAME, OK_RES_TYPE, ERR_RES_TYPE) \
-	typedef struct {\
-		bool ok;\
+		bool ok;        	/**< Success/fail indicator */  \
 		union {\
-			OK_RES_TYPE ok;\
-			ERR_RES_TYPE err;\
+			OK_TYPE ok;     /**< Successful result value */ \
+			ERR_TYPE err;   /**< Unsucessful result value */\
 		} val;\
 	} NAME##_res;
 
-typedef struct {
-	int code;
-	char *msg;
-} code_msg_err;
-
-
-DECL_RESULT_ERR(code_msg_err, code_msg_err)
-
-#define DECL_OK(TYPE, ...) DECL_RESULT_OK(TYPE##_ok, TYPE)
-#define DECL_OK_ERR(TYPE, ...) DECL_RESULT_OK_ERR(TYPE##_ok_err, TYPE, code_msg_err)
-
-XX_CORETYPES(DECL_OK)
-XX_CORETYPES(DECL_OK_ERR)
 
 #endif

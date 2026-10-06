@@ -76,11 +76,14 @@ typedef bool (*eq_func)(const void *left, const void *right);
 
 
 /**
- * @brief Provides type-specific equality comparison functions,
+ * @brief Type-specific equality comparison functions,
  * e.g. eq_float, eq_uin64_t, etc.
  * @p leff and @p right are assumed to point to memory locations
  * containing values of the intended type, which are compared
  * in the usual (compiler-defined) sense.
+ *
+ * @param left pointer to lhs comparison operand
+ * @param right pointer to rhs comparison operand
  */
 #define DECL_EQ( TYPE )\
 	bool eq_##TYPE(const void *left, const void *right);
