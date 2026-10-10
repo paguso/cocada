@@ -196,6 +196,8 @@ debug_cflags = -Wall -g3
 debug_cflags += -DDEBUG_LVL=3 
 debug_cflags += -DMEM_DEBUG   
 debug_cflags += -DXCHAR_BYTES=4
+#debug_cflags += -fsanitize=address 
+
 ifdef print_mem
 debug_cflags += -DMEM_DEBUG_PRINT_ALL
 endif

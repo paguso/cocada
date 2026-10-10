@@ -58,64 +58,65 @@ CuSuite *vebset_get_test_suite();
 
 CuSuite* create_test_suite()
 {
-    CuSuite *suite = CuSuiteNew("all");
-    CuSuiteAddSuite(suite, arrays_get_test_suite());
-    CuSuiteAddSuite(suite, avl_get_test_suite());
-    CuSuiteAddSuite(suite, avlmap_get_test_suite());
-    CuSuiteAddSuite(suite, binheap_get_test_suite());
-    CuSuiteAddSuite(suite, bitarray_get_test_suite());
-    CuSuiteAddSuite(suite, bitbyte_get_test_suite());
-    CuSuiteAddSuite(suite, bitvec_get_test_suite());
-    CuSuiteAddSuite(suite, bytearray_get_test_suite());
-    CuSuiteAddSuite(suite, cstrutil_get_test_suite());
-    CuSuiteAddSuite(suite, deque_get_test_suite());
-    CuSuiteAddSuite(suite, hashmap_get_test_suite());
-    CuSuiteAddSuite(suite, hashset_get_test_suite());
-    CuSuiteAddSuite(suite, mathutil_get_test_suite());
-    CuSuiteAddSuite(suite, minqueue_get_test_suite());
-    CuSuiteAddSuite(suite, randutil_get_test_suite());
-    CuSuiteAddSuite(suite, range_get_test_suite());
-    CuSuiteAddSuite(suite, serialise_get_test_suite());
-    CuSuiteAddSuite(suite, segtree_get_test_suite());
-    CuSuiteAddSuite(suite, sort_get_test_suite());
-    CuSuiteAddSuite(suite, stack_get_test_suite());
-    CuSuiteAddSuite(suite, strbuf_get_test_suite());
-    CuSuiteAddSuite(suite, strfileread_get_test_suite());
-    CuSuiteAddSuite(suite, vebset_get_test_suite());
-    CuSuiteAddSuite(suite, vec_get_test_suite());
+	CuSuite *suite = CuSuiteNew("all");
+	CuSuiteAddSuite(suite, arrays_get_test_suite());
+	CuSuiteAddSuite(suite, avl_get_test_suite());
+	CuSuiteAddSuite(suite, avlmap_get_test_suite());
+	CuSuiteAddSuite(suite, binheap_get_test_suite());
+	CuSuiteAddSuite(suite, bitarray_get_test_suite());
+	CuSuiteAddSuite(suite, bitbyte_get_test_suite());
+	CuSuiteAddSuite(suite, bitvec_get_test_suite());
+	CuSuiteAddSuite(suite, bytearray_get_test_suite());
+	CuSuiteAddSuite(suite, cstrutil_get_test_suite());
+	CuSuiteAddSuite(suite, deque_get_test_suite());
+	CuSuiteAddSuite(suite, hashmap_get_test_suite());
+	CuSuiteAddSuite(suite, hashset_get_test_suite());
+	CuSuiteAddSuite(suite, mathutil_get_test_suite());
+	CuSuiteAddSuite(suite, minqueue_get_test_suite());
+	CuSuiteAddSuite(suite, randutil_get_test_suite());
+	CuSuiteAddSuite(suite, range_get_test_suite());
+	CuSuiteAddSuite(suite, serialise_get_test_suite());
+	CuSuiteAddSuite(suite, segtree_get_test_suite());
+	CuSuiteAddSuite(suite, sort_get_test_suite());
+	CuSuiteAddSuite(suite, stack_get_test_suite());
+	CuSuiteAddSuite(suite, strbuf_get_test_suite());
+	CuSuiteAddSuite(suite, strfileread_get_test_suite());
+	CuSuiteAddSuite(suite, vebset_get_test_suite());
+	CuSuiteAddSuite(suite, vec_get_test_suite());
 
-    CuSuitePrintTests(suite);
-    return suite;
+	CuSuitePrintTests(suite);
+	return suite;
 }
 
 void run_all_tests(CuSuite *rootSuite)
 {
-    CuString *output = CuStringNew();
-    CuSuiteRun(rootSuite);
-    CuSuiteSummary(rootSuite, output);
-    CuSuiteDetails(rootSuite, output);
-    printf("%s\n", output->buffer);
+	CuString *output = CuStringNew();
+	CuSuiteRun(rootSuite);
+	CuSuiteSummary(rootSuite, output);
+	CuSuiteDetails(rootSuite, output);
+	printf("%s\n", output->buffer);
 }
 
 void run_suite_tests(CuSuite *rootSuite, int nsuites, char **suiteNames)
 {
-    CuString *output = CuStringNew();
-    for (int i = 0; i < nsuites; i++) {
-        fprintf(stdout, "Running suite %s tests...\n", suiteNames[i]);
-        CuSuiteRunSuite(rootSuite, suiteNames[i]);
-    }
-    CuSuiteSummary(rootSuite, output);
-    CuSuiteDetails(rootSuite, output);
-    printf("%s\n", output->buffer);
+	CuString *output = CuStringNew();
+	for (int i = 0; i < nsuites; i++) {
+		fprintf(stdout, "Running suite %s tests...\n", suiteNames[i]);
+		CuSuiteRunSuite(rootSuite, suiteNames[i]);
+	}
+	CuSuiteSummary(rootSuite, output);
+	CuSuiteDetails(rootSuite, output);
+	printf("%s\n", output->buffer);
 }
 
 int main(int argc, char **argv)
 {
-    CuSuite *rootSuite = create_test_suite();
-    if (argc == 1) {
-        run_all_tests(rootSuite);
-    } else {
-        run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
-    }
-    return 0;
+	CuSuite *rootSuite = create_test_suite();
+	if (argc == 1) {
+		run_all_tests(rootSuite);
+	} else {
+		run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
+	}
+	CuSuiteDelete(rootSuite);
+	return 0;
 }

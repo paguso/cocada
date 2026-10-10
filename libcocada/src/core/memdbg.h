@@ -137,6 +137,13 @@ extern memdbg_query_t memdbg_query(const void *addr);
 
 #define free(ptr) (memdbg_free(ptr,  __FILE__ , __LINE__))
 
+#else
+
+#undef malloc
+#undef calloc
+#undef realloc
+#undef free
+
 #endif
 
 #endif

@@ -100,5 +100,40 @@
 		} val;\
 	} NAME##_res;
 
+/**
+ * @brief A Code-Message error type intended to be used with an
+ * OK-Error-Result type.
+ *
+ * Example:
+ *
+ * ```C
+ * #include <error.h>
+ *
+ * DECL_RESULT_OK_ERR(do_something, rawptr, code_msg_err)
+ *
+ * do_something_res do_something(const char* path)
+ * {
+ *	do_something_res result = {.ok = true};
+ *	FILE *f = fopen(path, "r");
+ *	if (errno) {
+ *		fprintf(stderr, "Error opening file '%s'.\n", path);
+ *		result.ok = false;
+ *		result.val.err = (code_msg_err) {
+ *			.code = errno, .msg = strerror(errno)
+ *		};
+ *		return result;
+ *	}
+ *	// go on to do something with file
+ *	return result;
+ * }
+ * ```
+ *
+ * @warning This type is supposed to live in the stack and be passed
+ * on by value. Therefore the @p msg field is not owned by the type.
+ */
+typedef struct code_msg_err {
+	int code;         /**< The error code */
+	const char *msg;  /**< The error message (non-owned) */
+} code_msg_err;
 
 #endif

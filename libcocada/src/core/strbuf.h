@@ -175,7 +175,9 @@ void strbuf_clip(strbuf *self, size_t from, size_t to);
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p self,
  *        separating each of these strings by @p sep
+ *
  * **Example**
+ *
  * ```C
  * strbuf *self = str_buf_new_from_str("Four seasons: ");
  * char *seasons[4] = {"Spring", "Summer", "Autumn", "Winter"};
@@ -218,7 +220,8 @@ size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
  * starting from position @p from_pos.
  *
  * **Example**
- * ```
+ *
+ * ```C
  * strbuf *self = strbuf_new_from_str("macaca", 6, 0);
  * strbuf_replace_n(self, "ca", "na", 2);
  * // yelds "manana"

@@ -30,9 +30,9 @@ char *CuStrCopy(const char *old);
 #define STRING_INC		256
 
 typedef struct {
-    int length;
-    int size;
-    char *buffer;
+	int length;
+	int size;
+	char *buffer;
 } CuString;
 
 void CuStringInit(CuString *str);
@@ -52,12 +52,12 @@ typedef struct CuTest CuTest;
 typedef void (*TestFunction)(CuTest *);
 
 struct CuTest {
-    char *name;
-    TestFunction function;
-    int failed;
-    int ran;
-    const char *message;
-    jmp_buf *jumpBuf;
+	char *name;
+	TestFunction function;
+	int failed;
+	int ran;
+	const char *message;
+	jmp_buf *jumpBuf;
 };
 
 void CuTestInit(CuTest *t, const char *name, TestFunction function);
@@ -143,12 +143,12 @@ void CuAssertPtrEquals_LineMsg(CuTest *tc,
 #define SUITE_ADD_TEST(SUITE,TEST)	CuSuiteAdd(SUITE, CuTestNew(#TEST, TEST), NULL)
 
 typedef struct {
-    char *name;
-    int count;
-    char *qualifiedTestNames[MAX_TEST_CASES];
-    CuTest *list[MAX_TEST_CASES];
-    int okCount;
-    int failCount;
+	char *name;
+	int count;
+	char *qualifiedTestNames[MAX_TEST_CASES];
+	CuTest *list[MAX_TEST_CASES];
+	int okCount;
+	int failCount;
 
 } CuSuite;
 
@@ -163,5 +163,7 @@ void CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary);
 void CuSuiteDetails(CuSuite *testSuite, CuString *details);
 void CuSuitePrintTests(CuSuite *testSuite);
+
+#undef MEM_DBG_OFF
 
 #endif /* CU_TEST_H */

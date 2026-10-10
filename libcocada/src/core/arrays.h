@@ -49,7 +49,7 @@
  *
  *                       |<---------------------- S Bytes ---------------------->|
  *
- *	+--------------------+-------------------------------------------------------+
+ *  +--------------------+-------------------------------------------------------+
  *  |     S (size_t)     |                 Useful array area                     |
  *  +--------------------+-------------------------------------------------------+
  *                        ^
@@ -84,7 +84,7 @@
  *
  *                       |<---------- S = (nmemb * nmemb_size) Bytes ----------->|
  *
- *	+--------------------+-------------------------------------------------------+
+ *  +--------------------+-------------------------------------------------------+
  *  |     S (size_t)     |                 Useful array area                     |
  *  +--------------------+-------------------------------------------------------+
  *                        ^
@@ -131,7 +131,9 @@ size_t sa_arr_sizeof(void *arr);
  */
 void sa_arr_free(void *arr);
 
-
+/**
+ * @hide
+ */
 #define DECL_SA_ARR(TYPE, ...)\
 	TYPE *sa_arr_##TYPE##_calloc(size_t nmemb);\
 	TYPE *sa_arr_##TYPE##_realloc(TYPE *arr, size_t nmemb);\
@@ -140,7 +142,7 @@ void sa_arr_free(void *arr);
 XX_CORETYPES(DECL_SA_ARR)
 
 /**
- * @brief Allocates a new array of N elements of a given TYPE.
+ * @brief Allocates a new array of N elements of a given @p TYPE.
  */
 #define ARR_NEW( TYPE, N ) (((N) > 0) ? ((TYPE*)(malloc((N)*sizeof(TYPE)))) : NULL)
 
@@ -250,7 +252,8 @@ XX_CORETYPES(DECL_SA_ARR)
  * the heap. Thus we can pass and receive a TYPE_array by value.
  *
  * Example:
- * ```
+ *
+ * ```C
  * void print_int_array(ARRAY(int) a){
  * 	for (size_t i=0; i<a.len; i++){
  * 		printf("%d ", a.arr[i]);
@@ -289,12 +292,11 @@ XX_CORETYPES(DECL_SA_ARR)
 XX_CORETYPES(DECL_ARRAY)
 
 /**
- * @brief Creates a new TYPE_array object with a given length
- * on the stack.
+ * @brief Creates a new TYPE_array wrapper *on the stack*.
  * The encapsulated array is allocated on the heap and is left
  * uninitialized.
- * This array can be freed with #ARRAY_FREE.
- * @see See example in #ARRAY
+ * @see ARRAY
+ * @see ARRAY_FREE
  */
 #define ARRAY_NEW(TYPE, LEN) ((ARRAY(TYPE)){.len=(LEN), .arr=(TYPE*)malloc((LEN)*sizeof(TYPE))})
 
@@ -303,10 +305,15 @@ XX_CORETYPES(DECL_ARRAY)
  * in a TYPE_array object on the stack.
  *
  * Example
- * ```
+ *
+ * ```C
  * int *src = calloc(5, sizeof(int));
  * ARRAY(int) a = ARRAY_NEW_FROM_ARR(int, 5, src);
  * ```
+ *
+ * @param TYPE The base type of @p SRC.
+ * @param LEN The length of @p SRC.
+ * @param @move SRC The array to be encapsulated.
  */
 #define ARRAY_NEW_FROM_ARR(TYPE, LEN, SRC) ((ARRAY(TYPE)){.len=(LEN), .arr=((TYPE*)(SRC))})
 

@@ -60,11 +60,9 @@ static int _getc(strread *self)
 			ungetc(c, fr->src);
 			c = EOF;
 			break;
-		}
-		else if (c == '\n' || c == '\r') {
+		} else if (c == '\n' || c == '\r') {
 			continue;
-		}
-		else {
+		} else {
 			break;
 		}
 	}
@@ -105,8 +103,7 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 		if ( c == delim || c == '>' ) {
 			ungetc(c, src);
 			break;
-		}
-		else if ( c == '\n' || c == '\r' ) {
+		} else if ( c == '\n' || c == '\r' ) {
 			continue;
 		}
 		dest[nread++] = c;
@@ -145,9 +142,9 @@ struct _fasta {
 };
 
 
-rawptr_ok_err_res fasta_open(const char *filename)
+fasta_open_res fasta_open(const char *filename)
 {
-	rawptr_ok_err_res result = {.ok = true};
+	fasta_open_res result = {.ok = true};
 	fasta *f = NEW(fasta);
 	f->src = fopen(filename, "r");
 	if (errno) {

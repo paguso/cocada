@@ -38,14 +38,14 @@
  * The AVL tree is a height-balanced search tree with O(lg n) worst-case
  * search, insertion and deletion.
  *
- * The AVL tree stores elements of a totally ordered set. As such
- * it requires a pointer to a total-order comparison function of
- * type `cmp_func` (see order.h), to be given on construction.
+ * The AVL tree stores elements of a totally ordered set in the nodes.
+ * Thus it requires a pointer to a total-order comparison function of
+ * type #cmp_func (see order.h), to be given on construction.
  * For the primitive types with the usual semantics, the default
- * typed comparison functions defined in the order.h (e.g. `cmp_int`,
- * `cmp_double`,...) can be passed to the object constructor.
+ * typed comparison functions defined in the order.h (e.g. #cmp_int,
+ * #cmp_double,...) can be passed to the object constructor.
  * For structured user-defined types, one should provide a custom
- * `cmp_func` comparator. Keep in mind that such a function
+ * #cmp_func comparator. Keep in mind that such a function
  * receives pointers to whatever is stored in the node. In the case of
  * indirect storage, that is when the node stores a reference/pointer
  * to an external object, the comparator should be called with
@@ -56,6 +56,7 @@
  * stored object of type `obj_t`, and suppose that `obj_t` has an
  * integer key field which should be used for  comparison.
  * In this case the comparison function could be something like
+ *
  * ```C
  * int cmp_obj_t (const void *l, const void *r) {
  *      obj_t *lo = *((obj_t **)l);
@@ -167,6 +168,11 @@ const void *avl_get(const avl *self, const void *key);
  * if it doesn't already contain a node matching this
  * value (according to the comparison function). Otherwise
  * this operation has no effect.
+ *
+ * @param val The value to be inserted (copied)
+ *
+ * @return A boolean indicating whether the insertion was
+ * successful
  */
 bool avl_ins(avl *self, void *val);
 
@@ -178,8 +184,12 @@ bool avl_ins(avl *self, void *val);
  * If however @p dest is NULL, the node is just deleted.
  * If no node matching the @p key is found, the operation
  * has no effect and the function returns false.
+ *
+ * @param val The value to be deleted
+ *
  * @return A boolean indicating whether the removal was
  * successful.
+ *
  * @warning After the operation, the tree has no longer a
  * reference to the removed value.
  */
@@ -187,17 +197,43 @@ bool avl_remv(avl *self, void *key, void *dest);
 
 
 /**
- * @brief Same as avl_remv(self, key, NULL)
+ * @brief Same as `avl_remv(self, key, NULL)`
+ * @see #avl_remv
  */
 bool avl_del(avl *self, void *key);
 
 
-
-#define DECL_AVL_ALL(TYPE, ...)\
+/**
+ * @brief Declares a TYPE-specific contains method.
+ * @param TYPE The type of the node values
+ * @see #avl_contains
+ */
+#define DECL_AVL_CONTAINS(TYPE, ...)\
 	bool avl_contains_##TYPE(const avl *self, TYPE val);\
+
+/**
+ * @brief Declares a TYPE-specific insert method.
+ * @param TYPE The type of the node values
+ * @see #avl_ins
+ */
+#define DECL_AVL_INS(TYPE, ...)\
 	bool avl_ins_##TYPE(avl *self, TYPE val);\
+
+/**
+ * @brief Declares a TYPE-specific delete method.
+ * @param TYPE The type of the node values
+ * @see #avl_del
+ */
+#define DECL_AVL_DEL(TYPE, ...)\
 	bool avl_del_##TYPE(avl *self, TYPE val);
 
+/**
+ * @hide
+ */
+#define DECL_AVL_ALL(TYPE, ...)\
+	DECL_AVL_CONTAINS(TYPE, ...)\
+	DECL_AVL_INS(TYPE, ...)\
+	DECL_AVL_DEL(TYPE, ...)\
 
 XX_CORETYPES(DECL_AVL_ALL)
 
@@ -245,7 +281,7 @@ typedef enum {
 
 /**
  * @brief AVL iterator. Implements the iter trait.
- * @see trait.h iter.h
+ * @see trait.h, iter.h
  */
 typedef struct _avl_iter avl_iter;
 

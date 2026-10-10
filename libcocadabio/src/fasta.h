@@ -70,12 +70,14 @@ typedef struct {
 } fasta_rec_rdr;
 
 
+DECL_RESULT_OK_ERR(fasta_open, rawptr, code_msg_err)
+
 
 /**
  * @brief Opens a FASTA file and places the cursor at its beginning.
  * @param filename The path to the file (**NO TRANSFER OF OWNERSHIP**)
  */
-rawptr_ok_err_res fasta_open(const char *filename);
+fasta_open_res fasta_open(const char *filename);
 
 
 /**
