@@ -336,12 +336,15 @@ void CuAssertPtrEquals_LineMsg(CuTest *tc, const char *file, int line,
 
 void CuSuiteInit(CuSuite *testSuite, const char *suiteName)
 {
+	assert(testSuite);
 	testSuite->name = CuStrCopy(suiteName);
-	testSuite->count = 0;
+	testSuite->testsCount = 0;
+	testSuite->suitesCount = 0;
 	testSuite->okCount = 0;
 	testSuite->failCount = 0;
-	memset(testSuite->list, 0, sizeof(testSuite->list));
-	memset(testSuite->qualifiedTestNames, 0, sizeof(testSuite->qualifiedTestNames));
+	testSuite->skippedCount = 0;
+	memset(testSuite->tests, 0, sizeof(testSuite->tests));
+	memset(testSuite->suites, 0, sizeof(testSuite->suites));
 }
 
 CuSuite *CuSuiteNew(const char *suiteName)
@@ -353,105 +356,127 @@ CuSuite *CuSuiteNew(const char *suiteName)
 
 void CuSuiteDelete(CuSuite *testSuite)
 {
-	unsigned int n;
-	free(testSuite->name);
-	for (n=0; n < MAX_TEST_CASES; n++) {
-		if (testSuite->qualifiedTestNames[n]) {
-			free(testSuite->qualifiedTestNames[n]);
-		}
-		if (testSuite->list[n]) {
-			CuTestDelete(testSuite->list[n]);
+	for (int i = 0; i < MAX_SUITES; i++) {
+		if (testSuite->suites[i]) {
+			CuSuiteDelete(testSuite->suites[i]);
 		}
 	}
+	for (int i = 0; i < MAX_TEST_CASES; i++) {
+		if (testSuite->tests[i]) {
+			CuTestDelete(testSuite->tests[i]);
+		}
+	}
+	free(testSuite->name);
 	free(testSuite);
 }
 
-void CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char* qualifiedName)
-{
-	assert(testSuite->count < MAX_TEST_CASES);
-	testSuite->list[testSuite->count] = testCase;
-	testSuite->qualifiedTestNames[testSuite->count] = (qualifiedName)?CuStrCopy(qualifiedName):CuStrCopy(testCase->name);
-	testSuite->count++;
-}
 
-void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2)
+bool CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char* qualifiedName)
 {
-	int i;
-	char nameBuf[512];
-	int sl = strlen(testSuite2->name);
-	assert (sl + 1 < 512);
-	strncpy(nameBuf, testSuite2->name, sl);
-	nameBuf[sl] = '.';
-	for (i = 0 ; i < testSuite2->count ; ++i) {
-		CuTest *testCase = testSuite2->list[i];
-		int tl = strlen(testCase->name);
-		assert (sl + 1 + tl < 512);
-		strncpy(&nameBuf[sl + 1], testCase->name, tl);
-		nameBuf[sl + 1 + tl] = '\0';
-		CuSuiteAdd(testSuite, testCase, nameBuf);
+	if (testSuite->testsCount == MAX_TEST_CASES) {
+		fprintf(stderr, "Cannot add test %s to %s: maximum number of tests reached.\n", testCase?testCase->name:"unnamed", testSuite?testSuite->name:"unnamed");
+		return false;
 	}
+	testSuite->tests[testSuite->testsCount++] = testCase;
 }
 
-void CuSuiteRun(CuSuite *testSuite)
+
+bool CuSuiteContainsDeep(CuSuite *parent, CuSuite *child)
 {
-	int i;
-	for (i = 0 ; i < testSuite->count ; ++i) {
-		CuTest *testCase = testSuite->list[i];
+	if (!parent || !child) return false;
+	for (int i = 0; i < MAX_SUITES; ++i) {
+		if (CuSuiteContainsDeep(parent->suites[i], child)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CuSuiteAddSuite(CuSuite *parentSuite, CuSuite *childSuite)
+{
+	if (parentSuite->suitesCount == MAX_SUITES) {
+		fprintf(stderr, "Cannot add suite %s to %s: maximum number os suites reached.\n", childSuite?childSuite->name:"unnamed", parentSuite?parentSuite->name:"unnamed");
+		return false;
+	}
+	// check for cycles
+	if (CuSuiteContainsDeep(parentSuite, childSuite)) {
+		fprintf(stderr, "Cannot add suite %s to %s: contains cycle.\n", childSuite?childSuite->name:"unnamed", parentSuite?parentSuite->name:"unnamed");
+		return false;
+	}
+	parentSuite->suites[parentSuite->suitesCount++] = childSuite;
+}
+
+
+CuSuiteRunStats CuSuiteRun(CuSuite *testSuite)
+{
+	CuSuiteRunStats res = (CuSuiteRunStats) {
+		0
+	};
+	if (!testSuite) return res;
+	for (int i = 0; i < testSuite->suitesCount; i++) {
+		CuSuiteRunStats chdres = CuSuiteRun(testSuite->suites[i]);
+		res.ok += chdres.ok;
+		res.fail += chdres.fail;
+		res.skipped += chdres.skipped;
+	}
+	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
+		CuTest *testCase = testSuite->tests[i];
 		CuTestRun(testCase);
 		if (testCase->failed) {
-			testSuite->failCount += 1;
+			res.fail++;
 		} else {
-			testSuite->okCount += 1;
+			res.ok++;
 		}
 	}
+	testSuite->failCount += res.fail;
+	testSuite->okCount += res.ok;
+	return res;
 }
 
-void CuSuiteRunSuites(CuSuite *testSuite, unsigned int n, char **suiteNames)
+CuSuiteRunStats _CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName, bool force)
 {
-	int i;
-	for (int s = 0; s < n; s++) {
-		int slen = strlen(suiteNames[s]);
-		for (i = 0 ; i < testSuite->count ; ++i) {
-			const char *qualifiedName = testSuite->qualifiedTestNames[i];
-			int qnlen = strlen(qualifiedName);
-			if (qnlen > slen && qualifiedName[slen] == '.' && strncmp(qualifiedName, suiteNames[s], slen)==0) {
-				CuTest *testCase = testSuite->list[i];
-				CuTestRun(testCase);
-				if (testCase->failed) {
-					testSuite->failCount += 1;
-				} else {
-					testSuite->okCount += 1;
-				}
-			}
-		}
+	CuSuiteRunStats res = (CuSuiteRunStats) {
+		0
+	};
+	if (!testSuite) return res;
+	bool nameEquals = testSuite->name && !strcmp(testSuite->name, suiteName);
+	for (int i = 0; i < testSuite->suitesCount; i++) {
+		CuSuiteRunStats chdres = _CuSuiteRunSuite(testSuite->suites[i], suiteName, nameEquals);
+		res.ok += chdres.ok;
+		res.fail += chdres.fail;
+		res.skipped += chdres.skipped;
 	}
-}
-
-void CuSuiteRunSuite(CuSuite *testSuite, const char *suiteName)
-{
-	int i;
-	int slen = strlen(suiteName);
-	for (i = 0 ; i < testSuite->count ; ++i) {
-		const char *qualifiedName = testSuite->qualifiedTestNames[i];
-		int qnlen = strlen(qualifiedName);
-		if (qnlen > slen && qualifiedName[slen] == '.' && strncmp(qualifiedName, suiteName, slen)==0) {
-			CuTest *testCase = testSuite->list[i];
+	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
+		if (force || nameEquals) {
+			CuTest *testCase = testSuite->tests[i];
 			CuTestRun(testCase);
 			if (testCase->failed) {
-				testSuite->failCount += 1;
+				res.fail++;
 			} else {
-				testSuite->okCount += 1;
+				res.ok++;
 			}
+		} else {
+			res.skipped++;
 		}
 	}
+	testSuite->failCount += res.fail;
+	testSuite->okCount += res.ok;
+	testSuite->skippedCount += res.skipped;
+	return res;
+}
+
+
+CuSuiteRunStats CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName)
+{
+	_CuSuiteRunSuite(testSuite, suiteName, false);
 }
 
 
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary)
 {
 	int i;
-	for (i = 0 ; i < testSuite->count ; ++i) {
-		CuTest *testCase = testSuite->list[i];
+	for (i = 0 ; i < testSuite->testsCount ; ++i) {
+		CuTest *testCase = testSuite->tests[i];
 		if (!testCase->ran) {
 			CuStringAppend(summary,  ".");
 		} else {
@@ -477,8 +502,8 @@ void CuSuiteDetails(CuSuite *testSuite, CuString *details)
 			CuStringAppendFormat(details, "There were %d failures:\n",
 			                     testSuite->failCount);
 
-		for (i = 0 ; i < testSuite->count ; ++i) {
-			CuTest *testCase = testSuite->list[i];
+		for (i = 0 ; i < testSuite->testsCount ; ++i) {
+			CuTest *testCase = testSuite->tests[i];
 			if (testCase->failed) {
 				failCount++;
 				CuStringAppendFormat(details, "%d) %s: %s\n",
@@ -488,19 +513,27 @@ void CuSuiteDetails(CuSuite *testSuite, CuString *details)
 		CuStringAppend(details, "\n!!!FAILURES!!!\n");
 
 	}
-	CuStringAppendFormat(details, "Total: %d  ",   testSuite->count);
-	CuStringAppendFormat(details, "Passes: %d  ",
-	                     testSuite->okCount);
+	CuStringAppendFormat(details, "Passes: %d  ", testSuite->okCount);
 	CuStringAppendFormat(details, "Fails: %d  ",  testSuite->failCount);
-	CuStringAppendFormat(details, "Skipped: %d\n",   testSuite->count - testSuite->okCount - testSuite->failCount);
+	CuStringAppendFormat(details, "Skipped: %d\n", testSuite->skippedCount);
 }
 
-void CuSuitePrintTests(CuSuite *testSuite)
+void _CuSuitePrint(CuSuite *testSuite, int level)
 {
-	fprintf(stdout, "Test cases for suite: %s\n", testSuite->name);
-	for (int i = 0; i < testSuite->count; i++) {
-		fprintf(stdout, "	%3d. %s\n", i, testSuite->qualifiedTestNames[i]);
+	if (!testSuite) return;
+	fprintf(stdout, "%*sSuite: %s\n", 2*level, "", testSuite->name?testSuite->name:"Undefined");
+	for (int i = 0; i < testSuite->suitesCount; i++) {
+		_CuSuitePrint(testSuite->suites[i], level+1);
 	}
+	for (int i = 0; i < testSuite->testsCount; i++) {
+		CuTest *test = testSuite->tests[i];
+		fprintf(stdout, "%*sTest: %s\n", 2*(level+1), "", test->name?test->name:"Undefined");
+	}
+}
+
+void CuSuitePrint(CuSuite *testSuite)
+{
+	_CuSuitePrint(testSuite, 0);
 }
 
 #undef MEM_DEBUG_OFF

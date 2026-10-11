@@ -43,7 +43,7 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
  * - The string buffer capacity           (uint64_t)
  * - The string buffer size               (uint64_t)
  *
- * On a typical 64-bit architecture each of these fields has 8bytes with
+ * On a typical 64-bit architecture each of these fields has 8 bytes with
  * no internal or terminal padding required. So the whole structure
  * occupies 24 bytes.
  *
@@ -51,9 +51,10 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
  * |  buffer*       |  capacity      | length         |
  * +----------------+----------------+----------------+
  *
- * For short strings this is very inefficient and cost unecessary allocation.
- * The Short-string optimisation idea is to use most of the struct's bytes
- * to store the string itself. We use all the bytes, except the last two:
+ * For short strings, this is very inefficient and cost unecessary heap
+ * allocations. The Short-string optimisation idea is to use most of the
+ * struct's own space to store the string itself. We use all the bytes,
+ * except the last two:
  * - The second-to-last byte will have a null-terminating '\0' char
  * - The last byte is used as follows:
  *   - the most significant bit is set to 1 to indicate that the string
@@ -74,13 +75,13 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
  *                                        +-+-+-+-+-+-+-+-+
  *                                         |
  *                                         v
- *                                 shor string 1-bit flag
+ *                                 short string 1-bit flag
  *
  * On x86-64bit architecture, the maximum short string size is therefore
  * 22, not counting the final '\0'. Thus any size fits in the last
- * 7 bits, which could account for lengths in the 0..127 range.
+ * 7 bits, which are enough to account for lengths in the 0..127 range.
  *
- * Notice that the the most significant bit of the last byte being used
+ * Notice that the most significant bit of the last byte being used
  * as a short string flag means that, once the string outgrows the
  * short string capacity, this last byte must be set to zero and
  * should no longer be used for long_strbuf.length. This has two
@@ -89,7 +90,7 @@ const static float  GROW_BY = 1.62f;  // (!) 1 < GROW_BY <= 2
  *    (0..2^56-1 minus one for the last '\0')
  * 2. On little-endian architecture, this last byte is the most significant
  *    byte of long_strbuf.lenght, so no problem because it won't be used
- *    anyways since we do not allow the capacity to go past the above cap.
+ *    anyways, since we do not allow the capacity to go past the above cap.
  *    However, on a big-endian machine, this last byte would be the
  *    least significant byte of long_strbuf.length, and it would have to
  *    be kept 0. To work around this problem, in this case we actually

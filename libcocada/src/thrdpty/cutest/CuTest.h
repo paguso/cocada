@@ -14,9 +14,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "memdbg.h"
-
-#define CUTEST_VERSION  "CuTest 1.5"
+#define CUTEST_VERSION  "CuTest 1.5-COCADA"
 
 /* CuString */
 
@@ -54,10 +52,10 @@ typedef void (*TestFunction)(CuTest *);
 struct CuTest {
 	char *name;
 	TestFunction function;
-	int failed;
-	int ran;
 	const char *message;
 	jmp_buf *jumpBuf;
+	int ran;
+	int failed;
 };
 
 void CuTestInit(CuTest *t, const char *name, TestFunction function);
@@ -138,31 +136,39 @@ void CuAssertPtrEquals_LineMsg(CuTest *tc,
 
 /* CuSuite */
 
+#define MAX_SUITES	1024
 #define MAX_TEST_CASES	1024
 
 #define SUITE_ADD_TEST(SUITE,TEST)	CuSuiteAdd(SUITE, CuTestNew(#TEST, TEST), NULL)
 
-typedef struct {
+typedef struct CuSuite {
 	char *name;
-	int count;
-	char *qualifiedTestNames[MAX_TEST_CASES];
-	CuTest *list[MAX_TEST_CASES];
-	int okCount;
+	//char *qualifiedTestNames[MAX_TEST_CASES];
+	struct CuSuite *suites[MAX_SUITES];
+	int suitesCount;
+	CuTest *tests[MAX_TEST_CASES];
+	int testsCount;
 	int failCount;
-
+	int okCount;
+	int skippedCount;
 } CuSuite;
 
+typedef struct CuSuiteRunStats {
+	int ok;
+	int fail;
+	int skipped;
+} CuSuiteRunStats;
 
 void CuSuiteInit(CuSuite *testSuite, const char *suiteName);
 CuSuite *CuSuiteNew(const char *suiteName);
 void CuSuiteDelete(CuSuite *testSuite);
-void CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char *qualifiedName);
-void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2);
-void CuSuiteRun(CuSuite *testSuite);
-void CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
+bool CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char *qualifiedName);
+bool CuSuiteAddSuite(CuSuite *parentSuite, CuSuite *childSuite);
+CuSuiteRunStats CuSuiteRun(CuSuite *testSuite);
+CuSuiteRunStats CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary);
 void CuSuiteDetails(CuSuite *testSuite, CuString *details);
-void CuSuitePrintTests(CuSuite *testSuite);
+void CuSuitePrint(CuSuite *testSuite);
 
 #undef MEM_DBG_OFF
 

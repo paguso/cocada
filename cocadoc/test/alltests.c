@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "CuTest.h"
 
@@ -43,48 +44,52 @@ CuSuite *cdmacro_get_test_suite();
 
 CuSuite* create_test_suite()
 {
-    CuSuite *suite = CuSuiteNew("all");
-    CuSuiteAddSuite(suite, cdlexer_get_test_suite());
-    CuSuiteAddSuite(suite, cddecl_get_test_suite());
-    CuSuiteAddSuite(suite, cddoc_get_test_suite());
-    CuSuiteAddSuite(suite, cdlint_get_test_suite());
-    CuSuiteAddSuite(suite, cdsym_get_test_suite());
-    CuSuiteAddSuite(suite, cdmd_get_test_suite());
-    CuSuiteAddSuite(suite, cdconfig_get_test_suite());
-    CuSuiteAddSuite(suite, cdmacro_get_test_suite());
-
-    CuSuitePrintTests(suite);
-    return suite;
+	CuSuite *suite = CuSuiteNew("all");
+	CuSuiteAddSuite(suite, cdlexer_get_test_suite());
+	CuSuiteAddSuite(suite, cddecl_get_test_suite());
+	CuSuiteAddSuite(suite, cddoc_get_test_suite());
+	CuSuiteAddSuite(suite, cdlint_get_test_suite());
+	CuSuiteAddSuite(suite, cdsym_get_test_suite());
+	CuSuiteAddSuite(suite, cdmd_get_test_suite());
+	CuSuiteAddSuite(suite, cdconfig_get_test_suite());
+	CuSuiteAddSuite(suite, cdmacro_get_test_suite());
+	return suite;
 }
 
 void run_all_tests(CuSuite *rootSuite)
 {
-    CuString *output = CuStringNew();
-    CuSuiteRun(rootSuite);
-    CuSuiteSummary(rootSuite, output);
-    CuSuiteDetails(rootSuite, output);
-    printf("%s\n", output->buffer);
+	CuString *output = CuStringNew();
+	CuSuiteRun(rootSuite);
+	CuSuiteSummary(rootSuite, output);
+	CuSuiteDetails(rootSuite, output);
+	printf("%s\n", output->buffer);
 }
 
 void run_suite_tests(CuSuite *rootSuite, int nsuites, char **suiteNames)
 {
-    CuString *output = CuStringNew();
-    for (int i = 0; i < nsuites; i++) {
-        fprintf(stdout, "Running suite %s tests...\n", suiteNames[i]);
-        CuSuiteRunSuite(rootSuite, suiteNames[i]);
-    }
-    CuSuiteSummary(rootSuite, output);
-    CuSuiteDetails(rootSuite, output);
-    printf("%s\n", output->buffer);
+	CuString *output = CuStringNew();
+	for (int i = 0; i < nsuites; i++) {
+		fprintf(stdout, "Running suite %s tests...\n", suiteNames[i]);
+		CuSuiteRunSuite(rootSuite, suiteNames[i]);
+	}
+	CuSuiteSummary(rootSuite, output);
+	CuSuiteDetails(rootSuite, output);
+	printf("%s\n", output->buffer);
 }
 
 int main(int argc, char **argv)
 {
-    CuSuite *rootSuite = create_test_suite();
-    if (argc == 1) {
-        run_all_tests(rootSuite);
-    } else {
-        run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
-    }
-    return 0;
+	CuSuite *rootSuite = create_test_suite();
+	if (argc == 1) {
+		run_all_tests(rootSuite);
+	} else {
+		if (!strcmp(argv[1], "-l")) {
+			fprintf(stdout, "Available tests\n");
+			CuSuitePrint(rootSuite);
+		} else {
+			run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
+		}
+	}
+	CuSuiteDelete(rootSuite);
+	return 0;
 }

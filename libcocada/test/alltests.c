@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "CuTest.h"
 
@@ -83,8 +84,6 @@ CuSuite* create_test_suite()
 	CuSuiteAddSuite(suite, strfileread_get_test_suite());
 	CuSuiteAddSuite(suite, vebset_get_test_suite());
 	CuSuiteAddSuite(suite, vec_get_test_suite());
-
-	CuSuitePrintTests(suite);
 	return suite;
 }
 
@@ -115,7 +114,12 @@ int main(int argc, char **argv)
 	if (argc == 1) {
 		run_all_tests(rootSuite);
 	} else {
-		run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
+		if (!strcmp(argv[1], "-l")) {
+			fprintf(stdout, "Available tests\n");
+			CuSuitePrint(rootSuite);
+		} else {
+			run_suite_tests(rootSuite, argc - 1, (argc > 1) ? &argv[1]: NULL);
+		}
 	}
 	CuSuiteDelete(rootSuite);
 	return 0;
