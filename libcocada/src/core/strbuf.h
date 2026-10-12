@@ -168,7 +168,7 @@ void strbuf_paste(strbuf *self, size_t from, const char *src, size_t len);
 
 
 /**
- * @brief Clips the contents of the stringbuffer.
+ * @brief Clips the contents of the string buffer.
  */
 void strbuf_clip(strbuf *self, size_t from, size_t to);
 

@@ -38,6 +38,7 @@ CuSuite *csrsbitarr_get_test_suite();
 CuSuite *cstrutil_get_test_suite();
 CuSuite *deque_get_test_suite();
 CuSuite *strbuf_get_test_suite();
+CuSuite *strview_get_test_suite();
 CuSuite *hashmap_get_test_suite();
 CuSuite *hashset_get_test_suite();
 //CuSuite *kwayrng_get_test_suite();
@@ -81,6 +82,7 @@ CuSuite* create_test_suite()
 	CuSuiteAddSuite(suite, sort_get_test_suite());
 	CuSuiteAddSuite(suite, stack_get_test_suite());
 	CuSuiteAddSuite(suite, strbuf_get_test_suite());
+	CuSuiteAddSuite(suite, strview_get_test_suite());
 	CuSuiteAddSuite(suite, strfileread_get_test_suite());
 	CuSuiteAddSuite(suite, vebset_get_test_suite());
 	CuSuiteAddSuite(suite, vec_get_test_suite());
