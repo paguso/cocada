@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
- 
+
 #ifndef STRVIEW_H
 #define STRVIEW_H
 
@@ -32,8 +32,8 @@
  * @brief String View
  * @author Paulo Fonseca
  *
- * A String View is a lightweight object used to represent a
- * *read-only* substring of an existing string.
+ * A String View is a lightweight object used to represent an
+ * *unmutable* substring of an existing string.
  */
 
 
@@ -68,34 +68,44 @@ typedef struct strview {
 } strview;
 
 
+
 /**
- * @brief String View initializer from a given pointer and length.
+ * @brief String View initialiser from a null-terminated C string.
  *
  * @param self A pointer to the memory to be initialised
  * @param src a pointer to the source string
- * @param len The length of the (sub)string
  *
- * @warning The strview has only non-owned references, so no
+ * @warning The #strview has only non-owned references, so no
  * specific destructor is needed for a stack-allocated strview.
  */
-void strview_init(strview *self, const char* src, size_t len);
+void strview_init(strview *self, const char* src);
 
 
 /**
- * @brief String View constructor initializer from a given pointer
- * and length.
+ * @brief String View builder from a null-terminated C string.
  *
- * @warning The strview is a lightweight object meant to be mostly
- * stack-allocated of stored in flat arrays. This constructor returns
- * a new heap-allocated strview. This should be avoided but this
- * constructor is included for completeness. The strview has only
- * non-owned references, so no  specific destruction is needed.
- * A heap-allocated strview can be disposed of with FREE .
+ * @param src a pointer to the source string
+ * @return A copy (by value) of a strview representing @p src
+ *
+ * @see strview_init
+ */
+strview strview_build(const char* src);
+
+
+/**
+ * @brief String View constructor from a null-terminated C string.
+ *
+ * @warning #strview is a lightweight object meant to be mostly
+ * stack-allocated or stored in flat arrays. This constructor returns
+ * a new heap-allocated instance. This should be avoided but this
+ * constructor is included for completeness. Since #strview has no
+ * owned references, no specific destructor is needed.
+ * A heap-allocated #strview can be disposed of with #FREE .
  *
  * @see strview_init
  * @see FREE
  */
-strview *strview_new(const char* src, size_t len);
+strview *strview_new(const char* src);
 
 
 /**
@@ -103,21 +113,37 @@ strview *strview_new(const char* src, size_t len);
  *
  * @param self A pointer to the memory to be initialised
  * @param src a pointer to the source string
- * @param from The initial position of the substring/offset from the start position
+ * @param from The initial position of the substring/offset from the start
+ * position of @p src
  * @param to The final position of the substring (not included)
  */
 void strview_init_from_range(strview *self, const char* src, size_t from, size_t to);
 
 
 /**
+ * @brief String View builder from a given pointer and substring range.
+ *
+ * @param src a pointer to the source string
+ * @param from The initial position of the substring/offset from the start
+ * position of @p src
+ * @param to The final position of the substring (not included)
+ *
+ * @return A copy (by value) of a strview representing  `src[from:to]`
+ *
+ * @see strvire_init_from_range
+ */
+strview strview_build_from_range(const char* src, size_t from, size_t to);
+
+
+/**
  * @brief String View constructor from a given pointer and substring range.
  *
- * @warning The strview is a lightweight object meant to be mostly
- * stack-allocated of stored in flat arrays. This constructor returns
- * a new heap-allocated strview. This should be avoided but this
- * constructor is included for completeness. The strview has only
- * non-owned references, so no  specific destruction is needed.
- * A heap-allocated strview can be disposed of with FREE .
+ * @warning #strview is a lightweight object meant to be mostly
+ * stack-allocated or stored in flat arrays. This constructor returns
+ * a new heap-allocated instance. This should be avoided but this
+ * constructor is included for completeness. Since #strview has no
+ * owned references, no specific destructor is needed.
+ * A heap-allocated #strview can be disposed of with #FREE .
  *
  * @see strview_new_from_range
  * @see FREE
@@ -169,6 +195,29 @@ bool strview_eqn_cstr(strview *self, const char *other, size_t n);
 
 
 /**
+ * @brief Returns a #strview coresponding to `self[from:to]`
+ */
+strview strview_substr(strview *self, size_t from, size_t to);
+
+
+
+/**
+ * @brief Find the first @p n occurrences of the pattern @p pat in @p self.
+ * The positions of the matches are stored in @p dest.
+ *
+ * @return The number of matches of @p pat in @p self from left to right,
+ * starting at position @p from_pos up to a maximum number @p n.
+
+ * @warning The array @p dest should have enough space to store at least
+ * @p n size_t values.
+ *
+ * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
+ */
+size_t strview_find_n(strview *self, const char *pat, size_t n,
+                      size_t *dest);
+
+
+/**
  * @brief String View Iterator type.
  *
  * A strview iterator is used to iterate over substrings of a source
@@ -201,7 +250,7 @@ strview strview_iter_next(strview_iter *self);
 
 
 /**
- * @brief Tokenises a string view.
+ * @brief Splits a string view.
  *
  * Let `X` be a string of lenght `n >= 0` and `S` be a separator string
  * of length `m > 0` such that `X = T_0 S_1 T_1 S_2 ... T_k-1 S_k T_k`
@@ -212,13 +261,12 @@ strview strview_iter_next(strview_iter *self);
  * Example
  *
  * ```C
- * strview sview;
- * strview_init(&sview, "strview_iter_has_next_" 22);
- * strview_iter *iter = strview_tok(&sview, "_", 1);
+ * strview sview = strview_build("strview_iter_has_next_");
+ * strview_iter *iter = strview_split(&sview, "_", 1);
  * for (int i = 0; strview_iter_has_next(iter); i++) {
  *     strview tok = strview_iter_next(iter);
  *     printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
- *	}
+ * }
  * ```
  * prints:
  * ```
@@ -234,8 +282,10 @@ strview strview_iter_next(strview_iter *self);
  * @param sep_len The length of the separator
  *
  * @returns An iterator over the tokens
+ *
+ * @warning The separator must be a non-empty string.
  */
-strview_iter *strview_tok(strview *self, const char *sep, size_t sep_len);
+strview_iter *strview_split(strview *self, const char *sep, size_t sep_len);
 
 
 #endif

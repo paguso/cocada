@@ -26,6 +26,7 @@
 #include <stddef.h>
 
 #include "new.h"
+#include "strview.h"
 
 typedef struct _strbuf strbuf;
 
@@ -65,7 +66,7 @@ void strbuf_free(strbuf *self);
  * @brief Creates a new string buffer from a source static string @p src.
  * @warning The source string contents are simply copied onto the dynamic
  *          string and the former is left untouched.
- * @param src The source string **NO TRANSFER OF OWNERSHIP**.
+ * @param src The source string.
  */
 strbuf *strbuf_new_from_str(const char *src, size_t len);
 
@@ -108,7 +109,12 @@ char strbuf_get(strbuf *self, size_t pos);
 
 
 /**
- * @brief Sets all positions to '\0'.
+ * @brief Clears the strbuf.
+ *
+ * @warning After this operation the strbuf *logically* represents an empty
+ * string (lenght = 0). However, this does not necessarily imply that
+ * internally the buffer has been completely cleared  (e.g. all positions
+ * set to '\0'), nor that the buffer size has been reduced to a minimum.
  */
 void strbuf_clear(strbuf *self);
 
@@ -202,19 +208,6 @@ void strbuf_ncat(strbuf *self, const strbuf *other, size_t n);
 
 
 /**
- * @brief Find the first @p n occurrences of the pattern @p pat in @p self starting from position @p from_pos. The positions of the matches are
- * stored in @p dest.
- * @return The number of matches of @p pat in @p self from left to right,
- * starting at position @p from_pos up to a maximum number @p n.
- * @warning The array @p dest should have enough space to store at least
- * @p n size_t values.
- * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
- */
-size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
-                     size_t *dest);
-
-
-/**
  * @brief Replaces the first @p n  left-to-right non-overlapping occurrences
  * of the substring @p old_str in the string buffer @p self, with the substring @p new_str
  * starting from position @p from_pos.
@@ -280,6 +273,15 @@ int sbprintf(strbuf *self, const char *fmt, ...);
  *          reference can become NULL or invalid.
  */
 const char *strbuf_as_str(strbuf *self);
+
+
+/**
+ * @brief Returns a string view representation of the current buffer.
+ *
+ * @warning The internal state can change between calls and the returned
+ *          view can become invalid.
+ */
+strview strbuf_as_strview(strbuf *self);
 
 
 /**

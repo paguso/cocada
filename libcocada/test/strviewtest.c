@@ -30,7 +30,45 @@
 #include "strview.h"
 
 
-void test_strview_tok(CuTest *tc)
+void test_strview_find_n(CuTest *tc)
+{
+	memdbg_reset();
+	char *s = "0123012301230123012301230123012301230123"
+	          "0123012301230123012301230123012301230123"
+	          "0123012301230123012301230123012301230123";
+	char *pat = "123";
+	strview sv = strview_build(s);
+	size_t matches[7];
+	size_t expected_pos = 1;
+	size_t n = strview_find_n(&sv, pat, 7, matches);
+	CuAssertSizeTEquals(tc, 7, n);
+	for (size_t i = 0; i < n; i++) {
+		CuAssertSizeTEquals(tc, expected_pos, matches[i]);
+		expected_pos += 4;
+	}
+	pat = "";
+	expected_pos = 0;
+	n = strview_find_n(&sv, pat, 7,  matches);
+	CuAssertSizeTEquals(tc, 7, n);
+	for (size_t i = 0; i < n; i++) {
+		CuAssertSizeTEquals(tc, expected_pos, matches[i]);
+		expected_pos += 1;
+	}
+	pat = "45678";
+	n = strview_find_n(&sv, pat, 7,  matches);
+	CuAssertSizeTEquals(tc, 0, n);
+	pat = s;
+	n = strview_find_n(&sv, pat, 7,  matches);
+	CuAssertSizeTEquals(tc, 1, n);
+	CuAssertSizeTEquals(tc, 0, matches[0]);
+	if (!memdbg_is_empty()) {
+		DEBUG_EXEC(memdbg_print_stats(stdout, true));
+	}
+	CuAssert(tc, "Memory leak", memdbg_is_empty());
+}
+
+
+void test_strview_split(CuTest *tc)
 {
 	memdbg_reset();
 	char *str = "The quick brown fox jumps over the lazy dog";
@@ -38,10 +76,9 @@ void test_strview_tok(CuTest *tc)
 	char *sep = " ";
 	size_t sep_len = strlen(sep);
 	size_t len = strlen(str);
-	strview sview;
-	strview_init(&sview, str, len);
+	strview sview = strview_build(str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	strview_iter *iter = strview_tok(&sview, sep, sep_len);
+	strview_iter *iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -54,9 +91,9 @@ void test_strview_tok(CuTest *tc)
 	len = strlen(str);
 	sep = "__";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -69,9 +106,9 @@ void test_strview_tok(CuTest *tc)
 	len = strlen(str);
 	sep = "_";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -79,15 +116,14 @@ void test_strview_tok(CuTest *tc)
 	}
 	strview_iter_free(iter);
 
-
 	str = "X_X_";
 	char *tokens4[] = {"X","X",""};
 	len = strlen(str);
 	sep = "_";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -100,9 +136,9 @@ void test_strview_tok(CuTest *tc)
 	len = strlen(str);
 	sep = "_";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -115,9 +151,9 @@ void test_strview_tok(CuTest *tc)
 	len = strlen(str);
 	sep = "__";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
@@ -130,16 +166,15 @@ void test_strview_tok(CuTest *tc)
 	len = strlen(str);
 	sep = "__";
 	sep_len = strlen(sep);
-	strview_init(&sview, str, len);
+	strview_init(&sview, str);
 	CuAssertSizeTEquals(tc, len, strview_len(&sview));
-	iter = strview_tok(&sview, sep, sep_len);
+	iter = strview_split(&sview, sep, sep_len);
 	for (int i = 0; strview_iter_has_next(iter); i++) {
 		strview tok = strview_iter_next(iter);
 		printf("tok = %"SVFMT" (len = %zu)\n", SVPRT(tok), tok.len);
 		CuAssertTrue(tc, strview_eq_cstr(&tok, tokens7[i]));
 	}
 	strview_iter_free(iter);
-
 
 	CuAssert(tc, "Memory Leak.", memdbg_is_empty());
 }
@@ -148,6 +183,7 @@ void test_strview_tok(CuTest *tc)
 CuSuite *strview_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("strview");
-	SUITE_ADD_TEST(suite, test_strview_tok);
+	SUITE_ADD_TEST(suite, test_strview_find_n);
+	SUITE_ADD_TEST(suite, test_strview_split);
 	return suite;
 }

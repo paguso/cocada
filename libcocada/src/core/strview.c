@@ -18,28 +18,37 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
- 
+
 #include <assert.h>
 #include <string.h>
 
 #include "cstrutil.h"
+#include "errlog.h"
 #include "new.h"
 #include "strview.h"
 
 
-void strview_init(strview *self, const char *src, size_t len)
+void strview_init(strview *self, const char *src)
 {
-	self->str = src;
-	self->len = len;
+	strview_init_from_range(self, src, 0, strlen(src));
 }
 
 
-strview *strview_new(const char* src, size_t len)
+strview strview_build(const char *src)
 {
-	strview *ret = NEW(strview);
-	strview_init(ret, src, len);
+	strview ret;
+	strview_init_from_range(&ret, src, 0, strlen(src));
 	return ret;
 }
+
+
+strview *strview_new(const char* src)
+{
+	strview *ret = NEW(strview);
+	strview_init_from_range(ret, src, 0, strlen(src));
+	return ret;
+}
+
 
 void strview_init_from_range(strview *self, const char *src, size_t from, size_t to)
 {
@@ -49,13 +58,21 @@ void strview_init_from_range(strview *self, const char *src, size_t from, size_t
 }
 
 
+strview strview_build_from_range(const char *src, size_t from, size_t to)
+{
+	strview ret;
+	strview_init_from_range(&ret, src, from, to);
+	return ret;
+}
+
+
 strview* strview_new_from_range(const char *src, size_t from, size_t to)
 {
-	assert (from <= to);
 	strview *ret = NEW(strview);
 	strview_init_from_range(ret, src, from, to);
 	return ret;
 }
+
 
 char *strview_to_new_cstr(strview *self)
 {
@@ -64,20 +81,24 @@ char *strview_to_new_cstr(strview *self)
 	return ret;
 }
 
+
 void strview_cpy_to_cstr(strview *self, char *dest)
 {
 	strncpy(dest, self->str, self->len);
 }
+
 
 size_t strview_len(strview *self)
 {
 	return self->len;
 }
 
+
 bool strview_eq_cstr(strview *self, const char *other)
 {
 	return strview_eqn_cstr(self, other, strlen(other));
 }
+
 
 bool strview_eqn_cstr(strview *self, const char *other, size_t n)
 {
@@ -91,8 +112,17 @@ bool strview_eqn_cstr(strview *self, const char *other, size_t n)
 }
 
 
+strview strview_substr(strview *self, size_t from, size_t to)
+{
+	assert(from <= to);
+	assert(to - from <= self->len);
+	strview ret;
+	strview_init_from_range(&ret, self->str, from, to);
+	return ret;
+}
 
 
+// Aho-corasick-like FSM
 typedef struct {
 	int n;
 	int *delta[256];
@@ -130,16 +160,42 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
+size_t strview_find_n(strview *self, const char *pat, size_t n,
+                      size_t *dest)
+{
+	size_t self_len = strview_len(self);
+	size_t patlen = strlen(pat);
+	if (n == 0 ||  patlen > self_len) {
+		return 0;
+	}
+	fsm *matcher = build_fsm(pat, patlen);
+	size_t ret = 0;
+	if (patlen == 0 && n > 0) {
+		dest[ret++] = 0;
+	}
+	const char *self_str = self->str;
+	for (size_t i = 0, state = 0; ret < n && i < self_len; i++) {
+		state = matcher->delta[(size_t)self_str[i]][state];
+		if (state == patlen) {
+			assert (i + 1 >= patlen );
+			dest[ret++] = i + 1 - patlen;
+		}
+	}
+	fsm_free(matcher);
+	return ret;
+}
+
 
 typedef enum {
-	TOKENIZER = 0
+	SPLITTER = 0
 } strview_iter_type;
+
 
 typedef struct {
 	char *sep;
 	size_t sep_len;
 	size_t pos;
-} tok_data_t;
+} split_data_t;
 
 
 typedef struct {
@@ -149,11 +205,11 @@ typedef struct {
 
 
 struct strview_iter {
-	strview *src;
 	strview_iter_vt *vt;
+	strview *src;
 	strview_iter_type type;
 	union {
-		tok_data_t tok_data;
+		split_data_t split_data;
 	} aux;
 };
 
@@ -162,8 +218,8 @@ void strview_iter_free(strview_iter *self)
 {
 	if (!self) return;
 	switch (self->type) {
-	case TOKENIZER:
-		FREE(self->aux.tok_data.sep);
+	case SPLITTER:
+		FREE(self->aux.split_data.sep);
 		break;
 	default:
 		break;
@@ -185,20 +241,21 @@ strview strview_iter_next(strview_iter *it)
 
 
 
-static bool _strview_tok_has_next(strview_iter *it)
+static bool _strview_split_has_next(strview_iter *it)
 {
-	size_t pos = it->aux.tok_data.pos;
+	size_t pos = it->aux.split_data.pos;
 	size_t len = strview_len(it->src);
 	return pos <= len;
 }
 
-static strview _strview_tok_next(strview_iter *it)
+static strview _strview_split_next(strview_iter *it)
 {
-	size_t pos = it->aux.tok_data.pos;
+	size_t pos = it->aux.split_data.pos;
 	const char *str = it->src->str;
-	const char *sep = it->aux.tok_data.sep;
-	size_t sep_len = it->aux.tok_data.sep_len;
+	const char *sep = it->aux.split_data.sep;
+	size_t sep_len = it->aux.split_data.sep_len;
 	size_t len = strview_len(it->src);
+	assert(pos <= len);
 	// find next occurrence of separator
 	size_t sep_pos = pos;
 	while (sep_pos < len) {
@@ -210,28 +267,29 @@ static strview _strview_tok_next(strview_iter *it)
 	}
 	if (sep_pos < len) { // found separator at sep_pos
 		strview ret = {.str = str + pos, .len = sep_pos - pos };
-		it->aux.tok_data.pos = sep_pos + sep_len;
+		it->aux.split_data.pos = sep_pos + sep_len;
 		return ret;
 	} else { // separator not found
 		strview ret = {.str = str + pos, .len = len - pos };
-		it->aux.tok_data.pos = len + 1;
+		it->aux.split_data.pos = len + 1;
 		return ret;
 	}
 }
 
 
-static strview_iter_vt _strview_tok_vt = {_strview_tok_has_next, _strview_tok_next};
+static strview_iter_vt _strview_split_vt = {_strview_split_has_next, _strview_split_next};
 
 
-strview_iter *strview_tok(strview *self, const char *sep, size_t sep_len)
+strview_iter *strview_split(strview *self, const char *sep, size_t sep_len)
 {
+	ERROR_ASSERT(sep_len > 0, "strview split separator must be non-empty.");
 	strview_iter *ret = NEW(strview_iter);
-	ret->type = TOKENIZER;
+	ret->type = SPLITTER;
 	ret->src = self;
-	ret->aux.tok_data = (tok_data_t) {
+	ret->aux.split_data = (split_data_t) {
 		.sep = cstr_clone_len(sep, sep_len), .sep_len = sep_len, .pos = 0
 	};
-	ret->vt = &_strview_tok_vt;
+	ret->vt = &_strview_split_vt;
 	return ret;
 }
 

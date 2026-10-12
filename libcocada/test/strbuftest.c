@@ -218,42 +218,6 @@ void test_strbuf_fit(CuTest *tc)
 }
 
 
-void test_strbuf_find_n(CuTest *tc)
-{
-	memdbg_reset();
-	char *s = "0123012301230123012301230123012301230123"
-	          "0123012301230123012301230123012301230123"
-	          "0123012301230123012301230123012301230123";
-	char *pat = "123";
-	strbuf *sb = strbuf_new_from_str(s, strlen(s));
-	size_t matches[7];
-	size_t from_pos = 0;
-	size_t expected_pos = 1;
-	size_t n;
-	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
-		for (size_t i = 0; i < n; i++) {
-			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
-			from_pos = matches[i] + 1;
-			expected_pos += 4;
-		}
-	}
-	pat = "";
-	from_pos = 0;
-	expected_pos = 0;
-	while ((n = strbuf_find_n(sb, pat, 7, from_pos, matches)) > 0 ) {
-		for (size_t i = 0; i < n; i++) {
-			CuAssertSizeTEquals(tc, expected_pos, matches[i]);
-			from_pos = matches[i] + 1;
-			expected_pos += 1;
-		}
-	}
-	strbuf_free(sb);
-	if (!memdbg_is_empty()) {
-		DEBUG_EXEC(memdbg_print_stats(stdout, true));
-	}
-	CuAssert(tc, "Memory leak", memdbg_is_empty());
-}
-
 
 void test_strbuf_replace_n(CuTest *tc)
 {
@@ -392,7 +356,6 @@ CuSuite *strbuf_get_test_suite()
 	SUITE_ADD_TEST(suite, test_strbuf_paste);
 	SUITE_ADD_TEST(suite, test_strbuf_clip);
 	SUITE_ADD_TEST(suite, test_strbuf_fit);
-	SUITE_ADD_TEST(suite, test_strbuf_find_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_n);
 	SUITE_ADD_TEST(suite, test_strbuf_replace);
 	SUITE_ADD_TEST(suite, test_strbuf_replace_all);

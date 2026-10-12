@@ -294,7 +294,7 @@ char strbuf_get(strbuf *self, size_t pos)
 
 void strbuf_clear(strbuf *self)
 {
-	memset(_buffer(self), '\0', strbuf_capacity(self));
+	_buffer(self)[0] = '\0';
 	_set_len(self, 0);
 }
 
@@ -363,6 +363,12 @@ void strbuf_join(strbuf *self, size_t n, const char **arr, const char *sep)
 const char *strbuf_as_str(strbuf *self)
 {
 	return _buffer(self);
+}
+
+
+strview strbuf_as_strview(strbuf *self)
+{
+	return strview_build_from_range(_buffer(self), 0, strbuf_len(self));
 }
 
 
@@ -435,7 +441,6 @@ void strbuf_clip(strbuf *self, size_t from, size_t to)
 }
 
 
-
 // Aho-corasick-like FSM
 typedef struct {
 	int n;
@@ -470,32 +475,6 @@ static fsm *build_fsm(const char *pat, int len)
 	for (int i = 0; i < m; i++) {
 		ret->delta[i][ret->n - 1] = ret->delta[i][0];
 	}
-	return ret;
-}
-
-
-size_t strbuf_find_n(strbuf *self, const char *pat, size_t n, size_t from_pos,
-                     size_t *dest)
-{
-	size_t self_len = strbuf_len(self);
-	size_t patlen = strlen(pat);
-	if (n == 0 || from_pos + patlen > self_len) {
-		return 0;
-	}
-	fsm *matcher = build_fsm(pat, patlen);
-	size_t ret = 0;
-	if (patlen == 0 && n > 0) {
-		dest[ret++] = from_pos;
-	}
-	const char *self_str = _buffer(self);
-	for (size_t i = from_pos, state = 0; ret < n && i < self_len; i++) {
-		state = matcher->delta[(size_t)self_str[i]][state];
-		if (state == patlen) {
-			assert (i + 1 >= patlen );
-			dest[ret++] = i + 1 - patlen;
-		}
-	}
-	fsm_free(matcher);
 	return ret;
 }
 
