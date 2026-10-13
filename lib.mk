@@ -287,11 +287,15 @@ test_strict_deps_objs = $(foreach lib, $(strict_deps), \
 	$(patsubst %.c, ../lib$(lib)/$(test_build_dir)/%.o,\
 		$(notdir $(shell find ../lib$(lib)/$(src_dir) -name '*.c'))))
 
-.PHONY: test  
-test: test_lib_build test_test_build 
+.PHONY: test_build  
+test_build: test_lib_build test_test_build 
 	$(CC) $(INCLUDE_CFLAGS) $(test_cflags) $(CFLAGS) $(test_strict_deps_objs) \
 	$(test_build_dir)/*.o -lm -o $(test_build_dir)/test
 
+.PHONY: test
+test: test_build
+	echo "RUNNING TESTS for lib"$(lib_name)
+	$(test_build_dir)/test
 
 #
 # Static library build and installation

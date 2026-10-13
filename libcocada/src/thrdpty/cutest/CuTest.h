@@ -12,7 +12,9 @@
 
 #include <setjmp.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #define CUTEST_VERSION  "CuTest 1.5-COCADA"
 
@@ -148,27 +150,20 @@ typedef struct CuSuite {
 	int suitesCount;
 	CuTest *tests[MAX_TEST_CASES];
 	int testsCount;
-	int failCount;
-	int okCount;
-	int skippedCount;
 } CuSuite;
 
-typedef struct CuSuiteRunStats {
-	int ok;
-	int fail;
-	int skipped;
-} CuSuiteRunStats;
 
 void CuSuiteInit(CuSuite *testSuite, const char *suiteName);
 CuSuite *CuSuiteNew(const char *suiteName);
 void CuSuiteDelete(CuSuite *testSuite);
 bool CuSuiteAdd(CuSuite *testSuite, CuTest *testCase, const char *qualifiedName);
 bool CuSuiteAddSuite(CuSuite *parentSuite, CuSuite *childSuite);
-CuSuiteRunStats CuSuiteRun(CuSuite *testSuite);
-CuSuiteRunStats CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
+bool CuSuiteRun(CuSuite *testSuite);
+bool CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName);
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary);
-void CuSuiteDetails(CuSuite *testSuite, CuString *details);
+//void CuSuiteDetails(CuSuite *testSuite, CuString *details);
 void CuSuitePrint(CuSuite *testSuite);
+void CuSuitePrintResults(CuSuite *testSuite, FILE* stream);
 
 #undef MEM_DBG_OFF
 

@@ -340,9 +340,6 @@ void CuSuiteInit(CuSuite *testSuite, const char *suiteName)
 	testSuite->name = CuStrCopy(suiteName);
 	testSuite->testsCount = 0;
 	testSuite->suitesCount = 0;
-	testSuite->okCount = 0;
-	testSuite->failCount = 0;
-	testSuite->skippedCount = 0;
 	memset(testSuite->tests, 0, sizeof(testSuite->tests));
 	memset(testSuite->suites, 0, sizeof(testSuite->suites));
 }
@@ -407,116 +404,116 @@ bool CuSuiteAddSuite(CuSuite *parentSuite, CuSuite *childSuite)
 }
 
 
-CuSuiteRunStats CuSuiteRun(CuSuite *testSuite)
+bool CuSuiteRun(CuSuite *testSuite)
 {
-	CuSuiteRunStats res = (CuSuiteRunStats) {
-		0
-	};
-	if (!testSuite) return res;
+	if (!testSuite) return true;
+	bool ret = true;
 	for (int i = 0; i < testSuite->suitesCount; i++) {
-		CuSuiteRunStats chdres = CuSuiteRun(testSuite->suites[i]);
-		res.ok += chdres.ok;
-		res.fail += chdres.fail;
-		res.skipped += chdres.skipped;
+		ret = ret && CuSuiteRun(testSuite->suites[i]);
 	}
 	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
 		CuTest *testCase = testSuite->tests[i];
 		CuTestRun(testCase);
-		if (testCase->failed) {
-			res.fail++;
-		} else {
-			res.ok++;
-		}
+		ret = ret && !testCase->failed;
 	}
-	testSuite->failCount += res.fail;
-	testSuite->okCount += res.ok;
-	return res;
+	return ret;
 }
 
-CuSuiteRunStats _CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName, bool force)
+
+bool _CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName, bool force)
 {
-	CuSuiteRunStats res = (CuSuiteRunStats) {
-		0
-	};
-	if (!testSuite) return res;
+	if (!testSuite) return true;
+	bool ret = true;
 	bool nameEquals = testSuite->name && !strcmp(testSuite->name, suiteName);
 	for (int i = 0; i < testSuite->suitesCount; i++) {
-		CuSuiteRunStats chdres = _CuSuiteRunSuite(testSuite->suites[i], suiteName, nameEquals);
-		res.ok += chdres.ok;
-		res.fail += chdres.fail;
-		res.skipped += chdres.skipped;
+		ret = ret && _CuSuiteRunSuite(testSuite->suites[i], suiteName, nameEquals);
 	}
 	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
 		if (force || nameEquals) {
 			CuTest *testCase = testSuite->tests[i];
 			CuTestRun(testCase);
-			if (testCase->failed) {
-				res.fail++;
-			} else {
-				res.ok++;
-			}
-		} else {
-			res.skipped++;
+			ret = ret && !testCase->failed;
 		}
 	}
-	testSuite->failCount += res.fail;
-	testSuite->okCount += res.ok;
-	testSuite->skippedCount += res.skipped;
-	return res;
+	return ret;
 }
 
 
-CuSuiteRunStats CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName)
+bool CuSuiteRunSuite(CuSuite *testSuite, const char* suiteName)
 {
-	_CuSuiteRunSuite(testSuite, suiteName, false);
+	return _CuSuiteRunSuite(testSuite, suiteName, false);
+}
+
+
+typedef struct summresults {
+	int ok;
+	int fail;
+	int skipped;
+} summresults;
+
+void _CuSuiteSummary(CuSuite *testSuite, CuString *summary, summresults *res)
+{
+	for (int i = 0; i < testSuite->suitesCount; ++i) {
+		_CuSuiteSummary(testSuite->suites[i], summary, res);
+	}
+	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
+		CuTest *testCase = testSuite->tests[i];
+		if (!testCase->ran) {
+			CuStringAppend(summary,  ".");
+			res->skipped++;
+		} else {
+			CuStringAppend(summary, testCase->failed ? "F" : "V");
+			int failed = testCase->failed;
+			res->ok += (1 - failed);
+			res->fail += failed;
+		}
+	}
+}
+
+
+void _CuSuiteFailureDetails(CuSuite *testSuite, CuString *summary, int *failCount)
+{
+	for (int i = 0; i < testSuite->suitesCount; ++i) {
+		_CuSuiteFailureDetails(testSuite->suites[i], summary, failCount);
+	}
+	for (int i = 0 ; i < testSuite->testsCount ; ++i) {
+		CuTest *testCase = testSuite->tests[i];
+		if (testCase->failed) {
+			(*failCount)++;
+			CuStringAppend(summary, testCase->failed ? "F" : "V");
+			CuStringAppendFormat(summary, "%4d) %s: %s\n",
+			                     *failCount, testCase->name, testCase->message);
+		}
+	}
 }
 
 
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary)
 {
-	int i;
-	for (i = 0 ; i < testSuite->testsCount ; ++i) {
-		CuTest *testCase = testSuite->tests[i];
-		if (!testCase->ran) {
-			CuStringAppend(summary,  ".");
-		} else {
-			CuStringAppend(summary, testCase->failed ? "F" : "V");
-		}
-	}
-	CuStringAppend(summary, "\n\n");
-}
-
-void CuSuiteDetails(CuSuite *testSuite, CuString *details)
-{
-	int i;
-	int failCount = 0;
-
-	if (testSuite->failCount == 0) {
-		int passCount = testSuite->okCount;
-		const char *testWord = passCount == 1 ? "test" : "tests";
-		CuStringAppendFormat(details, "OK (%d %s)\n", passCount, testWord);
-	} else {
-		if (testSuite->failCount == 1)
-			CuStringAppend(details, "There was 1 failure:\n");
+	summresults res = {0, 0, 0};
+	_CuSuiteSummary(testSuite, summary, &res);
+	CuStringAppend(summary, "\n");
+	if (res.fail > 0) {
+		if (res.fail == 1)
+			CuStringAppend(summary, "There was 1 failure:\n");
 		else
-			CuStringAppendFormat(details, "There were %d failures:\n",
-			                     testSuite->failCount);
-
-		for (i = 0 ; i < testSuite->testsCount ; ++i) {
-			CuTest *testCase = testSuite->tests[i];
-			if (testCase->failed) {
-				failCount++;
-				CuStringAppendFormat(details, "%d) %s: %s\n",
-				                     failCount, testCase->name, testCase->message);
-			}
-		}
-		CuStringAppend(details, "\n!!!FAILURES!!!\n");
-
+			CuStringAppendFormat(summary, "There were %d failures:\n", res.fail);
+		int failCount = 0;
+		_CuSuiteFailureDetails(testSuite, summary, &failCount);
 	}
-	CuStringAppendFormat(details, "Passes: %d  ", testSuite->okCount);
-	CuStringAppendFormat(details, "Fails: %d  ",  testSuite->failCount);
-	CuStringAppendFormat(details, "Skipped: %d\n", testSuite->skippedCount);
+	CuStringAppendFormat(summary, "Pass: %d    Fail: %d    Skipped: %d\n", res.ok, res.fail, res.skipped);
 }
+
+
+void CuSuitePrintResults(CuSuite *testSuite, FILE* stream)
+{
+	fprintf(stream, "Test Results for suite %s:\n", testSuite->name?testSuite->name:"Undefined");
+	CuString *output = CuStringNew();
+	CuSuiteSummary(testSuite, output);
+	CuStringAppend(output, "\n");
+	fprintf(stream, "%s", output->buffer);
+}
+
 
 void _CuSuitePrint(CuSuite *testSuite, int level)
 {
