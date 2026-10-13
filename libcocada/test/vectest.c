@@ -580,7 +580,6 @@ CuSuite *vec_get_test_suite()
 	SUITE_ADD_TEST(suite, test_vec_free);
 	SUITE_ADD_TEST(suite, test_vec_flat_free);
 	SUITE_ADD_TEST(suite, test_vec_arr_of_from_vec);
-	//SUITE_ADD_TEST(suite, test_vec_get_speed);
-	SUITE_ADD_TEST(suite, test_vec_force_fail);
+	//SUITE_ADD_TEST(suite, test_vec_force_fail);
 	return suite;
 }
