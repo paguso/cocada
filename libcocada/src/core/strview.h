@@ -178,6 +178,21 @@ size_t strview_len(strview *self);
 
 
 /**
+ * @brief String view lexicographic comparison, compatible with #cmp_func (order.h)
+ *
+ * @param left a pointer to a strview
+ * @param right a pointer to a strview
+ *
+ * @return -1 if @p left is lexicographically smaller than @p right,
+ * 		    0 if @p left is equal to @p right, or
+ * 		   +1 if @p left is lexicographically greater than @p right,
+ *
+ * @see cmp_func
+ */
+int strview_cmp(const void* left, const void *right);
+
+
+/**
  * @brief Compares the contents of the string view to a raw string
  * for equality.
  */
@@ -197,8 +212,32 @@ bool strview_eqn_cstr(strview *self, const char *other, size_t n);
 /**
  * @brief Returns a #strview coresponding to `self[from:to]`
  */
-strview strview_substr(strview *self, size_t from, size_t to);
+strview strview_substr(const strview *self, size_t from, size_t to);
 
+
+/**
+ * @brief Finds the first occurrence of a substring in a string view.
+ *
+ * @param substr The substring searched for
+ * @param len The length of the substring searched for
+ *
+ * @return The position of the first occurrence of @p substr in @self,
+ * if any, or the length of the string view otherwise.
+ */
+size_t strview_find(const strview *self, const char *substr, size_t len);
+
+
+/**
+ * @brief Finds the last occurrence of a substring in a string view.
+ *
+ * @param substr The substring searched for
+ * @param len The length of the substring searched for
+ *
+ * @return The position of the last occurrence of @p substr in @self,
+ * if any, or the length of the string view otherwise.
+ * The length of the string view is also returned if @p len == 0.
+ */
+size_t strview_find_last(const strview *self, const char *substr, size_t len);
 
 
 /**
@@ -213,8 +252,7 @@ strview strview_substr(strview *self, size_t from, size_t to);
  *
  * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
  */
-size_t strview_find_n(strview *self, const char *pat, size_t n,
-                      size_t *dest);
+size_t strview_find_n(strview *self, const char *pat, size_t len, size_t n, size_t *dest);
 
 
 /**
@@ -286,6 +324,7 @@ strview strview_iter_next(strview_iter *self);
  * @warning The separator must be a non-empty string.
  */
 strview_iter *strview_split(strview *self, const char *sep, size_t sep_len);
+
 
 
 #endif

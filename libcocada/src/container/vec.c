@@ -76,7 +76,7 @@ vec *vec_new_with_capacity(size_t typesize, size_t init_capacity)
 	ret->typesize = typesize;
 	ret->capacity = MAX(vec_min_capacity(), init_capacity);
 	ret->len = 0;
-	ret->data = malloc(ret->capacity * ret->typesize); 
+	ret->data = malloc(ret->capacity * ret->typesize);
 	return ret;
 }
 
@@ -123,8 +123,7 @@ static void _check_and_resize(vec *v)
 {
 	if (v->len == v->capacity) {
 		_resize_to(v, GROW_BY * v->capacity);
-	}
-	else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD * v->capacity) {
+	} else if (v->capacity > MIN_CAPACITY && v->len < MIN_LOAD * v->capacity) {
 		_resize_to(v, v->len / MIN_LOAD);
 	}
 }
@@ -240,7 +239,6 @@ void vec_set(vec *v, size_t pos, const void *src)
 
 static void _vec_swap(vec *v, size_t i, size_t j, void *swp)
 {
-	if (i == j) return;
 	memcpy(swp, (byte_t *)v->data + (i * v->typesize), v->typesize);
 	memcpy((byte_t *)v->data + (i * v->typesize), (byte_t *)v->data + (j * v->typesize), v->typesize);
 	memcpy((byte_t *)v->data + (j * v->typesize), swp, v->typesize);
@@ -250,9 +248,14 @@ static void _vec_swap(vec *v, size_t i, size_t j, void *swp)
 void vec_swap(vec *v, size_t i, size_t j)
 {
 	if (i == j) return;
-	void *swp = malloc(sizeof(v->typesize));
-	_vec_swap(v, i, j, swp);
-	FREE(swp);
+	if (v->len < v->capacity) {
+		void *swp = (byte_t *)v->data + (v->len * v->typesize);
+		_vec_swap(v, i, j, swp);
+	} else {
+		void *swp = malloc(sizeof(v->typesize));
+		_vec_swap(v, i, j, swp);
+		FREE(swp);
+	}
 }
 
 
@@ -371,21 +374,17 @@ static size_t _first_geq_bsearch(const vec *v, const void *val, cmp_func cmp)
 {
 	if (vec_len(v) == 0 ) {
 		return 0;
-	}
-	else if (cmp(val, vec_first(v)) <= 0) {
+	} else if (cmp(val, vec_first(v)) <= 0) {
 		return 0;
-	}
-	else if (cmp(vec_last(v), val) < 0) {
+	} else if (cmp(vec_last(v), val) < 0) {
 		return vec_len(v);
-	}
-	else {
+	} else {
 		size_t l = 0, r = vec_len(v) - 1;
 		while (r - l > 1) { // l < ans <= r
 			size_t m = (l + r) / 2;
 			if (cmp(vec_get(v, m), val) < 0) {
 				l = m;
-			}
-			else {
+			} else {
 				r = m;
 			}
 		}
@@ -399,8 +398,7 @@ size_t vec_bsearch(const vec *v, const void *val, cmp_func cmp)
 	size_t fgeq = _first_geq_bsearch(v, val, cmp);
 	if ( ( fgeq < vec_len(v) ) && (cmp(vec_get(v, fgeq), val) == 0) ) {
 		return fgeq;
-	}
-	else {
+	} else {
 		return vec_len(v);
 	}
 }

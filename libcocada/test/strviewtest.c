@@ -29,6 +29,36 @@
 #include "memdbg.h"
 #include "strview.h"
 
+void test_strview_cmp(CuTest *tc)
+{
+	memdbg_reset();
+	strview l, r;
+	strview_init(&l, "");
+	strview_init(&r, "");
+	CuAssertTrue(tc, strview_cmp(&l, &r) == 0);
+	strview_init(&l, "");
+	strview_init(&r, "a");
+	CuAssertTrue(tc, strview_cmp(&l, &r) < 0);
+	strview_init(&l, "a");
+	strview_init(&r, "");
+	CuAssertTrue(tc, strview_cmp(&l, &r) > 0);
+	strview_init(&l, "abc");
+	strview_init(&r, "abc");
+	CuAssertTrue(tc, strview_cmp(&l, &r) == 0);
+	strview_init(&l, "abc");
+	strview_init(&r, "abd");
+	CuAssertTrue(tc, strview_cmp(&l, &r) < 0);
+	strview_init(&l, "abd");
+	strview_init(&r, "abc");
+	CuAssertTrue(tc, strview_cmp(&l, &r) > 0);
+	strview_init(&l, "abc");
+	strview_init(&r, "abcd");
+	CuAssertTrue(tc, strview_cmp(&l, &r) < 0);
+	strview_init(&l, "abcd");
+	strview_init(&r, "abc");
+	CuAssertTrue(tc, strview_cmp(&l, &r) > 0);
+	CuAssertTrue(tc, memdbg_is_empty());
+}
 
 void test_strview_find_n(CuTest *tc)
 {
@@ -40,7 +70,7 @@ void test_strview_find_n(CuTest *tc)
 	strview sv = strview_build(s);
 	size_t matches[7];
 	size_t expected_pos = 1;
-	size_t n = strview_find_n(&sv, pat, 7, matches);
+	size_t n = strview_find_n(&sv, pat, strlen(pat), 7, matches);
 	CuAssertSizeTEquals(tc, 7, n);
 	for (size_t i = 0; i < n; i++) {
 		CuAssertSizeTEquals(tc, expected_pos, matches[i]);
@@ -48,17 +78,17 @@ void test_strview_find_n(CuTest *tc)
 	}
 	pat = "";
 	expected_pos = 0;
-	n = strview_find_n(&sv, pat, 7,  matches);
+	n = strview_find_n(&sv, pat, strlen(pat), 7,  matches);
 	CuAssertSizeTEquals(tc, 7, n);
 	for (size_t i = 0; i < n; i++) {
 		CuAssertSizeTEquals(tc, expected_pos, matches[i]);
 		expected_pos += 1;
 	}
 	pat = "45678";
-	n = strview_find_n(&sv, pat, 7,  matches);
+	n = strview_find_n(&sv, pat, strlen(pat), 7,  matches);
 	CuAssertSizeTEquals(tc, 0, n);
 	pat = s;
-	n = strview_find_n(&sv, pat, 7,  matches);
+	n = strview_find_n(&sv, pat, strlen(pat), 7,  matches);
 	CuAssertSizeTEquals(tc, 1, n);
 	CuAssertSizeTEquals(tc, 0, matches[0]);
 	if (!memdbg_is_empty()) {
@@ -183,6 +213,7 @@ void test_strview_split(CuTest *tc)
 CuSuite *strview_get_test_suite()
 {
 	CuSuite *suite = CuSuiteNew("strview");
+	SUITE_ADD_TEST(suite, test_strview_cmp);
 	SUITE_ADD_TEST(suite, test_strview_find_n);
 	SUITE_ADD_TEST(suite, test_strview_split);
 	return suite;

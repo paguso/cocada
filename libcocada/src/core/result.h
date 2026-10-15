@@ -29,11 +29,12 @@
  *
  * This header contain macros for declaring generic Result types.
  * A Result type is used in functions that may result in runtime errors.
- * The type encapsulates both possible results of such operations,
+ * The type encapsulates possible results of such operations,
  * the successful result and the error result.
  *
- * There are thwo kinds or results:
+ * There are three kinds or results:
  * 1. OK-Result
+ * 2. Error-Result
  * 2. OK-Error-Result
  *
  * An *OK-Result* encapsulates a boolean indicating if the operation was
@@ -44,6 +45,19 @@
  * if (res.ok) {
  * 		T val = res.val;
  * 		consume res.val ...
+ * } else {
+ * 		handle failure...
+ * }
+ * ```
+ *
+ * An *Error-Result* encapsulates a boolean indicating if the operation was
+ * successful and a result value of a given type `T` if the operation fails.
+ *
+ * ```C
+ * T_result res = do_something(...);
+ * if (res.ok) {
+ * 		T val = res.err_val;
+ * 		consume res.err_val ...
  * } else {
  * 		handle failure...
  * }
@@ -79,7 +93,21 @@
 	 */\
 	typedef struct {\
 		bool ok;        	/**< Success/fail indicator */  \
-		OK_TYPE val;	/**< Successful result value. */\
+		OK_TYPE val_ok;	    /**< Successful result value */\
+	} NAME##_res;
+
+/**
+ * @brief Declares an Error-Result `NAME_res`.
+ * @param NAME The type name prefix.
+ * @param ERR_TYPE The type of the unsuccessful operation result value.
+ */
+#define DECL_RESULT_ERR(NAME, ERR_TYPE) \
+	/**\
+	 * @brief Error-Result type.\
+	 */\
+	typedef struct {\
+		bool ok;        	/**< Success/fail indicator */  \
+		ERR_TYPE val_err;	/**< Unsuccessful result value */\
 	} NAME##_res;
 
 /**
