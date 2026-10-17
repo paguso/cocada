@@ -53,8 +53,7 @@ static xchar_wt _xstr_getc(xstrread *t)
 	xstr *src = (xstr *) rdr->src;
 	if (rdr->index < xstr_len(src))  {
 		return xstr_get(src, rdr->index++);
-	}
-	else {
+	} else {
 		return XEOF;
 	}
 }
@@ -112,8 +111,7 @@ static xchar_wt _str_getc(xstrread *t)
 	char *src = (char *) rdr->src;
 	if (rdr->index < rdr->len) {
 		return src[rdr->index++];
-	}
-	else {
+	} else {
 		return XEOF;
 	}
 }
@@ -211,29 +209,25 @@ size_t  _strread_read_until(xstrread *t, xstr *dest, xchar_t delim)
 	strread *sr = (strread *) rdr->src;
 	size_t r = 0;
 	if (dest != NULL) {
-		int c = strread_getc(sr);
+		int c = strread_peek(sr);
 		while (c != EOF && c != delim && r < xstr_len(dest)) {
+			c = strread_getc(sr);
 			xstr_set(dest, r, c);
 			r++;
-			c = strread_getc(sr);
+			c = strread_peek(sr);
 		}
 		while (c != EOF && c != delim) {
+			c = strread_getc(sr);
 			xstr_push(dest, c);
 			r++;
-			c = strread_getc(sr);
+			c = strread_peek(sr);
 		}
-		if (c == delim) {
-			strread_ungetc(sr);
-		}
-	}
-	else {
-		int c = strread_getc(sr);
+	} else {
+		int c = strread_peek(sr);
 		while (c != EOF && c != delim) {
-			r++;
 			c = strread_getc(sr);
-		}
-		if (c == delim) {
-			strread_ungetc(sr);
+			r++;
+			c = strread_peek(sr);
 		}
 	}
 	return r;

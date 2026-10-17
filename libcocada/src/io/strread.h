@@ -34,6 +34,7 @@
  * @see trait.h
  */
 
+#include "strbuf.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -46,9 +47,12 @@ typedef struct _strread strread;
 typedef struct {
 	void    (*reset) (strread *self);
 	int		(*getc) (strread *self);
-	int		(*ungetc) (strread *self);
+	int		(*peek) (strread *self);
 	size_t  (*read_str) (strread *self, char *dest, size_t n);
 	size_t  (*read_str_until) (strread *self, char *dest, char delim);
+	size_t  (*read_strbuf) (strread *self, strbuf *dest);
+	size_t  (*read_strbuf_until) (strread *self, strbuf *dest, char delim);
+	bool    (*eof) (strread *self);
 }  strread_vt;
 
 
@@ -78,18 +82,13 @@ int strread_getc(strread *self);
 
 
 /**
- * @brief Attempts to put back the last char read into the stream to
- * be read by subsequent read operations.
- * If the base stream implementing the trait does not support this operation
- * or if no char has been read from the stream, the function returns 0.
- * Otherwise, it returns 1
+ * @brief Peeks at the next char from a stream without consuming it.
  *
- * @return int 0 if the operation is not supported or no char has been read,
- * 		   1 otherwise.
- * @warning Only one char can be put back into the stream. Once a char is put back,
- * a subsequent call to this function will return 0.
+ * @return The next character as an int, or EOF if the stream has
+ *          reached its end.
+ *
  */
-int strread_ungetc(strread *self);
+int strread_peek(strread *self);
 
 
 /**
@@ -102,12 +101,26 @@ size_t strread_read_str(strread *self, char *dest, size_t n);
 
 /**
  * @brief Attempts to read the next chars into the @p dest until
+ * 		  a new line is found, or the end of the stream is reached.
+ *
+ * @return The number of chars actually read.
+ */
+size_t strread_read_strbuf(strread *self, strbuf *dest);
+
+
+/**
+ * @brief Attempts to read the next chars into the @p dest until
  * 		  the next occurrence of the delimiter @p delim is found,
  * 		  or the end of the stream is reached.
  * @return The number of chars actually read.
  */
 size_t strread_read_str_until(strread *self, char *dest, char delim);
 
+
+size_t strread_read_strbuf_until(strread *self, strbuf *dest, char delim);
+
+
+bool strread_eof(strread *self);
 
 
 #endif

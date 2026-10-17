@@ -25,6 +25,7 @@
 
 #include "mathutil.h"
 #include "new.h"
+#include "strbuf.h"
 #include "strread.h"
 #include "strreader.h"
 
@@ -47,23 +48,26 @@ static int _strreader_getc(strread *t)
 	strreader *rdr = (strreader *) t->impltor;
 	if (rdr->index < rdr->len) {
 		return rdr->src[rdr->index++];
-	}
-	else {
+	} else {
 		return EOF;
 	}
 }
 
 
-static int _strreader_ungetc(strread *t)
+static int _strreader_peek(strread *t)
 {
 	strreader *rdr = (strreader *) t->impltor;
-	if (0 < rdr->index && rdr->index <= rdr->len) {
-		rdr->index--;
-		return 1;
+	if (rdr->index < rdr->len) {
+		return rdr->src[rdr->index];
+	} else {
+		return EOF;
 	}
-	else {
-		return 0;
-	}
+}
+
+static bool _strreader_eof(strread *t)
+{
+	strreader *rdr = (strreader *) t->impltor;
+	return  (rdr->index >= rdr->len);
 }
 
 
@@ -74,6 +78,28 @@ static size_t _strreader_read_str(strread *t, char *dest, size_t n)
 	strncpy(dest, rdr->src + rdr->index, r);
 	rdr->index += r;
 	return r;
+}
+
+
+static size_t _strreader_read_strbuf(strread *t, strbuf *dest)
+{
+	strreader *rdr = (strreader *) t->impltor;
+	size_t ret =  rdr->len - rdr->index;
+	strbuf_nappend(dest, rdr->src + rdr->index, ret);
+	rdr->index += ret;
+	return ret;
+}
+
+
+static size_t _strreader_read_strbuf_until(strread *t, strbuf *dest, char delim)
+{
+	strreader *rdr = (strreader *) t->impltor;
+	size_t r, ret;
+	for (r = rdr->index; r < rdr->len && rdr->src[r] != delim; r++);
+	ret = r - rdr->index;
+	strbuf_nappend(dest, rdr->src + rdr->index, ret);
+	rdr->index = r;
+	return ret;
 }
 
 
@@ -92,9 +118,12 @@ static size_t _strreader_read_str_until(strread *t, char *dest, char delim)
 
 static strread_vt _strreader_vt = { .reset = _strreader_reset,
                                     .getc = _strreader_getc,
-                                    .ungetc = _strreader_ungetc,
+                                    .peek = _strreader_peek,
+                                    .eof = _strreader_eof,
                                     .read_str = _strreader_read_str,
-                                    .read_str_until = _strreader_read_str_until
+                                    .read_str_until = _strreader_read_str_until,
+                                    .read_strbuf = _strreader_read_strbuf,
+                                    .read_strbuf_until = _strreader_read_strbuf_until
                                   };
 
 

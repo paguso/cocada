@@ -19,16 +19,22 @@
  *
  */
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
+#include "strbuf.h"
 #include "strread.h"
 #include "strfilereader.h"
 #include "new.h"
 
+
+#define _BUFSZ 128
+char _buf[_BUFSZ];
 
 
 struct _strfilereader {
@@ -54,9 +60,52 @@ static int _getc(strread *self)
 }
 
 
+static int _peek(strread *self)
+{
+	FILE *f = ((strfilereader *)self->impltor)->src;
+	int c;
+	if ((c = fgetc(f)) == EOF) {
+		return EOF;
+	} else {
+		ungetc(c,f);
+		return c;
+	}
+}
+
+
 static size_t _read_str(strread *self, char *dest, size_t n)
 {
 	return fread(dest, sizeof(char), n, ((strfilereader *)self->impltor)->src);
+}
+
+
+static size_t _read_strbuf(strread *self, strbuf *dest)
+{
+	FILE *src = ((strfilereader *)self->impltor)->src;
+	size_t ret = 0;
+	while(true) {
+		size_t nread = 0;
+		_buf[0] = '\0';
+		_buf[_BUFSZ - 2] = '\0';
+		if (fgets(_buf, _BUFSZ, src) != NULL) {
+			nread =  strlen(_buf);
+			if (nread > 0) {
+				// something read
+				strbuf_nappend(dest, _buf, nread);
+				ret += nread;
+				if (_buf[nread - 1] == '\n') {
+					// whole line read
+					break;
+				} else {
+					assert(_BUFSZ - 1 == nread);
+				}
+			}
+		}
+		if (nread == 0) {
+			break;
+		}
+	}
+	return ret;
 }
 
 
@@ -76,11 +125,41 @@ static size_t _read_str_until(strread *self, char *dest, char delim)
 }
 
 
+static size_t _read_strbuf_until(strread *self, strbuf *dest, char delim)
+{
+	FILE *src = ((strfilereader *)self->impltor)->src;
+	size_t nread = 0;
+	char c;
+	while (!feof(src)) {
+		if ( (c = fgetc(src)) == delim ) {
+			fseek(src, -1, SEEK_CUR);
+			break;
+		}
+		_buf[nread % _BUFSZ] = c;
+		nread++;
+		if (nread % _BUFSZ == 0) {
+			strbuf_nappend(dest, _buf, nread % _BUFSZ);
+		}
+	}
+	strbuf_nappend(dest, _buf, nread % _BUFSZ);
+	return nread;
+}
+
+
+static bool _eof(strread *self)
+{
+	return feof(((strfilereader *)self->impltor)->src);
+}
+
 static strread_vt _strread_vt  = {
 	.getc = _getc,
+	.peek = _peek,
 	.read_str = _read_str,
 	.read_str_until = _read_str_until,
-	.reset = _reset
+	.read_strbuf = _read_strbuf,
+	.read_strbuf_until = _read_strbuf_until,
+	.reset = _reset,
+	.eof = _eof
 };
 
 

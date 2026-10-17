@@ -48,9 +48,9 @@ int strread_getc(strread *self)
 }
 
 
-int strread_ungetc(strread *self)
+int strread_peek(strread *self)
 {
-	return self->vt->ungetc(self);
+	return self->vt->peek(self);
 }
 
 
@@ -66,6 +66,21 @@ size_t strread_read_str_until(strread *self, char *dest, char delim)
 }
 
 
+size_t strread_read_strbuf(strread *self, strbuf *dest)
+{
+	return self->vt->read_strbuf(self, dest);
+}
 
+
+size_t strread_read_strbuf_until(strread *self, strbuf *dest, char delim)
+{
+	return self->vt->read_strbuf_until(self, dest, delim);
+}
+
+
+bool strread_eof(strread *self)
+{
+	return self->vt->eof(self);
+}
 
 

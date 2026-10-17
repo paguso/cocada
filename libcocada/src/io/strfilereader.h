@@ -44,6 +44,7 @@
 
 #include "trait.h"
 #include "strread.h"
+#include "strbuf.h"
 
 
 /**

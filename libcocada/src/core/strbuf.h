@@ -178,6 +178,7 @@ void strbuf_paste(strbuf *self, size_t from, const char *src, size_t len);
  */
 void strbuf_clip(strbuf *self, size_t from, size_t to);
 
+
 /**
  * @brief Appends copies of @p n strings in an array @p arr to @p self,
  *        separating each of these strings by @p sep
@@ -248,6 +249,24 @@ size_t strbuf_replace_all(strbuf *self, const char *old_str,
 
 
 /**
+ * @brief remove whitespaces from the beginning of the string buffer
+ */
+void strbuf_trim_left(strbuf *self);
+
+
+/**
+ * @brief remove whitespaces from the end of the string buffer
+ */
+void strbuf_trim_right(strbuf *self);
+
+
+/**
+ * @brief remove whitespaces from both ends of the string buffer
+ */
+void strbuf_trim(strbuf *self);
+
+
+/**
  * @brief Reverses the contents of the string buffer.
  */
 void strbuf_reverse(strbuf *self);
@@ -292,7 +311,5 @@ strview strbuf_as_strview(strbuf *self);
  * @warning After this operation, the dynamic string @p self is destroyed.
  */
 char *strbuf_detach(strbuf *self);
-
-
 
 #endif

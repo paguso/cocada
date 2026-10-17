@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -532,6 +533,34 @@ size_t strbuf_replace_all(strbuf *self, const char *old_str,
                           size_t from)
 {
 	return strbuf_replace_n(self, old_str, new_str, SIZE_MAX, from);
+}
+
+
+void strbuf_trim_left(strbuf *self)
+{
+	size_t l;
+	const char *buf = _buffer(self);
+	for (l = 0; l < strbuf_len(self) && isspace(buf[l]); l++);
+	strbuf_clip(self, l, strbuf_len(self));
+}
+
+
+void strbuf_trim_right(strbuf *self)
+{
+	size_t  r;
+	const char *buf = _buffer(self);
+	for (r = strbuf_len(self); r > 0 && isspace(buf[r-1]); r--);
+	strbuf_clip(self, 0, r);
+}
+
+
+void strbuf_trim(strbuf *self)
+{
+	size_t l, r;
+	const char *buf = _buffer(self);
+	for (l = 0; l < strbuf_len(self) && isspace(buf[l]); l++);
+	for (r = strbuf_len(self); r > l && isspace(buf[r-1]); r--);
+	strbuf_clip(self, l, r);
 }
 
 

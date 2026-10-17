@@ -163,7 +163,7 @@ cleanup:
 		FREE(build);
 		FREE(pre_rel);
 		return (semver_res) {
-			.ok = false, .val = NULL
+			.ok = false, .val_ok = NULL
 		};
 	}
 	semver *ret = NEW(semver);
@@ -173,7 +173,7 @@ cleanup:
 	ret->pre_rel = pre_rel;
 	ret->build = build;
 	return (semver_res) {
-		.ok = true, .val = ret
+		.ok = true, .val_ok = ret
 	};
 }
 

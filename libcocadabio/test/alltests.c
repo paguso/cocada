@@ -28,6 +28,7 @@
 
 CuSuite *align_get_test_suite();
 CuSuite *fasta_get_test_suite();
+CuSuite *fastq_get_test_suite();
 
 
 CuSuite* create_test_suite()
@@ -35,6 +36,7 @@ CuSuite* create_test_suite()
 	CuSuite *suite = CuSuiteNew("all");
 	CuSuiteAddSuite(suite, align_get_test_suite());
 	CuSuiteAddSuite(suite, fasta_get_test_suite());
+	CuSuiteAddSuite(suite, fastq_get_test_suite());
 	return suite;
 }
 
