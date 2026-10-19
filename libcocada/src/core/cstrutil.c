@@ -136,19 +136,24 @@ void cstr_trim(char *str, size_t len, char *unwanted, size_t unw_len)
 }
 
 
-
-
-char *cstr_resize(char *str, size_t len)
+char *cstr_resize(char *str, size_t cap)
 {
-	size_t l = strlen(str);
-	str = realloc(str, len + 1);
-	if (l < len) {
-		memset(str + l, '\0', (len - l));
-	}
-	str[len] = '\0';
+	size_t l = (str != NULL) ? strlen(str): 0;
+	str = realloc(str, cap + 1);
+	if (l < cap) memset(str + l, '\0', (cap + 1 - l));
+	str[cap] = '\0';
 	return str;
 }
 
+
+char *cstr_ensure_capacity(char *str, size_t cap)
+{
+	size_t l = (str != NULL) ? strlen(str): 0;
+	if (str != NULL && l >= cap) return str;
+	str = realloc(str, cap + 1);
+	memset(str + l, '\0', (cap + 1 - l));
+	return str;
+}
 
 
 char *cstr_cut(char *str, size_t from, size_t to)
@@ -157,7 +162,6 @@ char *cstr_cut(char *str, size_t from, size_t to)
 	strcpy(&(str[from]), &(str[to]));
 	return str;
 }
-
 
 
 void cstr_revert(char *str, size_t len)

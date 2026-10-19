@@ -74,7 +74,7 @@ strview* strview_new_from_range(const char *src, size_t from, size_t to)
 }
 
 
-char *strview_to_new_cstr(strview *self)
+char *strview_to_new_cstr(const strview *self)
 {
 	char *ret = cstr_new(self->len);
 	strview_cpy_to_cstr(self, ret);
@@ -82,13 +82,28 @@ char *strview_to_new_cstr(strview *self)
 }
 
 
-void strview_cpy_to_cstr(strview *self, char *dest)
+char *strview_substr_to_new_cstr(const strview *self, size_t from, size_t to)
+{
+	char *ret = cstr_new(to - from);
+	strview_substr_cpy_to_cstr(self, from, to, ret);
+	return ret;
+}
+
+
+void strview_cpy_to_cstr(const strview *self, char *dest)
 {
 	strncpy(dest, self->str, self->len);
 }
 
 
-size_t strview_len(strview *self)
+void strview_substr_cpy_to_cstr(const strview *self, size_t from, size_t to, char *dest)
+{
+	if (to < from) return;
+	strncpy(dest, self->str + from, to - from);
+}
+
+
+size_t strview_len(const strview *self)
 {
 	return self->len;
 }
@@ -108,13 +123,13 @@ int strview_cmp(const void* left, const void *right)
 }
 
 
-bool strview_eq_cstr(strview *self, const char *other)
+bool strview_eq_cstr(const strview *self, const char *other)
 {
 	return strview_eqn_cstr(self, other, strlen(other));
 }
 
 
-bool strview_eqn_cstr(strview *self, const char *other, size_t n)
+bool strview_eqn_cstr(const strview *self, const char *other, size_t n)
 {
 	if (self->len != n) return false;
 	for (size_t i = 0 ; i < n; i++) {
@@ -138,7 +153,7 @@ strview strview_substr(const strview *self, size_t from, size_t to)
 
 size_t strview_find(const strview *self, const char *substr, size_t len)
 {
-	for (size_t i = 0, j = 0, l = self->len - len; i <= l; ++i) {
+	for (size_t i = 0, j = 0; i + len <= self->len; ++i) {
 		for (j = 0; j < len && self->str[i+j] == substr[j]; ++j);
 		if  (j == len) return i;
 	}
@@ -148,9 +163,9 @@ size_t strview_find(const strview *self, const char *substr, size_t len)
 
 size_t strview_find_last(const strview *self, const char *substr, size_t len)
 {
-	for (size_t i = 0, j = 0, l = self->len - len; i <= l; ++i) {
-		for (j = 0; j < len && self->str[l-i+j] == substr[j]; ++j);
-		if  (j == len) return i;
+	for (size_t i = 0, j = 0; i + len <= self->len; ++i) {
+		for (j = 0; j < len && self->str[self->len - len - i + j] == substr[j]; ++j);
+		if  (j == len) return self->len-len-i;
 	}
 	return self->len;
 }
@@ -194,7 +209,7 @@ static fsm *build_fsm(const char *pat, int len)
 }
 
 
-size_t strview_find_n(strview *self, const char *pat, size_t len, size_t n, size_t *dest)
+size_t strview_find_n(const strview *self, const char *pat, size_t len, size_t n, size_t *dest)
 {
 	size_t self_len = strview_len(self);
 	size_t patlen = strlen(pat);
@@ -313,7 +328,7 @@ static strview _strview_split_next(strview_iter *it)
 static strview_iter_vt _strview_split_vt = {_strview_split_has_next, _strview_split_next};
 
 
-strview_iter *strview_split(strview *self, const char *sep, size_t sep_len)
+strview_iter *strview_split(const strview *self, const char *sep, size_t sep_len)
 {
 	ERROR_ASSERT(sep_len > 0, "strview split separator must be non-empty.");
 	strview_iter *ret = NEW(strview_iter);

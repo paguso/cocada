@@ -115,7 +115,9 @@ strview *strview_new(const char* src);
  * @param src a pointer to the source string
  * @param from The initial position of the substring/offset from the start
  * position of @p src
- * @param to The final position of the substring (not included)
+ * @param to The final position of the substring (not included).
+ *
+ * @warning No bound checks performed. If @p to < @p from, the behaviour is undefined.
  */
 void strview_init_from_range(strview *self, const char* src, size_t from, size_t to);
 
@@ -129,6 +131,8 @@ void strview_init_from_range(strview *self, const char* src, size_t from, size_t
  * @param to The final position of the substring (not included)
  *
  * @return A copy (by value) of a strview representing  `src[from:to]`
+ *
+ * @warning No bound checks performed. If @p to < @p from, the behaviour is undefined.
  *
  * @see strvire_init_from_range
  */
@@ -145,6 +149,8 @@ strview strview_build_from_range(const char* src, size_t from, size_t to);
  * owned references, no specific destructor is needed.
  * A heap-allocated #strview can be disposed of with #FREE .
  *
+ * @warning No bound checks performed. If @p to < @p from, the behaviour is undefined.
+ *
  * @see strview_new_from_range
  * @see FREE
  */
@@ -155,7 +161,20 @@ strview *strview_new_from_range(const char* src, size_t from, size_t to);
  * @brief Creates a new heap-allocated null-terminated C string from
  * a strview
  */
-char *strview_to_new_cstr(strview *self);
+char *strview_to_new_cstr(const strview *self);
+
+
+/**
+ * @brief Creates a new heap-allocated null-terminated C string from
+ * the strview substring `self[from:to]`.
+ *
+ * @param from The initial position of the substring/offset from the start
+ * position of @p self
+ * @param to The final position of the substring (not included)
+ *
+ * @warning No bound checks performed. If @p to < @p from, the behaviour is undefined.
+ */
+char *strview_substr_to_new_cstr(const strview *self, size_t from, size_t to);
 
 
 /**
@@ -168,13 +187,29 @@ char *strview_to_new_cstr(strview *self);
  * @warning @p dest must be large enough to hold the length of @self plus
  * the extra '\0'. Bound checks are not ensured.
  */
-void strview_cpy_to_cstr(strview *self, char *dest);
+void strview_cpy_to_cstr(const strview *self, char *dest);
+
+
+/**
+ * @brief Copies the contents of the string view substring `self[from:to]`
+ * to a char buffer and appends  a null '\0' char.
+ *
+ * @param self The source strview
+ * @param from The initial position of the substring/offset from the start
+ * position of @p self
+ * @param to The final position of the substring (not included)
+ * @param dest The destination buffer
+ *
+ * @warning @p dest must be large enough to hold the length of @self plus
+ * the extra '\0'. Bound checks are not ensured.
+ */
+void strview_substr_cpy_to_cstr(const strview *self, size_t from, size_t to, char *dest);
 
 
 /**
  * @brief Returns the length of th strview.
  */
-size_t strview_len(strview *self);
+size_t strview_len(const strview *self);
 
 
 /**
@@ -196,7 +231,7 @@ int strview_cmp(const void* left, const void *right);
  * @brief Compares the contents of the string view to a raw string
  * for equality.
  */
-bool strview_eq_cstr(strview *self, const char *other);
+bool strview_eq_cstr(const strview *self, const char *other);
 
 
 /**
@@ -206,7 +241,7 @@ bool strview_eq_cstr(strview *self, const char *other);
  * @return true iff the length of the strview is at least @p n and
  * its first @p n positions are equal to those of @p other.
  */
-bool strview_eqn_cstr(strview *self, const char *other, size_t n);
+bool strview_eqn_cstr(const strview *self, const char *other, size_t n);
 
 
 /**
@@ -252,7 +287,7 @@ size_t strview_find_last(const strview *self, const char *substr, size_t len);
  *
  * @note This algorithm runs in O(m+l) time, where m=strlen(pat) and l=strbuf_len(self)-from_pos.
  */
-size_t strview_find_n(strview *self, const char *pat, size_t len, size_t n, size_t *dest);
+size_t strview_find_n(const strview *self, const char *pat, size_t len, size_t n, size_t *dest);
 
 
 /**
@@ -315,16 +350,15 @@ strview strview_iter_next(strview_iter *self);
  * tok =  (len = 0)
  * ```
  *
- * @param self The string view to be tokenised
+ * @param self The string view to be split
  * @param sep The separator string
  * @param sep_len The length of the separator
  *
- * @returns An iterator over the tokens
+ * @returns An iterator over the split tokens
  *
  * @warning The separator must be a non-empty string.
  */
-strview_iter *strview_split(strview *self, const char *sep, size_t sep_len);
-
+strview_iter *strview_split(const strview *self, const char *sep, size_t sep_len);
 
 
 #endif

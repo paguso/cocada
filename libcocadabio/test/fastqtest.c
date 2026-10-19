@@ -53,14 +53,22 @@ static char *seq[4] = {
 	"tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
 };
 
-static char *desc[4] = {
-	"",
+
+static char *id[4] = {
+	"seq0",
 	"seq1",
-	"seq2 short description",
-	"seq3 a very very very very a very very very very a very very very very a very very very very a very very very very a very very very very long sequence"
+	"seq2",
+	"seq3"
 };
 
-static size_t desc_offsets[4] = {-1, -1, -1, -1};
+static char *desc[4] = {
+	"",
+	"",
+	"short description",
+	"a very very very very a very very very very a very very very very a very very very very a very very very very a very very very very long sequence"
+};
+
+static size_t id_offsets[4] = {-1, -1, -1, -1};
 static size_t seq_offsets[4] = {-1, -1, -1, -1};
 static size_t qlty_offsets[4] = {-1, -1, -1, -1};
 
@@ -69,8 +77,12 @@ static void test_setup()
 	FILE *file = fopen(filename, "w");
 	size_t offset = 0;
 	for (size_t i = 0; i < nseq; i++) {
-		desc_offsets[i] = offset;
+		id_offsets[i] = offset;
 		fputc('@', file);
+		offset += 1;
+		fputs(id[i], file);
+		offset += strlen(id[i]);
+		fputc(' ', file);
 		offset += 1;
 		fputs(desc[i], file);
 		offset += strlen(desc[i]);
@@ -112,9 +124,13 @@ void test_fastq_next(CuTest *tc)
 	fastq *f = result.val.ok;
 	size_t i = 0;
 	for (i = 0; fastq_has_next(f); i++) {
-		const fastq_rec *rr = fastq_next(f);
-		//CuAssertSizeTEquals(tc, desc_offsets[i], rr->descr_offset);
-		//CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
+		fastq_next_res res = fastq_next(f);
+		CuAssert(tc, "fastq_next error", res.ok);
+		const fastq_rec *rr = res.val.ok;
+		CuAssertSizeTEquals(tc, id_offsets[i], rr->id_offset);
+		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
+		CuAssertSizeTEquals(tc, qlty_offsets[i], rr->qlty_offset);
+		CuAssertStrEquals(tc, id[i], rr->id);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
 		size_t k = 0;

@@ -146,6 +146,23 @@ char *cstr_resize(char *str, size_t len);
 
 
 /**
+ * @brief Physically reesize the string, if necessary, to ensure
+ * a given capacity.
+ *
+ * @param str The string to be adjusted
+ * @param cap The desired logical capacity
+
+ * @return If @p cap is larger than length of @p str,
+ * the string is enlarged to have physical size @p cap+1,
+ * with trailing positions set to '\0', and a pointer to
+ * the adjusted string is returned. Else @p str is returned.
+ *
+ * @warning The string may be relocated.
+ */
+char *cstr_ensure_capacity(char *str, size_t cap);
+
+
+/**
  * @brief Cuts away the substring @p str[@p from: @p to] from @p str.
  * Example:
  * ```

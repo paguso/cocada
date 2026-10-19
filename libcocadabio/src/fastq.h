@@ -19,8 +19,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
-#ifndef FASTA_H
-#define FASTA_H
+#ifndef FASTQ_H
+#define FASTQ_H
 
 #include <stdbool.h>
 
@@ -45,27 +45,16 @@ typedef struct _fastq fastq;
  * @brief A FASTA record with in-memory sequence
  */
 typedef struct {
-	char *descr;	/**< Sequence descriptor (does not include the `>`) */
-	size_t seq_len;
+	char *id;       /**< Sequence identifier */
+	char *descr;	/**< Sequence description (optional) */
 	char *seq;   	/**< In-memory sequence content */
 	char *qlty;   	/**< In-memory sequence content */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file */
+	size_t seq_len;         /**< The length of the sequence */
+	size_t id_offset;	    /**< Id offset from the start of the file (starting from the @) */
 	size_t seq_offset;		/**< Sequence offset from the start of the file */
 	size_t qlty_offset;		/**< Quality offset from the start of the file */
 } fastq_rec;
 
-
-///*
-// * @brief A FASTA record with sequence loaded as a stream
-// */
-//typedef struct {
-//	char *descr;      	/**< Sequence descriptor */
-//	strread *seqrdr;	/**< Sequence contents reader */
-//	strread *qltyrdr;	/**< Sequence quality reader */
-//	size_t descr_offset;	/**< Descriptor offset from the start of the file */
-//	size_t seq_offset;		/**< Sequence offset from the start of the file */
-//	size_t qlty_offset;		/**< Quality offset from the start of the file */
-//} fastq_rec_rdr;
 
 
 DECL_RESULT_OK_ERR(fastq_open, fastq*, code_msg_err)
@@ -103,32 +92,26 @@ bool fastq_has_next(fastq *self);
 void fastq_rewind(fastq *self);
 
 
-///**
-// * @brief Advances the cursor to the next sequence record, and loads
-// * it as a stream.
-// * The returned strread reader is a virtual stream that points to the
-// * beginning of the sequence contents inside the file, and is used
-// * to read these contents as if they were in a separate stream,
-// * ignoring line breaks. EOF is reached at the end of the sequence.
-// *
-// * Example
-// * -------
-// *
-// * ```C
-// * fasta *fr = fasta_open("teste.fa");
-// * while(fasta_has_next(fr)) {
-// *  fasta_rec_rdr rec = fasta_next_reader(fr);
-// *  for (xchar c; (c=strread_getc(rec->seqrdr)) != EOF;) {
-// *      //do something with c
-// *  }
-// * }
-// * ```
-// * @warning The returned record reader object contains internal references and
-// * should *not* be modified or destroyed directly.
-// * @see strread
-// */
-//const fastq_rec_rdr *fastq_next_reader(fastq *self);
+typedef enum {
+	FASTQ_EXPECTED_AT,
+	FASTQ_EMPTY_ID,
+	FASTQ_EMPTY_SEQUENCE,
+	FASTQ_EXPECTED_PLUS,
+	FASTQ_WRONG_QLTY_SEQUENCE_LENGTH
+}
+fastq_error_code;
 
+
+extern const char *const fastq_error_messages[5];
+
+
+typedef struct {
+	fastq_error_code err_code;
+	size_t line_no;
+} fastq_error;
+
+
+DECL_RESULT_OK_ERR(fastq_next, const fastq_rec *, fastq_error)
 
 /**
  * @brief Advances the cursor to the next sequence record, loading
@@ -147,7 +130,7 @@ void fastq_rewind(fastq *self);
  * @warning The returned record object should *not* be modified or
  * destroyed directly.
  */
-const fastq_rec *fastq_next(fastq *self);
+fastq_next_res fastq_next(fastq *self);
 
 
 /**

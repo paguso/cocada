@@ -151,6 +151,7 @@ static bool _eof(strread *self)
 	return feof(((strfilereader *)self->impltor)->src);
 }
 
+
 static strread_vt _strread_vt  = {
 	.getc = _getc,
 	.peek = _peek,
