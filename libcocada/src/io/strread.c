@@ -77,10 +77,3 @@ size_t strread_read_strbuf_until(strread *self, strbuf *dest, char delim)
 	return self->vt->read_strbuf_until(self, dest, delim);
 }
 
-
-bool strread_eof(strread *self)
-{
-	return self->vt->eof(self);
-}
-
-

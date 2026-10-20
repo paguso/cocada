@@ -86,7 +86,6 @@ int strread_getc(strread *self);
  *
  * @return The next character as an int, or EOF if the stream has
  *          reached its end.
- *
  */
 int strread_peek(strread *self);
 
@@ -117,10 +116,14 @@ size_t strread_read_strbuf(strread *self, strbuf *dest);
 size_t strread_read_str_until(strread *self, char *dest, char delim);
 
 
+/**
+ * @brief Attempts to read the next chars into the the string buffer
+ * 		  @p dest until the next occurrence of the delimiter @p delim is found,
+ * 		  or the end of the stream is reached.
+ * @return The number of chars actually read.
+ */
 size_t strread_read_strbuf_until(strread *self, strbuf *dest, char delim);
 
-
-bool strread_eof(strread *self);
 
 
 #endif

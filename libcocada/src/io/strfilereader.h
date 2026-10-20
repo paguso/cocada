@@ -74,12 +74,22 @@ strfilereader *strfilereader_new_from_path(const char *path);
 
 
 /**
+ * @brief Moves to a given offset (in bytes) relative to the
+ * beginning of the stream.
+ *
+ * @param offset The desired offset from the beginning of the file
+ *
+ * @return true on success, false on failure.
+ */
+bool strfilereader_goto(strfilereader *self, size_t offset);
+
+
+/**
  * @brief Destructor. If the reader was created with #strfilereader_new,
  * the underlying stream is not closed. If the reader was created with the
  * #strfilereader_new_from_path constructor, the stream is closed.
  */
 void strfilereader_free(strfilereader *self);
-
 
 
 #endif

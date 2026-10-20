@@ -192,6 +192,11 @@ strfilereader *strfilereader_new(FILE *stream)
 }
 
 
+bool strfilereader_goto(strfilereader *self, size_t offset)
+{
+	return fseek(self->src, offset, SEEK_SET) == 0;
+}
+
 
 void strfilereader_free(strfilereader *self)
 {

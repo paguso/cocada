@@ -119,15 +119,15 @@ void test_fastq_next(CuTest *tc)
 	memdbg_reset();
 	test_setup();
 
-	fastq_open_res result = fastq_open(filename);
-	CuAssert(tc, "Error opening fasta", result.ok);
-	fastq *f = result.val.ok;
+	fastq_open_res r = fastq_open(filename);
+	CuAssert(tc, "Error opening fasta", r.ok);
+	fastq *f = r.val.ok;
 	size_t i = 0;
 	for (i = 0; fastq_has_next(f); i++) {
-		fastq_next_res res = fastq_next(f);
-		CuAssert(tc, "fastq_next error", res.ok);
-		const fastq_rec *rr = res.val.ok;
-		CuAssertSizeTEquals(tc, id_offsets[i], rr->id_offset);
+		fastq_next_res r = fastq_next(f);
+		CuAssert(tc, "fastq_next error", r.ok);
+		const fastq_rec *rr = r.val.ok;
+		CuAssertSizeTEquals(tc, id_offsets[i], rr->hdr_offset);
 		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
 		CuAssertSizeTEquals(tc, qlty_offsets[i], rr->qlty_offset);
 		CuAssertStrEquals(tc, id[i], rr->id);

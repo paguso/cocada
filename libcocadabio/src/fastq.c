@@ -39,7 +39,7 @@
 
 
 const char *const fastq_error_messages[5] = {
-	"Expected field 1 starter @",
+	"Expected header starter @",
 	"Empty record id",
 	"Empty sequence",
 	"Expected quality field separator +",
@@ -77,7 +77,7 @@ fastq_open_res fastq_open(const char *filename)
 	f->cur_line = 1;
 	f->cur_offset = 0;
 	f->cur_rec = (fastq_rec) {
-		.id=NULL, .descr=NULL, .seq=NULL, .qlty=NULL, .seq_len = 0, .id_offset=0, .seq_offset=0, .qlty_offset=0
+		.id=NULL, .descr=NULL, .seq=NULL, .qlty=NULL, .seq_len = 0, .hdr_offset=0, .seq_offset=0, .qlty_offset=0
 	};
 	goto SUCCESS;
 ERROR:
@@ -94,20 +94,6 @@ const char *fastq_path(fastq *self)
 {
 	return self->src_path;
 }
-
-
-//static bool _goto_next(fastq *self)
-//{
-//	int c;
-//	strread *rdr = strfilereader_as_strread(self->freader);
-//	while (!strread_eof(rdr)) {
-//		if ((c = (strread_getc(rdr))) == '@') {
-//			ungetc(c, self->src);
-//			return true;
-//		}
-//	}
-//	return false;
-//}
 
 
 bool fastq_has_next(fastq *self)
@@ -152,15 +138,15 @@ fastq_next_res fastq_next(fastq *self)
 	strread *reader = strfilereader_as_strread(self->freader);
 
 	// load description
-	self->cur_rec.id_offset = self->cur_offset;
+	self->cur_rec.hdr_offset = self->cur_offset;
 	strbuf_clear(self->linebuf);
 	self->cur_offset += strread_read_strbuf(reader, self->linebuf);
 	self->cur_line++;
 	WARN_ASSERT(strbuf_get(self->linebuf, 0) == '@',
 	            "Expected '@' at line %ld of %s.\n", self->cur_line, self->src_path);
-	if (strbuf_get(self->linebuf, 0) != '@') {
+	if (strbuf_len(self->linebuf) == 0 || strbuf_get(self->linebuf, 0) != '@') {
 		return (fastq_next_res) {
-			.ok = false, .val.err = {.err_code = FASTQ_EXPECTED_AT, .line_no = self->cur_line }
+			.ok = false, .val.err = {.code = FASTQ_EXPECTED_HEADER, .line = self->cur_line }
 		};
 	}
 	strbuf_clip(self->linebuf, 1, strbuf_len(self->linebuf));
@@ -173,7 +159,7 @@ fastq_next_res fastq_next(fastq *self)
 	            "Empty sequence identifier at line %ld of %s.\n", self->cur_line, self->src_path);
 	if (id_len == 0) {
 		return (fastq_next_res) {
-			.ok = false, .val.err = {.err_code = FASTQ_EMPTY_ID, .line_no = self->cur_line }
+			.ok = false, .val.err = {.code = FASTQ_EMPTY_ID, .line = self->cur_line }
 		};
 	}
 	strview_cpy_to_cstr(&id_sv, self->cur_rec.id);
@@ -198,7 +184,7 @@ fastq_next_res fastq_next(fastq *self)
 	            "Empty sequence at line %ld of %s.\n", self->cur_line, self->src_path);
 	if (strbuf_len(self->seqbuf) == 0) {
 		return (fastq_next_res) {
-			.ok = false, .val.err = {.err_code = FASTQ_EMPTY_SEQUENCE, .line_no = self->cur_line }
+			.ok = false, .val.err = {.code = FASTQ_EMPTY_SEQUENCE, .line = self->cur_line }
 		};
 	}
 	self->cur_rec.seq_len = strbuf_len(self->seqbuf);
@@ -207,7 +193,7 @@ fastq_next_res fastq_next(fastq *self)
 	            "Expected '+' at line %ld of %s.\n", self->cur_line, self->src_path);
 	if (strbuf_get(self->linebuf, 0) != '+') {
 		return (fastq_next_res) {
-			.ok = false, .val.err = {.err_code = FASTQ_EXPECTED_PLUS, .line_no = self->cur_line }
+			.ok = false, .val.err = {.code = FASTQ_EXPECTED_SEPARATOR, .line = self->cur_line }
 		};
 	}
 	strbuf_clip(self->linebuf, 1, strbuf_len(self->linebuf));
@@ -215,7 +201,8 @@ fastq_next_res fastq_next(fastq *self)
 	// load qualities
 	self->cur_rec.qlty_offset = self->cur_offset;
 	strbuf_clear(self->seqbuf);
-	while (!strread_eof(reader) && strbuf_len(self->seqbuf) < self->cur_rec.seq_len) {
+	int c;
+	while ((c=strread_peek(reader))!=EOF && c != '@') {
 		strbuf_clear(self->linebuf);
 		self->cur_offset += strread_read_strbuf(reader, self->linebuf);
 		self->cur_line++;
@@ -225,7 +212,7 @@ fastq_next_res fastq_next(fastq *self)
 	WARN_ASSERT(strbuf_len(self->seqbuf) == self->cur_rec.seq_len, "Wrong quality sequence length. Expected %zu != Actual %zu\n", self->cur_rec.seq_len, strbuf_len(self->seqbuf));
 	if (strbuf_len(self->seqbuf) != self->cur_rec.seq_len) {
 		return (fastq_next_res) {
-			.ok = false, .val.err = {.err_code = FASTQ_WRONG_QLTY_SEQUENCE_LENGTH, .line_no = self->cur_line }
+			.ok = false, .val.err = {.code = FASTQ_WRONG_QLTY_SEQUENCE_LENGTH, .line = self->cur_line }
 		};
 	}
 	self->cur_rec.qlty  = cstr_reassign(self->cur_rec.qlty, strbuf_as_str(self->seqbuf));
@@ -235,41 +222,6 @@ fastq_next_res fastq_next(fastq *self)
 	};
 }
 
-
-// const fastq_rec_rdr *fastq_next_reader(fastq *self)
-// {
-// 	if (!_goto_next(self)) {
-// 		return NULL;
-// 	}
-// 	// load description
-// 	self->cur_rec_rd.descr_offset = ftell(self->src);
-// 	ERROR_ASSERT(fgetc(self->src) == '>',
-// 	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset,
-// 	             self->src_path );
-// 	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
-// 	size_t l = 0;
-// 	bool eol = false;
-// 	while (!eol) {
-// 		if (self->cur_rec_rd_len[0] == l) {
-// 			self->cur_rec_rd_len[0] *= 1.66f;
-// 			//(size_t)(1.66f * self->cur_rec_rd_len[0]);
-// 			self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr,
-// 			                                     self->cur_rec_rd_len[0]);
-// 		}
-// 		fgets(self->cur_rec_rd.descr + l, self->cur_rec_rd_len[0] - l + 1, self->src);
-// 		l = strlen(self->cur_rec_rd.descr);
-// 		while (self->cur_rec_rd.descr[l - 1] == '\n'
-// 		        || self->cur_rec_rd.descr[l - 1] == '\r') {
-// 			self->cur_rec_rd.descr[--l] = '\0';
-// 			eol = true;
-// 		}
-// 	}
-// 	// load sequence reader
-// 	self->cur_rec_rd.seq_offset = ftell(self->src);
-// 	self->rd.file_pos = ftell(self->src);
-// 	return &(self->cur_rec_rd);
-// }
-//
 
 void fastq_close(fastq *self)
 {

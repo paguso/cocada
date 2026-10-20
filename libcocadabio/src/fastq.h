@@ -36,23 +36,23 @@
 
 
 /**
- * @brief FASTA file/stream type.
+ * @brief FASTQ file/stream reader type.
  */
 typedef struct _fastq fastq;
 
 
 /**
- * @brief A FASTA record with in-memory sequence
+ * @brief A FASTQ record with in-memory sequence
  */
 typedef struct {
-	char *id;       /**< Sequence identifier */
-	char *descr;	/**< Sequence description (optional) */
-	char *seq;   	/**< In-memory sequence content */
-	char *qlty;   	/**< In-memory sequence content */
-	size_t seq_len;         /**< The length of the sequence */
-	size_t id_offset;	    /**< Id offset from the start of the file (starting from the @) */
-	size_t seq_offset;		/**< Sequence offset from the start of the file */
-	size_t qlty_offset;		/**< Quality offset from the start of the file */
+	char *id;			/**< Sequence identifier */
+	char *descr;		/**< Sequence description (optional) */
+	char *seq;			/**< In-memory sequence content */
+	char *qlty;   		/**< In-memory sequence content */
+	size_t seq_len;		/**< The length of the sequence */
+	size_t hdr_offset;	/**< Id offset from the start of the file (starting from the @) */
+	size_t seq_offset;	/**< Sequence offset from the start of the file */
+	size_t qlty_offset;	/**< Quality offset from the start of the file */
 } fastq_rec;
 
 
@@ -92,22 +92,33 @@ bool fastq_has_next(fastq *self);
 void fastq_rewind(fastq *self);
 
 
+/**
+ * @brief FASTQ Parse error codes
+ */
 typedef enum {
-	FASTQ_EXPECTED_AT,
+	FASTQ_EXPECTED_HEADER,
 	FASTQ_EMPTY_ID,
 	FASTQ_EMPTY_SEQUENCE,
-	FASTQ_EXPECTED_PLUS,
+	FASTQ_EXPECTED_SEPARATOR,
 	FASTQ_WRONG_QLTY_SEQUENCE_LENGTH
 }
 fastq_error_code;
 
 
+/**
+ * @brief Error messages corresponding to the parse error codes.
+ *
+ * @see fastq_error_code
+ */
 extern const char *const fastq_error_messages[5];
 
 
+/**
+ * @brief Fastq parse error
+ */
 typedef struct {
-	fastq_error_code err_code;
-	size_t line_no;
+	fastq_error_code code; /**< The error code **/
+	size_t line;		   /**< The line at which the error occurs */
 } fastq_error;
 
 
@@ -119,14 +130,22 @@ DECL_RESULT_OK_ERR(fastq_next, const fastq_rec *, fastq_error)
  *
  * Example
  * -------
- *
  * ```C
- * fasta *fr = fasta_open("teste.fa");
- * while(fasta_has_next(fr)) {
- *  fasta_rec rec = fasta_next(fr);
- * 	printf("sequence is %s\n",rec->seq);
+ * fastq_open_res r = fastq_open(filename);
+ * if (!r.ok) //... treat error and exit
+ * fastq *f = r.val.ok;
+ * while (fastq_has_next(f)) {
+ * 	fastq_next_res r = fastq_next(f);
+ * 	if (!r.ok) {
+ * 		fprintf(stderr, fasta_error_messages[r.val.err.code]);
+ * 		// abort
+ * 	}
+ * 	const fastq_rec *rec = r.val.ok;
+ * 	// do something with the record
  * }
+ * fastq_close(f);
  * ```
+ *
  * @warning The returned record object should *not* be modified or
  * destroyed directly.
  */

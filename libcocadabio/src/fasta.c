@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -29,116 +30,28 @@
 #include "cstrutil.h"
 #include "fasta.h"
 #include "new.h"
+#include "strbuf.h"
+#include "strfilereader.h"
 #include "strread.h"
+#include "strview.h"
 #include "trait.h"
 #include "errlog.h"
 
-typedef struct _fastaread {
-	strread _t_strread;
-	FILE *src;
-	size_t file_pos;
-} fastaread;
 
-
-IMPL_TRAIT(fastaread, strread)
-
-
-static void _reset(strread *self)
-{
-	fastaread *fr = (fastaread *)self->impltor;
-	fseek(fr->src, fr->file_pos, SEEK_SET);
-}
-
-
-static int _getc(strread *self)
-{
-	fastaread *fr = (fastaread *)self->impltor;
-	int c;
-	while (true) {
-		c = fgetc(fr->src);
-		if (c == '>') {
-			ungetc(c, fr->src);
-			c = EOF;
-			break;
-		} else if (c == '\n' || c == '\r') {
-			continue;
-		} else {
-			break;
-		}
-	}
-	return c;
-}
-
-
-static size_t _read_str(strread *self, char *dest, size_t n)
-{
-	FILE *src = ((fastaread *)self->impltor)->src;
-	char *origdest = dest;
-	memset(dest, '\0', n + 1);
-	while ( !feof(src) && n > 0 ) {
-		fgets(dest, n + 1, src);
-		size_t l = strlen(dest);
-		if (dest[0] == '>') {
-			memset(dest, '\0', l );
-			break;
-		}
-		while (l > 0 && ( dest[l - 1] == '\n' || dest[l - 1] == '\r' )) {
-			dest[l - 1] = '\0';
-			l--;
-		}
-		dest += l;
-		n -= l;
-	}
-	return dest - origdest;
-}
-
-
-static size_t _read_str_until(strread *self, char *dest, char delim)
-{
-	FILE *src = ((fastaread *)self->impltor)->src;
-	size_t nread = 0;
-	char c;
-	while ( !feof(src) ) {
-		c = fgetc(src);
-		if ( c == delim || c == '>' ) {
-			ungetc(c, src);
-			break;
-		} else if ( c == '\n' || c == '\r' ) {
-			continue;
-		}
-		dest[nread++] = c;
-	}
-	dest[nread] = '\0';
-	return nread;
-}
-
-
-static strread_vt _strread_vt  = {
-	.getc = _getc,
-	.read_str = _read_str,
-	.read_str_until = _read_str_until,
-	.reset = _reset,
+const char *const fasta_error_messages[3] = {
+	"Expected record header start >",
+	"Empty record id",
+	"Empty sequence",
 };
 
-
-static void _fastaread_init(fastaread *fr, FILE *src)
-{
-
-	fr->src = src;
-	fr->_t_strread.impltor = fr;
-	fr->_t_strread.vt = &_strread_vt;
-}
-
-
-
 struct _fasta {
-	FILE *src;
-	char *src_path;
-	fasta_rec cur_rec;
-	size_t cur_rec_len[2];
-	fastaread rd;
-	fasta_rec_rdr cur_rec_rd;
-	size_t cur_rec_rd_len[2];
+	char *path;
+	strfilereader *freader;
+	//size_t cur_line;
+	size_t offset;
+	strbuf *linebuf;
+	strbuf *seqbuf;
+	fasta_rec record;
 };
 
 
@@ -146,23 +59,24 @@ fasta_open_res fasta_open(const char *filename)
 {
 	fasta_open_res result = {.ok = true};
 	fasta *f = NEW(fasta);
-	f->src = fopen(filename, "r");
-	if (errno) {
-		fprintf(stderr, "Error opening FASTA '%s'.\n", filename);
+	f->freader = strfilereader_new_from_path(filename);
+	if (!f->freader) {
 		result.ok = false;
-		result.val.err = (code_msg_err) {
-			.code = errno, .msg = strerror(errno)
-		};
+		if (errno) {
+			result.val.err = (code_msg_err) {
+				.code = errno, .msg = strerror(errno)
+			};
+		}
 		goto ERROR;
 	}
-	f->src_path = cstr_clone(filename);
-	_fastaread_init(&(f->rd), f->src);
-	f->cur_rec_len[0] = f->cur_rec_len[1] = 100;
-	f->cur_rec_rd_len[0] = f->cur_rec_rd_len[1] = 100;
-	f->cur_rec.descr = cstr_new(f->cur_rec_len[0]);
-	f->cur_rec.seq = cstr_new(f->cur_rec_len[1]);
-	f->cur_rec_rd.descr = cstr_new(f->cur_rec_rd_len[0]);
-	f->cur_rec_rd.seqrdr = fastaread_as_strread(&(f->rd));
+	f->path = cstr_clone(filename);
+	f->linebuf = strbuf_new();
+	f->seqbuf = strbuf_new();
+	//f->cur_line = 1;
+	f->offset = 0;
+	f->record = (fasta_rec) {
+		.id=NULL, .descr=NULL, .seq=NULL, .seq_len = 0, .hdr_offset=0, .seq_offset=0
+	};
 	goto SUCCESS;
 ERROR:
 	FREE(f);
@@ -176,137 +90,122 @@ SUCCESS:
 
 const char *fasta_path(fasta *self)
 {
-	return self->src_path;
+	return self->path;
 }
 
 
-static bool _goto_next(fasta *self)
+bool fasta_has_next(fasta *self)
 {
+	strread *reader = strfilereader_as_strread(self->freader);
 	int c;
-	while (!feof(self->src)) {
-		if ((c = fgetc(self->src)) == '>') {
-			ungetc(c, self->src);
+	while ((c = strread_peek(reader)) != EOF) {
+		if (c == '\n') {
+			c = strread_getc(reader);
+			self->offset++;
+			//self->cur_line++;
+		} else if (isspace(c)) {
+			c = strread_getc(reader);
+			self->offset++;
+		} else if (c == '>') {
 			return true;
+		} else {
+			ERROR_ASSERT(false, "Unexpected char at offset %zu of fasta file %s: expected '>' but found %c\n", self->offset, self->path, c);
 		}
 	}
 	return false;
 }
 
 
-bool fasta_has_next(fasta *self)
-{
-	long cur = ftell(self->src);
-	bool ret = _goto_next(self);
-	fseek(self->src, cur, SEEK_SET);
-	return ret;
-}
-
-
-bool fasta_goto(fasta *self, size_t descr_offset)
-{
-	return ((fseek(self->src, descr_offset, SEEK_SET) == 0) &&
-	        _goto_next(self));
-}
-
-
 void fasta_rewind(fasta *self)
 {
-	rewind(self->src);
+	strread_reset(strfilereader_as_strread(self->freader));
+	self->offset = 0;
 }
 
 
-const fasta_rec *fasta_next(fasta *self)
+bool fasta_goto(fasta *self, size_t offset)
 {
-	if (!_goto_next(self)) {
-		return NULL;
+	if (strfilereader_goto(self->freader, offset) &&
+	        strread_peek(strfilereader_as_strread(self->freader)) == '>') {
+		self->offset = offset;
+		return true;
+	} else {
+		fasta_rewind(self);
+		return false;
 	}
+}
+
+
+fasta_next_res fasta_next(fasta *self)
+{
+	strread *reader = strfilereader_as_strread(self->freader);
+
 	// load description
-	self->cur_rec.descr_offset = ftell(self->src);
-	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", self->cur_rec.descr_offset,
-	             self->src_path );
-	cstr_clear(self->cur_rec.descr, self->cur_rec_len[0]);
-	size_t l = 0;
-	bool eol = false;
-	while (!eol) {
-		if (self->cur_rec_len[0] == l) {
-			self->cur_rec_len[0] *= 1.66f;
-			self->cur_rec.descr = cstr_resize(self->cur_rec.descr, self->cur_rec_len[0]);
-		}
-		fgets(self->cur_rec.descr + l, self->cur_rec_len[0] - l + 1, self->src);
-		l = strlen(self->cur_rec.descr);
-		while (self->cur_rec.descr[l - 1] == '\n'
-		        || self->cur_rec.descr[l - 1] == '\r') {
-			self->cur_rec.descr[--l] = '\0';
-			eol = true;
-		}
+	//self->cur_rec.line = self->cur_line;
+	self->record.hdr_offset = self->offset;
+	strbuf_clear(self->linebuf);
+	self->offset += strread_read_strbuf(reader, self->linebuf);
+	//self->cur_line++;
+	WARN_ASSERT(strbuf_get(self->linebuf, 0) == '>',
+	            "Expected header start '>' at offset  %zu of %s.\n", self->offset, self->path);
+	if (strbuf_len(self->linebuf) == 0 || strbuf_get(self->linebuf, 0) != '>') {
+		return (fasta_next_res) {
+			.ok = false, .val.err = {.code = FASTA_EXPECTED_HEADER, .offset = self->record.hdr_offset }
+		};
 	}
+	strbuf_clip(self->linebuf, 1, strbuf_len(self->linebuf));
+	strbuf_trim(self->linebuf);
+	strview line_sv = strbuf_as_strview(self->linebuf);
+	size_t id_len = strview_find(&line_sv, " ", 1);
+	strview id_sv = strview_substr(&line_sv, 0, id_len);
+	self->record.id = cstr_ensure_capacity(self->record.id, id_len);
+	WARN_ASSERT(id_len > 0,
+	            "Empty sequence identifier at offset %ld of %s.\n", self->offset, self->path);
+	if (id_len == 0) {
+		return (fasta_next_res) {
+			.ok = false, .val.err = {.code = FASTA_EMPTY_ID, .offset = self->offset }
+		};
+	}
+	strview_cpy_to_cstr(&id_sv, self->record.id);
+	strbuf_clip(self->linebuf, id_len, strbuf_len(self->linebuf));
+	strbuf_trim(self->linebuf);
+	self->record.descr = cstr_reassign(self->record.descr, strbuf_as_str(self->linebuf));
+
 	// load sequence
-	self->cur_rec.seq_offset = ftell(self->src);
-	cstr_clear(self->cur_rec.seq, self->cur_rec_len[1]);
-	l = 0;
-	while ( !feof(self->src) ) {
-		if (self->cur_rec_len[1] == l) {
-			self->cur_rec_len[1] *= 1.66f;
-			//(size_t)(1.66f * self->cur_rec_len[1]);
-			self->cur_rec.seq = cstr_resize(self->cur_rec.seq, self->cur_rec_len[1]);
-		}
-		fgets(self->cur_rec.seq + l, self->cur_rec_len[1] - l + 1, self->src);
-		if (self->cur_rec.seq[l] == '>') {
-			fseek(self->src, l - strlen(self->cur_rec.seq), SEEK_CUR);
-			self->cur_rec.seq[l] = '\0';
-			break;
-		}
-		l = strlen(self->cur_rec.seq);
-		while (self->cur_rec.seq[l - 1] == '\n' || self->cur_rec.seq[l - 1] == '\r') {
-			self->cur_rec.seq[--l] = '\0';
-		}
+	self->record.seq_offset = self->offset;
+	strbuf_clear(self->seqbuf);
+	int c;
+	while ((c=strread_peek(reader))!=EOF && c != '>') {
+		strbuf_clear(self->linebuf);
+		self->offset += strread_read_strbuf(reader, self->linebuf);
+		//self->cur_line++;
+		strbuf_trim(self->linebuf);
+		strbuf_cat(self->seqbuf, self->linebuf);
 	}
-	return &(self->cur_rec);
-}
+	WARN_ASSERT(strbuf_len(self->seqbuf) > 0,
+	            "Empty sequence at offset %ld of %s.\n", self->offset, self->path);
+	if (strbuf_len(self->seqbuf) == 0) {
+		return (fasta_next_res) {
+			.ok = false, .val.err = {.code = FASTA_EMPTY_SEQUENCE, .offset = self->offset }
+		};
+	}
+	self->record.seq_len = strbuf_len(self->seqbuf);
+	self->record.seq  = cstr_reassign(self->record.seq, strbuf_as_str(self->seqbuf));
 
-
-const fasta_rec_rdr *fasta_next_reader(fasta *self)
-{
-	if (!_goto_next(self)) {
-		return NULL;
-	}
-	// load description
-	self->cur_rec_rd.descr_offset = ftell(self->src);
-	ERROR_ASSERT(fgetc(self->src) == '>',
-	             "Expected '>' at position %ld of %s.\n", self->cur_rec_rd.descr_offset,
-	             self->src_path );
-	cstr_clear(self->cur_rec_rd.descr, self->cur_rec_rd_len[0]);
-	size_t l = 0;
-	bool eol = false;
-	while (!eol) {
-		if (self->cur_rec_rd_len[0] == l) {
-			self->cur_rec_rd_len[0] *= 1.66f;
-			//(size_t)(1.66f * self->cur_rec_rd_len[0]);
-			self->cur_rec_rd.descr = cstr_resize(self->cur_rec_rd.descr,
-			                                     self->cur_rec_rd_len[0]);
-		}
-		fgets(self->cur_rec_rd.descr + l, self->cur_rec_rd_len[0] - l + 1, self->src);
-		l = strlen(self->cur_rec_rd.descr);
-		while (self->cur_rec_rd.descr[l - 1] == '\n'
-		        || self->cur_rec_rd.descr[l - 1] == '\r') {
-			self->cur_rec_rd.descr[--l] = '\0';
-			eol = true;
-		}
-	}
-	// load sequence reader
-	self->cur_rec_rd.seq_offset = ftell(self->src);
-	self->rd.file_pos = ftell(self->src);
-	return &(self->cur_rec_rd);
+	return (fasta_next_res) {
+		.ok = true, .val.ok = &(self->record)
+	};
 }
 
 
 void fasta_close(fasta *self)
 {
-	fclose(self->src);
-	FREE(self->src_path);
-	FREE(self->cur_rec.descr);
-	FREE(self->cur_rec.seq);
-	FREE(self->cur_rec_rd.descr);
+	FREE(self->path);
+	strfilereader_free(self->freader);
+	strbuf_free(self->linebuf);
+	strbuf_free(self->seqbuf);
+	FREE(self->record.id);
+	FREE(self->record.descr);
+	FREE(self->record.seq);
 	FREE(self);
 }

@@ -32,18 +32,16 @@
  * @author Paulo Fonseca
  *
  * A FASTA file is a plain text sequence of *records*, each consisting
- * of *description* and the *sequence itself*.
- * The `fasta` reader provides a way to iterate through the records
+ * of a *header*, with a *sequence id*  and optional *description*,
+ * and the *sequence itself*.
+ *
+ * The #fasta reader provides a way to iterate through the records
  * defined in a FASTA-format file.
- * During the iteration, each sequence can *either* be entirely loaded to
- * memory as a string, or be treated as a char input stream with a
- * buffered string reader (#strread), which avoids having to load
- * potentially large sequences fully into memory.
  */
 
 
 /**
- * @brief FASTA file/stream type.
+ * @brief FASTA file/stream reader.
  */
 typedef struct _fasta fasta;
 
@@ -52,27 +50,17 @@ typedef struct _fasta fasta;
  * @brief A FASTA record with in-memory sequence
  */
 typedef struct {
-	char *descr;	/**< Sequence descriptor (does not include the `>`) */
-	char *seq;   	/**< In-memory sequence content */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file */
-	size_t seq_offset;		/**< Sequence offset from the start of the file */
+	char *id;      			 /**< Sequence id (mandatory) */
+	char *descr;			 /**< Sequence description (optional) */
+	char *seq;   			 /**< In-memory sequence content */
+	size_t seq_len; 		 /**< Sequence length */
+	size_t hdr_offset;		 /**< Header offset from the start of the file */
+	size_t seq_offset;		 /**< Sequence offset from the start of the file */
 } fasta_rec;
-
-
-/**
- * @brief A FASTA record with sequence loaded as a stream
- */
-typedef struct {
-	char *descr;      	/**< Sequence descriptor */
-	strread *seqrdr;	/**< Sequence contents reader */
-	size_t descr_offset;	/**< Descriptor offset from the start of the file */
-	size_t seq_offset;		/**< Sequence offset from the start of the file */
-} fasta_rec_rdr;
 
 
 
 DECL_RESULT_OK_ERR(fasta_open, fasta*, code_msg_err)
-
 
 /**
  * @brief Opens a FASTA file and places the cursor at its beginning.
@@ -100,12 +88,17 @@ bool fasta_has_next(fasta *self);
 
 
 /**
- * @brief Moves the stream to the sequence at the given description offset
- * @p descr_offset.
+ * @brief Moves the stream to the sequence at the given  offset
  *
- * @return true on success, false on fail.
+ * @param id_offset The offset of the description line of the record
+ * starting with '>'
+ * @param line The line number (1-based) corresponding to this offset
+ *
+ * @return If the operation succeeds and the offset position
+ * contains a record start char '>', return true; else rewinds to
+ * the beginning of the file via #fasta_rewind and return false.
  */
-bool fasta_goto(fasta *self, size_t descr_offset);
+bool fasta_goto(fasta *self, size_t id_offset);
 
 
 /**
@@ -114,31 +107,35 @@ bool fasta_goto(fasta *self, size_t descr_offset);
 void fasta_rewind(fasta *self);
 
 
+
 /**
- * @brief Advances the cursor to the next sequence record, and loads
- * it as a stream.
- * The returned strread reader is a virtual stream that points to the
- * beginning of the sequence contents inside the file, and is used
- * to read these contents as if they were in a separate stream,
- * ignoring line breaks. EOF is reached at the end of the sequence.
- *
- * Example
- * -------
- *
- * ```C
- * fasta *fr = fasta_open("teste.fa");
- * while(fasta_has_next(fr)) {
- *  fasta_rec_rdr rec = fasta_next_reader(fr);
- *  for (xchar c; (c=strread_getc(rec->seqrdr)) != EOF;) {
- *      //do something with c
- *  }
- * }
- * ```
- * @warning The returned record reader object contains internal references and
- * should *not* be modified or destroyed directly.
- * @see strread
+ * @brief FASTA Parse error codes
  */
-const fasta_rec_rdr *fasta_next_reader(fasta *self);
+typedef enum {
+	FASTA_EXPECTED_HEADER,
+	FASTA_EMPTY_ID,
+	FASTA_EMPTY_SEQUENCE,
+}
+fasta_error_code;
+
+/**
+ * @brief Error messages corresponding to the parse error codes.
+ *
+ * @see fasta_error_code
+ */
+extern const char *const fasta_error_messages[3];
+
+
+/**
+ * @brief Fasta parse error
+ */
+typedef struct {
+	fasta_error_code code;  /**< The error code **/
+	size_t offset;          /**< The file offset at which the error occurs */
+} fasta_error;
+
+
+DECL_RESULT_OK_ERR(fasta_next, const fasta_rec *, fasta_error)
 
 
 /**
@@ -149,16 +146,24 @@ const fasta_rec_rdr *fasta_next_reader(fasta *self);
  * -------
  *
  * ```C
- * fasta *fr = fasta_open("teste.fa");
- * while(fasta_has_next(fr)) {
- *  fasta_rec rec = fasta_next(fr);
- * 	printf("sequence is %s\n",rec->seq);
+ * fasta_open_res r = fasta_open(filename);
+ * if (!r.ok) //... treat error and exit
+ * fasta *f = r.val.ok;
+ * while (fasta_has_next(f)) {
+ * 	fasta_next_res r = fasta_next(f);
+ * 	if (!r.ok) {
+ * 		fprintf(stderr, fasta_error_messages[r.val.err.code]);
+ * 		// abort
+ * 	}
+ * 	const fasta_rec *rec = r.val.ok;
+ * 	// do something with the record
  * }
+ * fasta_close(f);
  * ```
  * @warning The returned record object should *not* be modified or
  * destroyed directly.
  */
-const fasta_rec *fasta_next(fasta *self);
+fasta_next_res fasta_next(fasta *self);
 
 
 /**
