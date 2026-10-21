@@ -320,8 +320,9 @@ static const cdparam *find_param(const cddoc *doc, const char *name)
 }
 
 
+// An undocumented parameter is listed by name only, unless pedantic
 static void append_param(strbuf *out, const char *name, const cdparam *p, const cdfile *f,
-                         const cdsymtab *tab)
+                         const cdsymtab *tab, bool pedantic)
 {
 	strbuf_append(out, "- `");
 	strbuf_append(out, name);
@@ -329,11 +330,11 @@ static void append_param(strbuf *out, const char *name, const cdparam *p, const 
 	if (p && p->move) {
 		strbuf_append(out, " **(moved)**");
 	}
-	strbuf_append(out, ": ");
 	if (p && p->desc[0]) {
+		strbuf_append(out, ": ");
 		append_text(out, p->desc, f, tab, 0, "  ");
-	} else {
-		strbuf_append(out, "*undocumented*");
+	} else if (pedantic) {
+		strbuf_append(out, ": *undocumented*");
 	}
 	strbuf_append_char(out, '\n');
 }
@@ -370,9 +371,10 @@ static void append_brief(strbuf *out, const cddoc *doc, const cdfile *f, const c
 
 
 // The documentation of a declaration (or file comment, if d is NULL),
-// except its brief
+// except its brief. Undocumented parameters and return values are marked
+// as such only if pedantic.
 static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cdfile *f,
-                        const cdsymtab *tab, int shift)
+                        const cdsymtab *tab, int shift, bool pedantic)
 {
 	if (!doc) {
 		return;
@@ -390,7 +392,7 @@ static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cd
 			strbuf_append(out, "**Parameters**\n\n");
 			for (size_t i = 0, n = vec_len(params); i < n; i++) {
 				const char *name = vec_get_rawptr(params, i);
-				append_param(out, name, find_param(doc, name), f, tab);
+				append_param(out, name, find_param(doc, name), f, tab, pedantic);
 			}
 			strbuf_append_char(out, '\n');
 		}
@@ -398,7 +400,7 @@ static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cd
 		strbuf_append(out, "**Parameters**\n\n");
 		for (size_t i = 0, n = vec_len(doc->params); i < n; i++) {
 			const cdparam *p = vec_get(doc->params, i);
-			append_param(out, p->name, p, f, tab);
+			append_param(out, p->name, p, f, tab, pedantic);
 		}
 		strbuf_append_char(out, '\n');
 	}
@@ -407,16 +409,20 @@ static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cd
 	}
 
 	// return value
+	// (an undocumented one is omitted, unless pedantic, or moved to the caller)
 	bool returns = d && d->kind == CDD_FUNC && cddecl_returns_value(d);
-	if (doc->ret || returns) {
+	bool ret_doc = doc->ret && doc->ret[0];
+	if (ret_doc || (pedantic && (doc->ret || returns))) {
 		strbuf_append(out, "**Returns");
 		strbuf_append(out, doc->ret_move ? "** (moved to the caller): " : ":** ");
-		if (doc->ret && doc->ret[0]) {
+		if (ret_doc) {
 			append_text(out, doc->ret, f, tab, 0, "");
 		} else {
 			strbuf_append(out, "*undocumented*");
 		}
 		strbuf_append(out, "\n\n");
+	} else if (doc->ret_move) {
+		strbuf_append(out, "**Returns** (moved to the caller).\n\n");
 	}
 
 	for (size_t i = 0, n = vec_len(doc->warnings); i < n; i++) {
@@ -445,7 +451,9 @@ static void append_body(strbuf *out, const cddecl *d, const cddoc *doc, const cd
 }
 
 
-static void append_members(strbuf *out, const cddecl *d, const cdfile *f, const cdsymtab *tab)
+// An undocumented member is listed by name only, unless pedantic
+static void append_members(strbuf *out, const cddecl *d, const cdfile *f, const cdsymtab *tab,
+                           bool pedantic)
 {
 	if (!d->members || vec_len(d->members) == 0) {
 		return;
@@ -455,12 +463,13 @@ static void append_members(strbuf *out, const cddecl *d, const cdfile *f, const 
 		const cddecl *m = vec_get(d->members, i);
 		strbuf_append(out, "- `");
 		strbuf_append(out, m->name);
-		strbuf_append(out, "`: ");
+		strbuf_append(out, "`");
 		cddoc *doc = m->doc ? cddoc_parse(m->doc, strlen(m->doc)) : NULL;
 		if (doc && doc->brief[0]) {
+			strbuf_append(out, ": ");
 			append_text(out, doc->brief, f, tab, 0, "  ");
-		} else {
-			strbuf_append(out, "*undocumented*");
+		} else if (pedantic) {
+			strbuf_append(out, ": *undocumented*");
 		}
 		cddoc_free(doc);
 		strbuf_append_char(out, '\n');
@@ -696,7 +705,7 @@ static void append_contents(strbuf *out, const cdfile *f, const cdsymtab *tab)
 }
 
 
-char *cdmd_page(const cdfile *f, const cdsymtab *tab)
+char *cdmd_page(const cdfile *f, const cdsymtab *tab, bool pedantic)
 {
 	strbuf *out = strbuf_new();
 	strbuf_append(out, "# ");
@@ -758,7 +767,7 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 	// 1. description
 	strbuf_append(out, "## Description\n\n");
 	size_t before = strbuf_len(out);
-	append_body(out, NULL, doc, f, tab, 1);
+	append_body(out, NULL, doc, f, tab, 1, pedantic);
 	if (strbuf_len(out) == before) {
 		strbuf_append(out, "*No description.*\n\n");
 	}
@@ -786,9 +795,9 @@ char *cdmd_page(const cdfile *f, const cdsymtab *tab)
 			cddoc *ddoc = item_doc(it);
 			append_brief(out, ddoc, f, tab);
 			strbuf_append(out, "\n\n");
-			append_body(out, d, ddoc, f, tab, 3);
+			append_body(out, d, ddoc, f, tab, 3, pedantic);
 			cddoc_free(ddoc);
-			append_members(out, d, f, tab);
+			append_members(out, d, f, tab, pedantic);
 			if (it->fam) {
 				append_generated(out, it->fam);
 			} else {

@@ -66,6 +66,8 @@ cliparser *create_cli_parser()
 	                                      OPT_OPTIONAL, OPT_SINGLE, ARG_DIR, 1, 1, NULL, NULL));
 	cliparser_add_option(clip, cliopt_new_defaults('l', "lint",
 	                     "Check the documentation comments against the COCADA style"));
+	cliparser_add_option(clip, cliopt_new_defaults('p', "pedantic",
+	                     "Mark undocumented parameters, return values and members in the pages"));
 	cliparser_add_option(clip, cliopt_new_defaults('s', "symbols",
 	                     "Dump the symbol table of all input files (debug)"));
 	cliparser_add_option(clip, cliopt_new_defaults('D', "docs",
@@ -298,7 +300,7 @@ static bool write_file(const char *dir, const char *name, const char *text)
 
 // Writes the pages of all files and the index to dir
 static bool write_docs(const char *dir, const vec *files, const cdsymtab *tab,
-                       const char *title)
+                       const char *title, bool pedantic)
 {
 	if (!make_dirs(dir)) {
 		fprintf(stderr, "cocadoc: cannot create directory %s\n", dir);
@@ -308,7 +310,7 @@ static bool write_docs(const char *dir, const vec *files, const cdsymtab *tab,
 	for (size_t i = 0, n = vec_len(files); i < n; i++) {
 		const cdfile *f = vec_get_rawptr(files, i);
 		char *name = cdmd_page_name(f);
-		char *page = cdmd_page(f, tab);
+		char *page = cdmd_page(f, tab, pedantic);
 		ok = write_file(dir, name, page) && ok;
 		FREE(page);
 		FREE(name);
@@ -376,6 +378,7 @@ int main(int argc, char **argv)
 	bool docs = cliparser_opt_used_from_shortname(clip, 'D');
 	bool lint = cliparser_opt_used_from_shortname(clip, 'l');
 	bool symbols = cliparser_opt_used_from_shortname(clip, 's');
+	bool pedantic = cliparser_opt_used_from_shortname(clip, 'p');
 	bool debug = tokens || decls || docs || lint || symbols;
 	size_t nwarns = 0, counts[NRULES] = {0};
 	const vec *args = cliparser_arg_val_from_pos(clip, 0);
@@ -457,7 +460,7 @@ int main(int argc, char **argv)
 	cdsymtab *tab = (lint || symbols || outdir) ? cdsymtab_new(loaded) : NULL;
 	if (outdir && vec_len(loaded) > 0) {
 		char *title = index_title(cfg);
-		if (!write_docs(outdir, loaded, tab, title)) {
+		if (!write_docs(outdir, loaded, tab, title, pedantic)) {
 			ret = EXIT_FAILURE;
 		}
 		FREE(title);

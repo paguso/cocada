@@ -69,6 +69,8 @@ static const char *SRC_A =
     " * @see b_func, b.h\n"
     " */\n"
     "point *take(point *p, int n);\n"
+    "/**\n * @brief The area.\n * @param w The width.\n */\n"
+    "int area(int w, int h);\n"
     "void undoc(void);\n"
     "#define TWICE(X) (2 * (X))\n";
 
@@ -106,7 +108,7 @@ void test_cdmd_page(CuTest *tc)
 	CuAssertStrEquals(tc, "a.md", name);
 	FREE(name);
 
-	char *page = cdmd_page(a, tab);
+	char *page = cdmd_page(a, tab, true);
 	// header, navigation, description, contents
 	ASSERT_HAS(page, "# a.h\n\nModule A.\n\n**Author:** A\n\n"
 	           "**AI involvement:** [AI-generated, human-directed](ai-levels.md#ai-generated) "
@@ -135,6 +137,8 @@ void test_cdmd_page(CuTest *tc)
 	ASSERT_HAS(page, "- `p` **(moved)**: The point.\n- `n`: *undocumented*");
 	ASSERT_HAS(page, "**Returns** (moved to the caller): The copy.");
 	ASSERT_HAS(page, "> **Warning:** Careful\n> - really");
+	// pedantic: undocumented parameters and return values are marked
+	ASSERT_HAS(page, "- `w`: The width.\n- `h`: *undocumented*\n\n**Returns:** *undocumented*\n\n");
 	ASSERT_HAS(page, "**See also:** [b_func](b.md#b_func), [b.h](b.md)");
 	// undocumented function and macro
 	ASSERT_HAS(page, "### undoc\n\n```c\nvoid undoc(void);\n```\n\n*Undocumented.*\n\n"
@@ -144,7 +148,20 @@ void test_cdmd_page(CuTest *tc)
 	ASSERT_LACKS(page, "**Returns:** *undocumented*\n\n### TWICE"); // void: no return
 
 	FREE(page);
-	page = cdmd_page(b, tab);
+
+	// relaxed (default): undocumented parameters by name only, undocumented
+	// return values omitted
+	page = cdmd_page(a, tab, false);
+	ASSERT_HAS(page, "- `w`: The width.\n- `h`\n\n[Back to contents](#contents)");
+	ASSERT_HAS(page, "- `p` **(moved)**: The point.\n- `n`\n");
+	ASSERT_HAS(page, "**Returns** (moved to the caller): The copy.");
+	ASSERT_LACKS(page, "- `h`: *undocumented*");
+	ASSERT_LACKS(page, "- `n`: *undocumented*");
+	ASSERT_LACKS(page, "**Returns:** *undocumented*");
+	ASSERT_HAS(page, "- `x`: The x **coordinate**\n- `y`\n\n");
+	FREE(page);
+
+	page = cdmd_page(b, tab, true);
 	ASSERT_HAS(page, "[Back to module index](index.md#lib)");
 	ASSERT_LACKS(page, "AI involvement"); // no @ai: human, no note
 	// macro-generated functions: contents, entry, links; generator hidden

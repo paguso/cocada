@@ -65,7 +65,7 @@ debug_objs = $(patsubst %.c,$(debug_build_dir)/%.o,$(debug_srcs))
 
 .PHONY: build_debug
 build_debug: $(debug_build_dir) $(debug_objs) 
-	$(CC) $(debug_objs) -lm -o $(debug_build_dir)/cocadoc
+	$(CC) $(debug_objs) $(CFLAGS) -lm -o $(debug_build_dir)/cocadoc
 
 
 #
@@ -87,7 +87,7 @@ $(test_objs): | $(test_build_dir)
 
 .PHONY: test
 test: $(test_objs)
-	$(CC) $(test_objs) -lm -o $(test_build_dir)/test
+	$(CC) $(test_objs) $(CFLAGS) -lm -o $(test_build_dir)/test
 
 #
 # Release build
@@ -107,7 +107,7 @@ release_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(release_srcs))
 
 .PHONY: build
 build: $(release_build_dir) $(release_objs) 
-	$(CC) $(release_objs) -lm -o $(release_build_dir)/cocadoc
+	$(CC) $(release_objs) $(CFLAGS) -lm -o $(release_build_dir)/cocadoc
 
 -include $(debug_objs:.o=.d) $(release_objs:.o=.d) $(test_objs:.o=.d)
 

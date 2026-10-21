@@ -69,9 +69,13 @@ char *cdmd_page_name(const cdfile *f);
  * @brief Generates the documentation page of a file.
  * @param f The file.
  * @param tab The symbol table to resolve references with.
+ * @param pedantic Whether undocumented parameters, return values and
+ *        members are marked as such. Otherwise undocumented parameters and
+ *        members are listed by name only, and undocumented return values
+ *        are omitted.
  * @return @move The page (Markdown).
  */
-char *cdmd_page(const cdfile *f, const cdsymtab *tab);
+char *cdmd_page(const cdfile *f, const cdsymtab *tab, bool pedantic);
 
 
 /**
