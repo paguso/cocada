@@ -142,8 +142,8 @@ void test_fasta_next(CuTest *tc)
 		fasta_next_res result = fasta_next(f);
 		CuAssert(tc, "fasta_next error", result.ok);
 		const fasta_rec *rr = result.val.ok;
-		CuAssertSizeTEquals(tc, id_offsets[i], rr->hdr_offset);
-		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
+		CuAssertSizeTEquals(tc, id_offsets[i], rr->hdr_off);
+		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_off);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
 		size_t k = 0;

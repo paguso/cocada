@@ -28,10 +28,14 @@
 #include "strread.h"
 
 /**
- * @file fasta.h
- * @brief fastq file sequence reader.
+ * @file fastq.h
+ * @brief FASTQ file sequence reader.
  * @author Paulo Fonseca
  *
+ * The #fastq reader provides a way to iterate through the records
+ * defined in a FASTQ-format file
+ *
+ * @see https://en.wikipedia.org/wiki/FASTQ_format
  */
 
 
@@ -50,9 +54,9 @@ typedef struct {
 	char *seq;			/**< In-memory sequence content */
 	char *qlty;   		/**< In-memory sequence content */
 	size_t seq_len;		/**< The length of the sequence */
-	size_t hdr_offset;	/**< Id offset from the start of the file (starting from the @) */
-	size_t seq_offset;	/**< Sequence offset from the start of the file */
-	size_t qlty_offset;	/**< Quality offset from the start of the file */
+	size_t hdr_off;		/**< Id offset from the start of the file (starting from the @) */
+	size_t seq_off;		/**< Sequence offset from the start of the file */
+	size_t qlty_off;	/**< Quality offset from the start of the file */
 } fastq_rec;
 
 
@@ -65,14 +69,14 @@ DECL_RESULT_OK_ERR(fastq_open, fastq*, code_msg_err)
 /**
  * @brief Opens a fastq file and places the cursor at its beginning.
  *
- * @param filename The path to the file
+ * @param path The path to the file
  *
  * @return An OK-Error result containing a pointer to a #fastq, in
  * case of success, or a #code_msg_err in case of an error
  *
  * @see result.h
  */
-fastq_open_res fastq_open(const char *filename);
+fastq_open_res fastq_open(const char *path);
 
 
 /**
@@ -81,30 +85,45 @@ fastq_open_res fastq_open(const char *filename);
 const char *fastq_path(fastq *self);
 
 
-/**
- * @brief Checks whether there is a sequence *after* the current
- * cursor position
- */
-bool fastq_has_next(fastq *self);
-
 
 /**
- * @brief Sets the position of the stream to the beginning of the file.
+ * @brief Resets the reader to the beginning of the file.
  */
 void fastq_rewind(fastq *self);
+
+
+/**
+ * @brief Moves the stream reader to the sequence at the given  offset
+ *
+ * @param hdr_off The offset of the description line of the record
+ * starting with '@'
+ *
+ * @return If the operation succeeds and the offset position
+ * contains a record start char '@', return true; else rewinds to
+ * the beginning of the file via #fasta_rewind and return false.
+ */
+bool fastq_goto(fastq *self, size_t hdr_off);
+
+
+/**
+ * @brief Checks whether there is a sequence *after* the current
+ * cursor position. To be used for iterating over the fastq
+ * records in conjunction with #fastq_next
+ */
+bool fastq_has_next(fastq *self);
 
 
 /**
  * @brief FASTQ Parse error codes
  */
 typedef enum {
-	FASTQ_EXPECTED_HEADER,
+	FASTQ_MISSING_HDR,
 	FASTQ_EMPTY_ID,
-	FASTQ_EMPTY_SEQUENCE,
-	FASTQ_EXPECTED_SEPARATOR,
-	FASTQ_WRONG_QLTY_SEQUENCE_LENGTH
+	FASTQ_EMPTY_SEQ,
+	FASTQ_MISSING_SEP,
+	FASTQ_WRONG_QLTY_LEN
 }
-fastq_error_code;
+fastq_err_code;
 
 
 /**
@@ -112,19 +131,19 @@ fastq_error_code;
  *
  * @see fastq_error_code
  */
-extern const char *const fastq_error_messages[5];
+extern const char *const fastq_err_msg[5];
 
 
 /**
  * @brief Fastq parse error
  */
 typedef struct {
-	fastq_error_code code; /**< The error code **/
-	size_t line;		   /**< The line at which the error occurs */
-} fastq_error;
+	fastq_err_code code;   /**< The error code **/
+	size_t off;		       /**< The offset at which the error occurs */
+} fastq_err;
 
 
-DECL_RESULT_OK_ERR(fastq_next, const fastq_rec *, fastq_error)
+DECL_RESULT_OK_ERR(fastq_next, const fastq_rec *, fastq_err)
 
 /**
  * @brief Advances the cursor to the next sequence record, loading

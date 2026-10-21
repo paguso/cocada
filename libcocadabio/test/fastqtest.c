@@ -127,9 +127,9 @@ void test_fastq_next(CuTest *tc)
 		fastq_next_res r = fastq_next(f);
 		CuAssert(tc, "fastq_next error", r.ok);
 		const fastq_rec *rr = r.val.ok;
-		CuAssertSizeTEquals(tc, id_offsets[i], rr->hdr_offset);
-		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_offset);
-		CuAssertSizeTEquals(tc, qlty_offsets[i], rr->qlty_offset);
+		CuAssertSizeTEquals(tc, id_offsets[i], rr->hdr_off);
+		CuAssertSizeTEquals(tc, seq_offsets[i], rr->seq_off);
+		CuAssertSizeTEquals(tc, qlty_offsets[i], rr->qlty_off);
 		CuAssertStrEquals(tc, id[i], rr->id);
 		CuAssertStrEquals(tc, desc[i], rr->descr);
 		size_t seq_i_len = strlen(seq[i]);
