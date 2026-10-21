@@ -125,7 +125,7 @@
 		union {\
 			OK_TYPE ok;     /**< Successful result value */ \
 			ERR_TYPE err;   /**< Unsucessful result value */\
-		} val;\
+		} val;              /**< The value(Ok/Err) attached to the result */\
 	} NAME##_res;
 
 /**

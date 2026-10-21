@@ -56,7 +56,9 @@ typedef struct {
 } fastq_rec;
 
 
-
+/**
+ * @brief Ok-Error result for FASTQ open stream
+ */
 DECL_RESULT_OK_ERR(fastq_open, fastq*, code_msg_err)
 
 
