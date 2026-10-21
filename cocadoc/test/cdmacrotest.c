@@ -67,6 +67,7 @@ static const char *SRC_VEC =
     "/**\n * @brief The iterator as an iter.\n */\n"
     "DECL_TRAIT(vec_iter, iter);\n"
     "DECL_RESULT_OK(semver, semver *);\n"
+    "DECL_RESULT_OK(version, int);\n"
     "UNKNOWN_MACRO(x)\n"
     "REC(1)\n";
 
@@ -89,8 +90,8 @@ void test_cdmacro_families(CuTest *tc)
 
 	vec *warns = vec_new(sizeof(cdmacrowarn));
 	vec *fams = cdmacro_families(tab, vf, warns);
-	// vec_push, vec_get, one, two, as_trait, result
-	CuAssertSizeTEquals(tc, 6, vec_len(fams));
+	// vec_push, vec_get, one, two, as_trait, semver_res, version_res
+	CuAssertSizeTEquals(tc, 7, vec_len(fams));
 
 	const cdfamily *push = vec_get(fams, 0);
 	CuAssertStrEquals(tc, "DECL_VEC_PUSH", push->gen->name);
@@ -145,6 +146,21 @@ void test_cdmacro_families(CuTest *tc)
 	CuAssertStrEquals(tc, "/**< Success */", ((cddecl *)vec_get(inst->members, 0))->doc);
 	CuAssertStrEquals(tc, "/**< The semver * value */", ((cddecl *)vec_get(inst->members, 1))->doc);
 	CuAssertStrEquals(tc, "/**< The T value */", ((cddecl *)vec_get(res->pattern->members, 1))->doc);
+	CuAssertTrue(tc, res->direct);
+	CuAssertTrue(tc, !push->direct);
+
+	// each direct invocation of a generator makes a family of its own
+	const cdfamily *res2 = vec_get(fams, 6);
+	CuAssertTrue(tc, res2->gen == res->gen);
+	CuAssertTrue(tc, res2->direct);
+	CuAssertSizeTEquals(tc, 1, vec_len(res->instances));
+	CuAssertSizeTEquals(tc, 1, vec_len(res2->instances));
+	CuAssertStrEquals(tc, "version_res", cdfamily_name(res2));
+	CuAssertSizeTEquals(tc, 1, vec_len(res2->via));
+	CuAssertStrEquals(tc, "DECL_RESULT_OK(version, int)", (char *)vec_get_rawptr(res2->via, 0));
+	const cddecl *inst2 = ((const cdinstance *)vec_get(res2->instances, 0))->decl;
+	CuAssertTrue(tc, res2->doc_decl == NULL); // no doc in the body
+	CuAssertStrEquals(tc, "/**< The int value */", ((cddecl *)vec_get(inst2->members, 1))->doc);
 
 	// generators
 	const vec *pats;

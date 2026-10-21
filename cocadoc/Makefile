@@ -57,7 +57,7 @@ debug_cflags += -fpic
 
 
 $(debug_build_dir)/%.o: %.c
-	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(debug_cflags) $< -o $@
+	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(debug_cflags) $(CFLAGS) $< -o $@
 
 
 debug_srcs = $(cocada_srcs) $(srcs)
@@ -100,7 +100,7 @@ release_cflags += -DXCHAR_BYTES=4
 release_cflags += -O3
 
 $(release_build_dir)/%.o: %.c
-	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(release_cflags) $< -o $@
+	$(CC) -c $(INCLUDE_CFLAGS) $(DEP_CFLAGS) $(release_cflags) $(CFLAGS) $< -o $@
 
 release_srcs = $(cocada_srcs) $(srcs)
 release_objs = $(patsubst %.c,$(release_build_dir)/%.o,$(release_srcs))
